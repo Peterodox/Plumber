@@ -1,4 +1,4 @@
---Show a list of Dreamseed when appoaching Emarad Bounty Soil.
+--Show a list of Dreamseed when approaching Emerald Bounty Soil.
 --Show checkmark if the Plant's achievement criteria is complete
 --10 yd range: Plant Seed
 
