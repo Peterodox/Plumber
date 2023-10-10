@@ -4,10 +4,19 @@ local API = addon.API;
 local BUTTON_MIN_SIZE = 24;
 
 local Mixin = API.Mixin;
+local FadeFrame = API.UIFrameFade;
+
 local select = select;
 local tinsert = table.insert;
+local floor = math.floor;
+local time = time;
 local IsMouseButtonDown = IsMouseButtonDown;
 local PlaySound = PlaySound;
+local GetItemCount = GetItemCount;
+local GetSpellCharges = GetSpellCharges;
+local C_Item = C_Item;
+local CreateFrame = CreateFrame;
+
 
 local function DisableSharpening(texture)
     texture:SetTexelSnappingBias(0);
@@ -455,43 +464,24 @@ end
 do  -- TokenFrame
     local TOKEN_FRAME_SIDE_PADDING = 12;
     local TOKEN_FRAME_BUTTON_PADDING = 8;
-    local TOKEN_BUTTON_TEXT_ICON_GAP = 0;
+    local TOKEN_BUTTON_TEXT_ICON_GAP = 2;
     local TOKEN_BUTTON_ICON_SIZE = 12;
     local TOKEN_BUTTON_HEIGHT = 12;
 
-    local TokenDisplay = {};
+    local TokenDisplayMixin = {};
 
-    local function CreateTokenDisplay()
-        return API.CreateFromMixins(TokenDisplay)
+    local function CreateTokenDisplay(parent)
+        local f = addon.CreateThreeSliceFrame(parent);
+        f:SetHeight(16);
+        f:SetWidth(32);
+        Mixin(f, TokenDisplayMixin);
+        f.currencies = {};
+        f.tokenButtons = {};
+        return f
     end
-
     addon.CreateTokenDisplay = CreateTokenDisplay;
 
-    function TokenDisplay:GetFrame(hideBorder)
-        if not self.frame then
-            local f = CreateFrame("Frame", nil, UIParent, "ContainerFrameCurrencyBorderTemplate");
-            f:SetWidth(34);
-            f:SetPoint("CENTER", 0, 0);
-            f:Hide();
-            if not hideBorder then
-                f.leftEdge = "common-currencybox-left";
-                f.rightEdge = "common-currencybox-right";
-                f.centerEdge = "_common-currencybox-center";
-                f:OnLoad();
-            end
-            self.currencies = {};
-            self.tokenButtons = {};
-            self.frame = f;
-        end
-
-        return self.frame
-    end
-
-    function TokenDisplay:SetFrameWidth(width)
-        self.frame:SetWidth(width);
-    end
-
-    function TokenDisplay:AddCurrency(currencyID)
+    function TokenDisplayMixin:AddCurrency(currencyID)
         for i, id in ipairs(self.currencies) do
             if id == currencyID then
                 return
@@ -502,7 +492,7 @@ do  -- TokenFrame
         self:Update();
     end
 
-    function TokenDisplay:RemoveCurrency(currencyID)
+    function TokenDisplayMixin:RemoveCurrency(currencyID)
         local anyChange = false;
 
         if currencyID then
@@ -517,7 +507,7 @@ do  -- TokenFrame
         end
     end
 
-    function TokenDisplay:SetCurrencies(...)
+    function TokenDisplayMixin:SetCurrencies(...)
         self.currencies = {};
 
         local n = select('#', ...);
@@ -558,19 +548,17 @@ do  -- TokenFrame
         end
 
         --update width
-        local span = TOKEN_BUTTON_ICON_SIZE + TOKEN_BUTTON_TEXT_ICON_GAP + math.floor(self.Count:GetWrappedWidth() + 0.5);
+        local span = TOKEN_BUTTON_ICON_SIZE + TOKEN_BUTTON_TEXT_ICON_GAP + floor(self.Count:GetWrappedWidth() + 0.5);
         self:SetWidth(span);
         return span
     end
 
-    function TokenDisplay:AcquireTokenButton(index)
+    function TokenDisplayMixin:AcquireTokenButton(index)
         if not self.tokenButtons[index] then
-            local f = self:GetFrame();
-
-            local button = CreateFrame("Frame", nil, f);
+            local button = CreateFrame("Frame", nil, self);
 
             if index == 1 then
-                button:SetPoint("LEFT", f, "LEFT", TOKEN_FRAME_SIDE_PADDING, 0);
+                button:SetPoint("LEFT", self, "LEFT", TOKEN_FRAME_SIDE_PADDING, 0);
             else
                 button:SetPoint("LEFT", self.tokenButtons[index - 1], "RIGHT", TOKEN_FRAME_BUTTON_PADDING, 0);
             end
@@ -580,6 +568,7 @@ do  -- TokenFrame
             button.Icon = button:CreateTexture(nil, "ARTWORK");
             button.Icon:SetPoint("RIGHT", button, "RIGHT", 0, 0);
             button.Icon:SetSize(TOKEN_BUTTON_ICON_SIZE, TOKEN_BUTTON_ICON_SIZE);
+            button.Icon:SetTexCoord(0.0625, 0.9375, 0.0625, 0.9375);
 
             button.Count = button:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall");
             button.Count:SetJustifyH("RIGHT");
@@ -594,7 +583,7 @@ do  -- TokenFrame
         return self.tokenButtons[index]
     end
 
-    function TokenDisplay:Update()
+    function TokenDisplayMixin:Update()
         local numVisible = #self.currencies;
         local button;
 
@@ -612,49 +601,85 @@ do  -- TokenFrame
         if totalWidth < TOKEN_BUTTON_ICON_SIZE then
             totalWidth = TOKEN_BUTTON_ICON_SIZE;
         end
-        self:SetFrameWidth(totalWidth);
+        self:SetWidth(totalWidth);
 
         for i = numVisible + 1, #self.tokenButtons do
             self.tokenButtons[i]:Hide();
         end
     end
 
-    function TokenDisplay:SetFrameOwner(owner, position)
+    function TokenDisplayMixin:SetFrameOwner(owner, position)
         --To avoid taint, our frame isn't parent-ed to owner
         local b = owner:GetBottom();
         local r = owner:GetRight();
 
-        local f = self:GetFrame();
-        f:ClearAllPoints();
-
-        f:SetFrameStrata("FULLSCREEN");
+        self:ClearAllPoints();
+        self:SetFrameStrata("FULLSCREEN");
 
         local realParent = UIParent;
         local scale = realParent:GetScale();
 
         if position == "BOTTOMRIGHT" then
-            f:SetPoint("BOTTOMRIGHT", realParent, "BOTTOMLEFT", r, b);
+            self:SetPoint("BOTTOMRIGHT", realParent, "BOTTOMLEFT", r, b);
             --f:SetPoint("CENTER", UIParent, "BOTTOM", 0, 64)
         end
 
-        f:Show();
+        self:Show();
     end
 
-    function TokenDisplay:DisplayCurrencyOnFrame(owner, position, ...)
+    function TokenDisplayMixin:DisplayCurrencyOnFrame(owner, position, ...)
         self:SetFrameOwner(owner, position);
         self:SetCurrencies(...);
     end
 
-    function TokenDisplay:HideTokenFrame()
-        if self.frame and self.frame:IsShown() then
-            self.frame:Hide();
-            self.frame:ClearAllPoints();
+    function TokenDisplayMixin:HideTokenFrame()
+        if self:IsShown() then
+            self:Hide();
+            self:ClearAllPoints();
         end
     end
 end
 
-do  -- PeudoActionButton (a real ActionButtonTemplate will be )
+do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the button onMouseOver)
+    local PostClickOverlay;
+
+    local function PostClickOverlay_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        self.alpha = 1 - self.t*5;
+        self.scale = 1 + self.t*0.5;
+        if self.alpha < 0 then
+            self.alpha = 0;
+            self:Hide();
+        end
+        self:SetAlpha(self.alpha);
+        self:SetScale(self.scale);
+    end
+
     local PeudoActionButtonMixin = {};
+
+    function PeudoActionButtonMixin:ShowPostClickEffect()
+        if not PostClickOverlay then
+            PostClickOverlay = CreateFrame("Frame", nil, self);
+            PostClickOverlay:Hide();
+            PostClickOverlay:SetScript("OnUpdate", PostClickOverlay_OnUpdate);
+            PostClickOverlay:SetSize(64, 64);
+
+            local texture = PostClickOverlay:CreateTexture(nil, "OVERLAY");
+            PostClickOverlay.Texture = texture;
+            texture:SetSize(64, 64);
+            texture:SetPoint("CENTER", PostClickOverlay, "CENTER", 0, 0);
+            texture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-PostClickFeedback");
+            texture:SetBlendMode("ADD");
+        end
+
+        PostClickOverlay:ClearAllPoints();
+        PostClickOverlay:SetParent(self);
+        PostClickOverlay:SetScale(1);
+        PostClickOverlay:SetAlpha(0);
+        PostClickOverlay.t = 0;
+        PostClickOverlay:SetPoint("CENTER", self, "CENTER", 0, 0);
+        PostClickOverlay:Show();
+    end
 
     function PeudoActionButtonMixin:SetIcon(icon)
         self.Icon:SetTexture(icon);
@@ -672,29 +697,58 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be )
 
     function PeudoActionButtonMixin:SetItem(item)
         local icon = C_Item.GetItemIconByID(item);
-        local count = GetItemCount(item);
-
         self:SetIcon(icon);
         self.id = item;
         self.actionType = "item";
+        self:UpdateCount();
+    end
+
+    function PeudoActionButtonMixin:UpdateCount()
+        local count = 0;
+
+        if self.actionType == "item" then
+            count = GetItemCount(self.id);
+            self.Count:SetText(count);
+        elseif self.actionType == "spell" then
+            local currentCharges, maxCharges = GetSpellCharges();
+            if currentCharges then
+                count = currentCharges;
+            else
+                self.Count:SetText("");
+            end
+        end
+
+        self.charges = count;
 
         if count > 0 then
             self:SetIconState(1);
         else
             self:SetIconState(2);
+            self.Count:SetText("");
         end
+    end
 
-        self.Count:SetText(count);
+    function PeudoActionButtonMixin:GetCharges()
+        if not self.charges then
+            self:UpdateCount();
+        end
+        return self.charges
+    end
+
+    function PeudoActionButtonMixin:HasCharges()
+        return self:GetCharges() > 0
     end
 
     function PeudoActionButtonMixin:SetStatePushed()
         self.NormalTexture:Hide();
         self.PushedTexture:Show();
+        self.Icon:SetSize(39, 39);
     end
 
     function PeudoActionButtonMixin:SetStateNormal()
         self.NormalTexture:Show();
         self.PushedTexture:Hide();
+        self.Icon:SetSize(40, 40);
     end
 
     local function CreatePeudoActionButton(parent)
@@ -752,8 +806,95 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be )
 
         return button
     end
-
     addon.CreatePeudoActionButton = CreatePeudoActionButton;
+
+
+    local ActionButtonSpellCastOverlayMixin = {};
+
+    function ActionButtonSpellCastOverlayMixin:FadeIn()
+        FadeFrame(self, 0.25, 1, 0);
+    end
+
+    function ActionButtonSpellCastOverlayMixin:FadeOut()
+        FadeFrame(self, 0.25, 0);
+        self.Cooldown:Pause();
+    end
+
+    local PI2 = -2*math.pi;
+
+    local function Cooldown_OnUpdate(self, elapsed)
+        --Animation will desync once the frame becomes hidden
+        self.t = self.t + elapsed;
+        if self.t < self.duration then
+            self.EdgeTexture:SetRotation( self.t/self.duration * PI2 );
+        end
+    end
+
+    function ActionButtonSpellCastOverlayMixin:SetDuration(second)
+        second = second or 0;
+        self.Cooldown:SetCooldownDuration(second);
+        if second > 0 then
+            self.Cooldown:Resume();
+            self.Cooldown.t = 0;
+            self.Cooldown.duration = second;
+            self.Cooldown:SetScript("OnUpdate", Cooldown_OnUpdate);
+            self.Cooldown.EdgeTexture:Show();
+            self.Cooldown.EdgeTexture:SetRotation(0);
+            self.supposedEndTime = time() + second;
+        else
+            self.Cooldown:SetScript("OnUpdate", nil);
+            self.Cooldown.EdgeTexture:Hide();
+            self.supposedEndTime = nil;
+        end
+    end
+
+    local function CreateActionButtonSpellCastOverlay(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetSize(46, 46);
+
+        --[[
+        f.Border = f:CreateTexture(nil, "BACKGROUND", nil, 4);
+        f.Border:SetSize(64, 64);
+        f.Border:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.Border:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-SpellCast-Border", nil, nil, "TRILINEAR");
+        f.Border:SetTexCoord(0, 1, 0, 1);
+        f.Border:Hide();
+        --]]
+
+        local InnerShadow = f:CreateTexture(nil, "OVERLAY", nil, 1);   --Use this texture to increase contrast (HighlightTexture/SwipeTexture)
+        InnerShadow:SetSize(64, 64);
+        InnerShadow:SetPoint("CENTER", f, "CENTER", 0, 0);
+        InnerShadow:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-SpellCast-InnerShadow");
+        InnerShadow:SetTexCoord(0, 1, 0, 1);
+
+        f.Cooldown = CreateFrame("Cooldown", nil, f);
+        f.Cooldown:SetSize(64, 64);
+        f.Cooldown:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.Cooldown:SetHideCountdownNumbers(false);
+
+        f.Cooldown:SetSwipeTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-SpellCast-Swipe");
+        f.Cooldown:SetSwipeColor(1, 1, 1);
+        f.Cooldown:SetDrawSwipe(true);
+
+        ---- It seems creating edge doesn't work in Lua
+        --f.Cooldown:SetEdgeTexture("Interface/Cooldown/edge", 1, 1, 1, 1);  --Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-SpellCast-Edge
+        --f.Cooldown:SetDrawEdge(true);
+        --f.Cooldown:SetEdgeScale(1);
+        --f.Cooldown:SetUseCircularEdge(true);
+
+        local EdgeTexture = f.Cooldown:CreateTexture(nil, "OVERLAY", nil, 6);
+        f.Cooldown.EdgeTexture = EdgeTexture;
+        EdgeTexture:SetSize(64, 64);
+        EdgeTexture:SetPoint("CENTER", f, "CENTER", 0, 0);
+        EdgeTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-SpellCast-Edge");
+        EdgeTexture:SetTexCoord(0, 1, 0, 1);
+        EdgeTexture:Hide();
+
+        Mixin(f, ActionButtonSpellCastOverlayMixin);
+
+        return f
+    end
+    addon.CreateActionButtonSpellCastOverlay = CreateActionButtonSpellCastOverlay;
 end
 
 
@@ -850,4 +991,257 @@ do  --(In)Secure Button Pool
         return CreateSecureActionButton()
     end
     addon.AcquireSecureActionButton = AcquireSecureActionButton;
+end
+
+
+do
+    local SecondsToTime = API.SecondsToTime;
+
+    local TimerFrameMixin = {};
+    --t0:  totalElapsed
+    --t1: totalElapsed (between 0 - 1)
+    --s1: elapsedSeconds
+    --s0: full duration
+
+    function TimerFrameMixin:Init()
+        if not self.styleID then
+            self:SetStyle(2);
+            self:SetBarColor(131/255, 208/255, 228/255);
+            self:AbbreviateTimeText(true);
+        end
+    end
+
+    function TimerFrameMixin:Clear()
+        self:SetScript("OnUpdate", nil);
+        self.t0 = 0;
+        self.t1 = 0;
+        self.s1 = 1;
+        self.s0 = 1;
+        self.startTime = nil;
+        if self.BarMark then
+            self.BarMark:Hide();
+        end
+        self.DisplayProgress(self);
+    end
+
+    function TimerFrameMixin:Calibrate()
+        if self.startTime then
+            local currentTime = time();
+            self.t0 = currentTime - self.startTime;
+            self.s1 = self.t0;
+            self.DisplayProgress(self);
+        end
+    end
+
+    function TimerFrameMixin:SetTimes(currentSecond, total)
+        if currentSecond >= total or total == 0 then
+            self:Clear();
+        else
+            self.t0 = currentSecond;
+            self.t1 = 0;
+            self.s1 = floor(currentSecond + 0.5);
+            self.s0 = total;
+            self:SetScript("OnUpdate", self.OnUpdate);
+            self.DisplayProgress(self);
+            self.startTime = time();
+            if self.BarMark and self.styleID == 2 then
+                self.BarMark:Show();
+            end
+        end
+    end
+
+    function TimerFrameMixin:SetDuration(second)
+        self:SetTimes(0, second);
+    end
+
+    function TimerFrameMixin:SetEndTime(endTime)
+        local t = time();
+        self:SetDuration( (t > endTime and (t - endTime)) or 0 );
+    end
+
+    function TimerFrameMixin:SetReverse(reverse)
+        --If reverse, show remaining seconds instead of elpased seconds
+        self.isReverse = reverse;
+    end
+
+    function TimerFrameMixin:OnUpdate(elapsed)
+        self.t0 = self.t0 + elapsed;
+        self.t1 = self.t1 + elapsed;
+
+        if self.t0 >= self.s0 then
+            self:Clear();
+            return
+        end
+
+        if self.t1 > 1 then
+            self.t1 = self.t1 - 1;
+            self.s1 = self.s1 + 1;
+            self.DisplayProgress(self);
+        end
+
+        if self.continuous then
+            self.UpdateEveryFrame(self);
+        end
+    end
+
+    function TimerFrameMixin:AbbreviateTimeText(state)
+        self.abbreviated = state or false;
+    end
+
+    local function DisplayProgress_SimpleText(self)
+        if self.isReverse then
+            self.TimeText:SetText( SecondsToTime(self.s0 - self.s1, self.abbreviated) );
+        else
+            self.TimeText:SetText( SecondsToTime(self.s1, self.abbreviated) );
+        end
+    end
+
+    local function DisplayProgress_StatusBar(self)
+        if self.isReverse then
+            self.fw = (1 - self.s1/self.s0) * self.maxBarFillWidth;
+        else
+            self.fw = (self.s1/self.s0) * self.maxBarFillWidth;
+        end
+        if self.fw < 0.1 then
+            self.fw = 0.1;
+        end
+        self.BarFill:SetWidth(self.fw);
+    end
+
+    local function DisplayProgress_Style2(self)
+        DisplayProgress_SimpleText(self);
+        DisplayProgress_StatusBar(self);
+    end
+
+    local function UpdateEveryFrame_TimeText(self)
+
+    end
+
+    local function UpdateEveryFrame_StatusBar(self)
+        if self.isReverse then
+            self.fw = (1 - self.t0/self.s0) * self.maxBarFillWidth;
+        else
+            self.fw = (self.t0/self.s0) * self.maxBarFillWidth;
+        end
+        if self.fw < 0.1 then
+            self.fw = 0.1;
+        end
+        self.BarFill:SetWidth(self.fw);
+    end
+
+    function TimerFrameMixin:UpdateMaxBarFillWidth()
+        self.maxBarFillWidth = self:GetWidth() - 4;
+    end
+
+    function TimerFrameMixin:SetContinuous(state)
+        --Do something every frame instead of every second
+        self.continuous = state or false;
+    end
+
+    function TimerFrameMixin:SetStyle(styleID)
+        if styleID == self.styleID then return end;
+        self.styleID = styleID;
+
+        if styleID == 1 then
+            --Simple Text
+            self.DisplayProgress = DisplayProgress_SimpleText;
+            self.UpdateEveryFrame = UpdateEveryFrame_TimeText;
+            self.TimeText:SetFontObject("GameTooltipText");
+            self.TimeText:SetTextColor(1, 1, 1);
+            if self.BarLeft then
+                self.BarLeft:Hide();
+                self.BarCenter:Hide();
+                self.BarRight:Hide();
+                self.BarBG:Hide();
+                self.BarFill:Hide();
+                self.BarMark:Hide();
+            end
+        elseif styleID == 2 then
+            --StatusBar
+            self.DisplayProgress = DisplayProgress_Style2;
+            self.UpdateEveryFrame = UpdateEveryFrame_StatusBar;
+
+            local font, height, flag = GameFontHighlightSmall:GetFont();
+            self.TimeText:SetFont(font, 10, "");
+            self.TimeText:SetTextColor(0, 0, 0);
+
+            if not self.BarLeft then
+                local file = "Interface/AddOns/Plumber/Art/Frame/StatusBar_Small";
+                self.BarLeft = self:CreateTexture(nil, "OVERLAY");
+                self.BarLeft:SetSize(16, 32);
+                self.BarLeft:SetTexture(file);
+                self.BarLeft:SetTexCoord(0, 0.25, 0, 0.5);
+                self.BarLeft:SetPoint("CENTER", self, "LEFT", 0, 0);
+
+                self.BarRight = self:CreateTexture(nil, "OVERLAY");
+                self.BarRight:SetSize(16, 32);
+                self.BarRight:SetTexture(file);
+                self.BarRight:SetTexCoord(0.75, 1, 0, 0.5);
+                self.BarRight:SetPoint("CENTER", self, "RIGHT", 0, 0);
+
+                self.BarCenter = self:CreateTexture(nil, "OVERLAY");
+                self.BarCenter:SetTexture(file);
+                self.BarCenter:SetTexCoord(0.25, 0.75, 0, 0.5);
+                self.BarCenter:SetPoint("TOPLEFT", self.BarLeft, "TOPRIGHT", 0, 0);
+                self.BarCenter:SetPoint("BOTTOMRIGHT", self.BarRight, "BOTTOMLEFT", 0, 0);
+
+                self.BarBG = self:CreateTexture(nil, "BACKGROUND");
+                self.BarBG:SetTexture(file);
+                self.BarBG:SetTexCoord(0.015625, 0.265625, 0.515625, 0.765625);
+                self.BarBG:SetSize(14, 14);
+                self.BarBG:SetPoint("LEFT", self, "LEFT", 0, 0);
+                self.BarBG:SetPoint("RIGHT", self, "RIGHT", 0, 0);
+
+                self.BarFill = self:CreateTexture(nil, "ARTWORK");
+                self.BarFill:SetTexture(file);
+                self.BarFill:SetTexCoord(0.296875, 0.5, 0.53125, 0.734375);
+                self.BarFill:SetSize(13, 13);
+                self.BarFill:SetPoint("LEFT", self, "LEFT", 2, 0);
+
+                self.BarMark = self:CreateTexture(nil, "OVERLAY", nil, 1);
+                self.BarMark:SetTexture(file);
+                self.BarMark:SetTexCoord(0.75, 1, 0.515625, 0.765625);
+                self.BarMark:SetSize(16, 16);
+                self.BarMark:SetPoint("CENTER", self.BarFill, "RIGHT", 0, 0);
+
+                API.DisableSharpening(self.BarLeft);
+                API.DisableSharpening(self.BarRight);
+                API.DisableSharpening(self.BarCenter);
+                API.DisableSharpening(self.BarBG);
+                API.DisableSharpening(self.BarFill);
+
+                self:UpdateMaxBarFillWidth();
+            end
+
+            self.BarLeft:Show();
+            self.BarCenter:Show();
+            self.BarRight:Show();
+            self.BarBG:Show();
+            self.BarFill:Show();
+            self.BarMark:Show();
+        end
+    end
+
+    function TimerFrameMixin:SetBarColor(r, g, b)
+        if self.BarFill then
+            self.BarFill:SetVertexColor(r, g, b);
+        end
+    end
+
+    local function CreateTimerFrame(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetSize(48, 16);
+
+        f.TimeText = f:CreateFontString(nil, "OVERLAY", "GameTooltipText", 2);
+        f.TimeText:SetJustifyH("CENTER");
+        f.TimeText:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+        Mixin(f, TimerFrameMixin);
+        f:SetScript("OnSizeChanged", f.UpdateMaxBarFillWidth);
+        f:SetScript("OnShow", f.Calibrate);
+        f:Init();
+
+        return f
+    end
+    addon.CreateTimerFrame = CreateTimerFrame;
 end

@@ -1,5 +1,5 @@
-## Interface: 100107
-## Version: 1.0.3
+## Interface: 100200
+## Version: 1.0.4
 
 ## Title: Plumber
 
@@ -23,5 +23,4 @@ Modules\BackpackItemTracker.lua
 Modules\TimeRift.lua
 Modules\PlayerChoiceFrameToken.lua
 Modules\DruidModelFix.lua
-
-Modules\Test.lua
+Modules\Dreamseed.lua

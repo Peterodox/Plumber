@@ -4,7 +4,7 @@ local L = addon.L;
 
 --Module Control Panel
 L["Module Control"] = "Module Control";
-
+L["Quick Slot Generic Description"] = "\n\n*Quick Slot is a set of clickable buttons that appear under certain conditions.";
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Auto Join Events";
@@ -40,4 +40,4 @@ L["ModuleDescription PlayerChoiceFrameToken"] = "Show how many to-be-donated ite
 
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
 L["ModuleName EmeraldBountySeedList"] = "Quick Slot: Dreamseeds";
-L["ModuleDescription EmeraldBountySeedList"] = "Show a list of Dreamseeds when you approach an Emerald Bounty.";
+L["ModuleDescription EmeraldBountySeedList"] = "Show a list of Dreamseeds when you approach an Emerald Bounty."..L["Quick Slot Generic Description"];

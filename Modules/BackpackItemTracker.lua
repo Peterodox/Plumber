@@ -21,6 +21,8 @@ local FORMAT_ITEM_UNIQUE_MULTIPLE = ITEM_UNIQUE_MULTIPLE or "Unique (%d)";
 local PATTERN_UNIQUE_COUNT = string.gsub(FORMAT_ITEM_UNIQUE_MULTIPLE, "[()]", "%%%1");
 PATTERN_UNIQUE_COUNT = string.gsub(PATTERN_UNIQUE_COUNT, "%%d", "(%%d+)");
 
+local GetColorizedItemName = API.GetColorizedItemName;
+
 local CursorHasItem = CursorHasItem;
 local ClearCursor = ClearCursor;
 local GetCursorInfo = GetCursorInfo;
@@ -45,16 +47,6 @@ local HolidayTokens = {
 do
     for _, itemID in pairs(HolidayTokens) do
         AlwaysPinnedItems[itemID] = true;
-    end
-end
-
-local function GetColorizedItemName(itemID)
-    local name = C_Item.GetItemNameByID(itemID);
-    local quality = C_Item.GetItemQualityByID(itemID);
-
-    if name then
-        local color = API.GetItemQualityColor(quality);
-        return color:WrapTextInColorCode(name);
     end
 end
 
@@ -192,7 +184,7 @@ local function ShowItemTooltip(owner, itemID)
 
     local itemName = GetColorizedItemName(itemID);
     if itemName then
-        tooltip:SetText(itemName);
+        tooltip:SetText(itemName, 1, 1, 1, true);
 
         local bonding = ItemDataProvider:GetBondingText(itemID);
         if bonding then
@@ -571,7 +563,7 @@ function SettingsFrame:Init()
 
         b.Name = b:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
         b.Name:SetJustifyH("LEFT");
-        b.Name:SetSize(120, 12);
+        b.Name:SetSize(128, 12);
         b.Name:SetPoint("LEFT", b, "LEFT", ICON_SIZE + 4, 0);
         b.Name:SetMaxLines(1);
         b.Name:SetShadowOffset(1, -1);

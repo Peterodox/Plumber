@@ -9,6 +9,7 @@ local tremove = table.remove;
 local floor = math.floor;
 local sqrt = math.sqrt;
 local time = time;
+local GetCVarBool = C_CVar.GetCVarBool;
 
 do  -- Table
     local function Mixin(object, ...)
@@ -37,6 +38,18 @@ do  -- Table
         end
     end
     API.RemoveValueFromList = RemoveValueFromList;
+
+
+    local function ReverseList(list)
+        local tbl = {};
+        local n = 0;
+        for i = #list, 1, -1 do
+            n = n + 1;
+            tbl[n] = list[i];
+        end
+        return tbl
+    end
+    API.ReverseList = ReverseList;
 end
 
 do  -- String
@@ -118,7 +131,12 @@ do
     local D_MINUTES = D_MINUTES or "%d |4Minute:Minutes;";
     local D_SECONDS = D_SECONDS or "%d |4Second:Seconds;";
 
-    local function SecondsToTime(seconds, useHolidayFormat)
+    local DAYS_ABBR = DAYS_ABBR or "%d |4Day:Days;"
+    local HOURS_ABBR = HOURS_ABBR or "%d |4Hr:Hr;";
+    local MINUTES_ABBR = MINUTES_ABBR or "%d |4Min:Min;";
+    local SECONDS_ABBR = SECONDS_ABBR or "%d |4Sec:Sec;";
+
+    local function SecondsToTime(seconds, abbreviated, useHolidayFormat)
         local intialSeconds = seconds;
         local timeString = "";
         local isComplete = false;
@@ -126,21 +144,21 @@ do
         local hours = 0;
         local minutes = 0;
 
-        if seconds > 86400 then
+        if seconds >= 86400 then
             days = floor(seconds / 86400);
-            timeString = format(D_DAYS, days);
+            timeString = format((abbreviated and DAYS_ABBR) or D_DAYS, days);
             seconds = seconds - days * 86400;
             if useHolidayFormat and days > 2 then
                 isComplete = true;
             end
         end
 
-        if not isComplete then
+        if (not isComplete) and seconds >= 3600 then
             hours = floor(seconds / 3600);
             if timeString == "" then
-                timeString = format(D_HOURS, hours);
+                timeString = format((abbreviated and HOURS_ABBR) or D_HOURS, hours);
             else
-                timeString = timeString.." "..format(D_HOURS, hours);
+                timeString = timeString.." "..format((abbreviated and HOURS_ABBR) or D_HOURS, hours);
             end
             seconds = seconds - hours * 3600;
             if useHolidayFormat and (days >= 1) then
@@ -148,12 +166,12 @@ do
             end
         end
 
-        if not isComplete then
+        if (not isComplete) and seconds >= 60 then
             minutes = floor(seconds / 60);
             if timeString == "" then
-                timeString = format(D_MINUTES, minutes);
+                timeString = format((abbreviated and MINUTES_ABBR) or D_MINUTES, minutes);
             else
-                timeString = timeString.." "..format(D_MINUTES, minutes);
+                timeString = timeString.." "..format((abbreviated and MINUTES_ABBR) or D_MINUTES, minutes);
             end
             seconds = seconds - minutes * 60;
             if useHolidayFormat then
@@ -161,12 +179,12 @@ do
             end
         end
 
-        if not isComplete then
+        if (not isComplete) and seconds > 0 then
             seconds = floor(seconds);
             if timeString == "" then
-                timeString = format(D_SECONDS, seconds);
+                timeString = format((abbreviated and SECONDS_ABBR) or D_SECONDS, seconds);
             else
-                timeString = timeString.." "..format(D_SECONDS, seconds);
+                timeString = timeString.." "..format((abbreviated and SECONDS_ABBR) or D_SECONDS, seconds);
             end
         end
 
@@ -180,6 +198,24 @@ do
     API.SecondsToTime = SecondsToTime;
 end
 
+do  -- Item
+    local C_Item = C_Item;
+
+    local function GetColorizedItemName(itemID)
+        local name = C_Item.GetItemNameByID(itemID);
+        local quality = C_Item.GetItemQualityByID(itemID);
+    
+        if name and quality then
+            local color = API.GetItemQualityColor(quality);
+            name = color:WrapTextInColorCode(name);
+            if GetCVarBool("colorblindMode") then
+                name = name.." |cffffffff[".._G[string.format("ITEM_QUALITY%s_DESC", quality)].."]|r";
+            end
+            return name
+        end
+    end
+    API.GetColorizedItemName = GetColorizedItemName;
+end
 
 do  -- Tooltip Parser
     local GetInfoByHyperlink = C_TooltipInfo.GetHyperlink;
@@ -281,7 +317,7 @@ do  -- Holiday
     function HolidayInfoMixin:GetRemainingTimeString()
         --DD/HH/MM/SS
         local seconds = self:GetRemainingSeconds();
-        return API.SecondsToTime(seconds, true)
+        return API.SecondsToTime(seconds, false, true);
     end
 
     function HolidayInfoMixin:GetName()

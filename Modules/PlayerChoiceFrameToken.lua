@@ -6,8 +6,10 @@ if not addon.IsGame_10_2_0 then
     return
 end
 
-local GetCreatureIDFromGUID = addon.API.GetCreatureIDFromGUID;
+local API = addon.API;
+local GetCreatureIDFromGUID = API.GetCreatureIDFromGUID;
 local TokenDisplay;
+local TimerFrame;
 
 --[[
 local PlayerChoiceXCurrency = {
@@ -43,15 +45,44 @@ local function UpdateChoiceCurrency()
     if not (f and f:IsShown() and f.choiceInfo and f.choiceInfo.choiceID and f.choiceInfo.objectGUID) then return end;
 
     local creatureID = GetCreatureIDFromGUID(f.choiceInfo.objectGUID);
-    --print(creatureID)
+    --print(creatureID);
+
     if GUIDXCurrency[creatureID] then
+        if not TokenDisplay then
+            TokenDisplay = addon.CreateTokenDisplay(UIParent);
+        end
         TokenDisplay:DisplayCurrencyOnFrame(f, "BOTTOMRIGHT", GUIDXCurrency[creatureID]);
+        local currentTime, fullTime = API.GetActiveDreamseedGrowthTimes();
+        if currentTime and fullTime then
+            if not TimerFrame then
+                TimerFrame = addon.CreateTimerFrame(TokenDisplay);
+                TimerFrame:SetReverse(true);
+                TimerFrame:SetStyle(2);
+                TimerFrame:SetWidth(192);
+                TimerFrame:SetBarColor(218/255, 218/255, 34/255)
+                TimerFrame:UpdateMaxBarFillWidth();
+            end
+            TimerFrame:SetPoint("BOTTOM", f, "BOTTOM", 0, 236);
+            --print(currentTime, fullTime)
+            TimerFrame:Show();
+            TimerFrame:SetTimes(fullTime - currentTime, fullTime);
+        end
     end
 end
 
 local function EL_OnUpdate(self, elapsed)
     self:SetScript("OnUpdate", nil);
     UpdateChoiceCurrency();
+end
+
+local function HideWigets()
+    if TokenDisplay then
+        TokenDisplay:HideTokenFrame();
+    end
+    if TimerFrame then
+        TimerFrame:Hide();
+        TimerFrame:Clear();
+    end
 end
 
 EL:SetScript("OnEvent", function(self, event, ...)
@@ -61,24 +92,19 @@ EL:SetScript("OnEvent", function(self, event, ...)
     elseif event == "PLAYER_CHOICE_CLOSE" then
         self:UnregisterEvent(event);
         self:SetScript("OnUpdate", nil);
-        TokenDisplay:HideTokenFrame();
+        HideWigets();
     end
 end);
 
 local function EnableModule(state)
     if state then
-        if not TokenDisplay then
-            TokenDisplay = addon.CreateTokenDisplay();
-        end
         EL:RegisterEvent("PLAYER_CHOICE_UPDATE");
         EL:RegisterEvent("PLAYER_CHOICE_CLOSE");
     else
-        if TokenDisplay then
-            TokenDisplay:HideTokenFrame();
-        end
         EL:UnregisterEvent("PLAYER_CHOICE_UPDATE");
         EL:UnregisterEvent("PLAYER_CHOICE_CLOSE");
         EL:SetScript("OnUpdate", nil);
+        HideWigets();
     end
 end
 
