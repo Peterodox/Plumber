@@ -38,3 +38,12 @@ L["ModuleDescription DruidModelFix"] = "Corrige o problema de exibição do mode
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
 --L["ModuleName PlayerChoiceFrameToken"] = "To-Be-Donated Item Count"; TRANSLATION IN-COMING ON 10.2.0
 --L["ModuleDescription PlayerChoiceFrameToken"] = "Show how many to-be-donated item you have on the PlayerChoice UI.\n\nCurrently only supports Dreamseed Nurturing."; TRANSLATION IN-COMING ON 10.2.0
+
+
+
+
+-- !! Do NOT translate the following entries
+L["currency-2706"] = "Dragonetinho";
+L["currency-2707"] = "Draco";
+L["currency-2708"] = "Serpe";
+L["currency-2709"] = "Aspecto";

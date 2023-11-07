@@ -10,6 +10,7 @@ local select = select;
 local tinsert = table.insert;
 local floor = math.floor;
 local time = time;
+local GetTime = GetTime;
 local IsMouseButtonDown = IsMouseButtonDown;
 local PlaySound = PlaySound;
 local GetItemCount = GetItemCount;
@@ -35,6 +36,9 @@ do  -- Slice Frame
         GenericBox = true,
         WhiteBorder = true,
         WhiteBorderBlackBackdrop = true,
+        Metal_Hexagon = true,
+        Metal_Hexagon_Red = true,
+        Phantom = true,
     };
 
     local SliceFrameMixin = {};
@@ -118,6 +122,16 @@ do  -- Slice Frame
         end
     end
 
+    function SliceFrameMixin:CoverParent(padding)
+        padding = padding or 0;
+        local parent = self:GetParent();
+        if parent then
+            self:ClearAllPoints();
+            self:SetPoint("TOPLEFT", parent, "TOPLEFT", -padding, padding);
+            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", padding, -padding);
+        end
+    end
+
     local function CreateNineSliceFrame(parent, layoutName)
         if not (layoutName and NineSliceLayouts[layoutName]) then
             layoutName = "WhiteBorder";
@@ -131,11 +145,12 @@ do  -- Slice Frame
     end
     addon.CreateNineSliceFrame = CreateNineSliceFrame;
 
-    local function CreateThreeSliceFrame(parent, layoutName)
+    local function CreateThreeSliceFrame(parent, layoutName, frameType)
         if not (layoutName and ThreeSliceLayouts[layoutName]) then
             layoutName = "GenericBox";
         end
-        local f = CreateFrame("Frame", nil, parent);
+        frameType = frameType or "Frame";
+        local f = CreateFrame(frameType, nil, parent);
         Mixin(f, SliceFrameMixin);
         f:CreatePieces(3);
         f:SetTexture("Interface/AddOns/Plumber/Art/Frame/ThreeSlice_"..layoutName);
@@ -246,6 +261,20 @@ do  -- Checkbox
         else
             self:SetWidth(math.max(BUTTON_HITBOX_MIN_WIDTH, width));
             return width
+        end
+    end
+
+    function CheckboxMixin:SetData(data)
+        self.dbKey = data.dbKey;
+        self.tooltip = data.tooltip;
+        self.onClickFunc = data.onClickFunc;
+        self.onEnterFunc = data.onEnterFunc;
+        self.onLeaveFunc = data.onLeaveFunc;
+
+        if data.label then
+            return self:SetLabel(data.label)
+        else
+            return 0
         end
     end
 
@@ -462,7 +491,7 @@ do  -- Common Frame with Header (and close button)
 end
 
 do  -- TokenFrame
-    local TOKEN_FRAME_SIDE_PADDING = 12;
+    local TOKEN_FRAME_SIDE_PADDING = 8;
     local TOKEN_FRAME_BUTTON_PADDING = 8;
     local TOKEN_BUTTON_TEXT_ICON_GAP = 2;
     local TOKEN_BUTTON_ICON_SIZE = 12;
@@ -543,7 +572,7 @@ do  -- TokenFrame
             self.Icon:SetTexture(info.iconFileID);
             self.Count:SetText(info.quantity);
         else
-            self.Icon:SetTexture(134400);
+            self.Icon:SetTexture(134400);   --question mark
             self.Count:SetText("??");
         end
 
@@ -724,7 +753,7 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
             self:SetIconState(1);
         else
             self:SetIconState(2);
-            self.Count:SetText("");
+            --self.Count:SetText("");
         end
     end
 
@@ -821,12 +850,26 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
     end
 
     local PI2 = -2*math.pi;
+    local ceil = math.ceil;
 
     local function Cooldown_OnUpdate(self, elapsed)
-        --Animation will desync once the frame becomes hidden
         self.t = self.t + elapsed;
         if self.t < self.duration then
             self.EdgeTexture:SetRotation( self.t/self.duration * PI2 );
+        end
+
+        self.tick = self.tick + elapsed;
+        if self.tick >= 0.2 then
+            self.tick = 0;
+            local startTimeMs, durationMs = self:GetCooldownTimes();
+            local currentTimeSeconds = GetTime();
+            local elapsedTime = currentTimeSeconds - (startTimeMs / 1000.0);
+            local remainingTimeSeconds = (durationMs / 1000.0) - elapsedTime;
+            self.t = elapsedTime;   --Sync time
+            if self.showCountdownNumber then
+                remainingTimeSeconds = ceil(remainingTimeSeconds);
+                self.BackupCountdownNumber:SetText(remainingTimeSeconds);
+            end
         end
     end
 
@@ -836,15 +879,21 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         if second > 0 then
             self.Cooldown:Resume();
             self.Cooldown.t = 0;
+            self.Cooldown.tick = 0;
             self.Cooldown.duration = second;
-            self.Cooldown:SetScript("OnUpdate", Cooldown_OnUpdate);
             self.Cooldown.EdgeTexture:Show();
             self.Cooldown.EdgeTexture:SetRotation(0);
             self.supposedEndTime = time() + second;
+            local countdownNumberEnabled = C_CVar.GetCVarBool("countdownForCooldowns");
+            self.Cooldown.showCountdownNumber = not countdownNumberEnabled;
+            self.Cooldown.BackupCountdownNumber:SetShown(not countdownNumberEnabled);
+            self.Cooldown.BackupCountdownNumber:SetText("");
+            self.Cooldown:SetScript("OnUpdate", Cooldown_OnUpdate);
         else
             self.Cooldown:SetScript("OnUpdate", nil);
             self.Cooldown.EdgeTexture:Hide();
             self.supposedEndTime = nil;
+            self.Cooldown.BackupCountdownNumber:SetText("");
         end
     end
 
@@ -870,7 +919,18 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         f.Cooldown = CreateFrame("Cooldown", nil, f);
         f.Cooldown:SetSize(64, 64);
         f.Cooldown:SetPoint("CENTER", f, "CENTER", 0, 0);
-        f.Cooldown:SetHideCountdownNumbers(false);
+        f.Cooldown:SetHideCountdownNumbers(false);  --globally controlled by CVar "countdownForCooldowns" (boolean)
+
+        local CountdownNumber = f.Cooldown:CreateFontString(nil, "OVERLAY", nil, 6);
+        f.Cooldown.BackupCountdownNumber = CountdownNumber;
+        local font, fontHeight, flBarShake = GameFontNormal:GetFont();
+        CountdownNumber:SetFont(font, 16, "OUTLINE");
+        CountdownNumber:SetPoint("CENTER", f.Cooldown, "CENTER", 0, -1);
+        CountdownNumber:SetJustifyH("CENTER");
+        CountdownNumber:SetJustifyV("MIDDLE");
+        CountdownNumber:SetShadowOffset(1, -1);
+        CountdownNumber:SetShadowColor(0, 0, 0);
+        CountdownNumber:SetTextColor(1, 1, 1);
 
         f.Cooldown:SetSwipeTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-SpellCast-Swipe");
         f.Cooldown:SetSwipeColor(1, 1, 1);
@@ -900,57 +960,46 @@ end
 
 do  --(In)Secure Button Pool
     local InCombatLockdown = InCombatLockdown;
-    local GetCVar = C_CVar.GetCVar;
-    local SetCVar = C_CVar.SetCVar;
 
-    local SecureButtons = {};
-    local SecureButtonContainer = CreateFrame("Frame");
+    local SecureButtons = {};               --All SecureButton that were created. Recycle/Share unused buttons unless it was specified not to
+    local PrivateSecureButtons = {};        --These are the buttons that are not shared with other modules
+
+    local SecureButtonContainer = CreateFrame("Frame");     --Always hidden
     SecureButtonContainer:Hide();
-
-    local BUTTON_NAME = "PlumberSecureButton";
 
     function SecureButtonContainer:CollectButton(button)
         if not InCombatLockdown() then
             button:ClearAllPoints();
             button:Hide();
             button:SetParent(self);
+            button:ClearActions();
+            button:ClearScripts();
             button.isActive = false;
         end
     end
 
     SecureButtonContainer:SetScript("OnEvent", function(self, event, ...)
         if event == "PLAYER_REGEN_DISABLED" then
+            local anyActive = false;
             for i, button in ipairs(SecureButtons) do
                 if button.isActive then
                     self:CollectButton(button);
+                    anyActive = true;
                 end
             end
-            if self.previousValue then
-                SetCVar("ActionButtonUseKeyDown", self.previousValue);
-                self.previousValue = nil;
+
+            if not anyActive then
+                self:UnregisterEvent(event);
             end
         end
     end);
 
-    local function SecureButtonContainer_OnUpdate_OnShot(self, elapsed)
-        self:SetScript("OnUpdate", nil);
-        if self.previousValue then
-            SetCVar("ActionButtonUseKeyDown", self.previousValue);
-            self.previousValue = nil;
-        end
-    end
-
-    local function SecureActionButton_PreClick()
-        if not SecureButtonContainer.previousValue then
-            SecureButtonContainer.previousValue = GetCVar("ActionButtonUseKeyDown");
-            SetCVar("ActionButtonUseKeyDown", 0);
-            SecureButtonContainer:SetScript("OnUpdate", SecureButtonContainer_OnUpdate_OnShot);
-        end
-    end
-
     local function SecureActionButton_OnHide(self)
         if self.isActive then
             self:Release();
+        end
+        if self.onHideCallback then
+            self.onHideCallback(self);
         end
     end
 
@@ -958,6 +1007,43 @@ do  --(In)Secure Button Pool
 
     function SecureButtonMixin:Release()
         SecureButtonContainer:CollectButton(self);
+    end
+
+    function SecureButtonMixin:ShowDebugHitRect(state)
+        if state then
+            if not self.debugBG then
+                self.debugBG = self:CreateTexture(nil, "BACKGROUND");
+                self.debugBG:SetAllPoints(true);
+                self.debugBG:SetColorTexture(1, 0, 0, 0.5);
+            end
+        else
+            if self.debugBG then
+                self.debugBG:Hide();
+            end
+        end
+    end
+
+    function SecureButtonMixin:SetMacroText(macroText)
+        self:SetAttribute("macrotext", macroText);
+        self.macroText = macroText;
+    end
+
+    function SecureButtonMixin:ClearActions()
+        if self.macroText then
+            self.macroText = nil;
+            self:SetAttribute("type", nil);
+            self:SetAttribute("type1", nil);
+            self:SetAttribute("type2", nil);
+            self:SetAttribute("macrotext", nil);
+        end
+    end
+
+    function SecureButtonMixin:ClearScripts()
+        self:SetScript("OnEnter", nil);
+        self:SetScript("OnLeave", nil);
+        self:SetScript("PostClick", nil);
+        self:SetScript("OnMouseDown", nil);
+        self:SetScript("OnMouseUp", nil);
     end
 
     local function CreateSecureActionButton()
@@ -969,26 +1055,44 @@ do  --(In)Secure Button Pool
         button.isActive = true;
         Mixin(button, SecureButtonMixin);
 
-        button:SetScript("PreClick", SecureActionButton_PreClick);
+        button:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonDown", "RightButtonUp");
         button:SetScript("OnHide", SecureActionButton_OnHide);
 
         SecureButtonContainer:RegisterEvent("PLAYER_REGEN_DISABLED");
-        SecureButtonContainer:RegisterEvent("PLAYER_REGEN_ENABLED");
+        --SecureButtonContainer:RegisterEvent("PLAYER_REGEN_ENABLED");
 
         return button
     end
 
-    local function AcquireSecureActionButton()
+    local function AcquireSecureActionButton(privateKey)
         if InCombatLockdown() then return end;
 
-        for i, button in ipairs(SecureButtons) do
-            if not button:IsShown() then
-                button.isActive = true;
-                return button
+        local button;
+
+        if privateKey then
+            button = PrivateSecureButtons[privateKey];
+            if not button then
+                button = CreateSecureActionButton();
+                PrivateSecureButtons[privateKey] = button;
+            end
+        else
+            for i, b in ipairs(SecureButtons) do
+                if not b:IsShown() then
+                    b.isActive = true;
+                    button = b;
+                    break
+                end
+            end
+
+            if not button then
+                button = CreateSecureActionButton();
             end
         end
 
-        return CreateSecureActionButton()
+        button.isActive = true;
+        SecureButtonContainer:RegisterEvent("PLAYER_REGEN_DISABLED");
+
+        return button
     end
     addon.AcquireSecureActionButton = AcquireSecureActionButton;
 end
@@ -1161,7 +1265,7 @@ do
             self.DisplayProgress = DisplayProgress_Style2;
             self.UpdateEveryFrame = UpdateEveryFrame_StatusBar;
 
-            local font, height, flag = GameFontHighlightSmall:GetFont();
+            local font, height, flBarShake = GameFontHighlightSmall:GetFont();
             self.TimeText:SetFont(font, 10, "");
             self.TimeText:SetTextColor(0, 0, 0);
 
@@ -1200,8 +1304,8 @@ do
 
                 self.BarMark = self:CreateTexture(nil, "OVERLAY", nil, 1);
                 self.BarMark:SetTexture(file);
-                self.BarMark:SetTexCoord(0.75, 1, 0.515625, 0.765625);
-                self.BarMark:SetSize(16, 16);
+                self.BarMark:SetTexCoord(0.625, 1, 0.515625, 0.765625);
+                self.BarMark:SetSize(24, 16);
                 self.BarMark:SetPoint("CENTER", self.BarFill, "RIGHT", 0, 0);
 
                 API.DisableSharpening(self.BarLeft);
@@ -1244,4 +1348,920 @@ do
         return f
     end
     addon.CreateTimerFrame = CreateTimerFrame;
+
+
+    local TinyStatusBarMixin = {};
+
+    function TinyStatusBarMixin:Init()
+        local px = API.GetPixelForWidget(self, 1);
+        self.Stroke:SetPoint("TOPLEFT", self, "TOPLEFT", -px, px);
+        self.Stroke:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", px, -px);
+        self.OutStroke:SetPoint("TOPLEFT", self, "TOPLEFT", -2*px, 2*px);
+        self.OutStroke:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 2*px, -2*px);
+        self:SetHeight(2*px);
+        self:UpdateMaxBarFillWidth();
+    end
+
+    function TinyStatusBarMixin:SetBarColor(r, g, b)
+        self.BarFill:SetColorTexture(r, g, b);
+    end
+
+    function TinyStatusBarMixin:Calibrate()
+        if self.startTime then
+            local currentTime = time();
+            self.t0 = currentTime - self.startTime;
+            self.s1 = self.t0;
+            self.DisplayProgress(self);
+        end
+    end
+
+    function TinyStatusBarMixin:Clear()
+        self:SetScript("OnUpdate", nil);
+        self.t = 0;
+        self.duration = 0;
+        self.startTime = nil;
+        self.BarFill:Hide();
+    end
+
+    function TinyStatusBarMixin:UpdateMaxBarFillWidth()
+        self.maxBarFillWidth = self:GetWidth();
+    end
+
+    function TinyStatusBarMixin:SetTimes(currentSecond, total)
+        if currentSecond >= total or total == 0 then
+            self:Clear();
+        else
+            self.t = currentSecond;
+            self.duration = total;
+            self:SetScript("OnUpdate", self.OnUpdate);
+            self:DisplayProgress();
+            self.startTime = time();
+            self.BarFill:Show();
+        end
+    end
+
+    function TinyStatusBarMixin:DisplayProgress()
+        if self.isReverse then
+            self.BarFill:SetWidth(self.maxBarFillWidth * (1 - self.t/self.duration));
+        else
+            self.BarFill:SetWidth(self.maxBarFillWidth * self.t/self.duration);
+        end
+    end
+
+    function TinyStatusBarMixin:SetDuration(second)
+        self:SetTimes(0, second);
+    end
+
+    function TinyStatusBarMixin:SetEndTime(endTime)
+        local t = time();
+        self:SetDuration( (t > endTime and (t - endTime)) or 0 );
+    end
+
+    function TinyStatusBarMixin:SetReverse(reverse)
+        self.isReverse = reverse;
+    end
+
+    function TinyStatusBarMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= self.duration then
+            self:SetScript("OnUpdate", nil);
+            self.BarFill:Hide();
+            return
+        end
+        self:DisplayProgress();
+    end
+
+    local function CreateTinyStatusBar(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetSize(24, 2);
+
+        f.BarBG = f:CreateTexture(nil, "ARTWORK");
+        f.BarBG:SetAllPoints(true);
+        f.BarBG:SetColorTexture(0, 0, 0, 0.5);
+
+        f.Stroke = f:CreateTexture(nil, "BORDER");
+        f.Stroke:SetColorTexture(0, 0, 0);
+        f.Stroke:SetPoint("TOPLEFT", f, "TOPLEFT", -1, 1);
+        f.Stroke:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 1, -1);
+
+        f.OutStroke = f:CreateTexture(nil, "BACKGROUND");
+        f.OutStroke:SetColorTexture(1, 0.82, 0, 0.5);
+        f.OutStroke:SetPoint("TOPLEFT", f, "TOPLEFT", -2, 2);
+        f.OutStroke:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 2, -2);
+
+        local mask1 = f:CreateMaskTexture(nil, "BORDER");
+        mask1:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+        mask1:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
+        mask1:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Exclusion", "CLAMPTOWHITE", "CLAMPTOWHITE");
+        f.Stroke:AddMaskTexture(mask1);
+
+        local mask2 = f:CreateMaskTexture(nil, "BACKGROUND");
+        mask2:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+        mask2:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
+        mask2:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Exclusion", "CLAMPTOWHITE", "CLAMPTOWHITE");
+        f.OutStroke:AddMaskTexture(mask2);
+    
+        f.BarFill = f:CreateTexture(nil, "OVERLAY");
+        f.BarFill:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+        f.BarFill:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0);
+        f.BarFill:SetWidth(12);
+
+        DisableSharpening(f.BarBG);
+        DisableSharpening(f.Stroke);
+        DisableSharpening(f.OutStroke);
+        DisableSharpening(mask1);
+        DisableSharpening(mask2);
+        DisableSharpening(f.BarFill);
+
+        Mixin(f, TinyStatusBarMixin);
+        f:SetBarColor(1, 0.82, 0);
+        f:SetScript("OnShow", f.Calibrate);
+        f:Init();
+
+        return f
+    end
+    addon.CreateTinyStatusBar = CreateTinyStatusBar;
+end
+
+do --Red Button
+    local RedButtonMixin = {};
+
+
+    local LONG_CLICK_DURATION = 0.5;
+    local LongClickListner = CreateFrame("Frame");
+
+    function LongClickListner:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= LONG_CLICK_DURATION then
+            self:SetScript("OnUpdate", nil);
+            if self.owner and self.owner:IsVisible() and self.owner:IsEnabled() then
+                self.owner:SetButtonState(4);
+            end
+        end
+    end
+
+    function LongClickListner:SetOwner(button)
+        self:SetParent(button);
+        self.owner = button;
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+        self:Show();
+    end
+
+    function LongClickListner:Stop()
+        self:SetScript("OnUpdate", nil);
+        self.owner = nil;
+        self:Hide();
+    end
+
+    function LongClickListner:OnHide()
+        self:Stop();
+    end
+    LongClickListner:SetScript("OnHide", LongClickListner.OnHide);
+
+
+    function RedButtonMixin:SetButtonText(text)
+        self.ButtonText:SetText(text);
+    end
+
+    local function SetButtonState_Nomral(self, stateIndex)
+        local top = 0.25*(stateIndex - 1);
+        local bottom = 0.25*stateIndex;
+        self.Left:SetTexCoord(0, 0.125, top, bottom);
+        self.Middle:SetTexCoord(0.125, 0.875, top, bottom);
+        self.Right:SetTexCoord(0.875, 1, top, bottom);
+    end
+
+    local function SetButtonState_Large(self, stateIndex)
+        local top = 0.1875*(stateIndex - 1);
+        local bottom = 0.1875*stateIndex;
+        self.Left:SetTexCoord(0, 0.125, top, bottom);
+        self.Middle:SetTexCoord(0.125, 0.875, top, bottom);
+        self.Right:SetTexCoord(0.875, 1, top, bottom);
+    end
+
+    function RedButtonMixin:SetButtonState(stateIndex)
+        --1 Normal  2 Pushed  3 Disabled
+        if stateIndex ~= self.stateIndex then
+            self.stateIndex = stateIndex;
+        else
+            return
+        end
+
+        if stateIndex == 1 or stateIndex == 2 or stateIndex == 4 then --Normal/Pushed/LongClick
+            self:Enable();
+            if self:IsShown() and self:IsMouseOver() then
+                self.ButtonText:SetTextColor(1, 1, 1);
+            else
+                self.ButtonText:SetTextColor(1, 0.82, 0);
+            end
+            if stateIndex == 1 then
+                self.ButtonText:SetPoint("CENTER", 0, 0);
+                self:StopAllAnimations();
+            elseif stateIndex == 2 then
+                self.ButtonText:SetPoint("CENTER", self.pushOffset, -self.pushOffset);
+                self:StopAllAnimations();
+            elseif stateIndex == 4 then
+                self.ButtonText:SetPoint("CENTER", self.pushOffset, -self.pushOffset*2);
+                self.AnimPulse:Play();
+            end
+        elseif stateIndex == 3 then --Disabled
+            self:Disable();
+            self:StopAllAnimations();
+            self.ButtonText:SetTextColor(0.5, 0.5, 0.5);
+            self.ButtonText:SetPoint("CENTER", 0, 0);
+        end
+
+        self.SetButtonStateFunc(self, stateIndex);
+    end
+
+    function RedButtonMixin:OnMouseDown(button)
+        if not self:IsEnabled() then return end;
+        self:SetButtonState(2);
+
+        if button == "LeftButton" then
+            self.leftButtonDown = true;
+            if self.onMouseDownFunc then
+                self.onMouseDownFunc(self);
+            end
+
+            if self.canLongClick then
+                self.AnimFill:Play();
+                LongClickListner:SetOwner(self);
+            end
+        end
+    end
+
+    function RedButtonMixin:StopAllAnimations()
+        self.AnimFill:Stop();
+        self.AnimPulse:Stop();
+    end
+
+    function RedButtonMixin:OnMouseUp()
+        self.leftButtonDown = nil;
+
+        LongClickListner:Stop();
+        self:StopAllAnimations();
+
+        if self.onMouseUpFunc then
+            self.onMouseUpFunc(self);
+        end
+        if not self:IsEnabled() then return end;
+        self:SetButtonState(1);
+    end
+
+    function RedButtonMixin:OnHide()
+        if self:IsEnabled() then
+            self:SetButtonState(1);
+        else
+            self:SetButtonState(3);
+        end
+        self.leftButtonDown = nil;
+    end
+
+    function RedButtonMixin:OnEnter()
+        if self:IsEnabled() then
+            self.ButtonText:SetTextColor(1, 1, 1);
+        end
+    end
+
+    function RedButtonMixin:OnLeave()
+        if self:IsEnabled() then
+            self.ButtonText:SetTextColor(1, 0.82, 0);
+        end
+    end
+
+    local function CreateLongClickAnimation(f)
+        local ScanTexture = f:CreateTexture(nil, "OVERLAY", nil, -1);
+        f.ScanTexture = ScanTexture;
+        ScanTexture:SetSize(46, 21);
+        ScanTexture:SetPoint("RIGHT", f, "RIGHT", -184, -1);
+        ScanTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/RedButton-Scan", nil, nil, "TRILINEAR");
+        ScanTexture:SetVertexColor(0.4, 0.1, 0.1);
+        ScanTexture:SetBlendMode("ADD");
+        ScanTexture:SetAlpha(0);
+
+        local AnimFill = f:CreateAnimationGroup();
+        f.AnimFill = AnimFill;
+        AnimFill:SetToFinalAlpha(true);
+        local t1 = AnimFill:CreateAnimation("Translation");
+        t1:SetChildKey("ScanTexture");
+        t1:SetOffset(184, 0);
+        t1:SetDuration(LONG_CLICK_DURATION);
+        t1:SetOrder(1);
+        local a1 = AnimFill:CreateAnimation("Alpha");
+        a1:SetChildKey("ScanTexture");
+        a1:SetFromAlpha(0);
+        a1:SetToAlpha(1);
+        a1:SetDuration(0.1);
+        a1:SetOrder(1);
+        local a2 = AnimFill:CreateAnimation("Alpha");
+        a2:SetChildKey("ScanTexture");
+        a2:SetFromAlpha(1);
+        a2:SetToAlpha(0);
+        a2:SetDuration(0.5);
+        a2:SetStartDelay(LONG_CLICK_DURATION);
+        a2:SetOrder(1);
+
+        local PulseTexture = f:CreateTexture(nil, "OVERLAY", nil, -1);
+        f.PulseTexture = PulseTexture;
+        PulseTexture:SetPoint("TOPLEFT", f, "LEFT", 4, 8);
+        PulseTexture:SetPoint("BOTTOMRIGHT", f, "RIGHT", -2, -12);
+        PulseTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/RedButton-Pulse", nil, nil, "TRILINEAR");
+        PulseTexture:SetVertexColor(0.5, 0.25, 0.1);
+        PulseTexture:SetBlendMode("ADD");
+        PulseTexture:SetAlpha(0);
+
+        local AnimPulse = f:CreateAnimationGroup();
+        f.AnimPulse = AnimPulse;
+        AnimPulse:SetToFinalAlpha(true);
+        AnimPulse:SetLooping("BOUNCE");
+        local a5 = AnimPulse:CreateAnimation("Alpha");
+        a5:SetChildKey("PulseTexture");
+        a5:SetFromAlpha(0);
+        a5:SetToAlpha(1);
+        a5:SetDuration(0.5);
+        a5:SetOrder(1);
+    end
+
+    local function CreateRedButton(parent, sizeType)
+        sizeType = sizeType or "normal";
+
+        local f = CreateFrame("Button", nil, parent);
+        Mixin(f, RedButtonMixin);
+
+        f:SetScript("OnMouseDown", RedButtonMixin.OnMouseDown);
+        f:SetScript("OnMouseUp", RedButtonMixin.OnMouseUp);
+        f:SetScript("OnHide", RedButtonMixin.OnHide);
+        f:SetScript("OnEnter", RedButtonMixin.OnEnter);
+        f:SetScript("OnLeave", RedButtonMixin.OnLeave);
+
+        f.Left = f:CreateTexture(nil, "BORDER");
+        f.Left:SetPoint("CENTER", f, "LEFT", 0, 0);
+
+        f.Right = f:CreateTexture(nil, "BORDER");
+        f.Right:SetPoint("CENTER", f, "RIGHT", 0, 0);
+
+        f.Middle = f:CreateTexture(nil, "BORDER");
+        f.Middle:SetPoint("TOPLEFT", f.Left, "TOPRIGHT", 0, 0);
+        f.Middle:SetPoint("BOTTOMRIGHT", f.Right, "BOTTOMLEFT", 0, 0);
+
+        local file;
+        if sizeType == "normal" then
+            file = "RedButton-Normal";
+            f:SetSize(112, 22);
+            f.Left:SetSize(16, 32);
+            f.Right:SetSize(16, 32);
+            f.SetButtonStateFunc = SetButtonState_Nomral;
+            f.pushOffset = 1;
+        elseif sizeType == "large" then
+            file = "RedButton-Large";
+            f:SetSize(224, 30);
+            f.Left:SetSize(32, 48);
+            f.Right:SetSize(32, 48);
+            f.SetButtonStateFunc = SetButtonState_Large;
+            f.pushOffset = 2;
+        end
+        file = "Interface/AddOns/Plumber/Art/Frame/"..file;
+        f.Left:SetTexture(file);
+        f.Right:SetTexture(file);
+        f.Middle:SetTexture(file);
+
+        f.ButtonText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal", 4);
+        f.ButtonText:SetJustifyH("CENTER");
+        f.ButtonText:SetJustifyV("MIDDLE");
+        f.ButtonText:SetTextColor(1, 0.82, 0);
+        f.ButtonText:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+        f.Highlight = f:CreateTexture(nil, "HIGHLIGHT");
+        f.Highlight:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+        f.Highlight:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
+        f.Highlight:SetTexture("Interface/AddOns/Plumber/Art/Frame/RedButton-Highlight", nil, nil, "TRILINEAR");
+        f.Highlight:SetVertexColor(0.4, 0.1, 0.1);
+        f.Highlight:SetBlendMode("ADD");
+
+        DisableSharpening(f.Left);
+        DisableSharpening(f.Right);
+        DisableSharpening(f.Middle);
+
+        CreateLongClickAnimation(f);
+        f:SetButtonState(1);
+
+        return f
+    end
+    addon.CreateRedButton = CreateRedButton;
+end
+
+do  --Metal Progress Bar
+    local ProgressBarMixin = {};
+
+    function ProgressBarMixin:SetBarWidth(width)
+        self:SetWidth(width);
+        self.maxBarFillWidth = width;
+    end
+
+    function ProgressBarMixin:SetValueByRatio(ratio)
+        self.BarFill:SetWidth(ratio * self.maxBarFillWidth);
+        self.BarFill:SetTexCoord(0, ratio, self.barfillTop, self.barfillBottom);
+        self.visualRatio = ratio;
+    end
+
+    local FILL_SIZE_PER_SEC = 100;
+    local EasingFunc = addon.EasingFunctions.outQuart;
+
+    local function SmoothFill_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        local ratio = EasingFunc(self.t, self.fromRatio, self.toRatio, self.easeDuration);
+        if self.t >= self.easeDuration then
+            ratio = self.toRatio;
+            self.easeDuration = nil;
+            self:SetScript("OnUpdate", nil);
+        end
+        self:SetValueByRatio(ratio);
+    end
+
+    function ProgressBarMixin:SetValue(barValue, barMax, playPulse)
+        if barValue > barMax then
+            barValue = barMax;
+        end
+        if self.BarValue then
+            self.BarValue:SetText(barValue.."/"..barMax);
+        end
+        if barValue == 0 or barMax == 0 then
+            self.BarFill:Hide();
+            self:SetScript("OnUpdate", nil);
+        else
+            self.BarFill:Show();
+            local newRatio = barValue/barMax;
+            if self.smoothFill then
+                local deltaRatio, oldRatio;
+
+                if self.barMax and self.visualRatio then
+                    if self.barMax == 0 then
+                        oldRatio = 0;
+                    else
+                        oldRatio = self.visualRatio;
+                    end
+                    deltaRatio = newRatio - oldRatio;
+                else
+                    oldRatio = 0;
+                    deltaRatio = newRatio;
+                end
+
+                if oldRatio < 0 then
+                    oldRatio = -oldRatio;
+                end
+
+                if deltaRatio < 0 then
+                    deltaRatio = -deltaRatio;
+                end
+
+                local easeDuration = deltaRatio*self.maxBarFillWidth / FILL_SIZE_PER_SEC;
+
+                if self.wasHidden then
+                    --don't animte if the bar was hidden
+                    self.wasHidden = false;
+                    easeDuration = 0;
+                end
+                if easeDuration > 0.25 then
+                    self.toRatio = newRatio;
+                    self.fromRatio = oldRatio;
+                    if easeDuration > 1.5 then
+                        easeDuration = 1.5;
+                    end
+                    self.easeDuration = easeDuration;
+                    self.t = 0;
+                    self:SetScript("OnUpdate", SmoothFill_OnUpdate);
+                else
+                    self.easeDuration = nil;
+                    self:SetValueByRatio(newRatio);
+                    self:SetScript("OnUpdate", nil);
+                end
+            else
+                self:SetValueByRatio(newRatio);
+            end
+        end
+
+        if playPulse and barValue > self.barValue then
+            self:Flash();
+        end
+
+        self.barValue = barValue;
+        self.barMax = barMax;
+    end
+
+    function ProgressBarMixin:OnHide()
+        self.wasHidden = true;
+    end
+
+    function ProgressBarMixin:GetValue()
+        return self.barValue
+    end
+
+    function ProgressBarMixin:GetBarMax()
+        return self.barMax
+    end
+
+    function ProgressBarMixin:SetSmoothFill(state)
+        state = state or false;
+        self.smoothFill = state;
+        if not state then
+            self:SetScript("OnUpdate", nil);
+            if self.barValue and self.barMax then
+                self:SetValue(self.barValue, self.barMax);
+            end
+            self.easeDuration = nil;
+        end
+    end
+
+    function ProgressBarMixin:Flash()
+        self.BarPulse.AnimPulse:Stop();
+        self.BarPulse.AnimPulse:Play();
+        self.BarShake:Stop();
+        if self.playShake then
+            self.BarShake:Play();
+        end
+    end
+
+    function ProgressBarMixin:SetBarColor(r, g, b)
+        self.BarFill:SetVertexColor(r, g, b);
+    end
+
+    function ProgressBarMixin:SetBarColorTint(index)
+        if index < 1 or index > 8 then index = 2 end;   --White
+
+        if index ~= self.colorTint then
+            self.colorTint = index;
+        else
+            return
+        end
+
+        self.BarFill:SetVertexColor(1, 1, 1);
+        self.barfillTop = (index - 1)*0.125;
+        self.barfillBottom = index*0.125;
+
+        if self.barValue and self.barMax then
+            self:SetValue(self.barValue, self.barMax);
+        end
+    end
+
+    local function SetupNotchTexture_Normal(notch)
+        notch:SetTexCoord(0.815, 0.875, 0, 0.375);
+        notch:SetSize(16, 24);
+    end
+
+    local function SetupNotchTexture_Large(notch)
+        notch:SetTexCoord(0.5625, 0.59375, 0, 0.25);
+        notch:SetSize(16, 64);
+    end
+
+    function ProgressBarMixin:SetNumThreshold(numThreshold)
+        --Divide the bar evenly
+        --"partitionValues", in Blizzard's term
+        if numThreshold == self.numThreshold then return end;
+        self.numThreshold = numThreshold;
+
+        if not self.notches then
+            self.notches = {};
+        end
+
+        for _, n in ipairs(self.notches) do
+            n:Hide();
+        end
+
+        if numThreshold == 0 then return end;
+
+        local d = self.maxBarFillWidth / (numThreshold + 1);
+        for i = 1, numThreshold do
+            if not self.notches[i] then
+                self.notches[i] = self.Container:CreateTexture(nil, "OVERLAY", nil, 2);
+                self.notches[i]:SetTexture(self.textureFile);
+                self.SetupNotchTexture(self.notches[i]);
+                API.DisableSharpening(self.notches[i]);
+            end
+            self.notches[i]:ClearAllPoints();
+            self.notches[i]:SetPoint("CENTER", self.Container, "LEFT", i*d, 0);
+            self.notches[i]:Show();
+        end
+    end
+
+    local function CreateMetalProgressBar(parent, sizeType)
+        sizeType = sizeType or "normal";
+
+        local f = CreateFrame("Frame", nil, parent);
+        Mixin(f, ProgressBarMixin);
+
+        f:SetScript("OnHide", ProgressBarMixin.OnHide);
+
+        local Container = CreateFrame("Frame", nil, f); --Textures are attached to this frame, so we can setup animations
+        f.Container = Container;
+        Container:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+        Container:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0 ,0);
+
+        f.visualRatio = 0;
+        f.wasHidden = true;
+
+        f.BarFill = Container:CreateTexture(nil, "ARTWORK");
+        f.BarFill:SetTexCoord(0, 1, 0, 0.125);
+        f.BarFill:SetTexture("Interface/AddOns/Plumber/Art/Frame/ProgressBar-Fill");
+        f.BarFill:SetPoint("LEFT", Container, "LEFT", 0, 0);
+
+        f.Background = Container:CreateTexture(nil, "BACKGROUND");
+        f.Background:SetColorTexture(0.1, 0.1, 0.1, 0.8);
+        f.Background:SetPoint("TOPLEFT", Container, "TOPLEFT", 0, -2);
+        f.Background:SetPoint("BOTTOMRIGHT", Container, "BOTTOMRIGHT", 0, 2);
+
+        f.BarLeft = Container:CreateTexture(nil, "OVERLAY");
+        f.BarLeft:SetPoint("CENTER", Container, "LEFT", 0, 0);
+
+        f.BarRight = Container:CreateTexture(nil, "OVERLAY");
+        f.BarRight:SetPoint("CENTER", Container, "RIGHT", 0, 0);
+
+        f.BarMiddle = Container:CreateTexture(nil, "OVERLAY");
+        f.BarMiddle:SetPoint("TOPLEFT", f.BarLeft, "TOPRIGHT", 0, 0);
+        f.BarMiddle:SetPoint("BOTTOMRIGHT", f.BarRight, "BOTTOMLEFT", 0, 0);
+
+        local file, barWidth, barHeight;
+        if sizeType == "normal" then
+            file = "ProgressBar-Metal-Normal";
+            barWidth, barHeight = 168, 18;
+            f.BarLeft:SetTexCoord(0, 0.09375, 0, 0.375);
+            f.BarRight:SetTexCoord(0.65625, 0.75, 0, 0.375);
+            f.BarMiddle:SetTexCoord(0.09375, 0.65625, 0, 0.375);
+            f.BarLeft:SetSize(24, 24);
+            f.BarRight:SetSize(24, 24);
+            f.BarFill:SetSize(barWidth, 12);
+            f.SetupNotchTexture = SetupNotchTexture_Normal;
+        elseif sizeType == "large" then
+            file = "ProgressBar-Metal-Large";
+            barWidth, barHeight = 248, 28;  --32
+            f.BarLeft:SetTexCoord(0, 0.0625, 0, 0.25);
+            f.BarRight:SetTexCoord(0.46875, 0.53125, 0, 0.25);
+            f.BarMiddle:SetTexCoord(0.0625, 0.46875, 0, 0.25);
+            f.BarLeft:SetSize(32, 64);
+            f.BarRight:SetSize(32, 64);
+            f.BarFill:SetSize(barWidth, 20);    --24
+            f.SetupNotchTexture = SetupNotchTexture_Large;
+        end
+
+        local barFile = "Interface/AddOns/Plumber/Art/Frame/"..file;
+        f.textureFile = barFile;
+        f.BarLeft:SetTexture(barFile);
+        f.BarRight:SetTexture(barFile);
+        f.BarMiddle:SetTexture(barFile);
+
+        API.DisableSharpening(f.BarFill);
+        API.DisableSharpening(f.BarLeft);
+        API.DisableSharpening(f.BarRight);
+        API.DisableSharpening(f.BarMiddle);
+
+        f:SetBarWidth(barWidth);
+        f:SetHeight(barHeight);
+        f:SetBarColorTint(2);
+        --f:SetNumThreshold(0);
+        f:SetValue(0, 100);
+
+        
+        local BarPulse = CreateFrame("Frame", nil, f, "PlumberBarPulseTemplate");
+        BarPulse:SetPoint("RIGHT", f.BarFill, "RIGHT", 0, 0);
+        f.BarPulse = BarPulse;
+
+        
+        local BarShake = Container:CreateAnimationGroup();
+        f.BarShake = BarShake;
+        local a1 = BarShake:CreateAnimation("Translation");
+        a1:SetOrder(1);
+        a1:SetStartDelay(0.15);
+        a1:SetOffset(3, 0);
+        a1:SetDuration(0.05);
+        local a2 = BarShake:CreateAnimation("Translation");
+        a2:SetOrder(2);
+        a2:SetOffset(-4, 0);
+        a2:SetDuration(0.1);
+        local a3 = BarShake:CreateAnimation("Translation");
+        a3:SetOrder(3);
+        a3:SetOffset(1, 0);
+        a3:SetDuration(0.1);
+
+        return f
+    end
+    addon.CreateMetalProgressBar = CreateMetalProgressBar;
+end
+
+do
+    local function CreateTextDropShadow(fontString, parent)
+        parent = parent or fontString:GetParent();
+        local Shadow = parent:CreateTexture(nil, "BACKGROUND", nil, -1);
+        Shadow:SetPoint("TOPLEFT", fontString, "TOPLEFT", -8, 6);
+        Shadow:SetPoint("BOTTOMRIGHT", fontString, "BOTTOMRIGHT", 8, -8);
+        Shadow:SetTexture("Interface/AddOns/Plumber/Art/Button/GenericTextDropShadow");
+        fontString.Shadow = Shadow;
+    end
+    addon.CreateTextDropShadow = CreateTextDropShadow;
+end
+
+do  --Hotkey/Keyboard Icon
+    local TEXTURE_WIDTH, TEXTURE_HEIGHT = 256, 256;
+    local BLEEDING = 10;    --the distance between the key icon and the texture edge
+    local PIXEL_INGAME_RATIO = 0.5;
+
+    local KeyboardKeys;
+
+    if IsMacClient and IsMacClient() then
+        --Mac
+        KeyboardKeys = {
+            --Key = {left(pixel), right, top, bottom, keyName}
+            Alt = {128, 192, 0, 64, "LALT"},
+        };
+    else
+        --Windows
+        KeyboardKeys = {
+            Alt = {0, 78, 0, 64, "LALT"},
+        };
+    end
+
+
+    local HotkeyIconMixin = {};
+
+    function HotkeyIconMixin:SetKey(key, responsive)
+        self.responsive = responsive or false;
+
+        if responsive then
+            self:SetScript("OnEvent", self.OnEvent);
+        else
+            self:SetScript("OnEvent", nil);
+        end
+
+        if key == self.hotkey then
+            return
+        else
+            self.hotkey = key;
+        end
+
+        if KeyboardKeys[key] then
+            local left, right, top, bottom, keyName = unpack(KeyboardKeys[key]);
+            local textureWidth = (right - left) * PIXEL_INGAME_RATIO;
+            local textureHeight = (bottom - top) * PIXEL_INGAME_RATIO;
+            local effectiveWidth = (right - left - 2*BLEEDING) * PIXEL_INGAME_RATIO;
+            local effectiveHeight = (bottom - top - 2*BLEEDING) * PIXEL_INGAME_RATIO;
+            self.Texture:SetTexCoord(left/TEXTURE_WIDTH, right/TEXTURE_WIDTH, top/TEXTURE_HEIGHT, bottom/TEXTURE_HEIGHT);
+            self.Texture:SetSize(textureWidth, textureHeight);
+            self:SetSize(effectiveWidth, effectiveHeight);
+            self.keyName = keyName;
+        end
+    end
+
+    function HotkeyIconMixin:Flash()
+        self.AnimFlash:Stop();
+        self.AnimFlash:Play();
+    end
+
+    function HotkeyIconMixin:OnShow()
+        self.FlashTexture:SetAlpha(0);
+        if self.responsive and self.hotkey then
+            self:RegisterEvent("MODIFIER_STATE_CHANGED");
+        end
+    end
+
+    function HotkeyIconMixin:OnHide()
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+        self.AnimFlash:Stop();
+    end
+
+    function HotkeyIconMixin:OnEvent(event, ...)
+        if event == "MODIFIER_STATE_CHANGED" then
+            local key, down = ...
+            if down == 1 then
+                if key == self.keyName then
+                    self:Flash();
+                end
+            end
+        end
+    end
+
+    local function CreateHotkeyIcon(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetSize(22, 22);
+        f.Texture = f:CreateTexture(nil, "ARTWORK");
+        f.Texture:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.Texture:SetSize(32, 32);
+        f.Texture:SetTexture("Interface/AddOns/Plumber/Art/Button/Keyboard", nil, nil, "LINEAR");
+        f.Texture:SetTexCoord(0, 0.001, 0, 0.001);
+        DisableSharpening(f.Texture);
+
+        f.FlashTexture = f:CreateTexture(nil, "OVERLAY");
+        f.FlashTexture:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 2, 1);
+        f.FlashTexture:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -2, 1);
+        f.FlashTexture:SetHeight(8);
+        f.FlashTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/KeyboardFlash", nil, nil, "TRILINEAR");
+        f.FlashTexture:SetBlendMode("ADD");
+        f.FlashTexture:SetAlpha(0);
+
+        local AnimFlash = f:CreateAnimationGroup();
+        AnimFlash:SetToFinalAlpha(true);
+        f.AnimFlash = AnimFlash;
+        local a1 = AnimFlash:CreateAnimation("ALPHA");
+        a1:SetChildKey("FlashTexture");
+        a1:SetFromAlpha(0);
+        a1:SetToAlpha(0.67);
+        a1:SetDuration(0.1);
+        a1:SetOrder(1);
+        local a2 = AnimFlash:CreateAnimation("ALPHA");
+        a2:SetChildKey("FlashTexture");
+        a2:SetFromAlpha(0.67);
+        a2:SetToAlpha(0);
+        a2:SetDuration(0.5);
+        a2:SetOrder(2);
+
+        Mixin(f, HotkeyIconMixin);
+        f:SetScript("OnShow", HotkeyIconMixin.OnShow);
+        f:SetScript("OnHide", HotkeyIconMixin.OnHide);
+
+        return f
+    end
+    addon.CreateHotkeyIcon = CreateHotkeyIcon;
+end
+
+do  --Cursor Cooldown (Displayed near the cursor)
+    local UnitCastingInfo = UnitCastingInfo;
+
+    local CursorProgressIndicator;
+
+    local CursorProgressMixin = {};
+
+    function CursorProgressMixin:FadeIn()
+        FadeFrame(self, 0.2, 1, 0);
+    end
+
+    function CursorProgressMixin:FadeOut()
+        FadeFrame(self, 0.2, 0);
+    end
+
+    function CursorProgressMixin:OnHide()
+        self:Clear();
+    end
+
+    function CursorProgressMixin:SetColorIndex(colorIndex)
+        if colorIndex == 1 then
+            self:SetSwipeTexture("Interface/AddOns/Plumber/Art/Button/GenericCooldown-Swipe-Blue");
+        elseif colorIndex == 2 then
+            self:SetSwipeTexture("Interface/AddOns/Plumber/Art/Button/GenericCooldown-Swipe-Yellow");
+        end
+    end
+
+    function CursorProgressMixin:OnEvent(event, ...)
+        if event == "UNIT_SPELLCAST_START" then
+            local _, _, spellID = ...
+            if spellID ~= self.watchedSpellID then
+                return
+            end
+            local _, _, _, startTimeMs, endTimeMs = UnitCastingInfo("player");
+			if startTimeMs and endTimeMs then
+				--self:SetCooldownUNIX(startTime, endTime - startTime);
+                local durationMs = endTimeMs - startTimeMs;
+                self:SetCooldown(startTimeMs / 1000.0, durationMs / 1000.0);
+                self:FadeIn();
+            else
+                self:Clear();
+			end
+        elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
+
+        elseif event == "UNIT_SPELLCAST_STOP" then
+            self:Clear();
+        end
+    end
+
+    function CursorProgressMixin:WatchSpell(spellID)
+        self.watchedSpellID = spellID;
+        self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
+        self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+        self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
+    end
+
+    function CursorProgressMixin:ClearWatch()
+        self:Hide();
+        self:Clear();
+        self:UnregisterEvent("UNIT_SPELLCAST_START");
+        self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
+        self:UnregisterEvent("UNIT_SPELLCAST_STOP");
+    end
+
+    local function AcquireCursorProgressIndicator()
+        if not CursorProgressIndicator then
+            local f = CreateFrame("Cooldown", nil, UIParent, "PlumberGenericCooldownTemplate");
+            CursorProgressIndicator = f;
+            f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+            Mixin(f, CursorProgressMixin);
+            DisableSharpening(f.Background);
+            f:SetScript("OnEvent", CursorProgressMixin.OnEvent);
+            f:SetScript("OnHide", CursorProgressMixin.OnHide);
+            f:SetUseCircularEdge(true);
+            f:SetColorIndex(2);
+            f:SetFrameStrata("FULLSCREEN");
+            f:SetFixedFrameStrata(true);
+            f:WatchSpell();
+        end
+        return CursorProgressIndicator
+    end
+    addon.AcquireCursorProgressIndicator = AcquireCursorProgressIndicator;
 end

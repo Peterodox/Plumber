@@ -1,5 +1,5 @@
 ## Interface: 100200
-## Version: 1.0.4
+## Version: 1.1.1
 
 ## Title: Plumber
 
@@ -15,12 +15,17 @@
 Initialization.lua
 Locales\Localization.xml
 API.lua
-Modules\SharedWidgets.lua
+Modules\SharedWidgets.xml
+Modules\SharedTooltip.lua
 ControlCenter.lua
 
 Modules\GossipFrameMedal.lua
 Modules\BackpackItemTracker.lua
 Modules\TimeRift.lua
-Modules\PlayerChoiceFrameToken.lua
+#Modules\PlayerChoiceFrameToken.lua
 Modules\DruidModelFix.lua
 Modules\Dreamseed.lua
+#Modules\EventMap.lua
+Modules\MapPin.xml
+Modules\PlayerChoiceUI.lua
+Modules\Lockpicking.lua

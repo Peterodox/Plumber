@@ -1,10 +1,12 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local TooltipFrame = addon.SharedTooltip;
 
-local ENABLE_THIS_MODULE = true;    --DB.BackpackItemTracker
-local HIDE_ZERO_COUNT_ITEM = true;  --DB.HideZeroCountItem      Dock items inside a flyout menu
-local USE_CONSISE_TOOLTIP = true;   --DB.ConciseTokenTooltip
+local ENABLE_THIS_MODULE = true;        --DB.BackpackItemTracker
+local HIDE_ZERO_COUNT_ITEM = true;      --DB.HideZeroCountItem      Dock items inside a flyout menu
+local USE_CONSISE_TOOLTIP = true;       --DB.ConciseTokenTooltip
+local TRACK_UPGRADE_CURRENCY = true;    --DB.TrackItemUpgradeCurrency
 
 local MAX_CUSTOM_ITEMS = 6;
 
@@ -30,10 +32,15 @@ local GetItemCount = GetItemCount;
 --local GetItemUniquenessByID = C_Item.GetItemUniquenessByID;     --Only returns True for equipment, not items with Unique (10)
 local GetItemIconByID = C_Item.GetItemIconByID;
 local GetItemMaxStackSizeByID = C_Item.GetItemMaxStackSizeByID;
+local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
+local GetItemTooltipInfo = C_TooltipInfo.GetItemByID;
+local type = type;
+local tonumber = tonumber;
 
-local AlwaysPinnedItems = {};
+local ExcludeFromSave = {};
 local CurrentPinnedItems = {};
-local HolidayTokens = {
+local HolidayItems = {
+    --Holidays:
     lunarfestival = 21100,      --Coin of Ancestry
     loveintheair = 49927,       --Love Token
     noblegarden = 44791,        --Noblegarden Chocolate
@@ -44,9 +51,100 @@ local HolidayTokens = {
     --winterveil
 };
 
+local CrestCurrenies = {
+    --Universal Upgrade System (Crests)
+    --convert to string for hybrid process
+
+    2706,   --Whelpling (LFR, M5)
+    2707,   --Drake     (N, M10)
+    2708,   --Wyrm      (H, M15)
+    2709,   --Aspect    (M, M16+)
+};
+
+if not addon.IsGame_10_2_0 then
+    CrestCurrenies = {};
+end
+
+local EL = CreateFrame("Frame");
+EL:RegisterEvent("PLAYER_ENTERING_WORLD");
+
+local UseSpecialTooltip = {};   --item/currency that use a custom tooltip
+local InitializeModule;         --will be defined later
+
+local CrestUtil = {};
+CrestUtil.watchedCurrrencies = {};
+
+function CrestUtil:GetBestCrestName(colorized)
+    local numTiers = #CrestCurrenies;
+    local info, currencyID;
+    local name;
+
+    for tier = numTiers, 1, -1 do
+        currencyID = CrestCurrenies[tier];
+        info = GetCurrencyInfo(currencyID);
+        if info and info.discovered then
+            name = info.name;
+            if colorized then
+                name = API.ColorizeTextByQuality(name, info.quality);
+            end
+            return name
+        end
+    end
+
+    name = NONE or "None";
+    if colorized then
+        name = "|cffffffff"..name.."|r"
+    end
+    return name
+end
+
+function CrestUtil:GetBestCrestForPlayer()
+    --return the highest tier
+    if not TRACK_UPGRADE_CURRENCY then
+        EL:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+        return
+    end
+
+    local numTiers = #CrestCurrenies;
+    local bestTier = 0;
+    local info, currencyID, bestCurrencyID;
+
+    for tier = numTiers, 1, -1 do
+        currencyID = CrestCurrenies[tier];
+        info = GetCurrencyInfo(currencyID);
+        if info and info.discovered then
+            bestTier = tier;
+            bestCurrencyID = currencyID;
+            break
+        end
+    end
+
+    self.watchedCurrrencies = {};
+    if bestTier < numTiers then
+        --if there is an undiscovered tier above the player's best tier, listen to Events for update
+        local temp = "";
+        for tier = bestTier + 1, numTiers do
+            currencyID = CrestCurrenies[tier];
+            temp = temp .. " "..currencyID;
+            self.watchedCurrrencies[currencyID] = true;
+        end
+        EL:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+    else
+        EL:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+    end
+
+    return bestCurrencyID
+end
+
+
 do
-    for _, itemID in pairs(HolidayTokens) do
-        AlwaysPinnedItems[itemID] = true;
+    for _, id in pairs(HolidayItems) do
+        ExcludeFromSave[id] = true;
+    end
+
+    for _, id in pairs(CrestCurrenies) do
+        ExcludeFromSave[ tostring(id) ] = true;
+        UseSpecialTooltip[id] = true;
     end
 end
 
@@ -57,12 +155,13 @@ TrackerFrame.numCustomItems = 0;
 TrackerFrame:EnableMouse(true);
 TrackerFrame:SetFrameStrata("HIGH");
 TrackerFrame:SetFixedFrameStrata(true);
+TrackerFrame:Hide();
 
 local SettingsFrame = {};    --frame created on-use
 
 local ItemDataProvider = {};
 ItemDataProvider.counts = {};
-ItemDataProvider.uniqueness = {};
+ItemDataProvider.maxQuantities = {};
 ItemDataProvider.bondingTexts = {};
 ItemDataProvider.expirationTexts = {};
 
@@ -96,7 +195,7 @@ function ItemDataProvider:UpdateItemCount()
 
     for _, itemID in ipairs(TrackerFrame.list) do
         count = self:GetItemCount(itemID, true);
-        if count == 0 and not AlwaysPinnedItems[itemID] then
+        if count == 0 and not ExcludeFromSave[itemID] then
             totalZero = totalZero + 1;
             self.zeroCountItems[totalZero] = itemID;
         else
@@ -108,46 +207,60 @@ function ItemDataProvider:UpdateItemCount()
     self.hasZero = totalZero > 0;
 end
 
-function ItemDataProvider:CacheItemInfo(itemID)
-    if not self.uniqueness[itemID] then
-        local data = C_TooltipInfo.GetItemByID(itemID);
+function ItemDataProvider:CacheItemInfo(id)
+    if self.maxQuantities[id] then return end;
+
+    if type(id) == "number" then
+        local data = GetItemTooltipInfo(id);
         local maxQuantity;
         if data and data.lines then
             for i, line in ipairs(data.lines) do
                 if line.bonding then   --Bonding: 5(BLZ), 6(on-pick-up)
                     if line.bonding == 6 then
-                        self.bondingTexts[itemID] = ITEM_SOULBOUND or "Soulbound";
+                        self.bondingTexts[id] = ITEM_SOULBOUND or "Soulbound";
                     else
                         if line.bonding == 5 then
-                            self.bondingTexts[itemID] = "|cff82c5ff".. (ITEM_BNETACCOUNTBOUND or "Blizzard Account Bound") .."|r";  --BATTLENET_FONT_COLOR
+                            self.bondingTexts[id] = "|cff82c5ff".. (ITEM_BNETACCOUNTBOUND or "Blizzard Account Bound") .."|r";  --BATTLENET_FONT_COLOR
                         else
-                            self.bondingTexts[itemID] = line.leftText;
+                            self.bondingTexts[id] = line.leftText;
                         end
                     end
                 elseif not maxQuantity then
                     maxQuantity = string.match(line.leftText, PATTERN_UNIQUE_COUNT);
                     if maxQuantity then
-                        self.uniqueness[itemID] = tonumber(maxQuantity);
+                        self.maxQuantities[id] = tonumber(maxQuantity);
                     end
                 end
             end
 
             if not maxQuantity then
-                self.uniqueness[itemID] = 0;
+                self.maxQuantities[id] = 0;
             end
+        end
+    else
+        local currencyID = tonumber(id);
+    end
+end
+
+function ItemDataProvider:RequestAllItemData()
+    local list = TrackerFrame:CopyUserTrackList();
+
+    for i, id in ipairs(list) do
+        if type(id) == "number" then
+            GetItemTooltipInfo(id);
         end
     end
 end
 
 function ItemDataProvider:CacheAllItems()
-    for i, itemID in ipairs(TrackerFrame.list) do
-        self:CacheItemInfo(itemID);
+    for i, id in ipairs(TrackerFrame.list) do
+        self:CacheItemInfo(id);
     end
 end
 
 function ItemDataProvider:GetMaxQuantity(itemID)
     self:CacheItemInfo(itemID);
-    return self.uniqueness[itemID] or 0
+    return self.maxQuantities[itemID] or 0
 end
 
 function ItemDataProvider:GetBondingText(itemID)
@@ -170,45 +283,64 @@ function ItemDataProvider:SetExpirationText(itemID, stringOrFunc)
     self.expirationTexts[itemID] = stringOrFunc;
 end
 
-local function ShowItemTooltip(owner, itemID)
-    local tooltip = GameTooltip;
+local function ShowButtonTooltip(owner, itemID, currencyID)
+    GameTooltip:Hide();
 
-    tooltip:Hide();
-    tooltip:SetOwner(owner, "ANCHOR_RIGHT");
-
-    if not USE_CONSISE_TOOLTIP then
-        tooltip:SetItemByID(itemID);
-        tooltip:Show();
+    if currencyID then
+        local tooltip = TooltipFrame;
+        if UseSpecialTooltip[currencyID] then
+            tooltip:SetOwner(owner, "ANCHOR_RIGHT");
+            TooltipFrame:DisplayUpgradeCurrencies();
+        else
+            tooltip:SetOwner(owner, "ANCHOR_RIGHT");
+            tooltip:SetCurrencyByID(currencyID);
+            tooltip:Show();
+        end
         return
     end
 
-    local itemName = GetColorizedItemName(itemID);
-    if itemName then
-        tooltip:SetText(itemName, 1, 1, 1, true);
 
-        local bonding = ItemDataProvider:GetBondingText(itemID);
-        if bonding then
-            tooltip:AddLine(bonding, 1, 1, 1, true);
+    if USE_CONSISE_TOOLTIP then
+        local tooltip = TooltipFrame;
+        tooltip:SetOwner(owner, "ANCHOR_RIGHT");
+
+        local itemName = GetColorizedItemName(itemID);
+        if itemName then
+            tooltip:AddLeftLine(itemName, 1, 1, 1, true, nil, 1);
+            local bonding = ItemDataProvider:GetBondingText(itemID);
+            if bonding then
+                tooltip:AddLeftLine(bonding, 1, 1, 1, true);
+            end
+
+            local maxQuantity = ItemDataProvider:GetMaxQuantity(itemID);
+            if maxQuantity > 0 then
+                tooltip:AddLeftLine(string.format(FORMAT_ITEM_UNIQUE_MULTIPLE, maxQuantity), 1, 1, 1, true);
+            end
+
+            local expirationText = ItemDataProvider:GetExpirationText(itemID);
+            if expirationText then
+                tooltip:AddLeftLine(expirationText, 1, 0.5, 0.25, true);
+            end
+
+            local numInBags = GetItemCount(itemID);
+            local numTotal = GetItemCount(itemID, true);
+            if numInBags ~= numTotal then
+                local numInBanks = numTotal - numInBags;
+                tooltip:AddLeftLine(BANK, 1, 0.82, 0);
+                tooltip:AddRightLine(numInBanks, 1, 1, 1);
+            end
+
+            tooltip:Show();
+        else
+            tooltip:Hide();
         end
-
-        local maxQuantity = ItemDataProvider:GetMaxQuantity(itemID);
-        if maxQuantity > 0 then
-            tooltip:AddLine(string.format(FORMAT_ITEM_UNIQUE_MULTIPLE, maxQuantity), 1, 1, 1, true);
-        end
-
-        local expirationText = ItemDataProvider:GetExpirationText(itemID);
-        if expirationText then
-            tooltip:AddLine(expirationText, 1, 0.5, 0.25, true);    --TRANSMOG_SET_LIMITED_TIME_SET
-        end
-
-        local numInBags = GetItemCount(itemID);
-        local numTotal = GetItemCount(itemID, true);
-        if numInBags ~= numTotal then
-            local numInBanks = numTotal - numInBags;
-            tooltip:AddDoubleLine(BANK, numInBanks, 1, 0.82, 0, 1, 1, 1);
-        end
-
+        return
+    else
+        local tooltip = GameTooltip;
+        tooltip:SetOwner(owner, "ANCHOR_RIGHT");
+        tooltip:SetItemByID(itemID);
         tooltip:Show();
+        return
     end
 end
 
@@ -346,8 +478,30 @@ function SettingsFrame.OnChanged(manual)
 
     HIDE_ZERO_COUNT_ITEM = db.HideZeroCountItem;
     USE_CONSISE_TOOLTIP = db.ConciseTokenTooltip;
+    TRACK_UPGRADE_CURRENCY = db.TrackItemUpgradeCurrency;
 
     TrackerFrame:RequestUpdate(manual);
+end
+
+local function OptionButton_TrackItemUpgradeCurrency_OnClick()
+    local db = PlumberDB;
+    if not db then return end;
+
+    TRACK_UPGRADE_CURRENCY = db.TrackItemUpgradeCurrency;
+    InitializeModule();
+end
+
+local function OptionButton_TrackItemUpgradeCurrency_OnEnter(self)
+    local tooltip = GameTooltip;
+    tooltip:Hide();
+    tooltip:SetOwner(self, "ANCHOR_RIGHT");
+    tooltip:SetText(L["Track Upgrade Currency"], 1, 1, 1, true);
+    tooltip:AddLine(L["Track Upgrade Currency Tooltip"], 1, 0.82, 0, true);
+
+    local currencyName = CrestUtil:GetBestCrestName(true);
+    tooltip:AddLine(" ");
+    tooltip:AddLine(L["Currently Pinned Colon"].."\n"..currencyName, 1, 0.82, 0, true);
+    tooltip:Show();
 end
 
 function SettingsFrame:Init()
@@ -382,8 +536,9 @@ function SettingsFrame:Init()
 
     --Checkboxs
     local options = {
-        {dbKey = "HideZeroCountItem", label = L["Hide Not Owned Items"], onClickFunc = SettingsFrame.OnChanged},
+        {dbKey = "HideZeroCountItem", label = L["Hide Not Owned Items"], tooltip = L["Hide Not Owned Items Tooltip"], onClickFunc = SettingsFrame.OnChanged},
         {dbKey = "ConciseTokenTooltip", label = L["Concise Tooltip"], tooltip = L["Concise Tooltip Tooltip"], onClickFunc = SettingsFrame.OnChanged},
+        {dbKey = "TrackItemUpgradeCurrency", label = L["Track Upgrade Currency"], onClickFunc = OptionButton_TrackItemUpgradeCurrency_OnClick, onEnterFunc = OptionButton_TrackItemUpgradeCurrency_OnEnter},
     };
 
     local BUTTON_HEIGHT = 24;
@@ -394,12 +549,9 @@ function SettingsFrame:Init()
 
     for i, data in ipairs(options) do
         checkbox = addon.CreateCheckbox(f);
-        checkbox.tooltip = data.tooltip;
-        checkbox.dbKey = data.dbKey;
-        checkbox.onClickFunc = data.onClickFunc;
         checkbox:SetPoint("TOPLEFT", f, "TOPLEFT", PADDING, -fullHeight);
         fullHeight = fullHeight + OPTION_GAP_Y + BUTTON_HEIGHT;
-        checkboxWidth = checkbox:SetLabel(data.label);
+        checkboxWidth = checkbox:SetData(data);
         if checkboxWidth > maxButtonWidth then
             maxButtonWidth = checkboxWidth;
         end
@@ -581,6 +733,7 @@ function SettingsFrame:Init()
         self.ListButtons[i] = CreateTokenListButton();
         self.ListButtons[i]:SetPoint("TOPLEFT", f, "TOPLEFT", PADDING, -fullHeight);
         self.ListButtons[i].index = i;
+
         fullHeight = fullHeight + LIST_BUTTON_HEIGHT;
     end
 
@@ -769,12 +922,13 @@ do
 
     function TrayButtonMixin:OnEnter()
         if TrackerFrame.isArranging then return end;
-        ShowItemTooltip(self, self.itemID);
+        ShowButtonTooltip(self, self.itemID, self.currencyID);
         --TrackerFrame:HighlightTrayButton(self);
     end
 
     function TrayButtonMixin:OnLeave()
         GameTooltip:Hide();
+        TooltipFrame:Hide();
         if TrackerFrame.isArranging then return end;
         --TrackerFrame:HighlightTrayButton();
     end
@@ -796,6 +950,13 @@ do
         SettingsFrame:ShowUI();
     end
 
+    function TrayButtonMixin:UpdateAndRetureWidth()
+        local width = math.floor(self.Count:GetWrappedWidth() + TEXT_ICON_GAP + ICON_SIZE + 0.5);
+        self:SetWidth(width);
+        self.width = width;
+        return width
+    end
+
     function TrayButtonMixin:SetItem(itemID)
         local anyChange;
 
@@ -804,6 +965,7 @@ do
             self.itemID = itemID;
             self.Icon:SetTexture( GetItemIconByID(itemID) );
         end
+        self.currencyID = nil;
 
         local count = ItemDataProvider:GetItemCount(itemID);
         if count ~= self.lastCount then
@@ -814,7 +976,7 @@ do
             if count > 0 then
                 local maxQuantity = ItemDataProvider:GetMaxQuantity(itemID);
                 if maxQuantity > 0 and count >= maxQuantity then
-                    self.Count:SetTextColor(1.000, 0.282, 0.000);
+                    self.Count:SetTextColor(1.000, 0.282, 0.000);   --WARNING_FONT_COLOR
                 else
                     self.Count:SetTextColor(1, 1, 1);
                 end
@@ -825,15 +987,63 @@ do
         end
 
         if anyChange then
-            local width = math.floor(self.Count:GetWrappedWidth() + TEXT_ICON_GAP + ICON_SIZE + 0.5);
-            self:SetWidth(width);
-            self.width = width;
-            return width
+            return self:UpdateAndRetureWidth();
         else
             return self.width
         end
     end
 
+    function TrayButtonMixin:SetCurrency(currencyID)
+        local anyChange;
+
+        if currencyID ~= self.currencyID then
+            anyChange = true;
+            self.currencyID = currencyID;
+        end
+        self.itemID = nil;
+
+        local info = currencyID and GetCurrencyInfo(currencyID);
+
+        if not info then
+            self.Count:SetText("??");
+            self.Icon:SetTexture(134400);
+            return self:UpdateAndRetureWidth();
+        end
+
+        local count = info.quantity or 0;
+
+        self.Icon:SetTexture(info.iconFileID);
+        if count ~= self.lastCount then
+            self.lastCount = count;
+            anyChange = true;
+            self.Count:SetText(count);
+
+            if count > 0 then
+                local maxQuantity = info.maxQuantity;
+                if maxQuantity > 0 and count >= maxQuantity then
+                    self.Count:SetTextColor(1.000, 0.282, 0.000);   --WARNING_FONT_COLOR
+                else
+                    self.Count:SetTextColor(1, 1, 1);
+                end
+            else
+                self.Count:SetTextColor(0.5, 0.5, 0.5);
+            end
+        end
+
+        if anyChange then
+            return self:UpdateAndRetureWidth();
+        else
+            return self.width
+        end
+    end
+
+    function TrayButtonMixin:SetToken(id)
+        if type(id) == "number" then
+            return self:SetItem(id);
+        else
+            return self:SetCurrency( tonumber(id) );
+        end
+    end
 
     function TrackerFrame:AcquireTrayButton(i)
         if not self.TrayButtons[i] then
@@ -1022,37 +1232,15 @@ do
     API.DisableSharpening(tdb.Icon);
 
     --show a list of zero item on drop-up menu
-    local MENU_PADDING = 8;
-
-    local function CreateDockedMenu()
-        local menu = addon.CreateNineSliceFrame(tdb, "GreyBorderWithShadow");
-        tdb.Menu = menu;
-
-        menu:SetSize(64, 64);
-        menu:SetPoint("BOTTOMLEFT", tdb, "TOPLEFT", 0, 0);
-        menu:Hide();
-        menu:SetClampedToScreen(true);
-        menu:SetFrameStrata("TOOLTIP");
-        menu:SetFixedFrameStrata(true);
-
-        menu.Title = menu:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        menu.Title:SetTextColor(1, 0.82, 0);
-        menu.Title:SetJustifyH("CENTER");
-        menu.Title:SetPoint("TOP", menu, "TOP", 0, -MENU_PADDING);
-        menu.Title:SetText("Not Found");
-
-        menu.Manifest = menu:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        menu.Manifest:SetSpacing(4);
-        menu.Manifest:SetTextColor(1, 1, 1);
-        menu.Manifest:SetJustifyH("LEFT");
-        menu.Manifest:SetJustifyV("TOP");
-        menu.Manifest:SetPoint("TOPLEFT", menu, "TOPLEFT", MENU_PADDING, -24);
-    end
-
     local function ThreeDotButton_OnEnter(self)
         GameTooltip:Hide();
+        TooltipFrame:Hide();
+
         tdb.Icon:SetVertexColor(0.8, 0.8, 0.8);
-        local fullText;
+
+        TooltipFrame:SetOwner(tdb, "ANCHOR_RIGHT");
+        TooltipFrame:AddCenterLine(L["Not Found"], 1, 0.82, 0);
+
         local text, icon;
         for i, itemID in ipairs(ItemDataProvider:GetZeroCountItem()) do
             text = GetColorizedItemName(itemID);
@@ -1061,40 +1249,24 @@ do
                 icon = GetItemIconByID(itemID);
 
                 if icon then
-                    text = string.format("|T%s:0:0:0:-6:64:64:4:60:4:60|t %s", icon, text);
+                    text = string.format("|T%s:0:0:0:-1:64:64:4:60:4:60|t %s", icon, text);
                 end
 
-                if i == 1 then
-                    fullText = text;
-                else
-                    fullText = fullText.."\n"..text;
-                end
+                TooltipFrame:AddLeftLine(text, 1, 1, 1);
             end
         end
 
-        if not tdb.Menu then
-            CreateDockedMenu();
-        end
-
-        tdb.Menu.Manifest:SetText(fullText);
-        local width = tdb.Menu.Manifest:GetWrappedWidth() + 2*MENU_PADDING;
-        local height = tdb.Menu.Manifest:GetHeight() + 24 + MENU_PADDING;
-        tdb.Menu:SetSize(width, height)
-        tdb.Menu:Show();
+        TooltipFrame:Show();
     end
 
     local function ThreeDotButton_OnLeave(self)
         tdb.Icon:SetVertexColor(0.5, 0.5, 0.5);
-        if tdb.Menu then
-            tdb.Menu:Hide();
-        end
+        TooltipFrame:Hide();
     end
 
     local function ThreeDotButton_OnMouseUp(self)
         SettingsFrame:ToggleUI();
-        if tdb.Menu then
-            tdb.Menu:Hide();
-        end
+        TooltipFrame:Hide();
     end
 
     ThreeDotButton_OnLeave(tdb);
@@ -1185,7 +1357,7 @@ function TrackerFrame:SaveUserTrackList()
     local tbl = {};
     local n = 0;
     for i, id in ipairs(self.list) do
-        if not AlwaysPinnedItems[id] then
+        if not ExcludeFromSave[id] then
             n = n + 1;
             tbl[n] = id;
         end
@@ -1205,7 +1377,7 @@ function TrackerFrame:UpdateState()
 
     local n = 0;
     for i, id in ipairs(self.list) do
-        if not AlwaysPinnedItems[id] then
+        if not ExcludeFromSave[id] then
             n = n + 1;
         end
     end
@@ -1309,7 +1481,7 @@ end
 
 local function CanItemBeTracked(itemID)
     local stackSize = GetItemMaxStackSizeByID(itemID)
-    return stackSize > 1
+    return stackSize and stackSize > 1
 end
 
 do
@@ -1382,10 +1554,6 @@ end
 function TrackerFrame:SetToDisplayMode()
     self.Receptor:Hide();
     self:HideBorderAndGlow();
-
-    if not self:IsTrackingAnyItems() then
-        self:Hide();
-    end
 end
 
 local function TrackerFrame_OnUpdate_Request(self, elapsed)
@@ -1404,6 +1572,7 @@ function TrackerFrame:RequestUpdate(manual)
 end
 
 local function TokenTray_OnShow(self)
+    self:SetToDisplayMode();
     self:RegisterEvent("CURSOR_CHANGED");
     self:RegisterEvent("BAG_UPDATE");
 end
@@ -1444,7 +1613,6 @@ TrackerFrame:SetScript("OnShow", TokenTray_OnShow);
 TrackerFrame:SetScript("OnHide", TokenTray_OnHide);
 TrackerFrame:SetScript("OnEvent", TokenTray_OnEvent);
 TrackerFrame:SetScript("OnMouseUp", TrackerFrame_OnMouseUp);
-TrackerFrame:Show();        --To trigger OnShow on Init
 
 
 function TrackerFrame:GetTrackList()
@@ -1469,7 +1637,7 @@ function TrackerFrame:UpdateTray(manual)
         --Fade in new items
         wasTracked = {};
         for k, button in ipairs(self.TrayButtons) do
-            itemID = button.itemID;
+            itemID = button.itemID or button.currencyID;
             if itemID then
                 wasTracked[itemID] = true;
             end
@@ -1480,8 +1648,9 @@ function TrackerFrame:UpdateTray(manual)
         button = self:AcquireTrayButton(i);
         button:Show();
         itemID = list[i];
-        width = button:SetItem(itemID);
+        width = button:SetToken(itemID);
         fullWidth = fullWidth + width;
+        itemID = tonumber(itemID);
         if manual and not wasTracked[itemID] then
             API.UIFrameFadeIn(button, 0.5);
         end
@@ -1490,6 +1659,7 @@ function TrackerFrame:UpdateTray(manual)
     for i = numItems + 1, #self.TrayButtons do
         self.TrayButtons[i]:Hide();
         self.TrayButtons[i].itemID = nil;
+        self.TrayButtons[i].currencyID = nil;
     end
 
 
@@ -1512,7 +1682,6 @@ function TrackerFrame:UpdateTray(manual)
     self:SetWidth(fullWidth);
     self.Border:SetWidth(math.max(fullWidth, RECEPTOR_MIN_WIDTH));
     self:UpdateAnchor();
-    --print("Update Tray")
 end
 
 local function GetSearchBox()
@@ -1557,7 +1726,7 @@ function TrackerFrame:BuildTrackList()
     for _, itemID in ipairs(CurrentPinnedItems) do
         table.insert(self.list, 1, itemID);
     end
-    ItemDataProvider:CacheAllItems();
+
     TrackerFrame:UpdateState();
 end
 
@@ -1914,8 +2083,7 @@ local function RegisterBag()
 end
 
 
-local EL = CreateFrame("Frame");
-EL:RegisterEvent("PLAYER_ENTERING_WORLD");
+
 
 local function OnModuleEnabled()
     ENABLE_THIS_MODULE = true;
@@ -1928,6 +2096,7 @@ local function OnModuleEnabled()
     SettingsFrame.OnChanged();
 
     EL:RegisterEvent("USE_COMBINED_BAGS_CHANGED");
+    EL:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
 
     if AnchorToCompatibleAddOn then
         AnchorToCompatibleAddOn();
@@ -1939,13 +2108,24 @@ local function OnModuleDisabled()
     TrackerFrame:Hide();
 
     EL:UnregisterEvent("USE_COMBINED_BAGS_CHANGED");
+    EL:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
 end
 
-local function InitializeModule()
+function InitializeModule()
+    CurrentPinnedItems = {};
+
+    local trackCrests = true;
+    if trackCrests then
+        local bestCurrencyID = CrestUtil:GetBestCrestForPlayer();
+        if bestCurrencyID then
+            table.insert(CurrentPinnedItems, 1, tostring(bestCurrencyID));
+        end
+    end
+
     local HolidayInfo = API.GetActiveMajorHolidayInfo();
     if HolidayInfo then
         local key = HolidayInfo:GetKey();
-        local itemID = HolidayTokens[key];
+        local itemID = HolidayItems[key];
         if itemID then
             table.insert(CurrentPinnedItems, 1, itemID);
             --[[
@@ -1964,7 +2144,14 @@ local function InitializeModule()
     end
 
     if ENABLE_THIS_MODULE then
+        ItemDataProvider:CacheAllItems();
         OnModuleEnabled();
+    end
+end
+
+function CrestUtil:ProcessCurrencyUpdate(currencyID)
+    if currencyID and self.watchedCurrrencies[currencyID] then
+        InitializeModule();
     end
 end
 
@@ -1982,12 +2169,16 @@ EL:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent(event);
         C_Calendar.OpenCalendar();
+        ItemDataProvider:RequestAllItemData();
         self.t = -2;
         self.callback = InitializeModule;
         self:SetScript("OnUpdate", EL_OnUpdate_OneShot);
     elseif event == "USE_COMBINED_BAGS_CHANGED" then
         self.delay = -0.1;
         self:SetScript("OnUpdate", TrackerFrame_OnUpdate_Request);
+    elseif event == "CURRENCY_DISPLAY_UPDATE" then
+        local currencyID = ...
+        CrestUtil:ProcessCurrencyUpdate(currencyID);
     end
 end);
 

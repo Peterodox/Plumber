@@ -60,31 +60,60 @@ do  -- String
         end
     end
     API.GetCreatureIDFromGUID = GetCreatureIDFromGUID;
+
+    local function GetVignetteIDFromGUID(guid)
+        local id = match(guid, "Vignette%-0%-%d*%-%d*%-%d*%-(%d*)");
+        if id then
+            return tonumber(id)
+        end
+    end
+    API.GetVignetteIDFromGUID = GetVignetteIDFromGUID;
 end
 
 do  -- DEBUG
-
-    local function SaveLocalizedText(localizedText, englishText)
+    local function CreateSaveDB(key)
         if not PlumberDevOutput then
             PlumberDevOutput = {};
         end
-
-        local locale = GetLocale();
-        if not PlumberDevOutput[locale] then
-            PlumberDevOutput[locale] = {};
+        if not PlumberDevOutput[key] then
+            PlumberDevOutput[key] = {};
         end
-
-        PlumberDevOutput[locale][localizedText] = englishText or true;
     end
 
+    local function SaveLocalizedText(localizedText, englishText)
+        local locale = GetLocale();
+        CreateSaveDB(locale);
+        PlumberDevOutput[locale][localizedText] = englishText or true;
+    end
     API.SaveLocalizedText = SaveLocalizedText;
+
+    local function SaveDataUnderKey(key, ...)
+        CreateSaveDB(key);
+        PlumberDevOutput[key] = {...}
+    end
+    API.SaveDataUnderKey = SaveDataUnderKey;
 end
 
 do  --Math
+    local function Clamp(value, min, max)
+        if value > max then
+            return max
+        elseif value < min then
+            return min
+        end
+        return value
+    end
+    API.Clamp = Clamp;
+
     local function GetPointsDistance2D(x1, y1, x2, y2)
         return sqrt( (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2))
     end
     API.GetPointsDistance2D = GetPointsDistance2D;
+
+    local function Round(n)
+        return floor(n + 0.5);
+    end
+    API.Round = Round;
 end
 
 do  -- Color
@@ -110,6 +139,7 @@ do  -- Color
 
 
     -- Make Rare and Epic brighter (use the color in Narcissus)
+    local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS;
     local QualityColors = {};
     QualityColors[3] = CreateColor(105/255, 158/255, 255/255, 1);
     QualityColors[4] = CreateColor(185/255, 83/255, 255/255, 1);
@@ -122,6 +152,13 @@ do  -- Color
         end
     end
     API.GetItemQualityColor = GetItemQualityColor;
+
+
+    local function IsWarningColor(r, g, b)
+        --Used to determine if the tooltip fontstring is red, which indicates there is a requirement you don't meet
+        return (r > 0.99 and r <= 1) and (g > 0.1254 and g < 0.1255) and (b > 0.1254 and b < 0.1255)
+    end
+    API.IsWarningColor = IsWarningColor;
 end
 
 do
@@ -136,6 +173,11 @@ do
     local MINUTES_ABBR = MINUTES_ABBR or "%d |4Min:Min;";
     local SECONDS_ABBR = SECONDS_ABBR or "%d |4Sec:Sec;";
 
+    local SHOW_HOUR_BELOW_DAYS = 3;
+    local SHOW_MINUTE_BELOW_HOURS = 12;
+    local SHOW_SECOND_BELOW_MINUTES = 10;
+    local COLOR_RED_BELOW_SECONDS = 172800;
+
     local function SecondsToTime(seconds, abbreviated, useHolidayFormat)
         local intialSeconds = seconds;
         local timeString = "";
@@ -148,47 +190,65 @@ do
             days = floor(seconds / 86400);
             timeString = format((abbreviated and DAYS_ABBR) or D_DAYS, days);
             seconds = seconds - days * 86400;
-            if useHolidayFormat and days > 2 then
+            if useHolidayFormat and days >= SHOW_HOUR_BELOW_DAYS then
                 isComplete = true;
             end
         end
 
-        if (not isComplete) and seconds >= 3600 then
+        if not isComplete then
             hours = floor(seconds / 3600);
-            if timeString == "" then
-                timeString = format((abbreviated and HOURS_ABBR) or D_HOURS, hours);
-            else
-                timeString = timeString.." "..format((abbreviated and HOURS_ABBR) or D_HOURS, hours);
-            end
             seconds = seconds - hours * 3600;
-            if useHolidayFormat and (days >= 1) then
-                isComplete = true;
+
+            if hours > 0 then
+                local hourText = format((abbreviated and HOURS_ABBR) or D_HOURS, hours);
+                if timeString == "" then
+                    timeString = hourText;
+                else
+                    timeString = timeString.." "..hourText;
+                end
+
+                if useHolidayFormat and hours >= SHOW_MINUTE_BELOW_HOURS then
+                    isComplete = true;
+                end
+            else
+                if timeString ~= "" and useHolidayFormat then
+                    isComplete = true;
+                end
             end
         end
 
-        if (not isComplete) and seconds >= 60 then
+        if not isComplete then
             minutes = floor(seconds / 60);
-            if timeString == "" then
-                timeString = format((abbreviated and MINUTES_ABBR) or D_MINUTES, minutes);
-            else
-                timeString = timeString.." "..format((abbreviated and MINUTES_ABBR) or D_MINUTES, minutes);
-            end
             seconds = seconds - minutes * 60;
-            if useHolidayFormat then
-                isComplete = true;
+
+            if minutes > 0 then
+                local minuteText = format((abbreviated and MINUTES_ABBR) or D_MINUTES, minutes);
+                if timeString == "" then
+                    timeString = minuteText;
+                else
+                    timeString = timeString.." "..minuteText;
+                end
+                if useHolidayFormat and minutes >= SHOW_SECOND_BELOW_MINUTES then
+                    isComplete = true;
+                end
+            else
+                if timeString ~= "" and useHolidayFormat then
+                    isComplete = true;
+                end
             end
         end
 
         if (not isComplete) and seconds > 0 then
             seconds = floor(seconds);
+            local secondText = format((abbreviated and SECONDS_ABBR) or D_SECONDS, seconds);
             if timeString == "" then
-                timeString = format((abbreviated and SECONDS_ABBR) or D_SECONDS, seconds);
+                timeString = secondText;
             else
-                timeString = timeString.." "..format((abbreviated and SECONDS_ABBR) or D_SECONDS, seconds);
+                timeString = timeString.." "..secondText;
             end
         end
 
-        if useHolidayFormat and intialSeconds < 172800 then
+        if useHolidayFormat and intialSeconds < COLOR_RED_BELOW_SECONDS then
             --WARNING_FONT_COLOR
             timeString = "|cffff4800"..timeString.."|r";
         end
@@ -196,23 +256,116 @@ do
         return timeString
     end
     API.SecondsToTime = SecondsToTime;
+
+
+    --Unix Epoch is in UTC
+    local MonthDays = {
+        31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+    };
+
+    local function IsLeapYear(year)
+        return year % 400 == 0 or (year % 4 == 0 and year % 100 ~= 0)
+    end
+
+    local function GetFebruaryDays(year)
+        if IsLeapYear(year) then
+            return 29
+        else
+            return 28
+        end
+    end
+
+    local function IsLeftTimeFuture(time1, time2, i)
+        if not time1[i] then return false end;
+
+        if time1[i] > time2[i] then
+            return true;
+        elseif time1[i] == time2[i] then
+            return IsLeftTimeFuture(time1, time2, i + 1);
+        else
+            return false
+        end
+    end
+
+    local function GetNumDaysToDate(year, month, day)
+        local numDays = day;
+
+        for yr = 1, (year -1) do
+            if IsLeapYear(yr) then
+                numDays = numDays + 366;
+            else
+                numDays = numDays + 365;
+            end
+        end
+
+        for m = 1, (month - 1) do
+            if m == 2 then
+                numDays = numDays + GetFebruaryDays(year);
+            else
+                numDays = numDays + MonthDays[m];
+            end
+        end
+
+        return numDays
+    end
+
+    local function GetNumSecondsToDate(year, month, day, hour, minute, second)
+        hour = hour or 0;
+        minute = minute or 0;
+        second = second or 0;
+        local numDays = GetNumDaysToDate(year, month, day);
+        local numSeconds = second;
+        numSeconds = numSeconds + numDays * 86400;
+        numSeconds = numSeconds + hour * 3600 + minute * 60;
+        return numSeconds
+    end
+
+    local function ConvertCalendarTime(calendarTime)
+        --WoW's CalendarTime See https://warcraft.wiki.gg/wiki/API_C_DateAndTime.GetCurrentCalendarTime
+        local year = calendarTime.year;
+        local month = calendarTime.month;
+        local day = calendarTime.monthDay;
+        local hour = calendarTime.hour;
+        local minute = calendarTime.minute;
+        local second = calendarTime.second or 0;    --the original calendarTime does not contain second
+
+        return {year, month, day, hour, minute, second}
+    end
+
+    local function GetCalendarTimeDifference(lhsCalendarTime, rhsCalendarTime)
+        --time = {year, month, day, hour, minute, second}
+        local time1 = ConvertCalendarTime(lhsCalendarTime);
+        local time2 = ConvertCalendarTime(rhsCalendarTime);
+        local second1 = GetNumSecondsToDate(unpack(time1));
+        local second2 = GetNumSecondsToDate(unpack(time2));
+        return second2 - second1
+    end
+    API.GetCalendarTimeDifference = GetCalendarTimeDifference;
 end
 
 do  -- Item
     local C_Item = C_Item;
 
+    local function ColorizeTextByQuality(text, quality, allowColorBlind)
+        if not (text and quality) then
+            return text
+        end
+
+        local color = API.GetItemQualityColor(quality);
+        text = color:WrapTextInColorCode(text);
+        if allowColorBlind and GetCVarBool("colorblindMode") then
+            text = text.." |cffffffff[".._G[string.format("ITEM_QUALITY%s_DESC", quality)].."]|r";
+        end
+
+        return text
+    end
+    API.ColorizeTextByQuality = ColorizeTextByQuality;
+
     local function GetColorizedItemName(itemID)
         local name = C_Item.GetItemNameByID(itemID);
         local quality = C_Item.GetItemQualityByID(itemID);
-    
-        if name and quality then
-            local color = API.GetItemQualityColor(quality);
-            name = color:WrapTextInColorCode(name);
-            if GetCVarBool("colorblindMode") then
-                name = name.." |cffffffff[".._G[string.format("ITEM_QUALITY%s_DESC", quality)].."]|r";
-            end
-            return name
-        end
+
+        return ColorizeTextByQuality(name, quality, true);
     end
     API.GetColorizedItemName = GetColorizedItemName;
 end
@@ -275,29 +428,6 @@ do  -- Holiday
         [235485] = "winterveil",
     };
 
-    local function GetTimeDifference_Recursion(lhs, rhs, totalDayOffset)
-        --Requires Calendar Time (table)
-        if not totalDayOffset then
-            totalDayOffset = 0;
-        end
-
-        local diffYear = rhs.year - lhs.year;
-        local diffMonth = rhs.month - lhs.month;
-        local diffDay = rhs.monthDay - lhs.monthDay;
-
-        local dayOffset = floor(diffYear * 365 + diffMonth * 30.4 + diffDay * 1 + 0.5);
-
-        if dayOffset ~= 0 then
-            totalDayOffset = totalDayOffset + dayOffset;
-            local ct = C_DateAndTime.AdjustTimeByDays(lhs, dayOffset);
-            GetTimeDifference_Recursion(ct, rhs, totalDayOffset);
-        end
-
-        local minuteOffset = (totalDayOffset * 24 + rhs.hour - lhs.hour) * 60 + (rhs.minute - lhs.minute);
-
-        return totalDayOffset, minuteOffset
-    end
-
     local HolidayInfoMixin = {};
 
     function HolidayInfoMixin:GetRemainingSeconds()
@@ -334,7 +464,7 @@ do  -- Holiday
         local monthOffset = 0;
         local holidayInfo;
         local holidayKey, holidayName;
-        local endTimeString, remainingSeconds;
+        local endTimeString;
         local eventEndTimeMixin;    --{}
         local endTime;              --number time()
 
@@ -352,9 +482,8 @@ do  -- Holiday
         end
 
         if eventEndTimeMixin then
-            local dayOffset, minuteOffset = GetTimeDifference_Recursion(currentCalendarTime, eventEndTimeMixin);
             local presentTime = time();
-            remainingSeconds = minuteOffset * 60;
+            local remainingSeconds = API.GetCalendarTimeDifference(currentCalendarTime, eventEndTimeMixin);
             endTime = presentTime + remainingSeconds;
             if remainingSeconds <= 0 then
                 return
@@ -522,7 +651,7 @@ do  --Fade Frame
     API.UIFrameFadeIn = UIFrameFadeIn;   --from 0 to 1
 end
 
-do
+do  -- Map
     ---- Create Module that will be activated in specific zones:
     ---- 1. Soridormi Auto-report
 
@@ -549,9 +678,16 @@ do
 
     function ZoneTriggeredModuleMixin:SetValidZones(...)
         self.validMaps = {};
+        local map;
         for i = 1, select("#", ...) do
-            local uiMapID = select(i, ...);
-            self.validMaps[uiMapID] = true;
+            map = select(i, ...);
+            if type(map) == "table" then
+                for _, uiMapID in ipairs(map) do
+                    self.validMaps[uiMapID] = true;
+                end
+            else
+                self.validMaps[map] = true;
+            end
         end
     end
 
@@ -643,4 +779,153 @@ do
     end
 
     API.CreateZoneTriggeredModule = CreateZoneTriggeredModule;
+
+
+    --Get Player Coord Less RAM cost
+    local UnitPosition = UnitPosition;
+    local GetPlayerMapPosition = C_Map.GetPlayerMapPosition;
+    local posY, posX, data;
+    local lastUiMapID;
+    local MapData = {};
+
+    local function CacheMapData(uiMapID)
+        if MapData[uiMapID] then return end;
+        local instance, topLeft = C_Map.GetWorldPosFromMapPos(uiMapID, {x=0, y=0});
+        local width, height = C_Map.GetMapWorldSize(uiMapID);
+        if topLeft then
+            local top, left = topLeft:GetXY()
+            MapData[uiMapID] = {width, height, left, top};
+        end
+    end
+
+    local function GetPlayerMapCoord_Fallback(uiMapID)
+        local position = GetPlayerMapPosition(uiMapID, "player");
+        if position then
+            return position.x, position.Y
+        end
+    end
+
+    local function GetPlayerMapCoord(uiMapID)
+        posY, posX = UnitPosition("player");
+        if not (posX and posY) then return GetPlayerMapCoord_Fallback(uiMapID) end;
+
+        if uiMapID ~= lastUiMapID then
+            lastUiMapID = uiMapID;
+            CacheMapData(uiMapID);
+        end
+
+        data = MapData[uiMapID]
+        if not data or data[1] == 0 or data[2] == 0 then return GetPlayerMapCoord_Fallback(uiMapID) end;
+
+        return (data[3] - posX) / data[1], (data[4] - posY) / data[2]
+    end
+
+    API.GetPlayerMapCoord = GetPlayerMapCoord;
+
+    --[[
+    function YeetPos()
+        local uiMapID = C_Map.GetBestMapForUnit("player");
+        local x, y = GetPlayerMapCoord(uiMapID);
+        print(x, y);
+
+        local position = C_Map.GetPlayerMapPosition(uiMapID, "player");
+        local x0, y0 = position:GetXY();
+
+        print(x0, y0);
+    end
+    --]]
+end
+
+do  --Pixel
+    local GetPhysicalScreenSize = GetPhysicalScreenSize;
+
+    local function GetPixelForWidget(widget, pixelSize)
+        local SCREEN_WIDTH, SCREEN_HEIGHT = GetPhysicalScreenSize();
+        local scale = widget:GetEffectiveScale();
+        if pixelSize then
+            return pixelSize * (768/SCREEN_HEIGHT)/scale
+        else
+            return (768/SCREEN_HEIGHT)/scale
+        end
+    end
+    API.GetPixelForWidget = GetPixelForWidget;
+end
+
+do  --Easing
+    local EasingFunctions = {};
+    addon.EasingFunctions = EasingFunctions;
+
+
+    local sin = math.sin;
+    local cos = math.cos;
+    local pow = math.pow;
+    local pi = math.pi;
+
+    --t: total time elapsed
+    --b: beginning position
+    --e: ending position
+    --d: animation duration
+
+    function EasingFunctions.linear(t, b, e, d)
+        return (e - b) * t / d + b
+    end
+
+    function EasingFunctions.outSine(t, b, e, d)
+        return (e - b) * sin(t / d * (pi / 2)) + b
+    end
+
+    function EasingFunctions.inOutSine(t, b, e, d)
+        return -(e - b) / 2 * (cos(pi * t / d) - 1) + b
+    end
+
+    function EasingFunctions.outQuart(t, b, e, d)
+        t = t / d - 1;
+        return (b - e) * (pow(t, 4) - 1) + b
+    end
+
+    function EasingFunctions.outQuint(t, b, e, d)
+        t = t / d
+        return (b - e)* (pow(1 - t, 5) - 1) + b
+    end
+
+    function EasingFunctions.inQuad(t, b, e, d)
+        t = t / d
+        return (e - b) * pow(t, 2) + b
+    end
+end
+
+do  --Currency
+    local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
+    local CurrencyDataProvider = CreateFrame("Frame");
+    CurrencyDataProvider.cache = {};
+    CurrencyDataProvider.icons = {};
+
+    local RelevantKeys = {"name", "quantity", "iconFileID", "maxQuantity", "quality"};
+
+    CurrencyDataProvider:SetScript("OnEvent", function(self, event, currencyID, quantity, quantityChange)
+        if currencyID and self.cache[currencyID] then
+            self.cache[currencyID] = nil;
+        end
+    end);
+
+    function CurrencyDataProvider:CacheAndGetCurrencyInfo(currencyID)
+        if not self.cache[currencyID] then
+            local info = GetCurrencyInfo(currencyID);
+            if not info then return end;
+            local vital = {};
+        end
+
+        if not self.registered then
+            self.registered = true;
+            self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+        end
+
+        return self.cache[currencyID]
+    end
+
+    function CurrencyDataProvider:GetIcon(currencyID)
+        if not self.icons[currencyID] then
+            self:CacheAndGetCurrencyInfo(currencyID);
+        end
+    end
 end

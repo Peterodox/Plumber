@@ -14,22 +14,30 @@ if not addon.IsGame_10_2_0 then
 end
 
 local API = addon.API;
-
+local GetPlayerMapCoord = API.GetPlayerMapCoord;
+local GetCreatureIDFromGUID = API.GetCreatureIDFromGUID;
 
 local MAPID_EMRALD_DREAM = 2200;
 local VIGID_BOUNTY = 5971;
 local RANGE_PLANT_SEED = 10;
+local FORMAT_ITEM_COUNT_ICON = "%s|T%s:0:0:0:0:64:64:0:64:0:64|t";
+local SEED_ITEM_IDS = {208047, 208067, 208066};     --Gigantic, Plump, Small Dreamseed
 
 local sqrt = math.sqrt;
+local format = string.format;
 local C_VignetteInfo = C_VignetteInfo;
 local GetVignetteInfo = C_VignetteInfo.GetVignetteInfo;
-local GetPlayerMapPosition = C_Map.GetPlayerMapPosition;
+local GetStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo;
+local GetItemDisplayVisualizationInfo = C_UIWidgetManager.GetItemDisplayVisualizationInfo;
+local GetAllWidgetsBySetID = C_UIWidgetManager.GetAllWidgetsBySetID;
 local IsFlying = IsFlying;
 local IsMounted = IsMounted;
 local InCombatLockdown = InCombatLockdown;
 local GetAchievementCriteriaInfoByID = GetAchievementCriteriaInfoByID;
 local UIParent = UIParent;
-
+local GetItemCount = GetItemCount;
+local GetItemIconByID = C_Item.GetItemIconByID;
+local time = time;
 
 local function GetVisibleEmeraldBountyGUID()
     local vignetteGUIDs = C_VignetteInfo.GetVignettes();
@@ -97,6 +105,7 @@ local function ItemButton_OnEnter(self)
         local w, h = self:GetSize();
         RealActionButton:SetFrameStrata("DIALOG");
         RealActionButton:SetFixedFrameStrata(true);
+        RealActionButton:SetScript("OnEnter", nil);
         RealActionButton:SetScript("OnLeave", RealActionButton_OnLeave);
         RealActionButton:SetScript("PostClick", RealActionButton_PostClick);
         RealActionButton:SetScript("OnMouseDown", RealActionButton_OnMouseDown);
@@ -108,10 +117,10 @@ local function ItemButton_OnEnter(self)
         RealActionButton:Show();
         RealActionButton.owner = self;
 
-        local macroText = string.format("/use item:%s", self.id);
+        local macroText = format("/use item:%s", self.id);
         RealActionButton:SetAttribute("type", "macro");     --Any Mouseclick
-        RealActionButton:SetAttribute("macrotext", macroText);
-        RealActionButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        RealActionButton:SetMacroText(macroText);
+        RealActionButton:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonDown", "RightButtonUp");
 
         self:LockHighlight();
         self.hasActionButton = true;
@@ -126,14 +135,7 @@ local function ItemButton_OnLeave(self)
 end
 
 function EL:Init()
-    local SEED_ITEM_IDS = {208066, 208067, 208047};     --Small, Plump, GiganticDreamseed
-    local SEED_SPELL_IDS = {417642, 417645, 417508};
-    local START_FROM_RAREST = true;
-
-    if START_FROM_RAREST then
-        SEED_ITEM_IDS = API.ReverseList(SEED_ITEM_IDS);
-        SEED_SPELL_IDS = API.ReverseList(SEED_SPELL_IDS);
-    end
+    local SEED_SPELL_IDS = {417508, 417645, 417642};
 
     self.Container = CreateFrame("Frame", nil, self);
     self.Container:SetSize(46, 46);
@@ -369,6 +371,11 @@ function EL:AttemptShowUI()
     self:RegisterEvent("UPDATE_UI_WIDGET");
 
     self:SetFrameLayout(2);
+    self:UpdateItemCount();
+
+    for _, button in ipairs(self.Buttons) do
+        button.Count:Show();
+    end
 
     self.isChanneling = nil;
     self.Container:Show();
@@ -421,17 +428,6 @@ function EL:GetMapPointsDistance(x1, y1, x2, y2)
     return sqrt(x*x + y*y)
 end
 
---EL:RegisterEvent("UPDATE_UI_WIDGET");
-EL.widgetData = {};
-
-function EL:AddWidgetInfo(widgetInfo)
-    local widgetID = widgetInfo.widgetID;
-    if not self.widgetData[widgetID] then
-        self.widgetData[widgetID] = widgetInfo.widgetType;
-        return true
-    end
-end
-
 function EL:OnEvent(event, ...)
     if event == "VIGNETTE_MINIMAP_UPDATED" then
         local vignetteGUID, onMinimap = ...
@@ -463,15 +459,11 @@ function EL:OnEvent(event, ...)
         local widgetInfo = ...
         if DataProvider:IsValuableWidget(widgetInfo.widgetID) then
             if self:IsTrackedPlantGrowing() then
-                self:CloseUI();
+                self:StopTrackingPosition();
+                --self:CloseUI();
             end
         end
-        --[[
-        local isNew = self:AddWidgetInfo(widgetInfo);
-        if isNew then
-            print("ID:", widgetInfo.widgetID, "  Type:", widgetInfo.widgetType)     --https://wowpedia.fandom.com/wiki/UPDATE_UI_WIDGET
-        end
-        --]]
+
     elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
         local _, _, spellID = ...
         self:OnSpellCastChanged(spellID, true);
@@ -542,6 +534,7 @@ function EL:StopTrackingPosition()
         self.trackedObjectGUID = nil;
         self.isPlayerMoving = nil;
         self.isChanneling = nil;
+        self.isInRange = nil;
         self:UnregisterEvent("PLAYER_STARTED_MOVING");
         self:UnregisterEvent("PLAYER_STOPPED_MOVING");
         self:UnregisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED");
@@ -556,10 +549,10 @@ function EL:UpdateMap()
 end
 
 function EL:CalculatePlayerToTargetDistance()
-    local position = GetPlayerMapPosition(MAPID_EMRALD_DREAM, "player");
-    if position then
-        local d = self:GetMapPointsDistance(position.x, position.y, self.targetX, self.targetY);
-        --print(string.format("Distance: %.1f yd", d));
+    self.playerX, self.playerY = GetPlayerMapCoord(MAPID_EMRALD_DREAM);
+    if self.playerX and self.playerY then
+        local d = self:GetMapPointsDistance(self.playerX, self.playerY, self.targetX, self.targetY);
+        --print(format("Distance: %.1f yd", d));
 
         --Change update frequency dynamically
         if d <= 10 then
@@ -656,27 +649,34 @@ local PLANT_DATA = {
     --Kudos to @patf0rd on Twitter!
 
     --from VigInfo.ObjectGUID
-    --[creatureID] = {criteriaID, widgetID}
     --/dump C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(5136) (bag max 180(3 min))
+    --C_UIWidgetManager.GetItemDisplayVisualizationInfo()
+    --C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo()
+    --shownState = 1, itemInfo = {showAsEarned = true}
     --AchievementID = 19013;    --I Dream of Seeds
+    --https://warcraft.wiki.gg/wiki/UPDATE_UI_WIDGET
+    --C_UIWidgetManager.GetAllWidgetsBySetID
+    --DBC: Vignette - VisibleTrackingQuestID to find 3 chest for each plant
 
-    [208443] = {62028, 5084}, --"Ysera's Clover"
-    [208511] = {62029, 5122}, --"Chiming Foxglove"    --Oct. 10  Bugged. The map thinks another plant to the north-east is the closest
-    [208556] = {62030, 5123}, --"Dragon's Daffodil"
-    [208563] = {62031, 5125}, --"Singing Weedling"
-    [208605] = {62032, 5126}, --"Fuzzy Licorice"
-    [208606] = {62039, 5127}, --"Lofty Lupin"
-    [208607] = {62038, 5128}, --"Ringing Rose"
-    [208615] = {62037, 5129}, --"Dreamer's Daisy"
-    [208616] = {62035, 5130}, --"Viridescent Sprout"
-    [208617] = {62041, 5124}, --"Belligerent Begonias"
-    [209583] = {62027, 5131}, --"Lavatouched Lilies"
-    [209599] = {62040, 5132}, --"Lullaby Lavender"
-    [209880] = {62036, 5133}, --"Glade Goldenrod"
-    [210723] = {62185, 5134}, --"Comfy Chamomile"
-    [210724] = {62186, 5135}, --"Moon Tulip"
-    [210725] = {62189, 5136}, --"Flourishing Scurfpea"
-    [211059] = {62397, 5149}, --"Whisperbloom Sapling" ! (not spawning)
+    --[creatureID] = {criteriaID, widgetID(Growth Cycle),   3 Nurture Widgets,  6 Reward Widgets(There are actually 12 item widgets but only need 6)(Small, Plump, Gigantic Bounty, Small, Medium, Large Bloom(Shared by 3 rarities)),   3 DreamseedChest[VigID] (based on quality)} --Purple/Blue/Green, 3 widgetSetIDs
+    --          1      2        3     4     5        6     7     8     9     10    11       12    13    14       15   16   17
+    [208443] = {62028, 5084,    4994, 5087, 5088,    5183, 5181, 5182, 5184, 5245, 5247,    5769, 5856, 5857,    869, 918, 919}, --"Ysera's Clover"
+    [208511] = {62029, 5122,    4995, 5089, 5090,    5186, 5188, 5187, 5185, 5248, 5249,    5772, 5854, 5855,    870, 920, 921}, --"Chiming Foxglove"
+    [208556] = {62030, 5123,    4996, 5091, 5092,    5179, 5172, 5180, 5173, 5250, 5251,    5773, 5853, 5853,    871, 922, 923}, --"Dragon's Daffodil"
+    [208563] = {62031, 5125,    5000, 5095, 5096,    5194, 5195, 5196, 5193, 5254, 5255,    5775, 5848, 5849,    873, 926, 927}, --"Singing Weedling"
+    [208605] = {62032, 5126,    5001, 5097, 5098,    5198, 5200, 5199, 5197, 5256, 5257,    5776, 5846, 5847,    879, 928, 929}, --"Fuzzy Licorice"
+    [208606] = {62039, 5127,    5002, 5099, 5100,    5202, 5204, 5203, 5201, 5258, 5259,    5777, 5844, 5845,    875, 930, 931}, --"Lofty Lupin"
+    [208607] = {62038, 5128,    5003, 5101, 5102,    5206, 5208, 5207, 5205, 5260, 5261,    5778, 5842, 5843,    876, 932, 933}, --"Ringing Rose"  (ok)
+    [208615] = {62037, 5129,    5004, 5103, 5104,    5210, 5212, 5211, 5209, 5262, 5263,    5779, 5840, 5841,    877, 934, 935}, --"Dreamer's Daisy"  (ok)
+    [208616] = {62035, 5130,    5005, 5105, 5106,    5214, 5216, 5215, 5213, 5264, 5265,    5780, 5838, 5839,    878, 936, 937}, --"Viridescent Sprout"
+    [208617] = {62041, 5124,    4999, 5093, 5094,    5191, 5189, 5190, 5192, 5252, 5253,    5774, 5850, 5851,    872, 924, 925}, --"Belligerent Begonias"  --Sometimes not visible due to phasing?
+    [209583] = {62027, 5131,    5075, 5108, 5109,    5218, 5220, 5219, 5217, 5266, 5267,    5782, 5783, 5784,    897, 938, 939}, --"Lavatouched Lilies" (ok)
+    [209599] = {62040, 5132,    5076, 5107, 5110,    5222, 5224, 5223, 5221, 5268, 5269,    5787, 5788, 5789,    941, 898, 940}, --"Lullaby Lavender" (ok)
+    [209880] = {62036, 5133,    5077, 5111, 5112,    5226, 5228, 5227, 5225, 5270, 5271,    5790, 5791, 5792,    899, 942, 943}, --"Glade Goldenrod"  (ok)
+    [210723] = {62185, 5134,    5113, 5114, 5115,    5230, 5232, 5231, 5229, 5272, 5273,    5793, 5862, 5863,    944, 946, 945}, --"Comfy Chamomile"
+    [210724] = {62186, 5135,    5116, 5117, 5118,    5234, 5236, 5235, 5233, 5274, 5275,    5864, 5865, 5866,    947, 948, 949}, --"Moon Tulip"
+    [210725] = {62189, 5136,    5119, 5120, 5121,    5238, 5240, 5239, 5237, 5276, 5277,    5867, 5868, 5869,    950, 951, 952}, --"Flourishing Scurfpea"
+    [211059] = {62397, 5149,    5146, 5147, 5148,    5242, 5244, 5243, 5241, 5278, 5279,    5876, 5877, 5878,    970, 971, 972}, --"Whisperbloom Sapling" ! (not spawning due to Superbloom phasing)
 
     --Ageless Blossom (criteriaID: 62396)
 };
@@ -694,15 +694,18 @@ function DataProvider:IsValuableWidget(widgetID)
     return widgetID and self.valuableWidgets[widgetID]
 end
 
-function DataProvider:GetGrowthTimes(objectGUID)
-    local creatureID = API.GetCreatureIDFromGUID(objectGUID);
+function DataProvider:GetGrowthTimesByCreatureID(creatureID)
     if creatureID and PLANT_DATA[creatureID] then
         local widgetID = PLANT_DATA[creatureID][2];
-        local info = widgetID and C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(widgetID);
+        local info = widgetID and GetStatusBarWidgetVisualizationInfo(widgetID);
         if info then
             return info.barValue, info.barMax
         end
     end
+end
+function DataProvider:GetGrowthTimes(objectGUID)
+    local creatureID = GetCreatureIDFromGUID(objectGUID);
+    return self:GetGrowthTimesByCreatureID(creatureID)
 end
 
 function DataProvider:IsPlantGrowing(objectGUID)
@@ -710,8 +713,20 @@ function DataProvider:IsPlantGrowing(objectGUID)
     return remainingTime and remainingTime > 0
 end
 
-function DataProvider:GetPlantNameAndProgress(objectGUID)
-    local id = API.GetCreatureIDFromGUID(objectGUID);
+function DataProvider:GetPlantNameByCreatureID(creatureID)
+    if creatureID and PLANT_DATA[creatureID] then
+        local criteriaString = GetAchievementCriteriaInfoByID(19013, PLANT_DATA[creatureID][1]);
+        return criteriaString
+    end
+end
+
+function DataProvider:GetPlantNameAndProgress(objectGUID, isCreatureID)
+    local id;
+    if isCreatureID then
+        id = objectGUID;
+    else
+        id = GetCreatureIDFromGUID(objectGUID);
+    end
     if id and PLANT_DATA[id] then
         local criteriaString, criteriaType, completed = GetAchievementCriteriaInfoByID(19013, PLANT_DATA[id][1]);
         return criteriaString, completed
@@ -739,7 +754,376 @@ function DataProvider.GetActiveDreamseedGrowthTimes()
     end
 end
 
+function DataProvider:GetNurtureProgress(objectGUID, convertToString)
+    local creatureID = GetCreatureIDFromGUID(objectGUID);
+    if creatureID and PLANT_DATA[creatureID] then
+        local widgetID = PLANT_DATA[creatureID][3];
+        local info = widgetID and GetStatusBarWidgetVisualizationInfo(widgetID);
+        if info then
+            if convertToString then
+                local str = info.text;
+                if str then
+                    str = str..": ".. info.barValue .. "/" ..info.barMax
+                else
+                    str = info.barValue .. "/" ..info.barMax
+                end
+                return str
+            else
+                return info.barValue, info.barMax
+            end
+        end
+    end
+end
+
+function DataProvider:GetRewardTierByCreatureID(creatureID)
+    local seedTier, bloomTier = 0, 0;
+    if creatureID and PLANT_DATA[creatureID] then
+        local info, widgetID, itemID;
+        for i = 6, 8 do
+            widgetID = PLANT_DATA[creatureID][i];
+            info = widgetID and GetItemDisplayVisualizationInfo(widgetID);
+            if info and info.shownState == 1 and info.itemInfo and info.itemInfo.showAsEarned then
+                itemID = info.itemInfo.itemID;
+                if itemID == 210217 then
+                    seedTier = 1;   --Small Dreamy Bounty
+                elseif itemID == 210218 then
+                    seedTier = 2;   --Plump Dreamy Bounty
+                elseif itemID == 210219 then
+                    seedTier = 3;   --Gigantic Dreamy Bounty
+                end
+                break
+            end
+        end
+        for i = 9, 11 do
+            widgetID = PLANT_DATA[creatureID][i];
+            info = widgetID and GetItemDisplayVisualizationInfo(widgetID);
+            if info and info.shownState == 1 and info.itemInfo and info.itemInfo.showAsEarned then
+                itemID = info.itemInfo.itemID;
+                if itemID == 210224 then
+                    bloomTier = 1;  --Small     <50
+                elseif itemID == 210225 then
+                    bloomTier = 2;  --Medium    <100
+                elseif itemID == 210226 then
+                    bloomTier = 3;  --Large     =100
+                end
+                break
+            end
+        end
+    end
+    return seedTier, bloomTier
+end
+
+function DataProvider:GetRewardTier(objectGUID)
+    local creatureID = GetCreatureIDFromGUID(objectGUID);
+    return self:GetRewardTierByCreatureID(creatureID)
+end
+
+function DataProvider:GetGrowthStateChanged(creatureID, growthRemainingSeconds)
+    if not self.growthEndTimes then
+        self.growthEndTimes = {};
+    end
+
+    if growthRemainingSeconds <= 0 then
+        if self.growthEndTimes[creatureID] then
+            return true
+        else
+            return false
+        end
+    end
+
+    local isChanged = false;
+    local currentTime = time();
+
+    if self.growthEndTimes[creatureID] then
+        if currentTime > self.growthEndTimes[creatureID] then
+            isChanged = true;
+        end
+    else
+        isChanged = true;
+    end
+
+    self.growthEndTimes[creatureID] = currentTime + growthRemainingSeconds;
+
+    return isChanged
+end
+
+function DataProvider:Debug_ConstructWidgetID()
+    --3 Bounty, 3 Blooms
+    local REWARD_ITEMS = {210217, 210218, 210219, 210224, 210225, 210226};
+
+    for creatureID in pairs(PLANT_DATA) do
+        local info, widgetSetID, setWidgets;
+        local itemIDxWidgetID = {};
+
+        for i = 15, 17 do
+            widgetSetID = PLANT_DATA[creatureID][i];
+            setWidgets = GetAllWidgetsBySetID(widgetSetID);
+            if setWidgets then
+                local numItems = 0;
+                for _, widgetInfo in ipairs(setWidgets) do
+                    if widgetInfo.widgetType == 27 then
+                        numItems = numItems + 1;
+                        local widgetID = widgetInfo.widgetID;
+                        info = GetItemDisplayVisualizationInfo(widgetID);
+                        local itemID = info.itemInfo.itemID;
+                        if not itemIDxWidgetID[itemID] then
+                            itemIDxWidgetID[itemID] = widgetID;
+                        end
+                    end
+                end
+            end
+        end
+
+        local output;
+        for i, itemID in ipairs(REWARD_ITEMS) do
+            local widgetID = itemIDxWidgetID[itemID];
+            if output then
+                output = output..", "..widgetID;
+            else
+                output = widgetID;
+            end
+        end
+        API.SaveDataUnderKey(creatureID, output);
+    end
+end
+
+--[[
+function DataProvider:HasAnyRewardByCreatureID(creatureID)
+    --Three widgetSet for each plant, mapped to 3 different rarities
+    --All three Emerald Bloom rewards of each widgetSet will be flagged simultaneously
+    --All three status bar of each widgetSet also change in sync
+    --Save the objectGUID and position if it has unclaimed reward
+    --Returns: hasAnyReward, isRewardLocationCached
+    if creatureID and PLANT_DATA[creatureID] then
+        if self:IsDreamseedChestAvailableByCreatureID(creatureID) then
+            return true, true
+        end
+        local info, widgetSetID, setWidgets;
+        for i = 15, 17 do
+            widgetSetID = PLANT_DATA[creatureID][i];
+            setWidgets = GetAllWidgetsBySetID(widgetSetID);
+            if setWidgets then
+                for _, widgetInfo in ipairs(setWidgets) do
+                    if widgetInfo.widgetType == 27 then
+                        info = GetItemDisplayVisualizationInfo(widgetInfo.widgetID);
+                        if info and info.shownState == 1 and info.itemInfo and info.itemInfo.showAsEarned then
+                            return true, false
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return false, false
+end
+--]]
+
+function DataProvider:HasAnyRewardByCreatureID(creatureID)
+    --We now use a more RAM friendly (not getting all the widgets in a wigetSet), but less robust approach
+    if creatureID and PLANT_DATA[creatureID] then
+        if self:IsDreamseedChestAvailableByCreatureID(creatureID) then
+            return true, true
+        end
+        local creatureData = PLANT_DATA[creatureID];
+        local info;
+        for i = 6, 11 do
+            info = GetItemDisplayVisualizationInfo(creatureData[i]);
+            if info and info.shownState == 1 and info.itemInfo and info.itemInfo.showAsEarned then
+                return true, false
+            end
+        end
+    end
+    return false, false
+end
+
+function DataProvider:HasAnyReward(objectGUID)
+    local creatureID = GetCreatureIDFromGUID(objectGUID);
+    return self:HasAnyRewardByCreatureID(creatureID);
+end
+
+function DataProvider:GetResourcesText()
+    --208066, 208067, 208047
+    local info = C_CurrencyInfo.GetCurrencyInfo(2650);  --Emerald Dewdrop
+    local anyNonZero = false;
+    local text;
+
+    if info then
+        local quantity = info.quantity;
+        if quantity > 0 then
+            anyNonZero = true;
+            if quantity > 9999 then
+                quantity = "9999+";
+            end
+        else
+            quantity = "|cff8080800|r";
+        end
+        text = format(FORMAT_ITEM_COUNT_ICON, quantity, info.iconFileID).."  ";
+    else
+        return
+    end
+
+    local count, icon;
+
+    for _, itemID in ipairs(SEED_ITEM_IDS) do
+        count = GetItemCount(itemID);
+        icon = GetItemIconByID(itemID);
+        if count == 0 then
+            count = "|cff8080800|r";
+        else
+            anyNonZero = true;
+        end
+        text = text.."  "..format(FORMAT_ITEM_COUNT_ICON, count, icon);
+    end
+
+    if anyNonZero then
+        return text
+    else
+        --we don't show this text if player has none of the required resources
+    end
+end
+
+function DataProvider:GetChestOwnerCreatureIDs()
+    local tbl = {};
+    local vignetteID;
+    for creatureID, data in pairs(PLANT_DATA) do
+        for i = 12, 14 do
+            vignetteID = data[i];
+            tbl[vignetteID] = creatureID;
+        end
+    end
+    return tbl
+end
+
+function DataProvider:IsDreamseedChestAvailableByCreatureID(creatureID)
+    if not self.dreamseedChestStates then
+        return false
+    end
+
+    return self.dreamseedChestStates[creatureID] ~= nil
+end
+
+function DataProvider:IsDreamseedChestAvailable(objectGUID)
+    local creatureID = GetCreatureIDFromGUID(objectGUID);
+    return self:IsDreamseedChestAvailableByCreatureID(creatureID)
+end
+
+function DataProvider:SetChestStateByCreatureID(creatureID, state, objectGUID, x, y)
+    if not creatureID then return end;
+
+    if not self.dreamseedChestStates then
+        self.dreamseedChestStates = {};
+    end
+
+    --local plantName = self:GetPlantNameAndProgress(creatureID, true);
+    if state and not self.dreamseedChestStates[creatureID] then
+        self.dreamseedChestStates[creatureID] = {objectGUID, x, y};
+        if self.BackupCreaturePositions[creatureID] then
+            self.BackupCreaturePositions[creatureID] = {x, y};  --overwrite our database in case Blizzard moves things
+        end
+    else
+        self.dreamseedChestStates[creatureID] = nil;
+    end
+end
+
+function DataProvider:SetChestState(objectGUID, state, x, y)
+    local creatureID = GetCreatureIDFromGUID(objectGUID);
+    self:SetChestStateByCreatureID(creatureID, state, objectGUID, x, y)
+end
+
+function DataProvider:TryGetChestInfoByCreatureID(creatureID)
+    if self.dreamseedChestStates then
+        return self.dreamseedChestStates[creatureID]
+    end
+end
+
+function DataProvider:GetPlantCreatureIDs()
+    local tbl = {};
+    for creatureID in pairs(PLANT_DATA) do
+        tbl[creatureID] = false;
+    end
+    return tbl
+end
+
+function DataProvider:GetBackupLocation(creatureID)
+    return creatureID and self.BackupCreaturePositions[creatureID]
+end
+
 API.GetActiveDreamseedGrowthTimes = DataProvider.GetActiveDreamseedGrowthTimes;
+API.DreamseedUtil = DataProvider;
+
+
+
+
+DataProvider.BackupCreaturePositions = {
+    [208605] = {
+        0.634965717792511,
+        0.4709928631782532,
+    },
+    [209880] = {
+        0.4074325561523438,
+        0.4348400235176086,
+    },
+    [210725] = {
+        0.4873448014259338,
+        0.8045594692230225,
+    },
+    [208563] = {
+        0.6302892565727234,
+        0.5284437537193298,
+    },
+    [208443] = {
+        0.5924164056777954,
+        0.5876181125640869,
+    },
+    [208606] = {
+        0.5665966272354126,
+        0.4488694071769714,
+    },
+    [211059] = {
+        0.5114631652832031,
+        0.5863984823226929,
+    },
+    [208556] = {
+        0.6395775675773621,
+        0.6483616232872009,
+    },
+    [209583] = {
+        0.4067537784576416,
+        0.2478460669517517,
+    },
+    [209599] = {
+        0.5651239156723022,
+        0.3766665458679199,
+    },
+    [208615] = {
+        0.4638132452964783,
+        0.4048779606819153,
+    },
+    [208511] = {
+        0.5459136962890625,
+        0.6763055324554443,
+    },
+    [208617] = {
+        0.4990068674087524,
+        0.3544299006462097,
+    },
+    [208616] = {
+        0.400239109992981,
+        0.5268844366073608,
+    },
+    [210724] = {
+        0.4264156222343445,
+        0.740414023399353,
+    },
+    [208607] = {
+        0.4916412830352783,
+        0.4806915521621704,
+    },
+    [210723] = {
+        0.3845012784004211,
+        0.5920345783233643,
+    },
+};
 
 ---- Dev Tool
 --[[
@@ -783,10 +1167,12 @@ do
 
         for i, guid in ipairs(vignetteGUIDs) do
             info = C_VignetteInfo.GetVignetteInfo(guid);
-            if info.name == "Emerald Bounty" then
+            if info and info.name then
                 total = total + 1;
                 vignettesGUIDs[total] = info.vignetteGUID;
-                print(total, string.format("#%s  type:%s  %s  WorldMap %s  Minimap %s  Unique %s", info.vignetteID, info.type, info.name, tostring(info.onWorldMap), tostring(info.onMinimap), tostring(info.isUnique)));
+                if info.name == "Dreamseed Chest" and true then
+                    print(total, format("#%s  type:%s  %s  WorldMap %s  Minimap %s  Unique %s  %s", info.vignetteID, info.type, info.name, tostring(info.onWorldMap), tostring(info.onMinimap), tostring(info.isUnique), info.vignetteGUID));
+                end
             end
         end
 
@@ -813,7 +1199,7 @@ do
         print(trueDistance, distance);
     end
 
-    function TextStatusBar()
+    function TestStatusBar()
         if not PlumberTestStatusBar then
             PlumberTestStatusBar = addon.CreateTimerFrame(UIParent);
             PlumberTestStatusBar:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
@@ -825,5 +1211,68 @@ do
         end
         PlumberTestStatusBar:SetDuration(180);
     end
+
+    function TestTinyBar()
+        if not PlumberTestStatusBar then
+            PlumberTestStatusBar = addon.CreateTinyStatusBar(UIParent);
+            PlumberTestStatusBar:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+            PlumberTestStatusBar:UpdateMaxBarFillWidth();
+            PlumberTestStatusBar:SetReverse(true);
+        end
+        PlumberTestStatusBar:SetDuration(10);
+    end
 end
 --]]
+
+--[[
+local UiWidgets_Reward_Bounty = {
+    --{Small, Plump, Gigantic Bounty, Small, Medium, Large Bloom}
+    {5179, 5172, 5180, 5173, 5245, 5247},
+    {5183, 5181, 5182, 5184, 5248, 5249},
+    {5186, 5188, 5187, 5185, 5250, 5251},
+    {5191, 5189, 5190, 5192, 5252, 5253},
+    {5194, 5195, 5196, 5193, 5254, 5255},
+    {5198, 5200, 5199, 5197, 5256, 5257},
+    {5202, 5204, 5203, 5201, 5258, 5259},
+    {5206, 5208, 5207, 5205, 5260, 5261},
+    {5210, 5212, 5211, 5209, 5262, 5263},
+    {5214, 5216, 5215, 5213, 5264, 5265},
+    {5218, 5220, 5219, 5217, 5266, 5267},
+    {5222, 5224, 5223, 5221, 5268, 5269},
+    {5226, 5228, 5227, 5225, 5270, 5271},
+    {5230, 5232, 5231, 5229, 5272, 5273},
+    {5234, 5236, 5235, 5233, 5274, 5275},
+    {5238, 5240, 5239, 5237, 5276, 5277},
+    {5242, 5244, 5243, 5241, 5278, 5279},
+};
+--]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

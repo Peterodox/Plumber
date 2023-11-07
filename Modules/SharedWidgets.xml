@@ -1,0 +1,75 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="SharedWidgets.lua"/>
+
+    <Frame name="PlumberBarPulseTemplate" virtual="true">
+    <!--Derivative of Blizzard FullResourcePulseFrame-->
+        <Size x="16" y="32"/>
+        <Layers>
+            <Layer level="OVERLAY">
+                <Texture parentKey="Spike" alpha="0" alphaMode="ADD" file="Interface\AddOns\Plumber\Art\Frame\ProgressBar-Pulse" hidden="false">
+                    <TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
+                    <Size x="16" y="32"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Glow" alpha="0" alphaMode="ADD" file="Interface\AddOns\Plumber\Art\Frame\ProgressBar-Pulse">
+                    <TexCoords left="0" right="0.25" top="0" bottom="1"/>
+                    <Size x="16" y="32"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="1" y="0"/>
+                    </Anchors>
+                </Texture>
+                <MaskTexture file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Full" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
+                    </Anchors>
+                    <MaskedTextures>
+                        <MaskedTexture childKey="Glow"/>
+                    </MaskedTextures>
+                </MaskTexture>
+            </Layer>
+        </Layers>
+        <Animations>
+            <AnimationGroup parentKey="AnimPulse" setToFinalAlpha="true">
+                <Alpha childKey="Spike" order="1" fromAlpha="0" toAlpha="0" duration="0.15"/>
+                <Alpha childKey="Spike" startDelay="0.15" smoothing="IN" duration="0.1" order="1" fromAlpha="0" toAlpha="0.5"/>
+                <Scale childKey="Spike" startDelay="0.15" smoothing="NONE" duration="0.1" order="1" fromScaleX="0.25" fromScaleY="1" toScaleX="1.4" toScaleY="1">
+                    <Origin point="LEFT"/>
+                </Scale>
+                <Scale childKey="Spike" startDelay="0.25" smoothing="IN" duration="0.2" order="1" fromScaleX="1" fromScaleY="1" toScaleX="0.5" toScaleY="1">
+                    <Origin point="LEFT"/>
+                </Scale>
+                <Alpha childKey="Spike" startDelay="0.25" duration="0.25" order="1" fromAlpha="0.5" toAlpha="0"/>
+
+                <Alpha childKey="Glow" duration="0.1" order="1" fromAlpha="0" toAlpha="0.8"/>
+                <Translation childKey="Glow" duration="0.25" order="1" offsetX="8" offsetY="0" smoothing="OUT"/>
+                <Alpha childKey="Glow" startDelay="0.35" duration="0.15" order="1" fromAlpha="1" toAlpha="0"/>
+            </AnimationGroup>
+        </Animations>
+    </Frame>
+
+    <Cooldown name="PlumberGenericCooldownTemplate" hideCountdownNumbers="true" reverse="true" hidden="true" virtual="true">
+        <Size x="32" y="32"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <!--Texture setAllPoints="true">
+                    <Color r="1" a="0.5"/>
+                </Texture-->
+                <Texture parentKey="Background" file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Background">
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>	
+                </Texture>
+            </Layer>
+        </Layers>
+        <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Swipe-Blue">
+
+        </SwipeTexture>
+        <EdgeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Edge">
+
+        </EdgeTexture>
+    </Cooldown>
+</Ui>

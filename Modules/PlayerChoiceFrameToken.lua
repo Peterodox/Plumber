@@ -40,41 +40,6 @@ end
 
 local EL = CreateFrame("Frame");
 
-local function UpdateChoiceCurrency()
-    local f = PlayerChoiceFrame;
-    if not (f and f:IsShown() and f.choiceInfo and f.choiceInfo.choiceID and f.choiceInfo.objectGUID) then return end;
-
-    local creatureID = GetCreatureIDFromGUID(f.choiceInfo.objectGUID);
-    --print(creatureID);
-
-    if GUIDXCurrency[creatureID] then
-        if not TokenDisplay then
-            TokenDisplay = addon.CreateTokenDisplay(UIParent);
-        end
-        TokenDisplay:DisplayCurrencyOnFrame(f, "BOTTOMRIGHT", GUIDXCurrency[creatureID]);
-        local currentTime, fullTime = API.GetActiveDreamseedGrowthTimes();
-        if currentTime and fullTime then
-            if not TimerFrame then
-                TimerFrame = addon.CreateTimerFrame(TokenDisplay);
-                TimerFrame:SetReverse(true);
-                TimerFrame:SetStyle(2);
-                TimerFrame:SetWidth(192);
-                TimerFrame:SetBarColor(218/255, 218/255, 34/255)
-                TimerFrame:UpdateMaxBarFillWidth();
-            end
-            TimerFrame:SetPoint("BOTTOM", f, "BOTTOM", 0, 236);
-            --print(currentTime, fullTime)
-            TimerFrame:Show();
-            TimerFrame:SetTimes(fullTime - currentTime, fullTime);
-        end
-    end
-end
-
-local function EL_OnUpdate(self, elapsed)
-    self:SetScript("OnUpdate", nil);
-    UpdateChoiceCurrency();
-end
-
 local function HideWigets()
     if TokenDisplay then
         TokenDisplay:HideTokenFrame();
@@ -84,6 +49,47 @@ local function HideWigets()
         TimerFrame:Clear();
     end
 end
+
+local function UpdateChoiceCurrency()
+    local f = PlayerChoiceFrame;
+    if not (f and f:IsShown() and f.choiceInfo and f.choiceInfo.choiceID and f.choiceInfo.objectGUID) then
+        HideWigets();
+        return
+    end
+
+    local creatureID = GetCreatureIDFromGUID( f.choiceInfo.objectGUID );
+
+    if GUIDXCurrency[creatureID] then
+        if not TokenDisplay then
+            TokenDisplay = addon.CreateTokenDisplay(UIParent);
+        end
+        TokenDisplay:DisplayCurrencyOnFrame(f, "BOTTOMRIGHT", GUIDXCurrency[creatureID]);
+        local remainingTime, fullTime = API.GetActiveDreamseedGrowthTimes();
+        if remainingTime and fullTime then
+            if not TimerFrame then
+                TimerFrame = addon.CreateTimerFrame(TokenDisplay);
+                TimerFrame:SetReverse(true);
+                TimerFrame:SetStyle(2);
+                TimerFrame:SetWidth(192);
+                TimerFrame:SetBarColor(218/255, 218/255, 34/255)
+                TimerFrame:UpdateMaxBarFillWidth();
+            end
+            TimerFrame:SetPoint("BOTTOM", f, "BOTTOM", 0, 236);
+            --print(remainingTime, fullTime)
+            TimerFrame:Show();
+            TimerFrame:SetTimes(fullTime - remainingTime, fullTime);
+        end
+    else
+        HideWigets();
+    end
+end
+
+local function EL_OnUpdate(self, elapsed)
+    self:SetScript("OnUpdate", nil);
+    UpdateChoiceCurrency();
+end
+
+
 
 EL:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_CHOICE_UPDATE" then

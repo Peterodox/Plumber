@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.0.4";
-local VERSION_DATE = 1696553418;
+local VERSION_TEXT = "v1.1.1";
+local VERSION_DATE = 1699365522;
 
 
 local addonName, addon = ...
@@ -14,10 +14,17 @@ addon.VERSION_TEXT = VERSION_TEXT;
 local DefaultValues = {
     AutoJoinEvents = true,
     BackpackItemTracker = true,
+        HideZeroCountItem = true,
+        ConciseTokenTooltip = true,
+        TrackItemUpgradeCurrency = true,
     DruidModelFix = true,               --Remove after 10.2.0
     GossipFrameMedal = true,
-    PlayerChoiceFrameToken = true,      --First implementation in 10.2.0
     EmeraldBountySeedList = true,       --Show a list of Dreamseed when appoaching Emarad Bounty Soil
+    WorldMapPinSeedPlanting = true,     --Aditional Map Pin: Dreamseed
+    AlternativePlayerChoiceUI = true,   --Revamp PlayerChoiceFrame for Dreamseed Nurturing
+    HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
+
+    --PlayerChoiceFrameToken = true,      --First implementation in 10.2.0  --We instead revamp the who PlayerChoiceFrame
 };
 
 local function LoadDatabase()
