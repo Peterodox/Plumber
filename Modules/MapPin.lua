@@ -9,17 +9,26 @@ local VIGID_BOUNTY = 5971;
 local MAPID_EMRALD_DREAM = 2200;
 local PIN_SIZE_DORMANT = 12;
 local PIN_SIZE_ACTIVE = 18;
+local PIN_TINY_BAR_HEIGHT = 2;
 local PIN_TEMPLATE_NAME = "PlumberWorldMapPinTemplate";
+local PIN_DORMANT_TEXTURE = "Interface/AddOns/Plumber/Art/MapPin/SeedPlanting-Empty-Distant";   --optional postfix: -HC, High Contrast
 local FORMAT_TIME_LEFT = BONUS_OBJECTIVE_TIME_LEFT or "Time Left: %s";
 
 local DB_KEY_MASTER_SWITCH = "WorldMapPinSeedPlanting";     --This is the key that enable/disable our entire Map Pin Module. Since we only have one type of pins for now, we use the same key
 local DB_KEY_DREAMSEED = "WorldMapPinSeedPlanting";         --Control Dreamseed Pins (Show spawned soils, unclaimed chests, timer below active one)
 
 local MapFrame = WorldMapFrame;
+local MapScrollContainer = WorldMapFrame.ScrollContainer;
+local QuestDetailsFrame = QuestMapFrame and QuestMapFrame.DetailsFrame or nil;      --Hide our pins when viewing quest details
 local TooltipFrame = GameTooltip;
 
 local PinController = CreateFrame("Frame");
 local WorldMapDataProvider = CreateFromMixins(MapCanvasDataProviderMixin);
+
+--As a solution to the potential taint caused by MapDataProvider
+--We use this child frame of WorldMapFrame to check its mapID every 1/60 seconds
+local MapTracker = CreateFrame("Frame");
+MapTracker:Hide();
 
 local C_VignetteInfo = C_VignetteInfo;
 local GetVignetteInfo = C_VignetteInfo.GetVignetteInfo;
@@ -58,6 +67,10 @@ local function Debug_SaveCreatureLocation(objectGUID, x, y)
     end
 end
 
+local function IsViewingQuestDetails()
+    return QuestDetailsFrame and QuestDetailsFrame:IsVisible();
+end
+
 function PinController:AddPin(pin)
     table.insert(self.pins, pin);
 end
@@ -83,7 +96,28 @@ function PinController:UpdateTinyBarSize()
     self.tinybarDirty = false;
     if self.tinybars then
         for i, tinybar in ipairs(self.tinybars) do
-            tinybar:Init();
+            if tinybar:IsShown() then
+                tinybar:Init();
+            end
+        end
+    end
+end
+
+function PinController:UpdatePinSize()
+    local tempIndex;
+    for _, pin in ipairs(self.pins) do
+        tempIndex = pin.visualIndex;
+        pin.visualIndex = nil;
+        pin:SetVisual(tempIndex);
+    end
+end
+
+function PinController:UpdateTinyBarHeight()
+    self.tinybarDirty = false;
+    if self.tinybars then
+        for i, tinybar in ipairs(self.tinybars) do
+            tinybar:SetWidth(PIN_SIZE_ACTIVE);
+            tinybar:SetBarHeight(PIN_TINY_BAR_HEIGHT);
         end
     end
 end
@@ -387,6 +421,7 @@ function PlumberWorldMapPinMixin:UpdateState()
                 self.TinyBar = addon.CreateTinyStatusBar(self);
                 self.TinyBar:SetPoint("TOP", self, "BOTTOM", 0, -2);
                 self.TinyBar:SetWidth(PIN_SIZE_ACTIVE);
+                self.TinyBar:SetBarHeight(PIN_TINY_BAR_HEIGHT);
                 PinController:AddTinyBar(self.TinyBar);
             end
 
@@ -428,7 +463,7 @@ function PlumberWorldMapPinMixin:SetVisual(index)
         self:SetSize(PIN_SIZE_DORMANT, PIN_SIZE_DORMANT);
         self.Texture:SetSize(PIN_SIZE_ACTIVE, PIN_SIZE_ACTIVE); --We changed the icon size in the file
         if index == 1 then
-            self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/SeedPlanting-Empty-Distant");
+            self:SetTexture(PIN_DORMANT_TEXTURE);
         elseif index == 0 then
             self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/SeedPlanting-Bud");   --Unlooted
         end
@@ -478,7 +513,7 @@ end
 function WorldMapDataProvider:RemoveAllData()
     self.anyPins = false;
     PinController:ResetAllCreatureSpawnStates();
-	self:GetMap():RemoveAllPinsByTemplate(self:GetPinTemplate());
+	MapFrame:RemoveAllPinsByTemplate(self:GetPinTemplate());
 end
 
 function WorldMapDataProvider:RefreshAllData(fromOnShow)
@@ -489,14 +524,16 @@ end
 function WorldMapDataProvider:RefreshAllDataIfPossible()
     if DATA_PROVIDER_ADDED then
         self:RemoveAllIfNeeded();
-        self:ShowAllPins();
+        if not IsViewingQuestDetails() then
+            self:ShowAllPins();
+        end
     end
 end
 
 function WorldMapDataProvider:ShowAllPins()
     if not ENABLE_MAP_PIN then return end;
 
-    local uiMapID = self:GetMap():GetMapID();
+    local uiMapID = MapTracker:GetMapID()   --self:GetMap():GetMapID();
 
     if uiMapID ~= MAPID_EMRALD_DREAM then
         PinController:ListenEvents(false);
@@ -506,7 +543,7 @@ function WorldMapDataProvider:ShowAllPins()
     local vignetteGUIDs = C_VignetteInfo.GetVignettes();
     local pin;
     local info, vignettePosition, vignetteFacing;
-    local mapFrame = self:GetMap();
+    local mapFrame = MapFrame;
     local relavantVignetteGUIDs = {};
     local total = 0;
     local pins = {};
@@ -537,10 +574,10 @@ function WorldMapDataProvider:ShowAllPins()
     for i, pin in ipairs(pins) do
         if pin.isActive then
             pin:SetVisual(3);
-        elseif i == bestUniqueVignetteIndex then
-            pin:SetVisual(2);
         elseif pin.hasReawrd then
             pin:SetVisual(0);
+        elseif i == bestUniqueVignetteIndex then
+            pin:SetVisual(2);
         else
             pin:SetVisual(1);
         end
@@ -588,11 +625,113 @@ local function HookQuestDetailBackButton()
     end
 end
 
+
 local FilterFrame = CreateFrame("Frame", nil, UIParent);
 FilterFrame:Hide();
 FilterFrame:SetFrameStrata("TOOLTIP");
 FilterFrame:SetFixedFrameStrata(true);
 FilterFrame:SetIgnoreParentScale(true);
+
+
+function MapTracker:Attach()
+    if not self.attached then
+        self.attached = true;
+        self:SetParent(MapFrame);
+        self:EnableScripts();
+        self:Show();
+    end
+end
+
+function MapTracker:Detach()
+    if self.attached then
+        self.attached = nil;
+        self.mapID = nil;
+        self:SetParent(nil);
+        self:DisableScripts();
+        self:Hide();
+        WorldMapDataProvider:RemoveAllIfNeeded();
+        WorldMapDataProvider:OnHide();
+    end
+end
+
+function MapTracker:OnUpdate(elapsed)
+    self.t1 = self.t1 + elapsed;
+    self.t2 = self.t2 + elapsed;
+
+    if self.t1 > 0.016 then
+        self.t1 = 0;
+
+        self.newMapID = MapFrame.mapID;
+        if self.newMapID ~= self.mapID then
+            self.mapID = self.newMapID;
+            self:OnMapChanged();
+        end
+
+        self.newScale = MapScrollContainer.targetScale;
+        if self.newScale ~= self.mapScale then
+            self.mapScale = self.newScale;
+            self:OnCanvasScaleChanged();
+        end
+    end
+
+    if self.t2 > 0.1 then
+        self.t2 = 0;
+        self.detailsVisiblity = IsViewingQuestDetails();
+        if self.detailsVisiblity ~= self.isViewingDetails then
+            self.isViewingDetails = self.detailsVisiblity;
+            self:OnViewingQuestDetailsChanged();
+        end
+    end
+end
+
+function MapTracker:OnShow()
+    self.mapID = nil;
+    self.mapScale = nil;
+    self.isViewingDetails = IsViewingQuestDetails();
+    self.t1 = 1;
+    --self:OnUpdate(1);
+end
+
+function MapTracker:OnHide()
+    WorldMapDataProvider:OnHide();
+end
+
+function MapTracker:EnableScripts()
+    self.t1 = 0;
+    self.t2 = 0;
+    self:SetScript("OnShow", self.OnShow);
+    self:SetScript("OnHide", self.OnHide);
+    self:SetScript("OnUpdate", self.OnUpdate);
+end
+
+function MapTracker:DisableScripts()
+    self:SetScript("OnShow", nil);
+    self:SetScript("OnHide", nil);
+    self:SetScript("OnUpdate", nil);
+end
+
+function MapTracker:GetMapID()
+    return self.mapID
+end
+
+function MapTracker:OnMapChanged()
+    WorldMapDataProvider:RefreshAllDataIfPossible();
+end
+
+function MapTracker:OnCanvasScaleChanged()
+    WorldMapDataProvider:OnCanvasScaleChanged();
+    --PinController:UpdateTinyBarSize();
+end
+
+function MapTracker:OnViewingQuestDetailsChanged()
+    if self.isViewingDetails then
+
+    else
+        if ENABLE_MAP_PIN then
+            WorldMapDataProvider:RefreshAllDataIfPossible();
+        end
+    end
+end
 
 
 local ZoneTriggerModule;
@@ -610,15 +749,16 @@ local function EnableModule(state)
                 if not DATA_PROVIDER_ADDED then
                     --We register our module when the player is in Emerald Dream
                     DATA_PROVIDER_ADDED = true;
-                    MapFrame:AddDataProvider(WorldMapDataProvider);
+                    --MapFrame:AddDataProvider(WorldMapDataProvider);   --Potential taint!
                     MapFrame:RegisterCallback("PingQuestID", OnPingQuestID, PinController);
-                    HookQuestDetailBackButton();
+                    --HookQuestDetailBackButton();
                 end
-
+                MapTracker:Attach();
                 PinController:EnableModule(true);
             end
 
             local function OnLeaveZoneCallback()
+                MapTracker:Detach();
                 PinController:EnableModule(false);
             end
 
@@ -642,6 +782,38 @@ local function EnableModule(state)
     end
 end
 
+local function GetMapPinSizeSetting()
+    local id = PlumberDB and PlumberDB.MapPinSize;
+    if not id then
+        id = 1;
+    end
+    return id
+end
+
+local function SetPinSizeByID(id, update)
+    if (not id) or (id ~= 1 and id ~= 2) then return end;
+
+    if id == 1 then
+        PIN_SIZE_DORMANT = 12;
+        PIN_SIZE_ACTIVE = 18;
+        PIN_TINY_BAR_HEIGHT = 2;
+        PIN_DORMANT_TEXTURE = "Interface/AddOns/Plumber/Art/MapPin/SeedPlanting-Empty-Distant";
+    elseif id == 2 then
+        PIN_SIZE_DORMANT = 18;
+        PIN_SIZE_ACTIVE = 22;
+        PIN_TINY_BAR_HEIGHT = 4;
+        PIN_DORMANT_TEXTURE = "Interface/AddOns/Plumber/Art/MapPin/SeedPlanting-Empty-Distant-HC";
+    end
+
+    if update then
+        PinController:UpdatePinSize();
+        PinController:UpdateTinyBarHeight();
+    end
+
+    if PlumberDB then
+        PlumberDB.MapPinSize = id;
+    end
+end
 
 
 local LABEL_EMERALD_BOUNTY;
@@ -708,7 +880,7 @@ function DropDownButtonMixin_Dreamseed:OnClick()
     PlumberDB[self.dbKey] = newState;
     EnableModule(newState);
 
-    if newState and MapFrame:IsShown() and not(QuestMapFrame and QuestMapFrame.DetailsFrame and QuestMapFrame.DetailsFrame:IsShown()) then
+    if newState and MapFrame:IsShown() and not IsViewingQuestDetails() then
         WorldMapDataProvider:RefreshAllDataIfPossible();
     end
 
@@ -828,11 +1000,13 @@ function FilterFrame:CreateOptionList(dropdownWidth)
             if i == 1 then
                 DropDownButtonMixin.SetTitle(button, nil);
             elseif i == 2 then
+                --[[
                 if not self.mapName then
                     local info = C_Map.GetMapInfo(self.uiMapID);
                     self.mapName = info and info.name or nil;
                 end
-                DropDownButtonMixin.SetTitle(button, self.mapName);
+                --]]
+                DropDownButtonMixin.SetTitle(button, "Plumber");
             end
             button:SetScript("OnClick", nil);
         else
@@ -922,6 +1096,17 @@ function FilterFrame:SetupDropDown(dropdown)
     dropdown:SetHeight(height + extraHeight);
 
     self:ShowUI();
+
+    if not self.SizeSelectFrame then
+        local SizeSelectFrame = addon.CreateSimpleSizeSelect(self);
+        self.SizeSelectFrame = SizeSelectFrame;
+        SizeSelectFrame:ClearAllPoints();
+        SizeSelectFrame:SetPoint("TOPRIGHT", firstButton, "BOTTOMRIGHT", 0, 0); --firstButton is a blank line
+        SizeSelectFrame:SetNumChoices(2);
+        SizeSelectFrame:SelectSize( GetMapPinSizeSetting() );
+        SizeSelectFrame:SetOnSizeChangedCallback(SetPinSizeByID);
+        SizeSelectFrame:Show();
+    end
 end
 
 function FilterFrame:BlizzardMapFilter_OnMouseDown()
@@ -949,12 +1134,9 @@ do
         self:SetScript("OnEvent", nil);
         self:HookWorldFilterFrameButton();
         LABEL_EMERALD_BOUNTY = API.GetCreatureName(211123);
+
+        SetPinSizeByID( GetMapPinSizeSetting() );
     end);
-end
-
-
-do
-    
 end
 
 

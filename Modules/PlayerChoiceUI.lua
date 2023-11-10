@@ -15,6 +15,9 @@ local PATTERN_RESOURCE_DISPLAY = "%s |T%s:16:16:0:0:64:64:4:60:4:60|t";
 
 local API = addon.API;
 local GetCreatureIDFromGUID = API.GetCreatureIDFromGUID;
+local DreamseedUtil = API.DreamseedUtil;
+local GetWaypointFromText = API.GetWaypointFromText;
+local AreWaypointsClose = API.AreWaypointsClose;
 local easingFunc = addon.EasingFunctions.outQuart;
 local C_PlayerChoice = C_PlayerChoice;
 local C_UIWidgetManager = C_UIWidgetManager;
@@ -44,19 +47,34 @@ do
     end
 end
 
+
 local function HideBlizzardFrame()
     local f = PlayerChoiceFrame;
     if f then
         f:ClearAllPoints();
-        f:SetPoint("TOP", UIParent, "BOTTOM", 0, -32);
+        f:SetClampedToScreen(false);
+        f:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
     end
 end
+
+local function OnUpdate_OnShot(self)
+    self:SetScript("OnUpdate", nil);
+    HideBlizzardFrame();
+end
+
+local BlizzardFrameMover = CreateFrame("Frame");    --Attempted Fix for Report #10: "both the addon's UI and the default one are there"
+function BlizzardFrameMover:HidePlayerChoiceFrame()
+    HideBlizzardFrame();
+    self:SetScript("OnUpdate", OnUpdate_OnShot);
+end
+
 
 local PlayerChoiceUI = CreateFrame("Frame", nil, UIParent);
 PlayerChoiceUI:SetSize(64, 64);
 PlayerChoiceUI:SetPoint("CENTER", UIParent, "CENTER", 0, UI_OFFSET_Y);
 PlayerChoiceUI:Hide();
 PlayerChoiceUI:SetFrameStrata("DIALOG");
+PlayerChoiceUI:SetFixedFrameStrata(true);
 PlayerChoiceUI:SetFrameLevel(50);
 PlayerChoiceUI.LongClickWatcher = CreateFrame("Frame", nil, PlayerChoiceUI);
 
@@ -537,6 +555,107 @@ function PlayerChoiceUI:Init()
     CloseButton:SetScript("OnClick", CloseButton_OnClick);
 end
 
+
+
+
+local AnnounceButtonData = {};
+
+function AnnounceButtonData:SetTargetCoord(x, y)
+    self.x, self.y = x, y;
+end
+
+function AnnounceButtonData.ValidityCheck(msg)
+    local uiMapID, x, y = GetWaypointFromText(msg);
+    if uiMapID and uiMapID == 2200 then
+        x = x / 10000;
+        y = y / 10000;
+
+        local isClose = AreWaypointsClose(x, y, AnnounceButtonData.x or 0, AnnounceButtonData.y or 0);
+        return isClose
+    end
+end
+
+function AnnounceButtonData:GetDreamseedName()
+    if not self.nameDeamseed then
+        local spellID = 425856;
+        local name = GetSpellInfo(spellID);
+        if name then
+            self.nameDeamseed = name;
+        end
+    end
+    return self.nameDeamseed or "Dreamseed"
+end
+
+function AnnounceButtonData.UpdatePlayerLocation()
+    local creatureID, coordX, coordY = DreamseedUtil:GetNearbyPlantInfo();
+    if coordX and coordY then
+        AnnounceButtonData:SetTargetCoord(coordX, coordY);
+    end
+end
+
+function AnnounceButtonData.GenerateMessage()
+    local creatureID, coordX, coordY = DreamseedUtil:GetNearbyPlantInfo();
+    if not creatureID then
+        return false, 0
+    end
+
+    AnnounceButtonData:SetTargetCoord(coordX, coordY);
+
+    local DISABLE_ANNOUNCE_TIME = 20;
+
+    --local name = DreamseedUtil:GetPlantNameByCreatureID(creatureID);
+    local remainingTime = DreamseedUtil:GetGrowthTimesByCreatureID(creatureID);
+    local tint = PlayerChoiceUI.ProgressBar and PlayerChoiceUI.ProgressBar:GetBarColorTint() or 0;
+    local colorText;
+
+    if tint == 6 then   --purple
+        colorText = ICON_TAG_RAID_TARGET_DIAMOND3 or "Purple";
+    elseif tint == 7 then   --green
+        colorText = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
+    elseif tint == 8 then   --blue
+        colorText = ICON_TAG_RAID_TARGET_SQUARE3 or "Blue";
+    end
+
+    if colorText then
+        colorText = string.gsub(colorText, "^%l",string.upper);
+    end
+
+    if not (remainingTime and colorText) then
+        return false, 0
+    end
+
+    if remainingTime < DISABLE_ANNOUNCE_TIME then
+        return false, 3
+    end
+
+    local waypointText = API.CreateWaypointHyperlink(MAPID_EMRALD_DREAM, coordX, coordY);
+    local name = AnnounceButtonData:GetDreamseedName();
+    local msg = string.format("%s %s %s", colorText, name, waypointText);
+
+    if remainingTime < 90 then
+        --Add time
+        local abbreviated = true;
+        local partialTime = false;
+        local bakePluralEscapeSequence = true;
+        local timeText = API.SecondsToTime(remainingTime, abbreviated, partialTime, bakePluralEscapeSequence);
+        msg = msg.." "..timeText;
+    end
+
+    return true, msg
+end
+
+function PlayerChoiceUI:SetupAnnounceButton()
+    local Horn = addon.GetAnnounceButton();
+    Horn:SetParent(self);
+    Horn:ClearAllPoints();
+    Horn:SetPoint("BOTTOM", self, "TOP", 0, 2);
+    Horn:SetValidityCheck(AnnounceButtonData.ValidityCheck);
+    Horn:SetAnnouceTextSource(AnnounceButtonData.GenerateMessage);
+    Horn:EnableCursorBlocker(true);
+    Horn:ShowAndRequestUpdate(AnnounceButtonData.UpdatePlayerLocation);
+    AnnounceButtonData:GetDreamseedName();  --to cache item name
+end
+
 local INTRO_DURATION = 0.35;
 --local UI_FROM_OFFSET = UI_OFFSET_Y - 20;
 
@@ -586,6 +705,8 @@ function PlayerChoiceUI:ShowUI()
         self:RegisterEvent("PLAYER_DEAD");
         self:RegisterEvent("PLAYER_ENTERING_WORLD");
         self.consumeNextClick = false;
+
+        self:SetupAnnounceButton();
     end
 
     self:Show();
@@ -620,10 +741,11 @@ function PlayerChoiceUI:PLAYER_CHOICE_UPDATE()
     end
 
     local creatureID = GetCreatureIDFromGUID(choiceInfo.objectGUID);
+
     if VALID_CREATURES[creatureID] then
         local success = self:ShowUI();
         if success then
-            HideBlizzardFrame();
+            BlizzardFrameMover:HidePlayerChoiceFrame();
         end
 
         if self.autoClick and self.repeatButtonID then
@@ -909,6 +1031,13 @@ FrameMover:SetScript("OnUpdate", function(self, elapsed)
     PlayerChoiceUI:SetPoint("CENTER", 0, y);
 end);
 
+
+do
+    if GetLocale() == "deDE" then
+        --German words are longer, so we need to adjust the button width
+        OPTION_FRAME_WIDTH = OPTION_FRAME_WIDTH + 24;
+    end
+end
 
 
 --[[

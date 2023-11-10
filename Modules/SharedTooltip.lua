@@ -623,6 +623,8 @@ end
 
 do
     --Item Upgrade System (Crests)
+    local DBKEY_MORE_INFO_CREST = "TooltipShowExtraInfoCrest";
+
     local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
     local CrestCurrenies = {
         2709,   --Aspect    (M, M16+)
@@ -630,6 +632,7 @@ do
         2707,   --Drake     (N, M10)
         2706,   --Whelpling (LFR, M5)
     };
+    local FLIGHT_STONE_ID = 2245;
 
     local RAID_DIFFICUTY_M = PLAYER_DIFFICULTY6 or "Mythic";
     local RAID_DIFFICUTY_H = PLAYER_DIFFICULTY2 or "Heroic";
@@ -647,9 +650,17 @@ do
     local SEASON_CAP_LABEL = string.gsub(CURRENCY_SEASON_TOTAL_MAXIMUM or "Season Maximum: %s%s/%s", "%%s/%%s", "");
 
     function SharedTooltip:DisplayUpgradeCurrencies(showExtraInfo)
+        if PlumberDB then
+            --Save previous states
+            if showExtraInfo == nil then
+                showExtraInfo = PlumberDB and PlumberDB[DBKEY_MORE_INFO_CREST] or false;
+            end
+            PlumberDB[DBKEY_MORE_INFO_CREST] = showExtraInfo;
+        end
+
         self:ClearLines();
 
-        local info, name, quantity, toEarn, trackedQuantity, maxQuantity;
+        local info, name, quantity, toEarn, totalEarned, maxQuantity;
         local seasonCap;
         local anyDiscovered = showExtraInfo;     --We make sure there is no skipped tier between the discovered ones
         local row = 1;
@@ -670,18 +681,18 @@ do
                     quantity = string.format(CURRENCY_QUANTITY_ICON_FORMAT, quantity, info.iconFileID);
                 end
 
-                trackedQuantity = info.trackedQuantity or 0;
+                totalEarned = info.totalEarned or 0;    --info.trackedQuantity
                 maxQuantity = info.maxQuantity or 0;
 
                 if showExtraInfo then
                     --toEarn becomes number of Earned currency
-                    toEarn = trackedQuantity.."/"..maxQuantity;
+                    toEarn = totalEarned.."/"..maxQuantity;
                 else
                     --toEarn: how much left to earn
                     if maxQuantity == 0 then
                         toEarn = "-";
                     else
-                        toEarn = maxQuantity - trackedQuantity;
+                        toEarn = maxQuantity - totalEarned;
                         if toEarn <= 0 then
                             toEarn = "|TInterface/AddOns/Plumber/Art/Button/Checkmark-Green:0:0|t";
                         end
@@ -715,8 +726,24 @@ do
                 self:SetGridLine(1, 3, L["Numbers To Earn"], 0.5, 0.5, 0.5, 3, 3);
             end
 
-            self:AddBlankLine();
-            self:AddCenterLine(string.format(SEASON_CAP_LABEL, seasonCap), 0.5, 0.5, 0.5, nil, nil, 2)
+            if showExtraInfo then
+                --Show flightstone
+                info = GetCurrencyInfo(FLIGHT_STONE_ID);
+                if info then
+                    name = info.name;
+                    name = "|cffffd100"..name.."|r";
+                    quantity = info.quantity or 0;
+                    if showIcon then
+                        quantity = string.format(CURRENCY_QUANTITY_ICON_FORMAT, quantity, info.iconFileID);
+                    end
+                    self:AddBlankLine();
+                    self:AddCenterLine(name.."  "..quantity, 1, 1, 1, nil, nil, 2);
+                end
+            else
+                --Show season maximum
+                self:AddBlankLine();
+                self:AddCenterLine(string.format(SEASON_CAP_LABEL, seasonCap), 0.5, 0.5, 0.5, nil, nil, 2)
+            end
         else
             self:AddLeftLine(ERR_ITEM_NOT_FOUND, 1.000, 0.282, 0.000);
         end

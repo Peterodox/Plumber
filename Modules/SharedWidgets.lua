@@ -1358,7 +1358,7 @@ do
         self.Stroke:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", px, -px);
         self.OutStroke:SetPoint("TOPLEFT", self, "TOPLEFT", -2*px, 2*px);
         self.OutStroke:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 2*px, -2*px);
-        self:SetHeight(2*px);
+        self:SetHeight((self.heightPixel or 2)*px);
         self:UpdateMaxBarFillWidth();
     end
 
@@ -1431,6 +1431,13 @@ do
         self:DisplayProgress();
     end
 
+    function TinyStatusBarMixin:SetBarHeight(pixel)
+        if pixel ~= self.heightPixel then
+            self.heightPixel = pixel;
+            self:Init();
+        end
+    end
+
     local function CreateTinyStatusBar(parent)
         local f = CreateFrame("Frame", nil, parent);
         f:SetSize(24, 2);
@@ -1475,6 +1482,7 @@ do
 
         Mixin(f, TinyStatusBarMixin);
         f:SetBarColor(1, 0.82, 0);
+        f:SetBarHeight(2);
         f:SetScript("OnShow", f.Calibrate);
         f:Init();
 
@@ -1877,7 +1885,6 @@ do  --Metal Progress Bar
     function ProgressBarMixin:Flash()
         self.BarPulse.AnimPulse:Stop();
         self.BarPulse.AnimPulse:Play();
-        self.BarShake:Stop();
         if self.playShake then
             self.BarShake:Play();
         end
@@ -1903,6 +1910,10 @@ do  --Metal Progress Bar
         if self.barValue and self.barMax then
             self:SetValue(self.barValue, self.barMax);
         end
+    end
+
+    function ProgressBarMixin:GetBarColorTint()
+        return self.colorTint
     end
 
     local function SetupNotchTexture_Normal(notch)
@@ -2264,4 +2275,134 @@ do  --Cursor Cooldown (Displayed near the cursor)
         return CursorProgressIndicator
     end
     addon.AcquireCursorProgressIndicator = AcquireCursorProgressIndicator;
+end
+
+do  --Simple Size Select (S/M/L)
+    local OPTION_BUTTON_WIDTH = 16;     --Slightly larger: served as gap between buttons
+    local OPTION_BUTTON_HEIGHT = 14;
+
+    local SizeOptionButtonMixin = {};
+
+    function SizeOptionButtonMixin:OnEnter()
+        self:SetAlpha(1);
+        self:GetParent():ShowTitle(true);
+    end
+
+    function SizeOptionButtonMixin:OnLeave()
+        if not self.selected then
+            self:SetAlpha(0.6);
+        else
+            self:SetAlpha(0.8);
+        end
+        self:GetParent():ShowTitle(false);
+    end
+
+    function SizeOptionButtonMixin:OnClick()
+        self:GetParent():SelectSize(self.id, true);
+    end
+
+    function SizeOptionButtonMixin:SetSelected(state)
+        self.selected = state;
+        if state then
+            self.Icon:SetTexCoord(0.25*(self.id - 1), 0.25*self.id, 0, 0.5);
+            self:SetAlpha(1);
+        else
+            self.Icon:SetTexCoord(0.25*(self.id - 1), 0.25*self.id, 0.5, 1);
+        end
+
+        if self:IsMouseOver() then
+            self:SetAlpha(1);
+        else
+            if state then
+                self:SetAlpha(0.8);
+            else
+                self:SetAlpha(0.6);
+            end
+        end
+    end
+
+
+    local SizeSelectMixin = {};
+
+    function SizeSelectMixin:SelectSize(id, runScript)
+        if id ~= self.selectedSize then
+            self.selectedSize = id;
+        else
+            return
+        end
+
+        for i, button in ipairs(self.buttons) do
+            button:SetSelected(i == id);
+        end
+
+        if runScript and self.callback then
+            self.callback(id, true);
+        end
+    end
+
+    function SizeSelectMixin:SetNumChoices(numChoices)
+        if numChoices > 3 then
+            numChoices = 3;
+        end
+
+        if numChoices ~= self.numChoices then
+            self.numChoices = numChoices;
+        else
+            return
+        end
+
+        if not self.buttons then
+            self.buttons = {};
+        end
+
+        for i = 1, numChoices do
+            if not self.buttons[i] then
+                local button = CreateFrame("Button", nil, self);
+                self.buttons[i] = button;
+                button.id = i;
+                button:SetSize(OPTION_BUTTON_WIDTH, OPTION_BUTTON_HEIGHT);
+                button:SetPoint("LEFT", self, "LEFT", (i - 1)*OPTION_BUTTON_WIDTH, 0);
+                button.Icon = button:CreateTexture(nil, "OVERLAY");
+                button.Icon:SetSize(OPTION_BUTTON_HEIGHT, OPTION_BUTTON_HEIGHT);
+                button.Icon:SetPoint("CENTER", button, "CENTER", 0, 0);
+                button.Icon:SetTexture("Interface/AddOns/Plumber/Art/Button/SimpleSizeSelect");
+                button.Icon:SetTexCoord(0.75, 1, 0.5, 1);
+                button:SetAlpha(0.6);
+                button:SetScript("OnEnter", SizeOptionButtonMixin.OnEnter);
+                button:SetScript("OnLeave", SizeOptionButtonMixin.OnLeave);
+                button:SetScript("OnClick", SizeOptionButtonMixin.OnClick);
+                Mixin(button, SizeOptionButtonMixin);
+            end
+            self.buttons[i]:Show();
+        end
+        self:SetWidth(numChoices*OPTION_BUTTON_WIDTH);
+
+        for i = numChoices + 1, #self.buttons do
+            self.buttons[i]:Hide();
+        end
+    end
+
+    function SizeSelectMixin:SetOnSizeChangedCallback(callback)
+        self.callback = callback;
+    end
+
+    function SizeSelectMixin:ShowTitle(state)
+        self.Title:SetShown(state);
+    end
+
+    local function CreateSimpleSizeSelect(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetSize(OPTION_BUTTON_WIDTH, 16);
+
+        f.Title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
+        f.Title:SetJustifyH("RIGHT");
+        f.Title:SetPoint("RIGHT", f, "LEFT", -2, 0);
+        f.Title:Hide();
+        f.Title:SetText(addon.L["Pin Size"]);
+        f.Title:SetTextColor(1, 0.82, 0);
+
+        Mixin(f, SizeSelectMixin);
+        return f
+    end
+    addon.CreateSimpleSizeSelect = CreateSimpleSizeSelect;
 end

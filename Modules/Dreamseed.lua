@@ -16,6 +16,7 @@ end
 local API = addon.API;
 local GetPlayerMapCoord = API.GetPlayerMapCoord;
 local GetCreatureIDFromGUID = API.GetCreatureIDFromGUID;
+local AreWaypointsClose = API.AreWaypointsClose;
 
 local MAPID_EMRALD_DREAM = 2200;
 local VIGID_BOUNTY = 5971;
@@ -435,7 +436,7 @@ function EL:OnEvent(event, ...)
             self:StopTrackingPosition();
         elseif onMinimap then
             local info = GetVignetteInfo(vignetteGUID);
-            if info.vignetteID == VIGID_BOUNTY then
+            if info and info.vignetteID == VIGID_BOUNTY then
                 self.trackedObjectGUID = info.objectGUID;
                 self:UpdateTargetLocation(vignetteGUID);
             end
@@ -759,17 +760,24 @@ function DataProvider:GetNurtureProgress(objectGUID, convertToString)
     if creatureID and PLANT_DATA[creatureID] then
         local widgetID = PLANT_DATA[creatureID][3];
         local info = widgetID and GetStatusBarWidgetVisualizationInfo(widgetID);
-        if info then
+        if info and info.barValue and info.barMax then
+            local barValue, barMax = info.barValue, info.barMax;
+            if not (barValue and barMax) then return end;
+
+            if barValue > barMax then
+                barValue = barMax;
+            end
+
             if convertToString then
                 local str = info.text;
                 if str then
-                    str = str..": ".. info.barValue .. "/" ..info.barMax
+                    str = str..": ".. barValue .. "/" ..barMax
                 else
-                    str = info.barValue .. "/" ..info.barMax
+                    str = barValue .. "/" ..barMax
                 end
                 return str
             else
-                return info.barValue, info.barMax
+                return barValue, barMax
             end
         end
     end
@@ -1047,6 +1055,28 @@ end
 function DataProvider:GetBackupLocation(creatureID)
     return creatureID and self.BackupCreaturePositions[creatureID]
 end
+
+function DataProvider:EnumerateSpawnLocations()
+    return pairs(self.BackupCreaturePositions)
+end
+
+function DataProvider:GetNearbyPlantInfo()
+    local uiMapID = C_Map.GetBestMapForUnit("player");
+    if uiMapID ~= MAPID_EMRALD_DREAM then return end;
+
+    local x, y = GetPlayerMapCoord(MAPID_EMRALD_DREAM);
+    if x and y then
+        EL:UpdateMap();
+        local distance;
+        for creatureID, position in self:EnumerateSpawnLocations() do
+            distance = EL:GetMapPointsDistance(x, y, position[1], position[2]);
+            if distance <= 15 then
+                return creatureID, position[1], position[2]
+            end
+        end
+    end
+end
+
 
 API.GetActiveDreamseedGrowthTimes = DataProvider.GetActiveDreamseedGrowthTimes;
 API.DreamseedUtil = DataProvider;

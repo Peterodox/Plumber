@@ -1021,7 +1021,7 @@ do
             if count > 0 then
                 local maxQuantity = info.maxQuantity;
                 if maxQuantity > 0 and count >= maxQuantity then
-                    self.Count:SetTextColor(1.000, 0.282, 0.000);   --WARNING_FONT_COLOR
+                    self.Count:SetTextColor(0.251, 0.753, 0.251);   --DIM_GREEN_FONT_COLOR
                 else
                     self.Count:SetTextColor(1, 1, 1);
                 end

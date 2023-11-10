@@ -4,6 +4,7 @@ local _, addon = ...
 local EL = CreateFrame("Frame");
 
 local match = string.match;
+local strtrim = strtrim;
 local UnitName = UnitName;
 
 local RACE_TIMES = "^Race Times";
@@ -106,8 +107,9 @@ local function ProcessLines(...)
 
     while i < n do
         line = select(i, ...);
+
         if match(line, "[Cc][Ff][Ff][Ff][Ff][Dd]100") then  --title: Normal, Advanced, Reverse, etc.
-            i = i + 1;
+            i = i + 1;  --player record follows the title
             line = select(i, ...);
             medal = match(line, "medal%-small%-(%a+)");
             if medal then
@@ -121,10 +123,10 @@ local function ProcessLines(...)
                     rankID = 4;
                 end
             else
+                --No Attempts
                 rankID = 4;
-                i = i + 1;
+                i = i + 1;  --Gold time follows player record (if not reached gold)
             end
-
             ranks[k] = rankID;
             k = k + 1;
         end
@@ -136,7 +138,8 @@ local function ProcessLines(...)
         EL:QueryAuraTooltipInto();
     else
         UpdateGossipIcons(ranks);
-        EL:PostDataFullyRetrieved();
+        EL:QueryAuraTooltipInto();    --Sometimes the tooltip data is partial so we keep querying x times
+        --EL:PostDataFullyRetrieved();
     end
 end
 
@@ -152,8 +155,9 @@ end
 
 local function EL_OnUpdate(self, elapsed)
     self.t = self.t + elapsed;
-    if self.t > 0.2 then
+    if self.t > 0.25 then
         self.t = 0;
+        self.queryTimes = self.queryTimes + 1;
         self:SetScript("OnUpdate", nil);
 
         if self.auraInstanceID then
@@ -163,13 +167,21 @@ local function EL_OnUpdate(self, elapsed)
     end
 end
 
+function EL:ResetQueryCounter()
+    self.queryTimes = 0;
+end
+
 function EL:QueryAuraTooltipInto(auraInstanceID)
+    if self.queryTimes >= 3 then
+        self:PostDataFullyRetrieved();
+        return
+    end
+
     self.t = 0;
     if auraInstanceID then
         self.auraInstanceID = auraInstanceID;
     end
     self:SetScript("OnUpdate", EL_OnUpdate);
-    --print("Query")
 end
 
 function EL:PostDataFullyRetrieved()
@@ -206,6 +218,7 @@ local function EL_OnEvent(self, event, ...)
         if UnitName("npc") == NPC_NAME then
             self:RegisterUnitEvent("UNIT_AURA", "player");
             self:RegisterEvent("GOSSIP_CLOSED");
+            EL:ResetQueryCounter();
             EL:UpdateRaceTimesFromAura();
         end
         --API.SaveLocalizedText(UnitName("npc"));

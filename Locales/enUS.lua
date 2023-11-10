@@ -6,7 +6,7 @@ local L = addon.L;
 L["Module Control"] = "Module Control";
 L["Quick Slot Generic Description"] = "\n\n*Quick Slot is a set of clickable buttons that appear under certain conditions.";
 L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
-
+L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map - Map Filter - Plumber";
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Auto Join Events";
@@ -18,7 +18,7 @@ L["ModuleName BackpackItemTracker"] = "Backpack Item Tracker";
 L["ModuleDescription BackpackItemTracker"] = "Track stackable items on the Bag UI as if they were currencies.\n\nHoliday tokens are automatically tracked and pinned to the left.";
 L["Instruction Track Item"] = "Track Item";
 L["Hide Not Owned Items"] = "Hide Not Owned Items";
-L["Hide Not Owned Items Tooltip"] = "If you no longer own an item you tracked, it will be moved to a hidden menu."
+L["Hide Not Owned Items Tooltip"] = "If you no longer own an item you tracked, it will be moved to a hidden menu.";
 L["Concise Tooltip"] = "Concise Tooltip";
 L["Concise Tooltip Tooltip"] = "Only shows the item's binding type and its max quantity.";
 L["Item Track Too Many"] = "You may only track %d items at a time."
@@ -55,7 +55,8 @@ L["ModuleDescription EmeraldBountySeedList"] = "Show a list of Dreamseeds when y
 
 --WorldMapPin: SeedPlanting (Add pins to WorldMapFrame which display soil locations and growth cycle/progress)
 L["ModuleName WorldMapPinSeedPlanting"] = "Map Pin: Dreamseeds";
-L["ModuleDescription WorldMapPinSeedPlanting"] = "Show Dreamseed Soil's locations and their Growth Cycles on the world map.\n\n|cffd4641cEnabling this module will remove the game's default map pin for Emerald Bounty, which may affect the behavior of other addons.";
+L["ModuleDescription WorldMapPinSeedPlanting"] = "Show Dreamseed Soil's locations and their Growth Cycles on the world map."..L["Map Pin Change Size Method"].."\n\n|cffd4641cEnabling this module will remove the game's default map pin for Emerald Bounty, which may affect the behavior of other addons.";
+L["Pin Size"] = "Pin Size";
 
 
 --PlayerChoiceUI: Dreamseed Nurturing (PlayerChoiceFrame Revamp)
@@ -68,6 +69,13 @@ L["ModuleName HandyLockpick"] = "Handy Lockpick";
 L["ModuleDescription HandyLockpick"] = "Right click a lockbox in your bag or Trade UI to unlock it.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Cannot directly unlock a bank item\n- Affected by Soft Targeting Mode";
 L["Instruction Pick Lock"] = "<Right Click to Pick Lock>";
 
+
+--Rare/Location Announcement
+L["Announce Location Tooltip"] = "Share this location in chat.";
+L["Announce Forbidden Reason In Cooldown"] = "You have shared a location recently.";
+L["Announce Forbidden Reason Duplicate Message"] = "This location has been shared by another player recently.";
+L["Announce Forbidden Reason Soon Despawn"] = "You cannot share this location because it will soon despawn.";
+L["Available In Format"] = "Available in: |cffffffff%s|r";
 
 
 

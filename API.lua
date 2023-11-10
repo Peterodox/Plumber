@@ -4,6 +4,7 @@ local API = addon.API;
 local tonumber = tonumber;
 local match = string.match;
 local format = string.format;
+local gsub = string.gsub;
 local tinsert = table.insert;
 local tremove = table.remove;
 local floor = math.floor;
@@ -68,6 +69,14 @@ do  -- String
         end
     end
     API.GetVignetteIDFromGUID = GetVignetteIDFromGUID;
+
+    local function GetWaypointFromText(text)
+        local uiMapID, x, y = match(text, "|Hworldmap:(%d*):(%d*):(%d*)|h");
+        if uiMapID and x and y then
+            return tonumber(uiMapID), tonumber(x), tonumber(y)
+        end
+    end
+    API.GetWaypointFromText = GetWaypointFromText;
 end
 
 do  -- DEBUG
@@ -178,7 +187,29 @@ do
     local SHOW_SECOND_BELOW_MINUTES = 10;
     local COLOR_RED_BELOW_SECONDS = 172800;
 
-    local function SecondsToTime(seconds, abbreviated, useHolidayFormat)
+    local function BakePlural(number, singularPlural)
+        singularPlural = gsub(singularPlural, ";", "");
+
+        if number > 1 then
+            return format(gsub(singularPlural, "|4[^:]*:", ""), number);
+        else
+            singularPlural = gsub(singularPlural, ":.*", "");
+            singularPlural = gsub(singularPlural, "|4", "");
+            return format(singularPlural, number);
+        end
+    end
+
+    local function FormatTime(t, pattern, bakePluralEscapeSequence)
+        if bakePluralEscapeSequence then
+            return BakePlural(t, pattern);
+        else
+            return format(pattern, t);
+        end
+    end
+
+    local function SecondsToTime(seconds, abbreviated, partialTime, bakePluralEscapeSequence)
+        --partialTime: Stop processing if the remaining units don't really matter. e.g. to display the remaining time of an event when there are still days left
+        --bakePluralEscapeSequence: Convert EcsapeSequence like "|4Sec:Sec;" to its result so it can be sent to chat
         local intialSeconds = seconds;
         local timeString = "";
         local isComplete = false;
@@ -188,9 +219,12 @@ do
 
         if seconds >= 86400 then
             days = floor(seconds / 86400);
-            timeString = format((abbreviated and DAYS_ABBR) or D_DAYS, days);
             seconds = seconds - days * 86400;
-            if useHolidayFormat and days >= SHOW_HOUR_BELOW_DAYS then
+
+            local dayText = FormatTime(days, (abbreviated and DAYS_ABBR) or D_DAYS, bakePluralEscapeSequence);
+            timeString = dayText;
+
+            if partialTime and days >= SHOW_HOUR_BELOW_DAYS then
                 isComplete = true;
             end
         end
@@ -200,18 +234,18 @@ do
             seconds = seconds - hours * 3600;
 
             if hours > 0 then
-                local hourText = format((abbreviated and HOURS_ABBR) or D_HOURS, hours);
+                local hourText = FormatTime(hours, (abbreviated and HOURS_ABBR) or D_HOURS, bakePluralEscapeSequence);
                 if timeString == "" then
                     timeString = hourText;
                 else
                     timeString = timeString.." "..hourText;
                 end
 
-                if useHolidayFormat and hours >= SHOW_MINUTE_BELOW_HOURS then
+                if partialTime and hours >= SHOW_MINUTE_BELOW_HOURS then
                     isComplete = true;
                 end
             else
-                if timeString ~= "" and useHolidayFormat then
+                if timeString ~= "" and partialTime then
                     isComplete = true;
                 end
             end
@@ -222,17 +256,17 @@ do
             seconds = seconds - minutes * 60;
 
             if minutes > 0 then
-                local minuteText = format((abbreviated and MINUTES_ABBR) or D_MINUTES, minutes);
+                local minuteText = FormatTime(minutes, (abbreviated and MINUTES_ABBR) or D_MINUTES, bakePluralEscapeSequence);
                 if timeString == "" then
                     timeString = minuteText;
                 else
                     timeString = timeString.." "..minuteText;
                 end
-                if useHolidayFormat and minutes >= SHOW_SECOND_BELOW_MINUTES then
+                if partialTime and minutes >= SHOW_SECOND_BELOW_MINUTES then
                     isComplete = true;
                 end
             else
-                if timeString ~= "" and useHolidayFormat then
+                if timeString ~= "" and partialTime then
                     isComplete = true;
                 end
             end
@@ -240,7 +274,7 @@ do
 
         if (not isComplete) and seconds > 0 then
             seconds = floor(seconds);
-            local secondText = format((abbreviated and SECONDS_ABBR) or D_SECONDS, seconds);
+            local secondText = FormatTime(seconds, (abbreviated and SECONDS_ABBR) or D_SECONDS, bakePluralEscapeSequence);
             if timeString == "" then
                 timeString = secondText;
             else
@@ -248,7 +282,7 @@ do
             end
         end
 
-        if useHolidayFormat and intialSeconds < COLOR_RED_BELOW_SECONDS then
+        if partialTime and intialSeconds < COLOR_RED_BELOW_SECONDS and not bakePluralEscapeSequence then
             --WARNING_FONT_COLOR
             timeString = "|cffff4800"..timeString.."|r";
         end
@@ -354,7 +388,7 @@ do  -- Item
         local color = API.GetItemQualityColor(quality);
         text = color:WrapTextInColorCode(text);
         if allowColorBlind and GetCVarBool("colorblindMode") then
-            text = text.." |cffffffff[".._G[string.format("ITEM_QUALITY%s_DESC", quality)].."]|r";
+            text = text.." |cffffffff[".._G[format("ITEM_QUALITY%s_DESC", quality)].."]|r";
         end
 
         return text
@@ -654,7 +688,9 @@ end
 do  -- Map
     ---- Create Module that will be activated in specific zones:
     ---- 1. Soridormi Auto-report
+    ---- 2. Dreamseed
 
+    local C_Map = C_Map;
     local GetBestMapForUnit = C_Map.GetBestMapForUnit;
     local controller;
     local modules;
@@ -790,8 +826,10 @@ do  -- Map
 
     local function CacheMapData(uiMapID)
         if MapData[uiMapID] then return end;
+
         local instance, topLeft = C_Map.GetWorldPosFromMapPos(uiMapID, {x=0, y=0});
         local width, height = C_Map.GetMapWorldSize(uiMapID);
+
         if topLeft then
             local top, left = topLeft:GetXY()
             MapData[uiMapID] = {width, height, left, top};
@@ -799,6 +837,7 @@ do  -- Map
     end
 
     local function GetPlayerMapCoord_Fallback(uiMapID)
+        print(uiMapID)
         local position = GetPlayerMapPosition(uiMapID, "player");
         if position then
             return position.x, position.Y
@@ -834,19 +873,47 @@ do  -- Map
         print(x0, y0);
     end
     --]]
+
+    local MARGIN_X = 0.02;
+    local MARGIN_Y = MARGIN_X * 1.42;
+
+    local function AreWaypointsClose(userX, userY, preciseX, preciseY)
+        --Examine if the left coords (user set) is roughly the same as the precise position
+        --We don't calculate the exact distance (e.g. in yards)
+        --We assume the user waypoint falls into a square around around their target, cuz manually placed pin cannot reach that precision
+        --The margin of Y is larger than that of X, due to map ratio
+        return (userX > preciseX - MARGIN_X) and (userX < preciseX + MARGIN_X) and (userY > preciseY - MARGIN_Y) and (userY < preciseY + MARGIN_Y)
+    end
+    API.AreWaypointsClose = AreWaypointsClose;
+
+
+    local MAP_PIN_HYPERLINK = MAP_PIN_HYPERLINK or "|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a Map Pin Location";
+    local FORMAT_USER_WAYPOINT = "|cffffff00|Hworldmap:%d:%.0f:%.0f|h["..MAP_PIN_HYPERLINK.."]|h|r";    --Message will be blocked by the server if you changing the map pin's name 
+
+    local function CreateWaypointHyperlink(uiMapID, normalizedX, normalizedY)
+        if uiMapID and normalizedX and normalizedY then
+            return format(FORMAT_USER_WAYPOINT, uiMapID, 10000*normalizedX, 10000*normalizedY);
+        end
+    end
+    API.CreateWaypointHyperlink = CreateWaypointHyperlink;
 end
 
 do  --Pixel
     local GetPhysicalScreenSize = GetPhysicalScreenSize;
 
-    local function GetPixelForWidget(widget, pixelSize)
+    local function GetPixelForScale(scale, pixelSize)
         local SCREEN_WIDTH, SCREEN_HEIGHT = GetPhysicalScreenSize();
-        local scale = widget:GetEffectiveScale();
         if pixelSize then
             return pixelSize * (768/SCREEN_HEIGHT)/scale
         else
             return (768/SCREEN_HEIGHT)/scale
         end
+    end
+    API.GetPixelForScale = GetPixelForScale;
+
+    local function GetPixelForWidget(widget, pixelSize)
+        local scale = widget:GetEffectiveScale();
+        return GetPixelForScale(scale, pixelSize);
     end
     API.GetPixelForWidget = GetPixelForWidget;
 end
@@ -928,4 +995,24 @@ do  --Currency
             self:CacheAndGetCurrencyInfo(currencyID);
         end
     end
+end
+
+do  --Chat Message
+    --Check if the a rare spawn info has been announced by other players
+    local function SearchChatHistory(searchFunc)
+        local pool = ChatFrame1 and ChatFrame1.fontStringPool;
+        if pool then
+            local text, uiMapID, x, y;
+            for fontString in pool:EnumerateActive() do
+                text = fontString:GetText();
+                if text ~= nil then
+                    if searchFunc(text) then
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end
+    API.SearchChatHistory = SearchChatHistory;
 end
