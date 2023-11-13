@@ -8,7 +8,8 @@ local strtrim = strtrim;
 local UnitName = UnitName;
 
 local RACE_TIMES = "^Race Times";
-local NPC_NAME = "Bronze Timekeeper";
+local NPC_NAME1 = "Bronze Timekeeper";
+local NPC_NAME2 = " ";
 
 local RankIcons = {
     [1] = "Interface\\AddOns\\Plumber\\Art\\GossipIcons\\Medal_Gold",
@@ -17,52 +18,66 @@ local RankIcons = {
     [4] = "Interface\\AddOns\\Plumber\\Art\\GossipIcons\\Medal_None",
 };
 
+local function IsDragonRacingNPC_Genric()
+    return UnitName("npc") == NPC_NAME1
+end
+
+local function IsDragonRacingNPC_Variants()
+    local name = UnitName("npc");
+    return name and name == NPC_NAME1 or name == NPC_NAME2
+end
+
+local IsDragonRacingNPC = IsDragonRacingNPC_Genric;
+
+
 do
     local locale = GetLocale();
 
     if locale == "enUS" then
         RACE_TIMES = "^Race Times";
-        NPC_NAME = "Bronze Timekeeper";
+        NPC_NAME1 = "Bronze Timekeeper";
 
     elseif locale == "esMX" then
         RACE_TIMES = "^Tiempos de la carrera";
-        NPC_NAME = "Cronometradora bronce";
+        NPC_NAME1 = "Cronometradora bronce";
 
     elseif locale == "ptBR" then
         RACE_TIMES = "^Tempos da Corrida";
-        NPC_NAME = "Guarda-tempo Bronze";
+        NPC_NAME1 = "Guarda-tempo Bronze";
 
     elseif locale == "frFR" then
         RACE_TIMES = "^Temps des courses";
-        NPC_NAME = "Chronométreuse de bronze";
+        NPC_NAME1 = "Chronométreuse de bronze";
 
     elseif locale == "deDE" then
         RACE_TIMES = "^Rennzeiten";
-        NPC_NAME = "Bronzezeithüter";
+        NPC_NAME1 = "Bronzezeithüter";
+        NPC_NAME2 = "Bronzezeithüterin";
+        IsDragonRacingNPC = IsDragonRacingNPC_Variants;
 
     elseif locale == "esES" then
         RACE_TIMES = "^Tiempos de carrera";
-        NPC_NAME = "Vigilante del tiempo bronce";
+        NPC_NAME1 = "Vigilante del tiempo bronce";
 
     elseif locale == "itIT" then
         RACE_TIMES = "^Tempi della Corsa";
-        NPC_NAME = "Custode del Tempo Bronzea";
+        NPC_NAME1 = "Custode del Tempo Bronzea";
 
     elseif locale == "ruRU" then
         RACE_TIMES = "^Время гонки";
-        NPC_NAME = "Бронзовая хранительница времени";
+        NPC_NAME1 = "Бронзовая хранительница времени";
 
     elseif locale == "koKR" then
         RACE_TIMES = "^경주 시간";
-        NPC_NAME = "청동 시간지기";
+        NPC_NAME1 = "청동 시간지기";
 
     elseif locale == "zhTW" then
         RACE_TIMES = "^競賽時間";
-        NPC_NAME = "青銅時空守衛者";
+        NPC_NAME1 = "青銅時空守衛者";
 
     elseif locale == "zhCN" then
         RACE_TIMES = "^竞速时间";
-        NPC_NAME = "青铜时光守护者";
+        NPC_NAME1 = "青铜时光守护者";
     end
 end
 
@@ -215,7 +230,7 @@ end
 
 local function EL_OnEvent(self, event, ...)
     if event == "GOSSIP_SHOW" then
-        if UnitName("npc") == NPC_NAME then
+        if IsDragonRacingNPC() then
             self:RegisterUnitEvent("UNIT_AURA", "player");
             self:RegisterEvent("GOSSIP_CLOSED");
             EL:ResetQueryCounter();

@@ -8,6 +8,7 @@ L["Quick Slot Generic Description"] = "\n\n*Quick Slot is a set of clickable but
 L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map - Map Filter - Plumber";
 
+
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Auto Join Events";
 L["ModuleDescription AutoJoinEvents"] = "Auto select (Begin Time Rift) when you interact with Soridormi during the event.";
@@ -76,6 +77,9 @@ L["Announce Forbidden Reason In Cooldown"] = "You have shared a location recentl
 L["Announce Forbidden Reason Duplicate Message"] = "This location has been shared by another player recently.";
 L["Announce Forbidden Reason Soon Despawn"] = "You cannot share this location because it will soon despawn.";
 L["Available In Format"] = "Available in: |cffffffff%s|r";
+L["Seed Color Epic"] = ICON_TAG_RAID_TARGET_DIAMOND3 or "Purple";   --Using GlobalStrings as defaults
+L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Blue";
+L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
 
 
 

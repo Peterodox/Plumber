@@ -14,6 +14,7 @@ local UI_OFFSET_Y = 0;
 local PATTERN_RESOURCE_DISPLAY = "%s |T%s:16:16:0:0:64:64:4:60:4:60|t";
 
 local API = addon.API;
+local L = addon.L;
 local GetCreatureIDFromGUID = API.GetCreatureIDFromGUID;
 local DreamseedUtil = API.DreamseedUtil;
 local GetWaypointFromText = API.GetWaypointFromText;
@@ -48,7 +49,7 @@ do
 end
 
 
-local function HideBlizzardFrame()
+local function HideBlizzardFrame_Default()
     local f = PlayerChoiceFrame;
     if f then
         f:ClearAllPoints();
@@ -56,6 +57,24 @@ local function HideBlizzardFrame()
         f:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
     end
 end
+
+local function HideBlizzardFrame_MoveAny()
+    --Fixed an compatibility issue where after "MoveAny" users adjust the PlayerChoiceFrame
+    --the frame will be clamped to screen and constantly restore its previous position
+    --Mechanism: MoveAny hooks frame's SetPoint method
+    --see MoveAny\moveframes.lua
+
+    local f = PlayerChoiceFrame;
+    if f then
+        f:ClearAllPoints();
+        f:SetClampedToScreen(false);
+        f.maframesetpoint = true;
+        f:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
+        f.maframesetpoint = false;
+    end
+end
+
+local HideBlizzardFrame = HideBlizzardFrame_Default;
 
 local function OnUpdate_OnShot(self)
     self:SetScript("OnUpdate", nil);
@@ -609,11 +628,11 @@ function AnnounceButtonData.GenerateMessage()
     local colorText;
 
     if tint == 6 then   --purple
-        colorText = ICON_TAG_RAID_TARGET_DIAMOND3 or "Purple";
+        colorText = L["Seed Color Epic"];
     elseif tint == 7 then   --green
-        colorText = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
+        colorText = L["Seed Color Uncommon"];
     elseif tint == 8 then   --blue
-        colorText = ICON_TAG_RAID_TARGET_SQUARE3 or "Blue";
+        colorText = L["Seed Color Rare"];
     end
 
     if colorText then
@@ -924,6 +943,14 @@ local function EnableModule(state)
         end
         ZoneTriggerModule:SetEnabled(true);
         ZoneTriggerModule:Update();
+
+        if C_AddOns then
+            if C_AddOns.IsAddOnLoaded("MoveAny") then
+                HideBlizzardFrame = HideBlizzardFrame_MoveAny;
+            end
+            --BlizzMove does not support PlayerChoiceFrame
+            --MoveAnything cannot move anything after 10.0
+        end
     else
         if ZoneTriggerModule then
             ZoneTriggerModule:SetEnabled(false);
@@ -934,9 +961,9 @@ end
 
 do
     local moduleData = {
-        name = addon.L["ModuleName AlternativePlayerChoiceUI"],
+        name = L["ModuleName AlternativePlayerChoiceUI"],
         dbKey = "AlternativePlayerChoiceUI",
-        description = addon.L["ModuleDescription AlternativePlayerChoiceUI"],
+        description = L["ModuleDescription AlternativePlayerChoiceUI"],
         toggleFunc = EnableModule,
     };
 

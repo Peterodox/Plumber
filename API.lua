@@ -11,6 +11,7 @@ local floor = math.floor;
 local sqrt = math.sqrt;
 local time = time;
 local GetCVarBool = C_CVar.GetCVarBool;
+local CreateFrame = CreateFrame;
 
 do  -- Table
     local function Mixin(object, ...)
@@ -42,6 +43,7 @@ do  -- Table
 
 
     local function ReverseList(list)
+        if not list then return end;
         local tbl = {};
         local n = 0;
         for i = #list, 1, -1 do
@@ -1015,4 +1017,22 @@ do  --Chat Message
         return false
     end
     API.SearchChatHistory = SearchChatHistory;
+end
+
+do  --Cursor Position
+    local UI_SCALE_RATIO = 1;
+    local UIParent = UIParent;
+    local EL = CreateFrame("Frame");
+    local GetCursorPosition = GetCursorPosition;
+
+    EL:RegisterEvent("UI_SCALE_CHANGED");
+    EL:SetScript("OnEvent", function(self, event)
+        UI_SCALE_RATIO = 1 / UIParent:GetEffectiveScale();
+    end);
+
+    local function GetScaledCursorPosition()
+        local x, y = GetCursorPosition();
+        return x*UI_SCALE_RATIO, y*UI_SCALE_RATIO
+    end
+    API.GetScaledCursorPosition = GetScaledCursorPosition;
 end

@@ -54,7 +54,7 @@ end
 
 function SharedTooltip:Init()
     if not self.Background then
-        self.Background = addon.CreateNineSliceFrame(self, "GreyBorderWithShadow");
+        self.Background = addon.CreateNineSliceFrame(self, "Tooltip_Brown");
         self.Background:CoverParent(0);
     end
     if not self.Content then

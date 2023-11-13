@@ -9,6 +9,7 @@ local FadeFrame = API.UIFrameFade;
 local select = select;
 local tinsert = table.insert;
 local floor = math.floor;
+local ipairs = ipairs;
 local time = time;
 local GetTime = GetTime;
 local IsMouseButtonDown = IsMouseButtonDown;
@@ -29,7 +30,8 @@ do  -- Slice Frame
     local NineSliceLayouts = {
         WhiteBorder = true,
         WhiteBorderBlackBackdrop = true,
-        GreyBorderWithShadow = true,
+        Tooltip_Brown = true,
+        Menu_Black = true,
     };
 
     local ThreeSliceLayouts = {
@@ -2405,4 +2407,293 @@ do  --Simple Size Select (S/M/L)
         return f
     end
     addon.CreateSimpleSizeSelect = CreateSimpleSizeSelect;
+end
+
+do  --Draw shapes
+    local ArcMixin = {};
+
+    function ArcMixin:SetThickness(pixel, update)
+        self.px = API.GetPixelForWidget(self, pixel*0.5);
+        if self.radius and update then
+            self:SetRadius(self.radius);
+        end
+    end
+
+    function ArcMixin:SetColor(r, g, b, a)
+        a = a or 1;
+        self.Circle:SetVertexColor(r, g, b, a);
+    end
+
+    function ArcMixin:SetRadius(radius)
+        self.radius = radius;
+        local d = 2*(radius + self.px);
+        self.Circle:SetSize(d, d);
+        d = 2*(radius - self.px);
+        self.Mask1:SetSize(d, d);
+        self.Mask2:SetSize(d, d);
+    end
+
+    function ArcMixin:SetFromRadian(fromRadian)
+        -- y+, positive
+        -- y-, negative
+        self.Mask1:SetRotation(fromRadian);
+    end
+
+    function ArcMixin:SetToRadian(toRadian)
+        self.Mask2:SetRotation(toRadian);
+    end
+
+    function ArcMixin:SetFromDegree(fromDegree)
+        self:SetFromRadian(math.rad(fromDegree));
+    end
+
+    function ArcMixin:SetToDegree(toDegree)
+        self:SetToRadian(math.rad(toDegree));
+    end
+
+    function ArcMixin:Init()
+        local circle0 = self:CreateTexture(nil, "BACKGROUND");
+        self.Circle = circle0;
+        circle0:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Circle-HD");
+        circle0:SetPoint("CENTER", self, "CENTER", 0, 0);
+        DisableSharpening(circle0);
+
+        local circle1 = self:CreateMaskTexture(nil, "BACKGROUND");
+        self.Mask1 = circle1;
+        circle1:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Circle-Inverse-Right-HD", "CLAMP", "CLAMP");
+        circle1:SetPoint("CENTER", self, "CENTER", 0, 0);
+        circle0:AddMaskTexture(circle1);
+        DisableSharpening(circle1);
+
+        local circle3 = self:CreateMaskTexture(nil, "BACKGROUND");
+        self.Mask2 = circle3;
+        circle3:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Circle-Inverse-Right-HD", "CLAMP", "CLAMP");
+        circle3:SetPoint("CENTER", self, "CENTER", 0, 0);
+        circle0:AddMaskTexture(circle3);
+        DisableSharpening(circle3);
+
+        self.Init = nil;
+    end
+
+    local function CreateArc(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetSize(8, 8);
+        Mixin(f, ArcMixin);
+        f:SetThickness(1);
+        f:Init();
+        return f
+    end
+    addon.CreateArc = CreateArc;
+end
+
+do  --Shared Context Menu
+    local MENU_PADDING_X = 2;
+    local MENU_PADDING_Y = 8;
+    local MENU_BUTTON_HEIGHT = 24;
+    local MENU_BUTTON_WIDTH = 240;
+    local MENU_BUTTON_TEXT_OFFSET = 12;
+
+    local UIParent = UIParent;
+    local GetScaledCursorPosition = API.GetScaledCursorPosition;
+
+    local SharedContextMenu;
+    local ContextMenuMixin = {};
+    local MenuButtonMixin = {};
+
+
+    function MenuButtonMixin:OnEnter()
+        self.parent:FocusOnButton(self);
+    end
+
+    function MenuButtonMixin:OnLeave()
+        self.parent:FocusOnButton(nil);
+    end
+
+    function MenuButtonMixin:OnClick(button)
+        if self.onClickFunc and self.onClickFunc(self, button) then
+            self.parent:CloseMenu();
+        end
+    end
+
+    function MenuButtonMixin:OnMouseDown(button)
+        if button == "LeftButton" then
+            self.Text:SetPoint("LEFT", self, "LEFT", MENU_BUTTON_TEXT_OFFSET + 1, 0);
+        end
+    end
+
+    function MenuButtonMixin:OnMouseUp(button)
+        self.Text:SetPoint("LEFT", self, "LEFT", MENU_BUTTON_TEXT_OFFSET, 0);
+    end
+
+    function MenuButtonMixin:SetButtonData(buttonData)
+        self.Text:SetText(buttonData.text);
+        self.onClickFunc = buttonData.onClickFunc;
+    end
+
+
+    function ContextMenuMixin:ReleaseButtons()
+        if not self.buttons then return end;
+
+        for i, button in ipairs(self.buttons) do
+            button:Hide();
+        end
+
+        self.numActive = 0;
+    end
+
+    function ContextMenuMixin:GetButton()
+        if not self.buttons then
+            self.numActive = 0;
+            self.buttons = {};
+            self.ButtonContainer = CreateFrame("Frame", nil, self);
+            self.ButtonContainer:SetSize(8, 8);
+            self.ButtonContainer:SetPoint("CENTER", self, "CENTER", 0, 0);
+        end
+
+        local index = self.numActive + 1;
+        self.numActive = index;
+        local button = self.buttons[index];
+
+        if not button then
+            button = CreateFrame("Button", nil, self.ButtonContainer);
+            self.buttons[index] = button;
+            button:SetSize(MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+            button.Text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            button.Text:SetJustifyH("LEFT");
+            button.Text:SetPoint("LEFT", button, "LEFT", MENU_BUTTON_TEXT_OFFSET, 0);
+            button.Text:SetTextColor(1, 1, 1);
+            button.id = index;
+            button:SetPoint("TOPLEFT", self, "TOPLEFT", MENU_PADDING_X, -MENU_PADDING_Y + (1-index)*MENU_BUTTON_HEIGHT);
+            Mixin(button, MenuButtonMixin);
+            button:SetScript("OnEnter", MenuButtonMixin.OnEnter);
+            button:SetScript("OnLeave", MenuButtonMixin.OnLeave);
+            button:SetScript("OnClick", MenuButtonMixin.OnClick);
+            button:SetScript("OnMouseDown", MenuButtonMixin.OnMouseDown);
+            button:SetScript("OnMouseUp", MenuButtonMixin.OnMouseUp);
+            button.parent = self;
+        end
+
+        button:Show();
+
+        return button
+    end
+
+    function ContextMenuMixin:SetMinWidth(minWidth)
+        self.minWidth = minWidth;
+    end
+
+    function ContextMenuMixin:SetMinHeight(minHeight)
+        self.minHeight = minHeight;
+    end
+
+    function ContextMenuMixin:SetMenuSize(width, height)
+        if self.minWidth and width < self.minWidth then
+            width = self.minWidth;
+        end
+        if self.minHeight and height < self.minHeight then
+            height = self.minHeight;
+        end
+        self:SetSize(width, height);
+    end
+
+    function ContextMenuMixin:SetOwner(owner)
+        self.owner = owner;
+    end
+
+    function ContextMenuMixin:SetContent(content)
+        if content == self.content then
+            return
+        end
+        self.content = content;
+        self:ReleaseButtons();
+
+        local button;
+        for i, buttonData in ipairs(content) do
+            button = self:GetButton();
+            button:SetButtonData(buttonData);
+        end
+
+        self:SetHeight(#content * MENU_BUTTON_HEIGHT + 2 * MENU_PADDING_Y);
+    end
+
+    function ContextMenuMixin:CloseMenu()
+        self:Hide();
+        self:ClearAllPoints();
+    end
+
+    function ContextMenuMixin:OnHide()
+        self:CloseMenu();
+        self:SetScript("OnUpdate", nil);
+        self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+    end
+
+    function ContextMenuMixin:OnShow()
+        self:RegisterEvent("GLOBAL_MOUSE_DOWN");
+    end
+
+    function ContextMenuMixin:IsFocuesd()
+        return self:IsMouseOver() or (self.owner and self.owner:IsMouseOver())
+    end
+
+    function ContextMenuMixin:OnEvent(event, ...)
+        if event == "GLOBAL_MOUSE_DOWN" then
+            if not self:IsFocuesd() then
+                self:CloseMenu();
+            end
+        end
+    end
+
+    local function HighlightFrame_OnUpdate(self, elapsed)
+        local x, y = GetScaledCursorPosition();
+        self.HighlightTexture:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
+    end
+
+    function ContextMenuMixin:FocusOnButton(menuButton)
+        if menuButton then
+            self.HighlightFrame:ClearAllPoints();
+            self.HighlightFrame:SetPoint("TOPLEFT", menuButton, "TOPLEFT", 0, 0);
+            self.HighlightFrame:SetPoint("BOTTOMRIGHT", menuButton, "BOTTOMRIGHT", 0, 0);
+            self.HighlightFrame:Show();
+        else
+            self.HighlightFrame:Hide();
+        end
+    end
+
+    function ContextMenuMixin:Init()
+        self:SetFrameStrata("TOOLTIP");
+        self:SetFixedFrameStrata(true);
+
+        self:SetScript("OnShow", ContextMenuMixin.OnShow);
+        self:SetScript("OnHide", ContextMenuMixin.OnHide);
+        self:SetScript("OnEvent", ContextMenuMixin.OnEvent);
+
+        self:SetMinWidth(MENU_BUTTON_WIDTH + 2*MENU_PADDING_X);
+        self:SetMinHeight(MENU_BUTTON_HEIGHT + 2*MENU_PADDING_Y);
+        self:SetMenuSize(64, 64);
+
+        self.HighlightFrame = CreateFrame("Frame", nil, self);
+        self.HighlightFrame:SetClipsChildren(true);
+        local HighlightTexture = self.HighlightFrame:CreateTexture(nil, "ARTWORK");
+        HighlightTexture:SetSize(480, 480);
+        HighlightTexture:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Circle-Blurry");
+        HighlightTexture:SetAlpha(0.15);
+        self.HighlightFrame.HighlightTexture = HighlightTexture;
+        self.HighlightFrame:SetScript("OnUpdate", HighlightFrame_OnUpdate);
+
+        self.Init = nil;
+    end
+
+
+    local function GetSharedContextMenu()
+        if not SharedContextMenu then
+            local parent = UIParent;
+            local f = addon.CreateNineSliceFrame(parent, "Menu_Black");
+            SharedContextMenu = f;
+            Mixin(f, ContextMenuMixin);
+            f:Hide();
+            f:Init();
+        end
+        return SharedContextMenu
+    end
+    addon.GetSharedContextMenu = GetSharedContextMenu;
 end

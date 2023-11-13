@@ -9,6 +9,7 @@ local SecondsToTime = API.SecondsToTime;
 local COOLDOWN_ANNOUNCE = 20;
 local CAN_SEND_MESSAGE = false;
 
+local DELENSION = "";
 
 local HornButton = CreateFrame("Button");
 HornButton:Hide();
@@ -211,7 +212,12 @@ function HornButton:OnClick()
 
     if CAN_SEND_MESSAGE and msg then
         --print(msg);
-        SendChatMessage(msg, "CHANNEL", nil, 1);
+        local channelID = C_ChatInfo.GetGeneralChannelID();
+        if channelID then
+            SendChatMessage(msg, "CHANNEL", nil, channelID);
+        else
+            UIErrorsFrame:AddExternalErrorMessage("Could not find General Chat channel.");
+        end
         PrivateFrame:LockButton(1, true);
         PrivateFrame:StartLockTimer(true);
     end
@@ -365,7 +371,12 @@ addon.GetAnnounceButton = GetAnnounceButton;
 
 
 
-
+do
+    local locale = GetLocale();
+    if locale == "ruRU" then
+        DELENSION = ": ";
+    end
+end
 --Debug
 --[[
 local function ProcessChatMessage(msg)

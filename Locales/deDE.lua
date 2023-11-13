@@ -4,6 +4,9 @@ local _, addon = ...
 local L = addon.L;
 
 
+--Rare/Location Announcement
+L["Seed Color Epic"] = "Violett";   --Using GlobalStrings as defaults
+
 
 
 -- !! Do NOT translate the following entries
