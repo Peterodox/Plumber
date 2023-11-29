@@ -123,6 +123,10 @@ function OptionFrameMixin:SetupItem(itemID, showAsEarned)
 
         if showAsEarned then
             self.RewardFrame.Checkmark:Show();
+            if PlayerChoiceUI.requireRewardCheck then
+                PlayerChoiceUI.requireRewardCheck = false;
+                DreamseedUtil:MarkNearestPlantContributed();
+            end
         else
             self.RewardFrame.Checkmark:Hide();
         end
@@ -724,7 +728,7 @@ function PlayerChoiceUI:ShowUI()
         self:RegisterEvent("PLAYER_DEAD");
         self:RegisterEvent("PLAYER_ENTERING_WORLD");
         self.consumeNextClick = false;
-
+        self.requireRewardCheck = true;
         self:SetupAnnounceButton();
     end
 

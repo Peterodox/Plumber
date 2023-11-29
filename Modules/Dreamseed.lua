@@ -39,8 +39,15 @@ local GetAchievementCriteriaInfoByID = GetAchievementCriteriaInfoByID;
 local UIParent = UIParent;
 local GetItemCount = GetItemCount;
 local GetItemIconByID = C_Item.GetItemIconByID;
+local GetBestMapForUnit = C_Map.GetBestMapForUnit;
 local time = time;
 
+local IS_SEED_SPELL = {};
+do
+    for _, spellID in ipairs(SEED_SPELL_IDS) do
+        IS_SEED_SPELL[spellID] = true;
+    end
+end
 
 local function GetVisibleEmeraldBountyGUID()
     local vignetteGUIDs = C_VignetteInfo.GetVignettes();
@@ -135,6 +142,14 @@ function EL:OnEvent(event, ...)
         self:CalculatePlayerToTargetDistance();
         if IsMounted() then
             self.isPlayerMoving = true;
+        end
+        if event == "UNIT_SPELLCAST_SUCCEEDED" then
+            local _, _, spellID = ...
+            if spellID and IS_SEED_SPELL[spellID] then
+                C_Timer.After(0.2, function()
+                    DataProvider:MarkNearestPlantContributed();
+                end);
+            end
         end
     elseif event == "UPDATE_UI_WIDGET" then
         local widgetInfo = ...
@@ -553,36 +568,6 @@ end
 
 --[[
 function DataProvider:HasAnyRewardByCreatureID(creatureID)
-    --Three widgetSet for each plant, mapped to 3 different rarities
-    --All three Emerald Bloom rewards of each widgetSet will be flagged simultaneously
-    --All three status bar of each widgetSet also change in sync
-    --Save the objectGUID and position if it has unclaimed reward
-    --Returns: hasAnyReward, isRewardLocationCached
-    if creatureID and PLANT_DATA[creatureID] then
-        if self:IsDreamseedChestAvailableByCreatureID(creatureID) then
-            return true, true
-        end
-        local info, widgetSetID, setWidgets;
-        for i = 15, 17 do
-            widgetSetID = PLANT_DATA[creatureID][i];
-            setWidgets = GetAllWidgetsBySetID(widgetSetID);
-            if setWidgets then
-                for _, widgetInfo in ipairs(setWidgets) do
-                    if widgetInfo.widgetType == 27 then
-                        info = GetItemDisplayVisualizationInfo(widgetInfo.widgetID);
-                        if info and info.shownState == 1 and info.itemInfo and info.itemInfo.showAsEarned then
-                            return true, false
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return false, false
-end
---]]
-
-function DataProvider:HasAnyRewardByCreatureID(creatureID)
     --We now use a more RAM friendly (not getting all the widgets in a wigetSet), but less robust approach
     if creatureID and PLANT_DATA[creatureID] then
         if self:IsDreamseedChestAvailableByCreatureID(creatureID) then
@@ -599,6 +584,7 @@ function DataProvider:HasAnyRewardByCreatureID(creatureID)
     end
     return false, false
 end
+--]]
 
 function DataProvider:HasAnyReward(objectGUID)
     local creatureID = GetCreatureIDFromGUID(objectGUID);
@@ -658,19 +644,6 @@ function DataProvider:GetChestOwnerCreatureIDs()
     return tbl
 end
 
-function DataProvider:IsDreamseedChestAvailableByCreatureID(creatureID)
-    if not self.dreamseedChestStates then
-        return false
-    end
-
-    return self.dreamseedChestStates[creatureID] ~= nil
-end
-
-function DataProvider:IsDreamseedChestAvailable(objectGUID)
-    local creatureID = GetCreatureIDFromGUID(objectGUID);
-    return self:IsDreamseedChestAvailableByCreatureID(creatureID)
-end
-
 function DataProvider:SetChestStateByCreatureID(creatureID, state, objectGUID, x, y)
     if not creatureID then return end;
 
@@ -686,6 +659,11 @@ function DataProvider:SetChestStateByCreatureID(creatureID, state, objectGUID, x
         end
     else
         self.dreamseedChestStates[creatureID] = nil;
+    end
+
+    if not state then
+        --Player looted the chest
+        self:SetPlantContributedByCreatureID(creatureID, false);
     end
 end
 
@@ -717,7 +695,7 @@ function DataProvider:EnumerateSpawnLocations()
 end
 
 function DataProvider:GetNearbyPlantInfo()
-    local uiMapID = C_Map.GetBestMapForUnit("player");
+    local uiMapID = GetBestMapForUnit("player");
     if uiMapID ~= MAPID_EMRALD_DREAM then return end;
 
     local x, y = GetPlayerMapCoord(MAPID_EMRALD_DREAM);
@@ -730,6 +708,72 @@ function DataProvider:GetNearbyPlantInfo()
                 return creatureID, position[1], position[2]
             end
         end
+    end
+end
+
+function DataProvider:BuildPlantIndexTable()
+    local function SortByCriteriaID(a, b)
+        return PLANT_DATA[a] < PLANT_DATA[b]
+    end
+
+    local plants = {};
+    local n = 0;
+
+    for creatureID, data in pairs(PLANT_DATA) do
+        n = n + 1;
+        plants[n] = creatureID;
+    end
+
+    table.sort(plants, SortByCriteriaID);
+
+    local plantXIndex = {};
+    for index, creatureID in ipairs(plants) do
+        plantXIndex[creatureID] = index;
+    end
+
+    self.indexXPlant = plants;
+    self.plantXIndex = plantXIndex;
+end
+
+function DataProvider:GetPlantIndexByCreatureID(creatureID)
+    if not self.plantXIndex then
+        self:BuildPlantIndexTable();
+    end
+
+    return self.plantXIndex[creatureID]
+end
+
+function DataProvider:GetPlantCreatureIDByIndex(index)
+    if not self.indexXPlant then
+        self:BuildPlantIndexTable();
+    end
+
+    return self.indexXPlant[index]
+end
+
+function DataProvider:SetPlantContributedByCreatureID(creatureID, hasContributed)
+    if not self.plantContributed then
+        self.plantContributed = {};
+    end
+    self.plantContributed[creatureID] = hasContributed
+end
+
+function DataProvider:HasAnyRewardByCreatureID(creatureID)
+    --Alternative approach due to inconsistent data between actual spawn and widgetInfo
+    --Check if player has successfully cast Dreamseed / made contributions using PlayerChoiceUI
+    if creatureID and PLANT_DATA[creatureID] then
+        if not self.plantContributed then
+            self.plantContributed = {};
+        end
+        return self.plantContributed[creatureID]
+    end
+    return false, false
+end
+
+function DataProvider:MarkNearestPlantContributed()
+    local creatureID = self:GetNearbyPlantInfo();
+    if creatureID then
+        self:SetPlantContributedByCreatureID(creatureID, true);
     end
 end
 

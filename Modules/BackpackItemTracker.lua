@@ -1986,6 +1986,46 @@ function TrackerFrame:ParentTo_LiteBag()
     end
 end
 
+function TrackerFrame:ParentTo_Baganator()
+    local parent = Baganator_MainViewFrame;
+
+    if not parent then return end;
+
+    self.Background:Show();
+    self:SetParent(parent);
+    self:SetScript("OnShow", TrackerFrame_Update_OnShow);
+    self:Show();
+    self:SetClampedToScreen(false);
+    self:ClearAllPoints();
+
+    local anchorTo = parent.ToggleReagentsButton;
+
+    if anchorTo then
+        self:SetPoint("LEFT", anchorTo, "RIGHT", 8, 0);
+        self.Border:SetPoint("LEFT", self, "LEFT", 0, 0);
+    else
+        self:Hide();
+    end
+end
+
+function TrackerFrame:ParentTo_BetterBags()
+    local parent = BetterBagsBagBackpack;
+
+    if not parent then return end;
+
+    self.Background:Show();
+    self:SetParent(parent);
+    self:SetScript("OnShow", TrackerFrame_Update_OnShow);
+    self:Show();
+    self:SetClampedToScreen(false);
+
+    RepositionUtil.parent = parent;
+    self:ClearAllPoints();
+    self.Border:ClearAllPoints();
+    self:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 4, 5);
+    self.Border:SetPoint("LEFT", self, "LEFT", 0, 0);
+end
+
 local GetAddOnSearchBox = {
     Bagnon = function()
         if not (BagnonInventory1 and BagnonInventory1.SearchFrame and BagnonInventory1.searchToggle) then return end;
@@ -1995,15 +2035,24 @@ local GetAddOnSearchBox = {
         end
         return BagnonInventory1.SearchFrame
     end,
+
     AdiBags = function() return _G["AdiBagsContainer1SearchBox"] end,
+
     ArkInventory = function() return _G["ARKINV_Frame1SearchFilter"] end,
+
     ElvUI = function() return _G["ElvUI_ContainerFrameEditBox"] end,
+
     NDui = function()
         local box = NDui_BackpackBag.Search;
         if box then
             box:Show();
         end
         return box
+    end,
+
+    Baganator = function()
+        local bagFarme = Baganator_MainViewFrame;
+        return bagFarme and bagFarme.SearchBox
     end,
 };
 
@@ -2070,6 +2119,22 @@ local function AnchorToCompatibleAddOn()
             TrackerFrame.UpdateAnchor = DoesNothing;
             TrackerFrame:ParentTo_NDui();
             GetSearchBox = GetAddOnSearchBox.NDui;
+        end
+    elseif IsAddOnLoaded("Baganator") then
+        --Baganator is being actively developed
+        --Available space (width) is affected by Bag Columns, we ignore it for now
+        local bagFrame = Baganator_MainViewFrame;
+        if bagFrame then
+            TrackerFrame.UpdateAnchor = DoesNothing;
+            TrackerFrame:ParentTo_Baganator();
+            GetSearchBox = GetAddOnSearchBox.Baganator;
+        end
+    elseif IsAddOnLoaded("BetterBags") then --New Adibags(Still WIP)
+        local bagFrame = BetterBagsBagBackpack;     --WTF is this name
+        if bagFrame then
+            TrackerFrame.UpdateAnchor = DoesNothing;
+            TrackerFrame:ParentTo_BetterBags();
+            --GetSearchBox = GetAddOnSearchBox.BetterBags;  --No Search Bar yet
         end
     end
 

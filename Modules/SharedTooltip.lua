@@ -647,7 +647,7 @@ do
     };
 
     local CURRENCY_QUANTITY_ICON_FORMAT = "%s |T%s:10:10:0:-2:64:64:4:60:4:60|t";
-    local SEASON_CAP_LABEL = string.gsub(CURRENCY_SEASON_TOTAL_MAXIMUM or "Season Maximum: %s%s/%s", "%%s/%%s", "");
+    --local SEASON_CAP_LABEL = string.gsub(CURRENCY_SEASON_TOTAL_MAXIMUM or "Season Maximum: %s%s/%s", "%%s/%%s", "");
 
     function SharedTooltip:DisplayUpgradeCurrencies(showExtraInfo)
         if PlumberDB then
@@ -726,23 +726,17 @@ do
                 self:SetGridLine(1, 3, L["Numbers To Earn"], 0.5, 0.5, 0.5, 3, 3);
             end
 
-            if showExtraInfo then
-                --Show flightstone
-                info = GetCurrencyInfo(FLIGHT_STONE_ID);
-                if info then
-                    name = info.name;
-                    name = "|cffffd100"..name.."|r";
-                    quantity = info.quantity or 0;
-                    if showIcon then
-                        quantity = string.format(CURRENCY_QUANTITY_ICON_FORMAT, quantity, info.iconFileID);
-                    end
-                    self:AddBlankLine();
-                    self:AddCenterLine(name.."  "..quantity, 1, 1, 1, nil, nil, 2);
+            --Show flightstone
+            info = GetCurrencyInfo(FLIGHT_STONE_ID);
+            if info then
+                name = info.name;
+                name = "|cffffd100"..name.."|r";
+                quantity = info.quantity or 0;
+                if showIcon then
+                    quantity = string.format(CURRENCY_QUANTITY_ICON_FORMAT, quantity, info.iconFileID);
                 end
-            else
-                --Show season maximum
                 self:AddBlankLine();
-                self:AddCenterLine(string.format(SEASON_CAP_LABEL, seasonCap), 0.5, 0.5, 0.5, nil, nil, 2)
+                self:AddCenterLine(name.."  "..quantity, 1, 1, 1, nil, nil, 2);
             end
         else
             self:AddLeftLine(ERR_ITEM_NOT_FOUND, 1.000, 0.282, 0.000);

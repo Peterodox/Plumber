@@ -41,7 +41,7 @@ local function CreateUI()
     mask:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/PreviewMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
     preview:AddMaskTexture(mask);
 
-    local description = container:CreateFontString(nil, "OVERLAY", "GameFontNormal"); --GameFontNormal (ObjectiveFont), GameTooltipTextSmall
+    local description = container:CreateFontString(nil, "OVERLAY", "GameTooltipText"); --GameFontNormal (ObjectiveFont), GameTooltipTextSmall
     parent.Description = description;
     description:SetTextColor(0.5, 0.5, 0.5);
     description:SetJustifyH("LEFT");

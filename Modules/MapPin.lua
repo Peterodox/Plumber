@@ -4,6 +4,7 @@ local API = addon.API;
 local HIDE_INACTIVE_PIN = false;
 local DATA_PROVIDER_ADDED = false;
 local ENABLE_MAP_PIN = false;
+local PIN_ICON_PRIORITIZE_REWARD = false;   --If the plant is active and has unclaimed reward, show Seed or Flower icon
 
 local VIGID_BOUNTY = 5971;
 local MAPID_EMRALD_DREAM = 2200;
@@ -37,6 +38,7 @@ local IsWorldQuest = C_QuestLog.IsWorldQuest;
 local format = string.format;
 local pairs = pairs;
 local ipairs = ipairs;
+local _G = _G;
 
 local SecondsToTime = API.SecondsToTime;
 local DreamseedUtil = API.DreamseedUtil;    --Defined in Dreamseed.lua
@@ -572,7 +574,7 @@ function WorldMapDataProvider:ShowAllPins()
 
     local bestUniqueVignetteIndex = C_VignetteInfo.FindBestUniqueVignette(relavantVignetteGUIDs) or 0;
     for i, pin in ipairs(pins) do
-        if pin.isActive then
+        if pin.isActive and (PIN_ICON_PRIORITIZE_REWARD and not pin.hasReawrd) then
             pin:SetVisual(3);
         elseif pin.hasReawrd then
             pin:SetVisual(0);
@@ -734,6 +736,14 @@ function MapTracker:OnViewingQuestDetailsChanged()
 end
 
 
+local function LoadOptionalSettings()
+    --Settings that are controlled by command, no UI (due to specific user request)
+    --Requires /reload
+    if not PlumberDB then return end;
+
+    PIN_ICON_PRIORITIZE_REWARD = (PlumberDB.PinIconPrioritizeReward and true) or false;
+end
+
 local ZoneTriggerModule;
 
 local function EnableModule(state)
@@ -764,6 +774,8 @@ local function EnableModule(state)
 
             module:SetEnterZoneCallback(OnEnterZoneCallback);
             module:SetLeaveZoneCallback(OnLeaveZoneCallback);
+
+            LoadOptionalSettings();
         end
         ZoneTriggerModule:SetEnabled(true);
         ZoneTriggerModule:Update();
@@ -1059,8 +1071,8 @@ end
 
 function FilterFrame:OnUpdate_UpdateAfter(elapsed)
     --We update on the next n frame
-    --self.n = self.n + 1;
-    --if self.n < 60 then return end;
+    self.n = self.n + 1;
+    if self.n < 2 then return end;
 
     self:SetScript("OnUpdate", nil);
     if self.targetDropdown and self.targetDropdown:IsShown() then
@@ -1080,14 +1092,28 @@ function FilterFrame:RequestUpdateDropdown(targetDropdown, uiMapID)
     self:SetScript("OnUpdate", self.OnUpdate_UpdateAfter);
 end
 
+function FilterFrame:GetBestDropDownHeight(dropdown)
+    local backgroundFrame = _G["DropDownList1MenuBackdrop"];
+    local height1 = dropdown:GetHeight();
+    local height2;
+    local diffHeight = 0;
+    if backgroundFrame then
+        height2 = backgroundFrame:GetHeight();
+        if height2 - height1 > 1 then
+            diffHeight = height2 - height1;
+        end
+    end
+    return math.max(height1, height2), diffHeight
+end
+
 function FilterFrame:SetupDropDown(dropdown)
     local scale = dropdown:GetEffectiveScale();
     local top = dropdown:GetTop();
     local left = dropdown:GetLeft();
     local width = dropdown:GetWidth();
-    local height = dropdown:GetHeight();
+    local height, diffHeight = self:GetBestDropDownHeight(dropdown);
     local firstButton, numButtons = self:CreateOptionList(width);
-    local extraHeight = (UIDROPDOWNMENU_BUTTON_HEIGHT or 16) * numButtons;
+    local extraHeight = (UIDROPDOWNMENU_BUTTON_HEIGHT or 16) * numButtons - diffHeight;
     local xPos = 11;
 
     self:SetScale(scale);

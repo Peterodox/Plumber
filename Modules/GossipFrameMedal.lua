@@ -4,7 +4,6 @@ local _, addon = ...
 local EL = CreateFrame("Frame");
 
 local match = string.match;
-local strtrim = strtrim;
 local UnitName = UnitName;
 
 local RACE_TIMES = "^Race Times";
@@ -24,7 +23,7 @@ end
 
 local function IsDragonRacingNPC_Variants()
     local name = UnitName("npc");
-    return name and name == NPC_NAME1 or name == NPC_NAME2
+    return name and (name == NPC_NAME1 or name == NPC_NAME2)
 end
 
 local IsDragonRacingNPC = IsDragonRacingNPC_Genric;
@@ -48,6 +47,8 @@ do
     elseif locale == "frFR" then
         RACE_TIMES = "^Temps des courses";
         NPC_NAME1 = "Chronométreuse de bronze";
+        NPC_NAME2 = "Chronométreur de bronze";
+        IsDragonRacingNPC = IsDragonRacingNPC_Variants;
 
     elseif locale == "deDE" then
         RACE_TIMES = "^Rennzeiten";

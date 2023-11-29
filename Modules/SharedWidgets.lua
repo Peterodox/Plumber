@@ -18,6 +18,7 @@ local GetItemCount = GetItemCount;
 local GetSpellCharges = GetSpellCharges;
 local C_Item = C_Item;
 local CreateFrame = CreateFrame;
+local UIParent = UIParent;
 
 
 local function DisableSharpening(texture)
@@ -45,7 +46,40 @@ do  -- Slice Frame
 
     local SliceFrameMixin = {};
 
+    --Use the new Texture Slicing   (https://warcraft.wiki.gg/wiki/Patch_10.2.0/API_changes)
+    --The SlicedTexture is pixel-perfect but doesn't scale with parent, so we shelve this and observer Blizzard's implementation
+    local function NiceSlice_CreatePieces(frame)
+        if not frame.NineSlice then
+            frame.NineSlice = frame:CreateTexture(nil, "BACKGROUND");
+            --frame.NineSlice:SetTextureSliceMode(0); --Enum.UITextureSliceMode, 0 Stretched(Default)  1 Tiled
+            --DisableSharpening(frame.NineSlice);
+            frame.TestBG = frame:CreateTexture(nil, "OVERLAY");
+            frame.TestBG:SetAllPoints(true);
+            frame.TestBG:SetColorTexture(1, 0, 0, 0.5);
+        end
+    end
+
+    local function NiceSlice_SetCornerSize(frame, a)
+        frame.NineSlice:SetTextureSliceMargins(32, 32, 32, 32);
+        local offset = 0;
+        frame.NineSlice:ClearAllPoints();
+        frame.NineSlice:SetPoint("TOPLEFT", frame, "TOPLEFT", -offset, offset);
+        frame.NineSlice:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", offset, -offset);
+    end
+
+    local function NiceSlice_SetTexture(frame, texture)
+        frame.NineSlice:SetTexture(texture);
+    end
+
     function SliceFrameMixin:CreatePieces(n)
+        --[[
+        if n == 9 then
+            NiceSlice_CreatePieces(self);
+            NiceSlice_SetCornerSize(self, 16);
+            return
+        end
+        --]]
+
         if self.pieces then return end;
         self.pieces = {};
         self.numSlices = n;
@@ -105,6 +139,10 @@ do  -- Slice Frame
             self.pieces[1]:SetSize(a, 2*a);
             self.pieces[3]:SetSize(a, 2*a);
         elseif self.numSlices == 9 then
+            --if true then
+            --    NiceSlice_SetCornerSize(self, a);
+            --    return
+            --end
             self.pieces[1]:SetSize(a, a);
             self.pieces[3]:SetSize(a, a);
             self.pieces[7]:SetSize(a, a);
@@ -113,6 +151,10 @@ do  -- Slice Frame
     end
 
     function SliceFrameMixin:SetTexture(tex)
+        --if self.NineSlice then
+        --    NiceSlice_SetTexture(self, tex);
+        --    return
+        --end
         for i = 1, #self.pieces do
             self.pieces[i]:SetTexture(tex);
         end
@@ -162,7 +204,21 @@ do  -- Slice Frame
     addon.CreateThreeSliceFrame = CreateThreeSliceFrame;
 
 
-    -- With
+    local function CreateTextureSlice(frame)
+        if not frame.TextureSlice then
+            frame.TextureSlice = frame:CreateTexture(nil, "BACKGROUND");
+            frame.TextureSlice:SetTextureSliceMode(1); --Enum.UITextureSliceMode, 0 Stretched(Default)  1 Tiled
+        end
+        local pixelMargin = 1;
+        frame.TextureSlice:SetTextureSliceMargins(pixelMargin, pixelMargin, pixelMargin, pixelMargin);
+        local offset = 0;
+        frame.TextureSlice:ClearAllPoints();
+        frame.TextureSlice:SetPoint("TOPLEFT", frame, "TOPLEFT", -offset, offset);
+        frame.TextureSlice:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", offset, -offset);
+        frame.TextureSlice:SetTexture("Interface/AddOns/Plumber/Art/Frame/PixelBorder_Dashed_Moving");
+    end
+
+    addon.CreateTextureSlice = CreateTextureSlice;
 end
 
 do  -- Checkbox
