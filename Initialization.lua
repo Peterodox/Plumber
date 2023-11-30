@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.1.4";
-local VERSION_DATE = 1701270558;
+local VERSION_TEXT = "v1.1.5";
+local VERSION_DATE = 1701315962;
 
 
 local addonName, addon = ...
@@ -58,6 +58,8 @@ end);
 
 
 do
+    addon.IsGame_10_2_0 = true;
+
     local tocVersion = select(4, GetBuildInfo());
     addon.IsGame_10_2_0 = tocVersion and tocVersion >= 100200
 end

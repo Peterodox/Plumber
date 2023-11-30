@@ -81,6 +81,12 @@ L["Announce Forbidden Reason Soon Despawn"] = "你不能通告一个即将消失
 L["Available In Format"] = "此时间后可用：|cffffffff%s|r";
 
 
+--Generic
+L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally
+L["Reposition Button Vertical"] = "竖直方向移动";
+L["Reposition Button Tooltip"] = "左键点击并拖拉来移动这个窗口。";
+
+
 
 
 -- !! Do NOT translate the following entries

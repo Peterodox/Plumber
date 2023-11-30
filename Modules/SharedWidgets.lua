@@ -1,5 +1,6 @@
 local _, addon = ...
 local API = addon.API;
+local L = addon.L;
 
 local BUTTON_MIN_SIZE = 24;
 
@@ -2752,4 +2753,212 @@ do  --Shared Context Menu
         return SharedContextMenu
     end
     addon.GetSharedContextMenu = GetSharedContextMenu;
+end
+
+do  --Frame Reposition Button
+    local GetScaledCursorPosition = API.GetScaledCursorPosition;
+
+    local function OnUpdate_Frequency(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.016 then
+            self.t = 0;
+            return true
+        end
+        return false
+    end
+
+    local function OnUpdate_OnMoving(self, elapsed)
+        if OnUpdate_Frequency(self, elapsed) then
+            local x, y = GetScaledCursorPosition();
+            local offsetX, offsetY;
+            local anyChange;
+
+            if self.orientation == "x" then
+                offsetX = x - self.fromX;
+                if offsetX ~= self.offsetX then
+                    self.offsetX = offsetX;
+                    anyChange = true
+                end
+            elseif self.orientation == "y" then
+                offsetY = y - self.fromX;
+                if offsetY ~= self.offsetY then
+                    self.offsetY = offsetY;
+                    anyChange = true
+                end
+            end
+
+            if anyChange then
+                self.frameToControl:RepositionFrame(offsetX, offsetY);
+            end
+        end
+    end
+
+    local function OnUpdate_MonitorDiff(self, elapsed)
+        --start moving Owner once the cursor moves 2 units
+        if OnUpdate_Frequency(self, elapsed) then
+            local diff = 0;
+            local x, y = GetScaledCursorPosition();
+            if self.orientation == "x" then
+                diff = x - self.fromX;
+            elseif self.orientation == "y" then
+                diff = y - self.fromY;
+            end
+            if diff < 0 then
+                diff = -diff;
+            end
+            if diff >= 4 then   --Threshold
+                self.fromX, self.fromY = x, y;
+                self.isMovingFrame = true;
+                self:OnLeave();
+                self.frameToControl:SnapShotFramePosition();
+                self:SetScript("OnUpdate", OnUpdate_OnMoving);
+            end
+        end
+    end
+
+    local RepositionButtonMixin = {};
+
+    function RepositionButtonMixin:OnMouseDown(button)
+        if self:IsEnabled() then
+            self.Icon:SetPoint("CENTER", self, "CENTER", 0, -1);
+            if button == "LeftButton" then
+                --Pre Frame Reposition
+                self:LockHighlight();
+                self.t = 0;
+                self.fromX, self.fromY = GetScaledCursorPosition();
+                self:SetScript("OnUpdate", OnUpdate_MonitorDiff);
+            end
+        end
+    end
+
+    function RepositionButtonMixin:StopReposition()
+        self:SetScript("OnUpdate", nil);
+        self.isMovingFrame = false;
+        self.fromX, self.fromY = nil, nil;
+        self.offsetX, self.offsetY = nil, nil;
+    end
+
+    function RepositionButtonMixin:OnMouseUp()
+        if self.isMovingFrame then
+            self.frameToControl:ConfirmNewPosition();
+            self:StopReposition();
+        end
+        self.Icon:SetPoint("CENTER", self, "CENTER", 0, 0);
+        self:UnlockHighlight();
+    end
+
+    function RepositionButtonMixin:OnClick(button)
+        if button =="RightButton" then
+            self:OnDoubleClick();
+        end
+    end
+
+    function RepositionButtonMixin:OnDoubleClick()
+        self:StopReposition();
+        if self.frameToControl then
+            self.frameToControl:ResetFramePosition();
+        end
+    end
+
+    function RepositionButtonMixin:OnEnable()
+        self.Icon:SetDesaturated(false);
+        self.Icon:SetVertexColor(1, 1, 1);
+        self.Icon:SetPoint("CENTER", self, "CENTER", 0, 0);
+        self:RefreshOnEnter();
+    end
+
+    function RepositionButtonMixin:OnDisable()
+        self.Icon:SetDesaturated(true);
+        self.Icon:SetVertexColor(0.8, 0.8, 0.8);
+        self.Icon:SetPoint("CENTER", self, "CENTER", 0, 0);
+        --self.Highlight:Hide();
+        self:RefreshOnEnter();
+    end
+
+    function RepositionButtonMixin:RefreshOnEnter()
+        if self:IsVisible() and self:IsMouseOver() then
+            self:OnEnter();
+        end
+    end
+
+    function RepositionButtonMixin:OnShow()
+
+    end
+
+    function RepositionButtonMixin:OnHide()
+        self:StopReposition();
+    end
+
+    function RepositionButtonMixin:OnEnter()
+        if self.isMovingFrame then return end;
+        --self.Highlight:Show();
+
+        local tooltip = GameTooltip;
+        tooltip:Hide();
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+
+        if self.orientation == "x" then
+            tooltip:SetText(L["Reposition Button Horizontal"], 1, 1, 1);
+        elseif self.orientation == "y" then
+            tooltip:SetText(L["Reposition Button Vertical"], 1, 1, 1);
+        end
+
+        tooltip:AddLine(L["Reposition Button Tooltip"], 1, 0.82, 0, true);
+        tooltip:Show();
+    end
+
+    function RepositionButtonMixin:OnLeave()
+        GameTooltip:Hide();
+        --self.Highlight:Hide();
+    end
+
+    function RepositionButtonMixin:SetOrientation(xy)
+        self.orientation = xy;
+        local tex;
+        if xy == "x" then
+            tex = "Interface/AddOns/Plumber/Art/Button/MoveButton-X";
+        elseif xy == "y" then
+            tex = "Interface/AddOns/Plumber/Art/Button/MoveButton-Y";
+        end
+        self.Highlight:SetTexture(tex);
+        self.Icon:SetTexture(tex);
+    end
+
+    local function CreateRepositionButton(frameToControl)
+        local button = CreateFrame("Button", nil, frameToControl);
+        button.frameToControl = frameToControl;
+        button:SetSize(20, 20);
+        button:SetMotionScriptsWhileDisabled(true);
+        button:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        Mixin(button, RepositionButtonMixin);
+
+        local tex = "Interface/AddOns/Plumber/Art/Button/MoveButton-X";
+
+        button.Highlight = button:CreateTexture(nil, "HIGHLIGHT");
+        --button.Highlight:Hide();
+        button.Highlight:SetSize(32, 32);
+        button.Highlight:SetPoint("CENTER", button, "CENTER", 0, 0);
+        button.Highlight:SetTexture(tex);
+        button.Highlight:SetTexCoord(0.5, 1, 0, 1);
+
+        button.Icon = button:CreateTexture(nil, "ARTWORK");
+        button.Icon:SetSize(32, 32);
+        button.Icon:SetPoint("CENTER", button, "CENTER", 0, 0);
+        button.Icon:SetTexture(tex);
+        button.Icon:SetTexCoord(0, 0.5, 0, 1);
+
+        button:SetScript("OnMouseDown", button.OnMouseDown);
+        button:SetScript("OnMouseUp", button.OnMouseUp);
+        button:SetScript("OnClick", button.OnClick);
+        button:SetScript("OnDoubleClick", button.OnDoubleClick);
+        button:SetScript("OnEnable", button.OnEnable);
+        button:SetScript("OnDisable", button.OnDisable);
+        button:SetScript("OnShow", button.OnShow);
+        button:SetScript("OnHide", button.OnHide);
+        button:SetScript("OnEnter", button.OnEnter);
+        button:SetScript("OnLeave", button.OnLeave);
+
+        return button
+    end
+    addon.CreateRepositionButton = CreateRepositionButton;
 end

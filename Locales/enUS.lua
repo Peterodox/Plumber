@@ -82,6 +82,12 @@ L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Blue";
 L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
 
 
+--Generic
+L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
+L["Reposition Button Vertical"] = "Move Vertically";
+L["Reposition Button Tooltip"] = "Left-click and drag to move the window.";
+
+
 
 
 -- !! Do NOT translate the following entries

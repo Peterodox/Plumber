@@ -10,7 +10,8 @@ end
 local MAPID_EMRALD_DREAM = 2200;
 local OPTION_FRAME_WIDTH = 196;
 local OPTION_FRAME_GAP = 48;
-local UI_OFFSET_Y = 0;
+local UI_OFFSET_X = 0;      --Set by user via RepositionButton
+local UI_OFFSET_Y = 0;      --Controlled by Camera Zoom
 local PATTERN_RESOURCE_DISPLAY = "%s |T%s:16:16:0:0:64:64:4:60:4:60|t";
 
 local API = addon.API;
@@ -90,11 +91,12 @@ end
 
 local PlayerChoiceUI = CreateFrame("Frame", nil, UIParent);
 PlayerChoiceUI:SetSize(64, 64);
-PlayerChoiceUI:SetPoint("CENTER", UIParent, "CENTER", 0, UI_OFFSET_Y);
+PlayerChoiceUI:SetPoint("CENTER", UIParent, "CENTER", UI_OFFSET_X, UI_OFFSET_Y);
 PlayerChoiceUI:Hide();
 PlayerChoiceUI:SetFrameStrata("DIALOG");
 PlayerChoiceUI:SetFixedFrameStrata(true);
 PlayerChoiceUI:SetFrameLevel(50);
+PlayerChoiceUI:SetClampedToScreen(true);
 PlayerChoiceUI.LongClickWatcher = CreateFrame("Frame", nil, PlayerChoiceUI);
 
 
@@ -576,9 +578,12 @@ function PlayerChoiceUI:Init()
     CloseButton:SetScript("OnEnter", CloseButton_OnEnter);
     CloseButton:SetScript("OnLeave", CloseButton_OnLeave);
     CloseButton:SetScript("OnClick", CloseButton_OnClick);
+
+    local rb = addon.CreateRepositionButton(self);
+    self.RepositionButton = rb;
+    rb:SetOrientation("x");
+    rb:SetPoint("TOP", CloseButton, "BOTTOM", 0, -40);
 end
-
-
 
 
 local AnnounceButtonData = {};
@@ -680,7 +685,6 @@ function PlayerChoiceUI:SetupAnnounceButton()
 end
 
 local INTRO_DURATION = 0.35;
---local UI_FROM_OFFSET = UI_OFFSET_Y - 20;
 
 local function Intro_OnUpdate(self, elapsed)
     self.t = self.t + elapsed;
@@ -688,16 +692,15 @@ local function Intro_OnUpdate(self, elapsed)
     if alpha > 1 then
         alpha = 1;
     end
-    --local y = easingFunc(self.t, UI_FROM_OFFSET, UI_OFFSET_Y, INTRO_DURATION);
+
     local height = easingFunc(self.t, self.fullHeight - 48, self.fullHeight, INTRO_DURATION);
 
     if self.t > INTRO_DURATION then
-        --y = UI_OFFSET_Y;
         alpha = 1;
         height = self.fullHeight;
         self:SetScript("OnUpdate", nil);
     end
-    --PlayerChoiceUI:SetPoint("CENTER", 0, y);
+
     PlayerChoiceUI:SetAlpha(alpha);
     PlayerChoiceUI:SetHeight(height);
 end
@@ -925,6 +928,26 @@ function PlayerChoiceUI:Disable()
 end
 
 
+local function SetAndSaveFramePosition(offsetX)
+    UI_OFFSET_X = offsetX;
+    PlumberDB.playerchoiceuiOffsetX = offsetX;
+    local y = ZoomCalculator.fromY or 0;
+    PlayerChoiceUI:SetPoint("CENTER", UI_OFFSET_X, y);
+end
+
+
+local function LoadFramePosition()
+    local userPositionX = PlumberDB and PlumberDB.playerchoiceuiOffsetX;
+    if userPositionX then
+        if type(userPositionX) ~= "number" then
+            userPositionX = 0;
+            PlumberDB.playerchoiceuiOffsetX = userPositionX;
+        end
+        SetAndSaveFramePosition(userPositionX);
+    end
+end
+
+
 local ZoneTriggerModule;
 
 local function EnableModule(state)
@@ -944,6 +967,8 @@ local function EnableModule(state)
 
             module:SetEnterZoneCallback(OnEnterZoneCallback);
             module:SetLeaveZoneCallback(OnLeaveZoneCallback);
+
+            LoadFramePosition();
         end
         ZoneTriggerModule:SetEnabled(true);
         ZoneTriggerModule:Update();
@@ -1025,7 +1050,7 @@ function ZoomCalculator:Sync()
         self.zoom = zoom;
         local toY = CalculateOffsetYFromZoom(zoom);
         self.fromY = toY;
-        PlayerChoiceUI:SetPoint("CENTER", 0, toY);
+        PlayerChoiceUI:SetPoint("CENTER", UI_OFFSET_X, toY);
     end
 end
 
@@ -1059,8 +1084,40 @@ FrameMover:SetScript("OnUpdate", function(self, elapsed)
         self:Hide();
     end
     ZoomCalculator.fromY = y;
-    PlayerChoiceUI:SetPoint("CENTER", 0, y);
+    PlayerChoiceUI:SetPoint("CENTER", UI_OFFSET_X, y);
 end);
+
+
+
+
+local function CalculateOffsetXToUIParentCenter()
+    local uiCenterX, uiCenterY = UIParent:GetCenter();
+    local x, y = PlayerChoiceUI:GetCenter();
+    return x - uiCenterX, y - uiCenterY
+end
+
+function PlayerChoiceUI:ResetFramePosition()
+    SetAndSaveFramePosition(0);
+end
+
+function PlayerChoiceUI:SnapShotFramePosition()
+    self.repositionFromX, self.repositionFromY = CalculateOffsetXToUIParentCenter();
+end
+
+function PlayerChoiceUI:ConfirmNewPosition()
+    local x = CalculateOffsetXToUIParentCenter();
+    SetAndSaveFramePosition(x);
+    self.repositionFromX, self.repositionFromY = nil, nil;
+end
+
+function PlayerChoiceUI:RepositionFrame(offsetX, offsetY)
+    if not self.repositionFromX then
+        self:SnapShotFramePosition();
+    end
+    self:SetPoint("CENTER", self.repositionFromX + (offsetX or 0), self.repositionFromY + (offsetY or 0));
+end
+
+
 
 
 do
@@ -1100,8 +1157,8 @@ AjustButton:SetScript("OnMouseUp", function(self)
     self:SetScript("OnUpdate", nil);
 end);
 
-
 function TestAnim()
     PlayerChoiceUI:ShowUI();
+    PlayerChoiceUI:Show();
 end
 -]]

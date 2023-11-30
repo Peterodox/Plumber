@@ -574,8 +574,12 @@ function WorldMapDataProvider:ShowAllPins()
 
     local bestUniqueVignetteIndex = C_VignetteInfo.FindBestUniqueVignette(relavantVignetteGUIDs) or 0;
     for i, pin in ipairs(pins) do
-        if pin.isActive and (PIN_ICON_PRIORITIZE_REWARD and not pin.hasReawrd) then
-            pin:SetVisual(3);
+        if pin.isActive then
+            if PIN_ICON_PRIORITIZE_REWARD and pin.hasReawrd then
+                pin:SetVisual(0);
+            else
+                pin:SetVisual(3);
+            end
         elseif pin.hasReawrd then
             pin:SetVisual(0);
         elseif i == bestUniqueVignetteIndex then
