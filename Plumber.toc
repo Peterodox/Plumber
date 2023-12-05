@@ -1,5 +1,5 @@
 ## Interface: 100200
-## Version: 1.1.5
+## Version: 1.1.6
 
 ## Title: Plumber
 
@@ -31,3 +31,4 @@ Modules\MapPin.xml
 Modules\RareAnnouncement.lua
 Modules\PlayerChoiceUI.lua
 Modules\Lockpicking.lua
+Modules\BlizzFix_EventToast.lua

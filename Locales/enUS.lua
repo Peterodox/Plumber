@@ -71,6 +71,11 @@ L["ModuleDescription HandyLockpick"] = "Right click a lockbox in your bag or Tra
 L["Instruction Pick Lock"] = "<Right Click to Pick Lock>";
 
 
+--BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
+L["ModuleName BlizzFixEventToast"] = "Blitz Fix: Event Toast";
+L["ModuleDescription BlizzFixEventToast"] = "Modify the behavior of Event Toasts so they don't consume your mouse clicks. Also allow you to Right Click on the toast and close it immediately.\n\n*Event Toasts are banners that appear on the top of the screen when you complete certain activities.";
+
+
 --Rare/Location Announcement
 L["Announce Location Tooltip"] = "Share this location in chat.";
 L["Announce Forbidden Reason In Cooldown"] = "You have shared a location recently.";

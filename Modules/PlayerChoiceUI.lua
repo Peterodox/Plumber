@@ -75,6 +75,20 @@ local function HideBlizzardFrame_MoveAny()
     end
 end
 
+local function HideBlizzardFrame_Drift()
+    --Similar to MoveAny, they hook the SetPoint method
+    --see Drift\DriftHelpers.lua
+
+    local f = PlayerChoiceFrame;
+    if f then
+        f:ClearAllPoints();
+        f:SetClampedToScreen(false);
+        f.DriftAboutToSetPoint = true;
+        f:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
+        f.DriftAboutToSetPoint = false;
+    end
+end
+
 local HideBlizzardFrame = HideBlizzardFrame_Default;
 
 local function OnUpdate_OnShot(self)
@@ -976,6 +990,8 @@ local function EnableModule(state)
         if C_AddOns then
             if C_AddOns.IsAddOnLoaded("MoveAny") then
                 HideBlizzardFrame = HideBlizzardFrame_MoveAny;
+            elseif C_AddOns.IsAddOnLoaded("Drift") then
+                HideBlizzardFrame = HideBlizzardFrame_Drift;
             end
             --BlizzMove does not support PlayerChoiceFrame
             --MoveAnything cannot move anything after 10.0

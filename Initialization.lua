@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.1.5";
-local VERSION_DATE = 1701315962;
+local VERSION_TEXT = "v1.1.6";
+local VERSION_DATE = 1701784055;
 
 
 local addonName, addon = ...
@@ -23,6 +23,7 @@ local DefaultValues = {
     WorldMapPinSeedPlanting = true,     --Aditional Map Pin: Dreamseed
     AlternativePlayerChoiceUI = true,   --Revamp PlayerChoiceFrame for Dreamseed Nurturing
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
+    BlizzFixEventToast = true,          --Make Toast non-interactable
 
     --PlayerChoiceFrameToken = true,      --First implementation in 10.2.0  --We instead revamp the who PlayerChoiceFrame
 };
