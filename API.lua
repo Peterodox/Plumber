@@ -10,8 +10,10 @@ local tremove = table.remove;
 local floor = math.floor;
 local sqrt = math.sqrt;
 local time = time;
+local unpack = unpack;
 local GetCVarBool = C_CVar.GetCVarBool;
 local CreateFrame = CreateFrame;
+local securecallfunction = securecallfunction;
 
 do  -- Table
     local function Mixin(object, ...)
@@ -131,6 +133,7 @@ do  -- Color
     local ColorSwatches = {
         SelectionBlue = {12, 105, 216},
         SmoothGreen = {124, 197, 118},
+        WarningRed = {212, 100, 28}, --228, 13, 14  248, 81, 73
     };
 
     for _, swatch in pairs(ColorSwatches) do
@@ -293,6 +296,11 @@ do
     end
     API.SecondsToTime = SecondsToTime;
 
+    local function SecondsToClock(seconds)
+        --Clock: 00:00
+        return format("%s:%02d", math.floor(seconds / 60), math.floor(seconds % 60))
+    end
+    API.SecondsToClock = SecondsToClock;
 
     --Unix Epoch is in UTC
     local MonthDays = {
@@ -804,8 +812,10 @@ do  -- Map
         total = total + 1;
     end
 
-    local function CreateZoneTriggeredModule()
-        local module = {};
+    local function CreateZoneTriggeredModule(tag)
+        local module = {
+            tag = tag,
+        };
 
         for k, v in pairs(ZoneTriggeredModuleMixin) do
             module[k] = v;
@@ -1036,3 +1046,121 @@ do  --Cursor Position
     end
     API.GetScaledCursorPosition = GetScaledCursorPosition;
 end
+
+do  --TomTom Compatibility
+    local TomTomUtil = {};
+    addon.TomTomUtil = TomTomUtil;
+
+    TomTomUtil.waypointUIDs = {};
+    TomTomUtil.pauseCrazyArrowUpdate = false;
+
+    local TT;
+
+    function TomTomUtil:IsTomTomAvailable()
+        if self.available == nil then
+            self.available = (TomTom and TomTom.AddWaypoint and TomTom.RemoveWaypoint and TomTom.SetClosestWaypoint and TomTomCrazyArrow and true) or false
+            if self.available then
+                TT = TomTom;
+            end
+        end
+        return self.available
+    end
+
+    function TomTomUtil:AddWaypoint(uiMapID, x, y, desc, plumberTag, plumberArg1, plumberArg2)
+        --x, y: 0-1
+        if self:IsTomTomAvailable() then
+            plumberTag = plumberTag or "plumber";
+
+            local opts = {
+                title = desc or "TomTom Waypoint via Plumber",
+                from = "Plumber",
+                persistent = false,     --waypoint will not be saved
+                crazy = true,
+                cleardistance = 8,
+                arrivaldistance = 15,
+                world = false,          --don't show on WorldMap
+                minimap = false,
+                plumberTag = plumberTag,
+                plumberArg1 = plumberArg1,
+                plumberArg2 = plumberArg2,
+            };
+
+            local uid = securecallfunction(TT.AddWaypoint, TT, uiMapID, x, y, opts);
+
+            if uid then
+                if not self.waypointUIDs[uid] then
+                    self.waypointUIDs[uid] = {plumberTag, plumberArg1, plumberArg2};
+                end
+                return uid
+            else
+                return
+            end
+        end
+    end
+
+    function TomTomUtil:SelectClosestWaypoint()
+        local announceInChat = false;
+        securecallfunction(TT.SetClosestWaypoint, TT, announceInChat);
+    end
+
+    function TomTomUtil:RemoveWaypoint(uid)
+        if self:IsTomTomAvailable() then
+            securecallfunction(TT.RemoveWaypoint, TT, uid);
+        end
+    end
+
+    function TomTomUtil:RemoveWaypointsByTag(tag)
+        for uid, data in pairs(self.waypointUIDs) do
+            if data[1] == tag then
+                self.waypointUIDs[uid] = nil;
+                self:RemoveWaypoint(uid);
+            end
+        end
+    end
+
+    function TomTomUtil:RemoveWaypointsByRule(rule)
+        for uid, data in pairs(self.waypointUIDs) do
+            if rule(unpack(data)) then
+                self.waypointUIDs[uid] = nil;
+                self:RemoveWaypoint(uid);
+            end
+        end
+    end
+
+    function TomTomUtil:RemoveAllPlumberWaypoints()
+        for uid, tag in pairs(self.waypointUIDs) do
+            self:RemoveWaypoint(uid);
+        end
+        self.waypointUIDs = {};
+    end
+
+    function TomTomUtil:GetDistanceToWaypoint(uid)
+        return securecallfunction(TT.GetDistanceToWaypoint, TT, uid)
+    end
+end
+
+--[[
+local DEBUG = CreateFrame("Frame");
+DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
+DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
+DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+
+DEBUG:SetScript("OnEvent", function(self, event, ...)
+    print(event);
+    if event == "UNIT_SPELLCAST_SUCCEEDED" then
+        local name, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo("player");
+        self.endTime = endTime;
+    elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" then
+        local t = GetTime();
+        t = t * 1000;
+        if self.endTime then
+            local diff = t - self.endTime;
+            if diff < 200 and diff > -200 then
+                print("Natural Complete")
+            else
+                print("Interrupted")
+            end
+        end
+    end
+end);
+--]]

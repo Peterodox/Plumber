@@ -41,6 +41,8 @@ local GetItemCount = GetItemCount;
 local GetItemIconByID = C_Item.GetItemIconByID;
 local GetBestMapForUnit = C_Map.GetBestMapForUnit;
 local time = time;
+local GetTime = GetTime;
+local UnitChannelInfo = UnitChannelInfo;
 
 local IS_SEED_SPELL = {};
 do
@@ -106,6 +108,7 @@ function EL:CloseUI()
     self:UnregisterEvent("UPDATE_UI_WIDGET");
     self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
     self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
+
     QuickSlot:RequestCloseUI();
 end
 
@@ -146,9 +149,14 @@ function EL:OnEvent(event, ...)
         if event == "UNIT_SPELLCAST_SUCCEEDED" then
             local _, _, spellID = ...
             if spellID and IS_SEED_SPELL[spellID] then
-                C_Timer.After(0.2, function()
-                    DataProvider:MarkNearestPlantContributed();
-                end);
+                --This event fires when start Channeling (and we don't have a SPELLCAST_CHANNEL equivalent, it doesn't make sense)
+                --UNIT_SPELLCAST_CHANNEL_START fires before this event
+                --UNIT_SPELLCAST_CHANNEL_STOP fires regardless of finishing cast or not
+                --So we check if the the channel stops after endTime
+                local name, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo("player");
+                self.channelEndTime = endTime;
+            else
+                self.channelEndTime = nil;
             end
         end
     elseif event == "UPDATE_UI_WIDGET" then
@@ -160,8 +168,22 @@ function EL:OnEvent(event, ...)
         end
     elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
         self.isChanneling = true;
+
     elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" then
         self.isChanneling = nil;
+        if self.channelEndTime then
+            local t = GetTime();
+            t = t * 1000;
+            local diff = t - self.channelEndTime;
+            if diff < 200 and diff > -200 then
+                --Natural Complete
+                C_Timer.After(0.2, function()
+                    DataProvider:MarkNearestPlantContributed();
+                end);
+            else
+                --Interrupted
+            end
+        end
     end
 end
 EL:SetScript("OnEvent", EL.OnEvent);
@@ -229,6 +251,9 @@ end
 function EL:UpdateMap()
     self.mapWidth, self.mapHeight = C_Map.GetMapWorldSize(MAPID_EMRALD_DREAM);
 end
+EL.mapWidth = 7477.1201171875;
+EL.mapHeight = 4983.330078125;
+
 
 function EL:CalculatePlayerToTargetDistance()
     self.playerX, self.playerY = GetPlayerMapCoord(MAPID_EMRALD_DREAM);
@@ -272,7 +297,7 @@ local ZoneTriggerModule;
 local function EnableModule(state)
     if state then
         if not ZoneTriggerModule then
-            local module = API.CreateZoneTriggeredModule();
+            local module = API.CreateZoneTriggeredModule("quickslotseed");
             ZoneTriggerModule = module;
             module:SetValidZones(MAPID_EMRALD_DREAM);
             EL:UpdateMap();
@@ -775,6 +800,10 @@ function DataProvider:MarkNearestPlantContributed()
     if creatureID then
         self:SetPlantContributedByCreatureID(creatureID, true);
     end
+end
+
+function DataProvider:GetPlayerDistanceToTarget(playerX, playerY, targetX, targetY)
+    return EL:GetMapPointsDistance(playerX, playerY, targetX, targetY);
 end
 
 

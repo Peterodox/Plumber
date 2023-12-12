@@ -35,6 +35,7 @@ local C_VignetteInfo = C_VignetteInfo;
 local GetVignetteInfo = C_VignetteInfo.GetVignetteInfo;
 local GetVignettePosition = C_VignetteInfo.GetVignettePosition;
 local IsWorldQuest = C_QuestLog.IsWorldQuest;
+local After = C_Timer.After;
 local format = string.format;
 local pairs = pairs;
 local ipairs = ipairs;
@@ -182,10 +183,12 @@ function PinController:OnEvent(event, ...)
             local vignetteID = GetVignetteIDFromGUID(vignetteGUID);
             if self.chestOwnerCreatureID[vignetteID] then
                 --if the removed minimap icon is a Dreamseed Chest
-                local owner = self.chestOwnerCreatureID[vignetteID];
-                if not GetVignetteInfo(vignetteGUID) then
-                    DreamseedUtil:SetChestStateByCreatureID(owner, false);
-                end
+                After(0.5, function()
+                    local owner = self.chestOwnerCreatureID[vignetteID];
+                    if not GetVignetteInfo(vignetteGUID) then
+                        DreamseedUtil:SetChestStateByCreatureID(owner, false);
+                    end
+                end)
             end
         end
         if self.mapOpened and self.isRelavantVignetteGUID[vignetteGUID] then
@@ -360,12 +363,10 @@ function PlumberWorldMapPinMixin:OnMouseEnter()
     local resourceText = DreamseedUtil:GetResourcesText();
     if resourceText then
         TooltipFrame:AddLine(resourceText, 1, 1, 1, false);
-        TooltipFrame:Show();
     end
 
     if hasReward then
         TooltipFrame:AddLine(WEEKLY_REWARDS_UNCLAIMED_TITLE, 0.098, 1.000, 0.098, false);   --GREEN_FONT_COLOR
-        TooltipFrame:Show();
 
         --[[
         local seedTier, bloomTier;
@@ -377,6 +378,21 @@ function PlumberWorldMapPinMixin:OnMouseEnter()
         TooltipFrame:AddLine(string.format("%s/%s", seedTier, bloomTier), 1, 1, 1, false);
         TooltipFrame:Show();
         --]]
+    end
+
+    if (hasReward or self.isActive) and addon.ControlCenter:ShouldShowNavigatorOnDreamseedPins() then
+        TooltipFrame:AddLine(addon.L["Click To Track Location"], 1, 0.82, 0, true);
+    end
+
+    TooltipFrame:Show();
+end
+
+function PlumberWorldMapPinMixin:OnMouseClickAction(mouseButton)
+    if mouseButton == "LeftButton" then
+        if addon.ControlCenter:ShouldShowNavigatorOnDreamseedPins() then
+            addon.ControlCenter:EnableSuperTracking();
+            self:OnMouseEnter();
+        end
     end
 end
 
@@ -755,7 +771,7 @@ local function EnableModule(state)
         ENABLE_MAP_PIN = true;
 
         if not ZoneTriggerModule then
-            local module = API.CreateZoneTriggeredModule();
+            local module = API.CreateZoneTriggeredModule("mappin");
             ZoneTriggerModule = module;
             module:SetValidZones(MAPID_EMRALD_DREAM);
 

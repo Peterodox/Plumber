@@ -1,0 +1,49 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+	<Script file="SuperTrack.lua"/>
+
+	<Frame name="PlumberSuperTrackingTemplate" parent="UIParent" frameStrata="BACKGROUND" mixin="PlumberSuperTrackingMixin" virtual="true">
+		<Size x="100" y="100"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon"> <!-- atlas="Navigation-Tracked-Icon" useAtlasSize="true" -->
+                    <Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Arrow"> <!-- useAtlasSize="true" hidden="true" -->
+					<Size x="28" y="28"/>
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="60"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="Title" inherits="GameFontNormalSmall" justifyH="CENTER" justifyV="TOP" hidden="true" maxLines="1">
+					<Size x="120" y="0"/>
+                    <Color r="1" g="1" b="1"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.Icon" relativePoint="BOTTOM" x="0" y="2"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="DistanceText" inherits="GameFontNormalSmall" justifyH="CENTER" justifyV="TOP">
+					<Size x="0" y="0"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.Title" relativePoint="BOTTOM" x="0" y="-2"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="ETAText" inherits="GameFontNormalSmall" justifyH="CENTER" justifyV="TOP" hidden="true">
+					<Size x="0" y="0"/>
+					<!--Color r="1" g="1" b="1"/-->
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.DistanceText" relativePoint="BOTTOM" x="0" y="-2"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEvent method="OnEvent"/>
+			<OnUpdate method="OnUpdate"/>
+		</Scripts>
+	</Frame>
+</Ui>

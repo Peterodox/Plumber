@@ -17,6 +17,8 @@ Locales\Localization.xml
 API.lua
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
+#Modules\DirectionArrow.lua
+Modules\SuperTrack.xml
 ControlCenter.lua
 
 Modules\GossipFrameMedal.lua
@@ -28,7 +30,9 @@ Modules\QuickSlot.lua
 Modules\Dreamseed.lua
 #Modules\EventMap.lua
 Modules\MapPin.xml
+Modules\Navigator_Dreamseed.lua
 Modules\RareAnnouncement.lua
 Modules\PlayerChoiceUI.lua
 Modules\Lockpicking.lua
 Modules\BlizzFix_EventToast.lua
+

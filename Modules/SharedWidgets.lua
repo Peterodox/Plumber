@@ -2547,8 +2547,11 @@ do  --Shared Context Menu
     local MENU_PADDING_X = 2;
     local MENU_PADDING_Y = 8;
     local MENU_BUTTON_HEIGHT = 24;
+    local MENU_DIVIDER_HEIGHT = 14;
     local MENU_BUTTON_WIDTH = 240;
     local MENU_BUTTON_TEXT_OFFSET = 12;
+    local MENU_SUBBUTTON_TEXT_OFFSET = 30;
+    local MENU_TOOLTIP_DELAY = 0.5;
 
     local UIParent = UIParent;
     local GetScaledCursorPosition = API.GetScaledCursorPosition;
@@ -2564,6 +2567,7 @@ do  --Shared Context Menu
 
     function MenuButtonMixin:OnLeave()
         self.parent:FocusOnButton(nil);
+        GameTooltip:Hide();
     end
 
     function MenuButtonMixin:OnClick(button)
@@ -2573,20 +2577,136 @@ do  --Shared Context Menu
     end
 
     function MenuButtonMixin:OnMouseDown(button)
+        if not self:IsEnabled() then return end;
+
         if button == "LeftButton" then
-            self.Text:SetPoint("LEFT", self, "LEFT", MENU_BUTTON_TEXT_OFFSET + 1, 0);
+            self.Text:SetPoint("LEFT", self, "LEFT", self.baseTextOffset + 1, 0);
         end
     end
 
     function MenuButtonMixin:OnMouseUp(button)
-        self.Text:SetPoint("LEFT", self, "LEFT", MENU_BUTTON_TEXT_OFFSET, 0);
+        self.Text:SetPoint("LEFT", self, "LEFT", self.baseTextOffset, 0);
+    end
+
+    function MenuButtonMixin:SetupButtonTexture()
+        if self.divider then
+            self.divider:Hide();
+        end
+
+        if (not self.buttonType) or self.buttonType == "title" or self.buttonType == "divider" then
+            if self.Tex1 then
+                self.Tex1:Hide();
+            end
+            if self.Tex2 then
+                self.Tex2:Hide();
+            end
+
+            if self.buttonType == "divider" then
+                if not self.divider then
+                    self.divider = self:CreateTexture(nil, "ARTWORK");
+                    self.divider:SetPoint("LEFT", self, "LEFT", MENU_PADDING_X, 0);
+                    self.divider:SetPoint("RIGHT", self, "RIGHT", -MENU_PADDING_X, 0);
+                    self.divider:SetColorTexture(0.2, 0.2, 0.2);
+                    DisableSharpening(self.divider);
+                end
+                local px = API.GetPixelForWidget(self, 1);
+                self.divider:SetHeight(px);
+                self.divider:Show();
+            end
+
+            return
+        end
+
+
+        if not self.Tex1 then
+            self.Tex1 = self:CreateTexture(nil, "ARTWORK");
+            self.Tex1:SetSize(32, 32);
+            self.Tex1:SetPoint("CENTER", self, "LEFT", MENU_BUTTON_TEXT_OFFSET + 6, 0);
+            self.Tex1:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+            self.Tex1:SetTexCoord(0, 0.5, 0, 0.5);
+            DisableSharpening(self.Tex1);
+        end
+        if not self.Tex2 then
+            self.Tex2 = self:CreateTexture(nil, "OVERLAY");
+            self.Tex2:SetSize(16, 16);
+            self.Tex2:SetPoint("CENTER", self.Tex1, "CENTER", 0, 0);
+            self.Tex2:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+            self.Tex2:SetTexCoord(0.5, 0.75, 0.5, 0.75);
+            DisableSharpening(self.Tex2);
+        end
+
+        if self.buttonType == "checkbox" then
+            self.Tex1:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+            self.Tex2:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+        elseif self.buttonType == "radio" then
+            self.Tex1:SetTexture("Interface/AddOns/Plumber/Art/Button/RadioButton");
+            self.Tex2:SetTexture("Interface/AddOns/Plumber/Art/Button/RadioButton");
+        end
+
+        self.Tex2:SetShown(self.selected);
+        if self.selected then
+            self.Tex1:SetTexCoord(0, 0.5, 0, 0.5);
+        else
+            self.Tex1:SetTexCoord(0.5, 1, 0, 0.5);
+        end
+    end
+
+    function MenuButtonMixin:SetButtonType(buttonType, selected)
+        if buttonType ~= self.buttonType or selected ~= self.selected then
+            self.buttonType = buttonType;
+            self.selected = selected;
+        else
+            return
+        end
+
+        if buttonType == "divider" then
+            self:SetHeight(MENU_DIVIDER_HEIGHT);
+        else
+            self:SetHeight(MENU_BUTTON_HEIGHT);
+        end
+
+        if buttonType == "divider" or buttonType == "title" then
+            self:Disable();
+            if self.Tex1 then
+                self.Tex1:Hide();
+            end
+            if self.Tex2 then
+                self.Tex2:Hide();
+            end
+        else
+            self:Enable();
+        end
+
+        self:SetupButtonTexture();
+    end
+
+    function MenuButtonMixin:SetButtonColor(color)
+        if self.buttonType == "title" then
+            self.Text:SetTextColor(0.5, 0.5, 0.5);
+        elseif color then
+            self.Text:SetTextColor(color[1], color[2], color[3]);
+        else
+            self.Text:SetTextColor(1, 1, 1);
+        end
     end
 
     function MenuButtonMixin:SetButtonData(buttonData)
         self.Text:SetText(buttonData.text);
         self.onClickFunc = buttonData.onClickFunc;
+        self.tooltip = buttonData.tooltip;
+        self:SetButtonLevel(buttonData.level);
+        self:SetButtonType(buttonData.type, buttonData.selected);
+        self:SetButtonColor(buttonData.color);
     end
 
+    function MenuButtonMixin:SetButtonLevel(level)
+        if level == 1 then
+            self.baseTextOffset = MENU_SUBBUTTON_TEXT_OFFSET;
+        else
+            self.baseTextOffset = MENU_BUTTON_TEXT_OFFSET;
+        end
+        self.Text:SetPoint("LEFT", self, "LEFT", self.baseTextOffset, 0);
+    end
 
     function ContextMenuMixin:ReleaseButtons()
         if not self.buttons then return end;
@@ -2598,7 +2718,7 @@ do  --Shared Context Menu
         self.numActive = 0;
     end
 
-    function ContextMenuMixin:GetButton()
+    function ContextMenuMixin:AcquireButton()
         if not self.buttons then
             self.numActive = 0;
             self.buttons = {};
@@ -2620,7 +2740,12 @@ do  --Shared Context Menu
             button.Text:SetPoint("LEFT", button, "LEFT", MENU_BUTTON_TEXT_OFFSET, 0);
             button.Text:SetTextColor(1, 1, 1);
             button.id = index;
-            button:SetPoint("TOPLEFT", self, "TOPLEFT", MENU_PADDING_X, -MENU_PADDING_Y + (1-index)*MENU_BUTTON_HEIGHT);
+            --button:SetPoint("TOPLEFT", self, "TOPLEFT", MENU_PADDING_X, -MENU_PADDING_Y + (1-index)*MENU_BUTTON_HEIGHT);
+            if index == 1 then
+                button:SetPoint("TOPLEFT", self, "TOPLEFT", MENU_PADDING_X, -MENU_PADDING_Y);
+            else
+                button:SetPoint("TOPLEFT", self.buttons[index - 1], "BOTTOMLEFT", 0, 0);
+            end
             Mixin(button, MenuButtonMixin);
             button:SetScript("OnEnter", MenuButtonMixin.OnEnter);
             button:SetScript("OnLeave", MenuButtonMixin.OnLeave);
@@ -2657,20 +2782,25 @@ do  --Shared Context Menu
         self.owner = owner;
     end
 
-    function ContextMenuMixin:SetContent(content)
-        if content == self.content then
+    function ContextMenuMixin:SetContent(content, forceUpdate)
+        if content == self.content and not forceUpdate then
             return
         end
         self.content = content;
         self:ReleaseButtons();
 
         local button;
+        local numDivider = 0;
+
         for i, buttonData in ipairs(content) do
-            button = self:GetButton();
+            button = self:AcquireButton();
             button:SetButtonData(buttonData);
+            if buttonData.type == "divider" then
+                numDivider = numDivider + 1;
+            end
         end
 
-        self:SetHeight(#content * MENU_BUTTON_HEIGHT + 2 * MENU_PADDING_Y);
+        self:SetHeight((#content - numDivider) * MENU_BUTTON_HEIGHT + numDivider * MENU_DIVIDER_HEIGHT + 2 * MENU_PADDING_Y);
     end
 
     function ContextMenuMixin:CloseMenu()
@@ -2703,22 +2833,54 @@ do  --Shared Context Menu
     local function HighlightFrame_OnUpdate(self, elapsed)
         local x, y = GetScaledCursorPosition();
         self.HighlightTexture:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
+
+        if self.mouseoverTime then
+            self.mouseoverTime = self.mouseoverTime + elapsed;
+            if self.mouseoverTime >= MENU_TOOLTIP_DELAY then
+                self.mouseoverTime = nil;
+                SharedContextMenu:ShowFocusedButtonTooltip();
+            end
+        end
     end
 
     function ContextMenuMixin:FocusOnButton(menuButton)
+        self.focusedButton = menuButton;
         if menuButton then
             self.HighlightFrame:ClearAllPoints();
             self.HighlightFrame:SetPoint("TOPLEFT", menuButton, "TOPLEFT", 0, 0);
             self.HighlightFrame:SetPoint("BOTTOMRIGHT", menuButton, "BOTTOMRIGHT", 0, 0);
+            self.HighlightFrame.mouseoverTime = 0;
             self.HighlightFrame:Show();
         else
             self.HighlightFrame:Hide();
+            self.HighlightFrame.mouseoverTime = nil;
+        end
+    end
+
+    function ContextMenuMixin:ShowFocusedButtonTooltip()
+        if self.focusedButton and self.focusedButton.tooltip and self.focusedButton:IsVisible() then
+            local tooltip = GameTooltip;
+            tooltip:Hide();
+            tooltip:SetOwner(self.focusedButton, "ANCHOR_NONE");
+
+            local buttonRight = self.focusedButton:GetRight();
+            local uiRight = UIParent:GetRight();
+            if buttonRight and uiRight and buttonRight + 240 > uiRight then
+                tooltip:SetPoint("TOPRIGHT", self.focusedButton, "TOPLEFT", -4, 6);
+            else
+                tooltip:SetPoint("TOPLEFT", self.focusedButton, "TOPRIGHT", 4, 6);
+            end
+
+            tooltip:SetText(self.focusedButton.Text:GetText(), 1, 1, 1, true);
+            tooltip:AddLine(self.focusedButton.tooltip, 1, 0.82, 0, true);
+            tooltip:Show();
         end
     end
 
     function ContextMenuMixin:Init()
         self:SetFrameStrata("TOOLTIP");
         self:SetFixedFrameStrata(true);
+        self:SetClampedToScreen(true);
 
         self:SetScript("OnShow", ContextMenuMixin.OnShow);
         self:SetScript("OnHide", ContextMenuMixin.OnHide);

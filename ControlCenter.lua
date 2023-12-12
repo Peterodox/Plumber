@@ -7,6 +7,7 @@ local FRAME_WIDTH = 600;
 local PADDING = 16;
 local LEFT_SECTOR_WIDTH = math.floor(0.618*FRAME_WIDTH + 0.5);
 
+
 local ControlCenter = CreateFrame("Frame", nil, UIParent);
 addon.ControlCenter = ControlCenter;
 ControlCenter:SetSize(FRAME_WIDTH, FRAME_WIDTH * RATIO);
@@ -14,7 +15,19 @@ ControlCenter:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
 ControlCenter.modules = {};
 ControlCenter:Hide();
 
+local function CreateNewFeatureMark(button)
+    local newTag = button:CreateTexture(nil, "OVERLAY")
+    newTag:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/NewFeatureMark");
+    newTag:SetSize(16, 16);
+    newTag:SetPoint("RIGHT", button, "LEFT", -8, 0);
+    newTag:Show();
+end
+
 local function CreateUI()
+    local db = PlumberDB;
+    DB = db;
+    local settingsOpenTime = db.settingsOpenTime or 0;
+
     local parent = ControlCenter;
     local showCloseButton = true;
     local f = addon.CreateHeaderFrame(parent, showCloseButton);
@@ -77,7 +90,9 @@ local function CreateUI()
 
     local SelectionTexture = container:CreateTexture(nil, "ARTWORK");
     SelectionTexture:SetSize(LEFT_SECTOR_WIDTH - PADDING, 24);
-    SelectionTexture:SetColorTexture(1, 1, 1, 0.1);
+    SelectionTexture:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/SelectionTexture");
+    SelectionTexture:SetVertexColor(1, 1, 1, 0.1);
+    SelectionTexture:SetBlendMode("ADD");
     SelectionTexture:Hide();
 
     --Checkboxs
@@ -123,18 +138,23 @@ local function CreateUI()
     end
 
     for i, data in ipairs(parent.modules) do
-        numButton = numButton + 1;
-        checkbox = addon.CreateCheckbox(container);
-        parent.Checkboxs[numButton] = checkbox;
-        checkbox.dbKey = data.dbKey;
-        checkbox:SetPoint("TOPLEFT", container, "TOPLEFT", PADDING + 8, -fromOffsetY);
-        checkbox.data = data;
-        checkbox.onEnterFunc = Checkbox_OnEnter;
-        checkbox.onLeaveFunc = Checkbox_OnLeave;
-        checkbox.onClickFunc = Checkbox_OnClick;
-        checkbox:SetFixedWidth(CHECKBOX_WIDTH);
-        checkbox:SetLabel(data.name);
-        fromOffsetY = fromOffsetY + OPTION_GAP_Y + BUTTON_HEIGHT;
+        if (not data.validityCheck) or (data.validityCheck()) then
+            numButton = numButton + 1;
+            checkbox = addon.CreateCheckbox(container);
+            parent.Checkboxs[numButton] = checkbox;
+            checkbox.dbKey = data.dbKey;
+            checkbox:SetPoint("TOPLEFT", container, "TOPLEFT", PADDING + 8, -fromOffsetY);
+            checkbox.data = data;
+            checkbox.onEnterFunc = Checkbox_OnEnter;
+            checkbox.onLeaveFunc = Checkbox_OnLeave;
+            checkbox.onClickFunc = Checkbox_OnClick;
+            checkbox:SetFixedWidth(CHECKBOX_WIDTH);
+            checkbox:SetLabel(data.name);
+            fromOffsetY = fromOffsetY + OPTION_GAP_Y + BUTTON_HEIGHT;
+            if data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
+                CreateNewFeatureMark(checkbox);
+            end
+        end
     end
 
 
@@ -161,6 +181,9 @@ local function CreateUI()
         previewSize = frameWidth - leftSectorWidth - 2*PADDING + 4;
         preview:SetSize(previewSize, previewSize);
     end
+
+
+    db.settingsOpenTime = time();
 end
 
 function ControlCenter:ShowUI(onBlizzardOptionsUI)
@@ -179,7 +202,9 @@ function ControlCenter:InitializeModules()
     local db = PlumberDB;
 
     for _, moduleData in pairs(self.modules) do
-        moduleData.toggleFunc( db[moduleData.dbKey] );
+        if (not moduleData.validityCheck) or (moduleData.validityCheck()) then
+            moduleData.toggleFunc( db[moduleData.dbKey] );
+        end
     end
 end
 
@@ -196,7 +221,7 @@ function ControlCenter:UpdateButtonStates()
 end
 
 function ControlCenter:AddModule(moduleData)
-    --moduleData = {name = ModuleName, dbKey = PlumberDB[key], description = string, toggleFunc = function}
+    --moduleData = {name = ModuleName, dbKey = PlumberDB[key], description = string, toggleFunc = function, validityCheck = function, }
     table.insert(self.modules, moduleData);
 end
 
@@ -223,4 +248,17 @@ if Settings then
     local panel = ControlCenter;
     local category = Settings.RegisterCanvasLayoutCategory(panel, "Plumber");
     Settings.RegisterAddOnCategory(category);
+end
+
+
+do
+    function ControlCenter:ShouldShowNavigatorOnDreamseedPins()
+        return PlumberDB.Navigator_Dreamseed and not PlumberDB.Navigator_MasterSwitch
+    end
+
+    function ControlCenter:EnableSuperTracking()
+        PlumberDB.Navigator_MasterSwitch = true;
+        local SuperTrackFrame = addon.GetSuperTrackFrame();
+        SuperTrackFrame:TryEnableByModule();
+    end
 end

@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.1.6";
-local VERSION_DATE = 1701784055;
+local VERSION_TEXT = "v1.1.7";
+local VERSION_DATE = 1702384862;
 
 
 local addonName, addon = ...
@@ -25,6 +25,13 @@ local DefaultValues = {
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
     BlizzFixEventToast = true,          --Make Toast non-interactable
 
+
+    --In-game Navigation: Use waypoint (Super Tracking) to navigate players. Generally default to false, since it will mute WoW's own SuperTrackedFrame
+    Navigator_MasterSwitch = true,      --Decide if using our SuperTrackedFrame or the default one
+    Navigator_Dreamseed = false,
+
+
+    --Deprecated:
     --PlayerChoiceFrameToken = true,      --First implementation in 10.2.0  --We instead revamp the who PlayerChoiceFrame
 };
 

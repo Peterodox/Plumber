@@ -967,7 +967,7 @@ local ZoneTriggerModule;
 local function EnableModule(state)
     if state then
         if not ZoneTriggerModule then
-            local module = API.CreateZoneTriggeredModule();
+            local module = API.CreateZoneTriggeredModule("nurture");
             ZoneTriggerModule = module;
             module:SetValidZones(MAPID_EMRALD_DREAM);
 

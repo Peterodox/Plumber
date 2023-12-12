@@ -1,3 +1,7 @@
+--Reserved space below so all localization files line up
+
+
+
 local _, addon = ...
 local L = addon.L;
 
@@ -74,6 +78,22 @@ L["Instruction Pick Lock"] = "<Right Click to Pick Lock>";
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
 L["ModuleName BlizzFixEventToast"] = "Blitz Fix: Event Toast";
 L["ModuleDescription BlizzFixEventToast"] = "Modify the behavior of Event Toasts so they don't consume your mouse clicks. Also allow you to Right Click on the toast and close it immediately.\n\n*Event Toasts are banners that appear on the top of the screen when you complete certain activities.";
+
+
+--Navigator(Waypoint/SuperTrack) Shared Strings
+L["Priority"] = "Priority";
+L["Priority Default"] = "Default";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
+L["Priority Default Tooltip"] = "Follow WoW's default settings. Prioritize quest, corpse, vendor locations if possible. Otherwise, start tracking active seeds.";
+L["Stop Tracking"] = "Stop Tracking";
+L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/SuperTrackIcon:0:0:0:0|t " .. "Left click to track locations";
+
+
+--Navigator_Dreamseed (Use Super Tracking to navigate players)
+L["ModuleName Navigator_Dreamseed"] = "Navigator: Dreamseeds";
+L["ModuleDescription Navigator_Dreamseed"] = "Use the Waypoint system to guide you to the Dreamseeds.\n\n*Right click on the icon for more options.\n\n|cffd4641cThe game's default waypoints will be replaced while you are in the Emerald Dream.|r";
+L["Priority New Seeds"] = "Finding New Seeds";
+L["Priority Rewards"] = "Collecting Rewards";
+L["Stop Tracking Dreamseed Tooltip"] = "Stop tracking seeds until you Left Click on a map pin.";
 
 
 --Rare/Location Announcement
