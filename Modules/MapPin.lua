@@ -1,5 +1,6 @@
 local _, addon = ...
 local API = addon.API;
+local TomTomUtil = addon.TomTomUtil;        --Send location to TomTom
 
 local HIDE_INACTIVE_PIN = false;
 local DATA_PROVIDER_ADDED = false;
@@ -36,6 +37,7 @@ local GetVignetteInfo = C_VignetteInfo.GetVignetteInfo;
 local GetVignettePosition = C_VignetteInfo.GetVignettePosition;
 local IsWorldQuest = C_QuestLog.IsWorldQuest;
 local After = C_Timer.After;
+local InCombatLockdown = InCombatLockdown;
 local format = string.format;
 local pairs = pairs;
 local ipairs = ipairs;
@@ -277,21 +279,40 @@ end
 
 
 
+local function Dummy_SetPassThroughButtons()
+end
 
 PlumberWorldMapPinMixin = CreateFromMixins(MapCanvasPinMixin);
 
+function PlumberWorldMapPinMixin:OnCreated()
+    --When frame being created
+    self.originalSetPassThroughButtons = self.SetPassThroughButtons;
+    self.SetPassThroughButtons = Dummy_SetPassThroughButtons;
+    self:AllowPassThroughRightButton(true);
+end
+
 function PlumberWorldMapPinMixin:OnLoad()
-    --newPin
+    --newPin (see MapCanvasMixin:AcquirePin)
 	self:SetScalingLimits(1, 1.0, 1.2);
-    self.pinFrameLevelType = "PIN_FRAME_LEVEL_VIGNETTE";    --PIN_FRAME_LEVEL_VIGNETTE PIN_FRAME_LEVEL_AREA_POI
-    self.pinFrameLevelIndex = 23;
+    self.pinFrameLevelType = "PIN_FRAME_LEVEL_GROUP_MEMBER";    --PIN_FRAME_LEVEL_VIGNETTE  PIN_FRAME_LEVEL_AREA_POI   PIN_FRAME_LEVEL_WAYPOINT_LOCATION  PIN_FRAME_LEVEL_GROUP_MEMBER
+    self.pinFrameLevelIndex = 1;
     self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/SeedPlanting-Empty-Distant");
     PinController:AddPin(self);
 end
 
-function PlumberWorldMapPinMixin:SetPassThroughButtons(unpackedPrimitiveType)
+function PlumberWorldMapPinMixin:IsMouseClickEnabled()
+    return true
+end
+
+function PlumberWorldMapPinMixin:AllowPassThroughRightButton(unpackedPrimitiveType)
     --Original "SetPassThroughButtons" (see SimpleScriptRegionAPI for details) has chance to taint when called
     --So we overwrite it
+    if (not self.isRightButtonAllowed) and (not InCombatLockdown()) then
+        self.isRightButtonAllowed = true;
+        if self.originalSetPassThroughButtons then
+            self.originalSetPassThroughButtons(self, "RightButton");
+        end
+    end
 end
 
 function PlumberWorldMapPinMixin:SetTexture(texture)
@@ -367,33 +388,45 @@ function PlumberWorldMapPinMixin:OnMouseEnter()
 
     if hasReward then
         TooltipFrame:AddLine(WEEKLY_REWARDS_UNCLAIMED_TITLE, 0.098, 1.000, 0.098, false);   --GREEN_FONT_COLOR
-
-        --[[
-        local seedTier, bloomTier;
-        if self.objectGUID then
-            seedTier, bloomTier = DreamseedUtil:GetRewardTier(self.objectGUID);
-        else
-            seedTier, bloomTier = DreamseedUtil:GetRewardTierByCreatureID(self.cachedCreatureID);
-        end
-        TooltipFrame:AddLine(string.format("%s/%s", seedTier, bloomTier), 1, 1, 1, false);
-        TooltipFrame:Show();
-        --]]
     end
 
-    if (hasReward or self.isActive) and addon.ControlCenter:ShouldShowNavigatorOnDreamseedPins() then
-        TooltipFrame:AddLine(addon.L["Click To Track Location"], 1, 0.82, 0, true);
+    if TomTomUtil:IsTomTomAvailable() then
+        TooltipFrame:AddLine(addon.L["Click To Track In TomTom"], 1, 0.82, 0, true);
+        self:SetClickable(true);
+    else
+        if (hasReward or self.isActive) and addon.ControlCenter:ShouldShowNavigatorOnDreamseedPins() then
+            TooltipFrame:AddLine(addon.L["Click To Track Location"], 1, 0.82, 0, true);
+            self:SetClickable(true);
+        else
+            self:SetClickable(false);
+        end
     end
 
     TooltipFrame:Show();
+
+    self:AllowPassThroughRightButton(true);
 end
 
 function PlumberWorldMapPinMixin:OnMouseClickAction(mouseButton)
     if mouseButton == "LeftButton" then
-        if addon.ControlCenter:ShouldShowNavigatorOnDreamseedPins() then
-            addon.ControlCenter:EnableSuperTracking();
-            self:OnMouseEnter();
+        if TomTomUtil:IsTomTomAvailable() then
+            local x, y = self:GetPosition();
+            local desc = self.name;
+            TomTomUtil:AddWaypoint(MAPID_EMRALD_DREAM, x, y, desc);
+        else
+            if addon.ControlCenter:ShouldShowNavigatorOnDreamseedPins() then
+                addon.ControlCenter:EnableSuperTracking();
+                self:OnMouseEnter();
+            end
         end
     end
+end
+
+function PlumberWorldMapPinMixin:SetClickable(state)
+    if state ~= self.isClickable then
+        self.isClickable = state;
+    end
+    self:SetMouseClickEnabled(state);
 end
 
 function PlumberWorldMapPinMixin:OnAcquired(vignetteGUID, objectGUID)

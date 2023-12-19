@@ -2,7 +2,7 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="MapPin.lua"/>
 
-	<Frame name="PlumberWorldMapPinTemplate" enableMouseMotion="true" enableMouse="true" mixin="PlumberWorldMapPinMixin" virtual="true">
+	<Frame name="PlumberWorldMapPinTemplate" enableMouseMotion="true" enableMouse="false" mixin="PlumberWorldMapPinMixin" virtual="true">
 		<Size x="32" y="32"/>
 		<Layers>
 			<Layer level="ARTWORK">
@@ -34,5 +34,8 @@
 				<Scale childKey="Texture" order="7" duration="0.7" scaleX="0.87" scaleY="0.87" smoothing="OUT"/>
 			</AnimationGroup>
 		</Animations>
+		<Scripts>
+			<OnLoad method="OnCreated"/>
+		</Scripts>
 	</Frame>
 </Ui>

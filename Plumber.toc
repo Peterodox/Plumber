@@ -1,5 +1,5 @@
 ## Interface: 100200
-## Version: 1.1.6
+## Version: 1.1.8
 
 ## Title: Plumber
 
