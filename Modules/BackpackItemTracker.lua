@@ -2263,6 +2263,8 @@ do
         dbKey = "BackpackItemTracker",
         description = L["ModuleDescription BackpackItemTracker"],
         toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 1,
     };
 
     addon.ControlCenter:AddModule(moduleData);

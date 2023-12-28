@@ -72,6 +72,8 @@ do
         dbKey = "AutoJoinEvents",
         description = addon.L["ModuleDescription AutoJoinEvents"],
         toggleFunc = EnableModule,
+        categoryID = 2,
+        uiOrder = 2,
     };
 
     addon.ControlCenter:AddModule(moduleData);

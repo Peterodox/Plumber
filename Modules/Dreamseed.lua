@@ -333,6 +333,8 @@ do
         dbKey = "EmeraldBountySeedList",
         description = addon.L["ModuleDescription EmeraldBountySeedList"],
         toggleFunc = EnableModule,
+        categoryID = 10020001,
+        uiOrder = 1,
     };
 
     addon.ControlCenter:AddModule(moduleData);

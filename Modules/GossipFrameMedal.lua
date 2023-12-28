@@ -315,6 +315,8 @@ do
         dbKey = "GossipFrameMedal",
         description = description,
         toggleFunc = EnableModule,
+        categoryID = 2,
+        uiOrder = 1,
     };
 
     addon.ControlCenter:AddModule(moduleData);

@@ -1225,6 +1225,8 @@ do
         dbKey = DB_KEY_MASTER_SWITCH,   --WorldMapPinSeedPlanting
         description = addon.L["ModuleDescription WorldMapPinSeedPlanting"],
         toggleFunc = EnableModule,
+        categoryID = 10020001,
+        uiOrder = 2,
     };
 
     addon.ControlCenter:AddModule(moduleData);

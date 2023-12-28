@@ -1,11 +1,28 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local tinsert = table.insert
 
 local RATIO = 0.75; --h/w
 local FRAME_WIDTH = 600;
 local PADDING = 16;
+local BUTTON_HEIGHT = 24;
+local OPTION_GAP_Y = 8;
+local DIFFERENT_CATEGORY_OFFSET = 8;
 local LEFT_SECTOR_WIDTH = math.floor(0.618*FRAME_WIDTH + 0.5);
+
+local CATEGORY_ORDER = {
+    --Must match the keys in the localization
+
+    [0] = "Unknown",    --Used during development
+
+    [1] = "General",
+    [2] = "NPC Interaction",
+    [3] = "Class",
+
+    --Patch Feature uses the tocVersion and #00
+    [10020001] = "Dreamseeds",
+};
 
 
 local ControlCenter = CreateFrame("Frame", nil, UIParent);
@@ -23,7 +40,153 @@ local function CreateNewFeatureMark(button)
     newTag:Show();
 end
 
+
+local CategoryButtonMixin = {};
+
+function CategoryButtonMixin:SetCategory(categoryID)
+    self.categoryID = categoryID;
+    self.categoryKey = CATEGORY_ORDER[categoryID];
+
+    if self.categoryKey then
+        self.Label:SetText(L["Module Category ".. self.categoryKey]);
+    else
+        self.Label:SetText("Unknown Category");
+        self.categoryKey = "Unknown";
+    end
+end
+
+function CategoryButtonMixin:OnLoad()
+    self.collapsed = false;
+    self.childOptions = {};
+    self:UpdateArrow();
+end
+
+function CategoryButtonMixin:UpdateArrow()
+    if self.collapsed then
+        self.Arrow:SetTexCoord(0, 0.5, 0, 1);
+    else
+        self.Arrow:SetTexCoord(0.5, 1, 0, 1);
+    end
+end
+
+function CategoryButtonMixin:Expand()
+    if self.collapsed then
+        self.collapsed = false;
+        self.Drawer:SetHeight(self.drawerHeight);
+        self.Drawer:Show();
+        self:UpdateArrow();
+    end
+end
+
+function CategoryButtonMixin:Collapse()
+    if not self.collapsed then
+        self.collapsed = true;
+        self.Drawer:SetHeight(DIFFERENT_CATEGORY_OFFSET);
+        self.Drawer:Hide();
+        self:UpdateArrow();
+    end
+end
+
+function CategoryButtonMixin:ToggleCollapse()
+    if self.collapsed then
+        self:Expand();
+    else
+        self:Collapse();
+    end
+end
+
+function CategoryButtonMixin:OnClick()
+    self:ToggleCollapse();
+end
+
+function CategoryButtonMixin:OnEnter()
+    --ControlCenter.Preview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/CategoryPreview_"..self.categoryKey);
+end
+
+function CategoryButtonMixin:InitializeDrawer()
+    self.drawerHeight = #self.childOptions * (OPTION_GAP_Y + BUTTON_HEIGHT) + OPTION_GAP_Y + DIFFERENT_CATEGORY_OFFSET;
+    self.Drawer:SetHeight(self.drawerHeight);
+end
+
+function CategoryButtonMixin:UpdateModuleCount()
+    if self.childOptions then
+        local total = #self.childOptions;
+        local numEnabled = 0;
+        for i, checkbox in ipairs(self.childOptions) do
+            if checkbox:GetChecked() then
+                numEnabled = numEnabled + 1;
+            end
+        end
+        self.Count:SetText(string.format("%d/%d", numEnabled, total));
+    else
+        self.Count:SetText(nil);
+    end
+end
+
+function CategoryButtonMixin:AddChildOption(checkbox)
+    tinsert(self.childOptions, checkbox);
+end
+
+function CategoryButtonMixin:UpdateNineSlice(offset)
+    --Texture Slice don't follow its parent scale
+    --This texture has 4px gap in each direction
+    --Unused
+    self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
+    self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);
+end
+
+
+local function CreateCategoryButton(parent)
+    local b = CreateFrame("Button", nil, parent);
+
+    b:SetSize(LEFT_SECTOR_WIDTH - PADDING, BUTTON_HEIGHT);
+
+    b.Background = b:CreateTexture(nil, "BACKGROUND");
+    b.Background:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/CategoryButton-NineSlice");
+    b.Background:SetTextureSliceMargins(16, 16, 16, 16);
+    b.Background:SetTextureSliceMode(0);
+    b.Background:SetPoint("TOPLEFT", b, "TOPLEFT", 0, 0);
+    b.Background:SetPoint("BOTTOMRIGHT", b, "BOTTOMRIGHT", 0, 0);
+    --API.DisableSharpening(b.Background);
+
+    local arrowOffsetX = 8;
+
+    b.Arrow = b:CreateTexture(nil, "OVERLAY");
+    b.Arrow:SetSize(14, 14);
+    b.Arrow:SetPoint("LEFT", b, "LEFT", 8, 0);
+    b.Arrow:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/CollapseExpand");
+
+    b.Label = b:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    b.Label:SetJustifyH("LEFT");
+    b.Label:SetJustifyV("TOP");
+    b.Label:SetTextColor(1, 1, 1);
+    b.Label:SetPoint("LEFT", b, "LEFT", 28, 0);
+
+    b.Count = b:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+    b.Count:SetJustifyH("RIGHT");
+    b.Count:SetJustifyV("TOP");
+    b.Count:SetTextColor(0.5, 0.5, 0.5);
+    b.Count:SetPoint("RIGHT", b, "RIGHT", -8, 0);
+
+    b.Drawer = CreateFrame("Frame", nil, b);
+    b.Drawer:SetPoint("TOPLEFT", b, "BOTTOMLEFT", 0, 0);
+    b.Drawer:SetSize(16, 16);
+
+    API.Mixin(b, CategoryButtonMixin);
+    b:SetScript("OnClick", b.OnClick);
+    b:SetScript("OnEnter", b.OnEnter);
+
+    b:OnLoad();
+
+    b.Label:SetText("Dreamseed");
+    b.Count:SetText("4/4");
+
+    return b
+end
+
 local function CreateUI()
+    local CHECKBOX_WIDTH = LEFT_SECTOR_WIDTH - 2*PADDING;
+
     local db = PlumberDB;
     DB = db;
     local settingsOpenTime = db.settingsOpenTime or 0;
@@ -89,7 +252,7 @@ local function CreateUI()
 
 
     local SelectionTexture = container:CreateTexture(nil, "ARTWORK");
-    SelectionTexture:SetSize(LEFT_SECTOR_WIDTH - PADDING, 24);
+    SelectionTexture:SetSize(LEFT_SECTOR_WIDTH - PADDING, BUTTON_HEIGHT);
     SelectionTexture:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/SelectionTexture");
     SelectionTexture:SetVertexColor(1, 1, 1, 0.1);
     SelectionTexture:SetBlendMode("ADD");
@@ -110,14 +273,12 @@ local function CreateUI()
     };
     --]]
 
-    local BUTTON_HEIGHT = 24;
-    local OPTION_GAP_Y = 8;
-    local CHECKBOX_WIDTH = LEFT_SECTOR_WIDTH - 2*PADDING;
     local checkbox;
-    local fromOffsetY = headerHeight + PADDING;
+    local fromOffsetY = PADDING; -- +headerHeight
     local numButton = 0;
 
     parent.Checkboxs = {};
+    parent.CategoryButtons = {};
 
     local function Checkbox_OnEnter(self)
         description:SetText(self.data.description);
@@ -134,29 +295,87 @@ local function CreateUI()
     local function Checkbox_OnClick(self)
         if self.dbKey and self.data.toggleFunc then
             self.data.toggleFunc( self:GetChecked() );
+            ControlCenter:UpdateCategoryButtons();
         end
     end
+
+    local newCategoryPosition = {};
+
+    local function SortFunc_Module(a, b)
+        if a.categoryID ~= b.categoryID then
+            return a.categoryID < b.categoryID
+        end
+
+        if a.uiOrder ~= b.uiOrder then
+            return a.uiOrder < b.uiOrder
+            --should be finished here
+        end
+
+        return a.name < b.name
+    end
+
+    table.sort(parent.modules, SortFunc_Module);
+
+    local validModules = {};
+    local lastCategoryID;
+    local numValid = 0;
 
     for i, data in ipairs(parent.modules) do
         if (not data.validityCheck) or (data.validityCheck()) then
-            numButton = numButton + 1;
-            checkbox = addon.CreateCheckbox(container);
-            parent.Checkboxs[numButton] = checkbox;
-            checkbox.dbKey = data.dbKey;
-            checkbox:SetPoint("TOPLEFT", container, "TOPLEFT", PADDING + 8, -fromOffsetY);
-            checkbox.data = data;
-            checkbox.onEnterFunc = Checkbox_OnEnter;
-            checkbox.onLeaveFunc = Checkbox_OnLeave;
-            checkbox.onClickFunc = Checkbox_OnClick;
-            checkbox:SetFixedWidth(CHECKBOX_WIDTH);
-            checkbox:SetLabel(data.name);
-            fromOffsetY = fromOffsetY + OPTION_GAP_Y + BUTTON_HEIGHT;
-            if data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
-                CreateNewFeatureMark(checkbox);
+            numValid = numValid + 1;
+            if data.categoryID ~= lastCategoryID then
+                lastCategoryID = data.categoryID;
+                newCategoryPosition[numValid] = true;
             end
+            tinsert(validModules, data);
         end
     end
 
+    parent.modules = validModules;
+
+    local lastCategoryButton;
+    local positionInCategory;
+
+    for i, data in ipairs(parent.modules) do
+        if newCategoryPosition[i] then
+            local categoryButton = CreateCategoryButton(container);
+            tinsert(parent.CategoryButtons, categoryButton);
+
+            if i == 1 then
+                categoryButton:SetPoint("TOPLEFT", container, "TOPLEFT", PADDING, -fromOffsetY);
+            else
+                categoryButton:SetPoint("TOPLEFT", lastCategoryButton.Drawer, "BOTTOMLEFT", 0, 0);
+            end
+
+            categoryButton:SetCategory(data.categoryID);
+
+            lastCategoryButton = categoryButton;
+            positionInCategory = 0;
+        end
+
+        numButton = numButton + 1;
+        checkbox = addon.CreateCheckbox(lastCategoryButton.Drawer);
+        parent.Checkboxs[numButton] = checkbox;
+        checkbox.dbKey = data.dbKey;
+        checkbox:SetPoint("TOPLEFT", lastCategoryButton.Drawer, "TOPLEFT", 8, -positionInCategory * (OPTION_GAP_Y + BUTTON_HEIGHT) - OPTION_GAP_Y);
+        checkbox.data = data;
+        checkbox.onEnterFunc = Checkbox_OnEnter;
+        checkbox.onLeaveFunc = Checkbox_OnLeave;
+        checkbox.onClickFunc = Checkbox_OnClick;
+        checkbox:SetFixedWidth(CHECKBOX_WIDTH);
+        checkbox:SetLabel(data.name);
+
+        if data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
+            CreateNewFeatureMark(checkbox);
+        end
+
+        lastCategoryButton:AddChildOption(checkbox);
+        positionInCategory = positionInCategory + 1;
+    end
+
+    for i, categoryButton in ipairs(parent.CategoryButtons) do
+        categoryButton:InitializeDrawer();
+    end
 
     --Temporary "About" Tab
     local VersionText = container:CreateFontString(nil, "OVERLAY", "GameFontNormal"); --GameFontNormal (ObjectiveFont), GameTooltipTextSmall
@@ -195,6 +414,7 @@ function ControlCenter:ShowUI(onBlizzardOptionsUI)
     self:Show();
     self.Frame:SetShown(not onBlizzardOptionsUI);
     self:UpdateLayout();
+    self:UpdateButtonStates();
 end
 
 function ControlCenter:InitializeModules()
@@ -208,6 +428,12 @@ function ControlCenter:InitializeModules()
     end
 end
 
+function ControlCenter:UpdateCategoryButtons()
+    for _, categoryButton in pairs(self.CategoryButtons) do
+        categoryButton:UpdateModuleCount();
+    end
+end
+
 function ControlCenter:UpdateButtonStates()
     local db = PlumberDB;
 
@@ -218,10 +444,19 @@ function ControlCenter:UpdateButtonStates()
             button:SetChecked(false);
         end
     end
+
+    self:UpdateCategoryButtons();
 end
 
 function ControlCenter:AddModule(moduleData)
-    --moduleData = {name = ModuleName, dbKey = PlumberDB[key], description = string, toggleFunc = function, validityCheck = function, }
+    --moduleData = {name = ModuleName, dbKey = PlumberDB[key], description = string, toggleFunc = function, validityCheck = function, categoryID = number, uiOrder = number}
+
+    if not moduleData.categoryID then
+        moduleData.categoryID = 0;
+        moduleData.uiOrder = 0;
+        print("Plumber Debug:", moduleData.name, "No Category");
+    end
+
     table.insert(self.modules, moduleData);
 end
 
@@ -232,13 +467,11 @@ ControlCenter:SetScript("OnEvent", function(self, event, ...)
     self:UnregisterEvent(event);
     self:SetScript("OnEvent", nil);
     ControlCenter:InitializeModules();
-    --ControlCenter:ShowUI();
 end);
 
 ControlCenter:SetScript("OnShow", function(self)
     local hideBackground = true;
     self:ShowUI(hideBackground);
-    ControlCenter:UpdateButtonStates();
 end);
 
 

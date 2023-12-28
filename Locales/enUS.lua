@@ -13,6 +13,18 @@ L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map - Map Filter - Plumber";
 
 
+--Module Categories
+L["Module Category Unknown"] = "Unknown"    --Don't need to translate
+--- order: 1
+L["Module Category General"] = "General";
+--- order: 2
+L["Module Category NPC Interaction"] = "NPC Interaction";
+--- order: 3
+L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
+--- order: 4
+L["Module Category Dreamseeds"] = "Dreamseeds";     --Added in patch 10.2.0
+
+
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Auto Join Events";
 L["ModuleDescription AutoJoinEvents"] = "Auto select (Begin Time Rift) when you interact with Soridormi during the event.";

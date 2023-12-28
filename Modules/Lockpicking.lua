@@ -469,6 +469,8 @@ do
         dbKey = "HandyLockpick",
         description = addon.L["ModuleDescription HandyLockpick"],
         toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 100,
     };
 
     addon.ControlCenter:AddModule(moduleData);

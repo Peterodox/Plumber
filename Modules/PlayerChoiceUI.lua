@@ -1010,6 +1010,8 @@ do
         dbKey = "AlternativePlayerChoiceUI",
         description = L["ModuleDescription AlternativePlayerChoiceUI"],
         toggleFunc = EnableModule,
+        categoryID = 10020001,
+        uiOrder = 3,
     };
 
     addon.ControlCenter:AddModule(moduleData);
