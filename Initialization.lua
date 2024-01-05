@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.1.8";
-local VERSION_DATE = 1703005970;
+local VERSION_TEXT = "v1.1.9";
+local VERSION_DATE = 1704471247;
 
 
 local addonName, addon = ...
@@ -24,12 +24,21 @@ local DefaultValues = {
     AlternativePlayerChoiceUI = true,   --Revamp PlayerChoiceFrame for Dreamseed Nurturing
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
     BlizzFixEventToast = true,          --Make Toast non-interactable
-
+    AzerothianArchives = true,          --Adjust Talking Head's layout so it doesn't get in the way
 
     --In-game Navigation: Use waypoint (Super Tracking) to navigate players. Generally default to false, since it will mute WoW's own SuperTrackedFrame
     Navigator_MasterSwitch = true,      --Decide if using our SuperTrackedFrame or the default one
-    Navigator_Dreamseed = false,
+        Navigator_Dreamseed = false,
 
+    --Talking Head Revamp
+    TalkingHead_MasterSwitch = false,
+        TalkingHead_FontSize = 100,         --% Multiply default QuestFont Height
+        TalkingHead_InstantText = false,
+        TalkingHead_HideInInstance = false,
+        TalkingHead_HideWorldQuest = false,
+
+    --Declared elsewhere:
+        --DreamseedChestABTesting = math.random(100) >= 50
 
     --Deprecated:
     --PlayerChoiceFrameToken = true,      --First implementation in 10.2.0  --We instead revamp the who PlayerChoiceFrame

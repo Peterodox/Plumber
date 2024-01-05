@@ -11,9 +11,11 @@ local select = select;
 local tinsert = table.insert;
 local floor = math.floor;
 local ipairs = ipairs;
+local unpack = unpack;
 local time = time;
 local GetTime = GetTime;
 local IsMouseButtonDown = IsMouseButtonDown;
+local GetMouseFocus = GetMouseFocus;
 local PlaySound = PlaySound;
 local GetItemCount = GetItemCount;
 local GetSpellCharges = GetSpellCharges;
@@ -40,7 +42,7 @@ do  -- Slice Frame
         GenericBox = true,
         WhiteBorder = true,
         WhiteBorderBlackBackdrop = true,
-        Metal_Hexagon = true,
+        Metal_Hdgon = true,
         Metal_Hexagon_Red = true,
         Phantom = true,
     };
@@ -265,7 +267,7 @@ do  -- Checkbox
         else
             newState = not self:GetChecked();
             self:SetChecked(newState);
-            print("DB Key not assigned");
+            print("Plumber: DB Key not assigned");
         end
 
         if self.onClickFunc then
@@ -979,6 +981,7 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         f.Cooldown:SetSize(64, 64);
         f.Cooldown:SetPoint("CENTER", f, "CENTER", 0, 0);
         f.Cooldown:SetHideCountdownNumbers(false);  --globally controlled by CVar "countdownForCooldowns" (boolean)
+        f.Cooldown.noCooldownCount = true;          --Disabled for OmniCC (  see OmniCC\core\cooldown.lua Cooldown:OnCooldownDone()  )
 
         local CountdownNumber = f.Cooldown:CreateFontString(nil, "OVERLAY", nil, 6);
         f.Cooldown.BackupCountdownNumber = CountdownNumber;
@@ -1550,7 +1553,7 @@ do
     addon.CreateTinyStatusBar = CreateTinyStatusBar;
 end
 
-do --Red Button
+do  --Red Button
     local RedButtonMixin = {};
 
 
@@ -3123,4 +3126,658 @@ do  --Frame Reposition Button
         return button
     end
     addon.CreateRepositionButton = CreateRepositionButton;
+end
+
+do  --Slider
+    local Round = API.Round;
+    local SliderFrameMixin = {};
+
+    local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Frame/Slider";
+    local TEX_COORDS = {
+        Thumb_Nomral = {0, 0.5, 0, 0.25},
+        Thumb_Disable = {0.5, 1, 0, 0.25},
+        Thumb_Highlight = {0, 0.5, 0.25, 0.5},
+
+        Back_Nomral = {0, 0.25, 0.5, 0.625},
+        Back_Disable = {0.25, 0.5, 0.5, 0.625},
+        Back_Highlight = {0.5, 0.75, 0.5, 0.625},
+
+        Forward_Nomral = {0, 0.25, 0.625, 0.75},
+        Forward_Disable = {0.25, 0.5, 0.625, 0.75},
+        Forward_Highlight = {0.5, 0.75, 0.625, 0.75},
+
+        Slider_Left = {0, 0.125, 0.875, 1},
+        Slider_Middle = {0.125, 0.375, 0.875, 1},
+        Slider_Right = {0.375, 0.5, 0.875, 1},
+    };
+
+    local function SetTextureCoord(texture, key)
+        texture:SetTexCoord( unpack(TEX_COORDS[key]) );
+    end
+
+    local SharedMethods = {
+        "GetValue", "SetValue", "SetMinMaxValues",
+    };
+
+    for k, v in ipairs(SharedMethods) do
+        SliderFrameMixin[v] = function(self, ...)
+            return self.Slider[v](self.Slider, ...);
+        end;
+    end
+
+
+    local SliderScripts = {};
+
+    function SliderScripts:OnMinMaxChanged(min, max)
+        if self.formatMinMaxValueFunc then
+            self.formatMinMaxValueFunc(min, max);
+        end
+    end
+
+    function SliderScripts:OnValueChanged(value, userInput)
+        if value ~= self.value then
+            self.value = value;
+        else
+            return
+        end
+
+        self.ThumbTexture:SetPoint("CENTER", self.Thumb, "CENTER", 0, 0);
+
+        if self.ValueText then
+            if self.formatValueFunc then
+                self.ValueText:SetText(self.formatValueFunc(value));
+            else
+                self.ValueText:SetText(value);
+            end
+        end
+
+        if userInput then
+            if self.onValueChangedFunc then
+                self.onValueChangedFunc(value);
+            end
+        end
+    end
+
+    function SliderScripts:OnMouseDown()
+        if self:IsEnabled() then
+            self:LockHighlight();
+        end
+    end
+
+    function SliderScripts:OnMouseUp()
+        self:UnlockHighlight();
+    end
+
+
+    local function BackForwardButton_OnClick(self)
+        if self.delta then
+            self:GetParent():SetValueByDelta(self.delta, true);
+        end
+    end
+
+    function SliderFrameMixin:OnLoad()
+        for k, v in pairs(SliderScripts) do
+            self.Slider:SetScript(k, v);
+        end
+
+        self.Back:SetScript("OnClick", BackForwardButton_OnClick);
+        self.Forward:SetScript("OnClick", BackForwardButton_OnClick);
+
+        self.Slider.Left:SetTexture(TEXTURE_FILE);
+        self.Slider.Middle:SetTexture(TEXTURE_FILE);
+        self.Slider.Right:SetTexture(TEXTURE_FILE);
+        self.Slider.ThumbTexture:SetTexture(TEXTURE_FILE);
+        self.Slider.ThumbHighlight:SetTexture(TEXTURE_FILE);
+        SetTextureCoord(self.Slider.Left, "Slider_Left");
+        SetTextureCoord(self.Slider.Middle, "Slider_Middle");
+        SetTextureCoord(self.Slider.Right, "Slider_Right");
+        SetTextureCoord(self.Slider.ThumbTexture, "Thumb_Nomral");
+        SetTextureCoord(self.Slider.ThumbHighlight, "Thumb_Highlight");
+
+        self.Back.Texture:SetTexture(TEXTURE_FILE);
+        self.Back.Highlight:SetTexture(TEXTURE_FILE);
+        SetTextureCoord(self.Back.Texture, "Back_Nomral");
+        SetTextureCoord(self.Back.Highlight, "Back_Highlight");
+
+        self.Forward.Texture:SetTexture(TEXTURE_FILE);
+        self.Forward.Highlight:SetTexture(TEXTURE_FILE);
+        SetTextureCoord(self.Forward.Texture, "Forward_Nomral");
+        SetTextureCoord(self.Forward.Highlight, "Forward_Highlight");
+
+        self:SetMinMaxValues(0, 100);
+        self:SetValueStep(10);
+        self:SetObeyStepOnDrag(true);
+        self:SetValue(0);
+
+        self:Enable();
+
+        DisableSharpening(self.Slider.Left);
+        DisableSharpening(self.Slider.Middle);
+        DisableSharpening(self.Slider.Right);
+    end
+
+    function SliderFrameMixin:Enable()
+        self.Slider:Enable();
+        self.Back:Enable();
+        self.Forward:Enable();
+        SetTextureCoord(self.Slider.ThumbTexture, "Thumb_Nomral");
+        SetTextureCoord(self.Back.Texture, "Back_Nomral");
+        SetTextureCoord(self.Forward.Texture, "Forward_Nomral");
+        self.Label:SetTextColor(1, 1, 1);
+        self.RightText:SetTextColor(1, 0.82, 0);
+    end
+
+    function SliderFrameMixin:Disable()
+        self.Slider:Disable();
+        self.Back:Disable();
+        self.Forward:Disable();
+        self.Slider:UnlockHighlight();
+        SetTextureCoord(self.Slider.ThumbTexture, "Thumb_Disable");
+        SetTextureCoord(self.Back, "Back_Disable");
+        SetTextureCoord(self.Forward.Texture, "Forward_Disable");
+        self.Label:SetTextColor(0.5, 0.5, 0.5);
+        self.RightText:SetTextColor(0.5, 0.5, 0.5);
+    end
+
+    function SliderFrameMixin:SetValueByDelta(delta, userInput)
+        local value = self:GetValue();
+        self:SetValue(value + delta);
+
+        if userInput then
+            if self.onValueChangedFunc then
+                self.onValueChangedFunc(self:GetValue());
+            end
+        end
+    end
+
+    function SliderFrameMixin:SetValueStep(valueStep)
+        self.Slider:SetValueStep(valueStep);
+        self.Back.delta = -valueStep;
+        self.Forward.delta = valueStep;
+    end
+
+    function SliderFrameMixin:SetObeyStepOnDrag(obey)
+        self.Slider:SetObeyStepOnDrag(obey);
+        if not obey then
+            local min, max = self.GetMinMaxValues();
+            local delta = (max - min) * 0.1;
+            self.Back.delta = -delta;
+            self.Forward.delta = delta;
+        end
+    end
+
+    function SliderFrameMixin:SetLabel(label)
+        self.Label:SetText(label);
+    end
+
+    function SliderFrameMixin:SetFormatValueFunc(formatValueFunc)
+        self.Slider.formatValueFunc = formatValueFunc;
+        self.RightText:SetText(formatValueFunc(self:GetValue() or 0));
+    end
+
+    function SliderFrameMixin:SetOnValueChangedFunc(onValueChangedFunc)
+        self.Slider.onValueChangedFunc = onValueChangedFunc;
+        self.onValueChangedFunc = onValueChangedFunc;
+    end
+
+    local function FormatValue(value)
+        return value
+    end
+
+    local function CreateSlider(parent)
+        local f = CreateFrame("Frame", nil, parent, "PlumberMinimalSliderWithControllerTemplate");
+        Mixin(f, SliderFrameMixin);
+
+        f.Slider.ValueText = f.RightText;
+        f.Slider.Back = f.Back;
+        f.Slider.Forward = f.Forward;
+
+        f:SetFormatValueFunc(FormatValue);
+        f:OnLoad();
+
+        return f
+    end
+    addon.CreateSlider = CreateSlider;
+end
+
+do  --UIPanelButton
+    local UIPanelButtonMixin = {};
+
+    function UIPanelButtonMixin:OnClick(button)
+
+    end
+
+    function UIPanelButtonMixin:OnMouseDown(button)
+        if self:IsEnabled() then
+            self.Background:SetTexture("Interface/AddOns/Plumber/Art/Button/UIPanelButton-Down");
+        end
+    end
+
+    function UIPanelButtonMixin:OnMouseUp(button)
+        if self:IsEnabled() then
+            self.Background:SetTexture("Interface/AddOns/Plumber/Art/Button/UIPanelButton-Up");
+        end
+    end
+
+    function UIPanelButtonMixin:OnDisable()
+        self.Background:SetTexture("Interface/AddOns/Plumber/Art/Button/UIPanelButton-Disabled");
+    end
+
+    function UIPanelButtonMixin:OnEnable()
+        self.Background:SetTexture("Interface/AddOns/Plumber/Art/Button/UIPanelButton-Up");
+    end
+
+    function UIPanelButtonMixin:OnEnter()
+
+    end
+
+    function UIPanelButtonMixin:OnLeave()
+
+    end
+
+    function UIPanelButtonMixin:SetButtonText(text)
+        self:SetText(text);
+    end
+
+    local function CreateUIPanelButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        f:SetSize(144, 24);
+        Mixin(f, UIPanelButtonMixin);
+
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnEnable", f.OnEnable);
+        f:SetScript("OnDisable", f.OnDisable);
+
+        f.Background = f:CreateTexture(nil, "BACKGROUND");
+        f.Background:SetTexture("Interface/AddOns/Plumber/Art/Button/UIPanelButton-Up");
+        f.Background:SetTextureSliceMargins(32, 16, 32, 16);
+        f.Background:SetTextureSliceMode(1);
+        f.Background:SetAllPoints(true);
+        DisableSharpening(f.Background);
+
+        f.Highlight = f:CreateTexture(nil, "HIGHLIGHT");
+        f.Highlight:SetTexture("Interface/AddOns/Plumber/Art/Button/UIPanelButton-Highlight");
+        f.Highlight:SetTextureSliceMargins(32, 16, 32, 16);
+        f.Highlight:SetTextureSliceMode(0);
+        f.Highlight:SetAllPoints(true);
+        f.Highlight:SetBlendMode("ADD");
+        f.Highlight:SetVertexColor(0.5, 0.5, 0.5);
+
+        f:SetNormalFontObject("GameFontNormal");
+        f:SetHighlightFontObject("GameFontHighlight");
+        f:SetDisabledFontObject("GameFontDisable");
+        f:SetPushedTextOffset(0, -1);
+
+        return f
+    end
+    addon.CreateUIPanelButton = CreateUIPanelButton;
+end
+
+do  --EditMode
+    local Round = API.Round;
+    local EditModeSelectionMixin = {};
+
+    function EditModeSelectionMixin:OnDragStart()
+        self.parent:OnDragStart();
+    end
+
+    function EditModeSelectionMixin:OnDragStop()
+        self.parent:OnDragStop();
+    end
+
+    function EditModeSelectionMixin:ShowHighlighted()
+        --Blue
+        if not self.parent:IsShown() then return end;
+        self.isSelected = false;
+        self.Background:SetTexture("Interface/AddOns/Plumber/Art/Frame/EditModeHighlighted");
+        self:Show();
+        self.Label:Hide();
+    end
+
+    function EditModeSelectionMixin:ShowSelected()
+        --Yellow
+        if not self.parent:IsShown() then return end;
+        self.isSelected = true;
+        self.Background:SetTexture("Interface/AddOns/Plumber/Art/Frame/EditModeSelected");
+        self:Show();
+
+        if not self.hideLabel then
+            self.Label:Show();
+        end
+    end
+
+    function EditModeSelectionMixin:OnShow()
+        local offset = API.GetPixelForWidget(self, 6);
+        self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
+        self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);
+        self:RegisterEvent("GLOBAL_MOUSE_DOWN");
+    end
+
+    function EditModeSelectionMixin:OnHide()
+        self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+    end
+
+    local function IsMouseOverOptionToggle()
+        local obj = GetMouseFocus();
+        if obj and obj.isPlumberEditModeToggle then
+            return true
+        else
+            return false
+        end
+    end
+
+    function EditModeSelectionMixin:OnEvent(event, ...)
+        if event == "GLOBAL_MOUSE_DOWN" then
+            if self:IsShown() and not(self.parent:IsFocused() or IsMouseOverOptionToggle()) then
+                self:ShowHighlighted();
+                self.parent:ShowOptions(false);
+            end
+        end
+    end
+
+    function EditModeSelectionMixin:OnMouseDown()
+        self:ShowSelected();
+        self.parent:ShowOptions(true);
+
+        if EditModeManagerFrame and EditModeManagerFrame.ClearSelectedSystem then
+            EditModeManagerFrame:ClearSelectedSystem()
+        end
+    end
+
+
+    local function CreateEditModeSelection(parent, uiName, hideLabel)
+        local f = CreateFrame("Frame", nil, parent);
+        f:Hide();
+        f:SetAllPoints(true);
+        f:SetFrameStrata(parent:GetFrameStrata());
+        f:SetToplevel(true);
+        f:SetFrameLevel(999);
+        f:EnableMouse(true);
+        f:RegisterForDrag("LeftButton");
+        f:SetIgnoreParentAlpha(true);
+
+        f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightMedium");
+        f.Label:SetText(uiName);
+        f.Label:SetJustifyH("CENTER");
+        f.Label:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+        f.Background = f:CreateTexture(nil, "BACKGROUND");
+        f.Background:SetTexture("Interface/AddOns/Plumber/Art/Frame/EditModeHighlighted");
+        f.Background:SetTextureSliceMargins(16, 16, 16, 16);
+        f.Background:SetTextureSliceMode(0);
+        f.Background:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+        f.Background:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
+
+        Mixin(f, EditModeSelectionMixin);
+
+        f:SetScript("OnShow", f.OnShow);
+        f:SetScript("OnHide", f.OnHide);
+        f:SetScript("OnEvent", f.OnEvent);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnDragStart", f.OnDragStart);
+        f:SetScript("OnDragStop", f.OnDragStop);
+
+        parent.Selection = f;
+        f.parent = parent;
+        f.hideLabel = hideLabel;
+
+        return f
+    end
+    addon.CreateEditModeSelection = CreateEditModeSelection;
+
+
+    local EditModeSettingsDialog;
+    local DIALOG_WIDTH = 382;
+
+    local EditModeSettingsDialogMixin = {};
+
+    function EditModeSettingsDialogMixin:Exit()
+        self:Hide();
+        self:ClearAllPoints();
+        self.requireResetPosition = true;
+        if self.parent then
+            if self.parent.Selection then
+                self.parent.Selection:ShowHighlighted();
+            end
+            if self.parent.ExitEditMode and not API.IsInEditMode() then
+                self.parent:ExitEditMode();
+            end
+            self.parent = nil;
+        end
+    end
+
+    function EditModeSettingsDialogMixin:ReleaseAllWidgets()
+        for _, widget in pairs(self.widgets) do
+            widget:Hide();
+            widget:ClearAllPoints();
+        end
+
+        self.activeWidgets = {};
+    end
+
+    function EditModeSettingsDialogMixin:Layout()
+        local leftPadding = 20;
+        local topPadding = 48;
+        local bottomPadding = 20;
+        local OPTION_GAP_Y = 8;  --consistent with ControlCenter
+        local height = topPadding;
+        local widgetHeight;
+        local contentWidth = DIALOG_WIDTH - 2*leftPadding;
+
+        for order, widget in ipairs(self.activeWidgets) do
+            if widget.isGap then
+                height = height + 8 + OPTION_GAP_Y;
+            else
+                widget:SetPoint("TOPLEFT", self, "TOPLEFT", leftPadding, -height);
+                widgetHeight = Round(widget:GetHeight());
+                height = height + widgetHeight + OPTION_GAP_Y;
+                if widget.matchParentWidth then
+                    widget:SetWidth(contentWidth);
+                end
+            end
+        end
+        
+        height = height - OPTION_GAP_Y + bottomPadding;
+        self:SetHeight(height);
+    end
+
+    function EditModeSettingsDialogMixin:AcquireWidgetByType(type)
+        local widget;
+
+        if type == "Checkbox" then
+            if not self.checkboxes then
+                self.checkboxes = {};
+            end
+            widget = addon.CreateCheckbox(self);
+        elseif type == "Slider" then
+            if not self.sliders then
+                self.sliders = {};
+            end
+            widget = addon.CreateSlider(self);
+        elseif type == "UIPanelButton" then
+            widget = addon.CreateUIPanelButton(self);
+        elseif type == "Texture" then
+            widget = self:CreateTexture(nil, "OVERLAY");
+            widget.isDivider = nil;
+            widget.matchParentWidth = nil;
+        elseif type == "FontString" then
+            widget = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+            widget.matchParentWidth = true;
+        end
+
+        widget:Show();
+
+        return widget
+    end
+
+    function EditModeSettingsDialogMixin:CreateCheckbox(widgetData)
+        local checkbox = self:AcquireWidgetByType("Checkbox");
+
+        checkbox.Label:SetFontObject("GameFontHighlightMedium");    --Fonts in EditMode and Options are different
+        checkbox.Label:SetTextColor(1, 1, 1);
+
+        checkbox:SetData(widgetData);
+        checkbox:SetChecked( PlumberDB[checkbox.dbKey] );
+
+        return checkbox
+    end
+
+    function EditModeSettingsDialogMixin:CreateSlider(widgetData)
+        local slider = self:AcquireWidgetByType("Slider");
+
+        slider:SetLabel(widgetData.label);
+        slider:SetMinMaxValues(widgetData.minValue, widgetData.maxValue);
+
+        if widgetData.valueStep then
+            slider:SetObeyStepOnDrag(true);
+            slider:SetValueStep(widgetData.valueStep);
+        else
+            slider:SetObeyStepOnDrag(false);
+        end
+
+        slider:SetFormatValueFunc(widgetData.formatValueFunc);
+        slider:SetOnValueChangedFunc(widgetData.onValueChangedFunc);
+
+        if widgetData.dbKey and PlumberDB[widgetData.dbKey] then
+            slider:SetValue(PlumberDB[widgetData.dbKey]);
+        end
+
+        return slider
+    end
+
+    function EditModeSettingsDialogMixin:CreateUIPanelButton(widgetData)
+        local button = self:AcquireWidgetByType("UIPanelButton");
+        button:SetButtonText(widgetData.label);
+        button:SetScript("OnClick", widgetData.onClickFunc);
+        if (not widgetData.stateCheckFunc) or (widgetData.stateCheckFunc()) then
+            button:Enable();
+        else
+            button:Disable();
+        end
+        button.matchParentWidth = true;
+        return button
+    end
+
+    function EditModeSettingsDialogMixin:CreateDivider(widgetData)
+        local texture = self:AcquireWidgetByType("Texture");
+        texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/Divider_NineSlice");
+        texture:SetTextureSliceMargins(48, 4, 48, 4);
+        texture:SetTextureSliceMode(0);
+        texture:SetHeight(4);
+        texture.isDivider = true;
+        texture.matchParentWidth = true;
+        return texture
+    end
+
+    function EditModeSettingsDialogMixin:CreateHeader(widgetData)
+        local fontString = self:AcquireWidgetByType("FontString");
+        fontString:SetJustifyH("CENTER");
+        fontString:SetJustifyV("TOP");
+        fontString:SetSpacing(2);
+        fontString.matchParentWidth = true;
+        fontString:SetText(widgetData.label);
+        return fontString
+    end
+
+    function EditModeSettingsDialogMixin:SetupOptions(schematic)
+        self:ReleaseAllWidgets();
+        self:SetTitle(schematic.title);
+
+        if schematic.widgets then
+            for order, widgetData in ipairs(schematic.widgets) do
+                local widget;
+                if widgetData.type == "Checkbox" then
+                    widget = self:CreateCheckbox(widgetData);
+                elseif widgetData.type == "RadioGroup" then
+
+                elseif widgetData.type == "Slider" then
+                    widget = self:CreateSlider(widgetData);
+                elseif widgetData.type == "UIPanelButton" then
+                    widget = self:CreateUIPanelButton(widgetData);
+                elseif widgetData.type == "Divider" then
+                    widget = self:CreateDivider(widgetData);
+                elseif widgetData.type == "Header" then
+                    widget = self:CreateHeader(widgetData);
+                end
+
+                if widget then
+                    tinsert(self.activeWidgets, widget);
+                    widget.widgetKey = widgetData.widgetKey;
+                end
+            end
+        end
+        self:Layout();
+    end
+
+    function EditModeSettingsDialogMixin:FindWidget(widgetKey)
+        if self.activeWidgets then
+            for _, widget in pairs(self.activeWidgets) do
+                if widget.widgetKey == widgetKey then
+                    return widget
+                end
+            end
+        end
+    end
+
+    function EditModeSettingsDialogMixin:OnDragStart()
+        self:StartMoving();
+    end
+
+    function EditModeSettingsDialogMixin:OnDragStop()
+        self:StopMovingOrSizing();
+    end
+
+    function EditModeSettingsDialogMixin:SetTitle(title)
+        self.Title:SetText(title);
+    end
+
+    local function SetupSettingsDialog(parent, schematic)
+        if not EditModeSettingsDialog then
+            local f = CreateFrame("Frame", nil, UIParent);
+            EditModeSettingsDialog = f;
+            f:Hide();
+            f:SetSize(DIALOG_WIDTH, 350);
+            f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+            f:SetMovable(true);
+            f:SetClampedToScreen(true);
+            f:RegisterForDrag("LeftButton");
+            f:SetDontSavePosition(true);
+            f:SetFrameStrata("DIALOG");
+            f:SetFrameLevel(200);
+            f:EnableMouse(true);
+
+            f.widgets = {};
+            f.requireResetPosition = true;
+
+            Mixin(f, EditModeSettingsDialogMixin);
+
+            f.Border = CreateFrame("Frame", nil, f, "DialogBorderTranslucentTemplate");
+            f.CloseButton = CreateFrame("Button", nil, f, "UIPanelCloseButtonNoScripts");
+            f.CloseButton:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0);
+            f.CloseButton:SetScript("OnClick", function()
+                f:Exit();
+            end);
+            f.Title = f:CreateFontString(nil, "ARTWORK", "GameFontHighlightLarge");
+            f.Title:SetPoint("TOP", f, "TOP", 0, -16);
+            f.Title:SetText("Title");
+
+            f:SetScript("OnDragStart", f.OnDragStart);
+            f:SetScript("OnDragStop", f.OnDragStop);
+        end
+
+        if schematic ~= EditModeSettingsDialog.schematic then
+            EditModeSettingsDialog.requireResetPosition = true;
+            EditModeSettingsDialog.schematic = schematic;
+            EditModeSettingsDialog:ClearAllPoints();
+            EditModeSettingsDialog:SetupOptions(schematic);
+        end
+
+        EditModeSettingsDialog.parent = parent;
+
+        return EditModeSettingsDialog
+    end
+    addon.SetupSettingsDialog = SetupSettingsDialog;
 end

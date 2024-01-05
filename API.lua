@@ -118,6 +118,11 @@ do  --Math
     end
     API.Clamp = Clamp;
 
+    local function Lerp(startValue, endValue, amount)
+        return (1 - amount) * startValue + amount * endValue;
+    end
+    API.Lerp = Lerp;
+
     local function GetPointsDistance2D(x1, y1, x2, y2)
         return sqrt( (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2))
     end
@@ -712,7 +717,7 @@ do  -- Map
     ZoneTriggeredModuleMixin.inZone = false;
     ZoneTriggeredModuleMixin.enabled = true;
 
-    local function DoNothing()
+    local function DoNothing(arg)
     end
 
     ZoneTriggeredModuleMixin.enterZoneCallback = DoNothing;
@@ -737,16 +742,22 @@ do  -- Map
         end
     end
 
-    function ZoneTriggeredModuleMixin:PlayerEnterZone()
+    function ZoneTriggeredModuleMixin:PlayerEnterZone(mapID)
         if not self.inZone then
             self.inZone = true;
-            self.enterZoneCallback();
+            self.enterZoneCallback(mapID);
+        end
+
+        if mapID ~= self.currentMapID then
+            self.currentMapID = mapID;
+            self:OnCurrentMapChanged(mapID);
         end
     end
 
     function ZoneTriggeredModuleMixin:PlayerLeaveZone()
         if self.inZone then
             self.inZone = false;
+            self.currentMapID = nil;
             self.leaveZoneCallback();
         end
     end
@@ -759,10 +770,12 @@ do  -- Map
         self.leaveZoneCallback = callback;
     end
 
+    function ZoneTriggeredModuleMixin:OnCurrentMapChanged(newMapID)
+    end
+
     function ZoneTriggeredModuleMixin:SetEnabled(state)
         self.enabled = state or false;
         if not self.enabled then
-            self.inZone = false;
             self:PlayerLeaveZone();
         end
     end
@@ -772,7 +785,7 @@ do  -- Map
 
         local mapID = GetBestMapForUnit("player");
         if self:IsZoneValid(mapID) then
-            self:PlayerEnterZone();
+            self:PlayerEnterZone(mapID);
         else
             self:PlayerLeaveZone();
         end
@@ -796,7 +809,7 @@ do  -- Map
                 for i = 1, total do
                     if modules[i].enabled then
                         if modules[i]:IsZoneValid(mapID) then
-                            modules[i]:PlayerEnterZone();
+                            modules[i]:PlayerEnterZone(mapID);
                         else
                             modules[i]:PlayerLeaveZone();
                         end
@@ -1137,6 +1150,13 @@ do  --TomTom Compatibility
     function TomTomUtil:GetDistanceToWaypoint(uid)
         return securecallfunction(TT.GetDistanceToWaypoint, TT, uid)
     end
+end
+
+do  --Game UI
+    local function IsInEditMode()
+        return EditModeManagerFrame and EditModeManagerFrame:IsShown();
+    end
+    API.IsInEditMode = IsInEditMode;
 end
 
 --[[

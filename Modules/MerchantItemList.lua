@@ -40,6 +40,10 @@ end
 
 
 --[[
+    uiMapID: Azure Span (2024)      Traitor's Rest Azerothian Archive Started (2262)
+--]]
+
+--[[
     Priceless Artifact, 213536, 1000, 2657
     Historian's Utility Belt, 212635, 5000, 2657
     Historian's Fingerless Gloves, 212634, 5000, 2657

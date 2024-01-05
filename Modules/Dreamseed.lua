@@ -28,8 +28,11 @@ local SEED_SPELL_IDS = {417508, 417645, 417642};
 local math = math;
 local sqrt = math.sqrt;
 local format = string.format;
+local pairs = pairs;
+local ipairs = ipairs;
 local C_VignetteInfo = C_VignetteInfo;
 local GetVignetteInfo = C_VignetteInfo.GetVignetteInfo;
+local GetVignettes = C_VignetteInfo.GetVignettes
 local GetStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo;
 local GetItemDisplayVisualizationInfo = C_UIWidgetManager.GetItemDisplayVisualizationInfo;
 local GetAllWidgetsBySetID = C_UIWidgetManager.GetAllWidgetsBySetID;
@@ -52,7 +55,7 @@ do
 end
 
 local function GetVisibleEmeraldBountyGUID()
-    local vignetteGUIDs = C_VignetteInfo.GetVignettes();
+    local vignetteGUIDs = GetVignettes();
     local info;
 
     for i, vignetteGUID in ipairs(vignetteGUIDs) do
@@ -340,8 +343,6 @@ do
     addon.ControlCenter:AddModule(moduleData);
 end
 
---/script local map = C_Map.GetBestMapForUnit("player");local position = C_Map.GetPlayerMapPosition(map, "player");print(position:GetXY())
-
 
 local PLANT_DATA = {
     --17 types of Plant + 1 Tutorial
@@ -402,9 +403,15 @@ function DataProvider:GetGrowthTimesByCreatureID(creatureID)
         end
     end
 end
+
 function DataProvider:GetGrowthTimes(objectGUID)
     local creatureID = GetCreatureIDFromGUID(objectGUID);
     return self:GetGrowthTimesByCreatureID(creatureID)
+end
+
+function DataProvider:IsPlantGrowingByCreatureID(creatureID)
+    local remainingTime = self:GetGrowthTimesByCreatureID(creatureID)
+    return remainingTime and remainingTime > 0
 end
 
 function DataProvider:IsPlantGrowing(objectGUID)
@@ -690,7 +697,7 @@ function DataProvider:SetChestStateByCreatureID(creatureID, state, objectGUID, x
 
     if not state then
         --Player looted the chest
-        self:SetPlantContributedByCreatureID(creatureID, false);
+        self:SetPlantContributedByCreatureID(creatureID, nil);
     end
 end
 
@@ -778,11 +785,15 @@ function DataProvider:GetPlantCreatureIDByIndex(index)
     return self.indexXPlant[index]
 end
 
-function DataProvider:SetPlantContributedByCreatureID(creatureID, hasContributed)
+function DataProvider:SetPlantContributedByCreatureID(creatureID, chestFlag)
+    --chestFlag:
+    --nil (no chest)
+    --1 Potential chest (data from WidgetInfo)
+    --2 Chest (Player made contribution during current game session)
     if not self.plantContributed then
         self.plantContributed = {};
     end
-    self.plantContributed[creatureID] = hasContributed
+    self.plantContributed[creatureID] = chestFlag
 end
 
 function DataProvider:HasAnyRewardByCreatureID(creatureID)
@@ -792,7 +803,7 @@ function DataProvider:HasAnyRewardByCreatureID(creatureID)
         if not self.plantContributed then
             self.plantContributed = {};
         end
-        return self.plantContributed[creatureID]
+        return self.plantContributed[creatureID] ~= nil
     end
     return false, false
 end
@@ -800,12 +811,157 @@ end
 function DataProvider:MarkNearestPlantContributed()
     local creatureID = self:GetNearbyPlantInfo();
     if creatureID then
-        self:SetPlantContributedByCreatureID(creatureID, true);
+        self:SetPlantContributedByCreatureID(creatureID, 2);
     end
 end
 
 function DataProvider:GetPlayerDistanceToTarget(playerX, playerY, targetX, targetY)
     return EL:GetMapPointsDistance(playerX, playerY, targetX, targetY);
+end
+
+
+---- Workaround for inconsistent Chest flag:
+---- 1. When player logs in, query UIWidgetManager to get chests from previous game session
+---- 2. We check if the chests actually exist when player gets to their approximate locations
+
+function DataProvider:HasAnyPotentialRewardByCreatureID(creatureID)
+    --We now use a more RAM friendly (not getting all the widgets in a wigetSet), but less robust approach
+    if creatureID and PLANT_DATA[creatureID] then
+        local creatureData = PLANT_DATA[creatureID];
+        local info;
+        for i = 6, 11 do
+            info = GetItemDisplayVisualizationInfo(creatureData[i]);
+            if info and info.shownState == 1 and info.itemInfo and info.itemInfo.showAsEarned then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function DataProvider:GetChestOwnerCreatureID(vignetteID)
+    if not self.chestOwnerCreatureIDs then
+        self.chestOwnerCreatureIDs = self:GetChestOwnerCreatureIDs();
+    end
+    return vignetteID and self.chestOwnerCreatureIDs[vignetteID]
+end
+
+function DataProvider:IsDreamseedChest(vignetteID)
+    return self:GetChestOwnerCreatureID(vignetteID) ~= nil
+end
+
+function DataProvider:RequestScanChests()
+    if self.scanComplete then return end;
+
+    if self.scanner then
+        self.scanner.t = 0;
+        self.scanner:Show();
+        return
+    end
+
+    local anyPotentionReward;
+    local targetList = {};
+
+    local chestFlagAuto = 1;
+    local numTargets = 0;
+
+    for creatureID in pairs(PLANT_DATA) do
+        if self:HasAnyPotentialRewardByCreatureID(creatureID) then
+            anyPotentionReward = true;
+            if self.BackupCreaturePositions[creatureID] then
+                targetList[creatureID] = true;
+                self:SetPlantContributedByCreatureID(creatureID, chestFlagAuto);
+                numTargets = numTargets + 1;
+            end
+        end
+    end
+
+    --debugprint("numTargets", numTargets)
+
+    if PlumberDB then
+        if PlumberDB.DreamseedChestABTesting == nil then
+            PlumberDB.DreamseedChestABTesting = math.random(100) >= 50;
+        end
+        if not PlumberDB.DreamseedChestABTesting then
+            self.scanComplete = true;
+            return
+        end
+    end
+
+    if anyPotentionReward then
+        if not self.scanner then
+            self.scanner = CreateFrame("Frame");
+            self.scanner.t = 0;
+            self.scanner:SetScript("OnUpdate", function(f, elapsed)
+                f.t = f.t + elapsed;
+                if f.t > 3 then
+                    f.t = 0;
+                    local playerX, playerY = GetPlayerMapCoord(MAPID_EMRALD_DREAM);
+                    local distance;
+                    if playerX and playerY then
+                        local anyTarget, nearbyCreatureID, location;
+
+                        for creatureID in pairs(targetList) do
+                            anyTarget = true;
+                            location = self.BackupCreaturePositions[creatureID];
+                            if location then
+                                distance = self:GetPlayerDistanceToTarget(playerX, playerY, location[1], location[2]);
+                                if distance <= 200 then
+                                    nearbyCreatureID = creatureID;
+                                    break
+                                end
+                            end
+                        end
+
+                        if not anyTarget then
+                            f:SetScript("OnUpdate", nil);
+                            f.t = nil;
+                            self.scanComplete = true;
+                            --debugprint("Scan Complete");
+                        end
+
+                        if nearbyCreatureID then
+                            local vignetteGUIDs = GetVignettes();
+                            local info, ownerCreatureID;
+                            for i, vignetteGUID in ipairs(vignetteGUIDs) do
+                                info = GetVignetteInfo(vignetteGUID);
+                                if info then
+                                    ownerCreatureID = self:GetChestOwnerCreatureID(info.vignetteID);
+                                    if ownerCreatureID then
+                                        --debugprint(ownerCreatureID, nearbyCreatureID)
+                                    end
+                                    if ownerCreatureID == nearbyCreatureID then
+                                        targetList[ownerCreatureID] = nil;
+                                        self:SetPlantContributedByCreatureID(nearbyCreatureID, 2);
+                                        --debugprint("Found One");
+                                        break
+                                    end
+                                end
+                            end
+                            if self.plantContributed[nearbyCreatureID] == chestFlagAuto then
+                                if DataProvider:IsPlantGrowingByCreatureID(nearbyCreatureID) then
+                                    --debugprint("Still Growing");
+                                else
+                                    self:SetPlantContributedByCreatureID(nearbyCreatureID, nil);
+                                    --debugprint("Doesn't Exist");
+                                end
+                            end
+                        end
+                    end
+                end
+            end);
+        end
+    else
+        self.scanComplete = true;
+    end
+end
+
+function DataProvider:PauseScanner()
+    if self.scanComplete then return end;
+
+    if self.scanner then
+        self.scanner:Hide();
+    end
 end
 
 

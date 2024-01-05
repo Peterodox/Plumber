@@ -818,11 +818,13 @@ local function EnableModule(state)
                 end
                 MapTracker:Attach();
                 PinController:EnableModule(true);
+                DreamseedUtil:RequestScanChests();
             end
 
             local function OnLeaveZoneCallback()
                 MapTracker:Detach();
                 PinController:EnableModule(false);
+                DreamseedUtil:PauseScanner();
             end
 
             module:SetEnterZoneCallback(OnEnterZoneCallback);

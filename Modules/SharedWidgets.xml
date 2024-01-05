@@ -65,11 +65,130 @@
                 </Texture>
             </Layer>
         </Layers>
-        <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Swipe-Blue">
-
-        </SwipeTexture>
-        <EdgeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Edge">
-
-        </EdgeTexture>
+        <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Swipe-Blue"/>
+        <EdgeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Edge"/>
+        <KeyValues>
+            <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+        </KeyValues>
     </Cooldown>
+
+    <Slider name="PlumberMinimalSliderTemplate" orientation="HORIZONTAL" enableMouse="true" virtual="true">
+        <Size x="200" y="24"/>
+        <ThumbTexture parentKey="Thumb">
+            <Size x="12" y="12"/>
+        </ThumbTexture>
+        <Layers>
+            <Layer level="BORDER">
+                <Texture parentKey="Left">
+                    <Size x="8" y="16"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Right">
+                    <Size x="8" y="16"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Middle">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <Texture parentKey="ThumbTexture">
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.Thumb" relativePoint="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="ThumbHighlight">
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.ThumbTexture" relativePoint="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Slider>
+
+    <Frame name="PlumberMinimalSliderWithControllerTemplate" enableMouse="true" virtual="true">
+        <Size x="342" y="24"/>
+        <Frames>
+            <Slider parentKey="Slider" inherits="PlumberMinimalSliderTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="128"/>
+                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-60"/>
+                </Anchors>
+            </Slider>
+            <Button parentKey="Back">
+                <Size x="16" y="24"/>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeKey="$parent.Slider" relativePoint="LEFT" x="-4"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Texture">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <Layer level="HIGHLIGHT">
+                        <Texture parentKey="Highlight">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Button>
+            <Button parentKey="Forward">
+                <Size x="16" y="24"/>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.Slider" relativePoint="RIGHT" x="4"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Texture">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <Layer level="HIGHLIGHT">
+                        <Texture parentKey="Highlight">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Button>
+        </Frames>
+        <Layers>
+            <Layer level="ARTOWKR">
+                <FontString parentKey="Label" inherits="GameFontHighlightMedium" justifyH="LEFT" justifyV="MIDDLE">
+                    <Size x="100" y="32"/>
+                    <Anchors>
+                        <Anchor point="LEFT"/>
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="RightText" inherits="GameFontNormal" hidden="false">
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.Forward" relativePoint="RIGHT" x="6"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
 </Ui>

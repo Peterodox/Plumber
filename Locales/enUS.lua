@@ -14,6 +14,7 @@ L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map
 
 
 --Module Categories
+--- order: 0
 L["Module Category Unknown"] = "Unknown"    --Don't need to translate
 --- order: 1
 L["Module Category General"] = "General";
@@ -92,6 +93,23 @@ L["ModuleName BlizzFixEventToast"] = "Blitz Fix: Event Toast";
 L["ModuleDescription BlizzFixEventToast"] = "Modify the behavior of Event Toasts so they don't consume your mouse clicks. Also allow you to Right Click on the toast and close it immediately.\n\n*Event Toasts are banners that appear on the top of the screen when you complete certain activities.";
 
 
+--Talking Head
+L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Talking Head";
+L["ModuleDescription TalkingHead"] = "Replace the default Talking Head UI with a clean, headless one.";
+L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
+L["TalkingHead Option InstantText"] = "Instant Text";   --Should texts immediately, no gradual fading
+L["TalkingHead Option Condition Header"] = "Hide Texts From Source:";
+L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "World Quests";
+L["TalkingHead Option Condition WorldQuest Tooltip"] = "Hide the transcription if it's from a World Quest.\nSometimes Talking Head is triggered before accepting the World Quest, and we won't be able to hide it.";
+L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
+L["TalkingHead Option Condition Instance Tooltip"] = "Hide the transcription when you are in an instance.";
+
+
+--AzerothianArchives
+L["ModuleName AzerothianArchives"] = "Talking Head: Azerothian Archives";
+L["ModuleDescription AzerothianArchives"] = "Replace the default Talking Head UI while you are doing errands for the Azerothian Archives.";
+
+
 --Navigator(Waypoint/SuperTrack) Shared Strings
 L["Priority"] = "Priority";
 L["Priority Default"] = "Default";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
@@ -124,6 +142,8 @@ L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Move Vertically";
 L["Reposition Button Tooltip"] = "Left-click and drag to move the window.";
+L["Font Size"] = FONT_SIZE or "Font Size";
+L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Reset To Default Position";
 
 
 

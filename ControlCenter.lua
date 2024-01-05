@@ -184,6 +184,38 @@ local function CreateCategoryButton(parent)
     return b
 end
 
+local function OptionToggle_SetFocused(optionToggle, focused)
+    if focused then
+        optionToggle.Texture:SetTexCoord(0.5, 1, 0, 1);
+    else
+        optionToggle.Texture:SetTexCoord(0, 0.5, 0, 1);
+    end
+end
+
+local function OptionToggle_OnHide(self)
+    OptionToggle_SetFocused(self, false);
+end
+
+local function CreateOptionToggle(checkbox, onClickFunc)
+    if not checkbox.OptionToggle then
+        local b = CreateFrame("Button", nil, checkbox);
+        checkbox.OptionToggle = b;
+        b:SetSize(24, 24);
+        b:SetPoint("RIGHT", checkbox, "RIGHT", 0, 0);
+        b.Texture = b:CreateTexture(nil, "OVERLAY");
+        b.Texture:SetTexture("Interface/AddOns/Plumber/Art/Button/OptionToggle");
+        b.Texture:SetSize(16, 16);
+        b.Texture:SetPoint("CENTER", b, "CENTER", 0, 0);
+        b.Texture:SetVertexColor(0.6, 0.6, 0.6);
+        API.DisableSharpening(b.Texture);
+        b:SetScript("OnClick", onClickFunc);
+        b:SetScript("OnHide", OptionToggle_OnHide);
+        b.isPlumberEditModeToggle = true;
+        OptionToggle_SetFocused(b, false);
+        return b
+    end
+end
+
 local function CreateUI()
     local CHECKBOX_WIDTH = LEFT_SECTOR_WIDTH - 2*PADDING;
 
@@ -258,20 +290,6 @@ local function CreateUI()
     SelectionTexture:SetBlendMode("ADD");
     SelectionTexture:Hide();
 
-    --Checkboxs
-    --[[
-    local function IsDruidModelFixNecessary()
-        local _, _, classID = UnitClass("player");
-        if classID == 11 then return true end;
-    end
-
-    local options = {
-        {label = "Backpack Item Tracker",},
-        {label = "Dragonriding Medals",},
-        {label = "Auto Join Events",},
-        {label = "Moonkin Model Fix", validityCheck = IsDruidModelFixNecessary},
-    };
-    --]]
 
     local checkbox;
     local fromOffsetY = PADDING; -- +headerHeight
@@ -286,10 +304,18 @@ local function CreateUI()
         SelectionTexture:ClearAllPoints();
         SelectionTexture:SetPoint("LEFT", self, "LEFT", -PADDING, 0);
         SelectionTexture:Show();
+        if self.OptionToggle then
+            OptionToggle_SetFocused(self.OptionToggle, true);
+        end
     end
 
     local function Checkbox_OnLeave(self)
-        SelectionTexture:Hide();
+        if not self:IsMouseOver() then
+            SelectionTexture:Hide();
+            if self.OptionToggle then
+                OptionToggle_SetFocused(self.OptionToggle, false);
+            end
+        end
     end
 
     local function Checkbox_OnClick(self)
@@ -297,6 +323,20 @@ local function CreateUI()
             self.data.toggleFunc( self:GetChecked() );
             ControlCenter:UpdateCategoryButtons();
         end
+
+        if self.OptionToggle then
+            self.OptionToggle:SetShown(self:GetChecked());
+        end
+    end
+
+    local function OptionToggle_OnEnter(self)
+        Checkbox_OnEnter(self:GetParent());
+        self.Texture:SetVertexColor(1, 1, 1);
+    end
+
+    local function OptionToggle_OnLeave(self)
+        Checkbox_OnLeave(self:GetParent());
+        self.Texture:SetVertexColor(0.6, 0.6, 0.6);
     end
 
     local newCategoryPosition = {};
@@ -367,6 +407,12 @@ local function CreateUI()
 
         if data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
             CreateNewFeatureMark(checkbox);
+        end
+
+        if data.optionToggleFunc then
+            local button = CreateOptionToggle(checkbox, data.optionToggleFunc);
+            button:SetScript("OnEnter", OptionToggle_OnEnter);
+            button:SetScript("OnLeave", OptionToggle_OnLeave);
         end
 
         lastCategoryButton:AddChildOption(checkbox);
@@ -440,6 +486,9 @@ function ControlCenter:UpdateButtonStates()
     for _, button in pairs(self.Checkboxs) do
         if button.dbKey then
             button:SetChecked( db[button.dbKey] );
+            if button.OptionToggle then
+                button.OptionToggle:SetShown(button:GetChecked());
+            end
         else
             button:SetChecked(false);
         end
