@@ -42,7 +42,7 @@ do  -- Slice Frame
         GenericBox = true,
         WhiteBorder = true,
         WhiteBorderBlackBackdrop = true,
-        Metal_Hdgon = true,
+        Metal_Hexagon = true,
         Metal_Hexagon_Red = true,
         Phantom = true,
     };

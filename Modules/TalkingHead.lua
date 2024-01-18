@@ -50,6 +50,20 @@ NewTalkingHead.align = "center";
 addon.TalkingHead = NewTalkingHead;
 
 
+local function SetFontShadow(fontString)
+    --Game Bug: Shadow is removed upon SetAlphaGradient
+    fontString:SetShadowColor(0, 0, 0, 1);
+    fontString:SetShadowOffset(1, -1);
+end
+
+local function SetupFontString(fontString)
+    fontString:SetJustifyH("MIDDLE");
+    fontString:SetJustifyV("TOP");
+    fontString:SetSpacing(LINE_SPACING);
+    SetFontShadow(fontString);
+end
+
+
 local function FadeOutAfter_OnUpdate(self, elapsed)
     self.t = self.t + elapsed;
     if self.t >= self.fadeOutDelay then
@@ -203,7 +217,19 @@ function NewTalkingHead:SetFontHeightByPercentage(percentage)
     local fontHeight = Round(percentage * 0.01 * baseFontHeight);
 
     self.fontHeight = fontHeight;
-    self.LineText:SetFont(font, fontHeight, "");
+
+    local style, gray;
+    if DB.TalkingHead_TextOutline then
+        style = "OUTLINE";
+        gray = 0.898;   --VERY_LIGHT_GRAY_COLOR
+    else
+        style = "";
+        gray = 1;
+    end
+
+    self.LineText:SetFont(font, fontHeight, style);
+    self.LineText:SetTextColor(gray, gray, gray);
+    SetupFontString(self.LineText);
 
     DB.TalkingHead_FontSize = percentage;
 end
@@ -231,12 +257,6 @@ function NewTalkingHead:Init()
     self.fontHeight = self.baseFontHeight;
 
     self.LineText = NewTalkingHead:CreateFontString(nil, "OVERLAY", "QuestFont");
-    self.LineText:SetJustifyH("MIDDLE");
-    self.LineText:SetJustifyV("TOP");
-    self.LineText:SetSpacing(LINE_SPACING);
-    self.LineText:SetTextColor(1, 1, 1);
-    self.LineText:SetShadowColor(0, 0, 0);
-    self.LineText:SetShadowOffset(1, -1);
     self.LineText:SetPoint("TOP", self, "TOP", 0, 0);
     self.LineText:SetWidth(TEXT_WIDTH);
     self.LineText:SetAlpha(0);
@@ -519,6 +539,10 @@ local function Options_InstantText_OnClick(self, state)
     NewTalkingHead:ShowExampleText(true);
 end
 
+local function Options_TextOutline_OnClick(self, state)
+    NewTalkingHead:SetFontHeightByPercentage(DB.TalkingHead_FontSize);
+end
+
 local function Options_HideInInstance_OnClick(self, state)
     NewTalkingHead:OnSettingsChanged();
 end
@@ -546,6 +570,7 @@ local OPTIONS_SCHEMATIC = {
     title = L["EditMode TalkingHead"],
     widgets = {
         {type = "Checkbox", label = L["TalkingHead Option InstantText"], onClickFunc = Options_InstantText_OnClick, dbKey = "TalkingHead_InstantText"},
+        {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "TalkingHead_TextOutline"},
         {type = "Slider", label = L["Font Size"], minValue = 100, maxValue = 120, valueStep = 10, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "TalkingHead_FontSize"},
 
         {type = "Divider"},

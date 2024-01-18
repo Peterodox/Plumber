@@ -98,6 +98,7 @@ L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Talking
 L["ModuleDescription TalkingHead"] = "Replace the default Talking Head UI with a clean, headless one.";
 L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Instant Text";   --Should texts immediately, no gradual fading
+L["TalkingHead Option TextOutline"] = "Text Outline";
 L["TalkingHead Option Condition Header"] = "Hide Texts From Source:";
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "World Quests";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Hide the transcription if it's from a World Quest.\nSometimes Talking Head is triggered before accepting the World Quest, and we won't be able to hide it.";
@@ -125,6 +126,11 @@ L["ModuleDescription Navigator_Dreamseed"] = "Use the Waypoint system to guide y
 L["Priority New Seeds"] = "Finding New Seeds";
 L["Priority Rewards"] = "Collecting Rewards";
 L["Stop Tracking Dreamseed Tooltip"] = "Stop tracking seeds until you Left Click on a map pin.";
+
+
+--BlizzFixWardrobeTrackingTip (Permanently disable the tip for wardrobe shortcuts)
+L["ModuleName BlizzFixWardrobeTrackingTip"] = "Blitz Fix: Wardrobe Tip";
+L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Hide the tutorial for Wardrobe shortcuts.";
 
 
 --Rare/Location Announcement
