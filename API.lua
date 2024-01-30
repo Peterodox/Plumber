@@ -828,6 +828,7 @@ do  -- Map
     local function CreateZoneTriggeredModule(tag)
         local module = {
             tag = tag,
+            validMaps = {},
         };
 
         for k, v in pairs(ZoneTriggeredModuleMixin) do

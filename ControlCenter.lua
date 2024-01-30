@@ -22,6 +22,7 @@ local CATEGORY_ORDER = {
 
     --Patch Feature uses the tocVersion and #00
     [10020001] = "Dreamseeds",
+    [10020501] = "AzerothianArchives",
 };
 
 

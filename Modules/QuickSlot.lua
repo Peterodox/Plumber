@@ -22,6 +22,7 @@ QuickSlot:SetSize(8, 8);
 QuickSlot:SetAlpha(0);
 QuickSlot:SetFrameStrata("MEDIUM");
 QuickSlot.Buttons = {};
+QuickSlot.numActiveButtons = 0;
 QuickSlot.SpellXButton = {};
 
 local ContextMenu;
@@ -368,8 +369,6 @@ function QuickSlot:Init()
     self.SpellCastOverlay = addon.CreateActionButtonSpellCastOverlay(self);
     self.SpellCastOverlay:Hide();
 
-    self:SetFrameLayout(2);
-
     self.Init = nil;
 end
 
@@ -394,13 +393,16 @@ function QuickSlot:StartShowingDefaultHeaderCountdown(state)
     end
 end
 
-function QuickSlot:SetButtonData(itemData, spellData)
+function QuickSlot:SetButtonData(itemData, spellData, systemName)
     if itemData == self.itemData then
         return
     end
 
     self.itemData = itemData;
     self.spellData = spellData;
+    self.systemName = systemName;
+    self.layoutDirty = true;
+    self.numActiveButtons = #itemData;
 
     local buttonSize = ACTION_BUTTON_SIZE;
     local gap = ACTION_BUTTON_GAP;
@@ -420,6 +422,11 @@ function QuickSlot:SetButtonData(itemData, spellData)
         button.spellID = spellID;
         button:SetScript("OnEnter", ItemButton_OnEnter);
         button:SetScript("OnLeave", ItemButton_OnLeave);
+        button:Show();
+    end
+
+    for i = self.numActiveButtons + 1, #self.Buttons do
+        self.Buttons[i]:Hide();
     end
 end
 
@@ -481,7 +488,6 @@ function QuickSlot:SetFrameLayout(layoutIndex)
         local gapArc = buttonGap + buttonSize;
         local fromRadian = Positioner:GetFromRadian();
         local radianGap = gapArc/radius;
-        local numButtons = #self.Buttons;
         local radian;
         local x, y;
         local cx, cy = UIParent:GetCenter();
@@ -499,7 +505,7 @@ function QuickSlot:SetFrameLayout(layoutIndex)
 
         local headerRadiusOffset = 112;  --Positive value moves towards center
         local headerMaxWidth = 2*(headerRadiusOffset - buttonSize*0.5) - 8;
-        radian = fromRadian -(numButtons - 1)*radianGap*0.5;
+        radian = fromRadian -(self.numActiveButtons - 1)*radianGap*0.5;
         x = cx + (radius - headerRadiusOffset) * math.cos(radian);
         y = cy + (radius - headerRadiusOffset) * math.sin(radian);
 
@@ -793,6 +799,11 @@ function QuickSlot:ShowUI()
         self:Init();
     end
 
+    if self.layoutDirty then
+        self.layoutDirty = nil;
+        self:SetFrameLayout(2);
+    end
+
     self:RegisterEvent("BAG_UPDATE");
     self:RegisterEvent("PLAYER_REGEN_DISABLED");
     self:RegisterEvent("PLAYER_REGEN_ENABLED");
@@ -839,11 +850,13 @@ function QuickSlot:CloseUI()
     end
 end
 
-function QuickSlot:RequestCloseUI()
+function QuickSlot:RequestCloseUI(systemName)
     if self:IsInEditMode() then
         self.closeUIAfterEditing = true;
     else
-        self:CloseUI();
+        if (not systemName) or (systemName and systemName == self.systemName) then
+            self:CloseUI();
+        end
     end
 end
 

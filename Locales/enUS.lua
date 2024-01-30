@@ -24,7 +24,8 @@ L["Module Category NPC Interaction"] = "NPC Interaction";
 L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
 --- order: 4
 L["Module Category Dreamseeds"] = "Dreamseeds";     --Added in patch 10.2.0
-
+--- order: 5
+L["Module Category AzerothianArchives"] = "Azerothian Archives";     --Added in patch 10.2.5
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Auto Join Events";
@@ -107,8 +108,8 @@ L["TalkingHead Option Condition Instance Tooltip"] = "Hide the transcription whe
 
 
 --AzerothianArchives
-L["ModuleName AzerothianArchives"] = "Talking Head: Azerothian Archives";
-L["ModuleDescription AzerothianArchives"] = "Replace the default Talking Head UI while you are doing errands for the Azerothian Archives.";
+L["ModuleName Technoscryers"] = "Quick Slot: Technoscryers";
+L["ModuleDescription Technoscryers"] = "Show a button to put on the Technoscryers when you are doing Technoscrying World Quest."..L["Quick Slot Generic Description"];
 
 
 --Navigator(Waypoint/SuperTrack) Shared Strings

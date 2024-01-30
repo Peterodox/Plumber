@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.2.0";
-local VERSION_DATE = 1705561000;
+local VERSION_TEXT = "v1.2.2";
+local VERSION_DATE = 1706633000;
 
 
 local addonName, addon = ...
@@ -23,10 +23,10 @@ local DefaultValues = {
     WorldMapPinSeedPlanting = true,     --Aditional Map Pin: Dreamseed
     AlternativePlayerChoiceUI = true,   --Revamp PlayerChoiceFrame for Dreamseed Nurturing
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
+    Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
 
     --Modify default interface behavior:
     BlizzFixEventToast = true,          --Make Toast non-interactable
-    BlizzFixWardrobeTrackingTip = true, --Hide Wardrobe tip that cannot be disabled
 
     --In-game Navigation: Use waypoint (Super Tracking) to navigate players. Generally default to false, since it will mute WoW's own SuperTrackedFrame
     Navigator_MasterSwitch = true,      --Decide if using our SuperTrackedFrame or the default one
@@ -45,6 +45,7 @@ local DefaultValues = {
 
     --Deprecated:
     --PlayerChoiceFrameToken = true,      --First implementation in 10.2.0  --We instead revamp the who PlayerChoiceFrame
+    --BlizzFixWardrobeTrackingTip = true, --Hide Wardrobe tip that cannot be disabled   --Tip removed by Blizzard
 };
 
 local function LoadDatabase()

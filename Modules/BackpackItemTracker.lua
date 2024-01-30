@@ -1814,7 +1814,15 @@ function RepositionUtil:SetAnchorMode(id)
 end
 
 function TrackerFrame:ParentTo_Bagnon()
+    --Changes to Bagnon 10.2.15: Frame Struture Changed, Bottom Left of the Bag becomes DataBroker
+
     local parent = BagnonInventory1;
+    if not parent then
+        local frameInQuestion = BagnonContainerItem1 and BagnonContainerItem1:GetParent() and BagnonContainerItem1:GetParent():GetParent() and BagnonContainerItem1:GetParent():GetParent():GetParent();
+        if frameInQuestion and frameInQuestion.Title then
+            parent = frameInQuestion;
+        end
+    end
 
     if not parent then return end;
 
@@ -1998,10 +2006,10 @@ function TrackerFrame:ParentTo_Baganator()
     self:SetClampedToScreen(false);
     self:ClearAllPoints();
 
-    local anchorTo = parent.ToggleReagentsButton;
+    local anchorTo = Baganator_MainViewFrame;
 
     if anchorTo then
-        self:SetPoint("LEFT", anchorTo, "RIGHT", 8, 0);
+        self:SetPoint("LEFT", anchorTo, "BOTTOMLEFT", 54, 17);
         self.Border:SetPoint("LEFT", self, "LEFT", 0, 0);
     else
         self:Hide();
@@ -2233,7 +2241,11 @@ end
 EL:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent(event);
+
+        local currentCalendarTime = C_DateAndTime.GetCurrentCalendarTime();
+        C_Calendar.SetAbsMonth(currentCalendarTime.month, currentCalendarTime.year);
         C_Calendar.OpenCalendar();
+
         ItemDataProvider:RequestAllItemData();
         self.t = -2;
         self.callback = InitializeModule;

@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.1.8
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.2.1
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -11,6 +11,19 @@ L["Module Control"] = "Управление модулем";
 L["Quick Slot Generic Description"] = "\n\n*Быстрый слот - это набор интерактивных кнопок, которые появляются при определенных условиях.";
 L["Restriction Combat"] = "Не работает в бою";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*Вы можете изменить размер штифта на карте мира - Фильтр карты - Plumber";
+
+
+--Module Categories
+--- order: 0
+L["Module Category Unknown"] = "Unknown"    --Don't need to translate
+--- order: 1
+L["Module Category General"] = "Общие";
+--- order: 2
+L["Module Category NPC Interaction"] = "Взаимодействие с НПС";
+--- order: 3
+L["Module Category Class"] = "Класс";   --Player Class (rogue, paladin...)
+--- order: 4
+L["Module Category Dreamseeds"] = "Семена сна";     --Added in patch 10.2.0
 
 
 --AutoJoinEvents
@@ -80,12 +93,30 @@ L["ModuleName BlizzFixEventToast"] = "Blitz Fix: События";
 L["ModuleDescription BlizzFixEventToast"] = "Измените поведение всплывающих окон событий, чтобы для этого не требовалось ваших щелчков мыши. Также позволяет щелкнуть ПКМ на всплывающем окне и немедленно закрыть его.\n\n*Баннеры по событиям - это баннеры, которые появляются в верхней части экрана, когда вы выполняете определенные действия.";
 
 
+--Talking Head
+L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Говорящая голова";
+L["ModuleDescription TalkingHead"] = "Замените стандартный пользовательский интерфейс Говорящей головы на чистый, безголовый.";
+L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
+L["TalkingHead Option InstantText"] = "Мгновенный текст";   --Should texts immediately, no gradual fading
+L["TalkingHead Option TextOutline"] = "Текстовый контур";
+L["TalkingHead Option Condition Header"] = "Скрыть тексты из источника:";
+L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Локальные задания";
+L["TalkingHead Option Condition WorldQuest Tooltip"] = "Скрыть текст, если он из локального задания.\nИногда «Говорящая голова» срабатывает до принятия локального задания, и мы не сможем это скрыть.";
+L["TalkingHead Option Condition Instance"] = INSTANCE or "Подземелье";
+L["TalkingHead Option Condition Instance Tooltip"] = "Скрыть текст, когда вы находитесь в подземелье.";
+
+
+--AzerothianArchives
+L["ModuleName AzerothianArchives"] = "Говорящая голова: Азеротские архивы";
+L["ModuleDescription AzerothianArchives"] = "Замените стандартный пользовательский интерфейс Говорящей Головы, пока вы выполняете задания Азеротских архивов.";
+
+
 --Navigator(Waypoint/SuperTrack) Shared Strings
 L["Priority"] = "Приоритет";
 L["Priority Default"] = "По умолчанию";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
 L["Priority Default Tooltip"] = "Следуйте настройкам WoW по умолчанию. По возможности расставьте приоритеты в заданиях, местах воскрешения, местоположениях торговцев. В противном случае начните отслеживать активные семена.";
 L["Stop Tracking"] = "Прекратить отслеживание";
-L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/SuperTrackIcon:0:0:0:0|t " .. "Щелкните ЛКМ, чтобы отследить местоположение";
+L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "Щелкните ЛКМ, чтобы отследить местоположение";
 L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "Щелкните ЛКМ, чтобы отслеживать в TomTom";
 
 
@@ -97,21 +128,28 @@ L["Priority Rewards"] = "Сбор наград";
 L["Stop Tracking Dreamseed Tooltip"] = "Прекратите отслеживать семена до тех пор, пока не нажмете ЛКМ на штифт карты.";
 
 
+--BlizzFixWardrobeTrackingTip (Permanently disable the tip for wardrobe shortcuts)
+L["ModuleName BlizzFixWardrobeTrackingTip"] = "Blitz Fix: Совет по гардеробу";
+L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Скрыть руководство по гардеробу.";
+
+
 --Rare/Location Announcement
 L["Announce Location Tooltip"] = "Поделитесь этим местоположением в чате.";
 L["Announce Forbidden Reason In Cooldown"] = "Недавно вы поделились своим местоположением.";
 L["Announce Forbidden Reason Duplicate Message"] = "Недавно этим местоположением поделился другой игрок.";
 L["Announce Forbidden Reason Soon Despawn"] = "Вы не можете поделиться этим местоположением, потому что оно скоро исчезнет.";
 L["Available In Format"] = "Доступно в: |cffffffff%s|r";
-L["Seed Color Epic"] = "фиолетовый: ";
-L["Seed Color Rare"] = "синий: ";
-L["Seed Color Uncommon"] = "зеленый: ";
+L["Seed Color Epic"] = ICON_TAG_RAID_TARGET_DIAMOND3 or "фиолетовый: ";   --Using GlobalStrings as defaults
+L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "синий: ";
+L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "зеленый: ";
 
 
 --Generic
 L["Reposition Button Horizontal"] = "Перемещение по горизонтали";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Перемещение по вертикали";
 L["Reposition Button Tooltip"] = "Щелкните ЛКМ и перетащите, чтобы переместить окно.";
+L["Font Size"] = FONT_SIZE or "Размер шрифта";
+L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Сброс в положение по умолчанию";
 
 
 

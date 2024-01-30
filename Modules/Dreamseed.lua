@@ -24,6 +24,7 @@ local RANGE_PLANT_SEED = 10;
 local FORMAT_ITEM_COUNT_ICON = "%s|T%s:0:0:0:0:64:64:0:64:0:64|t";
 local SEED_ITEM_IDS = {208047, 208067, 208066};     --Gigantic, Plump, Small Dreamseed
 local SEED_SPELL_IDS = {417508, 417645, 417642};
+local QUICKSLOT_NAME = "dreamseed";
 
 local math = math;
 local sqrt = math.sqrt;
@@ -87,7 +88,7 @@ function EL:AttemptShowUI()
 
     self.isChanneling = nil;
 
-    QuickSlot:SetButtonData(SEED_ITEM_IDS, SEED_SPELL_IDS);
+    QuickSlot:SetButtonData(SEED_ITEM_IDS, SEED_SPELL_IDS, QUICKSLOT_NAME);
     QuickSlot:ShowUI();
 
     if self.trackedObjectGUID then
@@ -112,7 +113,7 @@ function EL:CloseUI()
     self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
     self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
 
-    QuickSlot:RequestCloseUI();
+    QuickSlot:RequestCloseUI(QUICKSLOT_NAME);
 end
 
 function EL:GetMapPointsDistance(x1, y1, x2, y2)

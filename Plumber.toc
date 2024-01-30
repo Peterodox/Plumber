@@ -1,5 +1,5 @@
 ## Interface: 100205
-## Version: 1.2.0
+## Version: 1.2.2
 
 ## Title: Plumber
 
@@ -38,4 +38,5 @@ Modules\PlayerChoiceUI.lua
 Modules\Lockpicking.lua
 Modules\BlizzFix_EventToast.lua
 Modules\TalkingHead.lua
-Modules\BlizzFix_WardrobeTrackingHelpTip.lua
+Modules\AzerothianArchives.lua
+#Modules\BlizzFix_WardrobeTrackingHelpTip.lua
