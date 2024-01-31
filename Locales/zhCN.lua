@@ -13,6 +13,20 @@ L["Restriction Combat"] = "战斗中不可用";    --Indicate a feature can only
 L["Map Pin Change Size Method"] = "\n\n*如需更改标记大小，请打开 世界地图 - 地图筛选 - Plumber";
 
 
+--Module Categories
+--- order: 0
+L["Module Category Unknown"] = "未知"    --Don't need to translate
+--- order: 1
+L["Module Category General"] = "常规";
+--- order: 2
+L["Module Category NPC Interaction"] = "NPC 交互";
+--- order: 3
+L["Module Category Class"] = "职业";   --Player Class (rogue, paladin...)
+--- order: 4
+L["Module Category Dreamseeds"] = "梦境之种";     --Added in patch 10.2.0
+--- order: 5
+L["Module Category AzerothianArchives"] = "艾泽拉斯档案馆";     --Added in patch 10.2.5
+
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "自动加入活动";
 L["ModuleDescription AutoJoinEvents"] = "在时空裂隙事件期间与索莉多米对话会自动选择加入活动。";
@@ -50,7 +64,7 @@ L["ModuleDescription DruidModelFix"] = "修复使用群星雕文导致人物界�
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
 L["ModuleName PlayerChoiceFrameToken"] = "显示捐献物品数";
-L["ModuleDescription PlayerChoiceFrameToken"] = "Show how many to-be-donated items you have on the PlayerChoice UI.\n\nCurrently only supports Dreamseed Nurturing.";
+L["ModuleDescription PlayerChoiceFrameToken"] = "在捐献界面上显示你有多少待捐物品。\n\n目前仅支持梦境之种的培育";
 
 
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
@@ -80,12 +94,31 @@ L["ModuleName BlizzFixEventToast"] = "暴雪UI改进: 事件通知";
 L["ModuleDescription BlizzFixEventToast"] = "让事件通知不挡住你的鼠标，并且允许你右键点击来立即关闭它。\n\n*“事件通知”指的是当你完成一些活动时，在屏幕上方出现的横幅。";
 
 
+--Talking Head
+L["ModuleName TalkingHead"] = "情景对话窗口";
+L["ModuleDescription TalkingHead"] = "用简洁的界面取代默认的情景对话窗口。";
+L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
+L["TalkingHead Option InstantText"] = "即使文本";   --Should texts immediately, no gradual fading
+L["TalkingHead Option TextOutline"] = "文本概要";
+L["TalkingHead Option Condition Header"] = "隐藏原始文本:";
+L["TalkingHead Option Condition WorldQuest"] = "世界任务";
+L["TalkingHead Option Condition WorldQuest Tooltip"] = "如果在世界任务中，隐藏。\n有时，在接受世界任务之前就会触发 “对话”，我们无法隐藏它。";
+L["TalkingHead Option Condition Instance"] = "场景";
+L["TalkingHead Option Condition Instance Tooltip"] = "当你在场景中，隐藏";
+
+
+--AzerothianArchives
+L["ModuleName Technoscryers"] = "快捷按钮: 科技占卜器";
+L["ModuleDescription Technoscryers"] = "显示一个按钮，以便在进行“科技考古世界任务”时给科技考古学者戴上。"..L["Quick Slot Generic Description"];
+
+
 --Navigator(Waypoint/SuperTrack) Shared Strings
 L["Priority"] = "优先级";
 L["Priority Default"] = "游戏默认";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
 L["Priority Default Tooltip"] = "遵从游戏默认设定。如果可能的话，优先追踪任务、尸体和商人位置，否则开始搜索新种子。";
 L["Stop Tracking"] = "停止追踪";
 L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/SuperTrackIcon:0:0:0:0|t " .. "左键点击以开始追踪种子。";
+L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "左键点击添加到 TomTom 内追踪";
 
 
 --Navigator_Dreamseed (Use Super Tracking to navigate players)
@@ -94,6 +127,11 @@ L["ModuleDescription Navigator_Dreamseed"] = "使用路径点系统指引你到�
 L["Priority New Seeds"] = "搜索新种子";
 L["Priority Rewards"] = "拾取奖励";
 L["Stop Tracking Dreamseed Tooltip"] = "停止搜索种子。你可以点击大地图上正在生长的种子来恢复追踪。";
+
+
+--BlizzFixWardrobeTrackingTip (Permanently disable the tip for wardrobe shortcuts)
+L["ModuleName BlizzFixWardrobeTrackingTip"] = "暴雪UI改进: 试衣间小提示";
+L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "隐藏试衣间快捷键教程。";
 
 
 --Rare/Location Announcement
@@ -111,6 +149,8 @@ L["Seed Color Uncommon"] = "绿色";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally
 L["Reposition Button Vertical"] = "竖直方向移动";
 L["Reposition Button Tooltip"] = "左键点击并拖拉来移动这个窗口。";
+L["Font Size"] = "字体大小";
+L["Reset To Default Position"] = "重置为默认位置";
 
 
 
