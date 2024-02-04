@@ -5,7 +5,6 @@ local _, addon = ...
 local API = addon.API;
 local QuickSlot = addon.QuickSlot;
 
-local GetQuestsForPlayerByMapID = C_TaskQuest.GetQuestsForPlayerByMapID;
 local IsQuestActive = C_TaskQuest.IsActive;
 local IsOnQuest = C_QuestLog.IsOnQuest;
 local HasOverrideActionBar = HasOverrideActionBar;
@@ -21,11 +20,14 @@ local QUICKSLOT_NAME = "technoscryers";
 
 local QUESTS = {
     [78820] = 2133,     --Zaralek Cavern
-    [78931] = 2118,     --The Forbidden Reach
+    [78931] = 2151,     --The Forbidden Reach
     [78616] = 2022,     --The Waking Shores
 };
 
-local QUEST_MAPS = {2133, 2118, 2022};
+local QUEST_MAPS = {};
+for _, uiMapID in pairs(QUESTS) do
+    table.insert(QUEST_MAPS, uiMapID);
+end
 
 local ZoneTriggerModule;
 local EL = CreateFrame("Frame");

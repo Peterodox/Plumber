@@ -2008,7 +2008,25 @@ function TrackerFrame:ParentTo_Baganator()
 
     local anchorTo = Baganator_MainViewFrame;
 
+    local function Callback_AllocateBags()
+        if anchorTo.lastBagDetails then
+            local numButtons = anchorTo.lastBagDetails.special and #anchorTo.lastBagDetails.special or 0;
+            local fromOffset = 2;
+            local iconButtonWidth = 32;
+            local buttonSpacing = 5;
+            local offset = (numButtons) * (iconButtonWidth + buttonSpacing) + fromOffset;
+            if anchorTo.BagLive then
+                self:ClearAllPoints();
+                self:SetPoint("LEFT", anchorTo.BagLive, "LEFT", offset, 0);
+                self:SetPoint("BOTTOM", anchorTo, "BOTTOM", 0, 9);
+            end
+        end
+    end
+
     if anchorTo then
+        if anchorTo.AllocateBags then
+            hooksecurefunc(Baganator_MainViewFrame, "AllocateBags", Callback_AllocateBags)
+        end
         self:SetPoint("LEFT", anchorTo, "BOTTOMLEFT", 54, 17);
         self.Border:SetPoint("LEFT", self, "LEFT", 0, 0);
     else
