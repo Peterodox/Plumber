@@ -879,6 +879,9 @@ function DataProvider:RequestScanChests()
 
     --debugprint("numTargets", numTargets)
 
+
+    --[[
+        --Disable AB Testing (Dreamseed Chests Icon can still be stuck on the map, so we have to enable on-set scanning every game session)
     if PlumberDB then
         if PlumberDB.DreamseedChestABTesting == nil then
             PlumberDB.DreamseedChestABTesting = math.random(100) >= 50;
@@ -888,6 +891,7 @@ function DataProvider:RequestScanChests()
             return
         end
     end
+    --]]
 
     if anyPotentionReward then
         if not self.scanner then

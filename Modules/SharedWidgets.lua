@@ -36,6 +36,8 @@ do  -- Slice Frame
         WhiteBorderBlackBackdrop = true,
         Tooltip_Brown = true,
         Menu_Black = true,
+        NineSlice_GenericBox = true,            --used by BackpackItemTracker
+        NineSlice_GenericBox_Border = true,     --used by BackpackItemTracker
     };
 
     local ThreeSliceLayouts = {

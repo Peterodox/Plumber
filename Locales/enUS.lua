@@ -48,9 +48,11 @@ L["Not Found"] = "Not Found";   --Item not found
 L["Own"] = "Own";   --Something that the player has/owns
 L["Numbers To Earn"] = "# To Earn";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
 L["Numbers Of Earned"] = "# Earned";    --The number of stuff the player has earned
-L["Track Upgrade Currency"] = "Track Crests";     --Crest: e.g. Drake’s Dreaming Crest
+L["Track Upgrade Currency"] = "Track Crests";       --Crest: e.g. Drake’s Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "Pin the top-tier crest you have earned to the bar.";
 L["Currently Pinned Colon"] = "Currently Pinned:";  --Tells the currently pinned item
+L["Bar Inside The Bag"] = "Bar Inside The Bag";     --Put the bar inside the bag UI (below money/currency)
+L["Bar Inside The Bag Tooltip"] = "Place the bar inside the bag UI.\n\nIt only works in Blizzard's Separate Bags mode.";
 
 
 --GossipFrameMedal

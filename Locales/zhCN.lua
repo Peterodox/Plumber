@@ -51,6 +51,8 @@ L["Numbers Of Earned"] = "已获取";    --The number of stuff the player has ea
 L["Track Upgrade Currency"] = "追踪纹章";     --Crest: e.g. Drake’s Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "在最左侧显示你已获得的最高等级的纹章。";
 L["Currently Pinned Colon"] = "当前显示：";     --Tells the currently pinned item
+L["Bar Inside The Bag"] = "显示在背包窗口内部";
+L["Bar Inside The Bag Tooltip"] = "将工具栏放置在背包窗口的内部。\n\n仅在使用暴雪默认背包的“分开的小包”模式下生效。";
 
 
 --GossipFrameMedal

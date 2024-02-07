@@ -7,17 +7,22 @@ local ENABLE_THIS_MODULE = true;        --DB.BackpackItemTracker
 local HIDE_ZERO_COUNT_ITEM = true;      --DB.HideZeroCountItem      Dock items inside a flyout menu
 local USE_CONSISE_TOOLTIP = true;       --DB.ConciseTokenTooltip
 local TRACK_UPGRADE_CURRENCY = true;    --DB.TrackItemUpgradeCurrency
+local INSIDE_SEPARATE_BAG = false;
 
 local MAX_CUSTOM_ITEMS = 6;
 
-local TRAY_FRAME_HEIGHT = 16;
+local BORDER_SHRINK = 2;
+local TRAY_FRAME_HEIGHT_BASE = 16;  --Single Row
 local TRAY_FRAME_MIN_WIDTH = 32;
 local TRAY_FRAME_MAX_WDITH = 384;
 local TRAY_FRAME_WIDTH_THRESHOLD = 240;
 local RECEPTOR_MIN_WIDTH = 128;
 
 local TRAY_BUTTON_GAP = 8;
+local TRAY_BUTTON_HEIGHT = 20;
 local TRAY_FRAME_SIDE_PADDING = 8;
+
+local BAG_FUNC_HOOKED = false;
 
 local FORMAT_ITEM_UNIQUE_MULTIPLE = ITEM_UNIQUE_MULTIPLE or "Unique (%d)";
 local PATTERN_UNIQUE_COUNT = string.gsub(FORMAT_ITEM_UNIQUE_MULTIPLE, "[()]", "%%%1");
@@ -152,6 +157,7 @@ end
 local TrackerFrame = CreateFrame("Frame", nil, UIParent);
 TrackerFrame.list = {};
 TrackerFrame.numCustomItems = 0;
+TrackerFrame.isBlizzardBag = true;
 TrackerFrame:EnableMouse(true);
 TrackerFrame:SetFrameStrata("HIGH");
 TrackerFrame:SetFixedFrameStrata(true);
@@ -472,6 +478,47 @@ function DragUtil:StopArranging()
 end
 
 
+local function UpdateFrameSize_Modified(self, extraHeight)
+    local height = self:CalculateHeight();
+    self:SetHeight(height + extraHeight);
+end
+
+local function UpdateFrameSize_Callback(self)
+    if not TrackerFrame:IsPlacedInsideBag() then
+        return
+    end
+    local extraHeight = TrackerFrame:CalculateHeight();
+    UpdateFrameSize_Modified(self, extraHeight);
+end
+
+local function UpdateCurrencyFrames_Modified(self, extraHeight)
+    local tokenFrame = BackpackTokenFrame;
+
+    if tokenFrame and tokenFrame:IsShown() then
+        tokenFrame:ClearAllPoints();
+        tokenFrame:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 8, 8 + extraHeight);
+        tokenFrame:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -8, 8 + extraHeight);
+    else
+        self.MoneyFrame:ClearAllPoints();
+        self.MoneyFrame:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 8, 8 + extraHeight);
+        self.MoneyFrame:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -8, 8 + extraHeight);
+    end
+end
+
+local function UpdateCurrencyFrames_Callback(self)
+    if not TrackerFrame:IsPlacedInsideBag() then
+        return
+    end
+    local extraHeight = TrackerFrame:CalculateHeight();
+    UpdateCurrencyFrames_Modified(self, extraHeight);
+end
+
+local function UpdateContainerLayout()
+    UpdateFrameSize_Callback(ContainerFrame1);
+    UpdateCurrencyFrames_Callback(ContainerFrame1);
+    UpdateContainerFrameAnchors()
+end
+
 function SettingsFrame.OnChanged(manual)
     local db = PlumberDB;
     if not db then return end;
@@ -479,6 +526,28 @@ function SettingsFrame.OnChanged(manual)
     HIDE_ZERO_COUNT_ITEM = db.HideZeroCountItem;
     USE_CONSISE_TOOLTIP = db.ConciseTokenTooltip;
     TRACK_UPGRADE_CURRENCY = db.TrackItemUpgradeCurrency;
+
+    local insideSeparateBag = db.TrackerBarInsideSeparateBag;
+
+    if insideSeparateBag then
+        if not BAG_FUNC_HOOKED then
+            local f = ContainerFrame1;
+
+            if f.UpdateFrameSize then
+                hooksecurefunc(f, "UpdateFrameSize", UpdateFrameSize_Callback);
+            end
+
+            if f.UpdateCurrencyFrames then
+                hooksecurefunc(f, "UpdateCurrencyFrames", UpdateCurrencyFrames_Callback);
+            end
+        end
+    elseif INSIDE_SEPARATE_BAG then
+        UpdateFrameSize_Modified(ContainerFrame1, 0);
+        UpdateCurrencyFrames_Modified(ContainerFrame1, 0);
+        UpdateContainerFrameAnchors()
+    end
+
+    INSIDE_SEPARATE_BAG = insideSeparateBag;
 
     TrackerFrame:RequestUpdate(manual);
 end
@@ -502,6 +571,10 @@ local function OptionButton_TrackItemUpgradeCurrency_OnEnter(self)
     tooltip:AddLine(" ");
     tooltip:AddLine(L["Currently Pinned Colon"].."\n"..currencyName, 1, 0.82, 0, true);
     tooltip:Show();
+end
+
+local function OptionButton_InsideBag_OnClick()
+
 end
 
 function SettingsFrame:Init()
@@ -540,6 +613,12 @@ function SettingsFrame:Init()
         {dbKey = "ConciseTokenTooltip", label = L["Concise Tooltip"], tooltip = L["Concise Tooltip Tooltip"], onClickFunc = SettingsFrame.OnChanged},
         {dbKey = "TrackItemUpgradeCurrency", label = L["Track Upgrade Currency"], onClickFunc = OptionButton_TrackItemUpgradeCurrency_OnClick, onEnterFunc = OptionButton_TrackItemUpgradeCurrency_OnEnter},
     };
+
+    if TrackerFrame.isBlizzardBag and (not C_CVar.GetCVarBool("combinedBags")) then
+        table.insert(options, {
+            dbKey = "TrackerBarInsideSeparateBag", label = L["Bar Inside The Bag"], tooltip = L["Bar Inside The Bag Tooltip"], onClickFunc = SettingsFrame.OnChanged,
+        });
+    end
 
     local BUTTON_HEIGHT = 24;
     local OPTION_GAP_Y = 8;
@@ -894,7 +973,6 @@ do
     --Tray Button: [itemCount][itemIcon]
     TrackerFrame.TrayButtons = {};
 
-    local TRAY_BUTTON_HEIGHT = 20;
     local ICON_SIZE = 12;
     local TEXT_ICON_GAP = 2;
 
@@ -1178,23 +1256,25 @@ do
     f:SetParent(parent);
 
     f:Hide();
-    f:SetSize(TRAY_FRAME_MIN_WIDTH, TRAY_FRAME_HEIGHT);
+    f:SetSize(TRAY_FRAME_MIN_WIDTH, TRAY_FRAME_HEIGHT_BASE);
     --f:SetPoint("LEFT", parent, "LEFT", 0, 0);
     f:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -64);    --child of UIParent
 
-    local bg = addon.CreateThreeSliceFrame(f, "GenericBox");
+    local bg = addon.CreateNineSliceFrame(f, "NineSlice_GenericBox"); --addon.CreateThreeSliceFrame(f, "GenericBox");
+    bg:SetCornerSize(8);
     f.Background = bg;
     bg:SetFrameLevel(f:GetFrameLevel() - 1);
-    bg:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
-    bg:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
+    bg:SetPoint("TOPLEFT", f, "TOPLEFT", BORDER_SHRINK, -BORDER_SHRINK);
+    bg:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -BORDER_SHRINK, BORDER_SHRINK);
 
-    local border = addon.CreateThreeSliceFrame(f, "WhiteBorderBlackBackdrop");
+    local border = addon.CreateNineSliceFrame(f, "NineSlice_GenericBox_Border"); --addon.CreateThreeSliceFrame(f, "WhiteBorderBlackBackdrop");
+    border:SetCornerSize(8);
     f.Border = border;
     local r, g, b = API.GetColorByName("SmoothGreen");
     border:SetColor(r, g, b);
     border:SetFrameLevel(f:GetFrameLevel() + 10);
     border:Hide();
-    border:SetSize(16, 16);
+    border:SetSize(16, 16 - 2*BORDER_SHRINK);
     border:SetPoint("CENTER", f, "CENTER", 0, 0);
 
     border.Instruction = border:CreateFontString(nil, "OVERLAY", "GameTooltipTextSmall");
@@ -1276,7 +1356,7 @@ do
 end
 
 
-function TrackerFrame:UpdateAnchor()
+function TrackerFrame:UpdateAnchor(forceUpdate)
     --When using CombinedBags, default to MoneyFrame, until it becomes to wide and we will put it under the ContainerUI
     local useCombinedBags = C_CVar.GetCVarBool("combinedBags");
     local anchorMode;
@@ -1293,7 +1373,7 @@ function TrackerFrame:UpdateAnchor()
         anchorMode = 3;
     end
 
-    if anchorMode == self.anchorMode then return end;
+    if (anchorMode == self.anchorMode) and (not forceUpdate) then return end;
     self.anchorMode = anchorMode;
 
     self:ClearAllPoints();
@@ -1304,12 +1384,20 @@ function TrackerFrame:UpdateAnchor()
         self.Background:Show();
         parent = ContainerFrame1;
         self:SetParent(parent);
-        self:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", -12, -4);
-        self.Border:SetPoint("RIGHT", self, "RIGHT", 0, 0);
+
+        if self:IsPlacedInsideBag() then
+            self:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 8, 8);
+            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -8, 8);
+            self.Border:SetPoint("TOPLEFT", self.Background, "TOPLEFT", 0, 0);
+            self.Border:SetPoint("BOTTOMRIGHT", self.Background, "BOTTOMRIGHT", 0, 0);
+        else
+            self:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", -12, -4);
+            self.Border:SetPoint("RIGHT", self, "RIGHT", -BORDER_SHRINK, 0);
+        end
     else
         parent = ContainerFrameCombinedBags;
         self:SetParent(parent)
-        self.Border:SetPoint("LEFT", self, "LEFT", 0, 0);
+        self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
         if anchorMode == 1 then
             --Anchor to MonenyFrame
             self.Background:Hide();
@@ -1623,6 +1711,11 @@ function TrackerFrame:GetTrackList()
     end
 end
 
+function TrackerFrame:IsPlacedInsideBag()
+    local f = ContainerFrame1;
+    return f and f:IsShown() and INSIDE_SEPARATE_BAG and self.isBlizzardBag == true
+end
+
 function TrackerFrame:UpdateTray(manual)
     ItemDataProvider:UpdateItemCount();
 
@@ -1644,44 +1737,153 @@ function TrackerFrame:UpdateTray(manual)
         end
     end
 
-    for i = 1, numItems do
-        button = self:AcquireTrayButton(i);
-        button:Show();
-        itemID = list[i];
-        width = button:SetToken(itemID);
-        fullWidth = fullWidth + width;
-        itemID = tonumber(itemID);
-        if manual and not wasTracked[itemID] then
-            API.UIFrameFadeIn(button, 0.5);
+    --Layout
+    if self:IsPlacedInsideBag() then
+        self.placedInsideBag = true;
+        local paddingX = 6;
+        local paddingY = 2;
+        local buttonHeight = 16;
+
+        local maxRowWidth = ContainerFrame1:GetWidth() - 2*8 - 1*paddingX;
+        local rowWidth = 0;
+        local numRows = 1;
+        local offsetX = paddingX;
+        local offsetY = paddingY;
+        local buttonGapY = 0;
+
+        for i = 1, numItems do
+            button = self:AcquireTrayButton(i);
+            button:Show();
+            button:SetHeight(buttonHeight);
+            itemID = list[i];
+            width = button:SetToken(itemID);
+            rowWidth = rowWidth + width + TRAY_BUTTON_GAP;
+            if rowWidth > maxRowWidth then
+                numRows = numRows + 1;
+                offsetX = paddingX;
+                offsetY = offsetY + buttonGapY + buttonHeight;
+                rowWidth = offsetX + width + TRAY_BUTTON_GAP;
+            end
+            itemID = tonumber(itemID);
+            if manual and not wasTracked[itemID] then
+                API.UIFrameFadeIn(button, 0.5);
+            end
+
+            button:ClearAllPoints();
+            button:SetPoint("TOPLEFT", self, "TOPLEFT", offsetX, -offsetY);
+            offsetX = offsetX + width + TRAY_BUTTON_GAP;
         end
+
+        --UpdateHeight
+
+        if HIDE_ZERO_COUNT_ITEM and ItemDataProvider:HasZeroCountItem() then
+            self.ThreeDotButton:Show();
+
+            if rowWidth + TRAY_BUTTON_GAP + 20 > maxRowWidth then
+                numRows = numRows + 1;
+                offsetX = TRAY_FRAME_SIDE_PADDING;
+                offsetY = offsetY + buttonGapY + buttonHeight;
+            end
+
+            self.ThreeDotButton:ClearAllPoints();
+            self.ThreeDotButton:SetPoint("TOPLEFT", self, "TOPLEFT", offsetX, -offsetY);
+            self.ThreeDotButton:SetHeight(16);
+        else
+            self.ThreeDotButton:Hide();
+        end
+
+        local height;
+        if numRows == 1 then
+            height = TRAY_FRAME_HEIGHT_BASE;
+        else
+            height = numRows * (buttonGapY + buttonHeight) - buttonGapY + 2*paddingY;
+        end
+        self:SetHeight(height);
+
+        if height ~= self.effectiveHeight then
+            self.effectiveHeight = height;
+            C_Timer.After(0.0, function()
+                UpdateContainerLayout();    --Safe?
+                self:UpdateAnchor(true);
+            end);
+        end
+
+    else
+        local resetPoint = false;
+        if self.placedInsideBag then
+            self.placedInsideBag = nil;
+            self.effectiveHeight = 0;
+            resetPoint = true;
+        end
+
+        for i = 1, numItems do
+            button = self:AcquireTrayButton(i);
+            button:Show();
+            itemID = list[i];
+            width = button:SetToken(itemID);
+            fullWidth = fullWidth + width;
+            itemID = tonumber(itemID);
+            if manual and not wasTracked[itemID] then
+                API.UIFrameFadeIn(button, 0.5);
+            end
+            
+            if resetPoint then
+                button:SetHeight(TRAY_BUTTON_HEIGHT);
+                button:ClearAllPoints();
+                if i == 1 then
+                    button:SetPoint("LEFT", self, "LEFT", TRAY_FRAME_SIDE_PADDING, 0);
+                else
+                    button:SetPoint("LEFT", self.TrayButtons[i - 1], "RIGHT", TRAY_BUTTON_GAP, 0);
+                end
+            end
+        end
+
+        if resetPoint then
+            self.ThreeDotButton:ClearAllPoints();
+            self.ThreeDotButton:SetPoint("RIGHT", self, "RIGHT", 0, 0);
+            self.ThreeDotButton:SetHeight(TRAY_BUTTON_HEIGHT);
+            self:SetHeight(TRAY_FRAME_HEIGHT_BASE);
+
+            C_Timer.After(0.01, function()
+                self:UpdateAnchor(true);
+            end);
+        end
+
+        --UpdateWidth
+        fullWidth = fullWidth + 2*TRAY_FRAME_SIDE_PADDING + (numItems - 1)*TRAY_BUTTON_GAP;
+
+        if HIDE_ZERO_COUNT_ITEM and ItemDataProvider:HasZeroCountItem() then
+            self.ThreeDotButton:Show();
+            fullWidth = fullWidth + 16;
+        else
+            self.ThreeDotButton:Hide();
+        end
+
+        if fullWidth < TRAY_FRAME_MIN_WIDTH then
+            fullWidth = TRAY_FRAME_MIN_WIDTH;
+        elseif fullWidth > TRAY_FRAME_MAX_WDITH then
+            fullWidth = TRAY_FRAME_MAX_WDITH;
+        end
+
+        self:SetWidth(fullWidth);
+        self.Border:SetWidth(math.max(fullWidth, RECEPTOR_MIN_WIDTH));
     end
+
+    self:UpdateAnchor();
 
     for i = numItems + 1, #self.TrayButtons do
         self.TrayButtons[i]:Hide();
         self.TrayButtons[i].itemID = nil;
         self.TrayButtons[i].currencyID = nil;
     end
+end
 
-
-    --UpdateWidth
-    fullWidth = fullWidth + 2*TRAY_FRAME_SIDE_PADDING + (numItems - 1)*TRAY_BUTTON_GAP;
-
-    if HIDE_ZERO_COUNT_ITEM and ItemDataProvider:HasZeroCountItem() then
-        self.ThreeDotButton:Show();
-        fullWidth = fullWidth + 16;
+function TrackerFrame:CalculateHeight()
+    if self.effectiveHeight then
+        return self.effectiveHeight + 3;
     else
-        self.ThreeDotButton:Hide();
+        return TRAY_FRAME_HEIGHT_BASE
     end
-
-    if fullWidth < TRAY_FRAME_MIN_WIDTH then
-        fullWidth = TRAY_FRAME_MIN_WIDTH;
-    elseif fullWidth > TRAY_FRAME_MAX_WDITH then
-        fullWidth = TRAY_FRAME_MAX_WDITH;
-    end
-
-    self:SetWidth(fullWidth);
-    self.Border:SetWidth(math.max(fullWidth, RECEPTOR_MIN_WIDTH));
-    self:UpdateAnchor();
 end
 
 local function GetSearchBox()
@@ -1741,7 +1943,7 @@ end
 
 local RepositionUtil = {};
 
-RepositionUtil.minYSize = TRAY_FRAME_HEIGHT + 4;
+RepositionUtil.minYSize = TRAY_FRAME_HEIGHT_BASE + 4;
 
 function RepositionUtil:Start()
     if not self.f then
@@ -1801,15 +2003,15 @@ function RepositionUtil:SetAnchorMode(id)
     if id == 1 then
         --Bellow bag, align to Left
         f:SetPoint("TOPLEFT", self.parent, "BOTTOMLEFT", 1, -2);
-        f.Border:SetPoint("LEFT", f, "LEFT", 0, 0);
+        f.Border:SetPoint("LEFT", f, "LEFT", BORDER_SHRINK, 0);
     elseif id == 2 then
         --Left of bottom-left, align to Right
         f:SetPoint("BOTTOMRIGHT", self.parent, "BOTTOMLEFT", -2, 2);
-        f.Border:SetPoint("RIGHT", f, "RIGHT", 0, 0);
+        f.Border:SetPoint("RIGHT", f, "RIGHT", -BORDER_SHRINK, 0);
     elseif id == 3 then
         --Right of bottom-right, align to Left
         f:SetPoint("BOTTOMLEFT", self.parent, "BOTTOMRIGHT", 2, 2);
-        f.Border:SetPoint("LEFT", f, "LEFT", 0, 0);
+        f.Border:SetPoint("LEFT", f, "LEFT", BORDER_SHRINK, 0);
     end
 end
 
@@ -1826,6 +2028,7 @@ function TrackerFrame:ParentTo_Bagnon()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -1857,6 +2060,7 @@ function TrackerFrame:ParentTo_AdiBags()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -1891,6 +2095,7 @@ function TrackerFrame:ParentTo_ArkInventory()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -1918,6 +2123,7 @@ function TrackerFrame:ParentTo_ElvUI()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -1945,6 +2151,7 @@ function TrackerFrame:ParentTo_NDui()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -1972,6 +2179,7 @@ function TrackerFrame:ParentTo_LiteBag()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -1999,6 +2207,7 @@ function TrackerFrame:ParentTo_Baganator()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -2028,7 +2237,7 @@ function TrackerFrame:ParentTo_Baganator()
             hooksecurefunc(Baganator_MainViewFrame, "AllocateBags", Callback_AllocateBags)
         end
         self:SetPoint("LEFT", anchorTo, "BOTTOMLEFT", 54, 17);
-        self.Border:SetPoint("LEFT", self, "LEFT", 0, 0);
+        self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
     else
         self:Hide();
     end
@@ -2039,6 +2248,7 @@ function TrackerFrame:ParentTo_BetterBags()
 
     if not parent then return end;
 
+    self.isBlizzardBag = false;
     self.Background:Show();
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
@@ -2049,7 +2259,7 @@ function TrackerFrame:ParentTo_BetterBags()
     self:ClearAllPoints();
     self.Border:ClearAllPoints();
     self:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 4, 5);
-    self.Border:SetPoint("LEFT", self, "LEFT", 0, 0);
+    self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
 end
 
 local GetAddOnSearchBox = {
@@ -2215,22 +2425,24 @@ function InitializeModule()
 
     local HolidayInfo = API.GetActiveMajorHolidayInfo();
     if HolidayInfo then
-        local key = HolidayInfo:GetKey();
-        local itemID = HolidayItems[key];
-        if itemID then
-            table.insert(CurrentPinnedItems, 1, itemID);
-            --[[
-            local expirationText = HolidayInfo:GetEndTimeString();
-            if expirationText then
-                expirationText = string.format(L["Holiday Ends Format"], expirationText);
+        for _, info in ipairs(HolidayInfo) do
+            local key = info:GetKey();
+            local itemID = HolidayItems[key];
+            if itemID then
+                table.insert(CurrentPinnedItems, 1, itemID);
+                --[[
+                local expirationText = info:GetEndTimeString();
+                if expirationText then
+                    expirationText = string.format(L["Holiday Ends Format"], expirationText);
+                end
+                --]]
+                local function GetExpirationTextFunc()
+                    local expirationText = info:GetRemainingTimeString();
+                    local ENDS_IN_FORMAT = BRAWL_TOOLTIP_ENDS or "Ends in %s";
+                    return string.format(ENDS_IN_FORMAT, expirationText);
+                end
+                ItemDataProvider:SetExpirationText(itemID, GetExpirationTextFunc);
             end
-            --]]
-            local function GetExpirationTextFunc()
-                local expirationText = HolidayInfo:GetRemainingTimeString();
-                local ENDS_IN_FORMAT = BRAWL_TOOLTIP_ENDS or "Ends in %s";
-                return string.format(ENDS_IN_FORMAT, expirationText);
-            end
-            ItemDataProvider:SetExpirationText(itemID, GetExpirationTextFunc);
         end
     end
 

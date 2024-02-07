@@ -516,39 +516,48 @@ do  -- Holiday
         local endTimeString;
         local eventEndTimeMixin;    --{}
         local endTime;              --number time()
+        local activeHolidayData;    --{ {holiday1}, {holiday2} }
 
         for i = 1, C_Calendar.GetNumDayEvents(monthOffset, presentDay) do   --Need to request data first with C_Calendar.OpenCalendar()
             holidayInfo = C_Calendar.GetHolidayInfo(monthOffset, presentDay, i);
+            --print(i, holidayInfo.name)
             if holidayInfo and holidayInfo.texture and CalendarTextureXHolidayKey[holidayInfo.texture] then
                 holidayKey = CalendarTextureXHolidayKey[holidayInfo.texture];
                 holidayName = holidayInfo.name;
+
                 if holidayInfo.startTime and holidayInfo.endTime then
                     endTimeString = FormatShortDate(holidayInfo.endTime.monthDay, holidayInfo.endTime.month) .." "..  GameTime_GetFormattedTime(holidayInfo.endTime.hour, holidayInfo.endTime.minute, true);
                     eventEndTimeMixin = holidayInfo.endTime;
                 end
-                break
+
+                local isEventActive = true;
+                if eventEndTimeMixin then
+                    local presentTime = time();
+                    local remainingSeconds = API.GetCalendarTimeDifference(currentCalendarTime, eventEndTimeMixin);
+                    endTime = presentTime + remainingSeconds;
+                    if remainingSeconds <= 0 then
+                        isEventActive = false;
+                    end
+                end
+        
+                if isEventActive and holidayName then
+                    local mixin = API.CreateFromMixins(HolidayInfoMixin);
+        
+                    mixin.name = holidayName;
+                    mixin.key = holidayKey;
+                    mixin.endTimeString = endTimeString;
+                    mixin.endTime = endTime;
+        
+                    if not activeHolidayData then
+                        activeHolidayData = {};
+                    end
+
+                    tinsert(activeHolidayData, mixin);
+                end
             end
         end
 
-        if eventEndTimeMixin then
-            local presentTime = time();
-            local remainingSeconds = API.GetCalendarTimeDifference(currentCalendarTime, eventEndTimeMixin);
-            endTime = presentTime + remainingSeconds;
-            if remainingSeconds <= 0 then
-                return
-            end
-        end
-
-        if holidayName then
-            local mixin = API.CreateFromMixins(HolidayInfoMixin);
-
-            mixin.name = holidayName;
-            mixin.key = holidayKey;
-            mixin.endTimeString = endTimeString;
-            mixin.endTime = endTime;
-
-            return mixin
-        end
+        return activeHolidayData
     end
     API.GetActiveMajorHolidayInfo = GetActiveMajorHolidayInfo;
 end

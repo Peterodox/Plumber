@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.2.3";
-local VERSION_DATE = 1707061937;
+local VERSION_TEXT = "v1.2.4";
+local VERSION_DATE = 1707324000;
 
 
 local addonName, addon = ...
@@ -17,6 +17,7 @@ local DefaultValues = {
         HideZeroCountItem = true,
         ConciseTokenTooltip = true,
         TrackItemUpgradeCurrency = true,
+        TrackerBarInsideSeparateBag = false,
     DruidModelFix = true,               --Remove after 10.2.0
     GossipFrameMedal = true,
     EmeraldBountySeedList = true,       --Show a list of Dreamseed when appoaching Emarad Bounty Soil
