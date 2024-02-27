@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.2.1
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.2.4
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -24,6 +24,8 @@ L["Module Category NPC Interaction"] = "Взаимодействие с НПС";
 L["Module Category Class"] = "Класс";   --Player Class (rogue, paladin...)
 --- order: 4
 L["Module Category Dreamseeds"] = "Семена сна";     --Added in patch 10.2.0
+--- order: 5
+L["Module Category AzerothianArchives"] = "Азеротские Архивы";     --Added in patch 10.2.5
 
 
 --AutoJoinEvents
@@ -49,6 +51,8 @@ L["Numbers Of Earned"] = "# Заработал";    --The number of stuff the pl
 L["Track Upgrade Currency"] = "Отслеживать гребни";     --Crest: e.g. Drake’s Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "Отображать гребни только высшего уровня, которые вы получили.";
 L["Currently Pinned Colon"] = "В настоящее время закреплен:";  --Tells the currently pinned item
+L["Bar Inside The Bag"] = "Панель внутри сумки";     --Put the bar inside the bag UI (below money/currency)
+L["Bar Inside The Bag Tooltip"] = "Поместите панель внутри UI сумки.\n\nРаботает только в режиме «Отдельные сумки» Blizzard.";
 
 
 --GossipFrameMedal

@@ -261,6 +261,10 @@ do
             end
         end
 
+        if partialTime and days > 0 then
+            isComplete = true;
+        end
+
         if not isComplete then
             minutes = floor(seconds / 60);
             seconds = seconds - minutes * 60;
