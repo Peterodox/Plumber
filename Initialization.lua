@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.2.5";
-local VERSION_DATE = 1709002000;
+local VERSION_TEXT = "v1.2.6";
+local VERSION_DATE = 1710947000;
 
 
 local addonName, addon = ...
@@ -18,7 +18,6 @@ local DefaultValues = {
         ConciseTokenTooltip = true,
         TrackItemUpgradeCurrency = true,
         TrackerBarInsideSeparateBag = false,
-    DruidModelFix = true,               --Remove after 10.2.0
     GossipFrameMedal = true,
     EmeraldBountySeedList = true,       --Show a list of Dreamseed when appoaching Emarad Bounty Soil
     WorldMapPinSeedPlanting = true,     --Aditional Map Pin: Dreamseed
@@ -45,6 +44,7 @@ local DefaultValues = {
         --DreamseedChestABTesting = math.random(100) >= 50
 
     --Deprecated:
+    --DruidModelFix = true,               --Fixed by Blizzard in 10.2.0
     --PlayerChoiceFrameToken = true,      --First implementation in 10.2.0  --We instead revamp the who PlayerChoiceFrame
     --BlizzFixWardrobeTrackingTip = true, --Hide Wardrobe tip that cannot be disabled   --Tip removed by Blizzard
 };
