@@ -151,7 +151,7 @@ local function EventFrame_OnEvent(self, event, ...)
         local npcGuid = UnitGUID("npc")
         local npcId = nil
         if npcGuid ~= nil then
-            npcId = select(3, UnitGUID("npc"):find("Creature%-%d+%-%d+%-%d+%-%d+%-(%d+)%-"))
+            npcId = tonumber(select(3, UnitGUID("npc"):find("Creature%-%d+%-%d+%-%d+%-%d+%-(%d+)%-")))
         end
 
         -- sanity check
@@ -183,13 +183,14 @@ local function EventFrame_OnEvent(self, event, ...)
             -- check it has a valid ID
             local id = f.gossipOptions[i].gossipOptionID
             if gossipData[id] ~= nil then
-
                 -- if true, this is a locked instance - show different icon
                 if gossipData[id] == true then
                     f.gossipOptions[i].icon = "Interface\\AddOns\\Plumber\\Art\\GossipIcons\\Lockout_Locked"
                 end
             end
         end
+
+        f:Update()
     end
 end
 
