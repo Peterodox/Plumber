@@ -24,6 +24,7 @@ Modules\SuperTrack.xml
 ControlCenter.lua
 
 Modules\GossipFrameMedal.lua
+Modules\LFRLockouts.lua
 Modules\BackpackItemTracker.lua
 Modules\TimeRift.lua
 #Modules\PlayerChoiceFrameToken.lua
