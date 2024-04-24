@@ -344,13 +344,13 @@ function NewTalkingHead:OnTalkingHeadRequested()
 
     --print(name, displayInfo, vo, duration)  --Debug
 
-    local success, voHandle = PlaySound(vo, "Talking Head", true, true);
-    if success then
-        self:RegisterEvent("SOUNDKIT_FINISHED");
-        self.voHandle = voHandle;
-    end
-
     if displayInfo and displayInfo ~= 0 and duration then
+        local success, voHandle = PlaySound(vo, "Talking Head", true, true);
+        if success then
+            self:RegisterEvent("SOUNDKIT_FINISHED");
+            self.voHandle = voHandle;
+        end
+
         --lineNumber start from 0
         local isFinalLine = lineNumber and numLines and (lineNumber + 1 == numLines);
 

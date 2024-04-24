@@ -626,12 +626,6 @@ do
     local DBKEY_MORE_INFO_CREST = "TooltipShowExtraInfoCrest";
 
     local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
-    local CrestCurrenies = {
-        2709,   --Aspect    (M, M16+)
-        2708,   --Wyrm      (H, M15)
-        2707,   --Drake     (N, M10)
-        2706,   --Whelpling (LFR, M5)
-    };
     local FLIGHT_STONE_ID = 2245;
 
     local RAID_DIFFICUTY_M = PLAYER_DIFFICULTY6 or "Mythic";
@@ -640,10 +634,10 @@ do
     local RAID_DIFFICUTY_LFR = PLAYER_DIFFICULTY3 or "Raid Finder";
 
     local CrestSources = {
-        RAID_DIFFICUTY_M..", +16",
-        RAID_DIFFICUTY_H..", +11",
-        RAID_DIFFICUTY_N..", +6",
-        RAID_DIFFICUTY_LFR..", +2",
+        RAID_DIFFICUTY_M..", +6",
+        RAID_DIFFICUTY_H..", +5",
+        RAID_DIFFICUTY_N,
+        RAID_DIFFICUTY_LFR,
     };
 
     local CURRENCY_QUANTITY_ICON_FORMAT = "%s |T%s:10:10:0:-2:64:64:4:60:4:60|t";
@@ -667,7 +661,7 @@ do
 
         local showIcon = true;
 
-        for i, currencyID in ipairs(CrestCurrenies) do
+        for i, currencyID in ipairs(addon.CrestCurrenies) do
             info = GetCurrencyInfo(currencyID);
             if info and (info.discovered or anyDiscovered) then
                 if info.discovered then

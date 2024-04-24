@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.2.4
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.2.6
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -111,8 +111,8 @@ L["TalkingHead Option Condition Instance Tooltip"] = "Скрыть текст, �
 
 
 --AzerothianArchives
-L["ModuleName AzerothianArchives"] = "Говорящая голова: Азеротские архивы";
-L["ModuleDescription AzerothianArchives"] = "Замените стандартный пользовательский интерфейс Говорящей Головы, пока вы выполняете задания Азеротских архивов.";
+L["ModuleName Technoscryers"] = "Быстрый слот: Техногадатель";
+L["ModuleDescription Technoscryers"] = "Показать кнопку, чтобы надеть Техногадатель, когда вы выполняете локальное задание по Техногаданию."..L["Quick Slot Generic Description"];
 
 
 --Navigator(Waypoint/SuperTrack) Shared Strings
@@ -163,3 +163,8 @@ L["currency-2706"] = "дракончика";
 L["currency-2707"] = "дракона";
 L["currency-2708"] = "змея";
 L["currency-2709"] = "Аспекта";
+
+L["currency-2806"] = L["currency-2706"];
+L["currency-2807"] = L["currency-2707"];
+L["currency-2809"] = L["currency-2708"];
+L["currency-2812"] = L["currency-2709"];
