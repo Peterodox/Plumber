@@ -81,6 +81,17 @@ do  -- String
         end
     end
     API.GetWaypointFromText = GetWaypointFromText;
+
+
+    local UnitGUID = UnitGUID;
+
+    local function GetUnitCreatureID(unit)
+        local guid = UnitGUID(unit);
+        if guid then
+            return GetCreatureIDFromGUID(guid)
+        end
+    end
+    API.GetUnitCreatureID = GetUnitCreatureID;
 end
 
 do  -- DEBUG
@@ -398,6 +409,7 @@ end
 
 do  -- Item
     local C_Item = C_Item;
+    local GetItemSpell = GetItemSpell;
 
     local function ColorizeTextByQuality(text, quality, allowColorBlind)
         if not (text and quality) then
@@ -421,6 +433,12 @@ do  -- Item
         return ColorizeTextByQuality(name, quality, true);
     end
     API.GetColorizedItemName = GetColorizedItemName;
+
+    local function GetItemSpellID(item)
+        local spellName, spellID = GetItemSpell(item);
+        return spellID
+    end
+    API.GetItemSpellID = GetItemSpellID;
 end
 
 do  -- Tooltip Parser
@@ -935,6 +953,12 @@ do  -- Map
         end
     end
     API.CreateWaypointHyperlink = CreateWaypointHyperlink;
+
+
+    local function GetZoneName(areaID)
+        return C_Map.GetAreaInfo(areaID) or ("Area:"..areaID)
+    end
+    API.GetZoneName = GetZoneName;
 end
 
 do  --Pixel

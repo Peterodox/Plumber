@@ -57,7 +57,7 @@ local function SetFontShadow(fontString)
 end
 
 local function SetupFontString(fontString)
-    fontString:SetJustifyH("MIDDLE");
+    fontString:SetJustifyH("CENTER");
     fontString:SetJustifyV("TOP");
     fontString:SetSpacing(LINE_SPACING);
     SetFontShadow(fontString);

@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.2.7";
-local VERSION_DATE = 1713920000;
+local VERSION_TEXT = "v1.2.8";
+local VERSION_DATE = 1715238000;
 
 
 local addonName, addon = ...
@@ -24,6 +24,7 @@ local DefaultValues = {
     AlternativePlayerChoiceUI = true,   --Revamp PlayerChoiceFrame for Dreamseed Nurturing
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
     Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
+    TillersFarm = true,
 
     --Modify default interface behavior:
     BlizzFixEventToast = true,          --Make Toast non-interactable

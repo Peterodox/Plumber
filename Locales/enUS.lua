@@ -137,6 +137,11 @@ L["ModuleName BlizzFixWardrobeTrackingTip"] = "Blitz Fix: Wardrobe Tip";
 L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Hide the tutorial for Wardrobe shortcuts.";
 
 
+--TillersFarm
+L["ModuleName TillersFarm"] = "Tillers Farm"
+L["ModuleDescription TillersFarm"] = "Show a list of seeds when you target the soils in Sunsong Ranch.";
+
+
 --Rare/Location Announcement
 L["Announce Location Tooltip"] = "Share this location in chat.";
 L["Announce Forbidden Reason In Cooldown"] = "You have shared a location recently.";

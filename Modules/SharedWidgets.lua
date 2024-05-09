@@ -17,9 +17,10 @@ local GetTime = GetTime;
 local IsMouseButtonDown = IsMouseButtonDown;
 local GetMouseFocus = GetMouseFocus;
 local PlaySound = PlaySound;
-local GetItemCount = GetItemCount;
 local GetSpellCharges = GetSpellCharges;
 local C_Item = C_Item;
+local GetItemCount = C_Item.GetItemCount;
+local GetItemIconByID = C_Item.GetItemIconByID;
 local CreateFrame = CreateFrame;
 local UIParent = UIParent;
 
@@ -789,7 +790,7 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
     end
 
     function PeudoActionButtonMixin:SetItem(item)
-        local icon = C_Item.GetItemIconByID(item);
+        local icon = GetItemIconByID(item);
         self:SetIcon(icon);
         self.id = item;
         self.actionType = "item";
