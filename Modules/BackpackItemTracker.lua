@@ -1568,7 +1568,7 @@ local function GetCursorItemID()
 end
 
 local function CanItemBeTracked(itemID)
-    local stackSize = GetItemMaxStackSizeByID(itemID)
+    local stackSize = itemID and GetItemMaxStackSizeByID(itemID)
     return stackSize and stackSize > 1
 end
 
@@ -2203,7 +2203,7 @@ function TrackerFrame:ParentTo_LiteBag()
 end
 
 function TrackerFrame:ParentTo_Baganator()
-    local parent = Baganator_BackpackViewFrame;
+    local parent = Baganator_SingleViewBackpackViewFrame;
 
     if not parent then return end;
 
@@ -2215,12 +2215,12 @@ function TrackerFrame:ParentTo_Baganator()
     self:SetClampedToScreen(false);
     self:ClearAllPoints();
 
-    local anchorTo = Baganator_BackpackViewFrame;
+    local anchorTo = Baganator_SingleViewBackpackViewFrame;
 
     local function Callback_AllocateBags()
         if anchorTo.lastBagDetails then
             local numButtons = anchorTo.lastBagDetails.special and #anchorTo.lastBagDetails.special or 0;
-            local fromOffset = 2;
+            local fromOffset = 0;
             local iconButtonWidth = 32;
             local buttonSpacing = 5;
             local offset = (numButtons) * (iconButtonWidth + buttonSpacing) + fromOffset;
@@ -2234,7 +2234,7 @@ function TrackerFrame:ParentTo_Baganator()
 
     if anchorTo then
         if anchorTo.AllocateBags then
-            hooksecurefunc(Baganator_BackpackViewFrame, "AllocateBags", Callback_AllocateBags)
+            hooksecurefunc(Baganator_SingleViewBackpackViewFrame, "AllocateBags", Callback_AllocateBags)
         end
         self:SetPoint("LEFT", anchorTo, "BOTTOMLEFT", 54, 17);
         self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
@@ -2258,8 +2258,15 @@ function TrackerFrame:ParentTo_BetterBags()
     RepositionUtil.parent = parent;
     self:ClearAllPoints();
     self.Border:ClearAllPoints();
-    self:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 4, 5);
+
     self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
+
+    local anchorOutside = true;
+    if anchorOutside then
+        self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -2);
+    else
+        self:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 4, 5);
+    end
 end
 
 local GetAddOnSearchBox = {
@@ -2287,7 +2294,7 @@ local GetAddOnSearchBox = {
     end,
 
     Baganator = function()
-        local bagFarme = Baganator_BackpackViewFrame;
+        local bagFarme = Baganator_SingleViewBackpackViewFrame;
         return bagFarme and bagFarme.SearchBox
     end,
 };
@@ -2345,7 +2352,7 @@ local function AnchorToCompatibleAddOn()
     elseif IsAddOnLoaded("Baganator") then
         --Baganator is being actively developed
         --Available space (width) is affected by Bag Columns, we ignore it for now
-        local bagFrame = Baganator_BackpackViewFrame;
+        local bagFrame = Baganator_SingleViewBackpackViewFrame;
         if bagFrame then
             TrackerFrame.UpdateAnchor = DoesNothing;
             TrackerFrame:ParentTo_Baganator();
