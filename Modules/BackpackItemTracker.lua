@@ -2203,7 +2203,10 @@ function TrackerFrame:ParentTo_LiteBag()
 end
 
 function TrackerFrame:ParentTo_Baganator()
-    local parent = Baganator_SingleViewBackpackViewFrame;
+    local backpackView1 = Baganator_SingleViewBackpackViewFrame;
+    local backpackView2 = Baganator_CategoryViewBackpackViewFrame;
+
+    local parent = backpackView1;
 
     if not parent then return end;
 
@@ -2215,10 +2218,11 @@ function TrackerFrame:ParentTo_Baganator()
     self:SetClampedToScreen(false);
     self:ClearAllPoints();
 
-    local anchorTo = Baganator_SingleViewBackpackViewFrame;
+    local isSingleView = true;
+    local anchorTo = backpackView1;
 
     local function Callback_AllocateBags()
-        if anchorTo.lastBagDetails then
+        if isSingleView and anchorTo.lastBagDetails then
             local numButtons = anchorTo.lastBagDetails.special and #anchorTo.lastBagDetails.special or 0;
             local fromOffset = 0;
             local iconButtonWidth = 32;
@@ -2232,9 +2236,38 @@ function TrackerFrame:ParentTo_Baganator()
         end
     end
 
+
+    --Supporting Category Group View
+
+    if backpackView1 and backpackView1:GetScript("OnShow") ~= nil then
+        backpackView1:HookScript("OnShow", function()
+            if not isSingleView then
+                isSingleView = true;
+                self:ClearAllPoints();
+                self.Border:ClearAllPoints();
+                self:SetParent(backpackView1);
+                Callback_AllocateBags();
+            end
+        end);
+    end
+
+    if backpackView2 and backpackView2:GetScript("OnShow") ~= nil then
+        backpackView2:HookScript("OnShow", function()
+            if isSingleView then
+                isSingleView = false;
+                self:ClearAllPoints();
+                self.Border:ClearAllPoints();
+                self:SetParent(backpackView2);
+                self:SetPoint("LEFT", backpackView2, "BOTTOMLEFT", 17, 17);
+                self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
+            end
+        end);
+    end
+
+
     if anchorTo then
         if anchorTo.AllocateBags then
-            hooksecurefunc(Baganator_SingleViewBackpackViewFrame, "AllocateBags", Callback_AllocateBags)
+            hooksecurefunc(backpackView1, "AllocateBags", Callback_AllocateBags)
         end
         self:SetPoint("LEFT", anchorTo, "BOTTOMLEFT", 54, 17);
         self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
