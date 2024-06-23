@@ -15,7 +15,7 @@ local unpack = unpack;
 local time = time;
 local GetTime = GetTime;
 local IsMouseButtonDown = IsMouseButtonDown;
-local GetMouseFocus = GetMouseFocus;
+local GetMouseFocus = API.GetMouseFocus;
 local PlaySound = PlaySound;
 local GetSpellCharges = GetSpellCharges;
 local C_Item = C_Item;
@@ -561,6 +561,11 @@ do  -- TokenFrame
     local TOKEN_BUTTON_ICON_SIZE = 12;
     local TOKEN_BUTTON_HEIGHT = 12;
 
+    local TOKEN_TYPE_CURRENCY = 0;
+    local TOKEN_TYPE_ITEM = 1;
+
+    local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
+
     local TokenDisplayMixin = {};
 
     local function CreateTokenDisplay(parent)
@@ -568,31 +573,36 @@ do  -- TokenFrame
         f:SetHeight(16);
         f:SetWidth(32);
         Mixin(f, TokenDisplayMixin);
-        f.currencies = {};
+        f.tokens = {};
         f.tokenButtons = {};
+
+        f:SetScript("OnHide", f.OnHide);
+        f:SetScript("OnEvent", f.OnEvent);
+
         return f
     end
     addon.CreateTokenDisplay = CreateTokenDisplay;
 
     function TokenDisplayMixin:AddCurrency(currencyID)
-        for i, id in ipairs(self.currencies) do
-            if id == currencyID then
+        for i, tokenInfo in ipairs(self.tokens) do
+            if tokenInfo[1] == TOKEN_TYPE_CURRENCY and tokenInfo[2] == currencyID then
                 return
             end
         end
 
-        tinsert(self.currencies, currencyID);
+        tinsert(self.tokens, {TOKEN_TYPE_CURRENCY, currencyID});
         self:Update();
     end
 
     function TokenDisplayMixin:RemoveCurrency(currencyID)
         local anyChange = false;
 
-        if currencyID then
-            anyChange = API.RemoveValueFromList(self.currencies, currencyID);
-        else
-            self.currencies = {};
-            anyChange = true;
+        for i, tokenInfo in ipairs(self.tokens) do
+            if tokenInfo[1] == TOKEN_TYPE_CURRENCY and tokenInfo[2] == currencyID then
+                table.remove(self.tokens, i);
+                anyChange = true;
+                break
+            end
         end
 
         if anyChange then
@@ -600,21 +610,26 @@ do  -- TokenFrame
         end
     end
 
-    function TokenDisplayMixin:SetCurrencies(...)
-        self.currencies = {};
+    function TokenDisplayMixin:AddItem(itemID)
+        for i, tokenInfo in ipairs(self.tokens) do
+            if tokenInfo[1] == TOKEN_TYPE_ITEM and tokenInfo[2] == itemID then
+                return
+            end
+        end
+
+        tinsert(self.tokens, {TOKEN_TYPE_ITEM, itemID});
+        self:Update();
+    end
+
+    function TokenDisplayMixin:SetTokens(...)
+        self.tokens = {};
 
         local n = select('#', ...);
-        local id = select(1, ...);
+        local tokenInfo;
 
-        if id and type(id) == "table" then
-            for _, v in ipairs(id) do
-                tinsert(self.currencies, v);
-            end
-        else
-            for i = 1, n do
-                id = select(i, ...);
-                tinsert(self.currencies, id);
-            end
+        for i = 1, n do
+            tokenInfo = select(i, ...);
+            tinsert(self.tokens, tokenInfo);
         end
 
         self:Update();
@@ -622,27 +637,54 @@ do  -- TokenFrame
 
     local function TokenButton_OnEnter(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetCurrencyByID(self.currencyID);
+        if self.tokenType == 0 and self.currencyID then
+            GameTooltip:SetCurrencyByID(self.currencyID);
+        elseif self.tokenType == 1 and self.itemID then
+            GameTooltip:SetItemByID(self.itemID);
+        else
+            GameTooltip:Hide();
+        end
     end
 
     local function TokenButton_OnLeave(self)
         GameTooltip:Hide();
     end
 
-    local function TokenButton_Setup(self, currencyID)
-        self.currencyID = currencyID;
-        local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
-        if info then
-            self.Icon:SetTexture(info.iconFileID);
-            self.Count:SetText(info.quantity);
+    function TokenDisplayMixin:SetupTokenButton(tokenButton, currencyData)
+        local icon, quantity;
+        local tokenType = currencyData[1];
+        local id = currencyData[2];
+
+        tokenButton.tokenType = tokenType;
+
+        if tokenType == 0 then
+            --Currency
+            self.anyCurrency = true;
+            tokenButton.currencyID = id;
+            tokenButton.itemID = nil;
+            local info = GetCurrencyInfo(id);
+            icon = info.iconFileID;
+            quantity = info.quantity;
+        elseif tokenType == 1 then
+            --Item
+            self.anyItem = true;
+            tokenButton.currencyID = nil;
+            tokenButton.itemID = id;
+            icon = GetItemIconByID(id)
+            quantity = GetItemCount(id);
+        end
+
+        if quantity then
+            tokenButton.Icon:SetTexture(icon);
+            tokenButton.Count:SetText(quantity);
         else
-            self.Icon:SetTexture(134400);   --question mark
-            self.Count:SetText("??");
+            tokenButton.Icon:SetTexture(134400);   --question mark
+            tokenButton.Count:SetText("??");
         end
 
         --update width
-        local span = TOKEN_BUTTON_ICON_SIZE + TOKEN_BUTTON_TEXT_ICON_GAP + floor(self.Count:GetWrappedWidth() + 0.5);
-        self:SetWidth(span);
+        local span = TOKEN_BUTTON_ICON_SIZE + TOKEN_BUTTON_TEXT_ICON_GAP + floor(tokenButton.Count:GetWrappedWidth() + 0.5);
+        tokenButton:SetWidth(span);
         return span
     end
 
@@ -677,16 +719,18 @@ do  -- TokenFrame
     end
 
     function TokenDisplayMixin:Update()
-        local numVisible = #self.currencies;
+        local numVisible = #self.tokens;
         local button;
 
         local totalWidth = 0;
         local buttonWidth;
 
-        for i, currencyID in ipairs(self.currencies) do
+        self:ListenEvents(false);
+
+        for i, tokenInfo in ipairs(self.tokens) do
             button = self:AcquireTokenButton(i);
             button:Show();
-            buttonWidth = TokenButton_Setup(button, currencyID);
+            buttonWidth = self:SetupTokenButton(button, tokenInfo);
             totalWidth = totalWidth + buttonWidth + TOKEN_FRAME_BUTTON_PADDING;
         end
 
@@ -699,22 +743,30 @@ do  -- TokenFrame
         for i = numVisible + 1, #self.tokenButtons do
             self.tokenButtons[i]:Hide();
         end
+
+        if self.anyCurrency then
+            self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+        end
+
+        if self.anyItem then
+            self:RegisterEvent("BAG_UPDATE");
+        end
     end
 
     function TokenDisplayMixin:SetFrameOwner(owner, position)
-        --To avoid taint, our frame isn't parent-ed to owner
-        local b = owner:GetBottom();
-        local r = owner:GetRight();
+        --local b = owner:GetBottom();
+        --local r = owner:GetRight();
 
         self:ClearAllPoints();
         self:SetFrameStrata("FULLSCREEN");
 
-        local realParent = UIParent;
-        local scale = realParent:GetScale();
+        local realParent = owner;   --UIParent
 
         if position == "BOTTOMRIGHT" then
-            self:SetPoint("BOTTOMRIGHT", realParent, "BOTTOMLEFT", r, b);
+            self:SetPoint("BOTTOMRIGHT", realParent, "BOTTOMLEFT", 0, 0);
             --f:SetPoint("CENTER", UIParent, "BOTTOM", 0, 64)
+        elseif position == "BOTTOM" then
+            self:SetPoint("BOTTOM", realParent, "BOTTOM", 0, 0);
         end
 
         self:Show();
@@ -722,7 +774,7 @@ do  -- TokenFrame
 
     function TokenDisplayMixin:DisplayCurrencyOnFrame(owner, position, ...)
         self:SetFrameOwner(owner, position);
-        self:SetCurrencies(...);
+        self:SetTokens(...);
     end
 
     function TokenDisplayMixin:HideTokenFrame()
@@ -730,6 +782,41 @@ do  -- TokenFrame
             self:Hide();
             self:ClearAllPoints();
         end
+    end
+
+    function TokenDisplayMixin:ListenEvents(state)
+        if state then
+            self:RegisterEvent("BAG_UPDATE");
+            self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+        else
+            self:UnregisterEvent("BAG_UPDATE");
+            self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+        end
+    end
+
+    function TokenDisplayMixin:OnHide()
+        self:ListenEvents(false);
+        self:SetScript("OnUpdate", nil);
+    end
+
+    local function Update_Delay(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= 0.5 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            self:Update();
+        end
+    end
+
+    function TokenDisplayMixin:RequestUpdate()
+        if not self:IsVisible() then return end;
+
+        self.t = 0;
+        self:SetScript("OnUpdate", Update_Delay);
+    end
+
+    function TokenDisplayMixin:OnEvent(event)
+        self:ListenEvents(false);
     end
 end
 

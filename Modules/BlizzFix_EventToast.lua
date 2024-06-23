@@ -12,7 +12,7 @@ if not BlizzardFrame then
 end
 
 local GetScaledCursorPosition = addon.API.GetScaledCursorPosition;
-local GetMouseFocus = GetMouseFocus;
+local GetMouseFocus = addon.API.GetMouseFocus;
 local WorldFrame = WorldFrame;
 local Original_OnUpdate = EventToastManagerFrameMixin and EventToastManagerFrameMixin.OnUpdate;
 local DEFAULT_STATE = BlizzardFrame and BlizzardFrame:IsMouseEnabled();

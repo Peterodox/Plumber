@@ -2,6 +2,7 @@ local _, addon = ...
 local API = addon.API;
 local L = addon.L;
 local tinsert = table.insert
+local CreateFrame = CreateFrame;
 
 local RATIO = 0.75; --h/w
 local FRAME_WIDTH = 600;
@@ -21,9 +22,16 @@ local CATEGORY_ORDER = {
     [3] = "Class",
 
     --Patch Feature uses the tocVersion and #00
-    [10020001] = "Dreamseeds",
-    [10020501] = "AzerothianArchives",
+    [10020000] = "Dragonflight",
 };
+
+
+local DEFAULT_COLLAPSED_CATEGORY = {
+};
+
+if addon.IsGame_11_0_0 then
+    DEFAULT_COLLAPSED_CATEGORY[10020000] = true;
+end
 
 
 local ControlCenter = CreateFrame("Frame", nil, UIParent);
@@ -32,6 +40,73 @@ ControlCenter:SetSize(FRAME_WIDTH, FRAME_WIDTH * RATIO);
 ControlCenter:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
 ControlCenter.modules = {};
 ControlCenter:Hide();
+
+local ScrollFrame = CreateFrame("Frame", nil, ControlCenter);
+ScrollFrame:SetPoint("TOPLEFT", ControlCenter, "TOPLEFT", 0, 0);
+ScrollFrame:SetPoint("BOTTOMLEFT", ControlCenter, "BOTTOMLEFT", 0, 0);
+ScrollFrame:SetWidth(LEFT_SECTOR_WIDTH);
+ControlCenter.ScrollFrame = ScrollFrame;
+
+
+do
+    local OFFSET_PER_SCROLL = (BUTTON_HEIGHT + OPTION_GAP_Y) * 2;
+
+    local function ScrollFrame_OnMouseWheel(self, delta)
+        if self.scrollOffset > 0 and delta > 0 then
+            self.scrollOffset = self.scrollOffset - OFFSET_PER_SCROLL;
+            if self.scrollOffset < 0 then
+                self.scrollOffset = 0;
+            end
+            self.ScrollChild:SetPoint("TOPLEFT", self, "TOPLEFT", 0, self.scrollOffset);
+        elseif self.scrollOffset < self.scrollRange and delta < 0 then
+            self.scrollOffset = self.scrollOffset + OFFSET_PER_SCROLL;
+            if self.scrollOffset > self.scrollRange then
+                self.scrollOffset = self.scrollRange;
+            end
+            self.ScrollChild:SetPoint("TOPLEFT", self, "TOPLEFT", 0, self.scrollOffset);
+        end
+    end
+
+    function ControlCenter:SetScrollRange(scrollRange)
+        local scrollable = scrollRange > 0;
+
+        if scrollable then
+            if not self.scrollable then
+                self.scrollable = true;
+                self.ScrollFrame:SetClipsChildren(true);
+                self.ScrollFrame:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel);
+                self.ScrollFrame.scrollOffset = 0;
+            end
+            self.ScrollFrame.scrollRange = scrollRange;
+        else
+            if self.scrollable then
+                self.scrollable = false;
+                self.ScrollFrame:SetClipsChildren(false);
+                self.ScrollFrame.ScrollChild:SetPoint("TOPLEFT", self.ScrollFrame, "TOPLEFT", 0, 0);
+                self.ScrollFrame.scrollOffset = 0;
+                self.ScrollFrame.scrollRange = 0;
+                self.ScrollFrame:SetScript("OnMouseWheel", nil);
+            end
+        end
+    end
+
+    function ControlCenter:UpdateScrollRange()
+        local frameHeight = self.ScrollFrame:GetHeight();
+        local firstButton = self.CategoryButtons[1];
+        local lastObject = self.lastCategoryButton.Drawer;
+
+        local contentHeight = 2 * PADDING + firstButton:GetTop() - lastObject:GetBottom();
+
+        self:SetScrollRange(math.ceil(contentHeight - frameHeight));
+    end
+
+    function ControlCenter:OnMouseWheel(delta)
+        if self.scrollable then
+
+        end
+    end
+end
+
 
 local function CreateNewFeatureMark(button)
     local newTag = button:CreateTexture(nil, "OVERLAY")
@@ -76,6 +151,7 @@ function CategoryButtonMixin:Expand()
         self.Drawer:SetHeight(self.drawerHeight);
         self.Drawer:Show();
         self:UpdateArrow();
+        ControlCenter:UpdateScrollRange();
     end
 end
 
@@ -85,6 +161,7 @@ function CategoryButtonMixin:Collapse()
         self.Drawer:SetHeight(DIFFERENT_CATEGORY_OFFSET);
         self.Drawer:Hide();
         self:UpdateArrow();
+        ControlCenter:UpdateScrollRange();
     end
 end
 
@@ -229,6 +306,12 @@ local function CreateUI()
     local f = addon.CreateHeaderFrame(parent, showCloseButton);
     parent.Frame = f;
 
+
+    local ScrollChild = CreateFrame("Frame", nil, ScrollFrame);
+    ScrollFrame.ScrollChild = ScrollChild;
+    ScrollChild:SetSize(8, 8);
+    ScrollChild:SetPoint("TOPLEFT", ScrollFrame, "TOPLEFT", 0, 0);
+
     local container = parent;
 
     f:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0);
@@ -252,13 +335,15 @@ local function CreateUI()
 
     local description = container:CreateFontString(nil, "OVERLAY", "GameTooltipText"); --GameFontNormal (ObjectiveFont), GameTooltipTextSmall
     parent.Description = description;
-    description:SetTextColor(0.5, 0.5, 0.5);
+    description:SetTextColor(0.659, 0.659, 0.659);    --0.5, 0.5, 0.5
     description:SetJustifyH("LEFT");
     description:SetJustifyV("TOP");
     description:SetSpacing(2);
     local visualOffset = 4;
     description:SetPoint("TOPLEFT", preview, "BOTTOMLEFT", visualOffset + 4, -PADDING);
     description:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -PADDING - visualOffset, PADDING);
+    description:SetShadowColor(0, 0, 0);
+    description:SetShadowOffset(1, -1);
 
     local dividerTop = container:CreateTexture(nil, "OVERLAY");
     dividerTop:SetSize(16, 16);
@@ -284,7 +369,7 @@ local function CreateUI()
     API.DisableSharpening(dividerMiddle);
 
 
-    local SelectionTexture = container:CreateTexture(nil, "ARTWORK");
+    local SelectionTexture = ScrollChild:CreateTexture(nil, "ARTWORK");
     SelectionTexture:SetSize(LEFT_SECTOR_WIDTH - PADDING, BUTTON_HEIGHT);
     SelectionTexture:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/SelectionTexture");
     SelectionTexture:SetVertexColor(1, 1, 1, 0.1);
@@ -379,11 +464,11 @@ local function CreateUI()
 
     for i, data in ipairs(parent.modules) do
         if newCategoryPosition[i] then
-            local categoryButton = CreateCategoryButton(container);
+            local categoryButton = CreateCategoryButton(ScrollChild);
             tinsert(parent.CategoryButtons, categoryButton);
 
             if i == 1 then
-                categoryButton:SetPoint("TOPLEFT", container, "TOPLEFT", PADDING, -fromOffsetY);
+                categoryButton:SetPoint("TOPLEFT", ScrollChild, "TOPLEFT", PADDING, -fromOffsetY);
             else
                 categoryButton:SetPoint("TOPLEFT", lastCategoryButton.Drawer, "BOTTOMLEFT", 0, 0);
             end
@@ -420,20 +505,31 @@ local function CreateUI()
         positionInCategory = positionInCategory + 1;
     end
 
+    ControlCenter.lastCategoryButton = lastCategoryButton;
+
     for i, categoryButton in ipairs(parent.CategoryButtons) do
         categoryButton:InitializeDrawer();
     end
 
+    for i, categoryButton in ipairs(parent.CategoryButtons) do
+        if DEFAULT_COLLAPSED_CATEGORY[categoryButton.categoryID] then
+            categoryButton:Collapse();
+        end
+    end
+
     --Temporary "About" Tab
     local VersionText = container:CreateFontString(nil, "OVERLAY", "GameFontNormal"); --GameFontNormal (ObjectiveFont), GameTooltipTextSmall
-    VersionText:SetPoint("BOTTOMLEFT", container, "BOTTOMLEFT", PADDING, PADDING);
+    VersionText:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -PADDING, PADDING);
     VersionText:SetTextColor(0.24, 0.24, 0.24);
-    VersionText:SetJustifyH("LEFT");
+    VersionText:SetJustifyH("RIGHT");
     VersionText:SetJustifyV("BOTTOM");
     VersionText:SetText(addon.VERSION_TEXT);
 
+    db.settingsOpenTime = time();
+
+
     function ControlCenter:UpdateLayout()
-        local frameWidth = math.floor(container:GetWidth() + 0.5);
+        local frameWidth = math.floor(self:GetWidth() + 0.5);
         if frameWidth == self.frameWidth then
             return
         end
@@ -446,10 +542,9 @@ local function CreateUI()
 
         previewSize = frameWidth - leftSectorWidth - 2*PADDING + 4;
         preview:SetSize(previewSize, previewSize);
+
+        ScrollFrame:SetWidth(leftSectorWidth);
     end
-
-
-    db.settingsOpenTime = time();
 end
 
 function ControlCenter:ShowUI(onBlizzardOptionsUI)
@@ -462,6 +557,7 @@ function ControlCenter:ShowUI(onBlizzardOptionsUI)
     self.Frame:SetShown(not onBlizzardOptionsUI);
     self:UpdateLayout();
     self:UpdateButtonStates();
+    self:UpdateScrollRange();
 end
 
 function ControlCenter:InitializeModules()

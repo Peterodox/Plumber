@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.2.9";
-local VERSION_DATE = 1716689000;
+local VERSION_TEXT = "v1.3.0";
+local VERSION_DATE = 1719120000;
 
 
 local addonName, addon = ...
@@ -17,6 +17,7 @@ local DefaultValues = {
         HideZeroCountItem = true,
         ConciseTokenTooltip = true,
         TrackItemUpgradeCurrency = true,
+        TrackHolidayItem = true,
         TrackerBarInsideSeparateBag = false,
     GossipFrameMedal = true,
     EmeraldBountySeedList = true,       --Show a list of Dreamseed when appoaching Emarad Bounty Soil
@@ -24,7 +25,7 @@ local DefaultValues = {
     AlternativePlayerChoiceUI = true,   --Revamp PlayerChoiceFrame for Dreamseed Nurturing
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
     Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
-    TillersFarm = true,
+    TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
 
     --Modify default interface behavior:
     BlizzFixEventToast = true,          --Make Toast non-interactable
@@ -79,10 +80,10 @@ EL:SetScript("OnEvent", function(self, event, ...)
 end);
 
 
-
 do
-    addon.IsGame_10_2_0 = true;
-
     local tocVersion = select(4, GetBuildInfo());
-    addon.IsGame_10_2_0 = tocVersion and tocVersion >= 100200
+    tocVersion = tonumber(tocVersion or 0);
+
+    addon.IsGame_10_2_0 = tocVersion >= 100200;
+    addon.IsGame_11_0_0 = tocVersion >= 110000;
 end

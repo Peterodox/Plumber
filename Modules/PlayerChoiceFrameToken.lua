@@ -2,40 +2,35 @@
 
 local _, addon = ...
 
-if not addon.IsGame_10_2_0 then
+if not addon.IsGame_11_0_0 then
     return
 end
 
-local API = addon.API;
-local GetCreatureIDFromGUID = API.GetCreatureIDFromGUID;
+
+local GetCreatureIDFromGUID = addon.API.GetCreatureIDFromGUID;
 local TokenDisplay;
 local TimerFrame;
 
---[[
+
 local PlayerChoiceXCurrency = {
-    [723] = 2650,       --Dreamseed (Ysera's Clover): Plump Dreamseed, Emerald Dewdrop  --widgetSetID 918, buttonID: 2314, 2315         --object:208633
-    [732] = 2650,       --Dreamseed (Singing Weedling): Gigantic Dreamseed, Emerald Dewdrop  --widgetSetID 873, buttonID: 2286, 2287    --object:208635
-    [741] = 2650,       --Dreamseed (Lofty Lupin)
-    [749] = 2650,       --Dreamseed (Viridescent Sprout)    --widgetSetID 936, buttonID: 2331, 2332 (changed after reload)
-    [769] = 2650,       --Dreamseed (outdoor): Gigantic Dreamseed, Emerald Dewdrop
-    [782] = 2650,       --Dreamseed: Emerald Dewdrop
-    [783] = 2650,       --Dreamseed: Emerald Dewdrop
-    [784] = 2650,       --Dreamseed: Emerald Dewdrop
+    --[choiceID] = {type, id}     --type: 0(currency) 1(item)
+    [832] = {1, 220520},    --Radian Echo, Worldsoul Memory: The Worldcarvers
+    [838] = {1, 212493},    --
 };
---]]
+
+do  --Radian Echo
+    local RadianEcho = {1, 220520};
+    PlayerChoiceXCurrency[827] = PlayerChoiceXCurrency[832];    --Worldsoul Memory: Primal Predators
+    PlayerChoiceXCurrency[829] = PlayerChoiceXCurrency[832];    --Worldsoul Memory: A Wounded Soul
+    PlayerChoiceXCurrency[831] = PlayerChoiceXCurrency[832];    --Worldsoul Memory: Ancient Explorers
+end
+
+
 
 local GUIDXCurrency = {};
 
 do
-    local DreamseedBloom = {
-        211142, 211143, 211120, 208463, 208633,
-        208635, 211091, 211126, 211130, 211219,
-        211091, 211221,
-    };
 
-    for _, creatureID in ipairs(DreamseedBloom) do
-        GUIDXCurrency[creatureID] = 2650;   --Emerald Dewdrop
-    end
 end
 
 local EL = CreateFrame("Frame");
@@ -52,33 +47,33 @@ end
 
 local function UpdateChoiceCurrency()
     local f = PlayerChoiceFrame;
+
     if not (f and f:IsShown() and f.choiceInfo and f.choiceInfo.choiceID and f.choiceInfo.objectGUID) then
         HideWigets();
         return
     end
 
-    local creatureID = GetCreatureIDFromGUID( f.choiceInfo.objectGUID );
+    local choiceID = f.choiceInfo.choiceID;
+    local itemType, id;
 
-    if GUIDXCurrency[creatureID] then
+    --print(choiceID)
+    if PlayerChoiceXCurrency[choiceID] then
+        itemType = 0;
+        id = PlayerChoiceXCurrency[choiceID];
+    else
+        local creatureID = GetCreatureIDFromGUID(f.choiceInfo.objectGUID);
+        if GUIDXCurrency[creatureID] then
+            itemType = 0;
+            id = GUIDXCurrency[creatureID];
+        end
+    end
+    
+
+    if id then
         if not TokenDisplay then
-            TokenDisplay = addon.CreateTokenDisplay(UIParent);
+            TokenDisplay = addon.CreateTokenDisplay(f);
         end
-        TokenDisplay:DisplayCurrencyOnFrame(f, "BOTTOMRIGHT", GUIDXCurrency[creatureID]);
-        local remainingTime, fullTime = API.GetActiveDreamseedGrowthTimes();
-        if remainingTime and fullTime then
-            if not TimerFrame then
-                TimerFrame = addon.CreateTimerFrame(TokenDisplay);
-                TimerFrame:SetReverse(true);
-                TimerFrame:SetStyle(2);
-                TimerFrame:SetWidth(192);
-                TimerFrame:SetBarColor(218/255, 218/255, 34/255)
-                TimerFrame:UpdateMaxBarFillWidth();
-            end
-            TimerFrame:SetPoint("BOTTOM", f, "BOTTOM", 0, 236);
-            --print(remainingTime, fullTime)
-            TimerFrame:Show();
-            TimerFrame:SetTimes(fullTime - remainingTime, fullTime);
-        end
+        TokenDisplay:DisplayCurrencyOnFrame(f, "BOTTOM", id); --BOTTOMRIGHT
     else
         HideWigets();
     end
@@ -109,7 +104,6 @@ local function EnableModule(state)
     else
         EL:UnregisterEvent("PLAYER_CHOICE_UPDATE");
         EL:UnregisterEvent("PLAYER_CHOICE_CLOSE");
-        EL:SetScript("OnUpdate", nil);
         HideWigets();
     end
 end
@@ -120,6 +114,9 @@ do
         dbKey = "PlayerChoiceFrameToken",
         description = addon.L["ModuleDescription PlayerChoiceFrameToken"],
         toggleFunc = EnableModule,
+        categoryID = 2,
+        uiOrder = 5,
+        moduleAddedTime = 1718500000,
     };
 
     addon.ControlCenter:AddModule(moduleData);

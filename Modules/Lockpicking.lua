@@ -2,22 +2,26 @@
 -- Game Issue #1: The game prioritizes the Soft Targeting target, so if the player is facing an object (e.g. mailbox, chair), the character will perform Pick Lock on that object
 -- Game Issue #2: You'll get a "Invalid Target" error if the targeted lockbox is in the bank. (/use a bank item moves it into your bag)
 
+local _, addon = ...
+
+if addon.IsGame_11_0_0 then
+    --MacroText Broken in 11.0  This module can no longer function
+    return
+end
+
 local _, _, classID = UnitClass("player");
 local _, _, raceID = UnitRace("player");
 if classID ~= 4 and raceID ~= 37 then return end;
 
 
-local _, addon = ...
 local API = addon.API;
-
-
 local IsWarningColor = API.IsWarningColor;
 
 local InCombatLockdown = InCombatLockdown;
 local IsSpellKnown = IsSpellKnown;
 local SpellIsTargeting = SpellIsTargeting;
-local GetMouseFocus = GetMouseFocus;
-local GetSpellInfo = GetSpellInfo;
+local GetMouseFocus = API.GetMouseFocus;
+local GetSpellInfo = API.GetSpellInfo;
 local GetCursorInfo = GetCursorInfo;
 local match = string.match;
 local IsInteractingWithNpcOfType = (C_PlayerInteractionManager and C_PlayerInteractionManager.IsInteractingWithNpcOfType) or function(type) return false end
@@ -463,7 +467,6 @@ local function EnableModule(state)
 end
 
 do
-
     local moduleData = {
         name = addon.L["ModuleName HandyLockpick"],
         dbKey = "HandyLockpick",

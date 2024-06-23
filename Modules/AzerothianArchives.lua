@@ -205,8 +205,8 @@ do
         dbKey = "Technoscryers",
         description = addon.L["ModuleDescription Technoscryers"],
         toggleFunc = EnableModule,
-        categoryID = 10020501,
-        uiOrder = 1,
+        categoryID = 10020000,
+        uiOrder = 10,
         moduleAddedTime = 1706633000,
     };
 

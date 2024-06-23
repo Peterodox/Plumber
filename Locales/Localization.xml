@@ -13,4 +13,6 @@
     <Script file="koKR.lua"/>
     <Script file="esMX.lua"/>
     <Script file="esES.lua"/>
+
+    <Script file="PostLoad.lua"/>
 </Ui>

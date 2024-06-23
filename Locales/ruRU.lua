@@ -137,11 +137,6 @@ L["ModuleName BlizzFixWardrobeTrackingTip"] = "Blitz Fix: Совет по гар
 L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Скрыть руководство по гардеробу.";
 
 
---TillersFarm
-L["ModuleName TillersFarm"] = "Ферма Пандарии"
-L["ModuleDescription TillersFarm"] = "Показывать список семян, когда вы выбираете почву на ферме Солнечной Песни.";
-
-
 --Rare/Location Announcement
 L["Announce Location Tooltip"] = "Поделитесь этим местоположением в чате.";
 L["Announce Forbidden Reason In Cooldown"] = "Недавно вы поделились своим местоположением.";

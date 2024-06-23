@@ -1,5 +1,6 @@
 local _, addon = ...
 local API = addon.API;
+local IS_TWW = addon.IsGame_11_0_0;
 
 local tonumber = tonumber;
 local match = string.match;
@@ -191,8 +192,7 @@ do  -- Color
     API.IsWarningColor = IsWarningColor;
 end
 
-do
-    -- Time
+do  -- Time
     local D_DAYS = D_DAYS or "%d |4Day:Days;";
     local D_HOURS = D_HOURS or "%d |4Hour:Hours;";
     local D_MINUTES = D_MINUTES or "%d |4Minute:Minutes;";
@@ -405,6 +405,29 @@ do
         return second2 - second1
     end
     API.GetCalendarTimeDifference = GetCalendarTimeDifference;
+
+
+    local function WrapNumberWithBrackets(text)
+        text = gsub(text, "%%d%+", "%%d");
+        text = gsub(text, "%%d", "%(%%d%+%)");
+        return text
+    end
+
+    local PATTERN_DAYS = WrapNumberWithBrackets(DAYS_ABBR);
+    local PATTERN_HOURS = WrapNumberWithBrackets(HOURS_ABBR);
+    local PATTERN_MINUTES = WrapNumberWithBrackets(MINUTES_ABBR);
+    local PATTERN_SECONDS = WrapNumberWithBrackets(SECONDS_ABBR);
+
+    local function ConvertTextToSeconds(durationText)
+        if not durationText then return 0 end;
+
+        local hours = tonumber(match(durationText, PATTERN_HOURS) or 0);
+        local minutes = tonumber(match(durationText, PATTERN_MINUTES) or 0);
+        local seconds = tonumber(match(durationText, PATTERN_SECONDS) or 0);
+
+        return 3600 * hours + 60 * minutes + seconds;
+    end
+    API.TimeLeftTextToSeconds = ConvertTextToSeconds;
 end
 
 do  -- Item
@@ -961,6 +984,16 @@ do  -- Map
     API.GetZoneName = GetZoneName;
 end
 
+do  --Instance --Map
+    local GetInstanceInfo = GetInstanceInfo;
+
+    local function GetMapID()
+        local instanceID = select(8, GetInstanceInfo());
+        return instanceID
+    end
+    API.GetMapID = GetMapID;
+end
+
 do  --Pixel
     local GetPhysicalScreenSize = GetPhysicalScreenSize;
 
@@ -1195,6 +1228,54 @@ do  --Game UI
         return EditModeManagerFrame and EditModeManagerFrame:IsShown();
     end
     API.IsInEditMode = IsInEditMode;
+end
+
+do  --Spell
+    if IS_TWW then
+        local GetSpellInfo_Table = C_Spell.GetSpellInfo;
+        local SPELL_INFO_KEYS = {"name", "rank", "iconID", "castTime", "minRange", "maxRange", "spellID", "originalIconID"};
+        local function GetSpellInfo_Flat(spellID)
+            local info = spellID and GetSpellInfo_Table(spellID);
+            if info then
+                local tbl = {};
+                local n = 0;
+                for _, key in ipairs(SPELL_INFO_KEYS) do
+                    n = n + 1;
+                    tbl[n] = info[key];
+                end
+                return unpack(tbl)
+            end
+        end
+        API.GetSpellInfo = GetSpellInfo_Flat;
+    else
+        API.GetSpellInfo = GetSpellInfo;
+    end
+end
+
+do  --System
+    if IS_TWW then
+        local GetMouseFoci = GetMouseFoci;
+
+        local function GetMouseFocus()
+            local objects = GetMouseFoci();
+            return objects and objects[1]
+        end
+        API.GetMouseFocus = GetMouseFocus;
+    else
+        API.GetMouseFocus = GetMouseFocus;
+    end
+end
+
+do  --Scenario
+    local SCENARIO_DELVES = addon.L["Scenario Delves"] or "Delves";
+
+    local GetScenarioInfo = C_ScenarioInfo.GetScenarioInfo;
+
+    local function IsInDelves()
+        local scenarioInfo = GetScenarioInfo();
+        return scenarioInfo and scenarioInfo.name == SCENARIO_DELVES
+    end
+    API.IsInDelves = IsInDelves;
 end
 
 --[[

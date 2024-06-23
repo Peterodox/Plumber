@@ -623,10 +623,12 @@ end
 
 do
     --Item Upgrade System (Crests)
+    local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
+
+    local CURRENCY_QUANTITY_ICON_FORMAT = "%s |T%s:10:10:0:-2:64:64:4:60:4:60|t";
     local DBKEY_MORE_INFO_CREST = "TooltipShowExtraInfoCrest";
 
-    local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
-    local FLIGHT_STONE_ID = 2245;
+    local BASE_CURRENCY_ID = 2245;  --Flightstones
 
     local RAID_DIFFICUTY_M = PLAYER_DIFFICULTY6 or "Mythic";
     local RAID_DIFFICUTY_H = PLAYER_DIFFICULTY2 or "Heroic";
@@ -640,7 +642,41 @@ do
         RAID_DIFFICUTY_LFR,
     };
 
-    local CURRENCY_QUANTITY_ICON_FORMAT = "%s |T%s:10:10:0:-2:64:64:4:60:4:60|t";
+    local UpgradeCurrencies = {
+        --Universal Upgrade System (Crests)
+        --convert to string for hybrid process
+        --CategoryID ~= 142
+        --From high tier to low
+
+        --S4 Awakened
+        2812,   --Aspect    (M, M6+)
+        2809,   --Wyrm      (H, M5)
+        2807,   --Drake     (N, M0)
+        2806,   --Whelpling (LFR, H)
+    };
+
+
+    if addon.IsGame_11_0_0 then
+        BASE_CURRENCY_ID = 3008;    --Valorstones
+
+        CrestSources = {
+            RAID_DIFFICUTY_M..", +9",
+            RAID_DIFFICUTY_H..", +4",
+            RAID_DIFFICUTY_N..", +3",
+            RAID_DIFFICUTY_LFR,
+        };
+
+        UpgradeCurrencies = {
+            --TWW S1
+            2917,   --Aspect    (M, M6+)
+            2916,   --Wyrm      (H, M5)
+            2915,   --Drake     (N, M0)
+            2914,   --Whelpling (LFR, H)
+        };
+    end
+
+    addon.UpgradeCurrencies = UpgradeCurrencies;
+
     --local SEASON_CAP_LABEL = string.gsub(CURRENCY_SEASON_TOTAL_MAXIMUM or "Season Maximum: %s%s/%s", "%%s/%%s", "");
 
     function SharedTooltip:DisplayUpgradeCurrencies(showExtraInfo)
@@ -661,7 +697,7 @@ do
 
         local showIcon = true;
 
-        for i, currencyID in ipairs(addon.CrestCurrenies) do
+        for i, currencyID in ipairs(UpgradeCurrencies) do
             info = GetCurrencyInfo(currencyID);
             if info and (info.discovered or anyDiscovered) then
                 if info.discovered then
@@ -721,7 +757,7 @@ do
             end
 
             --Show flightstone
-            info = GetCurrencyInfo(FLIGHT_STONE_ID);
+            info = GetCurrencyInfo(BASE_CURRENCY_ID);
             if info then
                 name = info.name;
                 name = "|cffffd100"..name.."|r";

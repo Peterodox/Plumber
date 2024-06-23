@@ -7,6 +7,7 @@ local ENABLE_THIS_MODULE = true;        --DB.BackpackItemTracker
 local HIDE_ZERO_COUNT_ITEM = true;      --DB.HideZeroCountItem      Dock items inside a flyout menu
 local USE_CONSISE_TOOLTIP = true;       --DB.ConciseTokenTooltip
 local TRACK_UPGRADE_CURRENCY = true;    --DB.TrackItemUpgradeCurrency
+local TRACK_HOLIDAY_ITEM = true;        --DB.TrackHolidayItem
 local INSIDE_SEPARATE_BAG = false;
 
 local MAX_CUSTOM_ITEMS = 6;
@@ -33,7 +34,7 @@ local GetColorizedItemName = API.GetColorizedItemName;
 local CursorHasItem = CursorHasItem;
 local ClearCursor = ClearCursor;
 local GetCursorInfo = GetCursorInfo;
-local GetItemCount = GetItemCount;
+local GetItemCount = C_Item.GetItemCount;
 --local GetItemUniquenessByID = C_Item.GetItemUniquenessByID;     --Only returns True for equipment, not items with Unique (10)
 local GetItemIconByID = C_Item.GetItemIconByID;
 local GetItemMaxStackSizeByID = C_Item.GetItemMaxStackSizeByID;
@@ -56,19 +57,8 @@ local HolidayItems = {
     --winterveil
 };
 
-local CrestCurrenies = {
-    --Universal Upgrade System (Crests)
-    --convert to string for hybrid process
-    --CategoryID ~= 142
+local UpgradeCurrencies = addon.UpgradeCurrencies;  --Defined in SharedTooltip.lua
 
-    --S4 Awakened
-    2812,   --Aspect    (M, M6+)
-    2809,   --Wyrm      (H, M5)
-    2807,   --Drake     (N, M0)
-    2806,   --Whelpling (LFR, H)
-};
-
-addon.CrestCurrenies = CrestCurrenies;
 
 local EL = CreateFrame("Frame");
 EL:RegisterEvent("PLAYER_ENTERING_WORLD");
@@ -80,12 +70,12 @@ local CrestUtil = {};
 CrestUtil.watchedCurrrencies = {};
 
 function CrestUtil:GetBestCrestName(colorized)
-    local numTiers = #CrestCurrenies;
+    local numTiers = #UpgradeCurrencies;
     local info, currencyID;
     local name;
 
     for tier = 1, numTiers do
-        currencyID = CrestCurrenies[tier];
+        currencyID = UpgradeCurrencies[tier];
         info = GetCurrencyInfo(currencyID);
         if info and info.discovered then
             name = info.name;
@@ -110,12 +100,12 @@ function CrestUtil:GetBestCrestForPlayer()
         return
     end
 
-    local numTiers = #CrestCurrenies;
+    local numTiers = #UpgradeCurrencies;
     local bestTier = 0;
     local info, currencyID, bestCurrencyID;
 
     for tier = 1, numTiers do
-        currencyID = CrestCurrenies[tier];
+        currencyID = UpgradeCurrencies[tier];
         info = GetCurrencyInfo(currencyID);
         if info and info.discovered then
             bestTier = numTiers - tier + 1;
@@ -129,7 +119,7 @@ function CrestUtil:GetBestCrestForPlayer()
         --if there is an undiscovered tier above the player's best tier, listen to Events for update
         local temp = "";
         for tier = bestTier + 1, numTiers do
-            currencyID = CrestCurrenies[tier];
+            currencyID = UpgradeCurrencies[tier];
             temp = temp .. " "..currencyID;
             self.watchedCurrrencies[currencyID] = true;
         end
@@ -147,7 +137,7 @@ do
         ExcludeFromSave[id] = true;
     end
 
-    for _, id in pairs(CrestCurrenies) do
+    for _, id in pairs(UpgradeCurrencies) do
         ExcludeFromSave[ tostring(id) ] = true;
         UseSpecialTooltip[id] = true;
     end
@@ -526,6 +516,7 @@ function SettingsFrame.OnChanged(manual)
     HIDE_ZERO_COUNT_ITEM = db.HideZeroCountItem;
     USE_CONSISE_TOOLTIP = db.ConciseTokenTooltip;
     TRACK_UPGRADE_CURRENCY = db.TrackItemUpgradeCurrency;
+    TRACK_HOLIDAY_ITEM = db.TrackHolidayItem;
 
     local insideSeparateBag = db.TrackerBarInsideSeparateBag;
 
@@ -573,6 +564,14 @@ local function OptionButton_TrackItemUpgradeCurrency_OnEnter(self)
     tooltip:Show();
 end
 
+local function OptionButton_TrackHolidayItem_OnClick()
+    local db = PlumberDB;
+    if not db then return end;
+
+    TRACK_HOLIDAY_ITEM = db.TrackHolidayItem;
+    InitializeModule();
+end
+
 local function OptionButton_InsideBag_OnClick()
 
 end
@@ -612,6 +611,7 @@ function SettingsFrame:Init()
         {dbKey = "HideZeroCountItem", label = L["Hide Not Owned Items"], tooltip = L["Hide Not Owned Items Tooltip"], onClickFunc = SettingsFrame.OnChanged},
         {dbKey = "ConciseTokenTooltip", label = L["Concise Tooltip"], tooltip = L["Concise Tooltip Tooltip"], onClickFunc = SettingsFrame.OnChanged},
         {dbKey = "TrackItemUpgradeCurrency", label = L["Track Upgrade Currency"], onClickFunc = OptionButton_TrackItemUpgradeCurrency_OnClick, onEnterFunc = OptionButton_TrackItemUpgradeCurrency_OnEnter},
+        {dbKey = "TrackHolidayItem", label = L["Track Holiday Item"], onClickFunc = OptionButton_TrackHolidayItem_OnClick},
     };
 
     if TrackerFrame.isBlizzardBag and (not C_CVar.GetCVarBool("combinedBags")) then
@@ -2422,15 +2422,12 @@ end
 function InitializeModule()
     CurrentPinnedItems = {};
 
-    local trackCrests = true;
-    if trackCrests then
-        local bestCurrencyID = CrestUtil:GetBestCrestForPlayer();
-        if bestCurrencyID then
-            table.insert(CurrentPinnedItems, 1, tostring(bestCurrencyID));
-        end
+    local bestCurrencyID = CrestUtil:GetBestCrestForPlayer();   --Returns nil if player opts out
+    if bestCurrencyID then
+        table.insert(CurrentPinnedItems, 1, tostring(bestCurrencyID));
     end
 
-    local HolidayInfo = API.GetActiveMajorHolidayInfo();
+    local HolidayInfo = TRACK_HOLIDAY_ITEM and API.GetActiveMajorHolidayInfo();
     if HolidayInfo then
         for _, info in ipairs(HolidayInfo) do
             local key = info:GetKey();

@@ -1,5 +1,5 @@
-## Interface: 100207
-## Version: 1.2.8
+## Interface: 100207, 110000
+## Version: 1.3.0
 
 ## Title: Plumber
 
@@ -26,7 +26,7 @@ ControlCenter.lua
 Modules\GossipFrameMedal.lua
 Modules\BackpackItemTracker.lua
 Modules\TimeRift.lua
-#Modules\PlayerChoiceFrameToken.lua
+Modules\PlayerChoiceFrameToken.lua
 #Modules\DruidModelFix.lua
 Modules\QuickSlot.lua
 Modules\Dreamseed.lua
@@ -39,7 +39,10 @@ Modules\Lockpicking.lua
 Modules\BlizzFix_EventToast.lua
 Modules\TalkingHead.lua
 Modules\AzerothianArchives.lua
-#Modules\Tillers.lua
+
+#TWW
+Modules\TooltipKey.lua
+Modules\Delves.lua
 
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua

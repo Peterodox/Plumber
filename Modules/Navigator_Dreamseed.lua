@@ -383,7 +383,7 @@ do
         description = addon.L["ModuleDescription Navigator_Dreamseed"],
         toggleFunc = EnableModule,
         moduleAddedTime = 1702258000,
-        categoryID = 10020001,
+        categoryID = 10020000,
         uiOrder = 4,
     };
 

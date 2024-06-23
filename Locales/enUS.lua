@@ -22,9 +22,11 @@ L["Module Category General"] = "General";
 L["Module Category NPC Interaction"] = "NPC Interaction";
 --- order: 3
 L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
---- order: 4
+
+L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
+
+--Deprecated
 L["Module Category Dreamseeds"] = "Dreamseeds";     --Added in patch 10.2.0
---- order: 5
 L["Module Category AzerothianArchives"] = "Azerothian Archives";     --Added in patch 10.2.5
 
 
@@ -50,6 +52,7 @@ L["Numbers To Earn"] = "# To Earn";     --The number of items/currencies player 
 L["Numbers Of Earned"] = "# Earned";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Track Crests";       --Crest: e.g. Drake’s Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "Pin the top-tier crest you have earned to the bar.";
+L["Track Holiday Item"] = "Track Holiday Currency";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Currently Pinned:";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Bar Inside The Bag";     --Put the bar inside the bag UI (below money/currency)
 L["Bar Inside The Bag Tooltip"] = "Place the bar inside the bag UI.\n\nIt only works in Blizzard's Separate Bags mode.";
@@ -67,7 +70,7 @@ L["ModuleDescription DruidModelFix"] = "Fix the Character UI model display issue
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
 L["ModuleName PlayerChoiceFrameToken"] = "To-Be-Donated Item Count";
-L["ModuleDescription PlayerChoiceFrameToken"] = "Show how many to-be-donated items you have on the PlayerChoice UI.\n\nCurrently only supports Dreamseed Nurturing.";
+L["ModuleDescription PlayerChoiceFrameToken"] = "Show how many to-be-donated items you have on the PlayerChoice UI.\n\nCurrently only supports Events in The War Within.";
 
 
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
@@ -137,11 +140,6 @@ L["ModuleName BlizzFixWardrobeTrackingTip"] = "Blitz Fix: Wardrobe Tip";
 L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Hide the tutorial for Wardrobe shortcuts.";
 
 
---TillersFarm
-L["ModuleName TillersFarm"] = "Tillers Farm"
-L["ModuleDescription TillersFarm"] = "Show a list of seeds when you target the soils in Sunsong Ranch.";
-
-
 --Rare/Location Announcement
 L["Announce Location Tooltip"] = "Share this location in chat.";
 L["Announce Forbidden Reason In Cooldown"] = "You have shared a location recently.";
@@ -151,6 +149,11 @@ L["Available In Format"] = "Available in: |cffffffff%s|r";
 L["Seed Color Epic"] = ICON_TAG_RAID_TARGET_DIAMOND3 or "Purple";   --Using GlobalStrings as defaults
 L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Blue";
 L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
+
+
+--Tooltip Chest Keys
+L["ModuleName TooltipChestKeys"] = "Tooltip: Chest Keys";
+L["ModuleDescription TooltipChestKeys"] = "Show info on the key required to open the current chest or door."
 
 
 --Generic
@@ -169,7 +172,12 @@ L["currency-2707"] = "Drake";
 L["currency-2708"] = "Wyrm";
 L["currency-2709"] = "Aspect";
 
-L["currency-2806"] = L["currency-2706"];
-L["currency-2807"] = L["currency-2707"];
-L["currency-2809"] = L["currency-2708"];
-L["currency-2812"] = L["currency-2709"];
+L["currency-2914"] = "Weathered";
+L["currency-2915"] = "Carved";
+L["currency-2916"] = "Runed";
+L["currency-2917"] = "Gilded";
+
+
+L["Scenario Delves"] = "Delves";
+L["GameObject Door"] = "Door";
+L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
