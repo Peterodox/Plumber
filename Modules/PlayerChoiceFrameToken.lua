@@ -54,26 +54,26 @@ local function UpdateChoiceCurrency()
     end
 
     local choiceID = f.choiceInfo.choiceID;
-    local itemType, id;
+    local itemType, tokenInfo;
 
     --print(choiceID)
     if PlayerChoiceXCurrency[choiceID] then
         itemType = 0;
-        id = PlayerChoiceXCurrency[choiceID];
+        tokenInfo = PlayerChoiceXCurrency[choiceID];
     else
         local creatureID = GetCreatureIDFromGUID(f.choiceInfo.objectGUID);
         if GUIDXCurrency[creatureID] then
             itemType = 0;
-            id = GUIDXCurrency[creatureID];
+            tokenInfo = GUIDXCurrency[creatureID];
         end
     end
     
 
-    if id then
+    if tokenInfo then
         if not TokenDisplay then
             TokenDisplay = addon.CreateTokenDisplay(f);
         end
-        TokenDisplay:DisplayCurrencyOnFrame(f, "BOTTOM", id); --BOTTOMRIGHT
+        TokenDisplay:DisplayCurrencyOnFrame(tokenInfo, f, "BOTTOM"); --BOTTOMRIGHT
     else
         HideWigets();
     end

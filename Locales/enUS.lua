@@ -56,6 +56,7 @@ L["Track Holiday Item"] = "Track Holiday Currency";       --e.g. Tricky Treats (
 L["Currently Pinned Colon"] = "Currently Pinned:";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Bar Inside The Bag";     --Put the bar inside the bag UI (below money/currency)
 L["Bar Inside The Bag Tooltip"] = "Place the bar inside the bag UI.\n\nIt only works in Blizzard's Separate Bags mode.";
+L["Catalyst Charges"] = "Catalyst Charges";
 
 
 --GossipFrameMedal
@@ -69,8 +70,8 @@ L["ModuleDescription DruidModelFix"] = "Fix the Character UI model display issue
 
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
-L["ModuleName PlayerChoiceFrameToken"] = "To-Be-Donated Item Count";
-L["ModuleDescription PlayerChoiceFrameToken"] = "Show how many to-be-donated items you have on the PlayerChoice UI.\n\nCurrently only supports Events in The War Within.";
+L["ModuleName PlayerChoiceFrameToken"] = "Choice UI: Item Cost";
+L["ModuleDescription PlayerChoiceFrameToken"] = "Show how many items it needs to complete a certain action on the PlayerChoice UI.\n\nCurrently only supports events in The War Within.";
 
 
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
@@ -153,7 +154,16 @@ L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
 
 --Tooltip Chest Keys
 L["ModuleName TooltipChestKeys"] = "Tooltip: Chest Keys";
-L["ModuleDescription TooltipChestKeys"] = "Show info on the key required to open the current chest or door."
+L["ModuleDescription TooltipChestKeys"] = "Show info on the key required to open the current chest or door.";
+
+
+--Merchant UI Price
+L["ModuleName MerchantPrice"] = "Merchant Price";
+L["ModuleDescription MerchantPrice"] = "Modify Merchant UI's behaviors:\n\n- Grey out only the insufficient currencies.\n\n- Show all required items in the coin box.";
+L["Num Items In Bank Format"] = (BANK or "Bank") ..": |cffffffff%d|r";
+L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Bags") ..": |cffffffff%d|r";
+L["Number Thousands"] = "K";    --15K  15,000
+L["Number Millions"] = "M";     --1.5M 1,500,000
 
 
 --Generic

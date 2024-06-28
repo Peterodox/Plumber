@@ -8,6 +8,10 @@ local L = addon.L;
 L["Seed Color Epic"] = "Violett";   --Using GlobalStrings as defaults
 
 
+--Generic
+L["Number Thousands"] = "K";        --15K  15,000
+L["Number Millions"] = " Mio.";     --1.5M 1,500,000
+
 
 -- !! Do NOT translate the following entries
 L["currency-2706"] = "Welpen";

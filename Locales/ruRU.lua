@@ -148,14 +148,17 @@ L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "синий: ";
 L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "зеленый: ";
 
 
+--Merchant UI Price
+L["Number Thousands"] = "Т";    --15K  15,000
+L["Number Millions"] = "М";     --1.5M 1,500,000
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Перемещение по горизонтали";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Перемещение по вертикали";
 L["Reposition Button Tooltip"] = "Щелкните ЛКМ и перетащите, чтобы переместить окно.";
 L["Font Size"] = FONT_SIZE or "Размер шрифта";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Сброс в положение по умолчанию";
-
-
 
 
 -- !! Do NOT translate the following entries

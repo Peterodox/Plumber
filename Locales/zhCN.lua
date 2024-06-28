@@ -22,9 +22,11 @@ L["Module Category General"] = "常规";
 L["Module Category NPC Interaction"] = "NPC 交互";
 --- order: 3
 L["Module Category Class"] = "职业";   --Player Class (rogue, paladin...)
---- order: 4
+
+L["Module Category Dragonflight"] = "巨龙时代";
+
+--Deprecated
 L["Module Category Dreamseeds"] = "梦境之种";     --Added in patch 10.2.0
---- order: 5
 L["Module Category AzerothianArchives"] = "艾泽拉斯档案馆";     --Added in patch 10.2.5
 
 
@@ -50,9 +52,11 @@ L["Numbers To Earn"] = "还可获取";     --The number of items/currencies play
 L["Numbers Of Earned"] = "已获取";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "追踪纹章";     --Crest: e.g. Drake’s Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "在最左侧显示你已获得的最高等级的纹章。";
+L["Track Holiday Item"] = "追踪节日货币";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "当前显示：";     --Tells the currently pinned item
 L["Bar Inside The Bag"] = "显示在背包窗口内部";
 L["Bar Inside The Bag Tooltip"] = "将工具栏放置在背包窗口的内部。\n\n仅在使用暴雪默认背包的“分开的小包”模式下生效。";
+L["Catalyst Charges"] = "充能层数";
 
 
 --GossipFrameMedal
@@ -67,7 +71,7 @@ L["ModuleDescription DruidModelFix"] = "修复使用群星雕文导致人物界�
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
 L["ModuleName PlayerChoiceFrameToken"] = "显示捐献物品数";
-L["ModuleDescription PlayerChoiceFrameToken"] = "在捐献界面上显示你有多少待捐物品。\n\n目前仅支持梦境之种的培育。";
+L["ModuleDescription PlayerChoiceFrameToken"] = "在捐献界面上显示你有多少待捐物品。\n\n目前仅支持地心之战内容";
 
 
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
@@ -146,6 +150,20 @@ L["Available In Format"] = "此时间后可用：|cffffffff%s|r";
 L["Seed Color Epic"] = "紫色";
 L["Seed Color Rare"] = "蓝色";
 L["Seed Color Uncommon"] = "绿色";
+
+
+--Tooltip Chest Keys
+L["ModuleName TooltipChestKeys"] = "鼠标提示：宝箱钥匙";
+L["ModuleDescription TooltipChestKeys"] = "显示打开某些宝箱所需的钥匙信息。";
+
+
+--Merchant UI Price
+L["ModuleName MerchantPrice"] = "商品价格";
+L["ModuleDescription MerchantPrice"] = "改变商人界面的默认行为：\n\n- 只把数量不足的货币变灰。\n\n- 在钱币方框内显示当前页面所需的所有货币。";
+L["Num Items In Bank Format"] = "银行: |cffffffff%d|r";
+L["Num Items In Bag Format"] = "背包: |cffffffff%d|r";
+L["Number Thousands"] = "K";
+L["Number Millions"] = "M";
 
 
 --Generic

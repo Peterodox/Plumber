@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.3.0";
-local VERSION_DATE = 1719120000;
+local VERSION_TEXT = "v1.3.1";
+local VERSION_DATE = 1719580000;
 
 
 local addonName, addon = ...
@@ -29,6 +29,7 @@ local DefaultValues = {
 
     --Modify default interface behavior:
     BlizzFixEventToast = true,          --Make Toast non-interactable
+    MerchantPrice = false;              --Merchant Price (Alt Currency) Overview, gray insufficient items
 
     --In-game Navigation: Use waypoint (Super Tracking) to navigate players. Generally default to false, since it will mute WoW's own SuperTrackedFrame
     Navigator_MasterSwitch = true,      --Decide if using our SuperTrackedFrame or the default one

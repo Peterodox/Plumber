@@ -311,14 +311,14 @@ local function GenerateMoneyText(rawCopper)
     local goldText, silverText, copperText;
 
     if copper > 0 then
-        copperText = string.format("%s|TInterface/AddOns/Plumber/Art/Frame/Coins:0:0:%s:-%s:128:32:0:32:0:32|t", copper, iconOffsetX, SPACING_INTERNAL);
+        copperText = string.format("%s|TInterface/AddOns/Plumber/Art/BackpackItemTracker/CoinSymbol:0:0:%s:-%s:128:32:64:96:0:32|t", copper, iconOffsetX, SPACING_INTERNAL);
         text = copperText;
     end
 
     if gold ~= 0 or silver ~= 0 then
-        silverText = string.format("%s|TInterface/AddOns/Plumber/Art/Frame/Coins:0:0:%s:-%s:128:32:32:64:0:32|t", silver, iconOffsetX, SPACING_INTERNAL);
+        silverText = string.format("%s|TInterface/AddOns/Plumber/Art/BackpackItemTracker/CoinSymbol:0:0:%s:-%s:128:32:32:64:0:32|t", silver, iconOffsetX, SPACING_INTERNAL);
         if gold > 0 then
-            goldText = string.format("%s|TInterface/AddOns/Plumber/Art/Frame/Coins:0:0:%s:-%s:128:32:64:96:0:32|t", gold, iconOffsetX, SPACING_INTERNAL);
+            goldText = string.format("%s|TInterface/AddOns/Plumber/Art/BackpackItemTracker/CoinSymbol:0:0:%s:-%s:128:32:0:32:0:32|t", gold, iconOffsetX, SPACING_INTERNAL);
             if text then
                 text = goldText.." "..silverText.." "..text;
             elseif silver == 0 then
@@ -628,7 +628,8 @@ do
     local CURRENCY_QUANTITY_ICON_FORMAT = "%s |T%s:10:10:0:-2:64:64:4:60:4:60|t";
     local DBKEY_MORE_INFO_CREST = "TooltipShowExtraInfoCrest";
 
-    local BASE_CURRENCY_ID = 2245;  --Flightstones
+    local BASE_CURRENCY_ID = 2245;      --Flightstones
+    local CATALYST_CURRENCY_ID = 2167;  --Item conversion   /dump ItemInteractionFrame.currencyTypeId
 
     local RAID_DIFFICUTY_M = PLAYER_DIFFICULTY6 or "Mythic";
     local RAID_DIFFICUTY_H = PLAYER_DIFFICULTY2 or "Heroic";
@@ -657,7 +658,8 @@ do
 
 
     if addon.IsGame_11_0_0 then
-        BASE_CURRENCY_ID = 3008;    --Valorstones
+        BASE_CURRENCY_ID = 3008;        --Valorstones
+        CATALYST_CURRENCY_ID = 2813;    --Harmonized Silk
 
         CrestSources = {
             RAID_DIFFICUTY_M..", +9",
@@ -678,6 +680,21 @@ do
     addon.UpgradeCurrencies = UpgradeCurrencies;
 
     --local SEASON_CAP_LABEL = string.gsub(CURRENCY_SEASON_TOTAL_MAXIMUM or "Season Maximum: %s%s/%s", "%%s/%%s", "");
+
+    function SharedTooltip:AppendCurrency(currencyID, addBlankLine, customName, hideWhenNotOwned)
+        local info = GetCurrencyInfo(currencyID);
+        if info then
+            if hideWhenNotOwned and info.quantity <= 0 then
+                return
+            end
+            local name = "|cffffd100"..(customName or info.name or "").."|r";
+            local quantity = string.format(CURRENCY_QUANTITY_ICON_FORMAT, info.quantity, info.iconFileID);
+            if addBlankLine then
+                self:AddBlankLine();
+            end
+            self:AddCenterLine(name.."  "..quantity, 1, 1, 1, nil, nil, 2);
+        end
+    end
 
     function SharedTooltip:DisplayUpgradeCurrencies(showExtraInfo)
         if PlumberDB then
@@ -757,16 +774,11 @@ do
             end
 
             --Show flightstone
-            info = GetCurrencyInfo(BASE_CURRENCY_ID);
-            if info then
-                name = info.name;
-                name = "|cffffd100"..name.."|r";
-                quantity = info.quantity or 0;
-                if showIcon then
-                    quantity = string.format(CURRENCY_QUANTITY_ICON_FORMAT, quantity, info.iconFileID);
-                end
-                self:AddBlankLine();
-                self:AddCenterLine(name.."  "..quantity, 1, 1, 1, nil, nil, 2);
+            self:AppendCurrency(BASE_CURRENCY_ID, true);
+
+            --Catalyst Charges
+            if showExtraInfo and CATALYST_CURRENCY_ID then
+                self:AppendCurrency(CATALYST_CURRENCY_ID, false, L["Catalyst Charges"], true);
             end
         else
             self:AddLeftLine(ERR_ITEM_NOT_FOUND, 1.000, 0.282, 0.000);

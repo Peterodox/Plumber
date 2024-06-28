@@ -39,6 +39,7 @@ Modules\Lockpicking.lua
 Modules\BlizzFix_EventToast.lua
 Modules\TalkingHead.lua
 Modules\AzerothianArchives.lua
+Modules\MerchantPrice.lua
 
 #TWW
 Modules\TooltipKey.lua
