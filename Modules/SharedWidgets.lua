@@ -619,15 +619,15 @@ do  -- TokenFrame   -- Money   -- Coin
             if gold > 0 then
                 local abbrev;
 
-                if gold >= 10000000 then    --15M
-                    gold = floor(gold / 100000);
+                if gold >= 10000000 then    --15M 10,000,000
+                    gold = floor(gold / 1000000);
                     gold = gold;
                     abbrev = NUMBER_M;
-                elseif gold >= 1000000 then --1.5M
+                elseif gold >= 1000000 then --1.5M 1,000,000
                     gold = floor(gold / 100000) / 10;
                     abbrev = NUMBER_M;
-                elseif gold >= 10000 then  --150K 15K
-                    gold = floor(gold / 10000);
+                elseif gold >= 10000 then  --150K 15K 10,000
+                    gold = floor(gold / 1000);
                     abbrev = NUMBER_K;
                 else
                     showSilver = true;
