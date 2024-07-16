@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.2.8
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.3.1
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -22,9 +22,11 @@ L["Module Category General"] = "Общие";
 L["Module Category NPC Interaction"] = "Взаимодействие с НПС";
 --- order: 3
 L["Module Category Class"] = "Класс";   --Player Class (rogue, paladin...)
---- order: 4
-L["Module Category Dreamseeds"] = "Семена сна";     --Added in patch 10.2.0
---- order: 5
+
+L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
+
+--Deprecated
+L["Module Category Dreamseeds"] = "Семя сна";     --Added in patch 10.2.0
 L["Module Category AzerothianArchives"] = "Азеротские Архивы";     --Added in patch 10.2.5
 
 
@@ -50,9 +52,11 @@ L["Numbers To Earn"] = "# Можно получить";     --The number of item
 L["Numbers Of Earned"] = "# Заработал";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Отслеживать гребни";     --Crest: e.g. Drake’s Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "Отображать гребни только высшего уровня, которые вы получили.";
+L["Track Holiday Item"] = "Отслеживать праздничную валюту";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "В настоящее время закреплен:";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Панель внутри сумки";     --Put the bar inside the bag UI (below money/currency)
 L["Bar Inside The Bag Tooltip"] = "Поместите панель внутри UI сумки.\n\nРаботает только в режиме «Отдельные сумки» Blizzard.";
+L["Catalyst Charges"] = "Заряды катализатора";
 
 
 --GossipFrameMedal
@@ -148,7 +152,16 @@ L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "синий: ";
 L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "зеленый: ";
 
 
+--Tooltip Chest Keys
+L["ModuleName TooltipChestKeys"] = "Подсказка: Ключи от сундука";
+L["ModuleDescription TooltipChestKeys"] = "Показать информацию о ключе, необходимом для открытия текущего сундука или двери.";
+
+
 --Merchant UI Price
+L["ModuleName MerchantPrice"] = "Цена торговца";
+L["ModuleDescription MerchantPrice"] = "Изменение поведения UI торговца:\n\n- Выделите серым цветом только те валюты, которых недостаточно.\n\n- Укажите все необходимые предметы в поле для монет.";
+L["Num Items In Bank Format"] = (BANK or "Банк") ..": |cffffffff%d|r";
+L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Сумка") ..": |cffffffff%d|r";
 L["Number Thousands"] = "Т";    --15K  15,000
 L["Number Millions"] = "М";     --1.5M 1,500,000
 
@@ -161,8 +174,20 @@ L["Font Size"] = FONT_SIZE or "Размер шрифта";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Сброс в положение по умолчанию";
 
 
+
+
 -- !! Do NOT translate the following entries
 L["currency-2706"] = "дракончика";
 L["currency-2707"] = "дракона";
 L["currency-2708"] = "змея";
 L["currency-2709"] = "Аспекта";
+
+L["currency-2914"] = "Weathered";
+L["currency-2915"] = "Carved";
+L["currency-2916"] = "Runed";
+L["currency-2917"] = "Gilded";
+
+
+L["Scenario Delves"] = "Вылазка";
+L["GameObject Door"] = "Дверь";
+L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database

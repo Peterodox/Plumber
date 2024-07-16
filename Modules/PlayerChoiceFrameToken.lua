@@ -20,9 +20,11 @@ local PlayerChoiceXCurrency = {
 
 do  --Radian Echo
     local RadianEcho = {1, 220520};
-    PlayerChoiceXCurrency[827] = PlayerChoiceXCurrency[832];    --Worldsoul Memory: Primal Predators
-    PlayerChoiceXCurrency[829] = PlayerChoiceXCurrency[832];    --Worldsoul Memory: A Wounded Soul
-    PlayerChoiceXCurrency[831] = PlayerChoiceXCurrency[832];    --Worldsoul Memory: Ancient Explorers
+    local target = PlayerChoiceXCurrency[832];
+    PlayerChoiceXCurrency[827] = target;    --Worldsoul Memory: Primal Predators
+    PlayerChoiceXCurrency[829] = target;    --Worldsoul Memory: A Wounded Soul
+    PlayerChoiceXCurrency[830] = target;    --Worldsoul Memory: Old Gods Forsaken
+    PlayerChoiceXCurrency[831] = target;    --Worldsoul Memory: Ancient Explorers
 end
 
 
@@ -56,7 +58,7 @@ local function UpdateChoiceCurrency()
     local choiceID = f.choiceInfo.choiceID;
     local itemType, tokenInfo;
 
-    --print(choiceID)
+    print(choiceID)
     if PlayerChoiceXCurrency[choiceID] then
         itemType = 0;
         tokenInfo = PlayerChoiceXCurrency[choiceID];

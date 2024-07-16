@@ -1004,7 +1004,12 @@ do  -- TokenFrame   -- Money   -- Coin
             tokenButton.currencyID = nil;
             tokenButton.itemID = id;
             icon = GetItemIconByID(id)
-            quantity = GetItemCount(id);
+
+            if self.includeBank then
+                quantity = GetItemCount(id, true, false, true);
+            else
+                quantity = GetItemCount(id);
+            end
         end
 
         if quantity then
@@ -1189,6 +1194,7 @@ do  -- TokenFrame   -- Money   -- Coin
 
     function TokenDisplayMixin:OnEvent(event)
         self:ListenEvents(false);
+        self:RequestUpdate();
     end
 
 
@@ -1265,6 +1271,7 @@ do  -- TokenFrame   -- Money   -- Coin
         f.tokens = {};
         f.tokenButtons = {};
         f.numberFont = "NumberFontNormal";
+        f.includeBank = true;
 
         return f
     end
@@ -1529,7 +1536,7 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         f.Cooldown:SetSize(64, 64);
         f.Cooldown:SetPoint("CENTER", f, "CENTER", 0, 0);
         f.Cooldown:SetHideCountdownNumbers(false);  --globally controlled by CVar "countdownForCooldowns" (boolean)
-        f.Cooldown.noCooldownCount = true;          --Disabled for OmniCC (  see OmniCC\core\cooldown.lua Cooldown:OnCooldownDone()  )
+        f.Cooldown.noCooldownCount = true;          --Disabled for OmniCC (  see OmniCC/core/cooldown.lua Cooldown:OnCooldownDone()  )
 
         local CountdownNumber = f.Cooldown:CreateFontString(nil, "OVERLAY", nil, 6);
         f.Cooldown.BackupCountdownNumber = CountdownNumber;
@@ -1550,7 +1557,7 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         --f.Cooldown:SetEdgeTexture("Interface/Cooldown/edge", 1, 1, 1, 1);  --Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-SpellCast-Edge
         --f.Cooldown:SetDrawEdge(true);
         --f.Cooldown:SetEdgeScale(1);
-        --f.Cooldown:SetUseCircularEdge(true);
+        --f.Cooldown:SetUseRadialEdge(true);
 
         local EdgeTexture = f.Cooldown:CreateTexture(nil, "OVERLAY", nil, 6);
         f.Cooldown.EdgeTexture = EdgeTexture;
@@ -1566,7 +1573,6 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
     end
     addon.CreateActionButtonSpellCastOverlay = CreateActionButtonSpellCastOverlay;
 end
-
 
 do  --(In)Secure Button Pool
     local InCombatLockdown = InCombatLockdown;
@@ -1706,7 +1712,6 @@ do  --(In)Secure Button Pool
     end
     addon.AcquireSecureActionButton = AcquireSecureActionButton;
 end
-
 
 do
     local SecondsToTime = API.SecondsToTime;
@@ -2876,7 +2881,7 @@ do  --Cursor Cooldown (Displayed near the cursor)
             DisableSharpening(f.Background);
             f:SetScript("OnEvent", CursorProgressMixin.OnEvent);
             f:SetScript("OnHide", CursorProgressMixin.OnHide);
-            f:SetUseCircularEdge(true);
+            f:SetUseRadialEdge(true);
             f:SetColorIndex(2);
             f:SetFrameStrata("FULLSCREEN");
             f:SetFixedFrameStrata(true);
@@ -4328,4 +4333,349 @@ do  --EditMode
         return EditModeSettingsDialog
     end
     addon.SetupSettingsDialog = SetupSettingsDialog;
+end
+
+do  --Radial Progress Bar
+    local RadialProgressBarMixin = {};
+
+    function RadialProgressBarMixin:SetPercentage(percentage)
+        local seconds = 100;
+
+        if percentage > 1 then
+            percentage = 1;
+        elseif percentage < 0 then
+            percentage = 0;
+        end
+
+        self:Pause();
+        self:SetCooldown(GetTime() - (seconds * percentage), seconds);
+    end
+
+    function RadialProgressBarMixin:SetValue(currentValue, maxValue)
+        if not currentValue or not maxValue or maxValue == 0 then
+            currentValue = 0;
+            maxValue = 1;
+        end
+
+        self:SetPercentage(currentValue / maxValue);
+    end
+
+    local function CreateRadialProgressBar(parent)
+        local f = CreateFrame("Cooldown", nil, parent, "PlumberRadialProgressBarTemplate");
+        Mixin(f, RadialProgressBarMixin);
+
+        local tex = "Interface/AddOns/Plumber/Art/Frame/ProgressBar-Radial-WarWithin";
+
+        f.Border:SetTexture(tex);
+        f.Border:SetTexCoord(0, 80/256, 80/256, 160/256);
+
+        f.BorderHighlight:SetTexture(tex);
+        f.BorderHighlight:SetTexCoord(0, 80/256, 80/256, 160/256);
+
+        f:SetSwipeTexture(tex);
+        local lowTexCoords =
+        {
+            x = 80/256,
+            y = 80/256,
+        };
+        local highTexCoords =
+        {
+            x = 160/256,
+            y = 160/256,
+        };
+        f:SetTexCoordRange(lowTexCoords, highTexCoords);
+
+        f.ValueText = f:CreateFontString("OVERLAY", nil, "GameFontNormalLargeOutline");
+        f.ValueText:SetJustifyH("CENTER");
+        f.ValueText:SetPoint("CENTER", f, "BOTTOM", 2, 14);
+        f.ValueText:SetTextColor(1, 0.82, 0);
+
+        return f
+    end
+    addon.CreateRadialProgressBar = CreateRadialProgressBar;
+end
+
+do  --Progress Bar With Level
+    local LevelProgressBarMixin = {};
+
+    local FILL_TEXTURE_LEFT = 26;
+    local FILL_TEXTURE_RIGHT = 262;
+    local FILL_TEXTURE_FULLWIDTH = 288;
+
+    function LevelProgressBarMixin:SetSizeScale(scale)
+        self.sizeScale = scale;
+
+        local hexSize = 96;
+        local hexOffset = -16;
+        local barBGWidth, barBGHeight = 288, 96;
+        local barFillHeight = 32;
+        local effectiveHeight = 64;
+        local effectiveWidth, barOffsetX, barOffsetY;
+
+        self.Label:ClearAllPoints();
+
+        if self.showLevel then
+            effectiveWidth = 300;
+            barOffsetX = 26;
+            barOffsetY = 8;
+            self.Label:SetPoint("BOTTOMLEFT", self.BarBackground, "LEFT", 36 * scale, 8 * scale);
+            self.Label:SetJustifyH("LEFT");
+        else
+            effectiveWidth = 248;
+            barOffsetX = 0;
+            barOffsetY = 0;
+            self.Label:SetPoint("BOTTOM", self.BarBackground, "CENTER", 0, 8 * scale);
+            self.Label:SetJustifyH("CENTER");
+        end
+
+        self:SetSize(effectiveWidth*scale, effectiveHeight*scale);
+
+        self.BarBackground:ClearAllPoints();
+        self.BarBackground:SetPoint("CENTER", self, "CENTER", barOffsetX * scale, barOffsetY * scale);
+        self.BarBackground:SetSize(barBGWidth * scale, barBGHeight * scale);
+
+        self.BarFill:ClearAllPoints();
+        self.BarFill:SetPoint("LEFT", self.BarBackground, "LEFT", 0, -16 * scale);
+        self.BarFill:SetHeight(barFillHeight * scale);
+
+        self.MouseoverFrame.ValueText:SetPoint("CENTER", self.BarBackground, "CENTER", 0, -16 * scale);
+
+        self.BarSurface:ClearAllPoints();
+        self.BarSurface:SetPoint("RIGHT", self.BarFill, "RIGHT", 8 * scale, 0);
+        self.BarSurface:SetSize(48 * scale, 32 * scale);
+
+        self.LevelBackground:ClearAllPoints();
+        self.LevelBackground:SetPoint("LEFT", self, "LEFT", hexOffset * scale, 0);
+        self.LevelBackground:SetSize(hexSize * scale, hexSize * scale);
+
+        self.MaxLevelIcon:SetSize(48 * scale, 48 * scale);
+
+        self.MouseoverArea:SetSize(248 * scale, 32 * scale);
+        self.MouseoverArea:SetPoint("CENTER", self.BarBackground, "CENTER", 0, -16 * scale);
+
+        self.BarSurfaceMask:SetWidth(236 * scale);
+
+        self.DeltaValueFrame:ClearAllPoints();
+        self.DeltaValueFrame:SetPoint("BOTTOMLEFT", self.BarBackground, "RIGHT", -60, 8);
+
+        self:SetValue(self.value or 0);
+    end
+
+    function LevelProgressBarMixin:SetLabel(label)
+        self.Label:SetText(label);
+    end
+
+    function LevelProgressBarMixin:ShowLevel(state)
+        state = state == true or state == nil;
+        self.showLevel = state;
+        self.LevelText:SetShown(state);
+        self.LevelBackground:SetShown(state);
+
+        if self.sizeScale then
+            self:SetSizeScale(self.sizeScale);
+        end
+    end
+
+    function LevelProgressBarMixin:SetLevel(level, reachMaxLevel)
+        self.level = level;
+        if reachMaxLevel then
+            self.LevelText:Hide();
+            self.MaxLevelIcon:Show();
+        else
+            self.LevelText:SetText(level);
+            self.LevelText:Show();
+            self.MaxLevelIcon:Hide();
+        end
+    end
+
+    function LevelProgressBarMixin:SetVisualByRatio(ratio)
+        if ratio > 1 then
+            ratio = 1;
+        end
+
+        self.visualRatio = ratio;
+        local textureWidth = FILL_TEXTURE_LEFT + (FILL_TEXTURE_RIGHT - FILL_TEXTURE_LEFT) * ratio;
+        self.BarFill:SetWidth(textureWidth * self.sizeScale);
+        self.BarFill:SetTexCoord(0, textureWidth / 512, 0.1875, 0.25);
+    end
+
+    local FILL_RATIO_PER_SEC = 0.25;     --50%/sec
+    local EasingFunc = addon.EasingFunctions.outSine;
+
+    local function CalculateEaseDuration(deltaRatio)
+        if deltaRatio < 0 then
+            deltaRatio = -deltaRatio;
+        end
+
+        if deltaRatio < 0.02 then
+            return 0
+        else
+            local t = deltaRatio / FILL_RATIO_PER_SEC;
+            if t < 0.5 then
+                t = 0.5;
+            elseif t > 2 then
+                t = 2;
+            end
+            return t
+        end
+    end
+
+    local function AnimFill_Plus_SameLevel(self, elapsed)
+        self.t = self.t + elapsed;
+        local ratio = EasingFunc(self.t, self.fromRatio, self.toRatio, self.easeDuration);
+        if self.t >= self.easeDuration then
+            self:ClearAnimation();
+            return
+        end
+        self:SetVisualByRatio(ratio);
+    end
+
+    local function AnimFill_Plus_LevelUp(self, elapsed)
+        local ratio = self.fromRatio + 2*FILL_RATIO_PER_SEC * elapsed;
+        self.fromRatio = ratio;
+        if ratio >= 1 then
+            ratio = 1;
+            self.t = 0;
+            self.fromRatio = 0;
+            self.easeDuration = CalculateEaseDuration(self.toRatio - self.fromRatio);
+            if self.easeDuration > 0 then
+                self:SetScript("OnUpdate", AnimFill_Plus_SameLevel);
+            else
+                self:ClearAnimation();
+            end
+        else
+            self:SetVisualByRatio(ratio);
+        end
+    end
+
+    function LevelProgressBarMixin:ClearAnimation()
+        if self.toRatio then
+            self:SetScript("OnUpdate", nil);
+            self:SetVisualByRatio(self.toRatio);
+            self.t = nil;
+            self.easeDuration = nil;
+            self.fromRatio = nil;
+            self.toRatio = nil;
+        end
+
+        if self:IsShown() and self.StartFadeOutCountdown and self.autoFadeOut and not self.MouseoverArea:IsMouseMotionFocus() then
+            self:StartFadeOutCountdown();
+        end
+    end
+
+    function LevelProgressBarMixin:SetValue(value, levelUp)
+        self.value = value;
+        local ratio = value / self.maxValue;
+        self.MouseoverFrame.ValueText:SetText(value.." / "..self.maxValue);
+
+        if self.useAnimation and self:IsVisible() then
+            self.t = 0;
+            self.fromRatio = self.visualRatio or 0;
+            self.toRatio = ratio;
+
+            if levelUp then
+                self:SetScript("OnUpdate", AnimFill_Plus_LevelUp);
+                return
+            else
+                self.easeDuration = CalculateEaseDuration(self.toRatio - self.fromRatio);
+                if self.easeDuration > 0 then
+                    self:SetScript("OnUpdate", AnimFill_Plus_SameLevel);
+                    return
+                end
+            end
+        end
+
+        self:ClearAnimation();
+        self:SetVisualByRatio(ratio);
+    end
+
+    function LevelProgressBarMixin:SetMaxValue(maxValue)
+        if maxValue <= 0 then
+            maxValue = 1;
+        end
+
+        self.maxValue = maxValue;
+    end
+
+    function LevelProgressBarMixin:AnimateDeltaValue(deltaValue)
+        self.DeltaValueFrame.Value:SetText(deltaValue);
+        self.DeltaValueFrame.AnimText:Stop();
+        self.DeltaValueFrame.AnimText:Play();
+        self.DeltaValueFrame:Show();
+    end
+
+    function LevelProgressBarMixin:SetValueByDelta(deltaValue, newMaxValue)
+        local newValue = (self.value or 0) + deltaValue;
+        local levelUp = self.maxValue and newValue > self.maxValue;
+        local value;
+
+        if levelUp then
+            value = newValue - (self.maxValue or 0);
+        else
+            value = newValue;
+        end
+
+        if newMaxValue then
+            self.maxValue = newMaxValue;
+        end
+
+        self:SetValue(value, levelUp);
+        self:AnimateDeltaValue(deltaValue);
+    end
+
+    function LevelProgressBarMixin:SetBarReachMaxLevel(state)
+        if state and not self.isMaxed then
+            self.isMaxed = true;
+            self:SetLevel(self.level or 0, true);
+        elseif (not state) and self.isMaxed then
+            self.isMaxed = false;
+            self:SetLevel(self.level or 0);
+        end
+    end
+
+    function LevelProgressBarMixin:SetUseAnimation(state)
+        self.useAnimation = state;
+    end
+
+    function LevelProgressBarMixin:IsAnimating()
+        return self.easeDuration ~= nil
+    end
+
+    function LevelProgressBarMixin:SetAutoFadeOut(state)
+        self.autoFadeOut = state == true;
+    end
+
+    local function CreateLevelProgressBar(parent)
+        local f = CreateFrame("Frame", nil, parent, "PlumberWoWProgressBarTemplate");
+        Mixin(f, LevelProgressBarMixin);
+
+        f:SetMaxValue(100);
+        f:ShowLevel(true);
+        f:SetSizeScale(0.8);
+
+        f.BarSurfaceMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Full", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST");
+
+        f.MouseoverArea:SetScript("OnEnter", function()
+            f.MouseoverFrame:Show();
+            if f.onEnterFunc then
+                f.onEnterFunc(f);
+            end
+        end);
+
+        f.MouseoverArea:SetScript("OnLeave", function()
+            f.MouseoverFrame:Hide();
+            if f.onLeaveFunc then
+                f.onLeaveFunc(f);
+            end
+        end);
+
+        f.MouseoverArea:SetScript("OnMouseDown", function()
+            f.MouseoverFrame:Hide();
+            f:Hide();
+            f:ClearAnimation();
+        end);
+
+        return f
+    end
+    addon.CreateLevelProgressBar = CreateLevelProgressBar;
 end

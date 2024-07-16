@@ -1,4 +1,4 @@
-## Interface: 100207, 110000
+## Interface: 100207, 110000, 110002
 ## Version: 1.3.0
 
 ## Title: Plumber
@@ -7,7 +7,7 @@
 ## Notes-zhCN: 提供多种便捷功能。|n请前往插件设置来查看更多信息。
 
 ## Author: Peterodox
-## SavedVariables: PlumberDB
+## SavedVariables: PlumberDB, PlumberDevData
 
 ## IconTexture: Interface\AddOns\Plumber\Art\Logo\PlumberLogo64
 
@@ -44,6 +44,7 @@ Modules\MerchantPrice.lua
 #TWW
 Modules\TooltipKey.lua
 Modules\Delves.lua
+Modules\ExpansionLandingPage.xml
 
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua

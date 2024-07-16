@@ -26,6 +26,7 @@ local DefaultValues = {
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
     Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
     TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
+    ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
 
     --Modify default interface behavior:
     BlizzFixEventToast = true,          --Make Toast non-interactable

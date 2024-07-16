@@ -16,6 +16,9 @@ local GetCVarBool = C_CVar.GetCVarBool;
 local CreateFrame = CreateFrame;
 local securecallfunction = securecallfunction;
 
+local function Nop(...)
+end
+
 do  -- Table
     local function Mixin(object, ...)
         for i = 1, select("#", ...) do
@@ -917,7 +920,6 @@ do  -- Map
     end
 
     local function GetPlayerMapCoord_Fallback(uiMapID)
-        print(uiMapID)
         local position = GetPlayerMapPosition(uiMapID, "player");
         if position then
             return position.x, position.Y
@@ -938,9 +940,69 @@ do  -- Map
 
         return (data[3] - posX) / data[1], (data[4] - posY) / data[2]
     end
-
     API.GetPlayerMapCoord = GetPlayerMapCoord;
 
+    local function ConvertMapPositionToContinentPosition(uiMapID, x, y, poiID)
+        local info = C_Map.GetMapInfo(uiMapID);
+        if not info then return end;
+    
+        local continentMapID;   --uiMapID
+    
+        while info do
+            if info.mapType == Enum.UIMapType.Continent then
+                continentMapID = info.mapID;
+                break
+            elseif info.parentMapID then
+                info = C_Map.GetMapInfo(info.parentMapID);
+            else
+                return
+            end
+        end
+    
+        if not continentMapID then
+            print(string.format("Map %s doesn't belong to any continent.", uiMapID));
+        end
+    
+        local point = {
+            uiMapID = uiMapID,
+            position = CreateVector2D(x, y);
+        };
+    
+        C_Map.SetUserWaypoint(point);
+    
+        C_Timer.After(0, function()
+            local posVector = C_Map.GetUserWaypointPositionForMap(continentMapID);
+            if posVector then
+                x, y = posVector:GetXY();
+                print(continentMapID, x, y);
+                
+                if not PlumberDevData then
+                    PlumberDevData = {};
+                end
+
+                if not PlumberDevData.POIPositions then
+                    PlumberDevData.POIPositions = {};
+                end
+    
+                if poiID then
+                    PlumberDevData.POIPositions[poiID] = {
+                        id = poiID,
+                        mapID = uiMapID,
+                        continent = continentMapID,
+                        cx = x,
+                        cy = y,
+                    };
+                end
+
+                C_Map.ClearUserWaypoint();
+            else
+                print("No user waypoint found.")
+            end
+        end);
+    end
+    API.ConvertMapPositionToContinentPosition = ConvertMapPositionToContinentPosition;
+
+    
     --[[
     function YeetPos()
         local uiMapID = C_Map.GetBestMapForUnit("player");
@@ -982,6 +1044,14 @@ do  -- Map
         return C_Map.GetAreaInfo(areaID) or ("Area:"..areaID)
     end
     API.GetZoneName = GetZoneName;
+
+    local HasActiveDelve = C_DelvesUI and C_DelvesUI.HasActiveDelve or Nop;
+    local function IsInDelves()
+        --See Blizzard InstanceDifficulty.lua
+        local _, _, _, mapID = UnitPosition("player");
+        return HasActiveDelve(mapID);
+    end
+    API.IsInDelves = IsInDelves;
 end
 
 do  --Instance --Map
@@ -1230,6 +1300,37 @@ do  --Game UI
     API.IsInEditMode = IsInEditMode;
 end
 
+do  --Reputation
+    local GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation;
+    local GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks;
+
+    local function GetFriendshipProgress(factionID)
+        local repInfo = factionID and GetFriendshipReputation(factionID);
+        if repInfo and repInfo.friendshipFactionID and  repInfo.friendshipFactionID > 0 then
+            local currentValue, maxValue;
+
+            if repInfo.nextThreshold then
+                currentValue = repInfo.standing - repInfo.reactionThreshold;
+                maxValue = repInfo.nextThreshold - repInfo.reactionThreshold;
+                if maxValue == 0 then
+                    currentValue = 1;
+                    maxValue = 1;
+                end
+            else
+                currentValue = 1;
+                maxValue = 1;
+            end
+
+            local rankInfo = GetFriendshipReputationRanks(repInfo.friendshipFactionID);
+            local level = rankInfo.currentLevel;
+            local isFull = level >= rankInfo.maxLevel;
+
+            return level, isFull, currentValue, maxValue
+        end
+    end
+    API.GetFriendshipProgress = GetFriendshipProgress;
+end
+
 do  --Spell
     if IS_TWW then
         local GetSpellInfo_Table = C_Spell.GetSpellInfo;
@@ -1267,6 +1368,7 @@ do  --System
 end
 
 do  --Scenario
+    --[[
     local SCENARIO_DELVES = addon.L["Scenario Delves"] or "Delves";
 
     local GetScenarioInfo = C_ScenarioInfo.GetScenarioInfo;
@@ -1276,6 +1378,7 @@ do  --Scenario
         return scenarioInfo and scenarioInfo.name == SCENARIO_DELVES
     end
     API.IsInDelves = IsInDelves;
+    --]]
 end
 
 --[[

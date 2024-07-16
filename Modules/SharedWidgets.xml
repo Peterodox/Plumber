@@ -191,4 +191,172 @@
             </Layer>
         </Layers>
     </Frame>
+
+	<Cooldown name="PlumberRadialProgressBarTemplate" reverse="true" hideCountdownNumbers="true" rotation="180" useParentLevel="true" virtual="true">
+		<Size x="68" y="68"/>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture parentKey="Border" setAllPoints="true"/>
+			</Layer>
+			<Layer level="BORDER" textureSubLevel="1">
+				<Texture parentKey="BorderHighlight" setAllPoints="true" hidden="true" alphaMode="ADD" alpha="0.5"/>
+			</Layer>
+		</Layers>
+		<SwipeTexture file="Interface\PVPFrame\pvpqueue-sidebar-honorbar-fill"/>
+        <KeyValues>
+            <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+        </KeyValues>
+	</Cooldown>
+
+    <Frame name="PlumberWoWProgressBarTemplate" virtual="true">
+        <Size x="248" y="64"/>
+        <Layers>
+            <!--Layer level="BACKGROUND" textureSubLevel="-1">
+                <Texture parentKey="DebugArea" setAllPoints="true">
+                    <Color r="1" a="0.5"/>
+                </Texture>
+            </Layer-->
+            <Layer level="BACKGROUND" textureSubLevel="1">
+                <Texture parentKey="BarBackground" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
+                    <Size x="288" y="96"/>
+                    <TexCoords left="0" right="0.5625" top="0" bottom="0.1875"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="BACKGROUND" textureSubLevel="2">
+                <Texture parentKey="BarFill" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
+                    <Size x="288" y="32"/>
+                    <TexCoords left="0" right="0.5625" top="0.1875" bottom="0.25"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.BarBackground" relativePoint="LEFT" x="0" y="-16"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="BACKGROUND" textureSubLevel="3">
+                <Texture parentKey="BarSurface" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
+                    <Size x="48" y="32"/>
+                    <TexCoords left="0.5625" right="0.65625" top="0.1875" bottom="0.25"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.BarFill" relativePoint="RIGHT" x="8" y="0"/>
+                    </Anchors>
+                </Texture>
+                <MaskTexture parentKey="BarSurfaceMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+                    <Size x="248" y="64"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.BarBackground" relativePoint="CENTER" x="0" y="0"/>
+                    </Anchors>
+                    <MaskedTextures>
+                        <MaskedTexture childKey="BarSurface"/>
+                    </MaskedTextures>
+                </MaskTexture>
+            </Layer>
+            <Layer level="BACKGROUND" textureSubLevel="5">
+                <Texture parentKey="LevelBackground" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" hidden="true">
+                    <Size x="96" y="96"/>
+                    <TexCoords left="0.8125" right="1" top="0" bottom="0.1875"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Label" inherits="GameFontNormalMed2" justifyH="LEFT" justifyV="BOTTOM" text="Bar Label">
+                    <Color r="1" g="1" b="1"/>
+                    <Shadow>
+                        <Offset>
+                            <AbsDimension x="1" y="-1"/>
+                        </Offset>
+                        <Color r="0" g="0" b="0"/>
+                    </Shadow>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativeKey="$parent.BarBackground" relativePoint="LEFT" x="36" y="8"/>
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="LevelText" inherits="SystemFont_Large2" justifyH="CENTER" hidden="true">
+                    <Color r="1" g="1" b="1"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.LevelBackground" relativePoint="CENTER" x="0" y="0"/>
+                    </Anchors>
+                </FontString>
+                <Texture parentKey="MaxLevelIcon" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" hidden="true">
+                    <Size x="48" y="48"/>
+                    <TexCoords left="0.6875" right="0.78125" top="0.09375" bottom="0.1875"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.LevelBackground" relativePoint="CENTER" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame parentKey="MouseoverFrame" hidden="true">
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="ValueText" inherits="SystemFont_Outline_Small" justifyH="CENTER" justifyV="MIDDLE">
+                            <Color r="1" g="1" b="1"/>
+                            <Anchors>
+                                <Anchor point="CENTER" relativeKey="$parent.$parent.BarBackground" relativePoint="CENTER" x="0" y="-8"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+
+            <Frame parentKey="MouseoverArea">
+                <Size x="248" y="32"/>
+                <Anchors>
+                    <Anchor point="CENTER" relativeKey="$parent.BarBackground" relativePoint="CENTER" x="0" y="0"/>
+                </Anchors>
+            </Frame>
+
+            <Frame parentKey="DeltaValueFrame" hidden="true">
+                <Size x="64" y="20"/>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <Texture parentKey="UpArrow" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" snapToPixelGrid="false">
+                            <Size x="24" y="24"/>
+                            <TexCoords left="0.6875" right="0.75" top="0" bottom="0.0625"/>
+                            <Anchors>
+                                <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="0" y="-2"/>
+                            </Anchors>
+                        </Texture>
+                        <FontString parentKey="Value" inherits="SystemFont_Shadow_Large_Outline" justifyH="LEFT" text="0">
+                            <Color r="1" g="1" b="1"/>
+                            <Anchors>
+                                <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="20" y="0"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Animations>
+                    <AnimationGroup parentKey="AnimText" setToFinalAlpha="true">
+                        <Alpha childKey="UpArrow" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+                        <Translation childKey="UpArrow" order="1" duration="0" offsetX="-2" offsetY="-28"/>
+                        <Alpha childKey="Value" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+                        <Translation childKey="Value" order="1" duration="0" offsetX="0" offsetY="-14"/>
+
+                        <Alpha childKey="UpArrow" order="2" fromAlpha="0" toAlpha="1" duration="0.15"/>
+                        <Translation childKey="UpArrow" order="2" duration="0.25" offsetX="2" offsetY="16" smoothing="OUT"/>
+                        <Alpha childKey="Value" order="2" fromAlpha="0" toAlpha="1" duration="0.15"/>
+                        <Translation childKey="Value" order="2" duration="0.25" offsetX="0" offsetY="4"/>
+
+                        <Alpha childKey="UpArrow" order="3" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.25"/>
+                        <Translation childKey="UpArrow" order="3" duration="2" offsetX="0" offsetY="16"/>
+                        <Alpha childKey="Value" order="3" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.25"/>
+                        <Translation childKey="Value" order="3" duration="2" offsetX="0" offsetY="16"/>
+                        
+                        <Scripts>
+                            <OnFinished>
+                                self:GetParent():Hide();
+                            </OnFinished>
+                            <OnStop>
+                                self:GetParent():Hide();
+                            </OnStop>
+                        </Scripts>
+                    </AnimationGroup>
+                </Animations>
+            </Frame>
+        </Frames>
+    </Frame>
 </Ui>

@@ -649,11 +649,6 @@ function WorldMapDataProvider:OnCanvasScaleChanged()
 end
 
 
-if not addon.IsGame_10_2_0 then
-    return
-end
-
-
 local function OnPingQuestID(f, questID)
     --TODO? Hide pins when checking quest detail?
     if not ENABLE_MAP_PIN then return end;
@@ -667,16 +662,6 @@ local function OnPingQuestID(f, questID)
             WorldMapDataProvider:RemoveAllIfNeeded();
             PinController:ListenEvents(false);
         end
-    end
-end
-
-local function HookQuestDetailBackButton()
-    if QuestMapFrame_ReturnFromQuestDetails then
-        local function OnReturnFromQuestDetails()
-            if not ENABLE_MAP_PIN then return end;
-            WorldMapDataProvider:RefreshAllDataIfPossible();
-        end
-        hooksecurefunc("QuestMapFrame_ReturnFromQuestDetails", OnReturnFromQuestDetails);
     end
 end
 
@@ -814,7 +799,6 @@ local function EnableModule(state)
                     DATA_PROVIDER_ADDED = true;
                     --MapFrame:AddDataProvider(WorldMapDataProvider);   --Potential taint!
                     MapFrame:RegisterCallback("PingQuestID", OnPingQuestID, PinController);
-                    --HookQuestDetailBackButton();
                 end
                 MapTracker:Attach();
                 PinController:EnableModule(true);
