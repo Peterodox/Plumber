@@ -181,3 +181,8 @@ L["currency-2706"] = "雏龙";
 L["currency-2707"] = "幼龙";
 L["currency-2708"] = "魔龙";
 L["currency-2709"] = "守护巨龙";
+
+
+--Map Pin Filter Name (name should be plural)
+L["Bountiful Delve"] =  "丰裕地下堡";
+L["Special Assignment"] = "特别任务";

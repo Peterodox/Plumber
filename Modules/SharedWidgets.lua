@@ -272,8 +272,8 @@ do  -- Checkbox
         local newState;
 
         if self.dbKey then
-            newState = not PlumberDB[self.dbKey];
-            PlumberDB[self.dbKey] = newState;
+            newState = not addon.GetDBValue(self.dbKey)
+            addon.SetDBValue(self.dbKey, newState);
             self:SetChecked(newState);
         else
             newState = not self:GetChecked();
@@ -4173,7 +4173,7 @@ do  --EditMode
         checkbox.Label:SetTextColor(1, 1, 1);
 
         checkbox:SetData(widgetData);
-        checkbox:SetChecked( PlumberDB[checkbox.dbKey] );
+        checkbox:SetChecked(addon.GetDBValue(checkbox.dbKey));
 
         return checkbox
     end
@@ -4194,8 +4194,8 @@ do  --EditMode
         slider:SetFormatValueFunc(widgetData.formatValueFunc);
         slider:SetOnValueChangedFunc(widgetData.onValueChangedFunc);
 
-        if widgetData.dbKey and PlumberDB[widgetData.dbKey] then
-            slider:SetValue(PlumberDB[widgetData.dbKey]);
+        if widgetData.dbKey and addon.GetDBValue(widgetData.dbKey) then
+            slider:SetValue(addon.GetDBValue(widgetData.dbKey));
         end
 
         return slider

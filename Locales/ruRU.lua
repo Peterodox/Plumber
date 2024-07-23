@@ -191,3 +191,8 @@ L["currency-2917"] = "Gilded";
 L["Scenario Delves"] = "Вылазка";
 L["GameObject Door"] = "Дверь";
 L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
+
+
+--Map Pin Filter Name (name should be plural)
+L["Bountiful Delve"] =  "Многообещающая вылазка";
+L["Special Assignment"] = "Особое поручение";

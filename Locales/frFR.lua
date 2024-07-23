@@ -11,3 +11,8 @@ L["currency-2706"] = "Dragonnet";
 L["currency-2707"] = "Drake";
 L["currency-2708"] = "Wyrm";
 L["currency-2709"] = "Aspect";
+
+
+--Map Pin Filter Name (name should be plural)
+L["Bountiful Delve"] =  "Gouffre abondant";
+L["Special Assignment"] = "Mission spéciale";
