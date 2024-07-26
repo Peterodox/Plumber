@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.3.2";
-local VERSION_DATE = 1721730000;
+local VERSION_TEXT = "v1.3.3";
+local VERSION_DATE = 1722000000;
 
 
 local addonName, addon = ...
@@ -156,4 +156,5 @@ do
 
     addon.IsGame_10_2_0 = tocVersion >= 100200;
     addon.IsGame_11_0_0 = tocVersion >= 110000;
+    addon.IsGame_11_0_2 = tocVersion >= 110002;
 end

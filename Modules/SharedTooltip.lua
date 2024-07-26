@@ -657,7 +657,7 @@ do
     };
 
 
-    if addon.IsGame_11_0_0 then
+    if addon.IsGame_11_0_2 then
         BASE_CURRENCY_ID = 3008;        --Valorstones
         CATALYST_CURRENCY_ID = 2813;    --Harmonized Silk
 

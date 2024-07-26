@@ -952,13 +952,15 @@ function SettingsFrame:UpdateListFrame()
     self.AlertText:SetShown(numActiveButton == 0);
 end
 
-function SettingsFrame:ShowUI()
+function SettingsFrame:ShowUI(atCursorPosition)
     self:Init();
     if not self.frame:IsShown() then
         self.frame:Show();
         self:UpdateListFrame();
         PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
     end
+
+    self:AnchorToTrackerFrame(not atCursorPosition);
 end
 
 function SettingsFrame:ToggleUI()
@@ -966,6 +968,30 @@ function SettingsFrame:ToggleUI()
         self:ShowUI();
     else
         self:CloseUI();
+    end
+end
+
+function SettingsFrame:AnchorToTrackerFrame(state)
+    local f = self.frame;
+
+    f:ClearAllPoints();
+    if state then
+        f:SetParent(TrackerFrame);
+        f:SetPoint("BOTTOMLEFT", TrackerFrame, "TOPLEFT", 0, 4);
+    else
+        f:SetParent(UIParent);
+        local x, y = GetScaledCursorPosition();
+        f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x + 16, y);
+    end
+end
+
+local function SettingsFrame_ToggleUIAtCursorPosition()
+    local f = SettingsFrame.frame;
+
+    if (not f) or (not f:IsShown()) then
+        SettingsFrame:ShowUI(true);
+    else
+        SettingsFrame:CloseUI();
     end
 end
 
@@ -1381,7 +1407,7 @@ function TrackerFrame:UpdateAnchor(forceUpdate)
 
     if anchorMode == 3 then
         --Anchor to Backpack
-        self.Background:Show();
+        self:SetShowBackground(true);
         parent = ContainerFrame1;
         self:SetParent(parent);
 
@@ -1400,11 +1426,11 @@ function TrackerFrame:UpdateAnchor(forceUpdate)
         self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
         if anchorMode == 1 then
             --Anchor to MonenyFrame
-            self.Background:Hide();
+            self:SetShowBackground(false);
             self:SetPoint("LEFT", parent.MoneyFrame, "LEFT", 0, 0);
         elseif anchorMode == 2 then
             --Anchor to CombinedBag BottomLeft
-            self.Background:Show();
+            self:SetShowBackground(true);
             self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 8, -4);
         end
     end
@@ -1876,6 +1902,8 @@ function TrackerFrame:UpdateTray(manual)
         self.TrayButtons[i].itemID = nil;
         self.TrayButtons[i].currencyID = nil;
     end
+
+    self:UpdateBackgroundVisibility();
 end
 
 function TrackerFrame:CalculateHeight()
@@ -2015,6 +2043,29 @@ function RepositionUtil:SetAnchorMode(id)
     end
 end
 
+function TrackerFrame:SetShowBackground(showBackground)
+    --Show Background Texture if our Frame is placed outside bag window
+    --Hide background if nothing is being tracked
+    self.showBackground = showBackground;
+    self:UpdateBackgroundVisibility();
+end
+
+function TrackerFrame:UpdateBackgroundVisibility()
+    local trackingAnything = self:IsTrackingAnyItems();
+
+    if self.showBackground then
+        if trackingAnything then
+            self.Background:Show();
+        else
+            self.Background:Hide();
+        end
+    else
+        self.Background:Hide();
+    end
+
+    self:EnableMouse(trackingAnything);
+end
+
 function TrackerFrame:ParentTo_Bagnon()
     --Changes to Bagnon 10.2.15: Frame Struture Changed, Bottom Left of the Bag becomes DataBroker
 
@@ -2029,7 +2080,7 @@ function TrackerFrame:ParentTo_Bagnon()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2061,7 +2112,7 @@ function TrackerFrame:ParentTo_AdiBags()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2096,7 +2147,7 @@ function TrackerFrame:ParentTo_ArkInventory()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2124,7 +2175,7 @@ function TrackerFrame:ParentTo_ElvUI()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2152,7 +2203,7 @@ function TrackerFrame:ParentTo_NDui()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2180,7 +2231,7 @@ function TrackerFrame:ParentTo_LiteBag()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2211,7 +2262,7 @@ function TrackerFrame:ParentTo_Baganator()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2282,7 +2333,7 @@ function TrackerFrame:ParentTo_BetterBags()
     if not parent then return end;
 
     self.isBlizzardBag = false;
-    self.Background:Show();
+    self:SetShowBackground(true);
     self:SetParent(parent);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
@@ -2296,7 +2347,7 @@ function TrackerFrame:ParentTo_BetterBags()
 
     local anchorOutside = true;
     if anchorOutside then
-        self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -2);
+        self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 5, -2);
     else
         self:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 4, 5);
     end
@@ -2544,6 +2595,7 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 1,
+        optionToggleFunc = SettingsFrame_ToggleUIAtCursorPosition,
     };
 
     addon.ControlCenter:AddModule(moduleData);

@@ -1,7 +1,6 @@
-if not (C_DelvesUI and C_AreaPoiInfo.GetDelvesForMap) then return end;
-
-
 local _, addon = ...
+if not addon.IsGame_11_0_2 then return end;
+
 local L = addon.L;
 local API = addon.API;
 local UIFrameFade = API.UIFrameFade;
@@ -495,8 +494,6 @@ do  --Seasonal Journey Progress
         local level = renownInfo.renownLevel or 1;
         local earned = renownInfo.renownReputationEarned or 0;
         local threshold = renownInfo.renownLevelThreshold or 1;
-
-        level = level - 1;
 
         return level, earned, threshold
     end

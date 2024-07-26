@@ -53,7 +53,7 @@ do
         ["MerchantMoneyFrame"] = MERCHANT_FRAME,
     };
 
-    function InvisibleContainer:HideObjects()
+    function InvisibleContainer:HideObjects(keepItemPrice)
         if not ShopUI then return end;
 
         if not self.f then
@@ -67,16 +67,18 @@ do
             end
         end
 
-        local merchantMoney, merchantAltCurrency;
+        if not keepItemPrice then
+            local merchantMoney, merchantAltCurrency;
 
-        for i = 1, BUYBACK_ITEMS_PER_PAGE do
-            merchantMoney = _G["MerchantItem"..i.."MoneyFrame"];
-            merchantAltCurrency = _G["MerchantItem"..i.."AltCurrencyFrame"];
-            if merchantMoney then
-                merchantMoney:SetParent(self.f);
-            end
-            if merchantAltCurrency then
-                merchantAltCurrency:SetParent(self.f);
+            for i = 1, BUYBACK_ITEMS_PER_PAGE do
+                merchantMoney = _G["MerchantItem"..i.."MoneyFrame"];
+                merchantAltCurrency = _G["MerchantItem"..i.."AltCurrencyFrame"];
+                if merchantMoney then
+                    merchantMoney:SetParent(self.f);
+                end
+                if merchantAltCurrency then
+                    merchantAltCurrency:SetParent(self.f);
+                end
             end
         end
 
@@ -406,7 +408,13 @@ function Controller:EnableModule(state)
                 hooksecurefunc("MerchantFrame_Update", MerchantFrame_Update_Callback);
             end
 
-            InvisibleContainer:HideObjects();
+            local keepItemPrice = C_AddOns.IsAddOnLoaded("Krowi_ExtendedVendorUI");
+            if keepItemPrice then
+                Controller.UpdateMerchantInfo = Controller._UpdateMerchantInfo;
+                Controller.UpdateBuybackInfo = Controller._UpdateBuybackInfo;
+            end
+
+            InvisibleContainer:HideObjects(keepItemPrice);
 
             self:SetScript("OnShow", self.OnShow);
             self:SetScript("OnHide", self.OnHide);
@@ -436,11 +444,134 @@ function Controller:EnableModule(state)
 end
 
 
+do  --For some Merchant UI addon users we only update the token frame
+    function Controller:GetShopPage()
+        return ShopUI.page or 1
+    end
+
+    function Controller:GetMaxItemsPerPage()
+        --Some addons may change this global
+        return _G.MERCHANT_ITEMS_PER_PAGE or MERCHANT_ITEMS_PER_PAGE;
+    end
+
+    function Controller:_UpdateMerchantInfo()
+        InvisibleContainer:HideBlizzardMerchantTokens();
+
+        local page = self:GetShopPage();
+
+        local name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID;
+        local numCost;
+        local itemTexture, itemValue, itemLink;
+        local id, currencyType;
+        local itemPerPage = self:GetMaxItemsPerPage();
+        local numMerchantItems = GetMerchantNumItems();
+        local fromIndex = (page - 1) * itemPerPage;
+        local anyGold;
+        local altCurreny;
+
+        local playerMoney = GetMoney();
+
+        local buttonIndex = 0;
+        local numPages = ceil(numMerchantItems / itemPerPage);
+
+        local numItemsThisPage;
+
+        if page < numPages then
+            numItemsThisPage = itemPerPage;
+        else
+            numItemsThisPage = numMerchantItems - (numPages - 1) * itemPerPage;
+        end
+
+        for i = fromIndex + 1, fromIndex + numItemsThisPage do
+            name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i);
+
+            buttonIndex = buttonIndex + 1;
+
+            if price and price > 0 then
+                anyGold = true;
+            end
+
+            local requiredCurrency;
+
+            if extendedCost then
+                numCost = GetMerchantItemCostInfo(i);
+                requiredCurrency = {};
+
+                for n = 1, numCost do
+                    itemTexture, itemValue, itemLink = GetMerchantItemCostItem(i, n);
+                    --uncached item's link may be nil
+
+                    if itemLink then
+                        id = match(itemLink, "currency:(%d+)");
+                        if id then
+                            currencyType = 0;
+                        else
+                            id = match(itemLink, "item:(%d+)");
+                            if id then
+                                currencyType = 1;
+                            end
+                        end
+
+                        if id and currencyType then
+                            id = tonumber(id);
+
+                            if not altCurreny then
+                                altCurreny = {};
+                            end
+
+                            if id and not altCurreny[id] then
+                                --assume itemID and currencyID don't accidently overlap
+                                altCurreny[id] = currencyType;
+                            end
+
+                            requiredCurrency[n] = {currencyType, id, itemValue, itemTexture};
+                        end
+                    else
+                        self:RequestUpdate(0.2);
+                    end
+                end
+            end
+        end
+
+        self:SetupTokenDisplay();
+
+        if anyGold or not altCurreny then
+            TokenDisplay:ShowMoneyFrame(true);
+        else
+            TokenDisplay:ShowMoneyFrame(false);
+        end
+
+        local tokens = {};
+        if altCurreny then
+            TokenDisplay.MoneyFrame:SetSimplified(true);
+
+            local n = 0;
+
+            for id, currencyType in pairs(altCurreny) do
+                n = n + 1;
+                tokens[n] = {currencyType, id};
+            end
+
+            tsort(tokens, SortFunc_CurrencyType);
+        else
+            TokenDisplay.MoneyFrame:SetSimplified(false);
+        end
+
+        TokenDisplay:DisplayCurrencyOnFrame(tokens, ShopUI, "BOTTOMRIGHT", -5, 6);
+    end
+
+    function Controller:_UpdateBuybackInfo()
+        self:SetupTokenDisplay();
+        TokenDisplay:ShowMoneyFrame(true);
+        TokenDisplay.MoneyFrame:SetSimplified(false);
+        TokenDisplay:DisplayCurrencyOnFrame(nil, ShopUI, "BOTTOMRIGHT", -5, 6);
+    end
+end
 
 
 do
     local function EnableModule(state)
-        Controller:EnableModule(state)
+        Controller:EnableModule(state);
     end
 
     local moduleData = {
