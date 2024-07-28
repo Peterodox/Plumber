@@ -60,11 +60,11 @@ L["ModuleDescription PlayerChoiceFrameToken"] = "Affiche combien d'objets il fau
 
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
 L["ModuleName EmeraldBountySeedList"] = "Emplacement rapide : Graines oniriques";
-L["ModuleDescription EmeraldBountySeedList"] = "Affichez une liste des Graines oniriques lorsque vous approchez d'une Manne d’émeraude."..L["Quick Slot Generic Description"];
+L["ModuleDescription EmeraldBountySeedList"] = "Affiche une liste des Graines oniriques lorsque vous approchez d'une Manne d’émeraude."..L["Quick Slot Generic Description"];
 
 --WorldMapPin: SeedPlanting (Add pins to WorldMapFrame which display soil locations and growth cycle/progress)
 L["ModuleName WorldMapPinSeedPlanting"] = "Marqueur de carte : Graines oniriques";
-L["ModuleDescription WorldMapPinSeedPlanting"] = "Affichez les emplacements des Graines oniriques et leurs cycles de croissance sur la carte du monde."..L["Map Pin Change Size Method"].."\n\n|cffd4641cActiver ce module supprimera le marqueur de carte par défaut pour Émeraude Bounty, ce qui peut affecter le comportement d'autres addons.";
+L["ModuleDescription WorldMapPinSeedPlanting"] = "Affichez les emplacements des Graines oniriques et leurs cycles de croissance sur la carte du monde."..L["Méthode de changement de taille du marqueur de carte"].."\n\n|cffd4641cActiver ce module supprimera le marqueur de carte par défaut pour Émeraude Bounty, ce qui peut affecter le comportement d'autres addons.";
 L["Pin Size"] = "Taille du marqueur";
 
 --PlayerChoiceUI: Dreamseed Nurturing (PlayerChoiceFrame Revamp)
@@ -93,8 +93,8 @@ L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
 L["TalkingHead Option Condition Instance Tooltip"] = "Masquez la transcription lorsque vous êtes dans une instance.";
 
 --AzerothianArchives
-L["ModuleName Technoscryers"] = "Emplacement rapide : Technoscryers";
-L["ModuleDescription Technoscryers"] = "Affichez un bouton pour enfiler les Technoscryers lorsque vous effectuez une quête mondiale Technoscrying."..L["Quick Slot Generic Description"];
+L["ModuleName Technoscryers"] = "Emplacement rapide : Divinobidules";
+L["ModuleDescription Technoscryers"] = "Affichez un bouton pour enfiler le Divinobidules lorsque vous effectuez une quête mondiale sur la La bidulodivination."..L["Ajoutez rapidement l'élément à l'emplacement rapide."];
 
 --Navigator(Waypoint/SuperTrack) Shared Strings
 L["Priority"] = "Priorité";
