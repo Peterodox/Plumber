@@ -63,6 +63,9 @@ L["Catalyst Charges"] = "Catalyst Charges";
 L["ModuleName GossipFrameMedal"] = "Dragonriding Race Medal";
 L["ModuleDescription GossipFrameMedal Format"] = "Replace the default icon %s with the medal %s you earn.\n\nIt may take a brief moment to acquire your records when you interact with the NPC.";
 
+--LFRLockouts
+L["ModuleName LFRLockouts"] = "LFR Lockouts"
+L["ModuleDescription LFRLockouts"] = "Replace the gossip icons with something else if you're locked out of a specific LFR wing."
 
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "Druid Model Fix";
