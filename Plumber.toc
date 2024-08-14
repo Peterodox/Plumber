@@ -1,5 +1,5 @@
-## Interface: 110000, 110002
-## Version: 1.3.3
+## Interface: 110002
+## Version: 1.3.4
 
 ## Title: Plumber
 
@@ -43,7 +43,8 @@ Modules\MerchantPrice.lua
 
 #TWW
 Modules\TooltipKey.lua
-Modules\Delves.lua
+Modules\DelvesScenario.lua
+Modules\DelvesDashboard.lua
 Modules\ExpansionLandingPage.xml
 
 #Modules\AddonList.lua

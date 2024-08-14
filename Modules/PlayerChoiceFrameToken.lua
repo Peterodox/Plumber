@@ -2,7 +2,7 @@
 
 local _, addon = ...
 
-if not addon.IsGame_11_0_0 then
+if not addon.IsGame_11_0_2 then
     return
 end
 
@@ -58,7 +58,6 @@ local function UpdateChoiceCurrency()
     local choiceID = f.choiceInfo.choiceID;
     local itemType, tokenInfo;
 
-    print(choiceID)
     if PlayerChoiceXCurrency[choiceID] then
         itemType = 0;
         tokenInfo = PlayerChoiceXCurrency[choiceID];

@@ -92,8 +92,15 @@ local function SetAllToastsInteractable(interactable)
         for obj in pool:EnumerateActive() do
             SetToastInteractable(obj, interactable);
         end
-        for obj in pool:EnumerateInactive() do
-            SetToastInteractable(obj, interactable);
+
+        if pool.EnumerateInactive then
+            for obj in pool:EnumerateInactive() do
+                SetToastInteractable(obj, interactable);
+            end
+        elseif pool.inactiveObjects then
+            for obj in pairs(pool.inactiveObjects) do
+                SetToastInteractable(obj, interactable);
+            end
         end
     end
 end

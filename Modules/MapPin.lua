@@ -457,6 +457,10 @@ do
         self:PostMouseEnter();
     end
 
+    function PlumberWorldMapPinMixin:TriggerMouseReEnter()
+        self.UpdateTooltip = self.OnMouseEnter;
+    end
+
     local function GetTextColorForEnabledState(enabledState)
         local Stats = Enum.WidgetEnabledState;
 
@@ -496,6 +500,15 @@ do
                     end
                 end
             end
+        end
+    end
+
+    function PlumberWorldMapPinMixin:AddQuestTimeToTooltip(tooltip, questID)
+        if not questID then return end;
+
+        local formattedTime, color, secondsRemaining = WorldMap_GetQuestTimeForTooltip(questID);
+        if formattedTime and color then
+            GameTooltip_AddColoredLine(tooltip, formattedTime, color);
         end
     end
 

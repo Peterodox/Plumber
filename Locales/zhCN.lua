@@ -166,6 +166,24 @@ L["Number Thousands"] = "K";
 L["Number Millions"] = "M";
 
 
+--Landing Page (Expansion Summary Minimap)
+L["ModuleName ExpansionLandingPage"] = "卡兹阿加概要";
+L["ModuleDescription ExpansionLandingPage"] = "在概要界面上显示额外信息：\n\n- 斩离之丝等级";
+L["Instruction Track Reputation"] = "<按住Shift点击追踪此声望>";
+L["Instruction Untrack Reputation"] = "<按住Shift点击停止追踪>";
+
+
+--WorldMapPin_TWW (Show Pins On Continent Map)
+L["ModuleName WorldMapPin_TWW"] = "地图标记：地心之战";
+L["ModuleDescription WorldMapPin_TWW"] = "在卡兹阿加地图上显示额外标记：\n\n- %s\n\n- %s";  --Wwe'll replace %s with locales (See Map Pin Filter Name at the bottom)
+
+
+--Delves
+L["Great Vault Tier Format"] = "难度 %s";
+L["Item Level Format"] = "物品等级%d";
+L["Item Level Abbr"] = "装等";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally
 L["Reposition Button Vertical"] = "竖直方向移动";

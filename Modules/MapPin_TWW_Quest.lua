@@ -12,26 +12,28 @@ local CreateVector2D = CreateVector2D;
 local GetMapPosFromWorldPos = C_Map.GetMapPosFromWorldPos;
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo;
 local GetMapInfoAtPosition = C_Map.GetMapInfoAtPosition;
+local IsQuestActive = C_TaskQuest.IsActive;
+local GetQuestLocation = C_TaskQuest.GetQuestLocation;
+local GetQuestInfoByQuestID = C_TaskQuest.GetQuestInfoByQuestID;
 
 local MAPID_KHAZALGAR = 2274;
 
-
 local POI_SPECIAL_WQ = {
     --Special Assignment
-    --poiID, x, y, continent, widgetSetID
+    --poiID, x, y, continent, widgetSetID, questID
     --https://wago.tools/db2/AreaPOI?filter[Name_lang]=special%20as&page=1&sort[ID]=asc
 
-    {7823, 2988, -4587, 2552, 1108},
-    {7824, 1091, -1021, 2552, 1117},
-    {7825, 1411, -4226, 2601, 1118},
-    {7826, 3227.21, -3330, 2601, 1119},
-    {7827, 1284, -1001, 2601, 1121},
+    {7823, 2988, -4587, 2552, 1108, 82355},     --Special Assignment: Cinderbee Surge
+    {7824, 1091, -1021, 2552, 1117, 81649},     --Special Assignment: Titanic Resurgence
+    {7825, 1411, -4226, 2601, 1118, },  --Special Assignment: Shadows Below (we don't have the questID for the unlocked quest yet)
+    {7826, 3227.21, -3330, 2601, 1119, 83229},  --Special Assignment: When the Deeps Stir
+    {7827, 1284, -1001, 2601, 1121, 82852},     --Special Assignment: Lynx Rescue
 
-    {7828, 4449, -834, 2601, 1120},
-    {7829, -625, -1424, 2601, 1122},
-    {7830, 4449, -834, 2601, 1123},
-    {7886, 1049, -4334, 2552, 1297},
-    {7887, 3385, -4532, 2552, 1298},
+    {7828, 4449, -834, 2601, 1120, 82787},      --Special Assignment: Rise of the Colossals
+    {7829, -625, -1424, 2601, 1122, 82531},     --Special Assignment: Bombs from Behind
+    {7830, 4449, -834, 2601, 1123, 82414},      --Special Assignment: A Pound of Cure
+    {7886, 1049, -4334, 2552, 1297, 81649},     --Special Assignment: Titanic Resurgence
+    {7887, 3385, -4532, 2552, 1298, 81650},     --Special Assignment: Titanic Resurgence (Same name different locations?)
 };
 
 
@@ -54,10 +56,32 @@ do
 
     function QuestPinMixin:PostMouseEnter(fromTimer)
         if self.data.uiMapID and self.data.poiID then
+            local tooltip = GameTooltip;
+            tooltip:Hide();
+
+            local questID = self.data.questID;
+
+            if self.data.isQuest and questID then
+                tooltip:SetOwner(self, "ANCHOR_RIGHT");
+
+                if ( not HaveQuestData(questID) ) then
+                    GameTooltip_SetTitle(tooltip, RETRIEVING_DATA, RED_FONT_COLOR);
+                    GameTooltip_SetTooltipWaitingForData(tooltip, true);
+                    tooltip:Show();
+                    self:TriggerMouseReEnter();
+                    return
+                end
+
+                local questName = GetQuestInfoByQuestID(questID)
+                tooltip:SetText(questName, 1, 1, 1);
+                self:AddQuestTimeToTooltip(tooltip, questID);
+                tooltip:Show();
+
+                return
+            end
+
             local poiInfo = GetAreaPOIInfo(self.data.uiMapID, self.data.poiID);
             if poiInfo then
-                local tooltip = GameTooltip;
-                tooltip:Hide();
                 tooltip:SetOwner(self, "ANCHOR_RIGHT");
                 tooltip:SetText(poiInfo.name, 1, 1, 1);
 
@@ -66,32 +90,6 @@ do
                 end
 
                 tooltip:Show();
-
-                --[[
-                local verticalPadding = nil;
-                if poiInfo.tooltipWidgetSet then
-                    local titleAdded = true;
-                    local overflow = GameTooltip_AddWidgetSet(tooltip, poiInfo.tooltipWidgetSet, titleAdded and poiInfo.addPaddingAboveTooltipWidgets and 10);  --This affects FPS
-                    if overflow then
-                        verticalPadding = -overflow;
-                    end
-                end
-
-                tooltip:Show();
-
-                if verticalPadding then
-                    tooltip:SetPadding(0, verticalPadding);
-                end
-
-                if not fromTimer then
-                    --Item Reward takes time to retrieve data
-                    C_Timer.After(0.2, function()
-                        if self:IsMouseMotionFocus() then
-                            self:PostMouseEnter(true);
-                        end
-                    end);
-                end
-                --]]
             end
         end
     end
@@ -108,7 +106,7 @@ do
         self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/WorldQuest-Capstone", "LINEAR");
         self.Texture:SetSize(20, 25);
 
-        local isLocked = false; --poiInfo.atlasName == worldquest-Capstone-questmarker-epic-Locked
+        local isLocked = not self.data.isQuest; --poiInfo.atlasName == worldquest-Capstone-questmarker-epic-Locked
 
         if isLocked then
             self:SetTexCoord(0, 0.5, 0, 0.625);
@@ -134,22 +132,46 @@ do
 
         local data;
         local positionToCache, p;
-        local poiID, continentID, worldPosition;
+        local poiID, questID, continentID, worldPosition, key, isQuest, isSpawned;
         local n = 0;
 
         for _, d in ipairs(POI_SPECIAL_WQ) do
             poiID = d[1];
+            questID = d[6];
             continentID = d[4];
             worldPosition = CreateVector2D(d[2], d[3]);
+
+            if questID and IsQuestActive(questID) then
+                key = questID;
+                isQuest = true;
+            else
+                key = poiID;
+                isQuest = false;
+            end
+
             local uiMapID, mapPosition = GetMapPosFromWorldPos(continentID, worldPosition);
             if uiMapID then
                 local x, y = mapPosition:GetXY();
                 local zoneMapInfo = GetMapInfoAtPosition(uiMapID, x, y);
                 local zoneMapID = zoneMapInfo and zoneMapInfo.mapID or uiMapID;
-                local poiInfo = GetAreaPOIInfo(zoneMapID, poiID);
-                if poiInfo then
+                local localX, localY;
+
+                if isQuest then
+                    isSpawned = true;
+                    localX, localY = GetQuestLocation(questID, zoneMapID);
+                else
+                    local poiInfo = GetAreaPOIInfo(zoneMapID, poiID);
+                    if poiInfo then
+                        isSpawned = true;
+                        localX, localY = poiInfo.position:GetXY();
+                    else
+                        isSpawned = false;
+                    end
+                end
+
+                if isSpawned then
                     uiMapID = zoneMapID;
-                    if POILocation[poiID] then
+                    if POILocation[key] then
                         n = n + 1;
 
                         if not data then
@@ -158,11 +180,13 @@ do
 
                         data[n] = {
                             mixin = QuestPinMixin,
-                            x = POILocation[poiID].x,
-                            y = POILocation[poiID].y,
+                            x = POILocation[key].x,
+                            y = POILocation[key].y,
                             clickable = false,
                             uiMapID = uiMapID,
                             poiID = poiID,
+                            questID = questID,
+                            isQuest = isQuest,
                         };
 
                     else
@@ -172,12 +196,12 @@ do
                         end
 
                         p = p + 1;
-                        local x, y = poiInfo.position:GetXY();
+
                         local position = {
                             uiMapID = uiMapID,
-                            poiID = poiID,
-                            x = x,
-                            y = y,
+                            x = localX,
+                            y = localY,
+                            poiID = key,
                         };
 
                         positionToCache[p] = position;
@@ -205,4 +229,13 @@ do
 
     SpecialQuestPinDataProvider.OptionData = OptionData;
     PinController:AddMapDataProvider(MAPID_KHAZALGAR, SpecialQuestPinDataProvider);
+end
+
+do
+    local function PrintTaskNames(uiMapID)
+        uiMapID = uiMapID or C_Map.GetBestMapForUnit("player");
+        for _, data in ipairs(C_TaskQuest.GetQuestsForPlayerByMapID(uiMapID)) do
+            print(data.questId, QuestUtils_GetQuestName(data.questId))
+        end
+    end
 end

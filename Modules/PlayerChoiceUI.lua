@@ -24,7 +24,7 @@ local easingFunc = addon.EasingFunctions.outQuart;
 local C_PlayerChoice = C_PlayerChoice;
 local C_UIWidgetManager = C_UIWidgetManager;
 local C_Item = C_Item;
-local GetItemCount = GetItemCount;
+local GetItemCount = C_Item.GetItemCount;
 local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local match = string.match;
 local find = string.find;
@@ -620,7 +620,7 @@ end
 function AnnounceButtonData:GetDreamseedName()
     if not self.nameDeamseed then
         local spellID = 425856;
-        local name = GetSpellInfo(spellID);
+        local name = API.GetSpellInfo(spellID);
         if name then
             self.nameDeamseed = name;
         end

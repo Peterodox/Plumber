@@ -96,6 +96,22 @@ do  -- String
         end
     end
     API.GetUnitCreatureID = GetUnitCreatureID;
+
+
+    local function GetGlobalObject(objNameKey)
+        --Get object via string "FrameName.Key1.Key2"
+        local obj = _G;
+
+        for k in string.gmatch(objNameKey, "%w+") do
+            obj = obj[k];
+            if not obj then
+                return
+            end
+        end
+
+        return obj
+    end
+    API.GetGlobalObject = GetGlobalObject;
 end
 
 do  -- DEBUG
@@ -193,6 +209,18 @@ do  -- Color
         return (r > 0.99 and r <= 1) and (g > 0.1254 and g < 0.1255) and (b > 0.1254 and b < 0.1255)
     end
     API.IsWarningColor = IsWarningColor;
+
+
+    local function SetTextColorByGlobal(fontString, colorMixin)
+        local r, g, b;
+        if colorMixin then
+            r, g, b = colorMixin:GetRGB();
+        else
+            r, g, b = 1, 1, 1;
+        end
+        fontString:SetTextColor(r, g, b);
+    end
+    API.SetTextColorByGlobal = SetTextColorByGlobal;
 end
 
 do  -- Time
@@ -1504,6 +1532,22 @@ do  --System
     else
         API.GetMouseFocus = GetMouseFocus;
     end
+end
+
+do  --Player
+    local function GetPlayerMaxLevel()
+        local serverExpansionLevel = GetServerExpansionLevel();
+		local maxLevel = GetMaxLevelForExpansionLevel(serverExpansionLevel);
+        return maxLevel or 80
+    end
+    API.GetPlayerMaxLevel = GetPlayerMaxLevel;
+
+    local function IsPlayerAtMaxLevel()
+        local maxLevel = GetPlayerMaxLevel();
+        local playerLevel = UnitLevel("player");
+        return playerLevel >= maxLevel
+    end
+    API.IsPlayerAtMaxLevel = IsPlayerAtMaxLevel;
 end
 
 do  --Scenario

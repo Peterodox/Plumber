@@ -2881,7 +2881,7 @@ do  --Cursor Cooldown (Displayed near the cursor)
             DisableSharpening(f.Background);
             f:SetScript("OnEvent", CursorProgressMixin.OnEvent);
             f:SetScript("OnHide", CursorProgressMixin.OnHide);
-            f:SetUseRadialEdge(true);
+            --f:SetUseRadialEdge(true);
             f:SetColorIndex(2);
             f:SetFrameStrata("FULLSCREEN");
             f:SetFixedFrameStrata(true);
@@ -4346,6 +4346,9 @@ do  --Radial Progress Bar
         elseif percentage < 0 then
             percentage = 0;
         end
+
+        local visualOffset = 0.07;     --Additional shrinking due to level background   --Remap 0-100 to 7-93
+        percentage = visualOffset * (1- percentage) + (1 - visualOffset) * percentage;
 
         self:Pause();
         self:SetCooldown(GetTime() - (seconds * percentage), seconds);

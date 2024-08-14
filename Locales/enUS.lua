@@ -178,6 +178,12 @@ L["ModuleName WorldMapPin_TWW"] = "Map Pin: "..(EXPANSION_NAME10 or "The War Wit
 L["ModuleDescription WorldMapPin_TWW"] = "Show additional pins on Khaz Algar continent map:\n\n- %s\n\n- %s";  --Wwe'll replace %s with locales (See Map Pin Filter Name at the bottom)
 
 
+--Delves
+L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Tier %s";
+L["Item Level Format"] = ITEM_LEVEL or "Item Level %d";
+L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Move Vertically";

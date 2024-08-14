@@ -3,12 +3,6 @@
 -- Game Issue #2: You'll get a "Invalid Target" error if the targeted lockbox is in the bank. (/use a bank item moves it into your bag)
 
 local _, addon = ...
-
-if addon.IsGame_11_0_0 then
-    --MacroText Broken in 11.0  This module can no longer function
-    return
-end
-
 local _, _, classID = UnitClass("player");
 local _, _, raceID = UnitRace("player");
 if classID ~= 4 and raceID ~= 37 then return end;
