@@ -53,7 +53,7 @@ do
         ["MerchantMoneyFrame"] = MERCHANT_FRAME,
     };
 
-    function InvisibleContainer:HideObjects(keepItemPrice)
+    function InvisibleContainer:HideObjects(noChangeItemPrice)
         if not ShopUI then return end;
 
         if not self.f then
@@ -67,7 +67,7 @@ do
             end
         end
 
-        if not keepItemPrice then
+        if not noChangeItemPrice then
             local merchantMoney, merchantAltCurrency;
 
             for i = 1, BUYBACK_ITEMS_PER_PAGE do
@@ -408,13 +408,13 @@ function Controller:EnableModule(state)
                 hooksecurefunc("MerchantFrame_Update", MerchantFrame_Update_Callback);
             end
 
-            local keepItemPrice = C_AddOns.IsAddOnLoaded("Krowi_ExtendedVendorUI");
-            if keepItemPrice then
+            local noChangeItemPrice = C_AddOns.IsAddOnLoaded("Krowi_ExtendedVendorUI") or C_AddOns.IsAddOnLoaded("ElvUI_WindTools");
+            if noChangeItemPrice then
                 Controller.UpdateMerchantInfo = Controller._UpdateMerchantInfo;
                 Controller.UpdateBuybackInfo = Controller._UpdateBuybackInfo;
             end
 
-            InvisibleContainer:HideObjects(keepItemPrice);
+            InvisibleContainer:HideObjects(noChangeItemPrice);
 
             self:SetScript("OnShow", self.OnShow);
             self:SetScript("OnHide", self.OnHide);

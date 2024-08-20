@@ -112,6 +112,8 @@ L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "W
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Hide the transcription if it's from a World Quest.\nSometimes Talking Head is triggered before accepting the World Quest, and we won't be able to hide it.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
 L["TalkingHead Option Condition Instance Tooltip"] = "Hide the transcription when you are in an instance.";
+L["TalkingHead Option Below WorldMap"] = "Send To Back When Map Opened";
+L["TalkingHead Option Below WorldMap Tooltip"] = "Send the Talking Head to the back when you open the World Map so it doesn't block it.";
 
 
 --AzerothianArchives
@@ -182,6 +184,9 @@ L["ModuleDescription WorldMapPin_TWW"] = "Show additional pins on Khaz Algar con
 L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Tier %s";
 L["Item Level Format"] = ITEM_LEVEL or "Item Level %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
+L["Delves Reputation Name"] = "Delver's Journey";
+L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
+L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
 
 
 --Generic

@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.3.3";
-local VERSION_DATE = 1722000000;
+local VERSION_TEXT = "v1.3.5";
+local VERSION_DATE = 1724100000;
 
 
 local addonName, addon = ...
@@ -88,6 +88,7 @@ local DefaultValues = {
     Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
     TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
+    Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
 
 
     --Unified Map Pin System
@@ -100,9 +101,11 @@ local DefaultValues = {
     BlizzFixEventToast = true,          --Make Toast non-interactable
     MerchantPrice = false;              --Merchant Price (Alt Currency) Overview, gray insufficient items
 
+
     --In-game Navigation: Use waypoint (Super Tracking) to navigate players. Generally default to false, since it will mute WoW's own SuperTrackedFrame
     Navigator_MasterSwitch = true,      --Decide if using our SuperTrackedFrame or the default one
         Navigator_Dreamseed = false,
+
 
     --Talking Head Revamp
     TalkingHead_MasterSwitch = false,
@@ -111,9 +114,12 @@ local DefaultValues = {
         TalkingHead_TextOutline = false,
         TalkingHead_HideInInstance = false,
         TalkingHead_HideWorldQuest = false,
+        TalkingHead_BelowWorldMap = false,
+
 
     --Declared elsewhere:
         --DreamseedChestABTesting = math.random(100) >= 50
+
 
     --Deprecated:
     --DruidModelFix = true,               --Fixed by Blizzard in 10.2.0

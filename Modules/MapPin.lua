@@ -552,7 +552,7 @@ do  --Master Switch
         description = string.format(L["ModuleDescription WorldMapPin_TWW"], L["Bountiful Delve"], L["Special Assignment"]);
         toggleFunc = EnableMapPinSystem,
         categoryID = 1,
-        uiOrder = 10,
+        uiOrder = 1101,
         moduleAddedTime = 1721730000,
     };
 

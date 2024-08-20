@@ -4,6 +4,7 @@ if not addon.IsGame_11_0_0 then return end;
 local API = addon.API;
 local L = addon.L;
 
+local C_Reputation = C_Reputation;
 
 local FACTION_FRAME_WIDTH = 60;
 
@@ -93,13 +94,30 @@ do
     end
 
     function FactionProgressMixin:Update()
-        local level, isFull, currentValue, maxValue = API.GetFriendshipProgress(self.factionID);
+        local isParagon;
+        local level, isFull, currentValue, maxValue;
 
-        if isFull then
-            self.ProgressBar.ValueText:SetText("");
+        if C_Reputation.IsFactionParagon(self.factionID) then
+            isParagon = true;
+            currentValue, maxValue = C_Reputation.GetFactionParagonInfo(self.factionID);
         else
-            self.ProgressBar.ValueText:SetText(level);
+            isParagon = false;
+            level, isFull, currentValue, maxValue = API.GetFriendshipProgress(self.factionID);
         end
+
+        self.isParagon = isParagon;
+
+        if isParagon then
+            self.ProgressBar:ShowNumber(false);
+        else
+            self.ProgressBar:ShowNumber(true);
+            if isFull then
+                self.ProgressBar.ValueText:SetText("");
+            else
+                self.ProgressBar.ValueText:SetText(level);
+            end
+        end
+
 
         self.ProgressBar:SetValue(currentValue, maxValue);
     end
@@ -108,7 +126,12 @@ do
         self.ProgressBar.BorderHighlight:Show();
 
         GameTooltip:Hide();
-        ReputationEntryMixin.ShowFriendshipReputationTooltip(self, self.factionID, "ANCHOR_RIGHT", false);
+
+        if self.isParagon then
+            ReputationParagonFrame_SetupParagonTooltip(self);
+        else
+            ReputationEntryMixin.ShowFriendshipReputationTooltip(self, self.factionID, "ANCHOR_RIGHT", false);
+        end
 
         GameTooltip:AddLine(" ");
         GameTooltip_AddColoredLine(GameTooltip, (IsFactionWatched(self.factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"], GREEN_FONT_COLOR);
@@ -299,7 +322,7 @@ do
         description = addon.L["ModuleDescription ExpansionLandingPage"],
         toggleFunc = MajorFactionButtonMod.EnableModule,
         categoryID = 1,
-        uiOrder = 7,
+        uiOrder = 1100,
         moduleAddedTime = 1720340000,
     };
 

@@ -4347,8 +4347,7 @@ do  --Radial Progress Bar
             percentage = 0;
         end
 
-        local visualOffset = 0.07;     --Additional shrinking due to level background   --Remap 0-100 to 7-93
-        percentage = visualOffset * (1- percentage) + (1 - visualOffset) * percentage;
+        percentage = self.visualOffset * (1- percentage) + (1 - self.visualOffset) * percentage;    --Additional shrinking due to level background   --Remap 0-100 to 7-93
 
         self:Pause();
         self:SetCooldown(GetTime() - (seconds * percentage), seconds);
@@ -4363,6 +4362,48 @@ do  --Radial Progress Bar
         self:SetPercentage(currentValue / maxValue);
     end
 
+    function RadialProgressBarMixin:ShowNumber(showNumber)
+        if showNumber then
+            if self.showNumber ~= true then
+                self.showNumber = true;
+                self.ValueText:Show();
+                self.visualOffset = 0.07;
+                self.Border:SetTexCoord(0, 80/256, 80/256, 160/256);
+                self.BorderHighlight:SetTexCoord(0, 80/256, 80/256, 160/256);
+                local lowTexCoords =
+                {
+                    x = 80/256,
+                    y = 80/256,
+                };
+                local highTexCoords =
+                {
+                    x = 160/256,
+                    y = 160/256,
+                };
+                self:SetTexCoordRange(lowTexCoords, highTexCoords);
+            end
+        else
+            if self.showNumber ~= false then
+                self.showNumber = false;
+                self.ValueText:Hide();
+                self.visualOffset = 0.01;
+                self.Border:SetTexCoord(0, 80/256, 0/256, 80/256);
+                self.BorderHighlight:SetTexCoord(0, 80/256, 0/256, 80/256);
+                local lowTexCoords =
+                {
+                    x = 80/256,
+                    y = 0/256,
+                };
+                local highTexCoords =
+                {
+                    x = 160/256,
+                    y = 80/256,
+                };
+                self:SetTexCoordRange(lowTexCoords, highTexCoords);
+            end
+        end
+    end
+
     local function CreateRadialProgressBar(parent)
         local f = CreateFrame("Cooldown", nil, parent, "PlumberRadialProgressBarTemplate");
         Mixin(f, RadialProgressBarMixin);
@@ -4370,28 +4411,17 @@ do  --Radial Progress Bar
         local tex = "Interface/AddOns/Plumber/Art/Frame/ProgressBar-Radial-WarWithin";
 
         f.Border:SetTexture(tex);
-        f.Border:SetTexCoord(0, 80/256, 80/256, 160/256);
-
         f.BorderHighlight:SetTexture(tex);
-        f.BorderHighlight:SetTexCoord(0, 80/256, 80/256, 160/256);
-
         f:SetSwipeTexture(tex);
-        local lowTexCoords =
-        {
-            x = 80/256,
-            y = 80/256,
-        };
-        local highTexCoords =
-        {
-            x = 160/256,
-            y = 160/256,
-        };
-        f:SetTexCoordRange(lowTexCoords, highTexCoords);
 
         f.ValueText = f:CreateFontString("OVERLAY", nil, "GameFontNormalLargeOutline");
         f.ValueText:SetJustifyH("CENTER");
         f.ValueText:SetPoint("CENTER", f, "BOTTOM", 2, 14);
         f.ValueText:SetTextColor(1, 0.82, 0);
+
+        f:ShowNumber(true);
+
+        f.noCooldownCount = true;
 
         return f
     end

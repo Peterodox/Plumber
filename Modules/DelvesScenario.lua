@@ -1,5 +1,4 @@
 local _, addon = ...
-if not addon.IsGame_11_0_2 then return end;
 
 local L = addon.L;
 local API = addon.API;
@@ -387,7 +386,7 @@ do  --Seasonal Journey Progress
 
         ProgressBar = addon.CreateLevelProgressBar(UIParent);
         ProgressBar:SetPoint("CENTER", UIParent, "TOP", 0, -128);
-        ProgressBar:SetLabel("Seasonal Journey");
+        ProgressBar:SetLabel(L["Delves Reputation Name"]);
         ProgressBar:SetLevel(5);
         ProgressBar:SetFrameStrata("HIGH");
         ProgressBar:SetFrameLevel(990);
@@ -631,8 +630,25 @@ do  --Seasonal Journey Progress
         end
         ZoneTriggerModule_Enable(state);
     end
+end
 
-    C_Timer.After(2, function() --debug
-        SeasonTracker:SetEnabled(true);
-    end);
+
+
+
+do
+    local function EnableModule(state)
+        SeasonTracker:SetEnabled(state);
+    end
+
+    local moduleData = {
+        name = addon.L["ModuleName Delves_SeasonProgress"],
+        dbKey = "Delves_SeasonProgress",
+        description = addon.L["ModuleDescription Delves_SeasonProgress"],
+        toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 1105,
+        moduleAddedTime = 1724100000,
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
 end

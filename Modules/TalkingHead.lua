@@ -32,6 +32,7 @@ local DB;
 
 local PVP_CREATURE_DISPLAYID = {
     [108418] = true,
+    [118482] = true,    --Ruffious
 };
 
 
@@ -141,6 +142,7 @@ function NewTalkingHead:FadeInText(speakerName, text, voiceoverDuration, hideNam
 
     if not hideName then
         local speechFormat;
+        --print(displayInfo, speakerName);    --debug
         if displayInfo and PVP_CREATURE_DISPLAYID[displayInfo] then
             speechFormat = SPEECH_FORMAT_PVP;
         else
@@ -278,6 +280,26 @@ function NewTalkingHead:Init()
     self:OnSettingsChanged();
 
     self.Init = function() end;
+end
+
+function NewTalkingHead:WorldMapOnShow()
+    if not self.enabled then return end;
+
+    if self.belowWorldMap then
+        if self:IsShown() then
+            self:SetFrameStrata("MEDIUM");
+        end
+    end
+end
+
+function NewTalkingHead:WorldMapOnHide()
+    if not self.enabled then return end;
+
+    if self.belowWorldMap then
+        if self:IsShown() then
+            self:SetFrameStrata("FULLSCREEN");
+        end
+    end
 end
 
 function NewTalkingHead:EnableTalkingHead()
@@ -455,6 +477,19 @@ function NewTalkingHead:OnSettingsChanged()
         self:UnregisterEvent("QUEST_TURNED_IN");
         self.shouldMuteLine = nil;
     end
+
+    if DB.TalkingHead_BelowWorldMap then
+        self.belowWorldMap = true;
+        if not self.worldmapHooked then
+            self.worldmapHooked = true;
+            if WorldMapFrame and WorldMapFrame.RegisterCallback then
+                EventRegistry:RegisterCallback("WorldMapOnShow", self.WorldMapOnShow, self);
+                WorldMapFrame:RegisterCallback("WorldMapOnHide", self.WorldMapOnHide, self);
+            end
+        end
+    else
+        self.belowWorldMap = false;
+    end
 end
 
 ---- Edit Mode
@@ -551,6 +586,15 @@ local function Options_HideWorldQuest_OnClick(self, state)
     NewTalkingHead:OnSettingsChanged();
 end
 
+local function Options_BelowWorldMap_OnClick(self, state)
+    NewTalkingHead:OnSettingsChanged();
+    if WorldMapFrame:IsVisible() then
+        NewTalkingHead:WorldMapOnShow();
+    else
+        NewTalkingHead:SetFrameStrata("FULLSCREEN");
+    end
+end
+
 local function Options_ResetPosition_ShouldEnable(self)
     if DB.TalkingHead_PositionX and DB.TalkingHead_PositionY then
         return true
@@ -577,6 +621,9 @@ local OPTIONS_SCHEMATIC = {
         {type = "Header", label = L["TalkingHead Option Condition Header"]};
         {type = "Checkbox", label = L["TalkingHead Option Condition Instance"] , onClickFunc = Options_HideInInstance_OnClick, dbKey = "TalkingHead_HideInInstance", tooltip = L["TalkingHead Option Condition Instance Tooltip"]},
         {type = "Checkbox", label = L["TalkingHead Option Condition WorldQuest"], onClickFunc = Options_HideWorldQuest_OnClick, dbKey = "TalkingHead_HideWorldQuest", tooltip = L["TalkingHead Option Condition WorldQuest Tooltip"]},
+
+        {type = "Divider"},
+        {type = "Checkbox", label = L["TalkingHead Option Below WorldMap"], onClickFunc = Options_BelowWorldMap_OnClick, dbKey = "TalkingHead_BelowWorldMap", tooltip = L["TalkingHead Option Below WorldMap Tooltip"]},
 
         {type = "Divider"},
         {type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = Options_ResetPosition_OnClick, stateCheckFunc = Options_ResetPosition_ShouldEnable, widgetKey = "ResetButton"},

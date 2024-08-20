@@ -112,6 +112,8 @@ L["TalkingHead Option Condition WorldQuest"] = "世界任务";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "隐藏来自世界任务的文字。\n有时对话会在接受世界任务之前触发，此时我们将无法隐藏这段文字。";
 L["TalkingHead Option Condition Instance"] = "副本";
 L["TalkingHead Option Condition Instance Tooltip"] = "在副本里隐藏文字。";
+L["TalkingHead Option Below WorldMap"] = "打开地图时置于底层";
+L["TalkingHead Option Below WorldMap Tooltip"] = "在你打开世界地图时，将对话特写头像置于底层以避免遮挡地图。";
 
 
 --AzerothianArchives
@@ -182,6 +184,9 @@ L["ModuleDescription WorldMapPin_TWW"] = "在卡兹阿加地图上显示额外�
 L["Great Vault Tier Format"] = "难度 %s";
 L["Item Level Format"] = "物品等级%d";
 L["Item Level Abbr"] = "装等";
+L["Delves Reputation Name"] = "地下堡赛季进度";
+L["ModuleName Delves_SeasonProgress"] = "地下堡: 赛季进度";
+L["ModuleDescription Delves_SeasonProgress"] = "在你提升“地下堡行者的旅程”时显示一个进度条。";
 
 
 --Generic
