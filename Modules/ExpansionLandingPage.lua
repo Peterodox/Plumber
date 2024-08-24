@@ -258,6 +258,7 @@ do
             container:SetParent(button);
             container:SetPoint("RIGHT", button, "RIGHT", 0, -32);
             container.scrollOverlay:Hide();
+            container:Show();
         else
             self:HideWidgets();
         end
@@ -304,6 +305,7 @@ do
                     end
                 end);
             end
+            self.factionEventListener:Show();
         else
             if self.factionEventListener then
                 self.factionEventListener:Hide();
