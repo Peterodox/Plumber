@@ -5,6 +5,7 @@ local API = addon.API;
 local L = addon.L;
 
 local C_Reputation = C_Reputation;
+local GetParagonValuesAndLevel = API.GetParagonValuesAndLevel;
 
 local FACTION_FRAME_WIDTH = 60;
 
@@ -99,7 +100,8 @@ do
 
         if C_Reputation.IsFactionParagon(self.factionID) then
             isParagon = true;
-            currentValue, maxValue = C_Reputation.GetFactionParagonInfo(self.factionID);
+            local paragonTimes;
+            currentValue, maxValue, paragonTimes = GetParagonValuesAndLevel(self.factionID);
         else
             isParagon = false;
             level, isFull, currentValue, maxValue = API.GetFriendshipProgress(self.factionID);
@@ -125,17 +127,19 @@ do
     function FactionProgressMixin:OnEnter()
         self.ProgressBar.BorderHighlight:Show();
 
-        GameTooltip:Hide();
+        local tooltip = GameTooltip;
+        tooltip:Hide();
 
         if self.isParagon then
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
             ReputationParagonFrame_SetupParagonTooltip(self);
         else
             ReputationEntryMixin.ShowFriendshipReputationTooltip(self, self.factionID, "ANCHOR_RIGHT", false);
         end
 
-        GameTooltip:AddLine(" ");
-        GameTooltip_AddColoredLine(GameTooltip, (IsFactionWatched(self.factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"], GREEN_FONT_COLOR);
-        GameTooltip:Show();
+        tooltip:AddLine(" ");
+        GameTooltip_AddColoredLine(tooltip, (IsFactionWatched(self.factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"], GREEN_FONT_COLOR);
+        tooltip:Show();
     end
 
     function FactionProgressMixin:OnLeave()

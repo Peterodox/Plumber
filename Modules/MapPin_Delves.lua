@@ -102,6 +102,8 @@ do
 
     function DelvesPinDataProvider:GetPinDataForMap(uiMapID)
         --Bountiful Delves won't appear in GetDelvesForMap() table, that's how we identify them
+        --The method above no longer works
+
         if uiMapID ~= MAPID_KHAZALGAR then return end;
 
         local data = {};
@@ -130,16 +132,19 @@ do
             isBountiful[delveIndex] = true;
         end
 
+        --[[
         local delveIndex, areaPoiIDs;
         for _, mapID in ipairs(DelveMaps) do
             areaPoiIDs = GetDelvesForMap(mapID) or {};
             for _, poiID in ipairs(areaPoiIDs) do
+                --print((GetAreaPOIInfo(mapID, poiID)).name)
                 delveIndex = POIxDelveIndex[poiID];
                 if delveIndex then
                     isBountiful[delveIndex] = false;
                 end
             end
         end
+        --]]
 
 
         local uiMapID, poiInfo;

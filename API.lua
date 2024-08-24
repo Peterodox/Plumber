@@ -1470,6 +1470,7 @@ end
 do  --Reputation
     local GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation;
     local GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks;
+    local GetFactionParagonInfo = C_Reputation.GetFactionParagonInfo;
 
     local function GetFriendshipProgress(factionID)
         local repInfo = factionID and GetFriendshipReputation(factionID);
@@ -1496,6 +1497,18 @@ do  --Reputation
         end
     end
     API.GetFriendshipProgress = GetFriendshipProgress;
+
+
+    local function GetParagonValuesAndLevel(factionID)
+        local totalEarned, threshold = GetFactionParagonInfo(factionID);
+        if totalEarned and threshold and threshold ~= 0 then
+            local paragonLevel = floor(totalEarned / threshold);    --How many times the player has reached paragon
+            local currentValue = totalEarned - paragonLevel * threshold;
+            return currentValue, threshold, paragonLevel
+        end
+        return 0, 1, 0
+    end
+    API.GetParagonValuesAndLevel = GetParagonValuesAndLevel;
 end
 
 do  --Spell

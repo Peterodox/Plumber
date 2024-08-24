@@ -25,7 +25,7 @@ local POI_SPECIAL_WQ = {
 
     {7823, 2988, -4587, 2552, 1108, 82355},     --Special Assignment: Cinderbee Surge
     {7824, 1091, -1021, 2552, 1117, 81649},     --Special Assignment: Titanic Resurgence
-    {7825, 1411, -4226, 2601, 1118, },  --Special Assignment: Shadows Below (we don't have the questID for the unlocked quest yet)
+    {7825, 1411, -4226, 2601, 1118, 81691},     --Special Assignment: Shadows Below
     {7826, 3227.21, -3330, 2601, 1119, 83229},  --Special Assignment: When the Deeps Stir
     {7827, 1284, -1001, 2601, 1121, 82852},     --Special Assignment: Lynx Rescue
 
@@ -73,7 +73,7 @@ do
                 end
 
                 local questName = GetQuestInfoByQuestID(questID)
-                tooltip:SetText(questName, 1, 1, 1);
+                tooltip:SetText(questName, 1, 1, 1, true);
                 self:AddQuestTimeToTooltip(tooltip, questID);
                 tooltip:Show();
 
@@ -83,7 +83,7 @@ do
             local poiInfo = GetAreaPOIInfo(self.data.uiMapID, self.data.poiID);
             if poiInfo then
                 tooltip:SetOwner(self, "ANCHOR_RIGHT");
-                tooltip:SetText(poiInfo.name, 1, 1, 1);
+                tooltip:SetText(poiInfo.name, 1, 1, 1, true);
 
                 if poiInfo.tooltipWidgetSet then
                     self:AttachWidgetSetToTooltip(tooltip, poiInfo.tooltipWidgetSet, WidgetTextRule);
