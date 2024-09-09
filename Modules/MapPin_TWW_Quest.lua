@@ -39,11 +39,6 @@ local POI_SPECIAL_WQ = {
 
 
 local POILocation = {};
-POILocation[7829] = {   --Special Assignment: Bombs from Behind
-    uiMapID = 2255,
-    x = 0.4659,
-    y = 0.78,           --(The real y is 0.7312) We changed this manually so it doesn't overlap the map's name (HitRect of Azj-Kahet map is bit messy, there are multiple sub areas)
-};
 
 
 local QuestPinMixin = {};
@@ -202,6 +197,7 @@ do
                             x = localX,
                             y = localY,
                             poiID = key,
+                            questID = questID,
                         };
 
                         positionToCache[p] = position;
@@ -231,7 +227,62 @@ do
     PinController:AddMapDataProvider(MAPID_KHAZALGAR, SpecialQuestPinDataProvider);
 end
 
-do
+
+do  --Dev Tool
+    local DevTool;
+
+    local function Yeet()
+        local tbl = {};
+        local index = 0;
+
+        for _, d in ipairs(POI_SPECIAL_WQ) do
+            local poiID = d[1];
+            local questID = d[6];
+            local continentID = d[4];
+            local worldPosition = CreateVector2D(d[2], d[3]);
+
+            local uiMapID, mapPosition = GetMapPosFromWorldPos(continentID, worldPosition);
+            if uiMapID then
+                index = index + 1;
+                local x, y = mapPosition:GetXY();
+                tbl[index] = {
+                    uiMapID = uiMapID,
+                    x = x,
+                    y = y,
+                    poiID = poiID,
+                };
+            else
+                print("NOT FOUND:", poiID, questID);
+            end
+        end
+
+
+        if not DevTool then
+            DevTool = CreateFrame("Frame");
+        end
+
+        DevTool.index = 0;
+        DevTool.t = 0;
+
+        DevTool:SetScript("OnUpdate", function(self, elapsed)
+            self.t = self.t + elapsed;
+            if self.t > 0.25 then
+                self.t = 0;
+            else
+                return
+            end
+
+            self.index = self.index + 1;
+            local data = tbl[self.index];
+            if not data then
+                self:SetScript("OnUpdate", nil);
+                return
+            end
+
+            API.ConvertMapPositionToContinentPosition(data.uiMapID, data.x, data.y, data.poiID);
+        end);
+    end
+
     local function PrintTaskNames(uiMapID)
         uiMapID = uiMapID or C_Map.GetBestMapForUnit("player");
         for _, data in ipairs(C_TaskQuest.GetQuestsForPlayerByMapID(uiMapID)) do
@@ -239,3 +290,93 @@ do
         end
     end
 end
+
+
+POILocation = {
+    [7887] = {
+        ["uiMapID"] = 2248,
+        ["y"] = 0.148,
+        ["x"] = 0.825,
+        ["poiID"] = 7887,
+        ["continent"] = 2274,
+    },
+    [7823] = {
+        ["uiMapID"] = 2248,
+        ["y"] = 0.179,
+        ["x"] = 0.828,
+        ["poiID"] = 7823,
+        ["continent"] = 2274,
+    },
+    [7824] = {
+        ["uiMapID"] = 2248,
+        ["y"] = 0.327,
+        ["x"] = 0.641,
+        ["poiID"] = 7824,
+        ["continent"] = 2274,
+    },
+    [7825] = {
+        ["uiMapID"] = 2274,
+        ["y"] = 0.588,
+        ["x"] = 0.597,
+        ["poiID"] = 7825,
+        ["continent"] = 2274,
+    },
+    [7826] = {
+        ["uiMapID"] = 2274,
+        ["y"] = 0.461,
+        ["x"] = 0.555,
+        ["poiID"] = 7826,
+        ["continent"] = 2274,
+    },
+    [7827] = {
+        ["uiMapID"] = 2274,
+        ["y"] = 0.597,
+        ["x"] = 0.446,
+        ["poiID"] = 7827,
+        ["continent"] = 2274,
+    },
+    [7828] = {
+        ["uiMapID"] = 2274,
+        ["y"] = 0.375,
+        ["x"] = 0.438,
+        ["poiID"] = 7828,
+        ["continent"] = 2274,
+    },
+    [7829] = {
+        ["uiMapID"] = 2274,
+        ["y"] = 0.731,
+        ["x"] = 0.466,
+        ["poiID"] = 7829,
+        ["continent"] = 2274,
+    },
+    [7830] = {
+        ["uiMapID"] = 2274,
+        ["y"] = 0.375,
+        ["x"] = 0.438,
+        ["poiID"] = 7830,
+        ["continent"] = 2274,
+    },
+    [7886] = {
+        ["uiMapID"] = 2248,
+        ["y"] = 0.33,
+        ["x"] = 0.814,
+        ["poiID"] = 7886,
+        ["continent"] = 2274,
+    },
+};
+
+for _, data in pairs(POI_SPECIAL_WQ) do
+    local poiID = data[1];
+    local questID = data[6];
+
+    if POILocation[poiID] and not POILocation[questID] then
+        POILocation[questID] = POILocation[poiID];
+    end
+end
+
+--Override Location
+POILocation[7829] = {   --Special Assignment: Bombs from Behind
+    uiMapID = 2255,
+    x = 0.4659,
+    y = 0.78,           --(The real y is 0.7312) We changed this manually so it doesn't overlap the map's name (HitRect of Azj-Kahet map is bit messy, there are multiple sub areas)
+};

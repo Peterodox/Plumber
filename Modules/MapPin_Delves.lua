@@ -132,21 +132,6 @@ do
             isBountiful[delveIndex] = true;
         end
 
-        --[[
-        local delveIndex, areaPoiIDs;
-        for _, mapID in ipairs(DelveMaps) do
-            areaPoiIDs = GetDelvesForMap(mapID) or {};
-            for _, poiID in ipairs(areaPoiIDs) do
-                --print((GetAreaPOIInfo(mapID, poiID)).name)
-                delveIndex = POIxDelveIndex[poiID];
-                if delveIndex then
-                    isBountiful[delveIndex] = false;
-                end
-            end
-        end
-        --]]
-
-
         local uiMapID, poiInfo;
         local positionToCache, p;
 
@@ -221,12 +206,119 @@ do
 end
 
 
-do  --Deve Tool
+do  --Dev Tool
     local function Yeet()
         local tbl = {};
-        for index, data in ipairs(DelvePOI) do
+        local index = 0;
+        for _, data in ipairs(DelvePOI) do
+            index = index + 1;
             tbl[index] = {data[1], data[2]};
         end
+        for _, data in ipairs(DelvePOI) do
+            index = index + 1;
+            tbl[index] = {data[1], data[3]};
+        end
         addon.SavePOIPosition(tbl)
+    end
+end
+
+
+POILocation = {
+    [7786] = {
+        ["uiMapID"] = 2255,
+        ["y"] = 0.863,
+        ["x"] = 0.451,
+        ["poiID"] = 7786,
+        ["continent"] = 2274,
+    },
+    [7863] = {
+        ["uiMapID"] = 2248,
+        ["y"] = 0.339,
+        ["x"] = 0.673,
+        ["poiID"] = 7863,
+        ["continent"] = 2274,
+    },
+    [7865] = {
+        ["uiMapID"] = 2248,
+        ["y"] = 0.201,
+        ["x"] = 0.778,
+        ["poiID"] = 7865,
+        ["continent"] = 2274,
+    },
+    [7867] = {
+        ["uiMapID"] = 2214,
+        ["y"] = 0.544,
+        ["x"] = 0.62,
+        ["poiID"] = 7867,
+        ["continent"] = 2274,
+    },
+    [7868] = {
+        ["uiMapID"] = 2215,
+        ["y"] = 0.524,
+        ["x"] = 0.327,
+        ["poiID"] = 7868,
+        ["continent"] = 2274,
+    },
+    [7779] = {
+        ["uiMapID"] = 2248,
+        ["y"] = 0.303,
+        ["x"] = 0.733,
+        ["poiID"] = 7779,
+        ["continent"] = 2274,
+    },
+    [7870] = {
+        ["uiMapID"] = 2215,
+        ["y"] = 0.547,
+        ["x"] = 0.39,
+        ["poiID"] = 7870,
+        ["continent"] = 2274,
+    },
+    [7871] = {
+        ["uiMapID"] = 2215,
+        ["y"] = 0.58,
+        ["x"] = 0.448,
+        ["poiID"] = 7871,
+        ["continent"] = 2274,
+    },
+    [7782] = {
+        ["uiMapID"] = 2214,
+        ["y"] = 0.583,
+        ["x"] = 0.525,
+        ["poiID"] = 7782,
+        ["continent"] = 2274,
+    },
+    [7873] = {
+        ["uiMapID"] = 2255,
+        ["y"] = 0.816,
+        ["x"] = 0.461,
+        ["poiID"] = 7873,
+        ["continent"] = 2274,
+    },
+    [7874] = {
+        ["uiMapID"] = 2255,
+        ["y"] = 0.639,
+        ["x"] = 0.429,
+        ["poiID"] = 7874,
+        ["continent"] = 2274,
+    },
+    [7780] = {
+        ["uiMapID"] = 2215,
+        ["y"] = 0.461,
+        ["x"] = 0.47,
+        ["poiID"] = 7780,
+        ["continent"] = 2274,
+    },
+};
+
+for _, data in pairs(DelvePOI) do
+    local poi1 = data[2];
+    local poi2 = data[3];
+
+    if POILocation[poi1] and not POILocation[poi2] then
+        POILocation[poi2] = POILocation[poi1];
+    end
+
+    if POILocation[poi2] and not POILocation[poi1] then
+        POILocation[poi1] = POILocation[poi2];
     end
 end

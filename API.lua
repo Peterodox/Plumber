@@ -163,6 +163,11 @@ do  --Math
         return floor(n + 0.5);
     end
     API.Round = Round;
+
+    local function RoundCoord(n)
+        return floor(n * 1000 + 0.5) * 0.001
+    end
+    API.RoundCoord = RoundCoord;
 end
 
 do  -- Color
@@ -998,7 +1003,7 @@ do  -- Map
             uiMapID = uiMapID,
             position = CreateVector2D(x, y);
         };
-    
+
         C_Map.SetUserWaypoint(point);
 
         C_Timer.After(0, function()
@@ -1016,14 +1021,14 @@ do  -- Map
                 end
     
                 if poiID then
-                    x = floor(x*10000 + 0.5)/10000;
-                    y = floor(y*10000 + 0.5)/10000;
+                    x = API.RoundCoord(x);
+                    y = API.RoundCoord(y);
                     PlumberDevData.POIPositions[poiID] = {
-                        id = poiID,
-                        mapID = uiMapID,
+                        poiID = poiID,
+                        uiMapID = uiMapID,
                         continent = continentMapID,
-                        cx = x,
-                        cy = y,
+                        x = x,
+                        y = y,
                     };
                 end
 
@@ -1070,8 +1075,10 @@ do  -- Map
     end
 
     local function ConvertAndCacheMapPositions(positions, onCoordReceivedFunc, onFinishedFunc)
+        --Convert Zone position to Continent position
         if not Converter then
             Converter = CreateFrame("Frame");
+            print("Plumber Request ConvertAndCacheMapPositions");
         end
 
         local MAPTYPE_CONTINENT = Enum.UIMapType.Continent;
@@ -1135,13 +1142,24 @@ do  -- Map
                             local positionData = {
                                 uiMapID = uiMapID,
                                 continent = continentMapID,
-                                x = x,
-                                y = y,
+                                x = API.RoundCoord(x),
+                                y = API.RoundCoord(y),
                                 poiID = poiID,
                             };
 
                             onCoordReceivedFunc(positionData)
                             C_Map.ClearUserWaypoint();
+
+                            --Debug Save Position
+                            --[[
+                            if not PlumberDevData then
+                                PlumberDevData = {};
+                            end
+                            if not PlumberDevData.Waypoints then
+                                PlumberDevData.Waypoints = {};
+                            end
+                            PlumberDevData.Waypoints[poiID] = positionData;
+                            --]]
                         end
                         Converter.t = 0.033;
                     end
