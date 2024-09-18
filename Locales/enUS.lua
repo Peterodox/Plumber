@@ -161,7 +161,7 @@ L["ModuleDescription TooltipChestKeys"] = "Show info on the key required to open
 
 --Tooltip Reputation Tokens
 L["ModuleName TooltipRepTokens"] = "Tooltip: Reputation Tokens";
-L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increased reputations.";
+L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increase reputation.";
 
 
 --Merchant UI Price
