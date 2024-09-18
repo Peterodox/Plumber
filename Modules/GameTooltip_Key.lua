@@ -199,7 +199,7 @@ do
         description = addon.L["ModuleDescription TooltipChestKeys"],
         toggleFunc = EnableModule,
         categoryID = 1,
-        uiOrder = 5,
+        uiOrder = 1110,
         moduleAddedTime = 1718500000,
     };
 

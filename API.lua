@@ -1,6 +1,6 @@
 local _, addon = ...
 local API = addon.API;
-local IS_TWW = addon.IsGame_11_0_0;
+local L = addon.L;
 
 local tonumber = tonumber;
 local match = string.match;
@@ -1486,9 +1486,14 @@ do  --Game UI
 end
 
 do  --Reputation
+    local C_Reputation = C_Reputation;
+    local C_MajorFactions = C_MajorFactions;
     local GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation;
     local GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks;
     local GetFactionParagonInfo = C_Reputation.GetFactionParagonInfo;
+    local GetFactionInfoByID = C_Reputation.GetFactionDataByID;
+    local UnitSex = UnitSex;
+    local GetText = GetText;
 
     local function GetFriendshipProgress(factionID)
         local repInfo = factionID and GetFriendshipReputation(factionID);
@@ -1527,10 +1532,99 @@ do  --Reputation
         return 0, 1, 0
     end
     API.GetParagonValuesAndLevel = GetParagonValuesAndLevel;
+
+
+    local function GetFactionStatusText(factionID)
+        --Derived from Blizzard ReputationFrame_InitReputationRow in ReputationFrame.lua
+        if not factionID then return end;
+        local p1, description, standingID, barMin, barMax, barValue = GetFactionInfoByID(factionID);
+
+        if type(p1) == "table" then
+            standingID = p1.reaction;
+            barMin = p1.currentReactionThreshold;
+            barMax = p1.nextReactionThreshold;
+            barValue = p1.currentStanding;
+        end
+
+        local isParagon = C_Reputation.IsFactionParagon(factionID);
+        local isMajorFaction = C_Reputation.IsMajorFaction(factionID);
+        local repInfo = GetFriendshipReputation(factionID);
+
+        local isCapped;
+        local factionStandingtext;  --Revered/Junior/Renown 1
+
+        if repInfo and repInfo.friendshipFactionID > 0 then --Friendship
+            factionStandingtext = repInfo.reaction;
+
+            if repInfo.nextThreshold then
+                barMin, barMax, barValue = repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.standing;
+            else
+                barMin, barMax, barValue = 0, 1, 1;
+                isCapped = true;
+            end
+
+            local rankInfo = GetFriendshipReputationRanks(repInfo.friendshipFactionID);
+            if rankInfo then
+                factionStandingtext = factionStandingtext .. string.format(" (Lv. %s/%s)", rankInfo.currentLevel, rankInfo.maxLevel);
+            end
+
+        elseif isMajorFaction then
+            local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID);
+            if majorFactionData then
+                barMin, barMax = 0, majorFactionData.renownLevelThreshold;
+                isCapped = C_MajorFactions.HasMaximumRenown(factionID);
+                barValue = isCapped and majorFactionData.renownLevelThreshold or majorFactionData.renownReputationEarned or 0;
+                factionStandingtext = L["Renown Level Label"] .. majorFactionData.renownLevel;
+
+                if isParagon then
+                    local totalEarned, threshold = C_Reputation.GetFactionParagonInfo(factionID);
+                    if totalEarned and threshold and threshold ~= 0 then
+                        local paragonLevel = floor(totalEarned / threshold);
+                        local currentValue = totalEarned - paragonLevel * threshold;
+                        factionStandingtext = ("|cff00ccff"..L["Paragon Reputation"].."|r %d/%d"):format(currentValue, threshold);
+                    end
+                else
+                    if isCapped then
+                        factionStandingtext = factionStandingtext.." "..L["Level Maxed"];
+                    end
+                end
+            end
+        elseif (standingID and standingID > 0) then
+            isCapped = standingID == 8;  --MAX_REPUTATION_REACTION
+            local gender = UnitSex("player");
+		    factionStandingtext = GetText("FACTION_STANDING_LABEL"..standingID, gender);    --GetText: Game API that returns localized texts
+        end
+
+        local rolloverText; --(0/24000)
+        if barValue and barMax and (not isCapped) then
+            rolloverText = string.format("(%s/%s)", barValue, barMax);
+        end
+
+        local text;
+
+        if factionStandingtext then
+            if not text then text = L["Current Colon"] end;
+            factionStandingtext = " |cffffffff"..factionStandingtext.."|r";
+            text = text .. factionStandingtext;
+        end
+
+        if rolloverText then
+            if not text then text = L["Current Colon"] end;
+            rolloverText = "  |cffffffff"..rolloverText.."|r";
+            text = text .. rolloverText;
+        end
+
+        if text then
+            text = " \n"..text;
+        end
+
+        return text
+    end
+    API.GetFactionStatusText = GetFactionStatusText;
 end
 
 do  --Spell
-    if IS_TWW then
+    if true then    --IS_TWW
         local GetSpellInfo_Table = C_Spell.GetSpellInfo;
         local SPELL_INFO_KEYS = {"name", "rank", "iconID", "castTime", "minRange", "maxRange", "spellID", "originalIconID"};
         local function GetSpellInfo_Flat(spellID)
@@ -1552,7 +1646,7 @@ do  --Spell
 end
 
 do  --System
-    if IS_TWW then
+    if true then    --IS_TWW
         local GetMouseFoci = GetMouseFoci;
 
         local function GetMouseFocus()

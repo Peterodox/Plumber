@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.3.7";
-local VERSION_DATE = 1725800000;
+local VERSION_TEXT = "v1.3.8";
+local VERSION_DATE = 1726600000;
 
 
 local addonName, addon = ...
@@ -87,6 +87,7 @@ local DefaultValues = {
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
     Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
     TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
+    TooltipRepTokens = true,            --Show faction info for items that grant rep
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
 

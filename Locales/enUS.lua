@@ -159,6 +159,11 @@ L["ModuleName TooltipChestKeys"] = "Tooltip: Chest Keys";
 L["ModuleDescription TooltipChestKeys"] = "Show info on the key required to open the current chest or door.";
 
 
+--Tooltip Reputation Tokens
+L["ModuleName TooltipRepTokens"] = "Tooltip: Reputation Tokens";
+L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increased reputations.";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Merchant Price";
 L["ModuleDescription MerchantPrice"] = "Modify Merchant UI's behaviors:\n\n- Grey out only the insufficient currencies.\n\n- Show all required items in the coin box.";
@@ -195,6 +200,10 @@ L["Reposition Button Vertical"] = "Move Vertically";
 L["Reposition Button Tooltip"] = "Left-click and drag to move the window.";
 L["Font Size"] = FONT_SIZE or "Font Size";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Reset To Default Position";
+L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renown ";  --There is a space
+L["Paragon Reputation"] = "Paragon";
+L["Level Maxed"] = "(Maxed)";   --Reached max level
+L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 
 
 

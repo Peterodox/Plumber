@@ -285,8 +285,9 @@ do  --Dev Tool
 
     local function PrintTaskNames(uiMapID)
         uiMapID = uiMapID or C_Map.GetBestMapForUnit("player");
+        print("MAP", uiMapID)
         for _, data in ipairs(C_TaskQuest.GetQuestsForPlayerByMapID(uiMapID)) do
-            print(data.questId, QuestUtils_GetQuestName(data.questId))
+            print(data.questId, QuestUtils_GetQuestName(data.questId), API.RoundCoord(data.x), API.RoundCoord(data.y))
         end
     end
 end
@@ -349,7 +350,7 @@ POILocation = {
         ["poiID"] = 7829,
         ["continent"] = 2274,
     },
-    [7830] = {
+    [7830] = {  --Pound of Cure
         ["uiMapID"] = 2274,
         ["y"] = 0.375,
         ["x"] = 0.438,
@@ -379,4 +380,14 @@ POILocation[7829] = {   --Special Assignment: Bombs from Behind
     uiMapID = 2255,
     x = 0.4659,
     y = 0.78,           --(The real y is 0.7312) We changed this manually so it doesn't overlap the map's name (HitRect of Azj-Kahet map is bit messy, there are multiple sub areas)
+};
+
+POILocation[82414] = {
+    --Pound of Cure (It seems the quest pin moves to its true location after being unlocked)
+    --We slightly move the pin so player knows it's in Azj-Kahet
+    ["uiMapID"] = 2274,
+    ["y"] = 0.65,  --0.606
+    ["x"] = 0.495,  --0.491
+    ["poiID"] = 7830,
+    ["continent"] = 2274,
 };

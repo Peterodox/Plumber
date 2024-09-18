@@ -94,7 +94,7 @@ function EL:ProcessOnNextCycle(func)
         self.queuedFuncs = {};
     end
 
-    self.t = -0.2;
+    self.t = -0.5;
     self:SetScript("OnUpdate", self.OnUpdate);
 
     for _, queuedFunc in ipairs(self.queuedFuncs) do
@@ -239,7 +239,7 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
         if event == "CURRENCY_DISPLAY_UPDATE" then
             local currencyID = ...
             if currencyID and (currencyID == CURRENCY_AFFIX_ACTIVE or currencyID == CURRENCY_AFFIX_MAXIMUM) then
-                self:RequestUpdate();
+                self:RequestUpdate(true);
             end
         end
     end
@@ -258,7 +258,7 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
 
     function BonusObjectiveTrackerMixin:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        if self.t >= 0.5 then
+        if self.t >= 1.0 then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             self:Update();
@@ -282,7 +282,7 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
         local widgets = C_UIWidgetManager.GetAllWidgetsBySetID(widgetSetID);
         if not widgets then return end;
 
-        local TYPE_ID = Enum.UIWidgetVisualizationType.ScenarioHeaderDelves or 29;
+        local TYPE_ID =  29;    --Enum.UIWidgetVisualizationType.ScenarioHeaderDelves
         local widgetID;
 
         for _, widgetInfo in ipairs(widgets) do

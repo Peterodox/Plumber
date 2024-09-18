@@ -159,6 +159,11 @@ L["ModuleName TooltipChestKeys"] = "鼠标提示：宝箱钥匙";
 L["ModuleDescription TooltipChestKeys"] = "显示打开某些宝箱所需的钥匙信息。";
 
 
+--Tooltip Reputation Tokens
+L["ModuleName TooltipRepTokens"] = "鼠标提示：声望兑换物";
+L["ModuleDescription TooltipRepTokens"] = "如果当前物品可以被直接使用来提升某一阵营的声望，显示此声望信息";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "商品价格";
 L["ModuleDescription MerchantPrice"] = "改变商人界面的默认行为：\n\n- 只把数量不足的货币变灰。\n\n- 在钱币方框内显示当前页面所需的所有货币。";
@@ -195,6 +200,10 @@ L["Reposition Button Vertical"] = "竖直方向移动";
 L["Reposition Button Tooltip"] = "左键点击并拖拉来移动这个窗口。";
 L["Font Size"] = "字体大小";
 L["Reset To Default Position"] = "重置到默认位置";
+L["Renown Level Label"] = "名望 ";  --There is a space
+L["Paragon Reputation"] = "巅峰";
+L["Level Maxed"] = "已满级";   --Reached max level
+L["Current Colon"] = "当前：";
 
 
 
