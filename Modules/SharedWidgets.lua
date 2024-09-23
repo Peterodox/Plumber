@@ -657,16 +657,15 @@ do  -- TokenFrame   -- Money   -- Coin
         else
             if gold > 0 then
                 coinIndex = coinIndex + 1;
-                gold = BreakUpLargeNumbers(gold);
-                self:SetGoldAmount(coinIndex, gold);
+                self:SetGoldAmount(coinIndex, BreakUpLargeNumbers(gold));
             end
 
-            if silver > 0 then
+            if silver > 0 or (gold > 0 and self.showCopperDuringAnimation) then
                 coinIndex = coinIndex + 1;
                 self:SetSilverAmount(coinIndex, silver);
             end
 
-            if copper > 0 then
+            if copper > 0 or self.showCopperDuringAnimation then
                 coinIndex = coinIndex + 1;
                 self:SetCopperAmount(coinIndex, copper);
             end
@@ -677,31 +676,31 @@ do  -- TokenFrame   -- Money   -- Coin
         local width;
 
         self.Amount1:SetPoint("LEFT", self, "LEFT", 0, 0);
-        width = self.Amount1:GetWrappedWidth() + AMOUNT_COIN_GAP;
+        width = self.Amount1:GetWrappedWidth() + self.valueSymbolGap;
         self.Symbol1:SetPoint("LEFT", self, "LEFT", width, 0);
 
         if self.colorblindMode then
             width = width + COLORBLIND_TEXT_GAP;
         else
-            width = width + COIN_TEXTURE_SIZE;
+            width = width + COIN_TEXTURE_SIZE + AMOUNT_COIN_GAP;
         end
 
         if coinIndex >= 2 then
             width = width + COIN_TYPE_GAP;
             self.Amount2:SetPoint("LEFT", self, "LEFT", width, 0);
-            width = width + self.Amount2:GetWrappedWidth() + AMOUNT_COIN_GAP;
+            width = width + self.Amount2:GetWrappedWidth() + self.valueSymbolGap;
             self.Symbol2:SetPoint("LEFT", self, "LEFT", width, 0);
             if self.colorblindMode then
                 width = width + COLORBLIND_TEXT_GAP;
             else
-                width = width + COIN_TEXTURE_SIZE;
+                width = width + COIN_TEXTURE_SIZE + AMOUNT_COIN_GAP;
             end
         end
 
         if coinIndex >= 3 then
             width = width + COIN_TYPE_GAP;
             self.Amount3:SetPoint("LEFT", self, "LEFT", width, 0);
-            width = width + self.Amount3:GetWrappedWidth() + AMOUNT_COIN_GAP;
+            width = width + self.Amount3:GetWrappedWidth() + self.valueSymbolGap;
             self.Symbol3:SetPoint("LEFT", self, "LEFT", width, 0);
             if self.colorblindMode then
                 width = width + COLORBLIND_TEXT_GAP;
@@ -751,6 +750,10 @@ do  -- TokenFrame   -- Money   -- Coin
             color = 2;
         end
 
+        if not color then
+            color = 0;
+        end
+
         if self.color ~= color then
             self.color = color;
             if color == 1 then
@@ -768,14 +771,57 @@ do  -- TokenFrame   -- Money   -- Coin
             end
         end
 
-        self.colorblindMode = GetCVarBool("colorblindMode");
-
         return self:Layout();
+    end
+
+    function MoneyDisplayMixin:GetAmount()
+        return self.rawCopper or 0
+    end
+
+    function MoneyDisplayMixin:OnUpdate_AnimateValue(elapsed)
+        self.totalTime = self.totalTime + elapsed;
+        self.updateTime = self.updateTime + elapsed;
+
+        if self.totalTime > 0.8 then
+            self.fromCopper = self.toCopper;
+            self:SetScript("OnUpdate", nil);
+            self:SetAmount(self.toCopper);
+            self.totalTime = nil;
+            self.updateTime = nil;
+        else
+            if self.updateTime > 0.05 then
+                self.newValue = self.deltaLerp(self.fromCopper, self.toCopper, 0.2, self.updateTime);
+                local delta = self.newValue - self.fromCopper;
+                if delta < 10 and delta > -10 then
+                    self.totalTime = 1;
+                else
+                    self.fromCopper = self.newValue;
+                    self.updateTime = self.updateTime - 0.05;
+                    self:SetAmount(self.fromCopper);
+                end
+            end
+        end
+    end
+
+    function MoneyDisplayMixin:SetAmountByDelta(addRawCopper, animte)
+        if animte then
+            self.fromCopper = self.fromCopper or self:GetAmount();
+            self.toCopper = self.fromCopper + addRawCopper;
+            self.updateTime = 0;
+            self.totalTime = 0;
+            local copper = self.toCopper % 100;
+            self.showCopperDuringAnimation = floor(copper) > 0;
+            self:SetScript("OnUpdate", self.OnUpdate_AnimateValue);
+        else
+            self.fromCopper = self:GetAmount();
+            self.showCopperDuringAnimation = nil;
+            self:SetAmount(self:GetAmount() + addRawCopper);
+        end
     end
 
     function MoneyDisplayMixin:SetGoldAmount(coinIndex, amount)
         if self.colorblindMode then
-            self["Amount"..coinIndex]:SetText(amount..(GOLD_AMOUNT_SYMBOL or "g"));
+            self["Amount"..coinIndex]:SetText(amount..self.goldSymbol);
             self["Symbol"..coinIndex]:Hide();
         else
             self["Amount"..coinIndex]:SetText(amount);
@@ -785,7 +831,7 @@ do  -- TokenFrame   -- Money   -- Coin
 
     function MoneyDisplayMixin:SetSilverAmount(coinIndex, amount)
         if self.colorblindMode then
-            self["Amount"..coinIndex]:SetText(amount..(SILVER_AMOUNT_SYMBOL or "s"));
+            self["Amount"..coinIndex]:SetText(amount..self.silverSymbol);
             self["Symbol"..coinIndex]:Hide();
         else
             self["Amount"..coinIndex]:SetText(amount);
@@ -795,12 +841,16 @@ do  -- TokenFrame   -- Money   -- Coin
 
     function MoneyDisplayMixin:SetCopperAmount(coinIndex, amount)
         if self.colorblindMode then
-            self["Amount"..coinIndex]:SetText(amount..(COPPER_AMOUNT_SYMBOL or "c"));
+            self["Amount"..coinIndex]:SetText(amount..self.copperSymbol);
             self["Symbol"..coinIndex]:Hide();
         else
             self["Amount"..coinIndex]:SetText(amount);
             self:SetTextureCopper(self["Symbol"..coinIndex]);
         end
+    end
+
+    function MoneyDisplayMixin:OnShow()
+        self.colorblindMode = GetCVarBool("colorblindMode");
     end
 
     local function CreateMoneyDisplay(parent, numberFont)
@@ -812,7 +862,7 @@ do  -- TokenFrame   -- Money   -- Coin
         f.rawCopper = 0;
 
         local fontObject = numberFont or "NumberFontNormal";
-    
+
         f.Amount1 = f:CreateFontString(nil, "OVERLAY", fontObject);
         f.Amount2 = f:CreateFontString(nil, "OVERLAY", fontObject);
         f.Amount3 = f:CreateFontString(nil, "OVERLAY", fontObject);
@@ -841,6 +891,16 @@ do  -- TokenFrame   -- Money   -- Coin
         f:SetTextureGold(f.Symbol1);
         f:SetTextureSilver(f.Symbol2);
         f:SetTextureCopper(f.Symbol3);
+
+        f.goldSymbol = GOLD_AMOUNT_SYMBOL or "g";
+        f.silverSymbol = SILVER_AMOUNT_SYMBOL or "s";
+        f.copperSymbol = COPPER_AMOUNT_SYMBOL or "c";
+
+        f.valueSymbolGap = 2;
+        f.deltaLerp = API.DeltaLerp;
+
+        f:SetScript("OnShow", f.OnShow);
+        f:OnShow();
 
         return f
     end

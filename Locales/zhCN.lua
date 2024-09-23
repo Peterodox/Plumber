@@ -204,6 +204,7 @@ L["Renown Level Label"] = "名望 ";  --There is a space
 L["Paragon Reputation"] = "巅峰";
 L["Level Maxed"] = "已满级";   --Reached max level
 L["Current Colon"] = "当前：";
+L["Unclaimed Reward Alert"] = "你有未领取的巅峰宝箱";
 
 
 

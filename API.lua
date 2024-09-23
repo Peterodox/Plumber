@@ -168,6 +168,15 @@ do  --Math
         return floor(n * 1000 + 0.5) * 0.001
     end
     API.RoundCoord = RoundCoord;
+
+    local function Saturate(value)
+        return Clamp(value, 0.0, 1.0);
+    end
+
+    local function DeltaLerp(startValue, endValue, amount, timeSec)
+        return Lerp(startValue, endValue, Saturate(amount * timeSec * 60.0));
+    end
+    API.DeltaLerp = DeltaLerp;
 end
 
 do  -- Color
@@ -196,6 +205,7 @@ do  -- Color
     -- Make Rare and Epic brighter (use the color in Narcissus)
     local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS;
     local QualityColors = {};
+    QualityColors[1] = CreateColor(0.92, 0.92, 0.92, 1);
     QualityColors[3] = CreateColor(105/255, 158/255, 255/255, 1);
     QualityColors[4] = CreateColor(185/255, 83/255, 255/255, 1);
 
@@ -1346,6 +1356,34 @@ do  --Currency
             self:CacheAndGetCurrencyInfo(currencyID);
         end
     end
+
+    local CoinUtil = {};
+    addon.CoinUtil = CoinUtil;
+
+    CoinUtil.patternGold = L["Match Pattern Gold"];
+    CoinUtil.patternSilver = L["Match Pattern Silver"];
+    CoinUtil.patternCopper = L["Match Pattern Copper"];
+
+    function CoinUtil:GetCopperFromCoinText(coinText)
+        local rawCopper = 0;
+        local gold = match(coinText, self.patternGold);
+        local silver = match(coinText, self.patternSilver);
+        local copper = match(coinText, self.patternCopper);
+
+        if gold then
+            rawCopper = rawCopper + 10000 * (tonumber(gold) or 0);
+        end
+
+        if silver then
+            rawCopper = rawCopper + 100 * (tonumber(silver) or 0);
+        end
+
+        if copper then
+            rawCopper = rawCopper + (tonumber(copper) or 0);
+        end
+
+        return rawCopper
+    end
 end
 
 do  --Chat Message
@@ -1552,6 +1590,7 @@ do  --Reputation
 
         local isCapped;
         local factionStandingtext;  --Revered/Junior/Renown 1
+        local cappedAlert;
 
         if repInfo and repInfo.friendshipFactionID > 0 then --Friendship
             factionStandingtext = repInfo.reaction;
@@ -1577,11 +1616,15 @@ do  --Reputation
                 factionStandingtext = L["Renown Level Label"] .. majorFactionData.renownLevel;
 
                 if isParagon then
-                    local totalEarned, threshold = C_Reputation.GetFactionParagonInfo(factionID);
+                    local totalEarned, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID);
                     if totalEarned and threshold and threshold ~= 0 then
                         local paragonLevel = floor(totalEarned / threshold);
                         local currentValue = totalEarned - paragonLevel * threshold;
                         factionStandingtext = ("|cff00ccff"..L["Paragon Reputation"].."|r %d/%d"):format(currentValue, threshold);
+                    end
+
+                    if hasRewardPending then
+                        cappedAlert = "|cffff4800"..L["Unclaimed Reward Alert"].."|r";
                     end
                 else
                     if isCapped then
@@ -1616,11 +1659,32 @@ do  --Reputation
 
         if text then
             text = " \n"..text;
+
+            if cappedAlert then
+                text = text.."\n"..cappedAlert;
+            end
         end
 
         return text
     end
     API.GetFactionStatusText = GetFactionStatusText;
+
+
+    local function GetReputationChangeFromText(text)
+        local name, amount;
+        name, amount = match(text, L["Match Patter Rep 1"]);
+        if not name then
+            name, amount = match(text, L["Match Patter Rep 2"]);
+        end
+        if name then
+            if amount then
+                amount = gsub(amount, ",", "");
+                amount = tonumber(amount);
+            end
+            return name, amount
+        end
+    end
+    API.GetReputationChangeFromText = GetReputationChangeFromText;
 end
 
 do  --Spell
@@ -1687,6 +1751,102 @@ do  --Scenario
     end
     API.IsInDelves = IsInDelves;
     --]]
+end
+
+do  --ObjectPool
+    local ObjectPoolMixin = {};
+
+    function ObjectPoolMixin:RemoveObject(obj)
+        obj:Hide();
+        obj:ClearAllPoints();
+
+        if obj.OnRemoved then
+            obj:OnRemoved();
+        end
+    end
+
+    function ObjectPoolMixin:RecycleObject(obj)
+        local isActive;
+
+        for i, activeObject in ipairs(self.activeObjects) do
+            if activeObject == obj then
+                tremove(self.activeObjects, i);
+                isActive = true;
+                break
+            end
+        end
+
+        if isActive then
+            self:RemoveObject(obj);
+            self.numUnused = self.numUnused + 1;
+            self.unusedObjects[self.numUnused] = obj;
+        end
+    end
+
+    function ObjectPoolMixin:CreateObject()
+        local obj = self.createObjectFunc();
+        tinsert(self.objects, obj);
+        obj.Release = self.Object_Release;
+        return obj
+    end
+
+    function ObjectPoolMixin:Acquire()
+        local obj;
+
+        if self.numUnused > 0 then
+            obj = tremove(self.unusedObjects, self.numUnused);
+            self.numUnused = self.numUnused - 1;
+        end
+
+        if not obj then
+            obj = self:CreateObject();
+        end
+
+        tinsert(self.activeObjects, obj);
+        obj:Show();
+
+        return obj
+    end
+
+    function ObjectPoolMixin:ReleaseAll()
+        if #self.activeObjects == 0 then return end;
+
+        for _, obj in ipairs(self.activeObjects) do
+            self:RemoveObject(obj);
+        end
+
+        self.activeObjects = {};
+        self.unusedObjects = {};
+
+        for index, obj in ipairs(self.objects) do
+            self.unusedObjects[index] = obj;
+        end
+
+        self.numUnused = #self.objects;
+
+        local function Object_Release(f)
+            self:RecycleObject(f);
+        end
+        self.Object_Release = Object_Release;
+    end
+
+    function ObjectPoolMixin:GetTotalObjects()
+        return #self.objects
+    end
+
+    local function CreateObjectPool(createObjectFunc)
+        local pool = {};
+        API.Mixin(pool, ObjectPoolMixin);
+
+        pool.objects = {};
+        pool.activeObjects = {};
+        pool.unusedObjects = {};
+        pool.numUnused = 0;
+        pool.createObjectFunc = createObjectFunc;
+
+        return pool
+    end
+    API.CreateObjectPool = CreateObjectPool;
 end
 
 --[[

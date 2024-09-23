@@ -204,6 +204,7 @@ L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renown ";  --There is a space
 L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
+L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
 
 
 
@@ -228,3 +229,11 @@ L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID onc
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Bountiful Delves";
 L["Special Assignment"] = "Special Assignments";
+
+
+L["Match Pattern Gold"] = "([%d%,]+) Gold";
+L["Match Pattern Silver"] = "([%d]+) Silver";
+L["Match Pattern Copper"] = "([%d]+) Copper";
+
+L["Match Patter Rep 1"] = "Your Warband's reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Patter Rep 2"] = "Reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED

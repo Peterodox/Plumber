@@ -1,0 +1,125 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="LootUI.lua"/>
+
+	<Frame name="PlumberLootUIIconTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" setAllPoints="true">
+                    <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="0">
+				<Texture parentKey="Border" setAllPoints="true" file="Interface\AddOns\Plumber\Art\LootUI\IconBorder-Square.png">
+                    <TextureSliceMode mode="Stretched"/>
+                    <TextureSliceMargins left="4" right="4" top="4" bottom="4"/>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="2">
+				<Texture parentKey="IconOverlay" hidden="true">
+                    <Size x="64" y="64"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="PlumberLootUIItemFrameTemplate" alpha="0" virtual="true">
+		<Size x="256" y="32"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Count" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE">
+                    <Color r="1" g="1" b="1"/>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="DummyCount" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" hidden="true">
+                    <Color r="1" g="1" b="1"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Count" relativePoint="CENTER"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
+                    <Size x="192"/>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Animations>
+			<AnimationGroup parentKey="AnimItemCount">
+				<Alpha childKey="Count" fromAlpha="0" toAlpha="0" duration="0" order="1"/>
+                <Translation childKey="Count" offsetY="-6" duration="0" order="1"/>
+				<Alpha childKey="DummyCount" fromAlpha="1" toAlpha="1" duration="0" order="1"/>
+
+				<Alpha childKey="DummyCount" fromAlpha="1" toAlpha="0" duration="0.25" order="2" startDelay="0.25"/>
+                <Translation childKey="DummyCount" offsetY="6" duration="0.25" smoothing="OUT" order="2" startDelay="0.25"/>
+                <Alpha childKey="Count" fromAlpha="0" toAlpha="1" duration="0.25" order="2" startDelay="0.25"/>
+                <Translation childKey="Count" offsetY="6" duration="0.25" smoothing="IN" order="2" startDelay="0.25"/>
+			</AnimationGroup>
+		</Animations>
+	</Frame>
+
+	<Frame name="PlumberLootUIBackgroundTemplate" ignoreParentScale="true" useParentLevel="true" virtual="true">
+        <Size x="512" y="512"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" setAllPoints="true">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+                <MaskTexture parentKey="MaskRight" file="Interface/AddOns/Plumber/Art/LootUI/BackgroundMask-Right" hWrapMode="CLAMP" vWrapMode="CLAMP">
+                    <MaskedTextures>
+                        <MaskedTexture childKey="Background"/>
+                    </MaskedTextures>
+                    <Size x="512" y="512"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="0"/>
+                    </Anchors>
+                </MaskTexture>
+                <MaskTexture parentKey="MaskBottom" file="Interface/AddOns/Plumber/Art/LootUI/BackgroundMask-Bottom" hWrapMode="CLAMP" vWrapMode="CLAMP">
+                    <MaskedTextures>
+                        <MaskedTexture childKey="Background"/>
+                    </MaskedTextures>
+                    <Size x="512" y="64"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="-448"/>
+                    </Anchors>
+                </MaskTexture>
+            </Layer>
+
+			<Layer level="BORDER">
+                <Texture parentKey="TopLine">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+                    </Anchors>
+					<Size x="512" y="8"/>
+                </Texture>
+                <Texture parentKey="TopLineEnd">
+                    <Size x="16" y="8"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.TopLine" relativePoint="RIGHT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+
+                <Texture parentKey="LeftLine">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+                    </Anchors>
+					<Size x="512" y="8"/>
+                </Texture>
+                <Texture parentKey="LeftLineEnd">
+                    <Size x="8" y="16"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativeKey="$parent.LeftLine" relativePoint="BOTTOM" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>

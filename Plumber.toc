@@ -46,6 +46,7 @@ Modules\DelvesScenario.lua
 Modules\DelvesDashboard.lua
 Modules\ExpansionLandingPage.xml
 Modules\GameTooltipExtension.xml
+Modules\LootUI.xml
 
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua
