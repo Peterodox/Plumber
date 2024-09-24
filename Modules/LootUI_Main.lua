@@ -243,7 +243,7 @@ do  --UI LootButton
     function ItemFrameMixin:OnEnter()
         --Effective during Manual Mode
         if self.data.slotType == Defination.SLOT_TYPE_ITEM then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
             GameTooltip:SetLootItem(self.data.slotIndex);
         elseif self.data.slotType == Defination.SLOT_TYPE_CURRENCY then
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -511,6 +511,101 @@ do  --UI Background
             self.BackgroundFrame:SetBackgroundSize(width, height);
         end
     end
+end
+
+
+do  --UI Basic
+    local function OnUpdate_FadeOut(self, elapsed)
+        self.alpha = self.alpha - 4*elapsed;
+        if self.alpha <= 0 then
+            self.alpha = 0;
+            self:SetScript("OnUpdate", nil);
+            self:Hide();
+        end
+        self:SetAlpha(self.alpha);
+    end
+
+    function MainFrame:TryHide()
+        self.lootQueue = nil;
+        self.isUpdatingPage = nil;
+        self.alpha = self:GetAlpha();
+        self:SetScript("OnUpdate", OnUpdate_FadeOut);
+    end
+
+    function MainFrame:Disable()
+        if self.timerFrame then
+            self.timerFrame:SetScript("OnUpdate", nil);
+            self.timerFrame.t = nil;
+        end
+
+        self:Hide();
+        self:ClearAllPoints();
+    end
+
+    function MainFrame:Reposition()
+        local viewportWidth, viewportHeight = WorldFrame:GetSize();
+        viewportWidth = math.min(viewportWidth, viewportHeight * 16/9);
+
+        local scale = UIParent:GetEffectiveScale();
+        self:SetScale(scale);
+
+        local offsetX = math.floor((0.5 - 0.3333) * viewportWidth /scale);
+
+        self:ClearAllPoints();
+        self:SetPoint("TOPLEFT", nil, "CENTER", offsetX, 0);
+    end
+
+    function MainFrame:Init()
+        self.Init = nil;
+
+        Formatter:Init()
+
+        self.itemFramePool = API.CreateObjectPool(CreateItemFrame);
+
+
+        local function CreatePagniation()
+            local texture = self:CreateTexture(nil, "OVERLAY");
+            texture:SetTexture("Interface/AddOns/Plumber/Art/LootUI/LootUI.png");
+            texture:SetTexCoord(0, 32/1024, 0, 32/512);
+            return texture
+        end
+        self.paginationPool = API.CreateObjectPool(CreatePagniation);
+
+
+        local MoneyFrame = addon.CreateMoneyDisplay(self, "GameFontNormal");
+        self.MoneyFrame = MoneyFrame;
+        MoneyFrame:SetHeight(Formatter.TEXT_BUTTON_HEIGHT);
+        MoneyFrame:Hide();
+        MoneyFrame.EnableMouseScript = ItemFrameMixin.EnableMouseScript;
+        MoneyFrame:SetScript("OnMouseDown", ItemFrameMixin.OnMouseDown);
+
+        function MoneyFrame:SetData(data)
+            if self:IsShown() then
+                self:SetAmountByDelta(data.quantity, true);     --true: animate
+            else
+                self:SetAmount(data.quantity);
+            end
+        end
+
+        function MoneyFrame:IsSameItem(data)
+            return data.slotType == Defination.SLOT_TYPE_MONEY
+        end
+
+        self:InitBackground();
+
+        local Header = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        self.Header = Header;
+        Header:Hide();
+        Header:SetJustifyH("CENTER");
+        Header:SetPoint("BOTTOM", self, "TOPLEFT", 0.5 * Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING, Formatter.BUTTON_SPACING);
+        Header:SetText("Loot Manually")
+    end
+
+    function MainFrame:AcquireItemFrame()
+        local f = self.itemFramePool:Acquire();
+        f.Text:SetWidth(Formatter.NAME_WIDTH);
+        return f
+    end
 
     function MainFrame:SetMaxPage(page)
         self.paginationPool:ReleaseAll();
@@ -528,4 +623,31 @@ do  --UI Background
             end
         end
     end
+
+    function MainFrame:SetLootSlotCleared(slotIndex)
+        if self.activeFrames then
+            for _, itemFrame in ipairs(self.activeFrames) do
+                if itemFrame.data.slotIndex == slotIndex then
+                    itemFrame:Hide();
+                    return true
+                end
+            end
+        end
+    end
+
+    function MainFrame:ReleaseAll()
+        if self.activeFrames then
+            self.activeFrames = nil;
+            self.itemFramePool:ReleaseAll();
+            self.MoneyFrame:Hide();
+            self.MoneyFrame:ClearAllPoints();
+            self:SetMaxPage(nil);
+        end
+    end
+
+    function MainFrame:OnHide()
+        self:ReleaseAll();
+        self:Hide();
+    end
+    MainFrame:SetScript("OnHide", MainFrame.OnHide);
 end
