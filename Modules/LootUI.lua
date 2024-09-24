@@ -14,6 +14,9 @@ local GetMoney = GetMoney;
 local GetItemReagentQualityByItemInfo = C_TradeSkillUI.GetItemReagentQualityByItemInfo;
 local GetItemInfoInstant = C_Item.GetItemInfoInstant;
 local GetPhysicalScreenSize = GetPhysicalScreenSize;
+local IsModifiedClick = IsModifiedClick;
+local GetCVarBool = C_CVar.GetCVarBool;
+local InCombatLockdown = InCombatLockdown;
 
 local tsort = table.sort;
 local pairs = pairs;
@@ -43,7 +46,7 @@ local DOT_SIZE = 18;
 local COUNT_NAME_GAP = 0.5 * BASE_FONT_SIZE;
 local NAME_WIDTH = 16 * BASE_FONT_SIZE;
 local BUTTON_WIDTH = ICON_SIZE + ICON_TEXT_GAP + NAME_WIDTH;
-
+local BUTTON_SPACING = 12;
 local MAX_ITEM_PER_PAGE = 5;
 
 local EVENT_DURATION = 1.5;     --Unregister ChatMSG x seconds after LOOT_CLOSED
@@ -55,6 +58,8 @@ local EL = CreateFrame("Frame");
 local MainFrame = CreateFrame("Frame");
 MainFrame:Hide();
 MainFrame:SetAlpha(0);
+
+local MANUAL_MODE = false;      --If true, pause processing chat loot msg and pick up items by clicking it.
 
 
 local Formatter = {};
@@ -168,6 +173,12 @@ local function MergeData(d1, d2)
     return false
 end
 
+local function ShouldAutoLoot()
+    print(GetCVarBool("autoLootDefault"), IsModifiedClick("AUTOLOOTTOGGLE"))
+    return GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE")
+end
+
+
 do  --Loot Table
     function EL:WipeLootTable()
         self.loots = {};
@@ -276,7 +287,7 @@ do  --Event Handler
     end
 
     function EL:ListenSlotEvent(state)
-        if state then
+        if state and MANUAL_MODE then
             self:RegisterEvent("LOOT_SLOT_CHANGED");
             self:RegisterEvent("LOOT_SLOT_CLEARED");
         else
@@ -291,15 +302,17 @@ do  --Event Handler
         self.anyLootInSlot = {};
         self.playerMoney = GetMoney();
 
+        MANUAL_MODE = not ShouldAutoLoot();
+
         local numItems = GetNumLootItems();
 
         if numItems == 0 then
-           --self:ListenSlotEvent(false);
+           self:ListenSlotEvent(false);
            CloseLoot();
            return
         else
-            --self:ListenSlotEvent(true);
-            self:ListenDynamicEvents(true);
+            self:ListenSlotEvent(true);
+            self:ListenChatEvents(true);
         end
 
         local icon, name, quantity, currencyID, quality, locked, isQuestItem, questID, isActive, isCoin;
@@ -366,16 +379,24 @@ do  --Event Handler
 
         tsort(self.currentLoots, SortFunc_LootSlot);
 
-        for slotIndex = 1, numItems do
-            LootSlot(slotIndex);
+        if MANUAL_MODE then
+            print("MANU")
+            MainFrame:DisplayPendingLoot();
+        else
+            for slotIndex = 1, numItems do
+                LootSlot(slotIndex);
+            end
         end
     end
 
     function EL:OnLootClosed()
         self:RequestUnregisterDynamicEvents();
         self.lootOpened = false;
-        --self:ListenSlotEvent(false);
+        self:ListenSlotEvent(false);
         CloseLoot();
+        if MainFrame.manualMode then
+            MainFrame:ClosePendingLoot();
+        end
     end
 
     function EL:OnUpdate_UnregisterDynamicEvents(elapsed)
@@ -383,11 +404,11 @@ do  --Event Handler
         if self.t > EVENT_DURATION then
             self.t = 0;
             self:SetScript("OnUpdate", nil);
-            self:ListenDynamicEvents(false);
+            self:ListenChatEvents(false);
         end
     end
 
-    function EL:ListenDynamicEvents(state)
+    function EL:ListenChatEvents(state)
         if state then
             if not self.playerGUID then
                 self.playerGUID = UnitGUID("player");
@@ -411,67 +432,77 @@ do  --Event Handler
         self:SetScript("OnUpdate", self.OnUpdate_UnregisterDynamicEvents);
     end
 
+    function EL:OnLootSlotChanged(slotIndex)
+        print(slotIndex);
+    end
+
     function EL:OnLootSlotCleared(slotIndex)
         if self.anyLootInSlot then
             self.anyLootInSlot[slotIndex] = false;
         end
-        self:RequestLootResult();
+        print(slotIndex);
     end
 
     function EL:OnEvent(event, ...)
         if event == "LOOT_OPENED" then
             self:OnLootOpened(...);
+            print(event, GetTimePreciseSec(), ...)
         elseif event == "LOOT_READY" then
             local isAutoLoot =  ...
-
-        elseif event == "LOOT_SLOT_CHANGED" then
-            --Can happen during AoE Loot
-        elseif event == "LOOT_SLOT_CLEARED" then
-            self:OnLootSlotCleared(...);
         elseif event == "LOOT_CLOSED" then
+            print(event, GetTimePreciseSec(), ...)
             --Usually fire two times in a row. In this case "GetNumLootItems" returns the re-looted value during the first trigger.
             --Can fire only one time if player leaves the corpse fast. And "LOOT_SLOT_CLEARED" won't trigger. Items are fully looted and "GetNumLootItems" returns 0
             self:OnLootClosed();
-        elseif event == "CHAT_MSG_LOOT" or event == "CHAT_MSG_CURRENCY" or event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
-            --This is the most robust way to determine what's been looted.
-            --Less responsive and more costly
-            if self.currentLoots then
-                local guid = select(12, ...);
-                if event == "CHAT_MSG_LOOT" then
-                    if guid == self.playerGUID then
-                        self:ProcessMessageItem(...);
+        else
+            if MANUAL_MODE then
+                if event == "LOOT_SLOT_CHANGED" then
+                    --Can happen during AoE Loot
+                    self:OnLootSlotChanged(...);
+                elseif event == "LOOT_SLOT_CLEARED" then
+                    self:OnLootSlotCleared(...);
+                end
+            else
+                if event == "CHAT_MSG_LOOT" or event == "CHAT_MSG_CURRENCY" or event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
+                    --This is the most robust way to determine what's been looted.
+                    --Less responsive and more costly
+                    if self.currentLoots then
+                        local guid = select(12, ...);
+                        if event == "CHAT_MSG_LOOT" then
+                            if guid == self.playerGUID then
+                                self:ProcessMessageItem(...);
+                            end
+                        elseif event == "CHAT_MSG_CURRENCY" then    --guid is nil. Appear later than other chat events (~0.8s delay)
+                            self:ProcessMessageCurrency(...);
+                        elseif event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
+                            self:ProcessMessageFaction(...);
+                        end
                     end
-                elseif event == "CHAT_MSG_CURRENCY" then    --guid is nil. Appear later than other chat events (~0.8s delay)
-                    self:ProcessMessageCurrency(...);
-                elseif event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
-                    self:ProcessMessageFaction(...);
+                elseif event == "PLAYER_MONEY" then
+                    if self.playerMoney then
+                        local money = GetMoney();
+                        local delta = money - self.playerMoney;
+                        if delta > 0 then
+                            local data = {
+                                slotType = SLOT_TYPE_MONEY,
+                                quantity = delta,
+                                name = tostring(money),
+                            };
+                            MainFrame:QueueDisplayLoot(data);
+                        end
+                        self.playerMoney = money;
+                    end
                 end
-            end
-        elseif event == "PLAYER_MONEY" then
-            if self.playerMoney then
-                local money = GetMoney();
-                local delta = money - self.playerMoney;
-                if delta > 0 then
-                    local data = {
-                        slotType = SLOT_TYPE_MONEY,
-                        quantity = delta,
-                        name = tostring(money),
-                    };
-                    MainFrame:QueueDisplayLoot(data);
-                end
-                self.playerMoney = money;
             end
         end
-
         --print(event, GetTimePreciseSec(), ...)
     end
 end
 
 
 local CreateItemFrame;
+local ItemFrameMixin = {};
 do  --UI LootButton
-    local ItemFrameMixin = {};
-
     function ItemFrameMixin:SetIcon(texture, data)
         self.showIcon = texture ~= nil;
         self.Count:ClearAllPoints();
@@ -527,14 +558,6 @@ do  --UI LootButton
 
     function ItemFrameMixin:SetNameByQuality(name, quality)
         self:SetNameByColor(name, API.GetItemQualityColor(quality or 1));
-    end
-
-    local function PrependItemCount(data)
-        if data.hideCount then
-            return data.name
-        else
-            return "|cffebebeb+"..data.quantity.."|r  "..data.name;
-        end
     end
 
     function ItemFrameMixin:SetData(data)
@@ -611,7 +634,7 @@ do  --UI LootButton
 
     function ItemFrameMixin:OnRemoved()
         self.data = nil;
-        self:SetAlpha(0);
+        self:StopAnimating();
     end
 
     function ItemFrameMixin:AnimateItemCount(oldValue, newValue)
@@ -624,6 +647,35 @@ do  --UI LootButton
         end
     end
 
+    function ItemFrameMixin:OnEnter()
+        --Effective during Manual Mode
+        if self.data.slotType == SLOT_TYPE_ITEM then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip:SetLootItem(self.data.slotIndex);
+        elseif self.data.slotType == SLOT_TYPE_CURRENCY then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip:SetLootCurrency(self.data.slotIndex);
+        end
+    end
+
+    function ItemFrameMixin:OnLeave()
+        --Effective during Manual Mode
+        GameTooltip:Hide();
+    end
+
+    function ItemFrameMixin:OnMouseDown()
+        LootSlot(self.data.slotIndex);
+    end
+
+    function ItemFrameMixin:EnableMouseScript(state)
+        if state then
+            self:EnableMouse(true);
+            self:EnableMouseMotion(true);
+        else
+            self:EnableMouse(false);
+            self:EnableMouseMotion(false);
+        end
+    end
 
     local function CreateIconFrame(itemFrame)
         local f = CreateFrame("Frame", nil, itemFrame, "PlumberLootUIIconTemplate");
@@ -647,7 +699,31 @@ do  --UI LootButton
         f.AnimItemCount:SetScript("OnStop", AnimItemCount_OnStop);
         f.AnimItemCount:SetScript("OnFinished", AnimItemCount_OnStop);
 
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+
+        f.scriptEnabled = true;
+        f:EnableMouseScript(false);
+
         return f
+    end
+
+
+    function MainFrame:LayoutActiveFrames()
+        local height = 0;
+
+        for i, itemFrame in ipairs(self.activeFrames) do
+            if i == 1 then
+                itemFrame:SetPoint("TOPLEFT", self, "TOPLEFT", BUTTON_SPACING, -BUTTON_SPACING);
+            else
+                itemFrame:SetPoint("TOPLEFT", self.activeFrames[i - 1], "BOTTOMLEFT", 0, -BUTTON_SPACING);
+            end
+            height = height + itemFrame:GetHeight() + BUTTON_SPACING;
+        end
+
+        local frameHeight = height + BUTTON_SPACING;
+        return frameHeight
     end
 end
 
@@ -860,9 +936,7 @@ do  --UI Background
 end
 
 
-do  --UI MainFrame
-    local BUTTON_SPACING = 12;
-
+do  --UI Notification Mode
     local tinsert = table.insert;
     local tremove = table.remove;
 
@@ -876,27 +950,16 @@ do  --UI MainFrame
         end
     end
 
-    function MainFrame:RequestLootResult()
-        self.t = 0;
-        self:SetScript("OnUpdate", self.OnUpdate_DisplayLootResult);
-    end
-
-    function MainFrame:QueueDisplayLoot(lootData)
-        if not self.timerFrame then
-            self.timerFrame = CreateFrame("Frame");
+    local function OnUpdate_FadeIn_All_ThenHide(self, elapsed)
+        if self.toAlpha then
+            self.alpha = self.alpha + 8*elapsed;
+            if self.alpha > 1 then
+                self.alpha = 1;
+                self.toAlpha = nil;
+            end
+            self:SetAlpha(self.alpha);
         end
 
-        if not self.lootQueue then
-            self.lootQueue = {};
-        end
-
-        tinsert(self.lootQueue, lootData);
-
-        self.timerFrame.t = 0;
-        self.timerFrame:SetScript("OnUpdate", OnUpdate_DisplayLootResult);
-    end
-
-    function MainFrame:OnUpdate_HideAfterDelay(elapsed)
         self.t = self.t + elapsed;
         if self.t >= AUTO_HIDE_DELAY then
             self.t = 0;
@@ -909,20 +972,7 @@ do  --UI MainFrame
         end
     end
 
-    function MainFrame:OnUpdate_FadeIn_All(elapsed)
-        if self.toAlpha then
-            self.alpha = self.alpha + 8*elapsed;
-            if self.alpha > 1 then
-                self.alpha = 1;
-                self.toAlpha = nil;
-            end
-            self:SetAlpha(self.alpha);
-        end
-
-        self:OnUpdate_HideAfterDelay(elapsed);
-    end
-
-    function MainFrame:OnUpdate_FadeIn_Individual(elapsed)
+    local function OnUpdate_FadeIn_Individual(self, elapsed)
         if self.anyAlphaChange then
             self.anyAlphaChange = nil;
             for _, obj in ipairs(self.activeFrames) do
@@ -938,10 +988,30 @@ do  --UI MainFrame
             end
         end
 
-        self:OnUpdate_FadeIn_All(elapsed);
+        if self.toAlpha then
+            self.alpha = self.alpha + 8*elapsed;
+            if self.alpha > 1 then
+                self.alpha = 1;
+                self.toAlpha = nil;
+            end
+            self:SetAlpha(self.alpha);
+        end
+
+        if not (self.anyAlphaChange or self.toAlpha) then
+            self.t = self.t + elapsed;
+            if self.t >= AUTO_HIDE_DELAY then
+                self.t = 0;
+                self:SetScript("OnUpdate", nil);
+                if self.lootQueue then
+                   self:DisplayNextPage();
+                else
+                    self:TryHide();
+                end
+            end
+        end
     end
 
-    function MainFrame:OnUpdate_FadeOut_ThenDisplayNextPage(elapsed)
+    local function OnUpdate_FadeOut_ThenDisplayNextPage(self, elapsed)
         if self.anyAlphaChange then
             self.anyAlphaChange = nil;
             for _, obj in ipairs(self.activeFrames) do
@@ -965,6 +1035,21 @@ do  --UI MainFrame
         end
     end
 
+    function MainFrame:QueueDisplayLoot(lootData)
+        if not self.timerFrame then
+            self.timerFrame = CreateFrame("Frame");
+        end
+
+        if not self.lootQueue then
+            self.lootQueue = {};
+        end
+
+        tinsert(self.lootQueue, lootData);
+
+        self.timerFrame.t = 0;
+        self.timerFrame:SetScript("OnUpdate", OnUpdate_DisplayLootResult);
+    end
+
     function MainFrame:DisplayNextPage()
         if self.lootQueue and #self.lootQueue > 0 then
             self.anyAlphaChange = true;
@@ -973,7 +1058,7 @@ do  --UI MainFrame
                 obj.toAlpha = 0;
                 obj.alpha = obj:GetAlpha();
             end
-            self:SetScript("OnUpdate", self.OnUpdate_FadeOut_ThenDisplayNextPage);
+            self:SetScript("OnUpdate", OnUpdate_FadeOut_ThenDisplayNextPage);
         else
             self:TryHide();
         end
@@ -987,6 +1072,10 @@ do  --UI MainFrame
         else
             self:TryHide();
             return
+        end
+
+        if self.manualMode then
+            self:SetManualMode(false);
         end
 
         --Merge Data
@@ -1084,20 +1173,17 @@ do  --UI MainFrame
                 local n = #self.activeFrames;
                 n = n + 1;
                 self.activeFrames[n] = itemFrame;
-                if n == 1 then
-                    itemFrame:SetPoint("TOPLEFT", self, "TOPLEFT", BUTTON_SPACING, -BUTTON_SPACING);
-                else
-                    itemFrame:SetPoint("TOPLEFT", self.activeFrames[n - 1], "BOTTOMLEFT", 0, -BUTTON_SPACING);
-                end
 
                 if fadeIndividualFrame then
                     itemFrame.toAlpha = 1;
-                    itemFrame.alpha = itemFrame:GetAlpha();
+                    itemFrame.alpha = 0;
                 else
                     itemFrame.toAlpha = nil;
                     itemFrame.alpha = 1;
                     itemFrame:SetAlpha(1);
                 end
+
+                itemFrame:EnableMouseScript(false);
             end
         end
 
@@ -1105,11 +1191,7 @@ do  --UI MainFrame
         local frameHeight;
 
         if numFrames > 0 then
-            local height = 0;
-            for _, obj in ipairs(self.activeFrames) do
-                height = height + obj:GetHeight() + BUTTON_SPACING;
-            end
-            frameHeight = height + BUTTON_SPACING;
+            frameHeight = self:LayoutActiveFrames();
         else
             frameHeight = 32;
         end
@@ -1117,7 +1199,6 @@ do  --UI MainFrame
         local frameWidth = BUTTON_WIDTH + BUTTON_SPACING * 2;
         self:SetSize(frameWidth, frameHeight);
         self:Reposition();
-
         local scale = self:GetEffectiveScale();
         self:SetBackgroundSize(frameWidth * scale, (frameHeight + ICON_BUTTON_HEIGHT) * scale);
 
@@ -1130,15 +1211,15 @@ do  --UI MainFrame
 
         if self:IsShown() then
             self.anyAlphaChange = true;
-            self:SetScript("OnUpdate", self.OnUpdate_FadeIn_Individual);
+            self:SetScript("OnUpdate", OnUpdate_FadeIn_Individual);
         else
-            self:SetScript("OnUpdate", self.OnUpdate_FadeIn_All);
+            self:SetScript("OnUpdate", OnUpdate_FadeIn_All_ThenHide);
             self:Show();
             self.anyAlphaChange = nil;
         end
     end
 
-    function MainFrame:OnUpdate_FadeOut(elapsed)
+    local function OnUpdate_FadeOut(self, elapsed)
         self.alpha = self.alpha - 4*elapsed;
         if self.alpha <= 0 then
             self.alpha = 0;
@@ -1152,7 +1233,7 @@ do  --UI MainFrame
         self.lootQueue = nil;
         self.isUpdatingPage = nil;
         self.alpha = self:GetAlpha();
-        self:SetScript("OnUpdate", self.OnUpdate_FadeOut);
+        self:SetScript("OnUpdate", OnUpdate_FadeOut);
     end
 
     function MainFrame:Disable()
@@ -1200,6 +1281,8 @@ do  --UI MainFrame
         self.MoneyFrame = MoneyFrame;
         MoneyFrame:SetHeight(TEXT_BUTTON_HEIGHT);
         MoneyFrame:Hide();
+        MoneyFrame.EnableMouseScript = ItemFrameMixin.EnableMouseScript;
+        MoneyFrame:SetScript("OnMouseDown", ItemFrameMixin.OnMouseDown);
 
         function MoneyFrame:SetData(data)
             if self:IsShown() then
@@ -1213,8 +1296,14 @@ do  --UI MainFrame
             return data.slotType == SLOT_TYPE_MONEY
         end
 
-
         self:InitBackground();
+
+        local Header = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        self.Header = Header;
+        Header:Hide();
+        Header:SetJustifyH("CENTER");
+        Header:SetPoint("BOTTOM", self, "TOPLEFT", 0.5 * BUTTON_WIDTH + BUTTON_SPACING, BUTTON_SPACING);
+        Header:SetText("Loot Manually")
     end
 
     function MainFrame:AcquireItemFrame()
@@ -1238,6 +1327,97 @@ do  --UI MainFrame
         self:Hide();
     end
     MainFrame:SetScript("OnHide", MainFrame.OnHide);
+end
+
+
+do  --UI Manually Pickup Mode
+    local function OnUpdate_FadeOut_DisableMotion(self, elapsed)
+        self.alpha = self.alpha - 8*elapsed;
+        if self.alpha <= 0 then
+            self.alpha = 0;
+            self:SetScript("OnUpdate", nil);
+            self:Hide();
+        end
+        self:SetAlpha(self.alpha);
+    end
+
+    local function OnUpdate_FadeIn(self, elapsed)
+        self.alpha = self.alpha + 8*elapsed;
+        if self.alpha >= 1 then
+            self.alpha = 1;
+            self.toAlpha = nil;
+            self:SetScript("OnUpdate", nil);
+        end
+        self:SetAlpha(self.alpha);
+    end
+
+    function MainFrame:SetManualMode(state)
+        self.manualMode = state == true;
+        self:ReleaseAll();
+        self.Header:SetShown(state);
+    end
+
+    function MainFrame:DisplayPendingLoot()
+        if not EL.currentLoots then return end;
+        --loots have been sorted so the key is no longer slotIndex
+
+        if self.Init then
+            self:Init();
+        end
+
+        self:SetManualMode(true);
+
+        local itemFrame;
+        local activeFrames = {};
+        self.activeFrames = activeFrames;
+
+        for i, data in ipairs(EL.currentLoots) do
+            if data.slotType == SLOT_TYPE_MONEY then
+                itemFrame = self.MoneyFrame;
+                local rawCopper = CoinUtil:GetCopperFromCoinText(data.name);
+                itemFrame.data = data;
+                itemFrame:SetAmount(rawCopper);
+                itemFrame:Show();
+            else
+                itemFrame = self:AcquireItemFrame();
+                itemFrame:SetData(data);
+            end
+            activeFrames[i] = itemFrame;
+            itemFrame:SetAlpha(1);
+            itemFrame.toAlpha = nil;
+            itemFrame:EnableMouseScript(true);
+        end
+
+        local frameHeight = self:LayoutActiveFrames();
+
+        local frameWidth = BUTTON_WIDTH + BUTTON_SPACING * 2;
+        self:SetSize(frameWidth, frameHeight);
+        self:Reposition();
+        local scale = self:GetEffectiveScale();
+        self:SetBackgroundSize(frameWidth * scale, (frameHeight + ICON_BUTTON_HEIGHT) * scale);
+
+        self.t = 0;
+        self.toAlpha = 1;
+        self.alpha = self:GetAlpha();
+
+        self:SetScript("OnUpdate", OnUpdate_FadeIn);
+        self:Show();
+    end
+
+    function MainFrame:ClosePendingLoot()
+        if not self:IsShown() then return end;
+        self.lootQueue = nil;
+        self.isUpdatingPage = nil;
+        self.alpha = self:GetAlpha();
+
+        if self.activeFrames then
+            for _, itemFrame in ipairs(self.activeFrames) do
+                itemFrame:EnableMouseScript(false);
+            end
+        end
+
+        self:SetScript("OnUpdate", OnUpdate_FadeOut_DisableMotion);
+    end
 end
 
 
