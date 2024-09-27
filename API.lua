@@ -1834,6 +1834,12 @@ do  --ObjectPool
         return #self.objects
     end
 
+    function ObjectPoolMixin:CallAllObjects(method, ...)
+        for i, obj in ipairs(self.objects) do
+            obj[method](obj, ...);
+        end
+    end
+
     local function CreateObjectPool(createObjectFunc)
         local pool = {};
         API.Mixin(pool, ObjectPoolMixin);

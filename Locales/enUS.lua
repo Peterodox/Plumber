@@ -194,6 +194,11 @@ L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
 L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
 
 
+--Loot UI
+L["Take All"] = "Take All";     --Take all items from a loot window
+L["You Received"] = YOU_RECEIVED_LABEL or "You recieved";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Move Vertically";

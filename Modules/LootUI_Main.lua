@@ -1,16 +1,24 @@
 local _, addon = ...
 local API = addon.API;
+local L = addon.L;
 
+local Round = API.Round;
+local ipairs = ipairs;
 
 local LootSlot = LootSlot;
 local GetPhysicalScreenSize = GetPhysicalScreenSize;
-local ipairs = ipairs;
+local InCombatLockdown = InCombatLockdown;
 local CreateFrame = CreateFrame;
+local IsCosmeticItem = C_Item.IsCosmeticItem;
 
 
-local MainFrame = CreateFrame("Frame");
+local MainFrame = CreateFrame("Frame", nil, UIParent);
 MainFrame:Hide();
 MainFrame:SetAlpha(0);
+MainFrame:SetFrameStrata("HIGH");
+MainFrame:SetToplevel(true);
+MainFrame:SetClampedToScreen(true);
+
 
 local P_Loot = {};
 P_Loot.MainFrame = MainFrame;
@@ -28,19 +36,19 @@ local Defination = {
 };
 P_Loot.Defination = Defination;
 
+local IsRareItem;   --See Bottom
 
 local Formatter = {};
 P_Loot.Formatter = Formatter;
 do
     Formatter.tostring = tostring;
     Formatter.strlen = string.len;
-    local Round = API.Round;
 
     function Formatter:Init()
         Formatter:CalculateDimensions();
 
         if not self.DummyFontString then
-            self.DummyFontString = MainFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal");
+            self.DummyFontString = MainFrame:CreateFontString(nil, "BACKGROUND", "PlumberLootUIFont");
             self.DummyFontString:Hide();
             self.DummyFontString:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
         end
@@ -51,24 +59,29 @@ do
     end
 
     function Formatter:CalculateDimensions(fontSize)
+        local fontFile, defaultFontSize = ObjectiveTrackerFont14:GetFont();
+        local normalizedFontSize;
+
         if not fontSize then
-            local _;
-            _, fontSize = GameFontNormal:GetFont();
+            fontSize = defaultFontSize;
         end
 
-        local locale = GetLocale();
+        PlumberLootUIFont:SetFont(fontFile, Round(fontSize), "OUTLINE");
 
+        local locale = GetLocale();
         if locale == "zhCN" or locale == "zhTW" then
-            fontSize = 0.8 * fontSize;
+            normalizedFontSize = Round(0.8 * fontSize);
+        else
+            normalizedFontSize = fontSize;
         end
 
         self.BASE_FONT_SIZE = fontSize;                      --GameFontNormal
-        self.ICON_SIZE = Round(32/12 * fontSize);
-        self.TEXT_BUTTON_HEIGHT = Round(16/12 * fontSize);
+        self.ICON_SIZE = Round(32/12 * normalizedFontSize);
+        self.TEXT_BUTTON_HEIGHT = Round(16/12 * normalizedFontSize);
         self.ICON_BUTTON_HEIGHT = self.ICON_SIZE;
         self.ICON_TEXT_GAP = Round(self.ICON_SIZE / 4);
-        self.DOT_SIZE = Round(1.5 * fontSize);
-        self.COUNT_NAME_GAP = Round(0.5 * fontSize);
+        self.DOT_SIZE = Round(1.5 * normalizedFontSize);
+        self.COUNT_NAME_GAP = Round(0.5 * normalizedFontSize);
         self.NAME_WIDTH = Round(16 * fontSize);
         self.BUTTON_WIDTH = self.ICON_SIZE + self.ICON_TEXT_GAP + self.BASE_FONT_SIZE + self.COUNT_NAME_GAP + self.NAME_WIDTH;
         self.BUTTON_SPACING = 12;
@@ -89,52 +102,175 @@ do
 
         return self.numberWidths[digits]
     end
+
+    function Formatter:GetPixelPerfectScale()
+        if not self.pixelPerfectsScale then
+            local SCREEN_WIDTH, SCREEN_HEIGHT = GetPhysicalScreenSize();
+            self.pixelPerfectsScale = 768/SCREEN_HEIGHT;
+        end
+        return self.pixelPerfectsScale
+    end
+
+    function Formatter:PixelPerfectTextureSlice(object)
+        object:SetScale(self:GetPixelPerfectScale());
+    end
 end
 
 
 local CreateItemFrame;
 local ItemFrameMixin = {};
-do  --UI LootButton
+do  --UI ItemButton
+    local ANIM_DURATION_BUTTON_HOVER = 0.25;
+    local ANIM_OFFSET_H_BUTTON_HOVER = 8;
+    local Esaing_OutQuart = addon.EasingFunctions.outQuart;
+
+    local function Anim_ShiftButtonCentent_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t < ANIM_DURATION_BUTTON_HOVER then
+            self.offset = Esaing_OutQuart(self.t, 0, ANIM_OFFSET_H_BUTTON_HOVER, ANIM_DURATION_BUTTON_HOVER);
+        else
+            self.offset = ANIM_OFFSET_H_BUTTON_HOVER;
+            self:SetScript("OnUpdate", nil);
+        end
+        self.Reference:SetPoint("LEFT", self, "LEFT", self.offset, 0);
+    end
+
+    local function Anim_ResetButtonCentent_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t < ANIM_DURATION_BUTTON_HOVER then
+            self.offset = Esaing_OutQuart(self.t, self.offset, 0, ANIM_DURATION_BUTTON_HOVER);
+        else
+            self.offset = 0;
+            self:SetScript("OnUpdate", nil);
+            self.hovered = nil;
+            self.t = nil;
+        end
+        self.Reference:SetPoint("LEFT", self, "LEFT", self.offset, 0);
+    end
+
+    local function Anim_ShiftAndFadeOutButton_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+
+        self.alpha = self.alpha - 5 * elapsed;
+        if self.alpha < 0 then
+            self.alpha = 0;
+        end
+        self:SetAlpha(self.alpha);
+
+        self.offset = self.offset + 128 * elapsed;
+        if self.t < ANIM_DURATION_BUTTON_HOVER then
+
+        else
+            self:SetScript("OnUpdate", nil);
+        end
+        self.Reference:SetPoint("LEFT", self, "LEFT", self.offset, 0);
+    end
+
+    function ItemFrameMixin:ShowHoverVisual()
+        self.hovered = true;
+        self.t = 0;
+        self:SetScript("OnUpdate", Anim_ShiftButtonCentent_OnUpdate);
+    end
+
+    function ItemFrameMixin:PlaySlideOutAnimation()
+        if self.hovered then
+            self:Hide();
+        else
+            self.hovered = true;
+            self.t = 0;
+            self.alpha = self:GetAlpha();
+            if not self.offset then
+                self.offset = 0;
+            end
+            self:SetScript("OnUpdate", Anim_ShiftAndFadeOutButton_OnUpdate);
+        end
+    end
+
+    function ItemFrameMixin:ResetHoverVisual(instant)
+        if self.hovered then
+            self.t = 0;
+            if instant then
+                self.hovered = nil;
+                self.offset = 0;
+                self.Reference:SetPoint("LEFT", self, "LEFT", 0, 0);
+                self:SetScript("OnUpdate", nil);
+            else
+                if not self.offset then
+                    self.offset = 0;
+                end
+                self:SetScript("OnUpdate", Anim_ResetButtonCentent_OnUpdate);
+            end
+        end
+    end
+
     function ItemFrameMixin:SetIcon(texture, data)
         self.showIcon = texture ~= nil;
-        self.Count:ClearAllPoints();
-        self.Text:ClearAllPoints();
         local f = self.IconFrame;
         if texture then
+            self.hasIcon = true;
             local iconSize = Formatter.ICON_SIZE;
             f.Icon:SetTexture(texture);
             f:SetSize(iconSize, iconSize);
-            f:SetPoint("LEFT", self, "LEFT", 0, 0);
+            f:SetPoint("LEFT", self.Reference, "LEFT", 0, 0);
+            f.IconOverlay:Hide();
             f.IconOverlay:SetSize(2*iconSize, 2*iconSize);
-            self.Count:SetPoint("LEFT", self, "LEFT", iconSize + Formatter.ICON_TEXT_GAP, 0);
-            self.Text:SetPoint("LEFT", self, "LEFT", iconSize + Formatter.ICON_TEXT_GAP, 0);
-            self:SetHeight(Formatter.ICON_BUTTON_HEIGHT);
+            self:SetButtonHeight(Formatter.ICON_BUTTON_HEIGHT);
 
             if data then
-                if data.questType ~= 0 then
-                    if data.questType == Defination.QUEST_TYPE_NEW then
-                        f.IconOverlay:SetTexCoord(0.625, 0.75, 0, 0.125);
-                    elseif data.questType == Defination.QUEST_TYPE_ONGOING then
-                        f.IconOverlay:SetTexCoord(0.75, 0.875, 0, 0.125);
+                if data.slotType == Defination.SLOT_TYPE_ITEM then
+                    if data.questType ~= 0 then
+                        if data.questType == Defination.QUEST_TYPE_NEW then
+                            f.IconOverlay:SetTexCoord(0.625, 0.75, 0, 0.125);
+                        elseif data.questType == Defination.QUEST_TYPE_ONGOING then
+                            f.IconOverlay:SetTexCoord(0.75, 0.875, 0, 0.125);
+                        end
+                        f.IconOverlay:Show();
+                        self:SetBorderColor(1, 195/255, 41/255);
+                    elseif data.craftQuality ~= 0 then
+                        f.IconOverlay:SetTexCoord((data.craftQuality - 1) * 0.125, data.craftQuality * 0.125, 0, 0.125);
+                        f.IconOverlay:Show();
+                    elseif data.id then
+                        if IsCosmeticItem(data.id) then
+                            f.IconOverlay:SetTexCoord(0, 0.125, 0.125, 0.25);
+                            f.IconOverlay:Show();
+                            self:SetBorderColor(1, 0, 1);
+                        end
                     end
-                    f.IconOverlay:Show();
-                    self:SetBorderColor(1, 195/255, 41/255);
-                elseif data.craftQuality ~= 0 then
-                    f.IconOverlay:SetTexCoord((data.craftQuality - 1) * 0.125, data.craftQuality * 0.125, 0, 0.125);
-                    f.IconOverlay:Show();
-                else
-                    f.IconOverlay:Hide();
                 end
-            else
-                f.IconOverlay:Hide();
             end
 
             f:Show();
         else
+            self.hasIcon = nil;
             f:Hide();
-            self.Text:SetPoint("LEFT", self, "LEFT", 0, 0);
             self:SetHeight(Formatter.TEXT_BUTTON_HEIGHT);
         end
+    end
+
+    function ItemFrameMixin:ShowGlow(state)
+        if state then
+            if not self.glowFX then
+                local f = MainFrame.glowFXPool:Acquire();
+                f.glowFX = f;
+                f:ClearAllPoints();
+                f:SetPoint("CENTER", self.IconFrame, "CENTER", 0, 0);
+                f:SetParent(self.IconFrame);
+                f:SetFrameSize(Formatter.ICON_SIZE, Formatter.ICON_SIZE);
+                f.AnimGlow:Play();
+                f:SetQualityColor(self.quality);
+                f:Show();
+            end
+        else
+            if self.glowFX then
+                self.glowFX:Release();
+                self.glowFX = nil;
+            end
+        end
+    end
+
+    function ItemFrameMixin:SetButtonHeight(height)
+        self:SetHeight(height);
+        self.Reference:SetHeight(height);
     end
 
     function ItemFrameMixin:SetBorderColor(r, g, b)
@@ -150,7 +286,10 @@ do  --UI LootButton
     end
 
     function ItemFrameMixin:SetNameByQuality(name, quality)
-        self:SetNameByColor(name, API.GetItemQualityColor(quality or 1));
+        quality = quality or 1;
+        self.quality = quality;
+        local color = API.GetItemQualityColor(quality);
+        self:SetNameByColor(name, color);
     end
 
     function ItemFrameMixin:SetData(data)
@@ -165,6 +304,8 @@ do  --UI LootButton
             self:SetCurrency(data);
         elseif data.slotType == Defination.SLOT_TYPE_REP then
             self:SetReputation(data);
+        elseif data.slotType == Defination.SLOT_TYPE_MONEY then
+            self:SetMoney(data);
         end
 
         self.data = data;
@@ -172,11 +313,11 @@ do  --UI LootButton
 
     function ItemFrameMixin:SetCount(data)
         if (not data) or data.hideCount then
+            self.countWidth = nil;
             self.Count:Hide();
         else
             local countWidth = Formatter:GetNumberWidth(data.quantity);
-            self.Text:ClearAllPoints();
-            self.Text:SetPoint("LEFT", self, "LEFT",  Formatter.ICON_SIZE + Formatter.ICON_TEXT_GAP + countWidth + Formatter.COUNT_NAME_GAP, 0);
+            self.countWidth = countWidth;
             if data.oldQuantity then
                 self:AnimateItemCount(data.oldQuantity, data.quantity);
                 data.oldQuantity = nil;
@@ -187,24 +328,66 @@ do  --UI LootButton
         end
     end
 
+    function ItemFrameMixin:Layout()
+        local offset;
+
+        if self.hasIcon then
+            offset = Formatter.ICON_SIZE + Formatter.ICON_TEXT_GAP;
+        else
+            offset = 0;
+        end
+        self.Count:ClearAllPoints();
+        self.Count:SetPoint("LEFT", self.Reference, "LEFT", offset, 0);
+
+        if self.countWidth then
+            offset = offset + self.countWidth + Formatter.COUNT_NAME_GAP;
+        end
+        self.Text:ClearAllPoints();
+        self.Text:SetPoint("LEFT", self.Reference, "LEFT", offset, 0);
+    end
+
     function ItemFrameMixin:SetItem(data)
         self:SetNameByQuality(data.name, data.quality);
         self:SetIcon(data.icon, data);
         self:SetCount(data);
+        self:Layout();
+
+        if IsRareItem(data) then
+            self:ShowGlow(true);
+        else
+            self:ShowGlow(false);
+        end
     end
 
     function ItemFrameMixin:SetCurrency(data)
         self:SetNameByQuality(data.name, data.quality);
         self:SetIcon(data.icon);
         self:SetCount(data);
+        self:Layout();
+        self:ShowGlow(false);
     end
 
     function ItemFrameMixin:SetReputation(data)
-        local name = string.format("%s +%s", data.name, (data.quantity or ""));
         self:SetIcon(nil);
+        if data.quantity then
+            self:SetCount(data);
+        else
+            self:SetCount(nil);
+        end
+        self.Text:SetText(data.name);
+        self.Text:SetTextColor(0, 0.8, 1);    --The default color (0.5, 0.5, 1) is too dark so we use INFLUENCE_COLOR
+        self:Layout();
+        self:ShowGlow(false);
+    end
+
+    function ItemFrameMixin:SetMoney(data)
+        --For manual pick-up mode
+        local name = string.gsub(data.name, "%c", ", ");
+        self:SetIcon(data.icon);
         self:SetCount(nil);
-        self.Text:SetText(name);
-        self.Text:SetTextColor(0.5, 0.5, 1);
+        self:SetNameByQuality(name, 1);
+        self:Layout();
+        self:ShowGlow(false);
     end
 
     function ItemFrameMixin:IsSameItem(data)
@@ -221,13 +404,14 @@ do  --UI LootButton
     end
 
     function ItemFrameMixin:UpdatePixel()
-        local SCREEN_WIDTH, SCREEN_HEIGHT = GetPhysicalScreenSize();
-        self.IconFrame.Border:SetScale(768/SCREEN_HEIGHT);
+        Formatter:PixelPerfectTextureSlice(self.IconFrame.Border);
     end
 
     function ItemFrameMixin:OnRemoved()
         self.data = nil;
         self:StopAnimating();
+        self:ResetHoverVisual(true);
+        self.hasGlowFX = nil;
     end
 
     function ItemFrameMixin:AnimateItemCount(oldValue, newValue)
@@ -249,11 +433,16 @@ do  --UI LootButton
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
             GameTooltip:SetLootCurrency(self.data.slotIndex);
         end
+
+        MainFrame:HighlightItemFrame(self);
+        self:ShowHoverVisual();
     end
 
     function ItemFrameMixin:OnLeave()
         --Effective during Manual Mode
         GameTooltip:Hide();
+        MainFrame:HighlightItemFrame(nil);
+        self:ResetHoverVisual();
     end
 
     function ItemFrameMixin:OnMouseDown()
@@ -306,6 +495,9 @@ do  --UI LootButton
     function MainFrame:LayoutActiveFrames()
         local height = 0;
         local spacing = Formatter.BUTTON_SPACING;
+        local iconSize = Formatter.ICON_SIZE;
+        local textWidth;
+        local maxTextWidth = 0;
 
         for i, itemFrame in ipairs(self.activeFrames) do
             if i == 1 then
@@ -313,11 +505,23 @@ do  --UI LootButton
             else
                 itemFrame:SetPoint("TOPLEFT", self.activeFrames[i - 1], "BOTTOMLEFT", 0, -spacing);
             end
+
             height = height + itemFrame:GetHeight() + spacing;
+
+            if itemFrame.Text then
+                textWidth = itemFrame.Text:GetWrappedWidth();
+            else
+                textWidth = itemFrame:GetWidth() - 2*iconSize;
+            end
+            if textWidth > maxTextWidth then
+                maxTextWidth = textWidth;
+            end
         end
 
+        local frameWidth = maxTextWidth + 2*iconSize + Formatter:GetNumberWidth(10) + spacing;
         local frameHeight = height + spacing;
-        return frameHeight
+
+        return frameWidth, frameHeight
     end
 end
 
@@ -476,14 +680,14 @@ do  --UI Background
     function MainFrame:InitBackground()
         self.InitBackground = nil;
 
-        local f = CreateFrame("Frame", "TTBG", self, "PlumberLootUIBackgroundTemplate");
+        local f = CreateFrame("Frame", nil, self, "PlumberLootUIBackgroundTemplate");
         self.BackgroundFrame = f;
         API.Mixin(f, BackgroundMixin);
         f:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
 
         f:UpdatePixel();
         f:SetBackgroundSize(256, 256);
-        f:SetBackgroundAlpha(0.6);
+        f:SetBackgroundAlpha(0.50);
 
         local file = "Interface/AddOns/Plumber/Art/LootUI/LootUI.png";
         f.Background:SetTexture(file);
@@ -510,6 +714,187 @@ do  --UI Background
             self.BackgroundFrame.toHeight = nil;
             self.BackgroundFrame:SetBackgroundSize(width, height);
         end
+    end
+end
+
+
+local CreateUIButton
+do  --UI Generic Button (Hotkey Button)
+    local UIButtonMixin = {};
+
+    function UIButtonMixin:SetHotkey(key)
+        if key then
+            self.hotkeyName = key;
+            self.HotkeyFrame.Hotkey:SetText(key);
+            self.HotkeyFrame:Show();
+        else
+            self.hotkeyName = nil;
+            self.HotkeyFrame:Hide();
+        end
+        self:Layout();
+    end
+
+    function UIButtonMixin:SetButtonText(text)
+        self.Text:SetText(text);
+        self:Layout();
+    end
+
+    function UIButtonMixin:Layout()
+        local textWidth = self.Text:GetUnboundedStringWidth();
+        local scale = Formatter:GetPixelPerfectScale();
+        --self.Background:SetScale(scale);
+        self.Text:ClearAllPoints();
+        local padding = 12;  --Hotkey Padding
+        if self.hotkeyName then
+            local bgPadding = 4;
+            local bgHeight = Formatter.BASE_FONT_SIZE + 2*bgPadding;
+            local bgWidth;
+            if string.len(self.hotkeyName) > 1 then
+                bgWidth = self.Hotkey:GetUnboundedStringWidth() + 2*bgPadding;
+            else
+                bgWidth = bgHeight;
+            end
+
+            self.HotkeyFrame:SetSize(bgWidth, bgHeight);
+            self.HotkeyFrame:SetPoint("LEFT", self, "LEFT", padding, 0);
+            self.HotkeyFrame.HotkeyBackdrop:SetScale(scale);
+            self.Text:SetPoint("LEFT", self.HotkeyFrame, "RIGHT", bgPadding, 0);
+            self:SetWidth(Round(padding + bgWidth + bgPadding + textWidth + padding));
+        else
+            self.Text:SetPoint("LEFT", self, "LEFT", 2*padding, 0);
+            self:SetWidth(Round(textWidth + 4*padding));
+        end
+        self:SetHeight(Round(Formatter.BASE_FONT_SIZE + 2*padding));
+    end
+
+    function UIButtonMixin:SetHighlighted(state)
+        if state then
+            self.Background:SetTexCoord(136/1024, 264/1024, 72/512, 104/512);
+        else
+            self.Background:SetTexCoord(0, 128/1024, 72/512, 104/512);
+        end
+    end
+
+    function UIButtonMixin:OnEnter()
+        self:SetHighlighted(true);
+    end
+
+    function UIButtonMixin:OnLeave()
+        self:SetHighlighted(false);
+    end
+
+    function CreateUIButton(parent)
+        local f = CreateFrame("Button", nil, parent, "PlumberLootUIGenericButtonTemplate");
+        local file = "Interface/AddOns/Plumber/Art/LootUI/LootUI.png";
+        f.HotkeyFrame.HotkeyBackdrop:SetTexture(file);
+        f.HotkeyFrame.HotkeyBackdrop:SetTexCoord(16/1024, 32/1024, 40/512, 56/512);
+        f.Background:SetTexture(file);
+        f.Background:SetTexCoord(0, 128/1024, 72/512, 104/512);
+        API.Mixin(f, UIButtonMixin);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        return f
+    end
+end
+
+
+local TakeAllButtonMixin = {};
+do  --TakeAllButton
+    function TakeAllButtonMixin:OnClick()
+        MainFrame:LootAllItemsSorted();
+    end
+
+    function TakeAllButtonMixin:OnKeyDown(key)
+        local isValid;
+        if key == self.hotkeyName then
+            isValid = true;
+            self:OnClick();
+        end
+
+        if not InCombatLockdown() then
+            self:SetPropagateKeyboardInput(not isValid);
+        end
+    end
+
+    function TakeAllButtonMixin:OnEvent(event, ...)
+        if event == "PLAYER_REGEN_DISABLED" then
+            self:SetPropagateKeyboardInput(true);
+        end
+    end
+
+    function TakeAllButtonMixin:OnShow()
+        if (not InCombatLockdown()) or self:GetPropagateKeyboardInput() then
+            self:SetScript("OnKeyDown", self.OnKeyDown);
+        end
+        self:RegisterEvent("PLAYER_REGEN_DISABLED");
+    end
+
+    function TakeAllButtonMixin:OnHide()
+        self:SetScript("OnKeyDown", nil);
+        self:UnregisterEvent("PLAYER_REGEN_DISABLED");
+    end
+
+    function TakeAllButtonMixin:OnLoad()
+        self:SetScript("OnEvent", self.OnEvent);
+        self:SetScript("OnShow", self.OnShow);
+        self:SetScript("OnHide", self.OnHide);
+        self:SetScript("OnClick", self.OnClick);
+    end
+end
+
+
+local CreateSpikeyGlowFrame;
+do
+    local GLOW_COLORS = {
+        [1] = {0.8, 0.8, 0.8},
+        [2] = {0, 1, 0},
+        [3] = {0, 0.5, 1},
+        [4] = {0.5, 0, 1},
+        [5] = {1, 0.5, 0},
+    };
+
+    local SPIKE_COLORS = {
+        [3] = {0.5, 0.8, 1},
+        [4] = {0.83, 0.5, 1},
+    };
+
+    local SpikeyGlowMixin = {};
+
+    function SpikeyGlowMixin:OnLoad()
+        self.Glow:SetTexture("Interface/AddOns/Plumber/Art/LootUI/IconOverlay.png");
+        self.Glow:SetTexCoord(0.875, 1, 0.875, 1);
+
+        self.Spike:SetTexture("Interface/AddOns/Plumber/Art/LootUI/LootUI.png");
+        self.Spike:SetTexCoord(422/1024, 494/1024, 0, 72/512);
+    end
+
+    function SpikeyGlowMixin:SetFrameSize(width, height)
+        self:SetSize(width, height);
+        local scale = 1.7;
+        self.Spike:SetSize(width*scale, height*scale);
+        self.SpikeMask:SetSize(width*scale, height*scale)
+        self.Glow:SetSize(2*width, 2*height);
+        self.Exclusion:SetSize(width, height);
+    end
+
+    function SpikeyGlowMixin:SetQualityColor(quality)
+        if GLOW_COLORS[quality] then
+            local c = GLOW_COLORS[quality];
+            self.Glow:SetVertexColor(c[1], c[2], c[3]);
+            if SPIKE_COLORS[quality] then
+                c = SPIKE_COLORS[quality];
+            end
+            self.Spike:SetVertexColor(c[1], c[2], c[3]);
+        else
+            self:Hide();
+        end
+    end
+
+    function CreateSpikeyGlowFrame(parent)
+        local f = CreateFrame("Frame", nil, parent, "PlumberSpikeyGlowTemplate");
+        API.Mixin(f, SpikeyGlowMixin);
+        f:OnLoad();
+        return f
     end
 end
 
@@ -547,8 +932,7 @@ do  --UI Basic
         viewportWidth = math.min(viewportWidth, viewportHeight * 16/9);
 
         local scale = UIParent:GetEffectiveScale();
-        self:SetScale(scale);
-
+        --self:SetScale(scale);
         local offsetX = math.floor((0.5 - 0.3333) * viewportWidth /scale);
 
         self:ClearAllPoints();
@@ -562,7 +946,6 @@ do  --UI Basic
 
         self.itemFramePool = API.CreateObjectPool(CreateItemFrame);
 
-
         local function CreatePagniation()
             local texture = self:CreateTexture(nil, "OVERLAY");
             texture:SetTexture("Interface/AddOns/Plumber/Art/LootUI/LootUI.png");
@@ -571,6 +954,7 @@ do  --UI Basic
         end
         self.paginationPool = API.CreateObjectPool(CreatePagniation);
 
+        self.glowFXPool = API.CreateObjectPool(CreateSpikeyGlowFrame);
 
         local MoneyFrame = addon.CreateMoneyDisplay(self, "GameFontNormal");
         self.MoneyFrame = MoneyFrame;
@@ -578,6 +962,8 @@ do  --UI Basic
         MoneyFrame:Hide();
         MoneyFrame.EnableMouseScript = ItemFrameMixin.EnableMouseScript;
         MoneyFrame:SetScript("OnMouseDown", ItemFrameMixin.OnMouseDown);
+        MoneyFrame:SetScript("OnEnter", ItemFrameMixin.OnEnter);
+        MoneyFrame:SetScript("OnLeave", ItemFrameMixin.OnLeave);
 
         function MoneyFrame:SetData(data)
             if self:IsShown() then
@@ -591,19 +977,49 @@ do  --UI Basic
             return data.slotType == Defination.SLOT_TYPE_MONEY
         end
 
+
         self:InitBackground();
 
         local Header = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         self.Header = Header;
-        Header:Hide();
         Header:SetJustifyH("CENTER");
-        Header:SetPoint("BOTTOM", self, "TOPLEFT", 0.5 * Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING, Formatter.BUTTON_SPACING);
-        Header:SetText("Loot Manually")
+        Header:SetPoint("BOTTOM", self, "TOP", 0, Formatter.BUTTON_SPACING);
+        Header:SetText(L["You Received"]);
+        Header:SetTextColor(1, 1, 1, 0.5);
+        Header:Hide();
+
+        local ButtonHighlight = CreateFrame("Frame", nil, self, "PlumberLootUIButtonHighlightTemplate");
+        self.ButtonHighlight = ButtonHighlight;
+        ButtonHighlight.Texture:SetTexCoord(40/1024, 420/1024, 0, 64/512);
+        Formatter:PixelPerfectTextureSlice(ButtonHighlight.Texture);
+
+
+        local TakeAllButton = CreateUIButton(self);
+        self.TakeAllButton = TakeAllButton;
+        TakeAllButton:SetHotkey("E");
+        TakeAllButton:SetButtonText(L["Take All"]);
+        TakeAllButton:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", -2*Formatter.BUTTON_SPACING, Formatter.BUTTON_SPACING);
+        TakeAllButton:Hide();
+        API.Mixin(TakeAllButton, TakeAllButtonMixin);
+        TakeAllButton:OnLoad();
+    end
+
+    function MainFrame:HighlightItemFrame(itemFrame)
+        self.ButtonHighlight:Hide();
+        self.ButtonHighlight:ClearAllPoints();
+        if itemFrame then
+            local spacing = Formatter.BUTTON_SPACING;
+            self.ButtonHighlight:SetPoint("TOPLEFT", itemFrame, "TOPLEFT", -Formatter.ICON_BUTTON_HEIGHT, 0.5*spacing);
+            self.ButtonHighlight:SetPoint("BOTTOMRIGHT", itemFrame, "BOTTOMRIGHT", 0, -0.5*spacing);
+            self.ButtonHighlight:SetParent(itemFrame);
+            self.ButtonHighlight:Show();
+        end
     end
 
     function MainFrame:AcquireItemFrame()
         local f = self.itemFramePool:Acquire();
         f.Text:SetWidth(Formatter.NAME_WIDTH);
+        f:SetWidth(Formatter.BUTTON_WIDTH);
         return f
     end
 
@@ -628,7 +1044,9 @@ do  --UI Basic
         if self.activeFrames then
             for _, itemFrame in ipairs(self.activeFrames) do
                 if itemFrame.data.slotIndex == slotIndex then
-                    itemFrame:Hide();
+                    --itemFrame:Hide();
+                    itemFrame:EnableMouseScript(false);
+                    itemFrame:PlaySlideOutAnimation();
                     return true
                 end
             end
@@ -639,6 +1057,7 @@ do  --UI Basic
         if self.activeFrames then
             self.activeFrames = nil;
             self.itemFramePool:ReleaseAll();
+            self.glowFXPool:ReleaseAll();
             self.MoneyFrame:Hide();
             self.MoneyFrame:ClearAllPoints();
             self:SetMaxPage(nil);
@@ -650,4 +1069,38 @@ do  --UI Basic
         self:Hide();
     end
     MainFrame:SetScript("OnHide", MainFrame.OnHide);
+
+    function MainFrame:OnUIScaleChanged()
+        if not self.uiScaleDirty then
+            self.uiScaleDirty = true;
+            C_Timer.After(0.33, function()
+                self.uiScaleDirty = nil;
+                self:Reposition();
+                if self.itemFramePool then
+                    self.itemFramePool:CallAllObjects("UpdatePixel");
+                end
+                if self.BackgroundFrame then
+                    self.BackgroundFrame:UpdatePixel();
+                end
+            end);
+        end
+    end
+end
+
+
+do
+    local RareItems = {
+        --[210796] = true,    --debug
+        [210939] = true,    --Null Stone
+        [224025] = true,    --Crackling Shard
+    };
+
+    function IsRareItem(data)
+        if RareItems[data.id] then
+            return true;
+        elseif data.classID == 15 and data.subclassID == 5 then
+            --Mount
+            return true
+        end
+    end
 end
