@@ -4163,12 +4163,13 @@ do  --EditMode
     end
 
     function EditModeSettingsDialogMixin:ReleaseAllWidgets()
-        for _, widget in pairs(self.widgets) do
-            widget:Hide();
-            widget:ClearAllPoints();
-        end
-
         self.activeWidgets = {};
+
+        self.checkboxPool:ReleaseAll();
+        self.sliderPool:ReleaseAll();
+        self.uiPanelButtonPool:ReleaseAll();
+        self.texturePool:ReleaseAll();
+        self.fontStringPool:ReleaseAll();
     end
 
     function EditModeSettingsDialogMixin:Layout()
@@ -4201,27 +4202,19 @@ do  --EditMode
         local widget;
 
         if type == "Checkbox" then
-            if not self.checkboxes then
-                self.checkboxes = {};
-            end
-            widget = addon.CreateCheckbox(self);
+            widget = self.checkboxPool:Acquire();
         elseif type == "Slider" then
-            if not self.sliders then
-                self.sliders = {};
-            end
-            widget = addon.CreateSlider(self);
+            widget = self.sliderPool:Acquire();
         elseif type == "UIPanelButton" then
-            widget = addon.CreateUIPanelButton(self);
+            widget = self.uiPanelButtonPool:Acquire();
         elseif type == "Texture" then
-            widget = self:CreateTexture(nil, "OVERLAY");
+            widget = self.texturePool:Acquire();
             widget.isDivider = nil;
             widget.matchParentWidth = nil;
         elseif type == "FontString" then
-            widget = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+            widget = self.fontStringPool:Acquire();
             widget.matchParentWidth = true;
         end
-
-        widget:Show();
 
         return widget
     end
@@ -4347,6 +4340,16 @@ do  --EditMode
         self.Title:SetText(title);
     end
 
+    function EditModeSettingsDialogMixin:IsOwner(parent)
+        return parent == self.parent
+    end
+
+    function EditModeSettingsDialogMixin:HideOption(parent)
+        if (not parent) or self:IsOwner(parent) then
+            self:Hide();
+        end
+    end
+
     local function SetupSettingsDialog(parent, schematic)
         if not EditModeSettingsDialog then
             local f = CreateFrame("Frame", nil, UIParent);
@@ -4362,7 +4365,7 @@ do  --EditMode
             f:SetFrameLevel(200);
             f:EnableMouse(true);
 
-            f.widgets = {};
+            f.activeWidgets = {};
             f.requireResetPosition = true;
 
             Mixin(f, EditModeSettingsDialogMixin);
@@ -4379,6 +4382,32 @@ do  --EditMode
 
             f:SetScript("OnDragStart", f.OnDragStart);
             f:SetScript("OnDragStop", f.OnDragStop);
+
+
+            local function CreateCheckbox()
+                return addon.CreateCheckbox(f);
+            end
+            f.checkboxPool = API.CreateObjectPool(CreateCheckbox);
+
+            local function CreateSlider()
+                return addon.CreateSlider(f);
+            end
+            f.sliderPool = API.CreateObjectPool(CreateSlider);
+
+            local function CreateUIPanelButton()
+                return addon.CreateUIPanelButton(f);
+            end
+            f.uiPanelButtonPool = API.CreateObjectPool(CreateUIPanelButton);
+
+            local function CreateTexture()
+                return f:CreateTexture(nil, "OVERLAY");
+            end
+            f.texturePool = API.CreateObjectPool(CreateTexture);
+
+            local function CreateFontString()
+                return f:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+            end
+            f.fontStringPool = API.CreateObjectPool(CreateFontString);
         end
 
         if schematic ~= EditModeSettingsDialog.schematic then

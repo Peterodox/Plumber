@@ -195,8 +195,20 @@ L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the to
 
 
 --Loot UI
+L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
+L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
 L["Take All"] = "Take All";     --Take all items from a loot window
 L["You Received"] = YOU_RECEIVED_LABEL or "You recieved";
+L["Sample Item 4"] = "Awesome Epic Item";
+L["Sample Item 3"] = "Awesome Rare Item";
+L["Sample Item 2"] = "Awesome Uncommon Item";
+L["Sample Item 1"] = "Common Item";
+L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
+L["LootUI Option Force Auto Loot"] = "Force Auto Loot";
+L["LootUI Option Force Auto Loot Tooltip"] = "Always enable Auto Loot to counter the occasional auto loot failure.\n\nTo temporarily cancel auto loot on a specific pickup, press and hold %s key until the loot window appears.";
+L["LootUI Option Owned Count"] = "Show Number Of Owned Items";
+L["LootUI Option Use Hotkey"] = "Press Key To Take All Items";
+L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Looting mode, press the following hotkey to take all items.";
 
 
 --Generic

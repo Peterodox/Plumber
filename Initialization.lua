@@ -92,6 +92,15 @@ local DefaultValues = {
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
 
 
+    --Custom Loot Window
+    LootUI = false,
+        LootUI_FontSize = 14,
+        LootUI_ShowItemCount = false,
+        LootUI_UseHotkey = true,
+        LootUI_HotkeyName = "E",
+        LootUI_ForceAutoLoot = true,
+
+
     --Unified Map Pin System
     WorldMapPin_TWW = true,             --Master Switch for TWW Map Pins
         WorldMapPin_TWW_Delve = true,   --Show Bountiful Delves on continent map

@@ -645,7 +645,7 @@ function NewTalkingHead:ShowOptions(state)
         end
     else
         if self.OptionFrame then
-            self.OptionFrame:Hide();
+            self.OptionFrame:HideOption(self);
         end
         if not API.IsInEditMode() then
             self:CloseImmediately();
@@ -690,7 +690,7 @@ function NewTalkingHead:OnDragStop()
     end
     DB.TalkingHead_PositionY = top;
 
-    if self.OptionFrame then
+    if self.OptionFrame and self.OptionFrame:IsOwner(self) then
         local button = self.OptionFrame:FindWidget("ResetButton");
         if button then
             button:Enable();

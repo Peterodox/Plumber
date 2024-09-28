@@ -41,8 +41,12 @@ local AUTO_HIDE_DELAY = 3.0;    --Determined by the number of items. From 2.0s t
 
 local EL = CreateFrame("Frame");
 
+local ENABLE_MODULE = false;
 local MANUAL_MODE = false;      --If true, pause processing chat loot msg and pick up items by clicking it.
 
+-- User Settings
+local FORCE_AUTO_LOOT = true;
+------------------
 
 local function SortFunc_LootSlot(a, b)
     if a.slotType ~= b.slotType then
@@ -216,7 +220,11 @@ do  --Event Handler
         self.playerMoney = GetMoney();
 
         --print("isAutoLoot", isAutoLoot, GetCVarBool("autoLootDefault"), IsModifiedClick("AUTOLOOTTOGGLE"));
-        MANUAL_MODE = not isAutoLoot --not ShouldAutoLoot();
+        if FORCE_AUTO_LOOT then
+            MANUAL_MODE = (not isAutoLoot) and IsModifiedClick("AUTOLOOTTOGGLE");     --Need hold down the Modifier Key until the window appears
+        else
+            MANUAL_MODE = not isAutoLoot;
+        end
 
         local numItems = GetNumLootItems();
 
@@ -682,26 +690,11 @@ do  --UI Notification Mode
         end
 
         local numFrames = (self.activeFrames and #self.activeFrames) or 0;
-        local frameWidth, frameHeight;
 
         local r = (MAX_ITEM_PER_PAGE - numFrames)/MAX_ITEM_PER_PAGE;
         AUTO_HIDE_DELAY = r * 2.0 + (1 - r) * 3.0;
 
-        if numFrames > 0 then
-            frameWidth, frameHeight = self:LayoutActiveFrames();
-        else
-            frameWidth, frameHeight = 192, 32;
-        end
-
-        local maxFrameWidth = Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING * 2;
-        if frameWidth > maxFrameWidth then
-            frameWidth = maxFrameWidth;
-        end
-
-        self:SetSize(frameWidth, frameHeight);
-        self:Reposition();
-        local scale = self:GetEffectiveScale();
-        self:SetBackgroundSize((frameWidth + Formatter.ICON_BUTTON_HEIGHT) * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
+        self:LayoutActiveFrames();
 
         if not multipage then
             self.lootQueue = nil;
@@ -785,13 +778,8 @@ do  --UI Manually Pickup Mode
             itemFrame:EnableMouseScript(true);
         end
 
-        local _, frameHeight = self:LayoutActiveFrames();
-
-        local frameWidth = Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING * 2;
-        self:SetSize(frameWidth, frameHeight);
-        self:Reposition();
-        local scale = self:GetEffectiveScale();
-        self:SetBackgroundSize(frameWidth * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
+        local fixedFrameWidth = true;
+        self:LayoutActiveFrames(fixedFrameWidth);
 
         self.t = 0;
         self.toAlpha = 1;
@@ -841,20 +829,220 @@ do  --UI Manually Pickup Mode
 end
 
 
+do  --Edit Mode
+    local L = addon.L;
+
+    function MainFrame:ShowSampleItems()
+        self:Disable();
+
+        local sampleItems = {
+            {icon = 4622270, name = L["Sample Item 4"], quality = 4, quantity = 1},
+            {icon = 463446, name = L["Sample Item 3"], quality = 3, quantity = 20},
+            {icon = 4549280, name = L["Sample Item 2"], quality = 2, quantity = 100},
+            {icon = 2967113, name = L["Sample Item 1"], quality = 1, quantity = 50},
+        };
+
+        local itemFrame;
+        local activeFrames = {};
+
+        for i, data in ipairs(sampleItems) do
+            itemFrame = self:AcquireItemFrame();
+            activeFrames[i] = itemFrame;
+            itemFrame:SetNameByQuality(data.name, data.quality);
+            itemFrame:SetIcon(data.icon);
+            itemFrame:SetCount(data);
+            itemFrame:Layout();
+            itemFrame:SetAlpha(1);
+            itemFrame:Show();
+            itemFrame:EnableMouseScript(false);
+        end
+
+        self.activeFrames = activeFrames;
+        self:LayoutActiveFrames();
+        self:Show();
+        self:SetAlpha(1);
+
+        self.manualMode = nil;
+        self.Header:Hide();
+        self.TakeAllButton:Show();
+        self.TakeAllButton:Layout();
+        self.TakeAllButton:SetScript("OnKeyDown", nil);
+        self.TakeAllButton:Disable();
+    end
+
+    function MainFrame:EnterEditMode()
+        EL:ListenStaticEvent(false);
+
+        self:ShowSampleItems();
+
+        if not self.Selection then
+            local uiName = "Loot Window";
+            local hideLabel = true;
+            self.Selection = addon.CreateEditModeSelection(self, uiName, hideLabel);
+        end
+        self.Selection:ShowHighlighted();
+
+        self:LoadPosition();
+    end
+
+    function MainFrame:ExitEditMode()
+        if ENABLE_MODULE then
+            EL:ListenStaticEvent(true);
+        end
+
+        self:Disable();
+        self:SetAlpha(0);
+        self.TakeAllButton:Enable();
+
+        if self.Selection then
+            self.Selection:Hide();
+        end
+
+        self:ShowOptions(false);
+    end
+
+    function MainFrame:IsFocused()
+        return (self:IsShown() and (self:IsMouseOver() or self.TakeAllButton:IsMouseOver())) or (self.OptionFrame and self.OptionFrame:IsShown() and self.OptionFrame:IsMouseOver())
+    end
+
+
+    local function Options_ItemCount_OnClick(self, state)
+
+    end
+
+    local function Options_FontSizeSlider_OnValueChanged(value)
+        local locale = GetLocale();
+        if locale == "zhCN" or locale == "zhTW" then
+            value = value + 2;
+        end
+        PlumberDB.LootUI_FontSize = value;
+        Formatter:CalculateDimensions(value);
+        C_Timer.After(0, function()
+            MainFrame:ShowSampleItems();
+        end);
+    end
+
+    local function Options_FontSizeSlider_FormatValue(value)
+        return string.format("%.0f", value);
+    end
+
+    local function Options_ForceAutoLoot_OnClick(self, state)
+        if state then
+            FORCE_AUTO_LOOT = true;
+        else
+            FORCE_AUTO_LOOT = false;
+        end
+    end
+
+    local function Options_UseHotkey_OnClick(self, state)
+
+    end
+
+    local function Options_ResetPosition_OnClick(self)
+        self:Disable();
+        PlumberDB.LootUI_PositionX = nil;
+        PlumberDB.LootUI_PositionY = nil;
+        MainFrame:LoadPosition();
+    end
+
+    local function Options_ResetPosition_ShouldEnable(self)
+        if PlumberDB.LootUI_PositionX and PlumberDB.LootUI_PositionY then
+            return true
+        else
+            return false
+        end
+    end
+
+    local OPTIONS_SCHEMATIC = {
+        title = L["EditMode LootUI"],
+        widgets = {
+            {type = "Slider", label = L["Font Size"], minValue = 12, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "LootUI_FontSize"},
+            {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = Options_ItemCount_OnClick, dbKey = "LootUI_ShowItemCount",},
+
+            {type = "Divider"},
+            {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"]},
+            {type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = Options_UseHotkey_OnClick, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
+
+            {type = "Divider"},
+            {type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = Options_ResetPosition_OnClick, stateCheckFunc = Options_ResetPosition_ShouldEnable, widgetKey = "ResetButton"},
+        }
+    };
+
+
+    function MainFrame:ShowOptions(state)
+        if state then
+            self.OptionFrame = addon.SetupSettingsDialog(self, OPTIONS_SCHEMATIC);
+            self.OptionFrame:Show();
+            if self.OptionFrame.requireResetPosition then
+                self.OptionFrame.requireResetPosition = false;
+                self.OptionFrame:ClearAllPoints();
+                local top = self:GetTop();
+                local left = self:GetLeft();
+                self.OptionFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left, top + 64);
+            end
+        else
+            if self.OptionFrame then
+                self.OptionFrame:HideOption(self);
+            end
+        end
+    end
+
+    function MainFrame:OnDragStart()
+        self:SetMovable(true);
+        self:SetDontSavePosition(true);
+        self:StartMoving();
+    end
+
+    function MainFrame:OnDragStop()
+        self:StopMovingOrSizing();
+
+        local left = self:GetLeft();
+        local top = self:GetTop();
+
+        left = API.Round(left);
+        top = API.Round(top);
+
+        --Convert anchor and save position
+        local DB = PlumberDB;
+        DB.LootUI_PositionX = left;
+        DB.LootUI_PositionY = top;
+
+        self:LoadPosition();
+
+        if self.OptionFrame and self.OptionFrame:IsOwner(self) then
+            local button = self.OptionFrame:FindWidget("ResetButton");
+            if button then
+                button:Enable();
+            end
+        end
+    end
+end
+
+
 do
-    local ENABLE_MODULE = false;
+    local EDITMODE_HOOKED = false;
 
     local function EnableModule(state)
         if state then
+            ENABLE_MODULE = true;
             EL:ListenStaticEvent(true);
             EL:SetScript("OnEvent", EL.OnEvent);
+
             if MainFrame.Init then
                 MainFrame:Init();
             end
+
             MainFrame:OnUIScaleChanged();
+
             if LootFrame then
                 LootFrame:UnregisterEvent("LOOT_OPENED");
                 LootFrame:UnregisterEvent("LOOT_CLOSED");
+            end
+
+            if not EDITMODE_HOOKED then
+                EDITMODE_HOOKED = true;
+                EventRegistry:RegisterCallback("EditMode.Enter", MainFrame.EnterEditMode, MainFrame);
+                EventRegistry:RegisterCallback("EditMode.Exit", MainFrame.ExitEditMode, MainFrame);
             end
         elseif ENABLE_MODULE then
             ENABLE_MODULE = false;
@@ -870,18 +1058,41 @@ do
         end
     end
 
-    C_Timer.After(0, function ()
-        EnableModule(true);
+    --C_Timer.After(0, function ()
+        --EnableModule(true);
         --[[
         MainFrame:Show();
         MainFrame:SetAlpha(1);
         local frameHeight = 64;
         local frameWidth = Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING * 2;
         MainFrame:SetSize(frameWidth, frameHeight);
-        MainFrame:Reposition();
+        MainFrame:LoadPosition();
         local scale = MainFrame:GetEffectiveScale();
         MainFrame:SetBackgroundSize(frameWidth * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
         MainFrame.TakeAllButton:Show();
         --]]
-    end)
+    --end)
+
+    local function OptionToggle_OnClick(self, button)
+        if MainFrame.OptionFrame and MainFrame.OptionFrame:IsShown() then
+            MainFrame:ShowOptions(false);
+            MainFrame:ExitEditMode();
+        else
+            MainFrame:EnterEditMode();
+            MainFrame:ShowOptions(true);
+        end
+    end
+
+    local moduleData = {
+        name = addon.L["ModuleName LootUI"],
+        dbKey = "LootUI",
+        description = addon.L["ModuleDescription LootUI"],
+        toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 1115,
+        moduleAddedTime = 1727520000,
+        optionToggleFunc = OptionToggle_OnClick,
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
 end

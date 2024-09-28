@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.3.1
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.3.8
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -112,6 +112,8 @@ L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "�
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Скрыть текст, если он из локального задания.\nИногда «Говорящая голова» срабатывает до принятия локального задания, и мы не сможем это скрыть.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Подземелье";
 L["TalkingHead Option Condition Instance Tooltip"] = "Скрыть текст, когда вы находитесь в подземелье.";
+L["TalkingHead Option Below WorldMap"] = "Отправить на задний план при открытии карты";
+L["TalkingHead Option Below WorldMap Tooltip"] = "Отправьте Говорящую Голову на задний план, когда откроете Карту Мира, чтобы она не загораживала ее.";
 
 
 --AzerothianArchives
@@ -157,6 +159,11 @@ L["ModuleName TooltipChestKeys"] = "Подсказка: Ключи от сунд
 L["ModuleDescription TooltipChestKeys"] = "Показать информацию о ключе, необходимом для открытия текущего сундука или двери.";
 
 
+--Tooltip Reputation Tokens
+L["ModuleName TooltipRepTokens"] = "Подсказка: Жетоны репутации";
+L["ModuleDescription TooltipRepTokens"] = "Показывать информацию о фракции, если предмет можно использовать для повышения репутации.";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Цена торговца";
 L["ModuleDescription MerchantPrice"] = "Изменение поведения UI торговца:\n\n- Выделите серым цветом только те валюты, которых недостаточно.\n\n- Укажите все необходимые предметы в поле для монет.";
@@ -166,12 +173,37 @@ L["Number Thousands"] = "Т";    --15K  15,000
 L["Number Millions"] = "М";     --1.5M 1,500,000
 
 
+--Landing Page (Expansion Summary Minimap)
+L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Резюме Каз Алгара";
+L["ModuleDescription ExpansionLandingPage"] = "Отображение дополнительной информации на странице:\n\n- Уровень пакта с Отрезанными нитями";
+L["Instruction Track Reputation"] = "<Нажмите Shift, чтобы отслеживать эту репутацию>";
+L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Нажмите Shift, чтобы остановить отслеживание>";
+
+
+--WorldMapPin_TWW (Show Pins On Continent Map)
+L["ModuleName WorldMapPin_TWW"] = "Точка на карте: "..(EXPANSION_NAME10 or "The War Within");
+L["ModuleDescription WorldMapPin_TWW"] = "Показать дополнительные метки на карте континента Каз Алгара:\n\n- %s\n\n- %s";  --Wwe'll replace %s with locales (See Map Pin Filter Name at the bottom)
+
+
+--Delves
+L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Уровень %s";
+L["Item Level Format"] = ITEM_LEVEL or "Уровень предмета %d";
+L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
+L["Delves Reputation Name"] = "Путешествие в вылазки";
+L["ModuleName Delves_SeasonProgress"] = "Вылазки: Путешествие в вылазки";
+L["ModuleDescription Delves_SeasonProgress"] = "Отображение шкалы прогресса в верхней части экрана каждый раз, когда вы получаете опыт для вылазки";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Перемещение по горизонтали";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Перемещение по вертикали";
 L["Reposition Button Tooltip"] = "Щелкните ЛКМ и перетащите, чтобы переместить окно.";
 L["Font Size"] = FONT_SIZE or "Размер шрифта";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Сброс в положение по умолчанию";
+L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Известность ";  --There is a space
+L["Paragon Reputation"] = "Парагон";
+L["Level Maxed"] = "(Максимально)";   --Reached max level
+L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Текущий:";
 
 
 
@@ -190,7 +222,7 @@ L["currency-2917"] = "Gilded";
 
 L["Scenario Delves"] = "Вылазка";
 L["GameObject Door"] = "Дверь";
-L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
+L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameObjectID once it shows up in the database
 
 
 --Map Pin Filter Name (name should be plural)

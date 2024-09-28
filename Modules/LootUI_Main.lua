@@ -45,20 +45,21 @@ do
     Formatter.strlen = string.len;
 
     function Formatter:Init()
-        Formatter:CalculateDimensions();
+        local fontSize = PlumberDB and PlumberDB.LootUI_FontSize;
+        Formatter:CalculateDimensions(fontSize);
 
         if not self.DummyFontString then
             self.DummyFontString = MainFrame:CreateFontString(nil, "BACKGROUND", "PlumberLootUIFont");
             self.DummyFontString:Hide();
             self.DummyFontString:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
         end
-
-        local font = GameFontNormal:GetFont();
-        self.DummyFontString:SetFont(font, self.BASE_FONT_SIZE, "");
-        self.numberWidths = {};
     end
 
     function Formatter:CalculateDimensions(fontSize)
+        if not (fontSize and fontSize >= 12 and fontSize <= 16) then
+            fontSize = nil;
+        end
+
         local fontFile, defaultFontSize = ObjectiveTrackerFont14:GetFont();
         local normalizedFontSize;
 
@@ -66,7 +67,9 @@ do
             fontSize = defaultFontSize;
         end
 
-        PlumberLootUIFont:SetFont(fontFile, Round(fontSize), "OUTLINE");
+        local fontObject = PlumberLootUIFont;
+        fontObject:SetFont(fontFile, Round(fontSize), "OUTLINE");
+        fontObject:SetShadowOffset(0, 0);
 
         local locale = GetLocale();
         if locale == "zhCN" or locale == "zhTW" then
@@ -85,6 +88,8 @@ do
         self.NAME_WIDTH = Round(16 * fontSize);
         self.BUTTON_WIDTH = self.ICON_SIZE + self.ICON_TEXT_GAP + self.BASE_FONT_SIZE + self.COUNT_NAME_GAP + self.NAME_WIDTH;
         self.BUTTON_SPACING = 12;
+
+        self.numberWidths = {};
     end
 
     function Formatter:GetNumberWidth(number)
@@ -96,6 +101,7 @@ do
             for i = 1, digits do
                 text = text .. "8";
             end
+            text = text.." ";
             self.DummyFontString:SetText(text);
             self.numberWidths[digits] = Round(self.DummyFontString:GetWidth());
         end
@@ -340,7 +346,7 @@ do  --UI ItemButton
         self.Count:SetPoint("LEFT", self.Reference, "LEFT", offset, 0);
 
         if self.countWidth then
-            offset = offset + self.countWidth + Formatter.COUNT_NAME_GAP;
+            offset = offset + self.countWidth;
         end
         self.Text:ClearAllPoints();
         self.Text:SetPoint("LEFT", self.Reference, "LEFT", offset, 0);
@@ -492,7 +498,7 @@ do  --UI ItemButton
     end
 
 
-    function MainFrame:LayoutActiveFrames()
+    function MainFrame:LayoutActiveFrames(fixedFrameWidth)
         local height = 0;
         local spacing = Formatter.BUTTON_SPACING;
         local iconSize = Formatter.ICON_SIZE;
@@ -521,7 +527,26 @@ do  --UI ItemButton
         local frameWidth = maxTextWidth + 2*iconSize + Formatter:GetNumberWidth(10) + spacing;
         local frameHeight = height + spacing;
 
-        return frameWidth, frameHeight
+        --return frameWidth, frameHeight
+
+        local maxFrameWidth = Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING * 2;
+        if frameWidth > maxFrameWidth then
+            frameWidth = maxFrameWidth;
+        end
+
+        local backgroundWidth;
+
+        if fixedFrameWidth then
+            frameWidth = Formatter.BUTTON_WIDTH;
+            backgroundWidth = frameWidth + Formatter.BUTTON_SPACING * 2;
+        else
+            backgroundWidth = frameWidth + Formatter.ICON_BUTTON_HEIGHT
+        end
+
+        self:SetSize(frameWidth, frameHeight);
+
+        local scale = self:GetEffectiveScale();
+        self:SetBackgroundSize(backgroundWidth * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
     end
 end
 
@@ -924,19 +949,23 @@ do  --UI Basic
         end
 
         self:Hide();
-        self:ClearAllPoints();
+        self:SetScript("OnUpdate", nil);
     end
 
-    function MainFrame:Reposition()
-        local viewportWidth, viewportHeight = WorldFrame:GetSize();
-        viewportWidth = math.min(viewportWidth, viewportHeight * 16/9);
-
-        local scale = UIParent:GetEffectiveScale();
-        --self:SetScale(scale);
-        local offsetX = math.floor((0.5 - 0.3333) * viewportWidth /scale);
-
+    function MainFrame:LoadPosition()
         self:ClearAllPoints();
-        self:SetPoint("TOPLEFT", nil, "CENTER", offsetX, 0);
+        local DB = PlumberDB;
+        if DB and DB.LootUI_PositionX and DB.LootUI_PositionY then
+            self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", DB.LootUI_PositionX, DB.LootUI_PositionY);
+        else
+            local viewportWidth, viewportHeight = WorldFrame:GetSize();
+            viewportWidth = math.min(viewportWidth, viewportHeight * 16/9);
+
+            local scale = UIParent:GetEffectiveScale();
+            local offsetX = math.floor((0.5 - 0.3333) * viewportWidth /scale);
+
+            self:SetPoint("TOPLEFT", nil, "CENTER", offsetX, 0);
+        end
     end
 
     function MainFrame:Init()
@@ -956,7 +985,7 @@ do  --UI Basic
 
         self.glowFXPool = API.CreateObjectPool(CreateSpikeyGlowFrame);
 
-        local MoneyFrame = addon.CreateMoneyDisplay(self, "GameFontNormal");
+        local MoneyFrame = addon.CreateMoneyDisplay(self, "PlumberLootUIFont");
         self.MoneyFrame = MoneyFrame;
         MoneyFrame:SetHeight(Formatter.TEXT_BUTTON_HEIGHT);
         MoneyFrame:Hide();
@@ -998,10 +1027,13 @@ do  --UI Basic
         self.TakeAllButton = TakeAllButton;
         TakeAllButton:SetHotkey("E");
         TakeAllButton:SetButtonText(L["Take All"]);
-        TakeAllButton:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", -2*Formatter.BUTTON_SPACING, Formatter.BUTTON_SPACING);
+        TakeAllButton:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 0, Formatter.BUTTON_SPACING);
         TakeAllButton:Hide();
         API.Mixin(TakeAllButton, TakeAllButtonMixin);
         TakeAllButton:OnLoad();
+
+
+        self:LoadPosition();
     end
 
     function MainFrame:HighlightItemFrame(itemFrame)
@@ -1075,7 +1107,7 @@ do  --UI Basic
             self.uiScaleDirty = true;
             C_Timer.After(0.33, function()
                 self.uiScaleDirty = nil;
-                self:Reposition();
+                self:LoadPosition();
                 if self.itemFramePool then
                     self.itemFramePool:CallAllObjects("UpdatePixel");
                 end
