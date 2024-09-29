@@ -273,7 +273,7 @@ do  -- Checkbox
 
         if self.dbKey then
             newState = not addon.GetDBValue(self.dbKey)
-            addon.SetDBValue(self.dbKey, newState);
+            addon.SetDBValue(self.dbKey, newState, true);
             self:SetChecked(newState);
         else
             newState = not self:GetChecked();

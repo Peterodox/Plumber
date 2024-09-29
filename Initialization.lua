@@ -59,15 +59,19 @@ function CallbackRegistry:Trigger(event, ...)
     end
 end
 
+function CallbackRegistry:RegisterSettingCallback(dbKey, func, owner)
+    self:Register("SettingChanged."..dbKey, func, owner);
+end
+
 
 local function GetDBValue(dbKey)
     return DB[dbKey]
 end
 addon.GetDBValue = GetDBValue;
 
-local function SetDBValue(dbKey, value)
+local function SetDBValue(dbKey, value, userInput)
     DB[dbKey] = value;
-    addon.CallbackRegistry:Trigger("SettingChanged."..dbKey, value);
+    addon.CallbackRegistry:Trigger("SettingChanged."..dbKey, value, userInput);
 end
 addon.SetDBValue = SetDBValue;
 
@@ -145,6 +149,10 @@ local function LoadDatabase()
         if DB[dbKey] == nil then
             DB[dbKey] = value;
         end
+    end
+
+    for dbKey, value in pairs(DB) do
+        addon.CallbackRegistry:Trigger("SettingChanged."..dbKey, value);
     end
 
     if not DB.installTime or type(DB.installTime) ~= "number" then

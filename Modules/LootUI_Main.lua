@@ -10,9 +10,16 @@ local GetPhysicalScreenSize = GetPhysicalScreenSize;
 local InCombatLockdown = InCombatLockdown;
 local CreateFrame = CreateFrame;
 local IsCosmeticItem = C_Item.IsCosmeticItem;
+local GetItemCount = C_Item.GetItemCount;
 
 
-local MainFrame = CreateFrame("Frame", nil, UIParent);
+-- User Settings
+local SHOW_ITEM_COUNT = true;
+local USE_HOTKEY = true;
+------------------
+
+
+local MainFrame = CreateFrame("Frame", "PLU", UIParent);
 MainFrame:Hide();
 MainFrame:SetAlpha(0);
 MainFrame:SetFrameStrata("HIGH");
@@ -30,6 +37,7 @@ local Defination = {
     SLOT_TYPE_MONEY = 10,       --Game value is 2, but we sort it to top
     SLOT_TYPE_REP = 9,          --Custom Value
     SLOT_TYPE_ITEM = 1,
+    SLOT_TYPE_OVERFLOW = 128,   --Display overflown currency
 
     QUEST_TYPE_NEW = 2,
     QUEST_TYPE_ONGOING = 1,
@@ -156,20 +164,21 @@ do  --UI ItemButton
 
     local function Anim_ShiftAndFadeOutButton_OnUpdate(self, elapsed)
         self.t = self.t + elapsed;
+        if self.t > 0 then
+            self.alpha = self.alpha - 5 * elapsed;
+            if self.alpha < 0 then
+                self.alpha = 0;
+            end
+            self:SetAlpha(self.alpha);
 
-        self.alpha = self.alpha - 5 * elapsed;
-        if self.alpha < 0 then
-            self.alpha = 0;
+            self.offset = self.offset + 128 * elapsed;
+            if self.t < ANIM_DURATION_BUTTON_HOVER then
+
+            else
+                self:SetScript("OnUpdate", nil);
+            end
+            self.Reference:SetPoint("LEFT", self, "LEFT", self.offset, 0);
         end
-        self:SetAlpha(self.alpha);
-
-        self.offset = self.offset + 128 * elapsed;
-        if self.t < ANIM_DURATION_BUTTON_HOVER then
-
-        else
-            self:SetScript("OnUpdate", nil);
-        end
-        self.Reference:SetPoint("LEFT", self, "LEFT", self.offset, 0);
     end
 
     function ItemFrameMixin:ShowHoverVisual()
@@ -178,12 +187,12 @@ do  --UI ItemButton
         self:SetScript("OnUpdate", Anim_ShiftButtonCentent_OnUpdate);
     end
 
-    function ItemFrameMixin:PlaySlideOutAnimation()
+    function ItemFrameMixin:PlaySlideOutAnimation(delay)
         if self.hovered then
             self:Hide();
         else
             self.hovered = true;
-            self.t = 0;
+            self.t = (delay and -delay) or 0;
             self.alpha = self:GetAlpha();
             if not self.offset then
                 self.offset = 0;
@@ -218,11 +227,17 @@ do  --UI ItemButton
             f.Icon:SetTexture(texture);
             f:SetSize(iconSize, iconSize);
             f:SetPoint("LEFT", self.Reference, "LEFT", 0, 0);
+            f.Count:SetText(nil);
             f.IconOverlay:Hide();
             f.IconOverlay:SetSize(2*iconSize, 2*iconSize);
             self:SetButtonHeight(Formatter.ICON_BUTTON_HEIGHT);
 
             if data then
+                if data.locked then
+                    f.Icon:SetVertexColor(0.9, 0, 0);
+                else
+                    f.Icon:SetVertexColor(1, 1, 1);
+                end
                 if data.slotType == Defination.SLOT_TYPE_ITEM then
                     if data.questType ~= 0 then
                         if data.questType == Defination.QUEST_TYPE_NEW then
@@ -242,7 +257,28 @@ do  --UI ItemButton
                             self:SetBorderColor(1, 0, 1);
                         end
                     end
+
+                    if SHOW_ITEM_COUNT and data.id then
+                        local numOwned = GetItemCount(data.id);
+                        if numOwned > 0 then
+                            f.Count:SetText(numOwned);
+                        end
+                    end
+                elseif data.slotType == Defination.SLOT_TYPE_CURRENCY then
+                    local overflow, numOwned = API.WillCurrencyRewardOverflow(data.id, data.quantity);
+
+                    if overflow then
+                        self:SetBorderColor(1, 0, 0);
+                        f.IconOverlay:SetTexCoord(0.875, 1, 0, 0.125);
+                        f.IconOverlay:Show();
+                    end
+
+                    if SHOW_ITEM_COUNT and numOwned > 9999 then
+                        f.Count:SetText(AbbreviateNumbers(numOwned));
+                    end
                 end
+            else
+                f.Icon:SetVertexColor(1, 1, 1);
             end
 
             f:Show();
@@ -312,6 +348,8 @@ do  --UI ItemButton
             self:SetReputation(data);
         elseif data.slotType == Defination.SLOT_TYPE_MONEY then
             self:SetMoney(data);
+        elseif data.slotType == Defination.SLOT_TYPE_OVERFLOW then
+            self:SetOverflowCurrency(data);
         end
 
         self.data = data;
@@ -367,7 +405,7 @@ do  --UI ItemButton
 
     function ItemFrameMixin:SetCurrency(data)
         self:SetNameByQuality(data.name, data.quality);
-        self:SetIcon(data.icon);
+        self:SetIcon(data.icon, data);
         self:SetCount(data);
         self:Layout();
         self:ShowGlow(false);
@@ -394,6 +432,35 @@ do  --UI ItemButton
         self:SetNameByQuality(name, 1);
         self:Layout();
         self:ShowGlow(false);
+    end
+
+    function ItemFrameMixin:SetOverflowCurrency(data)
+        local currencyID = data.id;
+        local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+
+        local quantity;
+        local label;
+
+        if info.useTotalEarnedForMaxQty then
+            quantity = info.totalEarned;
+            label = L["Total Maximum"];
+        else
+            quantity = info.quantity;
+            label = "Total Cap: ";
+        end
+
+        local maxQuantity = info.maxQuantity or quantity;
+        label = "|cffff4800"..quantity.."/"..maxQuantity.."|r";
+        local name = info.name;
+        local text = name.."\n"..label;
+
+        self:SetNameByQuality(text, info.quality);
+        self:SetIcon(info.iconFileID);
+        self:SetBorderColor(1, 0, 0);
+        self.IconFrame.IconOverlay:SetTexCoord(0.875, 1, 0, 0.125);
+        self.IconFrame.IconOverlay:Show();
+        self:SetCount(nil);
+        self:Layout();
     end
 
     function ItemFrameMixin:IsSameItem(data)
@@ -499,6 +566,11 @@ do  --UI ItemButton
 
 
     function MainFrame:LayoutActiveFrames(fixedFrameWidth)
+        if not self.activeFrames then
+            self:TryHide();
+            return
+        end
+
         local height = 0;
         local spacing = Formatter.BUTTON_SPACING;
         local iconSize = Formatter.ICON_SIZE;
@@ -770,6 +842,9 @@ do  --UI Generic Button (Hotkey Button)
         --self.Background:SetScale(scale);
         self.Text:ClearAllPoints();
         local padding = 12;  --Hotkey Padding
+        local buttonHeight = Round(Formatter.BASE_FONT_SIZE + 2*padding);
+        local buttonWidth;
+        local minWidth = 2 * buttonHeight;
         if self.hotkeyName then
             local bgPadding = 4;
             local bgHeight = Formatter.BASE_FONT_SIZE + 2*bgPadding;
@@ -784,12 +859,17 @@ do  --UI Generic Button (Hotkey Button)
             self.HotkeyFrame:SetPoint("LEFT", self, "LEFT", padding, 0);
             self.HotkeyFrame.HotkeyBackdrop:SetScale(scale);
             self.Text:SetPoint("LEFT", self.HotkeyFrame, "RIGHT", bgPadding, 0);
-            self:SetWidth(Round(padding + bgWidth + bgPadding + textWidth + padding));
+            buttonWidth = Round(padding + bgWidth + bgPadding + textWidth + padding);
         else
-            self.Text:SetPoint("LEFT", self, "LEFT", 2*padding, 0);
-            self:SetWidth(Round(textWidth + 4*padding));
+            self.Text:SetPoint("LEFT", self, "LEFT", padding, 0)
+            buttonWidth = Round(textWidth + 2*padding);
         end
-        self:SetHeight(Round(Formatter.BASE_FONT_SIZE + 2*padding));
+
+        if buttonWidth < minWidth then
+            buttonWidth = minWidth;
+        end
+
+        self:SetSize(buttonWidth, buttonHeight);
     end
 
     function UIButtonMixin:SetHighlighted(state)
@@ -848,7 +928,7 @@ do  --TakeAllButton
     end
 
     function TakeAllButtonMixin:OnShow()
-        if (not InCombatLockdown()) or self:GetPropagateKeyboardInput() then
+        if self.hotkeyName and (not InCombatLockdown()) or self:GetPropagateKeyboardInput() then
             self:SetScript("OnKeyDown", self.OnKeyDown);
         end
         self:RegisterEvent("PLAYER_REGEN_DISABLED");
@@ -857,6 +937,14 @@ do  --TakeAllButton
     function TakeAllButtonMixin:OnHide()
         self:SetScript("OnKeyDown", nil);
         self:UnregisterEvent("PLAYER_REGEN_DISABLED");
+    end
+
+    function TakeAllButtonMixin:UpdateHotKey()
+        if USE_HOTKEY then
+            self:SetHotkey("E");
+        else
+            self:SetHotkey(nil);
+        end
     end
 
     function TakeAllButtonMixin:OnLoad()
@@ -1025,13 +1113,12 @@ do  --UI Basic
 
         local TakeAllButton = CreateUIButton(self);
         self.TakeAllButton = TakeAllButton;
-        TakeAllButton:SetHotkey("E");
         TakeAllButton:SetButtonText(L["Take All"]);
         TakeAllButton:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 0, Formatter.BUTTON_SPACING);
         TakeAllButton:Hide();
         API.Mixin(TakeAllButton, TakeAllButtonMixin);
         TakeAllButton:OnLoad();
-
+        TakeAllButton:UpdateHotKey();
 
         self:LoadPosition();
     end
@@ -1120,7 +1207,7 @@ do  --UI Basic
 end
 
 
-do
+do  --Rare Items
     local RareItems = {
         --[210796] = true,    --debug
         [210939] = true,    --Null Stone
@@ -1135,4 +1222,23 @@ do
             return true
         end
     end
+end
+
+
+do  --Callback Registery
+    local function SettingChanged_ShowItemCount(state, userInput)
+        SHOW_ITEM_COUNT = state;
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowItemCount", SettingChanged_ShowItemCount);
+
+    local function SettingChanged_UseHotkey(state, userInput)
+        USE_HOTKEY = state;
+        if userInput then
+            local button = MainFrame.TakeAllButton;
+            if button then
+                button:UpdateHotKey();
+            end
+        end
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseHotkey", SettingChanged_UseHotkey);
 end

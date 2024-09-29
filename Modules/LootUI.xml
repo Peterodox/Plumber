@@ -34,6 +34,13 @@
                     </Anchors>
 				</Texture>
 			</Layer>
+            <Layer level="OVERLAY" textureSubLevel="3">
+				<FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" justifyV="BOTTOM">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
+					</Anchors>
+				</FontString>
+            </Layer>
 		</Layers>
 	</Frame>
 

@@ -1,5 +1,6 @@
 local _, addon = ...
 local API = addon.API;
+local L = addon.L;
 local CoinUtil = addon.CoinUtil;
 local P_Loot = addon.P_Loot;
 
@@ -44,11 +45,16 @@ local EL = CreateFrame("Frame");
 local ENABLE_MODULE = false;
 local MANUAL_MODE = false;      --If true, pause processing chat loot msg and pick up items by clicking it.
 
+
 -- User Settings
 local FORCE_AUTO_LOOT = true;
 ------------------
 
 local function SortFunc_LootSlot(a, b)
+    if a.looted ~= b.looted then
+        return b.looted
+    end
+
     if a.slotType ~= b.slotType then
         return a.slotType > b.slotType
     end
@@ -188,6 +194,7 @@ end
 do  --Event Handler
     local STATIC_EVENTS = {
         "LOOT_OPENED", "LOOT_CLOSED", "LOOT_READY",
+        "LOOT_SLOT_CHANGED", "LOOT_SLOT_CLEARED",
         "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED",
     };
 
@@ -203,48 +210,16 @@ do  --Event Handler
         end
     end
 
-    function EL:ListenSlotEvent(state)
-        if state and MANUAL_MODE then
-            self:RegisterEvent("LOOT_SLOT_CHANGED");
-            self:RegisterEvent("LOOT_SLOT_CLEARED");
-        else
-            self:UnregisterEvent("LOOT_SLOT_CHANGED");
-            self:UnregisterEvent("LOOT_SLOT_CLEARED");
-        end
-    end
-
-    function EL:OnLootOpened(isAutoLoot, acquiredFromItem)
-        self.lootOpened = true;
+    function EL:BuildLootData()
         self.currentLoots = {};
         self.anyLootInSlot = {};
-        self.playerMoney = GetMoney();
-
-        --print("isAutoLoot", isAutoLoot, GetCVarBool("autoLootDefault"), IsModifiedClick("AUTOLOOTTOGGLE"));
-        if FORCE_AUTO_LOOT then
-            MANUAL_MODE = (not isAutoLoot) and IsModifiedClick("AUTOLOOTTOGGLE");     --Need hold down the Modifier Key until the window appears
-        else
-            MANUAL_MODE = not isAutoLoot;
-        end
+        self.overflowCurrencies = nil;
 
         local numItems = GetNumLootItems();
-
-        if numItems == 0 then
-           self:ListenSlotEvent(false);
-           CloseLoot();
-           return
-        else
-            self:ListenSlotEvent(true);
-            self:ListenChatEvents(true);
-            if acquiredFromItem then
-				PlaySound(SOUNDKIT.UI_CONTAINER_ITEM_OPEN);
-			elseif IsFishingLoot() then
-				PlaySound(SOUNDKIT.FISHING_REEL_IN);
-            end
-        end
-
         local icon, name, quantity, currencyID, quality, locked, isQuestItem, questID, isActive, isCoin;
         local slotType, link, craftQuality, id, _, classID, subclassID, questType, hideCount;
         local index = 0;
+        local itemOverflow;
 
         for slotIndex = 1, numItems do
             if LootSlotHasItem(slotIndex) then
@@ -258,6 +233,7 @@ do  --Event Handler
                 questType = nil;
                 craftQuality = nil;
                 classID, subclassID = nil, nil;
+                itemOverflow = nil;
 
                 if isCoin then --Enum.LootSlotType.Money
                     slotType = Defination.SLOT_TYPE_MONEY;  --Sort money to top
@@ -280,6 +256,10 @@ do  --Event Handler
                     elseif currencyID then
                         id = currencyID;
                         slotType = Defination.SLOT_TYPE_CURRENCY;
+                        local overflow, numOwned = API.WillCurrencyRewardOverflow(currencyID, quantity);
+                        if overflow then    --debug
+                            itemOverflow = true;
+                        end
                     end
                 end
 
@@ -287,6 +267,7 @@ do  --Event Handler
                 questType = questType or 0;
 
                 index = index + 1;
+                
                 self.currentLoots[index] = {
                     icon = icon,
                     name = name,
@@ -304,10 +285,51 @@ do  --Event Handler
                     classID = classID,
                     subclassID = subclassID,
                 };
+
+                if itemOverflow then
+                    if not self.overflowCurrencies then
+                        self.overflowCurrencies = {};
+                    end
+                    table.insert(self.overflowCurrencies, {
+                        id = id,
+                        slotType = Defination.SLOT_TYPE_OVERFLOW,
+                        slotIndex = slotIndex,
+                        quality = quality,
+                    });
+                end
             else
                 self.anyLootInSlot[slotIndex] = false;
             end
         end
+    end
+
+    function EL:OnLootOpened(isAutoLoot, acquiredFromItem)
+        self.lootOpened = true;
+
+        self.playerMoney = GetMoney();
+
+        --print("isAutoLoot", isAutoLoot, GetCVarBool("autoLootDefault"), IsModifiedClick("AUTOLOOTTOGGLE"));
+        if FORCE_AUTO_LOOT then
+            MANUAL_MODE = (not isAutoLoot) and IsModifiedClick("AUTOLOOTTOGGLE");     --Need hold down the Modifier Key until the window appears
+        else
+            MANUAL_MODE = not isAutoLoot;
+        end
+
+        local numItems = GetNumLootItems();
+
+        if numItems == 0 then
+           CloseLoot();
+           return
+        else
+            self:ListenDynamicEvents(true);
+            if acquiredFromItem then
+				PlaySound(SOUNDKIT.UI_CONTAINER_ITEM_OPEN);
+			elseif IsFishingLoot() then
+				PlaySound(SOUNDKIT.FISHING_REEL_IN);
+            end
+        end
+
+        self:BuildLootData();
 
         if MANUAL_MODE then
             tsort(self.currentLoots, SortFunc_LootSlot);
@@ -326,11 +348,11 @@ do  --Event Handler
     function EL:OnLootClosed()
         self:RequestUnregisterDynamicEvents();
         self.lootOpened = false;
-        self:ListenSlotEvent(false);
         CloseLoot();
         if MainFrame.manualMode then
             MainFrame:ClosePendingLoot();
         end
+        MainFrame.errorMode = nil;
     end
 
     function EL:OnUpdate_UnregisterDynamicEvents(elapsed)
@@ -338,11 +360,11 @@ do  --Event Handler
         if self.t > EVENT_DURATION then
             self.t = 0;
             self:SetScript("OnUpdate", nil);
-            self:ListenChatEvents(false);
+            self:ListenDynamicEvents(false);
         end
     end
 
-    function EL:ListenChatEvents(state)
+    function EL:ListenDynamicEvents(state)
         if state then
             if not self.playerGUID then
                 self.playerGUID = UnitGUID("player");
@@ -351,6 +373,7 @@ do  --Event Handler
             self:RegisterEvent("CHAT_MSG_CURRENCY");
             self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE");
             self:RegisterEvent("PLAYER_MONEY");
+            self:RegisterEvent("UI_ERROR_MESSAGE");
             self.t = 0;
             self:SetScript("OnUpdate", nil);
         else
@@ -358,6 +381,7 @@ do  --Event Handler
             self:UnregisterEvent("CHAT_MSG_CURRENCY");
             self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE");
             self:UnregisterEvent("PLAYER_MONEY");
+            self:UnregisterEvent("UI_ERROR_MESSAGE");
         end
     end
 
@@ -391,6 +415,14 @@ do  --Event Handler
             self:OnLootClosed();
         elseif event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then
             MainFrame:OnUIScaleChanged();
+        elseif event == "UI_ERROR_MESSAGE" then
+            --ERR_INV_FULL, ERR_LOOT_CANT_LOOT_THAT, ERR_LOOT_CANT_LOOT_THAT_NOW, ERR_LOOT_ROLL_PENDING
+            if self.lootOpened then
+                local errorType, message = ...
+                if errorType == 3 then
+                    MainFrame:OnErrored(errorType);
+                end
+            end
         else
             if MANUAL_MODE then
                 if event == "LOOT_SLOT_CHANGED" then
@@ -466,11 +498,7 @@ do  --UI Notification Mode
         if self.t >= AUTO_HIDE_DELAY then
             self.t = 0;
             self:SetScript("OnUpdate", nil);
-            if self.lootQueue then
-               self:DisplayNextPage();
-            else
-                self:TryHide();
-            end
+            self:DisplayNextPage();
         end
     end
 
@@ -506,11 +534,7 @@ do  --UI Notification Mode
             if self.t >= AUTO_HIDE_DELAY then
                 self.t = 0;
                 self:SetScript("OnUpdate", nil);
-                if self.lootQueue then
-                   self:DisplayNextPage();
-                else
-                    self:TryHide();
-                end
+                self:DisplayNextPage();
             end
         end
     end
@@ -554,8 +578,15 @@ do  --UI Notification Mode
         self.timerFrame:SetScript("OnUpdate", OnUpdate_DisplayLootResult);
     end
 
+    function MainFrame:StopQueue()
+        if self.timerFrame then
+            self.timerFrame:SetScript("OnUpdate", nil);
+        end
+        self.lootQueue = nil;
+    end
+
     function MainFrame:DisplayNextPage()
-        if self.lootQueue and #self.lootQueue > 0 then
+        if (self.lootQueue and #self.lootQueue > 0) or (EL.overflowCurrencies) then
             self.anyAlphaChange = true;
             self.isUpdatingPage = true;
             for _, obj in ipairs(self.activeFrames) do
@@ -563,19 +594,25 @@ do  --UI Notification Mode
                 obj.alpha = obj:GetAlpha();
             end
             self:SetScript("OnUpdate", OnUpdate_FadeOut_ThenDisplayNextPage);
+            return true
         else
             self:TryHide();
+            return false
         end
     end
 
     function MainFrame:DisplayLootResult()
+        local overflowWarning;
+
         if self.lootQueue then
-            if self.Init then
-                self:Init();
-            end
+            overflowWarning = false;
         else
-            self:TryHide();
-            return
+            if self:DisplayOverflowCurrencies() then
+                overflowWarning = true;
+            else
+                self:TryHide();
+                return
+            end
         end
 
         self:SetManualMode(false);
@@ -584,7 +621,6 @@ do  --UI Notification Mode
         local numQueued = #self.lootQueue;
 
         if numQueued > 1 then
-            local foundIndex;
             local index1 = 1;
             local index2 = 2;
             local data1 = self.lootQueue[index1];
@@ -692,7 +728,13 @@ do  --UI Notification Mode
         local numFrames = (self.activeFrames and #self.activeFrames) or 0;
 
         local r = (MAX_ITEM_PER_PAGE - numFrames)/MAX_ITEM_PER_PAGE;
-        AUTO_HIDE_DELAY = r * 2.0 + (1 - r) * 3.0;
+        if overflowWarning then
+            AUTO_HIDE_DELAY = r * 4.0 + (1 - r) * 6.0;
+            self.Header:SetText(L["Reach Currency Cap"]);
+        else
+            AUTO_HIDE_DELAY = r * 2.0 + (1 - r) * 3.0;
+            self.Header:SetText(L["You Received"]);
+        end
 
         self:LayoutActiveFrames();
 
@@ -710,6 +752,26 @@ do  --UI Notification Mode
             self:SetScript("OnUpdate", OnUpdate_FadeIn_All_ThenHide);
             self:Show();
             self.anyAlphaChange = nil;
+        end
+    end
+
+    function MainFrame:DisplayOverflowCurrencies()
+        if EL.overflowCurrencies then
+            if not self.lootQueue then
+                local pseudoLootQueue = {};
+
+                for i, data in ipairs(EL.overflowCurrencies) do
+                    pseudoLootQueue[i] = data;
+                end
+
+                self.lootQueue = pseudoLootQueue;
+            end
+
+            EL.overflowCurrencies = nil;
+
+            return true
+        else
+            return false
         end
     end
 end
@@ -738,7 +800,12 @@ do  --UI Manually Pickup Mode
 
     function MainFrame:SetManualMode(state)
         state = state == true;
-        if self.manualMode == state then return end
+        if self.manualMode == state then
+            if state then
+                self:ReleaseAll();
+            end
+            return
+        end
 
         self.manualMode = state;
         self:ReleaseAll();
@@ -758,10 +825,6 @@ do  --UI Manually Pickup Mode
     function MainFrame:DisplayPendingLoot()
         if not EL.currentLoots then return end;
         --loots have been sorted so the key is no longer slotIndex
-
-        if self.Init then
-            self:Init();
-        end
 
         self:SetManualMode(true);
 
@@ -826,20 +889,162 @@ do  --UI Manually Pickup Mode
             end
         end
     end
+
+
+    local function OnUpdate_FadeIn_ThenHideLootedFrames(self, elapsed)
+        self.alpha = self.alpha + 8*elapsed;
+        if self.alpha >= 1 then
+            self.alpha = 1;
+            self.toAlpha = nil;
+            self.t = self.t + elapsed;
+            if self.t > 0.5 then
+                self.t = 0;
+                self:SetScript("OnUpdate", nil);
+                if self.lootedFrames then
+                    for i, itemFrame in ipairs(self.lootedFrames) do
+                        itemFrame:PlaySlideOutAnimation((i - 1) * 0.1);
+                    end
+                    self.lootedFrames = nil;
+                end
+                if self.lootErrorCallback then
+                    self.lootErrorCallback(self);
+                    self.lootErrorCallback = nil;
+                end
+            end
+        else
+            self.t = 0;
+        end
+        self:SetAlpha(self.alpha);
+    end
+
+    local function MainFrame_DisplayUnlootedItems(self)
+        if not EL.currentLoots then return end;
+
+        self:ReleaseAll();
+
+        local itemFrame, slotIndex;
+        local activeFrames = {};
+        local n = 0;
+
+        self.activeFrames = activeFrames;
+
+        for i, data in ipairs(EL.currentLoots) do
+            slotIndex = data.slotIndex;
+            if LootSlotHasItem(slotIndex) then
+                itemFrame = self:AcquireItemFrame();
+                itemFrame:SetData(data);
+                n = n + 1;
+                activeFrames[n] = itemFrame;
+                itemFrame:SetAlpha(1);
+                itemFrame.toAlpha = nil;
+                itemFrame:EnableMouseScript(true);
+                if self.anyLootInSlot then
+                    if self.anyLootInSlot[slotIndex] then
+                        self.anyLootInSlot[slotIndex] = true;
+                    end
+                end
+            end
+        end
+
+        local fixedFrameWidth = true;
+        self:LayoutActiveFrames(fixedFrameWidth);
+    end
+
+    function MainFrame:OnErrored(errorType)
+        if self.errorMode then return end;
+        self.errorMode = true;
+
+        if not EL.currentLoots then return end;
+        --loots have been sorted so the key is no longer slotIndex
+
+        MANUAL_MODE = true;
+        self:SetManualMode(true);
+        self:StopQueue();
+
+        local itemFrame, slotIndex;
+        local activeFrames = {};
+        local lootedFrames = {};
+        local n = 0;
+
+        self.activeFrames = activeFrames;
+        self.lootedFrames = lootedFrames;
+
+        for i, data in ipairs(EL.currentLoots) do
+            if not LootSlotHasItem(data.slotIndex) then
+                data.looted = true;
+            end
+        end
+
+        tsort(EL.currentLoots, SortFunc_LootSlot);
+
+        for i, data in ipairs(EL.currentLoots) do
+            itemFrame = self:AcquireItemFrame();
+            itemFrame:SetData(data);
+            activeFrames[i] = itemFrame;
+            itemFrame:SetAlpha(1);
+            itemFrame.toAlpha = nil;
+            slotIndex = data.slotIndex;
+            if LootSlotHasItem(slotIndex) then
+                itemFrame:EnableMouseScript(true);
+            else
+                itemFrame:EnableMouseScript(false);
+                n = n + 1;
+                lootedFrames[n] = itemFrame;
+
+                if self.anyLootInSlot then
+                    if self.anyLootInSlot[slotIndex] then
+                        self.anyLootInSlot[slotIndex] = false;
+                    end
+                end
+            end
+        end
+
+        local fixedFrameWidth = true;
+        self:LayoutActiveFrames(fixedFrameWidth);
+
+        self.t = 0;
+        self.toAlpha = 1;
+        self.alpha = self:GetAlpha();
+
+        if n > 0 then
+            self.lootErrorCallback = function()
+                self.t = 0;
+                local delay = n * 0.1 + 0.25;
+                self:SetScript("OnUpdate", function(_, elapsed)
+                    self.t = self.t + elapsed;
+                    if self.t > delay then
+                        self:SetScript("OnUpdate", nil);
+                        MainFrame_DisplayUnlootedItems(self);
+                    end
+                end);
+            end
+        else
+            self.lootErrorCallback = nil;
+        end
+
+        self:SetScript("OnUpdate", OnUpdate_FadeIn_ThenHideLootedFrames);
+        self:Show();
+    end
 end
 
 
 do  --Edit Mode
     local L = addon.L;
+    local SHOW_ITEM_COUNT = false;
 
     function MainFrame:ShowSampleItems()
-        self:Disable();
+        if self.timerFrame then
+            self.timerFrame:SetScript("OnUpdate", nil);
+            self.timerFrame.t = nil;
+        end
+        self:ReleaseAll();
+        self:SetScript("OnUpdate", nil);
 
         local sampleItems = {
-            {icon = 4622270, name = L["Sample Item 4"], quality = 4, quantity = 1},
-            {icon = 463446, name = L["Sample Item 3"], quality = 3, quantity = 20},
-            {icon = 4549280, name = L["Sample Item 2"], quality = 2, quantity = 100},
-            {icon = 2967113, name = L["Sample Item 1"], quality = 1, quantity = 50},
+            {icon = 4622270, name = L["Sample Item 4"], quality = 4, quantity = 1, owned = 99},
+            {icon = 463446, name = L["Sample Item 3"], quality = 3, quantity = 20, owned = 99},
+            {icon = 4549280, name = L["Sample Item 2"], quality = 2, quantity = 100, owned = 99},
+            {icon = 2967113, name = L["Sample Item 1"], quality = 1, quantity = 50, owned = 99},
         };
 
         local itemFrame;
@@ -855,6 +1060,11 @@ do  --Edit Mode
             itemFrame:SetAlpha(1);
             itemFrame:Show();
             itemFrame:EnableMouseScript(false);
+            if SHOW_ITEM_COUNT then
+                itemFrame.IconFrame.Count:SetText("99");
+            else
+                itemFrame.IconFrame.Count:SetText(nil);
+            end
         end
 
         self.activeFrames = activeFrames;
@@ -872,7 +1082,10 @@ do  --Edit Mode
 
     function MainFrame:EnterEditMode()
         EL:ListenStaticEvent(false);
+        EL.overflowCurrencies = nil;
 
+        self.errorMode = nil;
+        self.inEditMode = true;
         self:ShowSampleItems();
 
         if not self.Selection then
@@ -890,6 +1103,7 @@ do  --Edit Mode
             EL:ListenStaticEvent(true);
         end
 
+        self.inEditMode = nil;
         self:Disable();
         self:SetAlpha(0);
         self.TakeAllButton:Enable();
@@ -1016,11 +1230,26 @@ do  --Edit Mode
             end
         end
     end
+
+    --Callback Registery
+    local function SettingChanged_ShowItemCount(state, userInput)
+        SHOW_ITEM_COUNT = state;
+        if userInput and MainFrame:IsShown() and MainFrame.inEditMode then
+            MainFrame:ShowSampleItems();
+        end
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowItemCount", SettingChanged_ShowItemCount);
 end
 
 
 do
     local EDITMODE_HOOKED = false;
+
+    local function EditMode_Enter()
+        if ENABLE_MODULE then
+            MainFrame:EnterEditMode();
+        end
+    end
 
     local function EnableModule(state)
         if state then
@@ -1041,7 +1270,7 @@ do
 
             if not EDITMODE_HOOKED then
                 EDITMODE_HOOKED = true;
-                EventRegistry:RegisterCallback("EditMode.Enter", MainFrame.EnterEditMode, MainFrame);
+                EventRegistry:RegisterCallback("EditMode.Enter", EditMode_Enter);
                 EventRegistry:RegisterCallback("EditMode.Exit", MainFrame.ExitEditMode, MainFrame);
             end
         elseif ENABLE_MODULE then

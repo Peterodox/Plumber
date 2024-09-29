@@ -1357,6 +1357,13 @@ do  --Currency
         end
     end
 
+    local function WillCurrencyRewardOverflow(currencyID, rewardQuantity)
+        local currencyInfo = GetCurrencyInfo(currencyID);
+        local quantity = currencyInfo and (currencyInfo.useTotalEarnedForMaxQty and currencyInfo.totalEarned or currencyInfo.quantity);
+        return quantity and currencyInfo.maxQuantity > 0 and rewardQuantity + quantity > currencyInfo.maxQuantity, quantity
+    end
+    API.WillCurrencyRewardOverflow = WillCurrencyRewardOverflow;
+
     local CoinUtil = {};
     addon.CoinUtil = CoinUtil;
 
