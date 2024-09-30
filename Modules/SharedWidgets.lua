@@ -805,7 +805,7 @@ do  -- TokenFrame   -- Money   -- Coin
 
     function MoneyDisplayMixin:SetAmountByDelta(addRawCopper, animte)
         if animte then
-            self.fromCopper = self.fromCopper or self:GetAmount();
+            self.fromCopper = self.fromCopper or GetMoney();
             self.toCopper = self.fromCopper + addRawCopper;
             self.updateTime = 0;
             self.totalTime = 0;

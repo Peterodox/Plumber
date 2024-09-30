@@ -10,7 +10,7 @@
     </Font>
 
     <Script file="LootUI_Main.lua"/>
-	<Script file="LootUI.lua"/>
+	<Script file="LootUI_Display.lua"/>
 
 	<Frame name="PlumberLootUIIconTemplate" virtual="true">
 		<Size x="32" y="32"/>
@@ -207,6 +207,30 @@
 				</Texture>
 			</Layer>
 		</Layers>
+        <Frames>
+            <Frame parentKey="FeedbackFrame" useParentLevel="true" hidden="true">
+                <Size x="64" y="64"/>
+                <Anchors>
+                    <Anchor point="CENTER"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK" textureSubLevel="0">
+                        <Texture parentKey="TopTexture" file="Interface\AddOns\Plumber\Art\LootUI\LootUI.png" alphaMode="ADD">
+                            <Size x="64" y="32"/>
+                            <Anchors>
+                                <Anchor point="BOTTOM" relativeKey="$parent" relativePoint="TOP" y="-2"/>
+                            </Anchors>
+                        </Texture>
+                        <Texture parentKey="BottomTexture" file="Interface\AddOns\Plumber\Art\LootUI\LootUI.png" alphaMode="ADD">
+                            <Size x="64" y="32"/>
+                            <Anchors>
+                                <Anchor point="TOP" relativeKey="$parent" relativePoint="BOTTOM" y="2"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Frame>
+        </Frames>
 	</Frame>
 
     <Frame name="PlumberSpikeyGlowTemplate" useParentLevel="true" hidden="true" virtual="true">

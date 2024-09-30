@@ -1,7 +1,6 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
-local CoinUtil = addon.CoinUtil;
 local P_Loot = addon.P_Loot;
 
 
@@ -43,12 +42,34 @@ local AUTO_HIDE_DELAY = 3.0;    --Determined by the number of items. From 2.0s t
 local EL = CreateFrame("Frame");
 
 local ENABLE_MODULE = false;
-local MANUAL_MODE = false;      --If true, pause processing chat loot msg and pick up items by clicking it.
 
 
 -- User Settings
 local FORCE_AUTO_LOOT = true;
 ------------------
+
+local CLASS_SORT_ORDER = {
+    [0] = 0,    --Consumable
+    [1] = 1,    --Container
+    [2] = 90,   --Weapon
+    [3] = 3,    --Gem
+    [4] = 80,   --Armor
+    [5] = 5,    --Reagent
+    [6] = 6,    --Projectile
+    [7] = 7,    --Tradegoods
+    [8] = 8,    --ItemEnhancement
+    [9] = 9,    --Recipe
+    [10] = 10,  --CurrencyTokenObsolete
+    [11] = 11,  --Quiver
+    [12] = 99,  --Quest Item
+    [13] = 13,  --Key
+    [14] = 14,  --PermanentObsolete
+    [15] = 15,  --Miscellaneous
+    [16] = 16,  --Glyph
+    [17] = 17,  --Battlepet
+    [18] = 18,  --WoWToken
+    [19] = 19,  --Profession
+};
 
 local function SortFunc_LootSlot(a, b)
     if a.looted ~= b.looted then
@@ -65,6 +86,10 @@ local function SortFunc_LootSlot(a, b)
 
     if a.quality ~= b.quality then
         return a.quality > b.quality
+    end
+
+    if (a.classID ~= b.classID) and (CLASS_SORT_ORDER[a.classID] and CLASS_SORT_ORDER[b.classID]) and (CLASS_SORT_ORDER[a.classID] ~= CLASS_SORT_ORDER[b.classID]) then
+        return CLASS_SORT_ORDER[a.classID] > CLASS_SORT_ORDER[b.classID]
     end
 
     if a.name ~= b.name then
@@ -132,22 +157,6 @@ do  --Process Loot Message
         end
     end
 
-    --[[
-    function EL:ProcessMessageItem(text)
-        --Debug Override
-        local data = {
-            name = "The Assembly of the Deeps",
-            quantity = 150,
-            slotType = Defination.SLOT_TYPE_REP,
-            questType = 0,
-            quality = 0,
-            slotIndex = -1;
-            craftQuality = 0,
-        };
-        MainFrame:QueueDisplayLoot(data);
-    end
-    --]]
-
     function EL:ProcessMessageCurrency(text)
         local currencyID = match(text, "currency:(%d+)", 1);
         if currencyID then
@@ -184,6 +193,8 @@ do  --Process Loot Message
                 quality = 0,
                 slotIndex = self.repDummyIndex;
                 craftQuality = 0,
+                classID = -1,
+                subclassID = -1,
             };
             MainFrame:QueueDisplayLoot(data);
         end
@@ -194,8 +205,8 @@ end
 do  --Event Handler
     local STATIC_EVENTS = {
         "LOOT_OPENED", "LOOT_CLOSED", "LOOT_READY",
-        "LOOT_SLOT_CHANGED", "LOOT_SLOT_CLEARED",
         "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED",
+        --"TRANSMOG_COLLECTION_SOURCE_ADDED",
     };
 
     function EL:ListenStaticEvent(state)
@@ -210,93 +221,95 @@ do  --Event Handler
         end
     end
 
+    local function BuildSlotData(slotIndex)
+        local _, slotType, craftQuality, id, itemOverflow, classID, subclassID, questType, hideCount;
+        local icon, name, quantity, currencyID, quality, locked, isQuestItem, questID, isActive, isCoin = GetLootSlotInfo(slotIndex);
+        local link = GetLootSlotLink(slotIndex);
+        slotType = GetLootSlotType(slotIndex) or 0;
+
+        if isCoin then --Enum.LootSlotType.Money
+            slotType = Defination.SLOT_TYPE_MONEY;  --Sort money to top
+        else
+            if slotType == Defination.SLOT_TYPE_ITEM then
+                if link then
+                    id, _, _, _, _, classID, subclassID = GetItemInfoInstant(link);
+                    if classID == 5 or classID == 7 then
+                        craftQuality = GetItemReagentQualityByItemInfo(link);
+                    elseif classID == 2 or classID == 4 then
+                        hideCount = true;
+                    end
+                end
+
+                if questID and not isActive then
+                    questType = Defination.QUEST_TYPE_NEW;
+                elseif questID or isQuestItem then  --Quest Required Item doesn't have questID
+                    questType = Defination.QUEST_TYPE_ONGOING;
+                end
+            elseif currencyID then
+                id = currencyID;
+                slotType = Defination.SLOT_TYPE_CURRENCY;
+                local overflow, numOwned = API.WillCurrencyRewardOverflow(currencyID, quantity);
+                if overflow then    --debug
+                    itemOverflow = true;
+                end
+            end
+        end
+
+        quality = quality or 1;
+        craftQuality = craftQuality or 0;
+        questType = questType or 0;
+        classID = classID or -1;
+        subclassID = subclassID or -1;
+
+        local data = {
+            icon = icon,
+            name = name,
+            quantity = quantity,
+            locked = locked,
+            quality = quality,
+            id = id,
+            slotType = slotType,
+            slotIndex = slotIndex,
+            link = link,
+            craftQuality = craftQuality,
+            questType = questType,
+            looted = false,
+            hideCount = hideCount,
+            classID = classID,
+            subclassID = subclassID,
+            overflow = itemOverflow,
+        };
+
+        return data
+    end
+
     function EL:BuildLootData()
         self.currentLoots = {};
         self.anyLootInSlot = {};
         self.overflowCurrencies = nil;
 
         local numItems = GetNumLootItems();
-        local icon, name, quantity, currencyID, quality, locked, isQuestItem, questID, isActive, isCoin;
-        local slotType, link, craftQuality, id, _, classID, subclassID, questType, hideCount;
         local index = 0;
-        local itemOverflow;
+        local data;
 
         for slotIndex = 1, numItems do
             if LootSlotHasItem(slotIndex) then
-                self.anyLootInSlot[slotIndex] = true;
-                icon, name, quantity, currencyID, quality, locked, isQuestItem, questID, isActive, isCoin = GetLootSlotInfo(slotIndex);
-                quality = quality or 1;
-                slotType = GetLootSlotType(slotIndex) or 0;
-                link = GetLootSlotLink(slotIndex);
-
-                hideCount = nil;
-                questType = nil;
-                craftQuality = nil;
-                classID, subclassID = nil, nil;
-                itemOverflow = nil;
-
-                if isCoin then --Enum.LootSlotType.Money
-                    slotType = Defination.SLOT_TYPE_MONEY;  --Sort money to top
-                else
-                    if slotType == Defination.SLOT_TYPE_ITEM then
-                        if link then
-                            id, _, _, _, _, classID, subclassID = GetItemInfoInstant(link);
-                            if classID == 5 or classID == 7 then
-                                craftQuality = GetItemReagentQualityByItemInfo(link);
-                            elseif classID == 2 or classID == 4 then
-                                hideCount = true;
-                            end
-                        end
-
-                        if questID and not isActive then
-                            questType = Defination.QUEST_TYPE_NEW;
-                        elseif questID or isQuestItem then  --Quest Required Item doesn't have questID
-                            questType = Defination.QUEST_TYPE_ONGOING;
-                        end
-                    elseif currencyID then
-                        id = currencyID;
-                        slotType = Defination.SLOT_TYPE_CURRENCY;
-                        local overflow, numOwned = API.WillCurrencyRewardOverflow(currencyID, quantity);
-                        if overflow then    --debug
-                            itemOverflow = true;
-                        end
-                    end
-                end
-
-                craftQuality = craftQuality or 0;
-                questType = questType or 0;
-
                 index = index + 1;
-                
-                self.currentLoots[index] = {
-                    icon = icon,
-                    name = name,
-                    quantity = quantity,
-                    locked = locked,
-                    quality = quality,
-                    id = id,
-                    slotType = slotType,
-                    slotIndex = slotIndex,
-                    link = link,
-                    craftQuality = craftQuality,
-                    questType = questType,
-                    looted = false,
-                    hideCount = hideCount,
-                    classID = classID,
-                    subclassID = subclassID,
-                };
+                data = BuildSlotData(slotIndex);
+                self.currentLoots[index] = data;
 
-                if itemOverflow then
+                if data.overflow then
                     if not self.overflowCurrencies then
                         self.overflowCurrencies = {};
                     end
                     table.insert(self.overflowCurrencies, {
-                        id = id,
+                        id = data.id,
                         slotType = Defination.SLOT_TYPE_OVERFLOW,
                         slotIndex = slotIndex,
-                        quality = quality,
+                        quality = data.quality,
                     });
                 end
+                self.anyLootInSlot[slotIndex] = true;
             else
                 self.anyLootInSlot[slotIndex] = false;
             end
@@ -305,14 +318,15 @@ do  --Event Handler
 
     function EL:OnLootOpened(isAutoLoot, acquiredFromItem)
         self.lootOpened = true;
-
+        self.dirtySlots = {};
         self.playerMoney = GetMoney();
 
         --print("isAutoLoot", isAutoLoot, GetCVarBool("autoLootDefault"), IsModifiedClick("AUTOLOOTTOGGLE"));
+        local useManualMode;
         if FORCE_AUTO_LOOT then
-            MANUAL_MODE = (not isAutoLoot) and IsModifiedClick("AUTOLOOTTOGGLE");     --Need hold down the Modifier Key until the window appears
+            useManualMode = (not isAutoLoot) and IsModifiedClick("AUTOLOOTTOGGLE");     --Need hold down the Modifier Key until the window appears
         else
-            MANUAL_MODE = not isAutoLoot;
+            useManualMode = not isAutoLoot;
         end
 
         local numItems = GetNumLootItems();
@@ -322,6 +336,9 @@ do  --Event Handler
            return
         else
             self:ListenDynamicEvents(true);
+            self:RegisterEvent("UI_ERROR_MESSAGE");
+            self:RegisterEvent("LOOT_SLOT_CHANGED");
+            self:RegisterEvent("LOOT_SLOT_CLEARED");
             if acquiredFromItem then
 				PlaySound(SOUNDKIT.UI_CONTAINER_ITEM_OPEN);
 			elseif IsFishingLoot() then
@@ -331,10 +348,17 @@ do  --Event Handler
 
         self:BuildLootData();
 
-        if MANUAL_MODE then
+        if useManualMode then
             tsort(self.currentLoots, SortFunc_LootSlot);
             MainFrame:DisplayPendingLoot();
         else
+            if MainFrame:IsShown() and MainFrame.manualMode and not MainFrame.errorMode then
+                MainFrame:Hide();
+                MainFrame:SetAlpha(0);
+                MainFrame:SetManualMode(false);
+            end
+            MainFrame.manualMode = false;
+
             for slotIndex = 1, numItems do
                 LootSlot(slotIndex);
             end
@@ -348,11 +372,16 @@ do  --Event Handler
     function EL:OnLootClosed()
         self:RequestUnregisterDynamicEvents();
         self.lootOpened = false;
+        self.anyLootInSlot = nil;
+        self.dirtySlots = nil;
         CloseLoot();
         if MainFrame.manualMode then
             MainFrame:ClosePendingLoot();
         end
         MainFrame.errorMode = nil;
+        self:UnregisterEvent("UI_ERROR_MESSAGE");
+        self:UnregisterEvent("LOOT_SLOT_CHANGED");
+        self:UnregisterEvent("LOOT_SLOT_CLEARED");
     end
 
     function EL:OnUpdate_UnregisterDynamicEvents(elapsed)
@@ -373,7 +402,6 @@ do  --Event Handler
             self:RegisterEvent("CHAT_MSG_CURRENCY");
             self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE");
             self:RegisterEvent("PLAYER_MONEY");
-            self:RegisterEvent("UI_ERROR_MESSAGE");
             self.t = 0;
             self:SetScript("OnUpdate", nil);
         else
@@ -381,7 +409,6 @@ do  --Event Handler
             self:UnregisterEvent("CHAT_MSG_CURRENCY");
             self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE");
             self:UnregisterEvent("PLAYER_MONEY");
-            self:UnregisterEvent("UI_ERROR_MESSAGE");
         end
     end
 
@@ -390,16 +417,80 @@ do  --Event Handler
         self:SetScript("OnUpdate", self.OnUpdate_UnregisterDynamicEvents);
     end
 
+
+    function EL:OnUpdate_ProcessSlotChanged(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.1 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            self:ProcessDirtySlots();
+        end
+    end
+
+    function EL:RequestProcessSlotChanged()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate_ProcessSlotChanged);
+    end
+
+    function EL:ProcessDirtySlots()
+        if not self.dirtySlots then return end;
+
+        for slotIndex, dirty in pairs(self.dirtySlots) do
+            if dirty then
+                self.dirtySlots[slotIndex] = false;
+                if LootSlotHasItem(slotIndex) then
+                    MainFrame:UpdateLootSlotData(slotIndex, BuildSlotData(slotIndex));
+                else
+                    self:OnLootSlotCleared(slotIndex);
+                end
+            end
+        end
+    end
+
     function EL:OnLootSlotChanged(slotIndex)
-        --print("SlotChanged", slotIndex);
+        if MainFrame.manualMode then
+            if self.dirtySlots and slotIndex and not self.dirtySlots[slotIndex] then
+                self.dirtySlots[slotIndex] = true;
+                self:RequestProcessSlotChanged();
+            end
+        end
+    end
+
+    function EL:OnUpdate_CheckRemainingLoot(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.05 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            self:CheckRemainingLoot();
+        end
+    end
+
+    function EL:CheckRemainingLoot()
+        local anyLeft = false;
+        local numItems = GetNumLootItems();
+        for slotIndex = 1, numItems do
+            if LootSlotHasItem(slotIndex) then
+                anyLeft = true
+                break
+            end
+        end
+
+        if anyLeft and self.lootOpened then
+            MainFrame:OnErrored();
+        end
     end
 
     function EL:OnLootSlotCleared(slotIndex)
-        if self.anyLootInSlot then
-            if self.anyLootInSlot[slotIndex] then
-                self.anyLootInSlot[slotIndex] = false;
-                MainFrame:SetLootSlotCleared(slotIndex);
+        if MainFrame.manualMode then
+            if self.anyLootInSlot then
+                if self.anyLootInSlot[slotIndex] then
+                    self.anyLootInSlot[slotIndex] = false;
+                    MainFrame:SetLootSlotCleared(slotIndex);
+                end
             end
+        else
+            --self.t = 0;
+            --self:SetScript("OnUpdate", self.OnUpdate_CheckRemainingLoot);
         end
     end
 
@@ -419,52 +510,47 @@ do  --Event Handler
             --ERR_INV_FULL, ERR_LOOT_CANT_LOOT_THAT, ERR_LOOT_CANT_LOOT_THAT_NOW, ERR_LOOT_ROLL_PENDING
             if self.lootOpened then
                 local errorType, message = ...
-                if errorType == 3 then
+                if errorType == 3 or true then
                     MainFrame:OnErrored(errorType);
                 end
             end
-        else
-            if MANUAL_MODE then
-                if event == "LOOT_SLOT_CHANGED" then
-                    --Can happen during AoE Loot
-                    self:OnLootSlotChanged(...);
-                elseif event == "LOOT_SLOT_CLEARED" then
-                    self:OnLootSlotCleared(...);
-                end
-            else
-                if event == "CHAT_MSG_LOOT" or event == "CHAT_MSG_CURRENCY" or event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
-                    --This is the most robust way to determine what's been looted.
-                    --Less responsive and more costly
-                    if self.currentLoots then
-                        local guid = select(12, ...);
-                        if event == "CHAT_MSG_LOOT" then
-                            if guid == self.playerGUID then
-                                self:ProcessMessageItem(...);
-                            end
-                        elseif event == "CHAT_MSG_CURRENCY" then    --guid is nil. Appear later than other chat events (~0.8s delay)
-                            self:ProcessMessageCurrency(...);
-                        elseif event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
-                            self:ProcessMessageFaction(...);
-                        end
+        elseif event == "CHAT_MSG_LOOT" or event == "CHAT_MSG_CURRENCY" or event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
+            --This is the most robust way to determine what's been looted.
+            --Less responsive and more costly
+            if self.currentLoots then
+                local guid = select(12, ...);
+                if event == "CHAT_MSG_LOOT" then
+                    if guid == self.playerGUID then
+                        self:ProcessMessageItem(...);
                     end
-                elseif event == "PLAYER_MONEY" then
-                    if self.playerMoney then
-                        local money = GetMoney();
-                        local delta = money - self.playerMoney;
-                        if delta > 0 then
-                            local data = {
-                                slotType = Defination.SLOT_TYPE_MONEY,
-                                quantity = delta,
-                                name = tostring(money),
-                            };
-                            MainFrame:QueueDisplayLoot(data);
-                        end
-                        self.playerMoney = money;
-                    end
+                elseif event == "CHAT_MSG_CURRENCY" then    --guid is nil. Appear later than other chat events (~0.8s delay)
+                    self:ProcessMessageCurrency(...);
+                elseif event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
+                    self:ProcessMessageFaction(...);
                 end
             end
+        elseif event == "PLAYER_MONEY" then
+            if self.playerMoney then
+                local money = GetMoney();
+                local delta = money - self.playerMoney;
+                if delta > 0 then
+                    local data = {
+                        slotType = Defination.SLOT_TYPE_MONEY,
+                        quantity = delta,
+                        name = tostring(money),
+                    };
+                    MainFrame:QueueDisplayLoot(data);
+                end
+                self.playerMoney = money;
+            end
+        elseif event == "LOOT_SLOT_CHANGED" then
+            --Can happen during AoE Loot
+            self:OnLootSlotChanged(...);
+
+        elseif event == "LOOT_SLOT_CLEARED" then
+            self:OnLootSlotCleared(...);
         end
-        --print(event, GetTimePreciseSec(), ...)
+        --print(event, GetTimePreciseSec(), ...)  --
     end
 end
 
@@ -564,6 +650,8 @@ do  --UI Notification Mode
     end
 
     function MainFrame:QueueDisplayLoot(lootData)
+        if self.manualMode then return end;
+
         if not self.timerFrame then
             self.timerFrame = CreateFrame("Frame");
         end
@@ -586,7 +674,7 @@ do  --UI Notification Mode
     end
 
     function MainFrame:DisplayNextPage()
-        if (self.lootQueue and #self.lootQueue > 0) or (EL.overflowCurrencies) then
+        if (self.lootQueue and #self.lootQueue > 0) or (EL.overflowCurrencies and #EL.overflowCurrencies > 0) then
             self.anyAlphaChange = true;
             self.isUpdatingPage = true;
             for _, obj in ipairs(self.activeFrames) do
@@ -679,7 +767,7 @@ do  --UI Notification Mode
         tsort(self.lootQueue, SortFunc_LootSlot);
 
         self.alpha = self:GetAlpha();
-        local fadeIndividualFrame = self:IsShown() and self.alpha > 0.5;
+        local fadeIndividualFrame = self:IsShown() and self.alpha > 0.25;
         local multipage = numTotal > MAX_ITEM_PER_PAGE;
         local lootThisPage;
 
@@ -711,47 +799,53 @@ do  --UI Notification Mode
                 local n = #self.activeFrames;
                 n = n + 1;
                 self.activeFrames[n] = itemFrame;
-
-                if fadeIndividualFrame then
-                    itemFrame.toAlpha = 1;
-                    itemFrame.alpha = 0;
-                else
-                    itemFrame.toAlpha = nil;
-                    itemFrame.alpha = 1;
-                    itemFrame:SetAlpha(1);
-                end
-
                 itemFrame:EnableMouseScript(false);
+                itemFrame.hasItem = true;
             end
         end
 
         local numFrames = (self.activeFrames and #self.activeFrames) or 0;
 
-        local r = (MAX_ITEM_PER_PAGE - numFrames)/MAX_ITEM_PER_PAGE;
-        if overflowWarning then
-            AUTO_HIDE_DELAY = r * 4.0 + (1 - r) * 6.0;
-            self.Header:SetText(L["Reach Currency Cap"]);
+        if numFrames > 0 then
+            local r = (MAX_ITEM_PER_PAGE - numFrames)/MAX_ITEM_PER_PAGE;
+            if overflowWarning then
+                AUTO_HIDE_DELAY = r * 4.0 + (1 - r) * 6.0;
+                self.Header:SetText(L["Reach Currency Cap"]);
+            else
+                AUTO_HIDE_DELAY = r * 2.0 + (1 - r) * 3.0;
+                self.Header:SetText(L["You Received"]);
+            end
+
+            self:LayoutActiveFrames();
+
+            if not multipage then
+                self.lootQueue = nil;
+            end
+
+            self.t = 0;
+            self.toAlpha = 1;
+
+            if fadeIndividualFrame then
+                self.anyAlphaChange = true;
+                self:SetScript("OnUpdate", OnUpdate_FadeIn_Individual);
+
+                for _, itemFrame in ipairs(self.activeFrames) do
+                    itemFrame.toAlpha = 1;
+                    itemFrame.alpha = itemFrame:GetAlpha();
+                end
+            else
+                self:SetScript("OnUpdate", OnUpdate_FadeIn_All_ThenHide);
+                self:Show();
+                self.anyAlphaChange = nil;
+
+                for _, itemFrame in ipairs(self.activeFrames) do
+                    itemFrame.toAlpha = nil;
+                    itemFrame.alpha = 1;
+                    itemFrame:SetAlpha(1);
+                end
+            end
         else
-            AUTO_HIDE_DELAY = r * 2.0 + (1 - r) * 3.0;
-            self.Header:SetText(L["You Received"]);
-        end
-
-        self:LayoutActiveFrames();
-
-        if not multipage then
-            self.lootQueue = nil;
-        end
-
-        self.t = 0;
-        self.toAlpha = 1;
-
-        if self:IsShown() then
-            self.anyAlphaChange = true;
-            self:SetScript("OnUpdate", OnUpdate_FadeIn_Individual);
-        else
-            self:SetScript("OnUpdate", OnUpdate_FadeIn_All_ThenHide);
-            self:Show();
-            self.anyAlphaChange = nil;
+            self:TryHide();
         end
     end
 
@@ -800,16 +894,10 @@ do  --UI Manually Pickup Mode
 
     function MainFrame:SetManualMode(state)
         state = state == true;
-        if self.manualMode == state then
-            if state then
-                self:ReleaseAll();
-            end
-            return
+        if state or self.manualMode then
+            self:ReleaseAll();
         end
-
         self.manualMode = state;
-        self:ReleaseAll();
-
         self:HighlightItemFrame(nil);
         if state then
             self.Header:Hide();
@@ -820,6 +908,7 @@ do  --UI Manually Pickup Mode
             self.TakeAllButton:Hide();
             self.BackgroundFrame:SetBackgroundAlpha(0.50);
         end
+        self:EnableMouseScript(state);
     end
 
     function MainFrame:DisplayPendingLoot()
@@ -839,6 +928,7 @@ do  --UI Manually Pickup Mode
             itemFrame:SetAlpha(1);
             itemFrame.toAlpha = nil;
             itemFrame:EnableMouseScript(true);
+            itemFrame.hasItem = true;
         end
 
         local fixedFrameWidth = true;
@@ -863,6 +953,8 @@ do  --UI Manually Pickup Mode
                 itemFrame:EnableMouseScript(false);
             end
         end
+
+        self:EnableMouseScript(false);
 
         self:SetScript("OnUpdate", OnUpdate_FadeOut_DisableMotion);
     end
@@ -938,6 +1030,8 @@ do  --UI Manually Pickup Mode
                 itemFrame:SetAlpha(1);
                 itemFrame.toAlpha = nil;
                 itemFrame:EnableMouseScript(true);
+                itemFrame.hasItem = true;
+
                 if self.anyLootInSlot then
                     if self.anyLootInSlot[slotIndex] then
                         self.anyLootInSlot[slotIndex] = true;
@@ -957,7 +1051,6 @@ do  --UI Manually Pickup Mode
         if not EL.currentLoots then return end;
         --loots have been sorted so the key is no longer slotIndex
 
-        MANUAL_MODE = true;
         self:SetManualMode(true);
         self:StopQueue();
 
@@ -986,8 +1079,10 @@ do  --UI Manually Pickup Mode
             slotIndex = data.slotIndex;
             if LootSlotHasItem(slotIndex) then
                 itemFrame:EnableMouseScript(true);
+                itemFrame.hasItem = true;
             else
                 itemFrame:EnableMouseScript(false);
+                itemFrame.hasItem = nil;
                 n = n + 1;
                 lootedFrames[n] = itemFrame;
 
@@ -1286,21 +1381,6 @@ do
             end
         end
     end
-
-    --C_Timer.After(0, function ()
-        --EnableModule(true);
-        --[[
-        MainFrame:Show();
-        MainFrame:SetAlpha(1);
-        local frameHeight = 64;
-        local frameWidth = Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING * 2;
-        MainFrame:SetSize(frameWidth, frameHeight);
-        MainFrame:LoadPosition();
-        local scale = MainFrame:GetEffectiveScale();
-        MainFrame:SetBackgroundSize(frameWidth * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
-        MainFrame.TakeAllButton:Show();
-        --]]
-    --end)
 
     local function OptionToggle_OnClick(self, button)
         if MainFrame.OptionFrame and MainFrame.OptionFrame:IsShown() then

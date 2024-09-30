@@ -118,15 +118,52 @@ do
     end
 
     function Formatter:GetPixelPerfectScale()
-        if not self.pixelPerfectsScale then
+        if not self.pixelPerfectScale then
             local SCREEN_WIDTH, SCREEN_HEIGHT = GetPhysicalScreenSize();
-            self.pixelPerfectsScale = 768/SCREEN_HEIGHT;
+            self.pixelPerfectScale = 768/SCREEN_HEIGHT;
         end
-        return self.pixelPerfectsScale
+        return self.pixelPerfectScale
     end
 
     function Formatter:PixelPerfectTextureSlice(object)
         object:SetScale(self:GetPixelPerfectScale());
+    end
+
+    function Formatter:PixelSizeForScale(pixelSize, objectScale)
+        local scale0 = self:GetPixelPerfectScale();
+        return pixelSize * scale0 / objectScale
+    end
+end
+
+
+local FocusSolver = CreateFrame("Frame");
+do
+    function FocusSolver:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.1 then
+            self.t = nil;
+            self:SetScript("OnUpdate", nil);
+            if self.object and self.object:IsMouseMotionFocus() then
+                self.object:OnFocused();
+            end
+        end
+    end
+
+    function FocusSolver:SetFocus(itemFrame)
+        self.object = itemFrame;
+        if itemFrame then
+            if not self.t then
+                self:SetScript("OnUpdate", self.OnUpdate);
+            end
+            self.t = 0;
+        else
+            self:SetScript("OnUpdate", nil);
+            self.t = nil;
+        end
+    end
+
+    function FocusSolver:IsLastFocus(itemFrame)
+        return self.object and self.object == itemFrame
     end
 end
 
@@ -188,7 +225,7 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:PlaySlideOutAnimation(delay)
-        if self.hovered then
+        if false and self.hovered then
             self:Hide();
         else
             self.hovered = true;
@@ -255,6 +292,10 @@ do  --UI ItemButton
                             f.IconOverlay:SetTexCoord(0, 0.125, 0.125, 0.25);
                             f.IconOverlay:Show();
                             self:SetBorderColor(1, 0, 1);
+                        elseif data.classID == 2 or data.classID == 4 then
+                            if data.link then
+                                --print(C_TransmogCollection.PlayerHasTransmogByItemInfo(data.link));
+                            end
                         end
                     end
 
@@ -485,6 +526,7 @@ do  --UI ItemButton
         self:StopAnimating();
         self:ResetHoverVisual(true);
         self.hasGlowFX = nil;
+        self.hasItem = nil;
     end
 
     function ItemFrameMixin:AnimateItemCount(oldValue, newValue)
@@ -498,17 +540,21 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:OnEnter()
-        --Effective during Manual Mode
-        if self.data.slotType == Defination.SLOT_TYPE_ITEM then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
-            GameTooltip:SetLootItem(self.data.slotIndex);
-        elseif self.data.slotType == Defination.SLOT_TYPE_CURRENCY then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-            GameTooltip:SetLootCurrency(self.data.slotIndex);
-        end
-
         MainFrame:HighlightItemFrame(self);
         self:ShowHoverVisual();
+        FocusSolver:SetFocus(self);
+    end
+
+    function ItemFrameMixin:OnFocused()
+        --Effective during Manual Mode
+        local tooltip = GameTooltip;
+        if self.data.slotType == Defination.SLOT_TYPE_ITEM then
+            tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
+            tooltip:SetLootItem(self.data.slotIndex);
+        elseif self.data.slotType == Defination.SLOT_TYPE_CURRENCY then
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            tooltip:SetLootCurrency(self.data.slotIndex);
+        end
     end
 
     function ItemFrameMixin:OnLeave()
@@ -516,10 +562,24 @@ do  --UI ItemButton
         GameTooltip:Hide();
         MainFrame:HighlightItemFrame(nil);
         self:ResetHoverVisual();
+        FocusSolver:SetFocus(nil);
     end
 
-    function ItemFrameMixin:OnMouseDown()
-        LootSlot(self.data.slotIndex);
+    function ItemFrameMixin:OnMouseDown(button)
+        if button == "LeftButton" and MainFrame.ButtonHighlight:IsShown() then
+            MainFrame.ButtonHighlight:ShowMouseDownFeedback();
+        end
+    end
+
+    function ItemFrameMixin:OnMouseUp(button)
+        MainFrame.ButtonHighlight:ShowMouseUpFeedback();
+    end
+
+    function ItemFrameMixin:OnClick(button)
+        if button == "LeftButton" then
+            LootSlot(self.data.slotIndex);
+            MainFrame:SetClickedFrameIndex(self.index);
+        end
     end
 
     function ItemFrameMixin:EnableMouseScript(state)
@@ -545,7 +605,7 @@ do  --UI ItemButton
     end
 
     function CreateItemFrame()
-        local f = CreateFrame("Frame", nil, MainFrame, "PlumberLootUIItemFrameTemplate");
+        local f = CreateFrame("Button", nil, MainFrame, "PlumberLootUIItemFrameTemplate");
         API.Mixin(f, ItemFrameMixin);
         CreateIconFrame(f);
         f:UpdatePixel();
@@ -557,68 +617,13 @@ do  --UI ItemButton
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
         f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
+        f:SetScript("OnClick", f.OnClick);
 
         f.scriptEnabled = true;
         f:EnableMouseScript(false);
 
         return f
-    end
-
-
-    function MainFrame:LayoutActiveFrames(fixedFrameWidth)
-        if not self.activeFrames then
-            self:TryHide();
-            return
-        end
-
-        local height = 0;
-        local spacing = Formatter.BUTTON_SPACING;
-        local iconSize = Formatter.ICON_SIZE;
-        local textWidth;
-        local maxTextWidth = 0;
-
-        for i, itemFrame in ipairs(self.activeFrames) do
-            if i == 1 then
-                itemFrame:SetPoint("TOPLEFT", self, "TOPLEFT", spacing, -spacing);
-            else
-                itemFrame:SetPoint("TOPLEFT", self.activeFrames[i - 1], "BOTTOMLEFT", 0, -spacing);
-            end
-
-            height = height + itemFrame:GetHeight() + spacing;
-
-            if itemFrame.Text then
-                textWidth = itemFrame.Text:GetWrappedWidth();
-            else
-                textWidth = itemFrame:GetWidth() - 2*iconSize;
-            end
-            if textWidth > maxTextWidth then
-                maxTextWidth = textWidth;
-            end
-        end
-
-        local frameWidth = maxTextWidth + 2*iconSize + Formatter:GetNumberWidth(10) + spacing;
-        local frameHeight = height + spacing;
-
-        --return frameWidth, frameHeight
-
-        local maxFrameWidth = Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING * 2;
-        if frameWidth > maxFrameWidth then
-            frameWidth = maxFrameWidth;
-        end
-
-        local backgroundWidth;
-
-        if fixedFrameWidth then
-            frameWidth = Formatter.BUTTON_WIDTH;
-            backgroundWidth = frameWidth + Formatter.BUTTON_SPACING * 2;
-        else
-            backgroundWidth = frameWidth + Formatter.ICON_BUTTON_HEIGHT
-        end
-
-        self:SetSize(frameWidth, frameHeight);
-
-        local scale = self:GetEffectiveScale();
-        self:SetBackgroundSize(backgroundWidth * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
     end
 end
 
@@ -810,6 +815,39 @@ do  --UI Background
             self.BackgroundFrame.toWidth = nil;
             self.BackgroundFrame.toHeight = nil;
             self.BackgroundFrame:SetBackgroundSize(width, height);
+        end
+    end
+
+    function MainFrame:SetClickedFrameIndex(index)
+        self.clickedFrameIndex = index;
+    end
+
+    function MainFrame:SetBottomFrameIndex(index)
+        self.bottomFrameIndex = index;
+    end
+
+    function MainFrame:UpdateBackgroundHeightAfterClicks()
+        if self.clickedFrameIndex then
+            self:SetClickedFrameIndex(nil);
+
+            if self.activeFrames and self.bottomFrameIndex > 0 then
+                local itemFrame;
+                local bottomFrameIndex;
+                for i = #self.activeFrames, 1, -1 do
+                    itemFrame = self.activeFrames[i];
+                    if itemFrame.hasItem then
+                        bottomFrameIndex = i;
+                        break
+                    end
+                end
+                if bottomFrameIndex and bottomFrameIndex > 0 and bottomFrameIndex ~= self.bottomFrameIndex then
+                    self:SetBottomFrameIndex(bottomFrameIndex);
+                    local frameHeight = bottomFrameIndex * (Formatter.ICON_BUTTON_HEIGHT + Formatter.BUTTON_SPACING) + Formatter.BUTTON_SPACING;
+                    self:SetHeight(frameHeight);
+                    local scale = self:GetEffectiveScale();
+                    self:SetBackgroundSize(self.BackgroundFrame.width, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
+                end
+            end
         end
     end
 end
@@ -1012,6 +1050,61 @@ do
 end
 
 
+local ButtonHighlightMixin = {};
+do
+    function ButtonHighlightMixin:UpdatePixel()
+        local scale = self:GetEffectiveScale();
+        local textureHeight = Formatter:PixelSizeForScale(28, scale);
+        local offsetY = Formatter:PixelSizeForScale(2, scale);
+        local textureWidth = 4 * textureHeight;
+        self.FeedbackFrame.TopTexture:SetSize(textureWidth, textureHeight);
+        self.FeedbackFrame.BottomTexture:SetSize(textureWidth, textureHeight);
+        self.FeedbackFrame.TopTexture:SetPoint("BOTTOM", self.FeedbackFrame, "TOP", 0.33*textureHeight, -offsetY);
+        self.FeedbackFrame.BottomTexture:SetPoint("TOP", self.FeedbackFrame, "BOTTOM", -0.33*textureHeight, offsetY);
+
+        Formatter:PixelPerfectTextureSlice(self.Texture);
+    end
+
+    local function OnUpdate_ClickFeedback(self, elapsed)
+        self.offsetX = self.offsetX + 512 * elapsed;
+        self.alpha = self.alpha - 5 * elapsed;
+        if self.alpha < 0 then
+            self.alpha = 0;
+            self.offsetX = 0;
+            self:Hide();
+            self:SetScript("OnUpdate", nil);
+        else
+            self:SetPoint("LEFT", self.parent, "LEFT", self.offsetX, 0);
+            self:SetAlpha(self.alpha);
+        end
+    end
+
+    function ButtonHighlightMixin:ShowMouseDownFeedback()
+        self.Texture:SetAlpha(1);
+    end
+
+    function ButtonHighlightMixin:ShowMouseUpFeedback()
+        self.Texture:SetAlpha(0.8);
+    end
+
+    function ButtonHighlightMixin:ShowClickFeedback()
+        local f = self.FeedbackFrame;
+        f:SetHeight(self:GetHeight());
+        f:SetAlpha(1);
+        f.alpha = 1;
+        f.offsetX = Formatter.ICON_BUTTON_HEIGHT * 2;
+        f.parent = self;
+        f:ClearAllPoints();
+        f:SetScript("OnUpdate", OnUpdate_ClickFeedback);
+        f:Show();
+    end
+
+    function ButtonHighlightMixin:StopClickFeedback()
+        self.FeedbackFrame:Hide();
+    end
+end
+
+
 do  --UI Basic
     local function OnUpdate_FadeOut(self, elapsed)
         self.alpha = self.alpha - 4*elapsed;
@@ -1054,6 +1147,65 @@ do  --UI Basic
 
             self:SetPoint("TOPLEFT", nil, "CENTER", offsetX, 0);
         end
+    end
+
+    function MainFrame:LayoutActiveFrames(fixedFrameWidth)
+        if not self.activeFrames then
+            self:TryHide();
+            return
+        end
+
+        local height = 0;
+        local spacing = Formatter.BUTTON_SPACING;
+        local iconSize = Formatter.ICON_SIZE;
+        local textWidth;
+        local maxTextWidth = 0;
+
+        for i, itemFrame in ipairs(self.activeFrames) do
+            if i == 1 then
+                itemFrame:SetPoint("TOPLEFT", self, "TOPLEFT", spacing, -spacing);
+            else
+                itemFrame:SetPoint("TOPLEFT", self.activeFrames[i - 1], "BOTTOMLEFT", 0, -spacing);
+            end
+
+            height = height + itemFrame:GetHeight() + spacing;
+
+            if itemFrame.Text then
+                textWidth = itemFrame.Text:GetWrappedWidth();
+            else
+                textWidth = itemFrame:GetWidth() - 2*iconSize;
+            end
+            if textWidth > maxTextWidth then
+                maxTextWidth = textWidth;
+            end
+
+            itemFrame.index = i;
+        end
+
+        local frameWidth = maxTextWidth + 2*iconSize + Formatter:GetNumberWidth(10) + spacing;
+        local frameHeight = height + spacing;
+
+        --return frameWidth, frameHeight
+
+        local maxFrameWidth = Formatter.BUTTON_WIDTH + Formatter.BUTTON_SPACING * 2;
+        if frameWidth > maxFrameWidth then
+            frameWidth = maxFrameWidth;
+        end
+
+        local backgroundWidth;
+
+        if fixedFrameWidth then
+            frameWidth = Formatter.BUTTON_WIDTH;
+            backgroundWidth = frameWidth + Formatter.BUTTON_SPACING * 2;
+            self:SetBottomFrameIndex(#self.activeFrames);
+        else
+            backgroundWidth = frameWidth + Formatter.ICON_BUTTON_HEIGHT
+        end
+
+        self:SetSize(frameWidth, frameHeight);
+
+        local scale = self:GetEffectiveScale();
+        self:SetBackgroundSize(backgroundWidth * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
     end
 
     function MainFrame:Init()
@@ -1108,8 +1260,11 @@ do  --UI Basic
         local ButtonHighlight = CreateFrame("Frame", nil, self, "PlumberLootUIButtonHighlightTemplate");
         self.ButtonHighlight = ButtonHighlight;
         ButtonHighlight.Texture:SetTexCoord(40/1024, 420/1024, 0, 64/512);
-        Formatter:PixelPerfectTextureSlice(ButtonHighlight.Texture);
-
+        ButtonHighlight.FeedbackFrame.TopTexture:SetTexCoord(272/1024, 336/1024, 74/512, 102/512);
+        ButtonHighlight.FeedbackFrame.BottomTexture:SetTexCoord(272/1024, 336/1024, 102/512, 74/512);
+        API.Mixin(ButtonHighlight, ButtonHighlightMixin);
+        ButtonHighlight:UpdatePixel();
+        ButtonHighlight:ShowMouseUpFeedback();
 
         local TakeAllButton = CreateUIButton(self);
         self.TakeAllButton = TakeAllButton;
@@ -1161,11 +1316,25 @@ do  --UI Basic
 
     function MainFrame:SetLootSlotCleared(slotIndex)
         if self.activeFrames then
-            for _, itemFrame in ipairs(self.activeFrames) do
+            for i, itemFrame in ipairs(self.activeFrames) do
                 if itemFrame.data.slotIndex == slotIndex then
                     --itemFrame:Hide();
                     itemFrame:EnableMouseScript(false);
                     itemFrame:PlaySlideOutAnimation();
+                    itemFrame.hasItem = nil;
+                    self:UpdateBackgroundHeightAfterClicks();
+                    return true
+                end
+            end
+        end
+    end
+
+    function MainFrame:UpdateLootSlotData(slotIndex, data)
+        if self.activeFrames then
+            for _, itemFrame in ipairs(self.activeFrames) do
+                if itemFrame.data.slotIndex == slotIndex then
+                    itemFrame.data = nil;
+                    itemFrame:SetData(data);
                     return true
                 end
             end
@@ -1180,12 +1349,15 @@ do  --UI Basic
             self.MoneyFrame:Hide();
             self.MoneyFrame:ClearAllPoints();
             self:SetMaxPage(nil);
+            self:SetClickedFrameIndex(nil);
         end
     end
 
     function MainFrame:OnHide()
-        self:ReleaseAll();
-        self:Hide();
+        if not self:IsShown() then
+            self:ReleaseAll();
+            --self:Hide();
+        end
     end
     MainFrame:SetScript("OnHide", MainFrame.OnHide);
 
@@ -1193,6 +1365,7 @@ do  --UI Basic
         if not self.uiScaleDirty then
             self.uiScaleDirty = true;
             C_Timer.After(0.33, function()
+                Formatter.pixelPerfectScale = nil;
                 self.uiScaleDirty = nil;
                 self:LoadPosition();
                 if self.itemFramePool then
@@ -1201,7 +1374,20 @@ do  --UI Basic
                 if self.BackgroundFrame then
                     self.BackgroundFrame:UpdatePixel();
                 end
+                if self.ButtonHighlight then
+                    self.ButtonHighlight:UpdatePixel();
+                end
             end);
+        end
+    end
+
+    function MainFrame:EnableMouseScript(state)
+        if state then
+            self:EnableMouse(true);
+            self:EnableMouseMotion(true);
+        else
+            self:EnableMouse(false);
+            self:EnableMouseMotion(false);
         end
     end
 end
