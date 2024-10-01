@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.3.8";
-local VERSION_DATE = 1726600000;
+local VERSION_TEXT = "v1.4.0";
+local VERSION_DATE = 1727700000;
 
 
 local addonName, addon = ...
@@ -103,6 +103,7 @@ local DefaultValues = {
         LootUI_UseHotkey = true,
         LootUI_HotkeyName = "E",
         LootUI_ForceAutoLoot = true,
+        LootUI_NewTransmogIcon = true,
 
 
     --Unified Map Pin System

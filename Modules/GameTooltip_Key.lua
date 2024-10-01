@@ -21,9 +21,15 @@ local MODULE_ENABLED = false;
 local IN_VALID_ZONE = false;
 
 local NAME_KEYS = {
-    --Name = {type, id, requiredQuantity}     --type: 0(currency) 1(item)
-    ["Delve Chest 1 Rare"] = {0, 3028, 1},
+    --Name = {type, id, requiredQuantity}     --type: 0(currency) 1(item) (get object name from itemID)
+    ["Delve Chest 1 Rare"] = {0, 3028, 1, 228942},
 };
+
+for _, data in pairs(NAME_KEYS) do
+    if data[4] then
+        GetItemName(data[4]);
+    end
+end
 
 local DOOR = L["GameObject Door"];
 
@@ -174,7 +180,7 @@ local function EnableModule(state)
             end
 
             for localeKey, data in pairs(NAME_KEYS) do
-                local name = L[localeKey];
+                local name = GetItemName(228942) or L[localeKey];
                 if name then
                     NAME_KEYS[name] = data;
                 end

@@ -1862,6 +1862,20 @@ do  --ObjectPool
     API.CreateObjectPool = CreateObjectPool;
 end
 
+do  --Transmog
+    local GetItemInfo = C_TransmogCollection.GetItemInfo;
+    local PlayerKnowsSource = C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance;
+
+    local function IsUncollectedTransmogByItemInfo(itemInfo)
+        --C_TransmogCollection.PlayerHasTransmogByItemInfo isn't reliable
+        local visualID, sourceID =GetItemInfo(itemInfo);
+        if sourceID and sourceID ~= 0 and (not PlayerKnowsSource(sourceID)) then
+            return true
+        end
+    end
+    API.IsUncollectedTransmogByItemInfo = IsUncollectedTransmogByItemInfo
+end
+
 --[[
 local DEBUG = CreateFrame("Frame");
 DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");

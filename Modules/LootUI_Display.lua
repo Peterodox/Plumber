@@ -129,11 +129,6 @@ local function MergeData(d1, d2)
     return false
 end
 
-local function ShouldAutoLoot()
-    return GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE")
-end
-
-
 do  --Process Loot Message
     function EL:ProcessMessageItem(text)
         --Do we need to use the whole itemlink?
@@ -323,7 +318,7 @@ do  --Event Handler
 
         --print("isAutoLoot", isAutoLoot, GetCVarBool("autoLootDefault"), IsModifiedClick("AUTOLOOTTOGGLE"));
         local useManualMode;
-        if FORCE_AUTO_LOOT then
+        if FORCE_AUTO_LOOT and GetCVarBool("autoLootDefault") then
             useManualMode = (not isAutoLoot) and IsModifiedClick("AUTOLOOTTOGGLE");     --Need hold down the Modifier Key until the window appears
         else
             useManualMode = not isAutoLoot;
@@ -1215,16 +1210,12 @@ do  --Edit Mode
     end
 
 
-    local function Options_ItemCount_OnClick(self, state)
-
-    end
-
     local function Options_FontSizeSlider_OnValueChanged(value)
+        PlumberDB.LootUI_FontSize = value;
         local locale = GetLocale();
         if locale == "zhCN" or locale == "zhTW" then
             value = value + 2;
         end
-        PlumberDB.LootUI_FontSize = value;
         Formatter:CalculateDimensions(value);
         C_Timer.After(0, function()
             MainFrame:ShowSampleItems();
@@ -1241,6 +1232,10 @@ do  --Edit Mode
         else
             FORCE_AUTO_LOOT = false;
         end
+    end
+
+    local function Options_ForceAutoLoot_ValidityCheck()
+        return GetCVarBool("autoLootDefault")
     end
 
     local function Options_UseHotkey_OnClick(self, state)
@@ -1266,10 +1261,11 @@ do  --Edit Mode
         title = L["EditMode LootUI"],
         widgets = {
             {type = "Slider", label = L["Font Size"], minValue = 12, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "LootUI_FontSize"},
-            {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = Options_ItemCount_OnClick, dbKey = "LootUI_ShowItemCount",},
+            {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
+            {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t")},
 
             {type = "Divider"},
-            {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"]},
+            {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"]},
             {type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = Options_UseHotkey_OnClick, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
 
             {type = "Divider"},
@@ -1280,7 +1276,8 @@ do  --Edit Mode
 
     function MainFrame:ShowOptions(state)
         if state then
-            self.OptionFrame = addon.SetupSettingsDialog(self, OPTIONS_SCHEMATIC);
+            local forceUpdate = true;
+            self.OptionFrame = addon.SetupSettingsDialog(self, OPTIONS_SCHEMATIC, forceUpdate);
             self.OptionFrame:Show();
             if self.OptionFrame.requireResetPosition then
                 self.OptionFrame.requireResetPosition = false;
@@ -1292,6 +1289,10 @@ do  --Edit Mode
         else
             if self.OptionFrame then
                 self.OptionFrame:HideOption(self);
+            end
+
+            if not API.IsInEditMode() then
+                self:Hide();
             end
         end
     end
@@ -1399,7 +1400,7 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 1115,
-        moduleAddedTime = 1727520000,
+        moduleAddedTime = 1727793830,
         optionToggleFunc = OptionToggle_OnClick,
     };
 

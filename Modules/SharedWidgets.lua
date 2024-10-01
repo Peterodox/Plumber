@@ -4295,23 +4295,25 @@ do  --EditMode
         if schematic.widgets then
             for order, widgetData in ipairs(schematic.widgets) do
                 local widget;
-                if widgetData.type == "Checkbox" then
-                    widget = self:CreateCheckbox(widgetData);
-                elseif widgetData.type == "RadioGroup" then
+                if (not widgetData.validityCheckFunc) or (widgetData.validityCheckFunc()) then
+                    if widgetData.type == "Checkbox" then
+                        widget = self:CreateCheckbox(widgetData);
+                    elseif widgetData.type == "RadioGroup" then
 
-                elseif widgetData.type == "Slider" then
-                    widget = self:CreateSlider(widgetData);
-                elseif widgetData.type == "UIPanelButton" then
-                    widget = self:CreateUIPanelButton(widgetData);
-                elseif widgetData.type == "Divider" then
-                    widget = self:CreateDivider(widgetData);
-                elseif widgetData.type == "Header" then
-                    widget = self:CreateHeader(widgetData);
-                end
+                    elseif widgetData.type == "Slider" then
+                        widget = self:CreateSlider(widgetData);
+                    elseif widgetData.type == "UIPanelButton" then
+                        widget = self:CreateUIPanelButton(widgetData);
+                    elseif widgetData.type == "Divider" then
+                        widget = self:CreateDivider(widgetData);
+                    elseif widgetData.type == "Header" then
+                        widget = self:CreateHeader(widgetData);
+                    end
 
-                if widget then
-                    tinsert(self.activeWidgets, widget);
-                    widget.widgetKey = widgetData.widgetKey;
+                    if widget then
+                        tinsert(self.activeWidgets, widget);
+                        widget.widgetKey = widgetData.widgetKey;
+                    end
                 end
             end
         end
@@ -4350,7 +4352,7 @@ do  --EditMode
         end
     end
 
-    local function SetupSettingsDialog(parent, schematic)
+    local function SetupSettingsDialog(parent, schematic, forceUpdate)
         if not EditModeSettingsDialog then
             local f = CreateFrame("Frame", nil, UIParent);
             EditModeSettingsDialog = f;
@@ -4410,10 +4412,13 @@ do  --EditMode
             f.fontStringPool = API.CreateObjectPool(CreateFontString);
         end
 
-        if schematic ~= EditModeSettingsDialog.schematic then
+        if (schematic ~= EditModeSettingsDialog.schematic) then
             EditModeSettingsDialog.requireResetPosition = true;
             EditModeSettingsDialog.schematic = schematic;
             EditModeSettingsDialog:ClearAllPoints();
+            EditModeSettingsDialog:SetupOptions(schematic);
+        elseif forceUpdate then
+            EditModeSettingsDialog.schematic = schematic;
             EditModeSettingsDialog:SetupOptions(schematic);
         end
 

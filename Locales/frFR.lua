@@ -203,6 +203,11 @@ L["Scenario Delves"] = "Delves";
 L["GameObject Door"] = "Porte";
 L["Delve Chest 1 Rare"] = "Coffre abondant";   --We'll use the GameObjectID once it shows up in the database
 
+
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Delves abondants";
 L["Special Assignment"] = "Assignations spéciales";
+
+
+L["Match Patter Rep 1"] = "Réputation de votre bataillon auprès de la faction (.+) augmentée de ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Patter Rep 2"] = "Réputation auprès de la faction (.+) augmentée de ([%d%,]+)";   --FACTION_STANDING_INCREASED

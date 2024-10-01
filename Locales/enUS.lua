@@ -208,6 +208,8 @@ L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Wi
 L["LootUI Option Force Auto Loot"] = "Force Auto Loot";
 L["LootUI Option Force Auto Loot Tooltip"] = "Always enable Auto Loot to counter the occasional auto loot failure.\n\nTo temporarily cancel auto loot on a specific pickup, press and hold %s key until the loot window appears.";
 L["LootUI Option Owned Count"] = "Show Number Of Owned Items";
+L["LootUI Option New Transmog"] = "Mark Uncollected Appearance";
+L["LootUI Option New Transmog Tooltip"] = "Add a marker %s if you have not collected the item's appearance.";
 L["LootUI Option Use Hotkey"] = "Press Key To Take All Items";
 L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Looting mode, press the following hotkey to take all items.";
 

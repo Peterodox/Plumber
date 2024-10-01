@@ -194,6 +194,26 @@ L["ModuleName Delves_SeasonProgress"] = "地下堡: 赛季进度";
 L["ModuleDescription Delves_SeasonProgress"] = "在你提升“地下堡行者的旅程”时显示一个进度条。";
 
 
+--Loot UI
+L["ModuleName LootUI"] = "拾取窗口";
+L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
+L["Take All"] = "全部拾取";     --Take all items from a loot window
+L["You Received"] = "你获得了";
+L["Reach Currency Cap"] = "货币已达到上限";
+L["Sample Item 4"] = "炫酷的史诗物品";
+L["Sample Item 3"] = "超棒的精良物品";
+L["Sample Item 2"] = "不错的优秀物品";
+L["Sample Item 1"] = "一般的普通物品";
+L["EditMode LootUI"] =  "Plumber: 拾取窗口";
+L["LootUI Option Force Auto Loot"] = "强制自动拾取";
+L["LootUI Option Force Auto Loot Tooltip"] = "强制使用自动拾取以修复自动拾取有时失效的问题。\n\n如想暂时取消一次自动拾取，请按住%s键直到拾取窗口出现。";
+L["LootUI Option Owned Count"] = "显示已拥有的数量";
+L["LootUI Option New Transmog"] = "标记未收集的外观";
+L["LootUI Option New Transmog Tooltip"] = "用 %s 标记出还未收集外观的物品。";
+L["LootUI Option Use Hotkey"] = "按快捷键拾取全部物品";
+L["LootUI Option Use Hotkey Tooltip"] = "在手动拾取模式下按快捷键来拾取全部物品。";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally
 L["Reposition Button Vertical"] = "竖直方向移动";
@@ -215,7 +235,25 @@ L["currency-2707"] = "幼龙";
 L["currency-2708"] = "魔龙";
 L["currency-2709"] = "守护巨龙";
 
+L["currency-2914"] = "风化";
+L["currency-2915"] = "蚀刻";
+L["currency-2916"] = "符文";
+L["currency-2917"] = "鎏金";
+
+
+L["Scenario Delves"] = "地下堡";
+L["GameObject Door"] = "门";
+L["Delve Chest 1 Rare"] = "丰裕宝匣";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "丰裕地下堡";
 L["Special Assignment"] = "特别任务";
+
+
+L["Match Pattern Gold"] = "([%d%,]+) 金";
+L["Match Pattern Silver"] = "([%d]+) 银";
+L["Match Pattern Copper"] = "([%d]+) 铜";
+
+L["Match Patter Rep 1"] = "你的战团在(.+)中的声望值提高了([%d%,]+)点";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Patter Rep 2"] = "你在(.+)中的声望值提高了([%d%,]+)点";   --FACTION_STANDING_INCREASED

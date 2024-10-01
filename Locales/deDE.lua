@@ -19,7 +19,19 @@ L["currency-2707"] = "Drachen";
 L["currency-2708"] = "Wyrms";
 L["currency-2709"] = "Aspekts";
 
+L["currency-2914"] = "Verwittertes";
+L["currency-2915"] = "Geschnitztes";
+L["currency-2916"] = "Runenverziertes";
+L["currency-2917"] = "Vergoldetes";
+
+
+L["Delve Chest 1 Rare"] = "Großzügiger Kasten";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Großzügige Tiefe";
 L["Special Assignment"] = "Spezialauftrag";
+
+
+L["Match Patter Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+ verbessert)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Patter Rep 2"] = "Euer Ruf bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --FACTION_STANDING_INCREASED

@@ -48,7 +48,16 @@ L["currency-2707"] = "Draco";
 L["currency-2708"] = "Serpe";
 L["currency-2709"] = "Aspecto";
 
+L["currency-2914"] = "Desgastado";
+L["currency-2915"] = "Entalhado";
+L["currency-2916"] = "Rúnico";
+L["currency-2917"] = "Dourado";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Imersão abundante";
 L["Special Assignment"] = "Designação especial";
+
+
+L["Match Patter Rep 1"] = "A Reputação do seu Bando de Guerra com (.+) aumentou em ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Patter Rep 2"] = "Reputação com (.+) aumentou em ([%d%,]+)";   --FACTION_STANDING_INCREASED

@@ -214,10 +214,10 @@ L["currency-2707"] = "дракона";
 L["currency-2708"] = "змея";
 L["currency-2709"] = "Аспекта";
 
-L["currency-2914"] = "Weathered";
-L["currency-2915"] = "Carved";
-L["currency-2916"] = "Runed";
-L["currency-2917"] = "Gilded";
+L["currency-2914"] = "Истертый";
+L["currency-2915"] = "Резной";
+L["currency-2916"] = "Рунический";
+L["currency-2917"] = "Позолоченный";
 
 
 L["Scenario Delves"] = "Вылазка";
@@ -228,3 +228,7 @@ L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameO
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Многообещающая вылазка";
 L["Special Assignment"] = "Особое поручение";
+
+
+L["Match Patter Rep 1"] = "Отношение (.+) к вашему отряду улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Patter Rep 2"] = "Отношение (.+) к вам улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED

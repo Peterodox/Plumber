@@ -3,6 +3,7 @@ local API = addon.API;
 local L = addon.L;
 
 local Round = API.Round;
+local IsUncollectedTransmogByItemInfo = API.IsUncollectedTransmogByItemInfo;
 local ipairs = ipairs;
 
 local LootSlot = LootSlot;
@@ -16,10 +17,11 @@ local GetItemCount = C_Item.GetItemCount;
 -- User Settings
 local SHOW_ITEM_COUNT = true;
 local USE_HOTKEY = true;
+local USE_MOG_MARKER = true;
 ------------------
 
 
-local MainFrame = CreateFrame("Frame", "PLU", UIParent);
+local MainFrame = CreateFrame("Frame", nil, UIParent);
 MainFrame:Hide();
 MainFrame:SetAlpha(0);
 MainFrame:SetFrameStrata("HIGH");
@@ -294,7 +296,10 @@ do  --UI ItemButton
                             self:SetBorderColor(1, 0, 1);
                         elseif data.classID == 2 or data.classID == 4 then
                             if data.link then
-                                --print(C_TransmogCollection.PlayerHasTransmogByItemInfo(data.link));
+                                if USE_MOG_MARKER and IsUncollectedTransmogByItemInfo(data.link) then
+                                    f.IconOverlay:SetTexCoord(0.125, 0.25, 0.125, 0.25);
+                                    f.IconOverlay:Show();
+                                end
                             end
                         end
                     end
@@ -1398,6 +1403,7 @@ do  --Rare Items
         --[210796] = true,    --debug
         [210939] = true,    --Null Stone
         [224025] = true,    --Crackling Shard
+        [221758] = true,    --Profaned Tinderbox
     };
 
     function IsRareItem(data)
@@ -1427,4 +1433,9 @@ do  --Callback Registery
         end
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseHotkey", SettingChanged_UseHotkey);
+
+    local function SettingChanged_NewTransmogIcon(state, userInput)
+        USE_MOG_MARKER = state;
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_NewTransmogIcon", SettingChanged_NewTransmogIcon);
 end
