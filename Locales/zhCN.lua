@@ -212,6 +212,7 @@ L["LootUI Option New Transmog"] = "标记未收集的外观";
 L["LootUI Option New Transmog Tooltip"] = "用 %s 标记出还未收集外观的物品。";
 L["LootUI Option Use Hotkey"] = "按快捷键拾取全部物品";
 L["LootUI Option Use Hotkey Tooltip"] = "在手动拾取模式下按快捷键来拾取全部物品。";
+L["LootUI Option Fade Delay"] = "每件物品推迟自动隐藏倒计时";
 
 
 --Generic

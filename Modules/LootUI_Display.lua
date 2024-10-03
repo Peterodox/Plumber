@@ -46,6 +46,8 @@ local ENABLE_MODULE = false;
 
 -- User Settings
 local FORCE_AUTO_LOOT = true;
+local AUTO_LOOT_ENABLE_TOOLTIP = true;
+local FADE_DELAY_PER_ITEM = 0.25;
 ------------------
 
 local CLASS_SORT_ORDER = {
@@ -143,6 +145,12 @@ do  --Process Loot Message
                             local count = GetItemCountFromText(text);
                             if count then
                                 data.quantity = count;
+                            end
+                            if AUTO_LOOT_ENABLE_TOOLTIP then
+                                local link = match(text, "|H(item[:%d]+)|h", 1);
+                                if link then
+                                    data.link = link;
+                                end
                             end
                             MainFrame:QueueDisplayLoot(data);
                         end
@@ -621,6 +629,8 @@ do  --UI Notification Mode
     end
 
     local function OnUpdate_FadeOut_ThenDisplayNextPage(self, elapsed)
+        if self.isFocused then return end;
+
         if self.anyAlphaChange then
             self.anyAlphaChange = nil;
             for _, obj in ipairs(self.activeFrames) do
@@ -777,6 +787,8 @@ do  --UI Notification Mode
             lootThisPage = self.lootQueue;
         end
 
+        local enableState = AUTO_LOOT_ENABLE_TOOLTIP and 2 or 0;
+
         for i, data in ipairs(lootThisPage) do
             if data.slotType == Defination.SLOT_TYPE_MONEY then
                 self.MoneyFrame:SetData(data);
@@ -794,7 +806,7 @@ do  --UI Notification Mode
                 local n = #self.activeFrames;
                 n = n + 1;
                 self.activeFrames[n] = itemFrame;
-                itemFrame:EnableMouseScript(false);
+                itemFrame:EnableMouseScript(enableState);
                 itemFrame.hasItem = true;
             end
         end
@@ -802,12 +814,11 @@ do  --UI Notification Mode
         local numFrames = (self.activeFrames and #self.activeFrames) or 0;
 
         if numFrames > 0 then
-            local r = (MAX_ITEM_PER_PAGE - numFrames)/MAX_ITEM_PER_PAGE;
             if overflowWarning then
-                AUTO_HIDE_DELAY = r * 4.0 + (1 - r) * 6.0;
+                AUTO_HIDE_DELAY = 4.0 + numFrames * FADE_DELAY_PER_ITEM;
                 self.Header:SetText(L["Reach Currency Cap"]);
             else
-                AUTO_HIDE_DELAY = r * 2.0 + (1 - r) * 3.0;
+                AUTO_HIDE_DELAY = 2.0 + numFrames * FADE_DELAY_PER_ITEM;
                 self.Header:SetText(L["You Received"]);
             end
 
@@ -840,7 +851,7 @@ do  --UI Notification Mode
                 end
             end
         else
-            self:TryHide();
+            self:TryHide(true);
         end
     end
 
@@ -922,7 +933,7 @@ do  --UI Manually Pickup Mode
             activeFrames[i] = itemFrame;
             itemFrame:SetAlpha(1);
             itemFrame.toAlpha = nil;
-            itemFrame:EnableMouseScript(true);
+            itemFrame:EnableMouseScript(1);
             itemFrame.hasItem = true;
         end
 
@@ -945,7 +956,7 @@ do  --UI Manually Pickup Mode
 
         if self.activeFrames then
             for _, itemFrame in ipairs(self.activeFrames) do
-                itemFrame:EnableMouseScript(false);
+                itemFrame:EnableMouseScript();
             end
         end
 
@@ -1024,7 +1035,7 @@ do  --UI Manually Pickup Mode
                 activeFrames[n] = itemFrame;
                 itemFrame:SetAlpha(1);
                 itemFrame.toAlpha = nil;
-                itemFrame:EnableMouseScript(true);
+                itemFrame:EnableMouseScript(1);
                 itemFrame.hasItem = true;
 
                 if self.anyLootInSlot then
@@ -1058,7 +1069,9 @@ do  --UI Manually Pickup Mode
         self.lootedFrames = lootedFrames;
 
         for i, data in ipairs(EL.currentLoots) do
-            if not LootSlotHasItem(data.slotIndex) then
+            if LootSlotHasItem(data.slotIndex) then
+                data.looted = false;
+            else
                 data.looted = true;
             end
         end
@@ -1073,10 +1086,10 @@ do  --UI Manually Pickup Mode
             itemFrame.toAlpha = nil;
             slotIndex = data.slotIndex;
             if LootSlotHasItem(slotIndex) then
-                itemFrame:EnableMouseScript(true);
+                itemFrame:EnableMouseScript(1);
                 itemFrame.hasItem = true;
             else
-                itemFrame:EnableMouseScript(false);
+                itemFrame:EnableMouseScript();
                 itemFrame.hasItem = nil;
                 n = n + 1;
                 lootedFrames[n] = itemFrame;
@@ -1149,7 +1162,7 @@ do  --Edit Mode
             itemFrame:Layout();
             itemFrame:SetAlpha(1);
             itemFrame:Show();
-            itemFrame:EnableMouseScript(false);
+            itemFrame:EnableMouseScript();
             if SHOW_ITEM_COUNT then
                 itemFrame.IconFrame.Count:SetText("99");
             else
@@ -1171,6 +1184,7 @@ do  --Edit Mode
     end
 
     function MainFrame:EnterEditMode()
+        self:SetFrameStrata("HIGH");
         EL:ListenStaticEvent(false);
         EL.overflowCurrencies = nil;
 
@@ -1189,6 +1203,8 @@ do  --Edit Mode
     end
 
     function MainFrame:ExitEditMode()
+        self:SetFrameStrata("DIALOG");
+
         if ENABLE_MODULE then
             EL:ListenStaticEvent(true);
         end
@@ -1205,11 +1221,6 @@ do  --Edit Mode
         self:ShowOptions(false);
     end
 
-    function MainFrame:IsFocused()
-        return (self:IsShown() and (self:IsMouseOver() or self.TakeAllButton:IsMouseOver())) or (self.OptionFrame and self.OptionFrame:IsShown() and self.OptionFrame:IsMouseOver())
-    end
-
-
     local function Options_FontSizeSlider_OnValueChanged(value)
         PlumberDB.LootUI_FontSize = value;
         local locale = GetLocale();
@@ -1224,6 +1235,23 @@ do  --Edit Mode
 
     local function Options_FontSizeSlider_FormatValue(value)
         return string.format("%.0f", value);
+    end
+
+    local function GetValidFadeOutDelay(value)
+        if not value then
+            value = 0.25;
+        end
+        return API.Clamp(value, 0.25, 1.0);
+    end
+
+    local function Options_FadeOutDelaySlider_OnValueChanged(value)
+        value = GetValidFadeOutDelay(value);
+        PlumberDB.LootUI_FadeDelayPerItem = value;
+        FADE_DELAY_PER_ITEM = value;
+    end
+
+    local function Options_FadeOutDelaySlider_FormatValue(value)
+        return string.format("%.2f", value);
     end
 
     local function Options_ForceAutoLoot_OnClick(self, state)
@@ -1261,6 +1289,7 @@ do  --Edit Mode
         title = L["EditMode LootUI"],
         widgets = {
             {type = "Slider", label = L["Font Size"], minValue = 12, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "LootUI_FontSize"},
+            {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueFunc = Options_FadeOutDelaySlider_FormatValue,  dbKey = "LootUI_FadeDelayPerItem"},
             {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t")},
 
@@ -1335,6 +1364,11 @@ do  --Edit Mode
         end
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowItemCount", SettingChanged_ShowItemCount);
+
+    local function SettingChanged_FadeDelayPerItem(value, userInput)
+        AUTO_HIDE_DELAY = GetValidFadeOutDelay(value);
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_FadeDelayPerItem", SettingChanged_FadeDelayPerItem);
 end
 
 

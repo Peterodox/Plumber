@@ -3806,7 +3806,7 @@ do  --Slider
 
         if userInput then
             if self.onValueChangedFunc then
-                self.onValueChangedFunc(value);
+                self.onValueChangedFunc(value, true);
             end
         end
     end
@@ -3867,6 +3867,8 @@ do  --Slider
         DisableSharpening(self.Slider.Left);
         DisableSharpening(self.Slider.Middle);
         DisableSharpening(self.Slider.Right);
+
+        self:SetLabelWidth(144);
     end
 
     function SliderFrameMixin:Enable()
@@ -3931,6 +3933,12 @@ do  --Slider
     function SliderFrameMixin:SetOnValueChangedFunc(onValueChangedFunc)
         self.Slider.onValueChangedFunc = onValueChangedFunc;
         self.onValueChangedFunc = onValueChangedFunc;
+    end
+
+    function SliderFrameMixin:SetLabelWidth(width)
+        self.Label:SetWidth(width);
+        self:SetWidth(242 + width);
+        self.Slider:SetPoint("LEFT", self, "LEFT", 28 + width, 0);
     end
 
     local function FormatValue(value)
@@ -4143,7 +4151,7 @@ do  --EditMode
 
 
     local EditModeSettingsDialog;
-    local DIALOG_WIDTH = 382;
+    local DIALOG_WIDTH = 432;
 
     local EditModeSettingsDialogMixin = {};
 

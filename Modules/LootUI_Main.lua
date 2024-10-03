@@ -10,6 +10,7 @@ local LootSlot = LootSlot;
 local GetPhysicalScreenSize = GetPhysicalScreenSize;
 local InCombatLockdown = InCombatLockdown;
 local CreateFrame = CreateFrame;
+local IsModifiedClick = IsModifiedClick;
 local IsCosmeticItem = C_Item.IsCosmeticItem;
 local GetItemCount = C_Item.GetItemCount;
 
@@ -18,13 +19,14 @@ local GetItemCount = C_Item.GetItemCount;
 local SHOW_ITEM_COUNT = true;
 local USE_HOTKEY = true;
 local USE_MOG_MARKER = true;
+local AUTO_LOOT_ENABLE_TOOLTIP = true;
 ------------------
 
 
 local MainFrame = CreateFrame("Frame", nil, UIParent);
 MainFrame:Hide();
 MainFrame:SetAlpha(0);
-MainFrame:SetFrameStrata("HIGH");
+MainFrame:SetFrameStrata("DIALOG");
 MainFrame:SetToplevel(true);
 MainFrame:SetClampedToScreen(true);
 
@@ -142,7 +144,7 @@ local FocusSolver = CreateFrame("Frame");
 do
     function FocusSolver:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        if self.t > 0.1 then
+        if self.t > 0.05 then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             if self.object and self.object:IsMouseMotionFocus() then
@@ -402,7 +404,8 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:SetCount(data)
-        if (not data) or data.hideCount then
+        if (not data) or (data.hideCount and data.quantity < 2) then
+            --We don't show equipment count unless you loot multiple of the same item (Legacy Raid)
             self.countWidth = nil;
             self.Count:Hide();
         else
@@ -434,6 +437,8 @@ do  --UI ItemButton
         end
         self.Text:ClearAllPoints();
         self.Text:SetPoint("LEFT", self.Reference, "LEFT", offset, 0);
+
+        self.textOffset = offset;
     end
 
     function ItemFrameMixin:SetItem(data)
@@ -545,21 +550,14 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:OnEnter()
-        MainFrame:HighlightItemFrame(self);
-        self:ShowHoverVisual();
-        FocusSolver:SetFocus(self);
-    end
-
-    function ItemFrameMixin:OnFocused()
-        --Effective during Manual Mode
-        local tooltip = GameTooltip;
-        if self.data.slotType == Defination.SLOT_TYPE_ITEM then
-            tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
-            tooltip:SetLootItem(self.data.slotIndex);
-        elseif self.data.slotType == Defination.SLOT_TYPE_CURRENCY then
-            tooltip:SetOwner(self, "ANCHOR_RIGHT");
-            tooltip:SetLootCurrency(self.data.slotIndex);
+        if self.enableState == 1 then
+            MainFrame:HighlightItemFrame(self);
+            self:ShowHoverVisual();
+        elseif self.enableState == 2 then
+            --MainFrame:HighlightItemFrame(self);
         end
+        FocusSolver:SetFocus(self);
+        MainFrame:SetFocused(true);
     end
 
     function ItemFrameMixin:OnLeave()
@@ -568,6 +566,28 @@ do  --UI ItemButton
         MainFrame:HighlightItemFrame(nil);
         self:ResetHoverVisual();
         FocusSolver:SetFocus(nil);
+        MainFrame:SetFocused(false);
+    end
+
+    function ItemFrameMixin:OnFocused()
+        --Effective during Manual Mode
+        local tooltip = GameTooltip;
+        if self.enableState == 1 then
+            if self.data.slotType == Defination.SLOT_TYPE_ITEM then
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
+                tooltip:SetLootItem(self.data.slotIndex);
+            elseif self.data.slotType == Defination.SLOT_TYPE_CURRENCY then
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
+                tooltip:SetLootCurrency(self.data.slotIndex);
+            end
+        elseif self.enableState == 2 then
+            if self.data.link then
+                local width = self:GetWidth();
+                local textWidth = self.Text:GetWrappedWidth();
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", -(width - textWidth - (self.textOffset or 0)), 0);
+                tooltip:SetHyperlink(self.data.link);
+            end
+        end
     end
 
     function ItemFrameMixin:OnMouseDown(button)
@@ -582,18 +602,34 @@ do  --UI ItemButton
 
     function ItemFrameMixin:OnClick(button)
         if button == "LeftButton" then
+            if IsModifiedClick("DRESSUP") and not InCombatLockdown() then
+                local itemID = self.data.slotType == Defination.SLOT_TYPE_ITEM and self.data.id;
+                if itemID and C_Item.IsDressableItemByID(itemID) then
+                    DressUpVisual(self.data.link);
+                    return
+                end
+            end
             LootSlot(self.data.slotIndex);
             MainFrame:SetClickedFrameIndex(self.index);
         end
     end
 
-    function ItemFrameMixin:EnableMouseScript(state)
-        if state then
+    function ItemFrameMixin:EnableMouseScript(enableState)
+        if enableState == 1 then
+            --Manual Loot: Enable Clicks and Hover
             self:EnableMouse(true);
             self:EnableMouseMotion(true);
+            self.enableState = 1;
+        elseif enableState == 2 then
+            --Auto Loot: Only enable Hover to display tooltip
+            self:EnableMouse(false);
+            self:EnableMouseMotion(true);
+            self.enableState = 2;
         else
+            --Auto Loot: Non-interactable
             self:EnableMouse(false);
             self:EnableMouseMotion(false);
+            self.enableState = 0;
         end
     end
 
@@ -626,7 +662,7 @@ do  --UI ItemButton
         f:SetScript("OnClick", f.OnClick);
 
         f.scriptEnabled = true;
-        f:EnableMouseScript(false);
+        f:EnableMouseScript();
 
         return f
     end
@@ -925,10 +961,12 @@ do  --UI Generic Button (Hotkey Button)
 
     function UIButtonMixin:OnEnter()
         self:SetHighlighted(true);
+        MainFrame:SetFocused(true);
     end
 
     function UIButtonMixin:OnLeave()
         self:SetHighlighted(false);
+        MainFrame:SetFocused(false);
     end
 
     function CreateUIButton(parent)
@@ -1121,11 +1159,27 @@ do  --UI Basic
         self:SetAlpha(self.alpha);
     end
 
-    function MainFrame:TryHide()
-        self.lootQueue = nil;
-        self.isUpdatingPage = nil;
-        self.alpha = self:GetAlpha();
-        self:SetScript("OnUpdate", OnUpdate_FadeOut);
+    local function OnUpdate_FadeOut_IfNotFocused(self, elapsed)
+        if self.isFocused then return end;
+        self.t = self.t + elapsed;
+        if self.t > 0.1 then
+            self.t = 0;
+            if not self:IsMouseOver() then
+                self:TryHide(true);
+            end
+        end
+    end
+
+    function MainFrame:TryHide(forceHide)
+        if (not AUTO_LOOT_ENABLE_TOOLTIP) or forceHide then
+            self.lootQueue = nil;
+            self.isUpdatingPage = nil;
+            self.alpha = self:GetAlpha();
+            self:SetScript("OnUpdate", OnUpdate_FadeOut);
+        else
+            self.t = 0;
+            self:SetScript("OnUpdate", OnUpdate_FadeOut_IfNotFocused);
+        end
     end
 
     function MainFrame:Disable()
@@ -1156,7 +1210,7 @@ do  --UI Basic
 
     function MainFrame:LayoutActiveFrames(fixedFrameWidth)
         if not self.activeFrames then
-            self:TryHide();
+            self:TryHide(true);
             return
         end
 
@@ -1251,6 +1305,13 @@ do  --UI Basic
             return data.slotType == Defination.SLOT_TYPE_MONEY
         end
 
+        function MoneyFrame:OnFocused()
+
+        end
+
+        function MoneyFrame:ResetHoverVisual()
+
+        end
 
         self:InitBackground();
 
@@ -1324,7 +1385,7 @@ do  --UI Basic
             for i, itemFrame in ipairs(self.activeFrames) do
                 if itemFrame.data.slotIndex == slotIndex then
                     --itemFrame:Hide();
-                    itemFrame:EnableMouseScript(false);
+                    itemFrame:EnableMouseScript();
                     itemFrame:PlaySlideOutAnimation();
                     itemFrame.hasItem = nil;
                     self:UpdateBackgroundHeightAfterClicks();
@@ -1392,9 +1453,33 @@ do  --UI Basic
             self:EnableMouseMotion(true);
         else
             self:EnableMouse(false);
-            self:EnableMouseMotion(false);
+            self:EnableMouseMotion(true);
         end
     end
+
+    function MainFrame:IsFocused()
+        return (self:IsShown() and (self:IsMouseOver() or self.TakeAllButton:IsMouseOver())) or (self.OptionFrame and self.OptionFrame:IsShown() and self.OptionFrame:IsMouseOver())
+    end
+
+    function MainFrame:SetFocused(state)
+        --Mouse Motion will be propagated to frames below
+        --If the user mouse down on our frames (e.g. move camera), the game triggers OnLeave so we do a IsMouseOver check
+        if (not state) and (not self:IsMouseOver()) then
+            self.isFocused = false;
+        else
+            self.isFocused = true;
+        end
+    end
+
+    function MainFrame:OnEnter()
+        self:SetFocused(true);
+    end
+    MainFrame:SetScript("OnEnter", MainFrame.OnEnter);
+
+    function MainFrame:OnLeave()
+        self:SetFocused(false);
+    end
+    MainFrame:SetScript("OnLeave", MainFrame.OnLeave);
 end
 
 
