@@ -13,11 +13,13 @@ local CreateFrame = CreateFrame;
 local IsModifiedClick = IsModifiedClick;
 local IsCosmeticItem = C_Item.IsCosmeticItem;
 local GetItemCount = C_Item.GetItemCount;
+local GetCursorPosition = GetCursorPosition;
 
 
 -- User Settings
 local SHOW_ITEM_COUNT = true;
 local USE_HOTKEY = true;
+local TAKE_ALL_MODIFIER_KEY = nil;  --"LALT"
 local USE_MOG_MARKER = true;
 local AUTO_LOOT_ENABLE_TOOLTIP = true;
 ------------------
@@ -383,7 +385,7 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:SetData(data)
-        if self.data and self.data.quantity ~= 0 then
+        if self.data and self.data.quantity ~= 0 and not (self.data.toast ~= data.toast and self.data.quantity == data.quantity) then
             data.oldQuantity = self.data.quantity;
             data.quantity = self.data.quantity + data.quantity;
         end
@@ -451,6 +453,13 @@ do  --UI ItemButton
             self:ShowGlow(true);
         else
             self:ShowGlow(false);
+        end
+
+        if data.classID == 15 and data.subclassID == 4 then
+            API.InquiryOpenableItem(data.id, function(bag, slot)
+                self:ShowGlow(true);
+                print(bag, slot)
+            end);
         end
     end
 
@@ -976,6 +985,8 @@ do  --UI Generic Button (Hotkey Button)
         f.HotkeyFrame.HotkeyBackdrop:SetTexCoord(16/1024, 32/1024, 40/512, 56/512);
         f.Background:SetTexture(file);
         f.Background:SetTexCoord(0, 128/1024, 72/512, 104/512);
+        f.Highlight:SetTexture(file);
+        f.Highlight:SetTexCoord(338/1024, 458/1024, 72/512, 104/512);
         API.Mixin(f, UIButtonMixin);
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
@@ -988,6 +999,9 @@ local TakeAllButtonMixin = {};
 do  --TakeAllButton
     function TakeAllButtonMixin:OnClick()
         MainFrame:LootAllItemsSorted();
+        self.AnimClick:Stop();
+        self.AnimClick:Play();
+        self.Highlight:Show();
     end
 
     function TakeAllButtonMixin:OnKeyDown(key)
@@ -1005,19 +1019,41 @@ do  --TakeAllButton
     function TakeAllButtonMixin:OnEvent(event, ...)
         if event == "PLAYER_REGEN_DISABLED" then
             self:SetPropagateKeyboardInput(true);
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            if self.hotkeyName and not self.hasOnKeyDownScript then
+                self:SetScript("OnKeyDown", self.OnKeyDown);
+                self.hasOnKeyDownScript = true;
+            end
+        elseif event == "MODIFIER_STATE_CHANGED" then
+            local key, down = ...
+            if down == 1 and key == TAKE_ALL_MODIFIER_KEY then
+                self:OnClick();
+            end
         end
     end
 
     function TakeAllButtonMixin:OnShow()
+        if MainFrame.inEditMode then return end;
+
         if self.hotkeyName and (not InCombatLockdown()) or self:GetPropagateKeyboardInput() then
             self:SetScript("OnKeyDown", self.OnKeyDown);
+            self.hasOnKeyDownScript = true;
         end
         self:RegisterEvent("PLAYER_REGEN_DISABLED");
+        self:RegisterEvent("PLAYER_REGEN_ENABLED");
+        if TAKE_ALL_MODIFIER_KEY then
+            self:RegisterEvent("MODIFIER_STATE_CHANGED");
+        end
     end
 
     function TakeAllButtonMixin:OnHide()
         self:SetScript("OnKeyDown", nil);
+        self.hasOnKeyDownScript = nil;
         self:UnregisterEvent("PLAYER_REGEN_DISABLED");
+        self:UnregisterEvent("PLAYER_REGEN_ENABLED");
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+        self.AnimClick:Stop();
+        self.Highlight:Hide();
     end
 
     function TakeAllButtonMixin:UpdateHotKey()
@@ -1064,7 +1100,7 @@ do
 
     function SpikeyGlowMixin:SetFrameSize(width, height)
         self:SetSize(width, height);
-        local scale = 1.7;
+        local scale = 1.75;
         self.Spike:SetSize(width*scale, height*scale);
         self.SpikeMask:SetSize(width*scale, height*scale)
         self.Glow:SetSize(2*width, 2*height);
@@ -1072,13 +1108,17 @@ do
     end
 
     function SpikeyGlowMixin:SetQualityColor(quality)
+        if not GLOW_COLORS[quality] then
+            quality = 1;
+        end
         if GLOW_COLORS[quality] then
             local c = GLOW_COLORS[quality];
             self.Glow:SetVertexColor(c[1], c[2], c[3]);
             if SPIKE_COLORS[quality] then
                 c = SPIKE_COLORS[quality];
             end
-            self.Spike:SetVertexColor(c[1], c[2], c[3]);
+            --self.Spike:SetVertexColor(c[1], c[2], c[3]);
+            self.Spike:SetVertexColor(1, 1, 1);
         else
             self:Hide();
         end
@@ -1176,6 +1216,7 @@ do  --UI Basic
             self.isUpdatingPage = nil;
             self.alpha = self:GetAlpha();
             self:SetScript("OnUpdate", OnUpdate_FadeOut);
+            self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
         else
             self.t = 0;
             self:SetScript("OnUpdate", OnUpdate_FadeOut_IfNotFocused);
@@ -1206,6 +1247,16 @@ do  --UI Basic
 
             self:SetPoint("TOPLEFT", nil, "CENTER", offsetX, 0);
         end
+    end
+
+    function MainFrame:PositionUnderMouse()
+        local x, y = GetCursorPosition();
+        local scale = self:GetEffectiveScale();
+		x = x / (scale) - Formatter.ICON_SIZE;
+		y = math.max((y / scale) + 24, 350);
+		self:ClearAllPoints();
+		self:SetPoint("TOPLEFT", nil, "BOTTOMLEFT", x, y);
+		self:Raise();
     end
 
     function MainFrame:LayoutActiveFrames(fixedFrameWidth)
@@ -1422,10 +1473,22 @@ do  --UI Basic
     function MainFrame:OnHide()
         if not self:IsShown() then
             self:ReleaseAll();
-            --self:Hide();
         end
+        self.isFocused = false;
+        self.manualMode = nil;
+        self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
     end
     MainFrame:SetScript("OnHide", MainFrame.OnHide);
+
+    function MainFrame:OnEvent(event, ...)
+        if event == "GLOBAL_MOUSE_DOWN" then
+            local button = ...
+            if button == "RightButton" and self:IsMouseOver() then
+                self:TryHide(true);
+            end
+        end
+    end
+    MainFrame:SetScript("OnEvent", MainFrame.OnEvent);
 
     function MainFrame:OnUIScaleChanged()
         if not self.uiScaleDirty then
@@ -1464,7 +1527,8 @@ do  --UI Basic
     function MainFrame:SetFocused(state)
         --Mouse Motion will be propagated to frames below
         --If the user mouse down on our frames (e.g. move camera), the game triggers OnLeave so we do a IsMouseOver check
-        if (not state) and (not self:IsMouseOver()) then
+        --if (not state) and (not self:IsMouseOver()) then
+        if not state then
             self.isFocused = false;
         else
             self.isFocused = true;
@@ -1524,3 +1588,15 @@ do  --Callback Registery
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_NewTransmogIcon", SettingChanged_NewTransmogIcon);
 end
+
+
+--[[    --Debug
+C_Timer.After(0, function()
+    local f = CreateSpikeyGlowFrame(UIParent);
+    f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+    f:SetQualityColor(2);
+    f:SetFrameSize(Formatter.ICON_SIZE, Formatter.ICON_SIZE);
+    f:Show();
+    f.AnimGlow:Play();
+end);
+--]]

@@ -21,8 +21,12 @@ local IsFishingLoot = IsFishingLoot;
 local GetMoney = GetMoney;
 local GetItemReagentQualityByItemInfo = C_TradeSkillUI.GetItemReagentQualityByItemInfo;
 local GetItemInfoInstant = C_Item.GetItemInfoInstant;
+local GetItemInfo = C_Item.GetItemInfo;
 local IsModifiedClick = IsModifiedClick;
 local GetCVarBool = C_CVar.GetCVarBool;
+local GetCurrencyIDFromLink = C_CurrencyInfo.GetCurrencyIDFromLink;
+local GetCurrencyInfoFromLink = C_CurrencyInfo.GetCurrencyInfoFromLink;
+
 
 local tsort = table.sort;
 local pairs = pairs;
@@ -48,6 +52,8 @@ local ENABLE_MODULE = false;
 local FORCE_AUTO_LOOT = true;
 local AUTO_LOOT_ENABLE_TOOLTIP = true;
 local FADE_DELAY_PER_ITEM = 0.25;
+local REPLACE_LOOT_ALERT = true;
+local LOOT_UNDER_MOUSE = true;
 ------------------
 
 local CLASS_SORT_ORDER = {
@@ -122,7 +128,11 @@ local function MergeData(d1, d2)
                 end
             else
                 if d1.id == d2.id then
-                    d1.quantity = d1.quantity + d2.quantity;
+                    if (d1.quantity == d2.quantity) and (d1.toast ~= d2.toast) then
+                        d1.toast = true;
+                    else
+                        d1.quantity = d1.quantity + d2.quantity;
+                    end
                     return true
                 end
             end
@@ -212,6 +222,10 @@ do  --Event Handler
         --"TRANSMOG_COLLECTION_SOURCE_ADDED",
     };
 
+    local ALERT_SYSTEM_EVENTS = {
+        "SHOW_LOOT_TOAST",
+    }
+
     function EL:ListenStaticEvent(state)
         if state then
             for _, event in ipairs(STATIC_EVENTS) do
@@ -220,6 +234,35 @@ do  --Event Handler
         else
             for _, event in ipairs(STATIC_EVENTS) do
                 EL:UnregisterEvent(event);
+            end
+        end
+    end
+
+    function EL:ListenAlertSystemEvent(state)
+        local f = AlertFrame;
+
+        if state then
+            if not self.enabled then return end;
+
+            self.alertSystemMuted = true;
+            for _, event in ipairs(ALERT_SYSTEM_EVENTS) do
+                self:RegisterEvent(event);
+            end
+
+            if f then
+                for _, event in ipairs(ALERT_SYSTEM_EVENTS) do
+                    f:UnregisterEvent(event);
+                end
+            end
+        elseif self.alertSystemMuted then
+            for _, event in ipairs(ALERT_SYSTEM_EVENTS) do
+                self:UnregisterEvent(event);
+            end
+
+            if f then
+                for _, event in ipairs(ALERT_SYSTEM_EVENTS) do
+                    f:RegisterEvent(event);
+                end
             end
         end
     end
@@ -497,6 +540,74 @@ do  --Event Handler
         end
     end
 
+    function EL:OnLootToast(typeIdentifier, itemLink, quantity, specID, sex, isPersonal, lootSource, lessAwesome, isUpgraded, isCorrupted)
+        --See Blizzard_FrameXML/Mainline/AlertFrames.lua
+        if typeIdentifier == "item" then
+            local itemName, _, itemRarity, _, _, _, _, _, _, itemTexture = GetItemInfo(itemLink);
+            local id, _, _, _, _, classID, subclassID = GetItemInfoInstant(itemLink);
+            local hideCount = false;
+            local craftQuality = 0;
+            if classID == 5 or classID == 7 then
+                craftQuality = GetItemReagentQualityByItemInfo(itemLink);
+            elseif classID == 2 or classID == 4 then
+                hideCount = true;
+            end
+            local data = {
+                icon = itemTexture,
+                name = itemName,
+                quantity = quantity,
+                locked = false,
+                quality = itemRarity,
+                id = id,
+                slotType = Defination.SLOT_TYPE_ITEM,
+                slotIndex = -1,
+                link = itemLink,
+                craftQuality = craftQuality,
+                questType = 0,
+                looted = true,
+                hideCount = hideCount,
+                classID = classID,
+                subclassID = subclassID,
+                overflow = false,
+                toast = true,
+            };
+            MainFrame:QueueDisplayLoot(data);
+        elseif typeIdentifier == "money" then
+            local data = {
+                slotType = Defination.SLOT_TYPE_MONEY,
+                quantity = quantity,
+                name = tostring(quantity),
+                toast = true,
+            };
+            MainFrame:QueueDisplayLoot(data);
+        elseif isPersonal and typeIdentifier == "currency" then
+            local currencyID = GetCurrencyIDFromLink(itemLink);
+            local currencyInfo = GetCurrencyInfoFromLink(itemLink);
+            local data = {
+                icon = currencyInfo.iconFileID,
+                name = currencyInfo.name,
+                quantity = quantity,
+                locked = false,
+                quality = currencyInfo.quality,
+                id = currencyID,
+                slotType = Defination.SLOT_TYPE_CURRENCY,
+                slotIndex = -1,
+                link = itemLink,
+                craftQuality = 0,
+                questType = 0,
+                looted = true,
+                hideCount = false,
+                classID = -1,
+                subclassID = -1,
+                overflow = false,
+                toast = true,
+            };
+            MainFrame:QueueDisplayLoot(data);
+        elseif typeIdentifier == "honor" then
+
+        end
+    end
+
     function EL:OnEvent(event, ...)
         if event == "LOOT_OPENED" then
             self:OnLootOpened(...);
@@ -544,7 +655,7 @@ do  --Event Handler
                     };
                     MainFrame:QueueDisplayLoot(data);
                 end
-                self.playerMoney = money;
+                self.playerMoney = nil;
             end
         elseif event == "LOOT_SLOT_CHANGED" then
             --Can happen during AoE Loot
@@ -552,6 +663,8 @@ do  --Event Handler
 
         elseif event == "LOOT_SLOT_CLEARED" then
             self:OnLootSlotCleared(...);
+        elseif event == "SHOW_LOOT_TOAST" then
+            self:OnLootToast(...);
         end
         --print(event, GetTimePreciseSec(), ...)  --
     end
@@ -723,6 +836,7 @@ do  --UI Notification Mode
                 while (data2) do
                     if MergeData(data1, data2) then
                         tremove(self.lootQueue, index2);
+                        numQueued = numQueued - 1;
                     else
                         index2 = index2 + 1;
                     end
@@ -853,6 +967,8 @@ do  --UI Notification Mode
         else
             self:TryHide(true);
         end
+
+        self:RegisterEvent("GLOBAL_MOUSE_DOWN");
     end
 
     function MainFrame:DisplayOverflowCurrencies()
@@ -909,10 +1025,21 @@ do  --UI Manually Pickup Mode
             self.Header:Hide();
             self.TakeAllButton:Show();
             self.BackgroundFrame:SetBackgroundAlpha(0.90);
+            self.isFocused = false;
+
+            if LOOT_UNDER_MOUSE then
+                self:PositionUnderMouse();
+            end
+
+            EL:ListenDynamicEvents(false);
         else
             self.Header:Show();
             self.TakeAllButton:Hide();
             self.BackgroundFrame:SetBackgroundAlpha(0.50);
+
+            if LOOT_UNDER_MOUSE then
+                self:LoadPosition();
+            end
         end
         self:EnableMouseScript(state);
     end
@@ -946,6 +1073,7 @@ do  --UI Manually Pickup Mode
 
         self:SetScript("OnUpdate", OnUpdate_FadeIn);
         self:Show();
+        self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
     end
 
     function MainFrame:ClosePendingLoot()
@@ -980,9 +1108,11 @@ do  --UI Manually Pickup Mode
         if self.activeFrames then
             local slotIndex;
             for _, itemFrame in ipairs(self.activeFrames) do
-                slotIndex = itemFrame.data.slotIndex;
-                if slotIndex and LootSlotHasItem(slotIndex) then
-                    LootSlot(slotIndex);
+                if itemFrame.data then
+                    slotIndex = itemFrame.data.slotIndex;
+                    if slotIndex and LootSlotHasItem(slotIndex) then
+                        LootSlot(slotIndex);
+                    end
                 end
             end
         end
@@ -1127,6 +1257,7 @@ do  --UI Manually Pickup Mode
 
         self:SetScript("OnUpdate", OnUpdate_FadeIn_ThenHideLootedFrames);
         self:Show();
+        self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
     end
 end
 
@@ -1295,6 +1426,8 @@ do  --Edit Mode
 
             {type = "Divider"},
             {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"]},
+            {type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
+            {type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"]},
             {type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = Options_UseHotkey_OnClick, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
 
             {type = "Divider"},
@@ -1369,6 +1502,22 @@ do  --Edit Mode
         AUTO_HIDE_DELAY = GetValidFadeOutDelay(value);
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_FadeDelayPerItem", SettingChanged_FadeDelayPerItem);
+
+    local function SettingChanged_ReplaceDefaultAlert(state, userInput)
+        REPLACE_LOOT_ALERT = state;
+        EL:ListenAlertSystemEvent(state);
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_ReplaceDefaultAlert", SettingChanged_ReplaceDefaultAlert);
+
+    local function SettingChanged_LootUnderMouse(state, userInput)
+        LOOT_UNDER_MOUSE = state;
+        if userInput then
+            if not LOOT_UNDER_MOUSE then
+                MainFrame:LoadPosition();
+            end
+        end
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_LootUnderMouse", SettingChanged_LootUnderMouse);
 end
 
 
@@ -1384,6 +1533,7 @@ do
     local function EnableModule(state)
         if state then
             ENABLE_MODULE = true;
+            EL.enabled = true;
             EL:ListenStaticEvent(true);
             EL:SetScript("OnEvent", EL.OnEvent);
 
@@ -1403,8 +1553,13 @@ do
                 EventRegistry:RegisterCallback("EditMode.Enter", EditMode_Enter);
                 EventRegistry:RegisterCallback("EditMode.Exit", MainFrame.ExitEditMode, MainFrame);
             end
+
+            if REPLACE_LOOT_ALERT then
+                EL:ListenAlertSystemEvent(true);
+            end
         elseif ENABLE_MODULE then
             ENABLE_MODULE = false;
+            EL.enabled = false;
             EL:ListenStaticEvent(false);
             EL:SetScript("OnEvent", nil);
             EL:SetScript("OnUpdate", nil);
@@ -1414,6 +1569,8 @@ do
                 LootFrame:RegisterEvent("LOOT_OPENED");
                 LootFrame:RegisterEvent("LOOT_CLOSED");
             end
+
+            EL:ListenAlertSystemEvent(false);
         end
     end
 

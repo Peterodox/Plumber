@@ -55,6 +55,11 @@
                     <TextureSliceMargins left="8" right="8" top="8" bottom="8"/>
 				</Texture>
 			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Highlight" setAllPoints="true" alpha="0" hidden="true">
+
+				</Texture>
+			</Layer>
 			<Layer level="OVERLAY" textureSubLevel="2">
 				<FontString parentKey="Text" inherits="PlumberLootUIFont" justifyH="LEFT" justifyV="MIDDLE" text="Button">
 					<Anchors>
@@ -70,13 +75,13 @@
                     <Anchor point="LEFT"/>
                 </Anchors>
                 <Layers>
-                    <Layer level="ARTWORK">
+                    <Layer level="OVERLAY" textureSubLevel="1">
                         <Texture parentKey="HotkeyBackdrop" setAllPoints="true" ignoreParentScale="true">
                             <TextureSliceMode mode="Stretched"/>
                             <TextureSliceMargins left="6" right="6" top="6" bottom="6"/>
                         </Texture>
                     </Layer>
-                    <Layer level="OVERLAY">
+                    <Layer level="OVERLAY" textureSubLevel="2">
                         <FontString parentKey="Hotkey" inherits="PlumberLootUIFont" justifyH="CENTER" justifyV="MIDDLE">
                             <Anchors>
                                 <Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER" x="0"/>
@@ -86,6 +91,12 @@
                 </Layers>
             </Frame>
         </Frames>
+        <Animations>
+            <AnimationGroup parentKey="AnimClick" setToFinalAlpha="true">
+                <Alpha childKey="Highlight" duration="0.1" fromAlpha="0" toAlpha="1" order="1"/>
+                <Alpha childKey="Highlight" duration="0.8" fromAlpha="1" toAlpha="0" startDelay="0.1" order="2"/>
+            </AnimationGroup>
+		</Animations>
     </Button>
 
 	<Frame name="PlumberLootUIItemFrameTemplate" alpha="0" virtual="true">
@@ -246,7 +257,7 @@
                 </Texture>
             </Layer>
             <Layer level="BORDER" textureSubLevel="1">
-                <Texture parentKey="Spike">
+                <Texture parentKey="Spike" alphaMode="ADD">
                     <Color r="0" g="0" b="0"/>
                     <Size x="64" y="64"/>
                     <Anchors>

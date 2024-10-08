@@ -124,27 +124,42 @@ do
         self.ProgressBar:SetValue(currentValue, maxValue);
     end
 
+    function FactionProgressMixin:ShowParagonTooltip()
+        local tooltip = EmbeddedItemTooltip;
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+        ReputationParagonFrame_SetupParagonTooltip(self);
+        tooltip:Show();
+
+        C_Timer.After(0.25, function()
+            if self:IsMouseMotionFocus() then
+                tooltip:Hide();
+                self:ShowParagonTooltip();
+            end
+        end);
+    end
+
     function FactionProgressMixin:OnEnter()
         self.ProgressBar.BorderHighlight:Show();
 
-        local tooltip = GameTooltip;
-        tooltip:Hide();
+        GameTooltip:Hide();
+        EmbeddedItemTooltip:Hide();
 
+        self.UpdateTooltip = nil;
         if self.isParagon then
-            tooltip:SetOwner(self, "ANCHOR_RIGHT");
-            ReputationParagonFrame_SetupParagonTooltip(self);
+            self:ShowParagonTooltip();
         else
+            local tooltip = GameTooltip;
             ReputationEntryMixin.ShowFriendshipReputationTooltip(self, self.factionID, "ANCHOR_RIGHT", false);
+            tooltip:AddLine(" ");
+            GameTooltip_AddColoredLine(tooltip, (IsFactionWatched(self.factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"], GREEN_FONT_COLOR);
+            tooltip:Show();
         end
-
-        tooltip:AddLine(" ");
-        GameTooltip_AddColoredLine(tooltip, (IsFactionWatched(self.factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"], GREEN_FONT_COLOR);
-        tooltip:Show();
     end
 
     function FactionProgressMixin:OnLeave()
         self.ProgressBar.BorderHighlight:Hide();
         GameTooltip:Hide();
+        EmbeddedItemTooltip:Hide();
     end
 
     function FactionProgressMixin:OnMouseDown(button)

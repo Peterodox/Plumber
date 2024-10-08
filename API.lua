@@ -1357,7 +1357,15 @@ do  --Currency
         end
     end
 
+    local IGNORED_OVERFLOW_ID = {
+        [3068] = true,      --Delver's Journey
+        [3143] = true,      --Delver's Journey
+    };
+
     local function WillCurrencyRewardOverflow(currencyID, rewardQuantity)
+        if IGNORED_OVERFLOW_ID[currencyID] then
+            return false, 0
+        end
         local currencyInfo = GetCurrencyInfo(currencyID);
         local quantity = currencyInfo and (currencyInfo.useTotalEarnedForMaxQty and currencyInfo.totalEarned or currencyInfo.quantity);
         return quantity and currencyInfo.maxQuantity > 0 and rewardQuantity + quantity > currencyInfo.maxQuantity, quantity
@@ -1875,6 +1883,152 @@ do  --Transmog
     end
     API.IsUncollectedTransmogByItemInfo = IsUncollectedTransmogByItemInfo
 end
+
+do
+    local GetItemCount = C_Item.GetItemCount
+    local GetContainerNumSlots = C_Container.GetContainerNumSlots;
+    local GetContainerItemID = C_Container.GetContainerItemID;
+    local GetItemInfoInstant = C_Item.GetItemInfoInstant;
+    local GetBagItem = C_TooltipInfo.GetBagItem;
+
+    local function GetItemBagPosition(itemID)
+        local count = GetItemCount(itemID); --unused arg2: Include banks
+        if count and count > 0 then
+            for bagID = 0, 4 do
+                for slotID = 1, GetContainerNumSlots(bagID) do
+                    if(GetContainerItemID(bagID, slotID) == itemID) then
+                        return bagID, slotID
+                    end
+                end
+            end
+        end
+    end
+    API.GetItemBagPosition = GetItemBagPosition;
+
+    local Processor = CreateFrame("Frame");
+    local ITEM_OPENABLE = ITEM_OPENABLE or "<Right Click to Open>";
+    local OPENABLE_ITEM = {};
+
+    local function IsItemOpenable(item)
+        local itemID, _, _, _, _, classID, subClassID = GetItemInfoInstant(item);
+        if OPENABLE_ITEM[itemID] ~= nil then
+            return OPENABLE_ITEM[itemID]
+        end
+
+        if classID == 15 and subClassID == 4 then
+            local bag, slot = GetItemBagPosition(itemID);
+            if bag and slot then
+                local tooltipData = GetBagItem(bag, slot);
+                if tooltipData then
+                    local lines = tooltipData.lines;
+                    local leftText = lines[#lines].leftText;
+                    if leftText and leftText == ITEM_OPENABLE then
+                        OPENABLE_ITEM[itemID] = true;
+                        return true
+                    else
+                        OPENABLE_ITEM[itemID] = false;
+                    end
+                end
+            end
+        end
+        return false
+    end
+
+    function Processor:OnUpdate_Queue(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.1 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            local itemID;
+            local anyMatch;
+
+            for bagID = 0, 4 do
+                for slotID = 1, GetContainerNumSlots(bagID) do
+                    itemID = GetContainerItemID(bagID, slotID);
+                    if self.queue[itemID] ~= nil then
+                        if self.queue[itemID].bagPosition == nil then
+                            anyMatch = true;
+                            self.queue[itemID].bagPosition = {bagID, slotID};
+                            if OPENABLE_ITEM[itemID] == nil then
+                                GetBagItem(bagID, slotID);
+                            end
+                        end
+                    end
+                end
+            end
+
+            if anyMatch then
+                self:SetScript("OnUpdate", self.OnUpdate_Tooltip);
+            end
+        end
+    end
+
+    function Processor:OnUpdate_Tooltip(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.1 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            local tooltipData;
+            local lines;
+            local leftText;
+            local openable;
+            local bag, slot;
+            for itemID, v in pairs(self.queue) do
+                if v.bagPosition then
+                    bag = v.bagPosition[1];
+                    slot = v.bagPosition[2];
+                    tooltipData = GetBagItem(bag, slot);
+
+                    if OPENABLE_ITEM[itemID] then
+                        openable = true;
+                    else
+                        openable = false;
+                        if tooltipData then
+                            lines = tooltipData.lines;
+                            leftText = lines[#lines].leftText;
+                            openable = leftText and leftText == ITEM_OPENABLE
+                            OPENABLE_ITEM[itemID] = openable;
+                        end
+                    end
+
+                    if openable then
+                        for callback in pairs(v) do
+                            if callback ~= "bagPosition" then
+                                callback(bag, slot)
+                            end
+                        end
+                    end
+                end
+            end
+
+            self.queue = nil;
+        end
+    end
+
+    function API.InquiryOpenableItem(itemID, callback)
+        --Pre-exclude invalid item types
+
+        if OPENABLE_ITEM[itemID] == false then
+            return false
+        end
+
+        if not Processor.queue then
+            Processor.queue = {};
+        end
+
+        if not Processor.queue[itemID] then
+            Processor.queue[itemID] = {};
+        end
+
+        callback = callback or Nop;
+
+        Processor.queue[itemID][callback] = true;
+
+        Processor.t = 0;
+        Processor:SetScript("OnUpdate", Processor.OnUpdate_Queue);
+    end
+end
+
 
 --[[
 local DEBUG = CreateFrame("Frame");

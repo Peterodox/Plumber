@@ -33,5 +33,5 @@ L["Bountiful Delve"] =  "Großzügige Tiefe";
 L["Special Assignment"] = "Spezialauftrag";
 
 
-L["Match Patter Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+ verbessert)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Patter Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Patter Rep 2"] = "Euer Ruf bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --FACTION_STANDING_INCREASED

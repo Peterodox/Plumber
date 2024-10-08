@@ -213,6 +213,10 @@ L["LootUI Option New Transmog Tooltip"] = "Add a marker %s if you have not colle
 L["LootUI Option Use Hotkey"] = "Press Key To Take All Items";
 L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Looting mode, press the following hotkey to take all items.";
 L["LootUI Option Fade Delay"] = "Fade Out Delay Per Item";
+L["LootUI Option Replace Default"] = "Replace Default Loot Alert";
+L["LootUI Option Replace Default Tooltip"] = "Replace the default loot alerts that usually appear above the action bars.";
+L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window at Mouse";
+L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r mode, the window will appear under the current mouse location";
 
 
 --Generic
