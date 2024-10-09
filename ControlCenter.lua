@@ -563,10 +563,19 @@ end
 function ControlCenter:InitializeModules()
     --Initial Enable/Disable Modules
     local db = PlumberDB;
+    local enabled;
 
     for _, moduleData in pairs(self.modules) do
         if (not moduleData.validityCheck) or (moduleData.validityCheck()) then
-            moduleData.toggleFunc( db[moduleData.dbKey] );
+            enabled = db[moduleData.dbKey];
+            if moduleData.requiredDBValues then
+                for dbKey, value in pairs(moduleData.requiredDBValues) do
+                    if db[dbKey] ~= nil and db[dbKey] ~= value then
+                        enabled = false;
+                    end
+                end
+            end
+            moduleData.toggleFunc(enabled);
         end
     end
 end

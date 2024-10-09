@@ -107,6 +107,7 @@ local DefaultValues = {
         LootUI_FadeDelayPerItem = 0.25,
         LootUI_ReplaceDefaultAlert = false,
         LootUI_LootUnderMouse = false;
+        LootUI_UseStockUI = false,
 
 
     --Unified Map Pin System

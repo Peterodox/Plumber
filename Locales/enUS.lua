@@ -205,8 +205,9 @@ L["Sample Item 3"] = "Awesome Rare Item";
 L["Sample Item 2"] = "Awesome Uncommon Item";
 L["Sample Item 1"] = "Common Item";
 L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
+L["Manual Loot Instruction Format"] = "To temporarily cancel auto loot on a specific pickup, press and hold |cffffffff%s|r key until the loot window appears.";
 L["LootUI Option Force Auto Loot"] = "Force Auto Loot";
-L["LootUI Option Force Auto Loot Tooltip"] = "Always enable Auto Loot to counter the occasional auto loot failure.\n\nTo temporarily cancel auto loot on a specific pickup, press and hold %s key until the loot window appears.";
+L["LootUI Option Force Auto Loot Tooltip"] = "Always enable Auto Loot to counter the occasional auto loot failure.";
 L["LootUI Option Owned Count"] = "Show Number Of Owned Items";
 L["LootUI Option New Transmog"] = "Mark Uncollected Appearance";
 L["LootUI Option New Transmog Tooltip"] = "Add a marker %s if you have not collected the item's appearance.";
@@ -217,6 +218,8 @@ L["LootUI Option Replace Default"] = "Replace Default Loot Alert";
 L["LootUI Option Replace Default Tooltip"] = "Replace the default loot alerts that usually appear above the action bars.";
 L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window at Mouse";
 L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r mode, the window will appear under the current mouse location";
+L["LootUI Option Use Default UI"] = "Use Default Loot Window";
+L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
 
 
 --Generic

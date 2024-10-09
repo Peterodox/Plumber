@@ -54,6 +54,7 @@ local AUTO_LOOT_ENABLE_TOOLTIP = true;
 local FADE_DELAY_PER_ITEM = 0.25;
 local REPLACE_LOOT_ALERT = true;
 local LOOT_UNDER_MOUSE = true;
+local USE_STOCK_UI = false;
 ------------------
 
 local CLASS_SORT_ORDER = {
@@ -380,16 +381,26 @@ do  --Event Handler
         if numItems == 0 then
            CloseLoot();
            return
-        else
-            self:ListenDynamicEvents(true);
-            self:RegisterEvent("UI_ERROR_MESSAGE");
-            self:RegisterEvent("LOOT_SLOT_CHANGED");
-            self:RegisterEvent("LOOT_SLOT_CLEARED");
-            if acquiredFromItem then
-				PlaySound(SOUNDKIT.UI_CONTAINER_ITEM_OPEN);
-			elseif IsFishingLoot() then
-				PlaySound(SOUNDKIT.FISHING_REEL_IN);
+        end
+
+        if USE_STOCK_UI then
+            if not isAutoLoot and not useManualMode then
+                --When game sends conflicting signals
+                for slotIndex = 1, numItems do
+                    LootSlot(slotIndex);
+                end
             end
+            return
+        end
+
+        self:ListenDynamicEvents(true);
+        self:RegisterEvent("UI_ERROR_MESSAGE");
+        self:RegisterEvent("LOOT_SLOT_CHANGED");
+        self:RegisterEvent("LOOT_SLOT_CLEARED");
+        if acquiredFromItem then
+            PlaySound(SOUNDKIT.UI_CONTAINER_ITEM_OPEN);
+        elseif IsFishingLoot() then
+            PlaySound(SOUNDKIT.FISHING_REEL_IN);
         end
 
         self:BuildLootData();
@@ -1416,6 +1427,12 @@ do  --Edit Mode
         end
     end
 
+    local function Tooltip_ManualLootInstruction()
+        local key = GetModifiedClick("AUTOLOOTTOGGLE");
+        key = key or "NONE";
+        return L["Manual Loot Instruction Format"]:format(key)
+    end
+
     local OPTIONS_SCHEMATIC = {
         title = L["EditMode LootUI"],
         widgets = {
@@ -1425,10 +1442,13 @@ do  --Edit Mode
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t")},
 
             {type = "Divider"},
-            {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"]},
+            {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
             {type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
             {type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"]},
             {type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = Options_UseHotkey_OnClick, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
+
+            {type = "Divider"},
+            {type = "Checkbox", label = L["LootUI Option Use Default UI"], onClickFunc = nil, dbKey = "LootUI_UseStockUI", tooltip = L["LootUI Option Use Default UI Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
 
             {type = "Divider"},
             {type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = Options_ResetPosition_OnClick, stateCheckFunc = Options_ResetPosition_ShouldEnable, widgetKey = "ResetButton"},
@@ -1543,19 +1563,16 @@ do
 
             MainFrame:OnUIScaleChanged();
 
-            if LootFrame then
-                LootFrame:UnregisterEvent("LOOT_OPENED");
-                LootFrame:UnregisterEvent("LOOT_CLOSED");
-            end
-
             if not EDITMODE_HOOKED then
                 EDITMODE_HOOKED = true;
                 EventRegistry:RegisterCallback("EditMode.Enter", EditMode_Enter);
                 EventRegistry:RegisterCallback("EditMode.Exit", MainFrame.ExitEditMode, MainFrame);
             end
 
-            if REPLACE_LOOT_ALERT then
+            if REPLACE_LOOT_ALERT and not USE_STOCK_UI then
                 EL:ListenAlertSystemEvent(true);
+            else
+                EL:ListenAlertSystemEvent(false);
             end
         elseif ENABLE_MODULE then
             ENABLE_MODULE = false;
@@ -1565,14 +1582,37 @@ do
             EL:SetScript("OnUpdate", nil);
             MainFrame:Disable();
 
+            EL:ListenAlertSystemEvent(false);
+        end
+    end
+
+
+    local function SettingChanged_UseStockUI(state, userInput)
+        USE_STOCK_UI = state == true;
+        if USE_STOCK_UI then
             if LootFrame then
                 LootFrame:RegisterEvent("LOOT_OPENED");
                 LootFrame:RegisterEvent("LOOT_CLOSED");
             end
 
+            if not MainFrame.inEditMode then
+                MainFrame:Disable();
+            end
+
             EL:ListenAlertSystemEvent(false);
+        else
+            if LootFrame then
+                LootFrame:UnregisterEvent("LOOT_OPENED");
+                LootFrame:UnregisterEvent("LOOT_CLOSED");
+            end
+
+            if REPLACE_LOOT_ALERT then
+                EL:ListenAlertSystemEvent(true);
+            end
         end
     end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseStockUI", SettingChanged_UseStockUI);
+
 
     local function OptionToggle_OnClick(self, button)
         if MainFrame.OptionFrame and MainFrame.OptionFrame:IsShown() then
