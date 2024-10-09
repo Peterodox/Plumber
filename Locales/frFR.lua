@@ -112,6 +112,8 @@ L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Q
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Masquez la transcription si elle provient d'une quête mondiale.\nParfois, la Tête parlante est déclenchée avant d'accepter la quête mondiale, et nous ne pourrons pas la masquer.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
 L["TalkingHead Option Condition Instance Tooltip"] = "Masquez la transcription lorsque vous êtes dans une instance.";
+L["TalkingHead Option Below WorldMap"] = "Send To Back When Map Opened";
+L["TalkingHead Option Below WorldMap Tooltip"] = "Send the Talking Head to the back when you open the World Map so it doesn't block it.";
 
 
 --AzerothianArchives
@@ -157,6 +159,11 @@ L["ModuleName TooltipChestKeys"] = "Infobulle : Clés de coffre";
 L["ModuleDescription TooltipChestKeys"] = "Affichez des informations sur la clé nécessaire pour ouvrir le coffre ou la porte actuelle.";
 
 
+--Tooltip Reputation Tokens
+L["ModuleName TooltipRepTokens"] = "Tooltip: Reputation Tokens";
+L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increase reputation.";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Prix du marchand";
 L["ModuleDescription MerchantPrice"] = "Modifiez le comportement de l'interface utilisateur du marchand :\n\n- Grisez uniquement les devises insuffisantes.\n\n- Affichez tous les objets requis dans la boîte de pièces.";
@@ -178,6 +185,43 @@ L["ModuleName WorldMapPin_TWW"] = "Marqueur de carte : "..(EXPANSION_NAME10 or "
 L["ModuleDescription WorldMapPin_TWW"] = "Affichez des marqueurs supplémentaires sur la carte du continent de Khaz Algar :\n\n- %s\n\n- %s";  --We'll replace %s with locales (See Map Pin Filter Name at the bottom)
 
 
+--Delves
+L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Tier %s";
+L["Item Level Format"] = ITEM_LEVEL or "Item Level %d";
+L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
+L["Delves Reputation Name"] = "Delver's Journey";
+L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
+L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
+
+
+--Loot UI
+L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
+L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
+L["Take All"] = "Take All";     --Take all items from a loot window
+L["You Received"] = YOU_RECEIVED_LABEL or "You recieved";
+L["Reach Currency Cap"] = "Reached currency caps";
+L["Sample Item 4"] = "Awesome Epic Item";
+L["Sample Item 3"] = "Awesome Rare Item";
+L["Sample Item 2"] = "Awesome Uncommon Item";
+L["Sample Item 1"] = "Common Item";
+L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
+L["Manual Loot Instruction Format"] = "To temporarily cancel auto loot on a specific pickup, press and hold |cffffffff%s|r key until the loot window appears.";
+L["LootUI Option Force Auto Loot"] = "Force Auto Loot";
+L["LootUI Option Force Auto Loot Tooltip"] = "Always enable Auto Loot to counter the occasional auto loot failure.";
+L["LootUI Option Owned Count"] = "Show Number Of Owned Items";
+L["LootUI Option New Transmog"] = "Mark Uncollected Appearance";
+L["LootUI Option New Transmog Tooltip"] = "Add a marker %s if you have not collected the item's appearance.";
+L["LootUI Option Use Hotkey"] = "Press Key To Take All Items";
+L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Looting mode, press the following hotkey to take all items.";
+L["LootUI Option Fade Delay"] = "Fade Out Delay Per Item";
+L["LootUI Option Replace Default"] = "Replace Default Loot Alert";
+L["LootUI Option Replace Default Tooltip"] = "Replace the default loot alerts that usually appear above the action bars.";
+L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window at Mouse";
+L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r mode, the window will appear under the current mouse location";
+L["LootUI Option Use Default UI"] = "Use Default Loot Window";
+L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Déplacer horizontalement";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Déplacer verticalement";
@@ -185,6 +229,11 @@ L["Reposition Button Tooltip"] = "Cliquez gauche et faites glisser pour déplace
 L["Font Size"] = FONT_SIZE or "Taille de la police";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Réinitialiser à la position par défaut";
 
+L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renown ";  --There is a space
+L["Paragon Reputation"] = "Paragon";
+L["Level Maxed"] = "(Maxed)";   --Reached max level
+L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
+L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
 
 
 
@@ -199,6 +248,7 @@ L["currency-2915"] = "Carved";
 L["currency-2916"] = "Runed";
 L["currency-2917"] = "Gilded";
 
+
 L["Scenario Delves"] = "Delves";
 L["GameObject Door"] = "Porte";
 L["Delve Chest 1 Rare"] = "Coffre abondant";   --We'll use the GameObjectID once it shows up in the database
@@ -208,6 +258,10 @@ L["Delve Chest 1 Rare"] = "Coffre abondant";   --We'll use the GameObjectID once
 L["Bountiful Delve"] =  "Delves abondants";
 L["Special Assignment"] = "Assignations spéciales";
 
+
+L["Match Pattern Gold"] = "([%d%,]+) Gold";
+L["Match Pattern Silver"] = "([%d]+) Silver";
+L["Match Pattern Copper"] = "([%d]+) Copper";
 
 L["Match Patter Rep 1"] = "Réputation de votre bataillon auprès de la faction (.+) augmentée de ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Patter Rep 2"] = "Réputation auprès de la faction (.+) augmentée de ([%d%,]+)";   --FACTION_STANDING_INCREASED
