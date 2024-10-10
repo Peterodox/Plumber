@@ -72,6 +72,15 @@ end
 local DataProvider = {};
 local EL = CreateFrame("Frame", nil, UIParent);
 
+local QUICKSLOT_DATA = {
+    buttons = {
+        {actionType = "item", itemID = 208047, spellID = 417508},   --Gigantic
+        {actionType = "item", itemID = 208067, spellID = 417645},   --Plump
+        {actionType = "item", itemID = 208066, spellID = 417642},   --Small Dreamseed
+    },
+    systemName = QUICKSLOT_NAME,
+    spellcastType = 2,      --Channel
+};
 
 function EL:IsTrackedPlantGrowing()
     return self.trackedObjectGUID and DataProvider:IsPlantGrowing(self.trackedObjectGUID);
@@ -88,7 +97,7 @@ function EL:AttemptShowUI()
 
     self.isChanneling = nil;
 
-    QuickSlot:SetButtonData(SEED_ITEM_IDS, SEED_SPELL_IDS, QUICKSLOT_NAME);
+    QuickSlot:SetButtonData(QUICKSLOT_DATA);
     QuickSlot:ShowUI();
 
     if self.trackedObjectGUID then

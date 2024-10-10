@@ -1554,12 +1554,18 @@ do
         end
     end
 
+    local STOCK_UI_MUTED = false;
+
     local function SettingChanged_UseStockUI(state, userInput)
         USE_STOCK_UI = state == true;
+        local f = LootFrame;
         if USE_STOCK_UI then
-            if LootFrame then
-                LootFrame:RegisterEvent("LOOT_OPENED");
-                LootFrame:RegisterEvent("LOOT_CLOSED");
+            if f then
+                if STOCK_UI_MUTED then
+                    STOCK_UI_MUTED = false;
+                    f:RegisterEvent("LOOT_OPENED");
+                    f:RegisterEvent("LOOT_CLOSED");
+                end
             end
 
             if not MainFrame.inEditMode then
@@ -1569,9 +1575,12 @@ do
             EL:ListenAlertSystemEvent(false);
         else
             if addon.GetDBBool("LootUI") then
-                if LootFrame then
-                    LootFrame:UnregisterEvent("LOOT_OPENED");
-                    LootFrame:UnregisterEvent("LOOT_CLOSED");
+                if f then
+                    if not STOCK_UI_MUTED then
+                        STOCK_UI_MUTED = true;
+                        f:UnregisterEvent("LOOT_OPENED");
+                        f:UnregisterEvent("LOOT_CLOSED");
+                    end
                 end
 
                 if REPLACE_LOOT_ALERT then

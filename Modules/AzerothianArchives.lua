@@ -151,9 +151,17 @@ function EL:UpdateQuest()
     end
 end
 
+local QUICKSLOT_DATA = {
+    buttons = {
+        {actionType = "item", itemID = GOGGLE_ITEM_ID, spellID = GOGGLE_SPELL_ID},
+    },
+    systemName = QUICKSLOT_NAME,
+    spellcastType = 1,      --Channel
+};
+
 function EL:UpdateQuickSlot()
     if self:ShouldShowQuickSlot() then
-        QuickSlot:SetButtonData(GOGGLE_ITEM_ID, GOGGLE_SPELL_ID, QUICKSLOT_NAME);
+        QuickSlot:SetButtonData(QUICKSLOT_DATA);
         QuickSlot:ShowUI();
         if not GOGGLE_NAME then
             GOGGLE_NAME = C_Item.GetItemNameByID(202247);

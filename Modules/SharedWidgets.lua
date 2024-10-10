@@ -17,7 +17,7 @@ local GetTime = GetTime;
 local IsMouseButtonDown = IsMouseButtonDown;
 local GetMouseFocus = API.GetMouseFocus;
 local PlaySound = PlaySound;
-local GetSpellCharges = GetSpellCharges;
+local GetSpellCharges = C_Spell.GetSpellCharges;
 local C_Item = C_Item;
 local GetItemCount = C_Item.GetItemCount;
 local GetItemIconByID = C_Item.GetItemIconByID;
@@ -1410,13 +1410,23 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         end
     end
 
-    function PeudoActionButtonMixin:SetItem(item)
-        local icon = GetItemIconByID(item);
+    function PeudoActionButtonMixin:SetItem(item, icon)
+        icon = icon or GetItemIconByID(item);
         self:SetIcon(icon);
         self.id = item;
         self.actionType = "item";
         local stackSize = GetItemMaxStackSizeByID(item)
         self.stackable = stackSize and stackSize > 1;
+        self:UpdateCount();
+    end
+
+    function PeudoActionButtonMixin:SetSpell(spell, icon)
+        if not icon then
+            icon = C_Spell.GetSpellTexture(spell);
+        end
+        self:SetIcon(icon);
+        self.id = spell;
+        self.actionType = "spell";
         self:UpdateCount();
     end
 
@@ -1431,22 +1441,22 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
                 self.Count:SetText("");
             end
         elseif self.actionType == "spell" then
-            local currentCharges, maxCharges = GetSpellCharges();
+            local currentCharges, maxCharges = GetSpellCharges(self.id);
             if currentCharges then
                 count = currentCharges;
             else
+                count = 1;
                 self.Count:SetText("");
             end
         end
-
-        self.charges = count;
 
         if count > 0 then
             self:SetIconState(1);
         else
             self:SetIconState(2);
-            --self.Count:SetText("");
         end
+
+        self.charges = count;
     end
 
     function PeudoActionButtonMixin:GetCharges()
@@ -1787,6 +1797,18 @@ do  --(In)Secure Button Pool
         return button
     end
     addon.AcquireSecureActionButton = AcquireSecureActionButton;
+
+    local function HideSecureActionButton(privateKey)
+        if InCombatLockdown() then return end;
+
+        if privateKey then
+            local button = PrivateSecureButtons[privateKey];
+            if button then
+                button:Release();
+            end
+        end
+    end
+    addon.HideSecureActionButton = HideSecureActionButton;
 end
 
 do
