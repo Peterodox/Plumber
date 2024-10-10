@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.4.2";
-local VERSION_DATE = 1728400000;
+local VERSION_TEXT = "v1.4.3";
+local VERSION_DATE = 1728500000;
 
 
 local addonName, addon = ...
@@ -74,6 +74,11 @@ local function SetDBValue(dbKey, value, userInput)
     addon.CallbackRegistry:Trigger("SettingChanged."..dbKey, value, userInput);
 end
 addon.SetDBValue = SetDBValue;
+
+local function GetDBBool(dbKey)
+    return DB[dbKey] == true
+end
+addon.GetDBBool = GetDBBool;
 
 
 local DefaultValues = {

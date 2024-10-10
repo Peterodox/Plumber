@@ -1525,7 +1525,11 @@ do  --Edit Mode
 
     local function SettingChanged_ReplaceDefaultAlert(state, userInput)
         REPLACE_LOOT_ALERT = state;
-        EL:ListenAlertSystemEvent(state);
+        if REPLACE_LOOT_ALERT and addon.GetDBBool("LootUI") then
+            EL:ListenAlertSystemEvent(true);
+        else
+            EL:ListenAlertSystemEvent(false);
+        end
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_ReplaceDefaultAlert", SettingChanged_ReplaceDefaultAlert);
 
@@ -1550,6 +1554,34 @@ do
         end
     end
 
+    local function SettingChanged_UseStockUI(state, userInput)
+        USE_STOCK_UI = state == true;
+        if USE_STOCK_UI then
+            if LootFrame then
+                LootFrame:RegisterEvent("LOOT_OPENED");
+                LootFrame:RegisterEvent("LOOT_CLOSED");
+            end
+
+            if not MainFrame.inEditMode then
+                MainFrame:Disable();
+            end
+
+            EL:ListenAlertSystemEvent(false);
+        else
+            if addon.GetDBBool("LootUI") then
+                if LootFrame then
+                    LootFrame:UnregisterEvent("LOOT_OPENED");
+                    LootFrame:UnregisterEvent("LOOT_CLOSED");
+                end
+
+                if REPLACE_LOOT_ALERT then
+                    EL:ListenAlertSystemEvent(true);
+                end
+            end
+        end
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseStockUI", SettingChanged_UseStockUI);
+
     local function EnableModule(state)
         if state then
             ENABLE_MODULE = true;
@@ -1569,10 +1601,16 @@ do
                 EventRegistry:RegisterCallback("EditMode.Exit", MainFrame.ExitEditMode, MainFrame);
             end
 
-            if REPLACE_LOOT_ALERT and not USE_STOCK_UI then
+            if addon.GetDBBool("LootUI_ReplaceDefaultAlert") and (not addon.GetDBBool("LootUI_UseStockUI")) then
                 EL:ListenAlertSystemEvent(true);
             else
                 EL:ListenAlertSystemEvent(false);
+            end
+
+            if addon.GetDBBool("LootUI_UseStockUI") then
+                SettingChanged_UseStockUI(true);
+            else
+                SettingChanged_UseStockUI(false);
             end
         elseif ENABLE_MODULE then
             ENABLE_MODULE = false;
@@ -1583,35 +1621,9 @@ do
             MainFrame:Disable();
 
             EL:ListenAlertSystemEvent(false);
+            SettingChanged_UseStockUI(true);
         end
     end
-
-
-    local function SettingChanged_UseStockUI(state, userInput)
-        USE_STOCK_UI = state == true;
-        if USE_STOCK_UI then
-            if LootFrame then
-                LootFrame:RegisterEvent("LOOT_OPENED");
-                LootFrame:RegisterEvent("LOOT_CLOSED");
-            end
-
-            if not MainFrame.inEditMode then
-                MainFrame:Disable();
-            end
-
-            EL:ListenAlertSystemEvent(false);
-        else
-            if LootFrame then
-                LootFrame:UnregisterEvent("LOOT_OPENED");
-                LootFrame:UnregisterEvent("LOOT_CLOSED");
-            end
-
-            if REPLACE_LOOT_ALERT then
-                EL:ListenAlertSystemEvent(true);
-            end
-        end
-    end
-    addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseStockUI", SettingChanged_UseStockUI);
 
 
     local function OptionToggle_OnClick(self, button)

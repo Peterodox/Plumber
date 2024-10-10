@@ -290,7 +290,7 @@ do  --UI ItemButton
                         end
                         f.IconOverlay:Show();
                         self:SetBorderColor(1, 195/255, 41/255);
-                    elseif data.craftQuality ~= 0 then
+                    elseif data.craftQuality and data.craftQuality ~= 0 then
                         f.IconOverlay:SetTexCoord((data.craftQuality - 1) * 0.125, data.craftQuality * 0.125, 0, 0.125);
                         f.IconOverlay:Show();
                     elseif data.id then
