@@ -1,6 +1,4 @@
 local _, addon = ...
-if not addon.IsGame_11_0_0 then return end;
-
 local API = addon.API;
 local L = addon.L;
 

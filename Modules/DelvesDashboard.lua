@@ -1,6 +1,4 @@
 local _, addon = ...
-if not addon.IsGame_11_0_2 then return end;
-
 local L = addon.L;
 local API = addon.API;
 local InCombatLockdown = InCombatLockdown;

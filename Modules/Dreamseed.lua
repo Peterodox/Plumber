@@ -9,10 +9,6 @@
 --  Taking off on Dragon with "Skyward Ascent (372610)" doesn't trigger "PLAYER_STARTED_MOVING", so we need to watch "UNIT_SPELLCAST_SUCCEEDED"
 
 local _, addon = ...
-if not addon.IsGame_10_2_0 then
-    return
-end
-
 local API = addon.API;
 local GetPlayerMapCoord = API.GetPlayerMapCoord;
 local GetCreatureIDFromGUID = API.GetCreatureIDFromGUID;

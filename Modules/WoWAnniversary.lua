@@ -22,28 +22,31 @@ local QUICKSLOT_NAME = "mount_maniac";
 
 function EL:UpdateMountButton()
     local widgetInfo = GetSpellDisplayVisualizationInfo(WIDGET_ID_MOUNT_MANIAC_MOUNT);
-    if (widgetInfo and widgetInfo.spellInfo and widgetInfo.spellInfo.spellID) then
+    if (widgetInfo and widgetInfo.spellInfo and widgetInfo.spellInfo.spellID and widgetInfo.spellInfo.shownState ~= 0) then
         local mountID = GetMountFromSpell(widgetInfo.spellInfo.spellID);
         if mountID then
             local name, spellID, icon, isActive, isUsable, sourceType, isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected = GetMountInfoByID(mountID);
 
+            local title, colorizedName;
+            if isCollected then
+                title = "|TInterface/AddOns/Plumber/Art/Button/Checkmark-Green-Shadow:16:16:-4:-2|t"..name;
+                colorizedName = "|cffffd100"..name.."|r";
+            else
+                title = "|TInterface/AddOns/Plumber/Art/Button/RedCross-Shadow:16:16:-4:-2|t"..name;
+                colorizedName = "|cff999999"..name.."|r";
+            end
+
             local data = {
                 buttons = {
-                    {actionType = "spell", spellID = spellID, icon = icon, name = name, macroText = "/cast "..name, enabled = isCollected},
+                    {actionType = "spell", spellID = spellID, icon = icon, name = colorizedName, macroText = "/cast "..name, enabled = isCollected},
                 },
                 systemName = QUICKSLOT_NAME,
                 spellcastType = 1,      --Cast
             };
 
-            if isCollected then
-                name = "|TInterface/AddOns/Plumber/Art/Button/Checkmark-Green-Shadow:16:16:-4:-2|t"..name;
-            else
-                name = "|TInterface/AddOns/Plumber/Art/Button/RedCross-Shadow:16:16:-4:-2|t"..name;
-            end
-
             QuickSlot:SetButtonData(data);
             QuickSlot:ShowUI();
-            QuickSlot:SetHeaderText(name, true);
+            QuickSlot:SetHeaderText(title, true);
             QuickSlot:SetDefaultHeaderText(name);
 
             return true
@@ -185,6 +188,30 @@ do
     end
 
     EnableModule(true);
+
+
+
+    local function ValidityCheck()
+        if addon.IsToCVersionEqualOrNewerThan(110005) then
+            return true
+        end
+
+        return time() > 1729400000
+    end
+
+
+    local moduleData = {
+        name = addon.L["ModuleName WoWAnniversary"],
+        dbKey = "WoWAnniversary",
+        description = addon.L["ModuleDescription WoWAnniversary"],
+        toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 1150,
+        moduleAddedTime = 1729500000,
+        validityCheck = ValidityCheck,
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
 end
 
 

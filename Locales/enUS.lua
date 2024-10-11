@@ -194,9 +194,13 @@ L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
 L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
 
 
+L["ModuleName WoWAnniversary"] = "WoW Anniversary";
+L["ModuleDescription WoWAnniversary"] = "- Summon the corresponding mount easily during the Mount Maniac event.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
-L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
+L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
 L["Take All"] = "Take All";     --Take all items from a loot window
 L["You Received"] = YOU_RECEIVED_LABEL or "You recieved";
 L["Reach Currency Cap"] = "Reached currency caps";

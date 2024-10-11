@@ -351,12 +351,23 @@ function QuickSlot:Init()
     Header:SetShadowColor(0, 0, 0);
     Header:SetShadowOffset(1, -1);
 
+    --[[
     local HeaderShadow = self:CreateTexture(nil, "ARTWORK");
     HeaderShadow:SetPoint("TOPLEFT", Header, "TOPLEFT", -8, 6);
     HeaderShadow:SetPoint("BOTTOMRIGHT", Header, "BOTTOMRIGHT", 8, -8);
     HeaderShadow:SetTexture("Interface/AddOns/Plumber/Art/Button/GenericTextDropShadow");
     HeaderShadow:Hide();
     HeaderShadow:SetAlpha(0);
+    --]]
+
+    local HeaderShadow = self:CreateTexture(nil, "ARTWORK");
+    HeaderShadow:SetTexture("Interface/AddOns/Plumber/Art/Frame/SubtitleShadow_NineSlice_Darker");
+    HeaderShadow:SetTextureSliceMargins(30, 30, 30, 30);
+    HeaderShadow:SetTextureSliceMode(0);
+    HeaderShadow:Hide();
+    HeaderShadow:SetAlpha(0);
+    HeaderShadow:SetPoint("TOPLEFT", Header, "TOPLEFT", -16, 16);
+    HeaderShadow:SetPoint("BOTTOMRIGHT", Header, "BOTTOMRIGHT", 16, -16);
 
     function QuickSlot:SetHeaderText(text, transparentText)
         if self:IsInEditMode() then return end;

@@ -2,11 +2,6 @@
 
 local _, addon = ...
 
-if not addon.IsGame_11_0_2 then
-    return
-end
-
-
 local GetCreatureIDFromGUID = addon.API.GetCreatureIDFromGUID;
 local TokenDisplay;
 local TimerFrame;

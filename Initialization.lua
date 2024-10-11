@@ -99,7 +99,7 @@ local DefaultValues = {
     TooltipRepTokens = true,            --Show faction info for items that grant rep
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
-
+    WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
 
     --Custom Loot Window
     LootUI = false,
@@ -188,7 +188,8 @@ do
     local tocVersion = select(4, GetBuildInfo());
     tocVersion = tonumber(tocVersion or 0);
 
-    addon.IsGame_10_2_0 = tocVersion >= 100200;
-    addon.IsGame_11_0_0 = tocVersion >= 110000;
-    addon.IsGame_11_0_2 = tocVersion >= 110002;
+    local function IsToCVersionEqualOrNewerThan(targetVersion)
+        return tocVersion >= targetVersion
+    end
+    addon.IsToCVersionEqualOrNewerThan = IsToCVersionEqualOrNewerThan;
 end

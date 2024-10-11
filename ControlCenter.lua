@@ -27,11 +27,8 @@ local CATEGORY_ORDER = {
 
 
 local DEFAULT_COLLAPSED_CATEGORY = {
+    [10020000] = true;
 };
-
-if addon.IsGame_11_0_0 then
-    DEFAULT_COLLAPSED_CATEGORY[10020000] = true;
-end
 
 
 local ControlCenter = CreateFrame("Frame", nil, UIParent);
