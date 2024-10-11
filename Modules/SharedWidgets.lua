@@ -4133,6 +4133,10 @@ do  --EditMode
             if self:IsShown() and not(self.parent:IsFocused() or IsMouseOverOptionToggle()) then
                 self:ShowHighlighted();
                 self.parent:ShowOptions(false);
+
+                if self.parent.ExitEditMode and not API.IsInEditMode() then
+                    self.parent:ExitEditMode();
+                end
             end
         end
     end

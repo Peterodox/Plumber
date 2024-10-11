@@ -53,7 +53,7 @@ local FORCE_AUTO_LOOT = true;
 local AUTO_LOOT_ENABLE_TOOLTIP = true;
 local FADE_DELAY_PER_ITEM = 0.25;
 local REPLACE_LOOT_ALERT = true;
-local LOOT_UNDER_MOUSE = true;
+local LOOT_UNDER_MOUSE = false;
 local USE_STOCK_UI = false;
 ------------------
 
@@ -1563,8 +1563,10 @@ do
             if f then
                 if STOCK_UI_MUTED then
                     STOCK_UI_MUTED = false;
-                    f:RegisterEvent("LOOT_OPENED");
-                    f:RegisterEvent("LOOT_CLOSED");
+                    if not C_AddOns.IsAddOnLoaded("Xloot") then
+                        f:RegisterEvent("LOOT_OPENED");
+                        f:RegisterEvent("LOOT_CLOSED");
+                    end
                 end
             end
 

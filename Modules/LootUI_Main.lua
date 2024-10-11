@@ -458,7 +458,6 @@ do  --UI ItemButton
         if data.classID == 15 and data.subclassID == 4 then
             API.InquiryOpenableItem(data.id, function(bag, slot)
                 self:ShowGlow(true);
-                print(bag, slot)
             end);
         end
     end
