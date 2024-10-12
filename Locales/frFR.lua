@@ -194,32 +194,38 @@ L["ModuleName Delves_SeasonProgress"] = "Périple du Gouffre";
 L["ModuleDescription Delves_SeasonProgress"] = "Affiche une barre de progression en haut de l'écran lorsque vous progressez dans le périple du Gouffre.";
 
 
+--WoW Anniversary
+L["ModuleName WoWAnniversary"] = "Anniversaire de WoW";
+L["ModuleDescription WoWAnniversary"] = "- Summon the corresponding mount easily during the Mount Maniac event.\n\n- Show voting results during the Fashion Frenzy event. ";
+L["Voting Result Header"] = "Resultats";
+
+
 --Loot UI
-L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
-L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
-L["Take All"] = "Take All";     --Take all items from a loot window
-L["You Received"] = YOU_RECEIVED_LABEL or "You recieved";
-L["Reach Currency Cap"] = "Reached currency caps";
-L["Sample Item 4"] = "Awesome Epic Item";
-L["Sample Item 3"] = "Awesome Rare Item";
-L["Sample Item 2"] = "Awesome Uncommon Item";
-L["Sample Item 1"] = "Common Item";
-L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
-L["Manual Loot Instruction Format"] = "To temporarily cancel auto loot on a specific pickup, press and hold |cffffffff%s|r key until the loot window appears.";
-L["LootUI Option Force Auto Loot"] = "Force Auto Loot";
-L["LootUI Option Force Auto Loot Tooltip"] = "Always enable Auto Loot to counter the occasional auto loot failure.";
-L["LootUI Option Owned Count"] = "Show Number Of Owned Items";
-L["LootUI Option New Transmog"] = "Mark Uncollected Appearance";
-L["LootUI Option New Transmog Tooltip"] = "Add a marker %s if you have not collected the item's appearance.";
-L["LootUI Option Use Hotkey"] = "Press Key To Take All Items";
-L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Looting mode, press the following hotkey to take all items.";
-L["LootUI Option Fade Delay"] = "Fade Out Delay Per Item";
-L["LootUI Option Replace Default"] = "Replace Default Loot Alert";
-L["LootUI Option Replace Default Tooltip"] = "Replace the default loot alerts that usually appear above the action bars.";
-L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window at Mouse";
-L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r mode, the window will appear under the current mouse location";
+L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Fenêtre de butin";
+L["ModuleDescription LootUI"] = "Remplace la fenêtre de butin par défaut et offre des fonctionnalités optionnelles :\n\n- Récupérer les objets rapidement\n\n- Corriger le bug d'échec du butin automatique.\n\n- Afficher un bouton Tout prendre lors du butin manuel.";
+L["Take All"] = "Tout prendre";     --Take all items from a loot window
+L["You Received"] = YOU_RECEIVED_LABEL or "Vous avez reçu";
+L["Reach Currency Cap"] = "Plafond de devise atteint";
+L["Sample Item 4"] = "Objet épique génial";
+L["Sample Item 3"] = "Objet rare génial";
+L["Sample Item 2"] = "Objet peu commun génial";
+L["Sample Item 1"] = "Objet commun";
+L["EditMode LootUI"] =  "Plumber : "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Fenêtre de butin");
+L["Manual Loot Instruction Format"] = "Pour annuler temporairement le butin automatique sur un objet spécifique, maintenez la touche |cffffffff%s|r jusqu'à ce que la fenêtre de butin apparaisse.";
+L["LootUI Option Force Auto Loot"] = "Forcer le butin automatique";
+L["LootUI Option Force Auto Loot Tooltip"] = "Toujours activer le butin automatique pour contrer les échecs occasionnels.";
+L["LootUI Option Owned Count"] = "Affiche le nombre d'objets possédés";
+L["LootUI Option New Transmog"] = "Marquer l'apparence non collectée";
+L["LootUI Option New Transmog Tooltip"] = "Ajouter un marqueur %s si vous n'avez pas collecté l'apparence de l'objet.";
+L["LootUI Option Use Hotkey"] = "Appuyer sur une touche pour tout prendre";
+L["LootUI Option Use Hotkey Tooltip"] = "En mode butin manuel, appuyez sur la touche suivante pour tout prendre.";
+L["LootUI Option Fade Delay"] = "Délai d'estompage par objet";
+L["LootUI Option Replace Default"] = "Remplacer l'alerte de butin par défaut";
+L["LootUI Option Replace Default Tooltip"] = "Remplace les alertes de butin par défaut qui apparaissent généralement au-dessus des barres d'action.";
+L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Ouvrir la fenêtre de butin à la souris";
+L["LootUI Option Loot Under Mouse Tooltip"] = "En mode |cffffffffButin manuel|r, la fenêtre apparaîtra sous la position actuelle de la souris";
 L["LootUI Option Use Default UI"] = "Utiliser la fenêtre de butin par défaut";
-L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
+L["LootUI Option Use Default UI Tooltip"] = "Utiliser la fenêtre de butin par défaut de WoW.\n\n|cffff4800Activer cette option annule tous les réglage
 
 
 --Generic
@@ -231,7 +237,7 @@ L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Réinitialiser
 
 L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renom ";  --There is a space
 L["Paragon Reputation"] = "Paragon";
-L["Level Maxed"] = "(Maxed)";   --Reached max level
+L["Level Maxed"] = "(Maximum)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Actuel:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Vous avez des récompenses non réclamées";
 
@@ -256,7 +262,7 @@ L["Delve Chest 1 Rare"] = "Coffre abondant";   --We'll use the GameObjectID once
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Gouffres abondants";
-L["Special Assignment"] = "Assignations spéciales";
+L["Special Assignment"] = "Missions spéciales";
 
 
 L["Match Pattern Gold"] = "([%d%,]+) Or";
