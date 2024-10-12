@@ -19,6 +19,7 @@ local GetCursorPosition = GetCursorPosition;
 -- User Settings
 local SHOW_ITEM_COUNT = true;
 local USE_HOTKEY = true;
+local TAKE_ALL_KEY = "E";
 local TAKE_ALL_MODIFIER_KEY = nil;  --"LALT"
 local USE_MOG_MARKER = true;
 local AUTO_LOOT_ENABLE_TOOLTIP = true;
@@ -909,7 +910,11 @@ do  --UI Generic Button (Hotkey Button)
     function UIButtonMixin:SetHotkey(key)
         if key then
             self.hotkeyName = key;
-            self.HotkeyFrame.Hotkey:SetText(key);
+            if API.GetModifierKeyName(key) ~= nil then
+                self.HotkeyFrame.Hotkey:SetText(API.GetModifierKeyName(key));
+            else
+                self.HotkeyFrame.Hotkey:SetText(key);
+            end
             self.HotkeyFrame:Show();
         else
             self.hotkeyName = nil;
@@ -937,7 +942,7 @@ do  --UI Generic Button (Hotkey Button)
             local bgHeight = Formatter.BASE_FONT_SIZE + 2*bgPadding;
             local bgWidth;
             if string.len(self.hotkeyName) > 1 then
-                bgWidth = self.Hotkey:GetUnboundedStringWidth() + 2*bgPadding;
+                bgWidth = self.HotkeyFrame.Hotkey:GetUnboundedStringWidth() + 2*bgPadding;
             else
                 bgWidth = bgHeight;
             end
@@ -1057,7 +1062,7 @@ do  --TakeAllButton
 
     function TakeAllButtonMixin:UpdateHotKey()
         if USE_HOTKEY then
-            self:SetHotkey("E");
+            self:SetHotkey(TAKE_ALL_KEY);
         else
             self:SetHotkey(nil);
         end
@@ -1586,6 +1591,26 @@ do  --Callback Registery
         USE_MOG_MARKER = state;
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_NewTransmogIcon", SettingChanged_NewTransmogIcon);
+
+    local function SettingChanged_HotkeyName(value, userInput)
+        if not (value and type("value") == "string") then
+            value = nil;
+        end
+        TAKE_ALL_KEY = value;
+        if API.GetModifierKeyName(value) ~= nil then
+            TAKE_ALL_MODIFIER_KEY = value;
+        else
+            TAKE_ALL_MODIFIER_KEY = nil;
+        end
+
+        if userInput then
+            local button = MainFrame.TakeAllButton;
+            if button then
+                button:UpdateHotKey();
+            end
+        end
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_HotkeyName", SettingChanged_HotkeyName);
 end
 
 

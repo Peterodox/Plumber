@@ -1736,6 +1736,29 @@ do  --System
     else
         API.GetMouseFocus = GetMouseFocus;
     end
+
+
+    local ModifierKeyName = {
+        LSHIFT = "Shift",
+        LCTRL = "Ctrl",
+        LALT = "Alt",
+    };
+
+    if IsMacClient and IsMacClient() then
+        --Mac OS
+        ModifierKeyName.LCTRL = "Command";
+        ModifierKeyName.LALT = "Option";
+    end
+
+    ModifierKeyName.RSHIFT = ModifierKeyName.LSHIFT;
+    ModifierKeyName.RCTRL = ModifierKeyName.LCTRL;
+    ModifierKeyName.RALT = ModifierKeyName.LALT;
+
+    API.GetModifierKeyName = function(key)
+        if key and ModifierKeyName[key] then
+            return ModifierKeyName[key]
+        end
+    end
 end
 
 do  --Player
