@@ -710,10 +710,6 @@ do
         end
     end
 
-    EnableModule(true);
-
-
-
     local function ValidityCheck()
         if addon.IsToCVersionEqualOrNewerThan(110005) then
             return true
@@ -721,7 +717,6 @@ do
 
         return time() > 1729400000
     end
-
 
     local moduleData = {
         name = L["ModuleName WoWAnniversary"],
