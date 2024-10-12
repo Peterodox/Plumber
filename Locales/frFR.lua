@@ -7,10 +7,10 @@ local L = addon.L;
 
 
 --Module Control Panel
-L["Module Control"] = "Module Control";
-L["Quick Slot Generic Description"] = "\n\n*Quick Slot is a set of clickable buttons that appear under certain conditions.";
-L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
-L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map - Map Filter - Plumber";
+L["Module Control"] = "Contrôle du module";
+L["Quick Slot Generic Description"] = "\n\n*L'emplacement rapide est un ensemble de boutons cliquables qui apparaissent sous certaines conditions.";
+L["Restriction Combat"] = "Ne fonctionne pas en combat";   --Indicate a feature can only work when out of combat
+L["Map Pin Change Size Method"] = "\n\n*Vous pouvez changer la taille du marqueur dans la carte du monde - Filtre de carte - Plumber";
 
 
 --Module Categories
@@ -27,12 +27,12 @@ L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge 
 
 --Deprecated
 L["Module Category Dreamseeds"] = "Graine onirique";     --Added in patch 10.2.0
-L["Module Category AzerothianArchives"] = "Azerothian Archives";     --Added in patch 10.2.5
+L["Module Category AzerothianArchives"] = "Archives d'Azeroth";     --Added in patch 10.2.5
 
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Rejoindre automatiquement les événements";
-L["ModuleDescription AutoJoinEvents"] = "Sélectionnez automatiquement (Commencer la Faille Temporelle) lorsque vous interagissez avec Soridormi pendant l'événement.";
+L["ModuleDescription AutoJoinEvents"] = "Sélectionne automatiquement (Commencer la Faille Temporelle) lorsque vous interagissez avec Soridormi pendant l'événement.";
 
 
 --BackpackItemTracker
@@ -55,13 +55,13 @@ L["Track Upgrade Currency Tooltip"] = "Épinglez l'emblème de plus haut niveau 
 L["Track Holiday Item"] = "Suivre la monnaie des événements saisonniers";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Actuellement épinglé :";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Barre à l'intérieur du sac";     --Put the bar inside the bag UI (below money/currency)
-L["Bar Inside The Bag Tooltip"] = "Placez la barre à l'intérieur de l'interface du sac.\n\nCela ne fonctionne que dans le mode Sacs Séparés de Blizzard.";
+L["Bar Inside The Bag Tooltip"] = "Place la barre à l'intérieur de l'interface du sac.\n\nCela ne fonctionne que dans le mode Sacs Séparés de Blizzard.";
 L["Catalyst Charges"] = "Charges du Catalyseur";
 
 
 --GossipFrameMedal
 L["ModuleName GossipFrameMedal"] = "Médaille de course de Vol à dos de dragon";
-L["ModuleDescription GossipFrameMedal Format"] = "Remplacez l'icône par défaut %s par la médaille %s que vous gagnez.\n\nCela peut prendre un moment pour obtenir vos enregistrements lorsque vous interagissez avec le PNJ.";
+L["ModuleDescription GossipFrameMedal Format"] = "Remplace l'icône par défaut %s par la médaille %s que vous gagnez.\n\nCela peut prendre un moment pour obtenir vos enregistrements lorsque vous interagissez avec le PNJ.";
 
 
 --DruidModelFix (Disabled after 10.2.0)
@@ -70,7 +70,7 @@ L["ModuleDescription DruidModelFix"] = "Corrige le problème d'affichage du mod�
 
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
-L["ModuleName PlayerChoiceFrameToken"] = "Interface de choix : Coût des objets";
+L["ModuleName PlayerChoiceFrameToken"] = "Choix de l'interface : Coût des objets";
 L["ModuleDescription PlayerChoiceFrameToken"] = "Affiche combien d'objets il faut pour compléter une certaine action dans l'interface de choix du joueur.\n\nActuellement, ne prend en charge que les événements dans The War Within.";
 
 
@@ -81,13 +81,13 @@ L["ModuleDescription EmeraldBountySeedList"] = "Affiche une liste des Graines on
 
 --WorldMapPin: SeedPlanting (Add pins to WorldMapFrame which display soil locations and growth cycle/progress)
 L["ModuleName WorldMapPinSeedPlanting"] = "Marqueur de carte : Graines oniriques";
-L["ModuleDescription WorldMapPinSeedPlanting"] = "Affichez les emplacements des Graines oniriques et leurs cycles de croissance sur la carte du monde."..L["Map Pin Change Size Method"].."\n\n|cffd4641cActiver ce module supprimera le marqueur de carte par défaut pour Émeraude Bounty, ce qui peut affecter le comportement d'autres addons.";
+L["ModuleDescription WorldMapPinSeedPlanting"] = "Affiche les emplacements des Graines oniriques et leurs cycles de croissance sur la carte du monde."..L["Map Pin Change Size Method"].."\n\n|cffd4641cActiver ce module supprimera le marqueur de carte par défaut pour Émeraude Bounty, ce qui peut affecter le comportement d'autres addons.";
 L["Pin Size"] = "Taille du marqueur";
 
 
 --PlayerChoiceUI: Dreamseed Nurturing (PlayerChoiceFrame Revamp)
-L["ModuleName AlternativePlayerChoiceUI"] = "Interface de choix : Entretien de la Graine onirique";
-L["ModuleDescription AlternativePlayerChoiceUI"] = "Remplacez l'interface de la Graine onirique par défaut par une interface moins bloquante, affiche le nombre d'objets que vous possédez et de contribuer automatiquement en cliquant et en maintenant le bouton.";
+L["ModuleName AlternativePlayerChoiceUI"] = "Choix de l'interface : Manne d'émeraude";
+L["ModuleDescription AlternativePlayerChoiceUI"] = "Remplace l'interface de la Graine onirique par défaut par une interface moins bloquante, affiche le nombre d'objets que vous possédez et de contribuer automatiquement en cliquant et en maintenant le bouton.";
 
 
 --HandyLockpick (Right-click a lockbox in your bag to unlock when you are not in combat. Available to rogues and mechagnomes)
@@ -98,27 +98,27 @@ L["Instruction Pick Lock"] = "<Cliquez droit pour crocheter>";
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
 L["ModuleName BlizzFixEventToast"] = "Correction de Blizzard : Toast d'événement";
-L["ModuleDescription BlizzFixEventToast"] = "Modifiez le comportement des toasts d'événement pour qu'ils ne bloquent pas vos clics de souris. Permet également de cliquer droit sur le toast pour le fermer immédiatement.\n\n*Les toasts d'événement sont des bannières qui apparaissent en haut de l'écran lorsque vous complétez certaines activités.";
+L["ModuleDescription BlizzFixEventToast"] = "Modifie le comportement des toasts d'événement pour qu'ils ne bloquent pas vos clics de souris. Permet également de cliquer droit sur le toast pour le fermer immédiatement.\n\n*Les toasts d'événement sont des bannières qui apparaissent en haut de l'écran lorsque vous complétez certaines activités.";
 
 
 --Talking Head
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Tête parlante";
-L["ModuleDescription TalkingHead"] = "Remplacez l'interface par défaut de la Tête parlante par une interface propre, sans tête.";
+L["ModuleDescription TalkingHead"] = "Remplace l'interface par défaut de la Tête parlante par une interface propre, sans tête.";
 L["EditMode TalkingHead"] = "Plumber : "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Texte instantané";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Contour du texte";   --Added a stroke/outline to the letter
-L["TalkingHead Option Condition Header"] = "Masquer les textes provenant de la source :";
+L["TalkingHead Option Condition Header"] = "Masque les textes provenant de la source :";
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Quêtes mondiales";
-L["TalkingHead Option Condition WorldQuest Tooltip"] = "Masquez la transcription si elle provient d'une quête mondiale.\nParfois, la Tête parlante est déclenchée avant d'accepter la quête mondiale, et nous ne pourrons pas la masquer.";
+L["TalkingHead Option Condition WorldQuest Tooltip"] = "Masque la transcription si elle provient d'une quête mondiale.\nParfois, la Tête parlante est déclenchée avant d'accepter la quête mondiale, et nous ne pourrons pas la masquer.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
-L["TalkingHead Option Condition Instance Tooltip"] = "Masquez la transcription lorsque vous êtes dans une instance.";
+L["TalkingHead Option Condition Instance Tooltip"] = "Masque la transcription lorsque vous êtes dans une instance.";
 L["TalkingHead Option Below WorldMap"] = "Send To Back When Map Opened";
 L["TalkingHead Option Below WorldMap Tooltip"] = "Send the Talking Head to the back when you open the World Map so it doesn't block it.";
 
 
 --AzerothianArchives
 L["ModuleName Technoscryers"] = "Emplacement rapide : Divinobidules";
-L["ModuleDescription Technoscryers"] = "Affichez un bouton pour enfiler le Divinobidules lorsque vous effectuez une quête mondiale sur la La bidulodivination."..L["Quick Slot Generic Description"];
+L["ModuleDescription Technoscryers"] = "Affiche un bouton pour enfiler le Divinobidules lorsque vous effectuez une quête mondiale sur la La bidulodivination."..L["Quick Slot Generic Description"];
 
 
 --Navigator(Waypoint/SuperTrack) Shared Strings
@@ -126,21 +126,21 @@ L["Priority"] = "Priorité";
 L["Priority Default"] = "Par défaut";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
 L["Priority Default Tooltip"] = "Suivre les paramètres par défaut de WoW. Prioriser les quêtes, les cadavres, les emplacements des vendeurs si possible. Sinon, commencer à suivre les graines actives.";
 L["Stop Tracking"] = "Arrêter le suivi";
-L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "Cliquez gauche pour suivre les emplacements";
-L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "Cliquez gauche pour suivre dans TomTom";
+L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "Clique gauche pour suivre les emplacements";
+L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "Clique gauche pour suivre dans TomTom";
 
 
 --Navigator_Dreamseed (Use Super Tracking to navigate players)
-L["ModuleName Navigator_Dreamseed"] = "Navigateur : Graines oniriques";
-L["ModuleDescription Navigator_Dreamseed"] = "Utilisez le système de point de passage pour vous guider vers les Graines oniriques.\n\n*Clic droit sur l'indicateur de position (le cas échéant) pour plus d'options.\n\n|cffd4641cLes points de passage par défaut du jeu seront remplacés lorsque vous êtes dans le Rêve d'émeraude.\n\nL'indicateur de position de la graine peut être remplacé par des quêtes.|r";
+L["ModuleName Navigator_Dreamseed"] = "Navigation : Graines oniriques";
+L["ModuleDescription Navigator_Dreamseed"] = "Utilise le système de point de passage pour vous guider vers les Graines oniriques.\n\n*Clic droit sur l'indicateur de position (le cas échéant) pour plus d'options.\n\n|cffd4641cLes points de passage par défaut du jeu seront remplacés lorsque vous êtes dans le Rêve d'émeraude.\n\nL'indicateur de position de la graine peut être remplacé par des quêtes.|r";
 L["Priority New Seeds"] = "Trouver de nouvelles graines";
 L["Priority Rewards"] = "Collecter les récompenses";
-L["Stop Tracking Dreamseed Tooltip"] = "Arrêter le suivi des graines jusqu'à ce que vous cliquiez gauche sur un marqueur de carte.";
+L["Stop Tracking Dreamseed Tooltip"] = "Arrête le suivi des graines jusqu'à ce que vous cliquiez gauche sur un marqueur de carte.";
 
 
 --BlizzFixWardrobeTrackingTip (Permanently disable the tip for wardrobe shortcuts)
 L["ModuleName BlizzFixWardrobeTrackingTip"] = "Correction de Blizzard : Astuce pour la garde-robe";
-L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Masquez le tutoriel pour les raccourcis de la garde-robe.";
+L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Masque le tutoriel pour les raccourcis de la garde-robe.";
 
 
 --Rare/Location Announcement
@@ -156,12 +156,12 @@ L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Vert";
 
 --Tooltip Chest Keys
 L["ModuleName TooltipChestKeys"] = "Infobulle : Clés de coffre";
-L["ModuleDescription TooltipChestKeys"] = "Affichez des informations sur la clé nécessaire pour ouvrir le coffre ou la porte actuelle.";
+L["ModuleDescription TooltipChestKeys"] = "Affiche des informations sur la clé nécessaire pour ouvrir le coffre ou la porte actuelle.";
 
 
 --Tooltip Reputation Tokens
-L["ModuleName TooltipRepTokens"] = "Tooltip: Reputation Tokens";
-L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increase reputation.";
+L["ModuleName TooltipRepTokens"] = "Infobulle : jeton de réputation";
+L["ModuleDescription TooltipRepTokens"] = "Affiche les informations sur la faction si l'objet peut être utilisé pour augmenter la réputation.";
 
 
 --Merchant UI Price
@@ -175,23 +175,23 @@ L["Number Millions"] = "M";     --1.5M 1,500,000
 
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Résumé de Khaz Algar";
-L["ModuleDescription ExpansionLandingPage"] = "Affichez des informations supplémentaires sur la page de destination :\n\n- Niveau du Pacte des Fils brisés";
+L["ModuleDescription ExpansionLandingPage"] = "Affiche des informations supplémentaires sur la page de destination :\n\n- Niveau du Pacte des Fils tranchés";
 L["Instruction Track Reputation"] = "<Maj + clic pour suivre cette réputation>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Maj + clic pour arrêter le suivi>";
 
 
 --WorldMapPin_TWW (Show Pins On Continent Map)
 L["ModuleName WorldMapPin_TWW"] = "Marqueur de carte : "..(EXPANSION_NAME10 or "The War Within");
-L["ModuleDescription WorldMapPin_TWW"] = "Affichez des marqueurs supplémentaires sur la carte du continent de Khaz Algar :\n\n- %s\n\n- %s";  --We'll replace %s with locales (See Map Pin Filter Name at the bottom)
+L["ModuleDescription WorldMapPin_TWW"] = "Affiche des marqueurs supplémentaires sur la carte du continent de Khaz Algar :\n\n- %s\n\n- %s";  --We'll replace %s with locales (See Map Pin Filter Name at the bottom)
 
 
 --Delves
 L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Tier %s";
-L["Item Level Format"] = ITEM_LEVEL or "Item Level %d";
+L["Item Level Format"] = ITEM_LEVEL or "Niveau d'objet %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
-L["Delves Reputation Name"] = "Delver's Journey";
-L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
-L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
+L["Delves Reputation Name"] = "Périple du Gouffre";
+L["ModuleName Delves_SeasonProgress"] = "Périple du Gouffre";
+L["ModuleDescription Delves_SeasonProgress"] = "Affiche une barre de progression en haut de l'écran lorsque vous progressez dans le périple du Gouffre.";
 
 
 --Loot UI
@@ -218,7 +218,7 @@ L["LootUI Option Replace Default"] = "Replace Default Loot Alert";
 L["LootUI Option Replace Default Tooltip"] = "Replace the default loot alerts that usually appear above the action bars.";
 L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window at Mouse";
 L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r mode, the window will appear under the current mouse location";
-L["LootUI Option Use Default UI"] = "Use Default Loot Window";
+L["LootUI Option Use Default UI"] = "Utiliser la fenêtre de butin par défaut";
 L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
 
 
@@ -229,11 +229,11 @@ L["Reposition Button Tooltip"] = "Cliquez gauche et faites glisser pour déplace
 L["Font Size"] = FONT_SIZE or "Taille de la police";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Réinitialiser à la position par défaut";
 
-L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renown ";  --There is a space
+L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renom ";  --There is a space
 L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
-L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
-L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
+L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Actuel:";
+L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Vous avez des récompenses non réclamées";
 
 
 
@@ -255,13 +255,13 @@ L["Delve Chest 1 Rare"] = "Coffre abondant";   --We'll use the GameObjectID once
 
 
 --Map Pin Filter Name (name should be plural)
-L["Bountiful Delve"] =  "Delves abondants";
+L["Bountiful Delve"] =  "Gouffres abondants";
 L["Special Assignment"] = "Assignations spéciales";
 
 
-L["Match Pattern Gold"] = "([%d%,]+) Gold";
-L["Match Pattern Silver"] = "([%d]+) Silver";
-L["Match Pattern Copper"] = "([%d]+) Copper";
+L["Match Pattern Gold"] = "([%d%,]+) Or";
+L["Match Pattern Silver"] = "([%d]+) Argent";
+L["Match Pattern Copper"] = "([%d]+) Cuivre";
 
 L["Match Patter Rep 1"] = "Réputation de votre bataillon auprès de la faction (.+) augmentée de ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Patter Rep 2"] = "Réputation auprès de la faction (.+) augmentée de ([%d%,]+)";   --FACTION_STANDING_INCREASED
