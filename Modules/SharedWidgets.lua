@@ -574,6 +574,68 @@ do  -- Common Frame with Header (and close button)
     end
 
     addon.CreateHeaderFrame = CreateHeaderFrame;
+
+
+    local ExpandCollapseButtonMixin = {};
+
+    function ExpandCollapseButtonMixin:OnClick()
+        local parent = self:GetParent();
+        if parent.ToggleExpanded then
+            parent:ToggleExpanded();
+        end
+    end
+
+    function ExpandCollapseButtonMixin:ShowNormalTexture()
+        if self.expanded then
+            self.Texture:SetTexCoord(0, 0.15625, 0, 0.15625);
+        else
+            self.Texture:SetTexCoord(0, 0.15625, 0.15625, 0.3125);
+        end
+    end
+
+    function ExpandCollapseButtonMixin:ShowPushedTexture()
+        if self.expanded then
+            self.Texture:SetTexCoord(0.15625, 0.3125, 0, 0.15625);
+        else
+            self.Texture:SetTexCoord(0.15625, 0.3125, 0.15625, 0.3125);
+        end
+    end
+
+    function ExpandCollapseButtonMixin:SetExpanded(state)
+        self.expanded = state;
+        self:ShowNormalTexture();
+    end
+
+    local function CreateExpandCollapseButton(parent)
+        local b = CreateFrame("Button", nil, parent);
+        b:SetSize(BUTTON_MIN_SIZE, BUTTON_MIN_SIZE);
+
+        Mixin(b, ExpandCollapseButtonMixin);
+
+        b.Texture = b:CreateTexture(nil, "ARTWORK");
+        b.Texture:SetTexture("Interface/AddOns/Plumber/Art/Button/ExpandCollapseButton");
+        b.Texture:SetPoint("CENTER", b, "CENTER", 0, 0);
+        b.Texture:SetSize(20, 20);
+        DisableSharpening(b.Texture);
+
+        b.Highlight = b:CreateTexture(nil, "HIGHLIGHT");
+        b.Highlight:SetTexture("Interface/AddOns/Plumber/Art/Button/ExpandCollapseButton");
+        b.Highlight:SetBlendMode("ADD");
+        b.Highlight:SetPoint("CENTER", b, "CENTER", 0, 0);
+        b.Highlight:SetSize(20, 20);
+        b.Highlight:SetTexCoord(0.3125, 0.46875, 0, 0.15625);
+        b.Highlight:SetVertexColor(0.8, 0.8, 0.8);
+
+        b:SetExpanded(true);
+
+        b:SetScript("OnClick", b.OnClick);
+        b:SetScript("OnMouseUp", b.ShowNormalTexture);
+        b:SetScript("OnMouseDown", b.ShowPushedTexture);
+        b:SetScript("OnShow", b.ShowNormalTexture);
+
+        return b
+    end
+    addon.CreateExpandCollapseButton = CreateExpandCollapseButton;
 end
 
 do  -- TokenFrame   -- Money   -- Coin

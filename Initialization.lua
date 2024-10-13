@@ -100,6 +100,7 @@ local DefaultValues = {
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
     WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
+        VotingResultsExpanded = true,
 
     --Custom Loot Window
     LootUI = false,

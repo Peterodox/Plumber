@@ -21,6 +21,7 @@ local GetSpellDisplayVisualizationInfo = C_UIWidgetManager.GetSpellDisplayVisual
 local GetTextWithStateWidgetVisualizationInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo;
 local GetMountFromSpell = C_MountJournal.GetMountFromSpell;
 local GetMountInfoByID = C_MountJournal.GetMountInfoByID;
+local GetMountInfoExtraByID = C_MountJournal.GetMountInfoExtraByID;
 local GetBuffDataByIndex = C_UnitAuras.GetBuffDataByIndex;
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo;
 local time = time;
@@ -33,6 +34,7 @@ function EL:UpdateMountButton()
         local mountID = GetMountFromSpell(widgetInfo.spellInfo.spellID);
         if mountID then
             local name, spellID, icon, isActive, isUsable, sourceType, isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected = GetMountInfoByID(mountID);
+            local _, description, source = GetMountInfoExtraByID(mountID);
 
             local title, colorizedName;
             if isCollected then
@@ -43,9 +45,19 @@ function EL:UpdateMountButton()
                 colorizedName = "|cff999999"..name.."|r";
             end
 
+            if description then
+                description = "|cffffd100"..description.."|r";
+            end
+
+            local tooltipLines = {
+                name,
+                source,
+                description,
+            };
+
             local data = {
                 buttons = {
-                    {actionType = "spell", spellID = spellID, icon = icon, name = colorizedName, macroText = "/cast "..name, enabled = isCollected},
+                    {actionType = "spell", spellID = spellID, icon = icon, name = colorizedName, macroText = "/cast "..name, enabled = isCollected, tooltipLines = tooltipLines},
                 },
                 systemName = QUICKSLOT_NAME,
                 spellcastType = 1,      --Cast
@@ -286,12 +298,13 @@ do  --Vote Counter
 
                     local Title = VoteCounter:CreateFontString(nil, "OVERLAY", "GameFontNormal");
                     VoteCounter.Title = Title;
-                    Title:SetJustifyH("CENTER");
-                    Title:SetPoint("CENTER", VoteCounter, "TOP", 0, -0.5*PADDING_V -0.5*BUTTON_HEIGHT);
+                    Title:SetJustifyH("LEFT");
+                    Title:SetPoint("LEFT", VoteCounter, "TOPLEFT", OFFSET_H, -0.5*PADDING_V -0.5*BUTTON_HEIGHT);
                     Title:SetText(L["Voting Result Header"]);
                     Title:SetTextColor(0.5, 0.5, 0.5);
 
                     local Divider = VoteCounter:CreateTexture(nil, "OVERLAY");
+                    VoteCounter.Divider = Divider;
                     Divider:SetTexture("Interface/AddOns/Plumber/Art/Frame/Divider_NineSlice");
                     Divider:SetTextureSliceMargins(48, 4, 48, 4);
                     Divider:SetTextureSliceMode(0);
@@ -299,6 +312,10 @@ do  --Vote Counter
                     API.DisableSharpening(Divider);
                     Divider:SetWidth(BUTTON_WIDTH);
                     Divider:SetPoint("CENTER", VoteCounter, "TOP", 0, -PADDING_V -BUTTON_HEIGHT);
+
+                    local ExpandCollapseButton = addon.CreateExpandCollapseButton(VoteCounter);
+                    VoteCounter.ExpandCollapseButton = ExpandCollapseButton;
+                    ExpandCollapseButton:SetPoint("RIGHT", VoteCounter, "TOPRIGHT", -0.5*PADDING_V, -0.5*PADDING_V -0.5*BUTTON_HEIGHT);
 
                     local function CreateEntryButton()
                         local f = CreateFrame("Frame", nil, VoteCounter);
@@ -400,6 +417,7 @@ do  --Vote Counter
                     end
 
                     VoteCounter:Reset();
+                    VoteCounter:ToggleExpanded(addon.GetDBValue("VotingResultsExpanded"));
                     VoteCounter:LoadPosition();
 
                     VoteCounter:SetScript("OnShow", VoteCounter.OnShow);
@@ -550,6 +568,7 @@ do  --Vote Counter
     end
 
     function VoteCounterMixin:RequestUpdate()
+        if not self.expanded then return end;
         if not self.t then
             self.t = 0;
             self:SetScript("OnUpdate", self.OnUpdate_UpdateEntries);
@@ -592,7 +611,11 @@ do  --Vote Counter
                 
             else
                 button = self.entryButtonPool:Acquire();
-                button.Name:SetText(self.gsub(data.name, "(%-.+)", ""));
+                if data.isPlayer then
+                    button.Name:SetText(UNIT_YOU or "You");
+                else
+                    button.Name:SetText(self.gsub(data.name, "(%-.+)", ""));
+                end
                 button.fullName = data.name;
                 self.guidButton[data.guid] = button;
                 button:SetData(data);
@@ -609,7 +632,11 @@ do  --Vote Counter
             end
         end
 
-        self:SetHeight(fromOffset + numButtons * BUTTON_HEIGHT + PADDING_V);
+        if numButtons > 0 then
+            self:SetHeight(fromOffset + numButtons * BUTTON_HEIGHT + PADDING_V);
+        else
+            self:SetHeight(PADDING_V + BUTTON_HEIGHT);
+        end
     end
 
     function VoteCounterMixin:Reset()
@@ -620,7 +647,9 @@ do  --Vote Counter
         self.n = 0;
         self:SetScript("OnUpdate", nil);
         self.t = nil;
-        self:SetHeight(PADDING_V + BUTTON_HEIGHT + PADDING_V);
+        if self.expanded then
+            self:SetHeight(PADDING_V + BUTTON_HEIGHT + PADDING_V);
+        end
         FocusSolver:SetFocus(nil);
     end
 
@@ -649,6 +678,27 @@ do  --Vote Counter
         self:UnregisterEvent("GLOBAL_MOUSE_UP");
     end
 
+    function VoteCounterMixin:ToggleExpanded(newState)
+        if newState == nil then
+            newState = not self.expanded;
+        end
+
+        self.expanded = newState;
+        self.ExpandCollapseButton:SetExpanded(newState);
+
+        if newState then
+            self.Divider:Show();
+            self:UpdateEntries();
+        else
+            self.entryButtonPool:ReleaseAll();
+            self.guidButton = {};
+            self:SetHeight(PADDING_V + BUTTON_HEIGHT);
+            self.Divider:Hide();
+            FocusSolver:SetFocus(nil);
+        end
+
+        addon.SetDBValue("VotingResultsExpanded", newState);
+    end
 
     do  --Debug
         --[[
@@ -661,7 +711,7 @@ do  --Vote Counter
             for i = 1, MAX_ENTRY_PER_PAGE do
                 local name = "Player"..i;
                 local guid = "p"..i;
-                if i == 1 then
+                if i == 0 then
                     guid = "Player-5765-000FC25A";
                     name = "Naughordespy-Vyranoth";
                 end

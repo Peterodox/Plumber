@@ -227,6 +227,8 @@ local function RealActionButton_OnLeave(self)
         QuickSlot:SetHeaderText();
         QuickSlot:StartShowingDefaultHeaderCountdown(true);
     end
+
+    GameTooltip:Hide();
 end
 
 local function RealActionButton_PostClick(self, button)
@@ -320,12 +322,27 @@ local function ItemButton_OnEnter(self)
         self:LockHighlight();
         self.hasActionButton = true;
     end
+
+    if self.tooltipLines then
+        local tooltip = GameTooltip;
+        tooltip:Hide();
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+        for i, text in ipairs(self.tooltipLines) do
+            if i == 1 then
+                tooltip:SetText(text, 1, 1, 1, true);
+            else
+                tooltip:AddLine(text, 1, 1, 1, true);
+            end
+        end
+        tooltip:Show();
+    end
 end
 
 local function ItemButton_OnLeave(self)
     if not (self:IsVisible() and self:IsMouseOver()) then
         QuickSlot:SetHeaderText();
         QuickSlot:StartShowingDefaultHeaderCountdown(true);
+        GameTooltip:Hide();
     end
 end
 
@@ -474,6 +491,7 @@ function QuickSlot:SetButtonData(buttonData)
             button.trackIndex = trackIndex;
             button.overrideName = info.name;
             button.macroText = info.macroText;
+            button.tooltipLines = info.tooltipLines;
             button:SetScript("OnEnter", ItemButton_OnEnter);
             button:SetScript("OnLeave", ItemButton_OnLeave);
             button:Show();
