@@ -25,7 +25,7 @@ ControlCenter.lua
 
 Modules\GossipFrameMedal.lua
 Modules\BackpackItemTracker.lua
-Modules\TimeRift.lua
+Modules\AutoJoinEvents.lua
 Modules\PlayerChoiceFrameToken.lua
 #Modules\DruidModelFix.lua
 Modules\QuickSlot.lua
@@ -48,6 +48,7 @@ Modules\ExpansionLandingPage.xml
 Modules\GameTooltipExtension.xml
 Modules\LootUI.xml
 Modules\WoWAnniversary.lua
+Modules\UnderlightAngler.lua
 
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua

@@ -32,7 +32,7 @@ L["Module Category AzerothianArchives"] = "Azerothian Archives";     --Added in 
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Auto Join Events";
-L["ModuleDescription AutoJoinEvents"] = "Auto select (Begin Time Rift) when you interact with Soridormi during the event.";
+L["ModuleDescription AutoJoinEvents"] = "Auto join these events when you interact with the NPC: \n\n- Time Rift\n\n- Theater Troupe";
 
 
 --BackpackItemTracker
@@ -198,6 +198,11 @@ L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the to
 L["ModuleName WoWAnniversary"] = "WoW Anniversary";
 L["ModuleDescription WoWAnniversary"] = "- Summon the corresponding mount easily during the Mount Maniac event.\n\n- Show voting results during the Fashion Frenzy event. ";
 L["Voting Result Header"] = "Results";
+
+
+--BlizzFixFishingArtifact
+L["ModuleName BlizzFixFishingArtifact"] = "Blitz Fix: Underlight Angler";
+L["ModuleDescription BlizzFixFishingArtifact"] = "Allow you to view the fishing artifact\'s traits again.";
 
 
 --Loot UI

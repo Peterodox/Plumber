@@ -1,21 +1,37 @@
--- Auto-select "Reporting for duty"
+-- Auto-select "Reporting for duty", "Theater"
 
 local _, addon = ...
 local API = addon.API;
 
 local EL = CreateFrame("Frame");
 local UnitName = UnitName;
-local SORIDORMI;
-local ENABLE_AUTO_REPORT = true;
+local TARGET_NPC_NAME;
+local TARGET_OPTION_ID;
+local MODULE_ENABLED = true;
 
+local Data = {
+    --[map] = {},
+
+    [2248] = {  --Begin Theater
+        gossipOptionID = 120733,
+        creature = 214296,
+        fallbackName = "Stage Manager Huberta",
+    },
+
+    [2025] = {  --Time Rift
+        gossipOptionID = 109275,
+        creature = 204450,
+        fallbackName = "Soridormi",
+    },
+};
 
 local function EL_OnGossipShow(self, event, ...)
-    if ENABLE_AUTO_REPORT and UnitName("npc") == SORIDORMI then
+    if MODULE_ENABLED and UnitName("npc") == TARGET_NPC_NAME then
         if GossipFrame and GossipFrame:IsShown() then
             --Auto Report-in
             local options = C_GossipInfo.GetOptions();
-            if options and options[1] and options[1].gossipOptionID == 109275 then
-                C_GossipInfo.SelectOption(109275);
+            if options and options[1] and options[1].gossipOptionID == TARGET_OPTION_ID then
+                C_GossipInfo.SelectOption(TARGET_OPTION_ID);
                 return
             end
         end
@@ -39,13 +55,25 @@ local function EnableModule(state)
             local module = API.CreateZoneTriggeredModule();
             ZoneTriggerModule = module;
 
-            module:SetValidZones(2025, 2199);
+            local maps = {};
+            for mapID, v in pairs(Data) do
+                API.GetCreatureName(v.creature);
+                table.insert(maps, mapID);
+            end
 
-            local function OnEnterZoneCallback()
-                if not SORIDORMI then
-                    SORIDORMI = API.GetCreatureName(204450) or "Soridormi";
+            module:SetValidZones(maps);
+
+            local function OnEnterZoneCallback(mapID)
+                if Data[mapID] then
+                    EL:RegisterEvent("GOSSIP_SHOW");
+                    if not Data[mapID].localizedName then
+                        Data[mapID].localizedName = API.GetCreatureName(Data[mapID].creature);
+                    end
+                    TARGET_NPC_NAME = Data[mapID].localizedName or Data[mapID].fallbackName;
+                    TARGET_OPTION_ID = Data[mapID].gossipOptionID;
+                else
+                    EL:UnregisterEvent("GOSSIP_SHOW");
                 end
-                EL:RegisterEvent("GOSSIP_SHOW");
             end
 
             local function OnLeaveZoneCallback()

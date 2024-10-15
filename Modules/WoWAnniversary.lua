@@ -1,4 +1,5 @@
 -- Mount Mania: Quick Slot, Summon Mount
+-- Fashion Frenzy: Leaderboard, Click to Target Player
 
 local _, addon = ...
 local API = addon.API;
@@ -90,8 +91,8 @@ function EL:GetPlayerEventArea()
     if self.playerX and self.playerY then
         if self.playerX > 0.6266 and self.playerY > 0.5122 and self.playerX < 0.6352 and self.playerY < 0.5197 then
             return 1    --Mount Maniac
-        elseif self.playerX > 0.6370 and self.playerY > 0.5107 and self.playerX < 0.6432 and self.playerY < 0.5233 then
-            return 2    --Story Time
+        --elseif self.playerX > 0.6370 and self.playerY > 0.5107 and self.playerX < 0.6432 and self.playerY < 0.5233 then
+        --    return 2    --Story Time (No addon for this)
         elseif self.playerX > 0.6317 and self.playerY > 0.4808 and self.playerX < 0.6378 and self.playerY < 0.4977 then
             return 3    --Fashion Frenzy
         end

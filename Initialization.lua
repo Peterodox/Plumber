@@ -101,6 +101,7 @@ local DefaultValues = {
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
     WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
         VotingResultsExpanded = true,
+    BlizzFixFishingArtifact = true,     --Fix Fishing Artifact Traits Not Showing bug
 
     --Custom Loot Window
     LootUI = false,
