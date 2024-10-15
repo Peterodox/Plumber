@@ -31,6 +31,9 @@ function EL:OnEvent(event, ...)
                 end
             end
             C_ArtifactUI.GetArtifactTier = New_GetArtifactTier;
+
+
+            ArtifactFrame.PerksTab:Refresh();
         end
     end
 end

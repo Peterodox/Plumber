@@ -32,7 +32,7 @@ L["Module Category AzerothianArchives"] = "艾泽拉斯档案馆";     --Added i
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "自动加入活动";
-L["ModuleDescription AutoJoinEvents"] = "在时空裂隙事件期间与索莉多米对话会自动选择加入活动。";
+L["ModuleDescription AutoJoinEvents"] = "与NPC交互时自动加入以下事件：\n\n- 时空裂隙\n\n- 剧场巡演";
 
 
 --BackpackItemTracker
@@ -198,6 +198,11 @@ L["ModuleDescription Delves_SeasonProgress"] = "在你提升“地下堡行者�
 L["ModuleName WoWAnniversary"] = "魔兽周年庆";
 L["ModuleDescription WoWAnniversary"] = "- 在坐骑狂欢活动期间轻松召唤相应坐骑。\n\n- 在时尚比赛期间显示投票结果。";
 L["Voting Result Header"] = "投票结果";
+
+
+--BlizzFixFishingArtifact
+L["ModuleName BlizzFixFishingArtifact"] = "幽光鱼竿修复";
+L["ModuleDescription BlizzFixFishingArtifact"] = "修复钓鱼神器幽光鱼竿特质不显示的问题。";
 
 
 --Loot UI
