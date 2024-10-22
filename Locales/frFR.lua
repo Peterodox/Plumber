@@ -32,7 +32,6 @@ L["Module Category AzerothianArchives"] = "Archives d'Azeroth";     --Added in p
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Rejoindre automatiquement les événements";
-L["ModuleDescription AutoJoinEvents"] = "Auto join these events when you interact with the NPC: \n\n- Time Rift\n\n- Theater Troupe";
 L["ModuleDescription AutoJoinEvents"] = "Rejoint automatiquement l'évènement lorsque vous intéragissez avec le PNJ : : \n\n- Faille temporelle\n\n- Groupe de théâtre";
 
 
