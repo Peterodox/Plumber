@@ -25,6 +25,8 @@ local Data = {
     },
 };
 
+Data[2199] = Data[2025];
+
 local function EL_OnGossipShow(self, event, ...)
     if MODULE_ENABLED and UnitName("npc") == TARGET_NPC_NAME then
         if GossipFrame and GossipFrame:IsShown() then

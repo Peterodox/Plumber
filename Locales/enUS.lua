@@ -198,6 +198,7 @@ L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the to
 L["ModuleName WoWAnniversary"] = "WoW Anniversary";
 L["ModuleDescription WoWAnniversary"] = "- Summon the corresponding mount easily during the Mount Maniac event.\n\n- Show voting results during the Fashion Frenzy event. ";
 L["Voting Result Header"] = "Results";
+L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "You have not collected this mount.";
 
 
 --BlizzFixFishingArtifact

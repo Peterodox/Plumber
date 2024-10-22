@@ -24,7 +24,7 @@ local POI_SPECIAL_WQ = {
     --https://wago.tools/db2/AreaPOI?filter[Name_lang]=special%20as&page=1&sort[ID]=asc
 
     {7823, 2988, -4587, 2552, 1108, 82355},     --Special Assignment: Cinderbee Surge
-    {7824, 1091, -1021, 2552, 1117, 81649},     --Special Assignment: Titanic Resurgence
+    {7824, 1091, -1021, 2552, 1117, 81647},     --Special Assignment: Titanic Resurgence (Isle of Dorn)
     {7825, 1411, -4226, 2601, 1118, 81691},     --Special Assignment: Shadows Below
     {7826, 3227.21, -3330, 2601, 1119, 83229},  --Special Assignment: When the Deeps Stir
     {7827, 1284, -1001, 2601, 1121, 82852},     --Special Assignment: Lynx Rescue

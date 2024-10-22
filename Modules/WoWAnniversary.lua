@@ -48,6 +48,9 @@ function EL:UpdateMountButton()
 
             if description then
                 description = "|cffffd100"..description.."|r";
+                if not isCollected then
+                    description = description.."\n\n|cffff4800"..L["Mount Not Collected"].."|r";
+                end
             end
 
             local tooltipLines = {
