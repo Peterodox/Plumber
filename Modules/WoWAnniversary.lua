@@ -103,35 +103,6 @@ function EL:GetPlayerEventArea()
     return nil
 end
 
-function EL:GetBuffStacks(unit)
-    unit = unit or "player";
-    local spellID = 87649;
-    local index = 1;
-    local aura;
-    local stack;
-
-    while (index > 0) do
-        aura = GetBuffDataByIndex(unit, index);
-        if aura then
-            index = index + 1;
-            if aura.spellId == spellID then
-                stack = aura.applications;
-                index = 0;
-            end
-        else
-            index = 0;
-        end
-    end
-
-    local canInspect = CanInspect(unit);
-    
-    if DressUpFrame:IsShown() then
-        print(unit)
-        local actor = DressUpFrame.ModelScene:GetPlayerActor();
-        actor:SetModelByUnit(unit)
-    end
-end
-
 function EL:ShowQuickSlot(state)
     if state then
         if not self.slotShown then
@@ -220,7 +191,6 @@ function EL:OnEvent(event, ...)
 
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         self:ProcessCombatLog( CombatLogGetCurrentEventInfo() );
-        print(...)
     end
 end
 
@@ -239,6 +209,7 @@ function EL:ListenEvents(state)
     end
 end
 
+--[[
 local function Debug_GetActiveEvent()
     local widgetSetID = C_UIWidgetManager.GetTopCenterWidgetSetID()
     local widgets = C_UIWidgetManager.GetAllWidgetsBySetID(widgetSetID);
@@ -252,9 +223,10 @@ local function Debug_GetActiveEvent()
     end
 end
 
-function Debug_GetPlayerCoord()
+local function Debug_GetPlayerCoord()
     print(GetPlayerMapCoord(71));
 end
+--]]
 
 
 do  --Vote Counter
