@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.4.5";
-local VERSION_DATE = 1729030000;
+local VERSION_TEXT = "v1.4.6";
+local VERSION_DATE = 1729700000;
 
 
 local addonName, addon = ...
@@ -141,6 +141,10 @@ local DefaultValues = {
         TalkingHead_HideInInstance = false,
         TalkingHead_HideWorldQuest = false,
         TalkingHead_BelowWorldMap = false,
+
+
+    --QuickSlot
+        QuickSlotHighContrastMode = false,
 
 
     --Declared elsewhere:

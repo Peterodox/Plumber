@@ -1,6 +1,8 @@
 local _, addon = ...
+local L = addon.L;
 local API = addon.API;
 local UIFrameFade = API.UIFrameFade;
+local GetDBBool = addon.GetDBBool;
 
 
 local ACTION_BUTTON_SIZE = 46;
@@ -34,8 +36,16 @@ local function ContextMenu_EditMode_OnClick(self, button)
     return true
 end
 
+local function ContextMenu_HighContrast_OnClick(self, button)
+    local state = not GetDBBool("QuickSlotHighContrastMode");
+    addon.SetDBValue("QuickSlotHighContrastMode", state);
+    QuickSlot:UseHighContrast(state);
+    return false
+end
+
 local ContextMenuData = {
-    { text = _G["HUD_EDIT_MODE_MENU"] or "Edit Mode", onClickFunc = ContextMenu_EditMode_OnClick},
+    {text = L["Quick Slot Edit Mode"], onClickFunc = ContextMenu_EditMode_OnClick},
+    {text = L["Quick Slot High Contrast Mode"], onClickFunc = ContextMenu_HighContrast_OnClick,},
 };
 
 
@@ -235,6 +245,10 @@ local function RealActionButton_PostClick(self, button)
     local owner = self.owner;
 
     if owner then
+        if owner.onClickFunc then
+            owner.onClickFunc();
+        end
+
         if button == "LeftButton" and owner:HasCharges() then
             owner:ShowPostClickEffect();
             return
@@ -305,7 +319,9 @@ local function ItemButton_OnEnter(self)
         RealActionButton.owner = self;
 
         local macroText;
-        if self.macroText then
+        if self.onClickFunc then
+            
+        elseif self.macroText then
             macroText = self.macroText;
         else
             if self.actionType == "item" then
@@ -383,8 +399,8 @@ function QuickSlot:Init()
     HeaderShadow:SetTextureSliceMode(0);
     HeaderShadow:Hide();
     HeaderShadow:SetAlpha(0);
-    HeaderShadow:SetPoint("TOPLEFT", Header, "TOPLEFT", -16, 16);
-    HeaderShadow:SetPoint("BOTTOMRIGHT", Header, "BOTTOMRIGHT", 16, -16);
+    HeaderShadow:SetPoint("TOPLEFT", Header, "TOPLEFT", -20, 20);
+    HeaderShadow:SetPoint("BOTTOMRIGHT", Header, "BOTTOMRIGHT", 20, -20);
 
     function QuickSlot:SetHeaderText(text, transparentText)
         if self:IsInEditMode() then return end;
@@ -393,7 +409,7 @@ function QuickSlot:Init()
             Header:SetSize(0, 0);
             Header:SetText(text);
             if transparentText then
-                local toAlpha = 0.6;
+                local toAlpha = self.highContrastMode and 1.0 or 0.6;
                 UIFrameFade(Header, 0.5, toAlpha);
                 UIFrameFade(HeaderShadow, 0.25, 0);
             else
@@ -491,6 +507,7 @@ function QuickSlot:SetButtonData(buttonData)
             button.trackIndex = trackIndex;
             button.overrideName = info.name;
             button.macroText = info.macroText;
+            button.onClickFunc = info.onClickFunc;
             button.tooltipLines = info.tooltipLines;
             button:SetScript("OnEnter", ItemButton_OnEnter);
             button:SetScript("OnLeave", ItemButton_OnLeave);
@@ -935,6 +952,8 @@ function QuickSlot:ShowUI()
         self:SetInteractable(true);
     end
 
+    self:UseHighContrast(GetDBBool("QuickSlotHighContrastMode"));
+
     return true
 end
 
@@ -968,6 +987,20 @@ function QuickSlot:RequestCloseUI(systemName)
     end
 end
 
+function QuickSlot:UseHighContrast(state)
+    state = state == true;
+    self.highContrastMode = state;
+
+    for i, button in ipairs(self.Buttons) do
+        button:UseHighContrast(state);
+    end
+
+    if self.Header then
+        local font, height, flag = self.Header:GetFont();
+        flag = state and "OUTLINE" or "";
+        self.Header:SetFont(font, height, flag);
+    end
+end
 
 function QuickSlot:OnEvent(event, ...)
     if event == "BAG_UPDATE" then

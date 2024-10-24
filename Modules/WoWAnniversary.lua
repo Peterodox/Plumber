@@ -29,6 +29,29 @@ local time = time;
 
 local QUICKSLOT_NAME = "mount_maniac";
 
+
+local function IsOnMount(mountSpellID)
+    local GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex;
+    local i = 1;
+    local spellID = 0;
+    local aura;
+
+    while spellID do
+        aura = GetAuraDataByIndex("player", i, "HELPFUL");
+        spellID = aura and aura.spellId;
+        if spellID then
+            if spellID == mountSpellID then
+                return true
+            end
+            i = i + 1;
+        else
+            break
+        end
+    end
+
+    return false
+end
+
 function EL:UpdateMountButton()
     local widgetInfo = GetSpellDisplayVisualizationInfo(WIDGET_ID_MOUNT_MANIAC_MOUNT);
     if (widgetInfo and widgetInfo.spellInfo and widgetInfo.spellInfo.spellID and widgetInfo.spellInfo.shownState ~= 0) then
@@ -38,12 +61,22 @@ function EL:UpdateMountButton()
             local _, description, source = GetMountInfoExtraByID(mountID);
 
             local title, colorizedName;
+            local onClickFunc;
+
             if isCollected then
                 title = "|TInterface/AddOns/Plumber/Art/Button/Checkmark-Green-Shadow:16:16:-4:-2|t"..name;
                 colorizedName = "|cffffd100"..name.."|r";
+                function onClickFunc()
+                    if not IsOnMount(spellID) then
+                        C_MountJournal.SummonByID(mountID);
+                    end
+                end
             else
                 title = "|TInterface/AddOns/Plumber/Art/Button/RedCross-Shadow:16:16:-4:-2|t"..name;
                 colorizedName = "|cff999999"..name.."|r";
+                function onClickFunc()
+
+                end
             end
 
             if description then
@@ -61,7 +94,7 @@ function EL:UpdateMountButton()
 
             local data = {
                 buttons = {
-                    {actionType = "spell", spellID = spellID, icon = icon, name = colorizedName, macroText = "/cast "..name, enabled = isCollected, tooltipLines = tooltipLines},
+                    {actionType = "spell", spellID = spellID, icon = icon, name = colorizedName, onClickFunc = onClickFunc, enabled = isCollected, tooltipLines = tooltipLines},
                 },
                 systemName = QUICKSLOT_NAME,
                 spellcastType = 1,      --Cast

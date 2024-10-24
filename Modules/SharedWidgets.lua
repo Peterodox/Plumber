@@ -1544,17 +1544,23 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         self.Icon:SetSize(40, 40);
     end
 
+    function PeudoActionButtonMixin:UseHighContrast(state)
+        if state then
+            self.NormalTexture:SetSize(128, 128);
+            self.NormalTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Border-HC");
+            self.PushedTexture:SetSize(128, 128);
+            self.PushedTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Highlight-Full-HC");
+        else
+            self.NormalTexture:SetSize(64, 64);
+            self.NormalTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Border");
+            self.PushedTexture:SetSize(64, 64);
+            self.PushedTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Highlight-Full");
+        end
+    end
+
     local function CreatePeudoActionButton(parent)
         local button = CreateFrame("Button", nil, parent);
         button:SetSize(46, 46);     --Stock ActionButton is 45x45
-
-        --[[
-        button.Border = button:CreateTexture(nil, "ARTWORK", nil, 2);
-        button.Border:SetSize(64, 64);
-        button.Border:SetPoint("CENTER", button, "CENTER", 0, 0);
-        button.Border:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Border");
-        button.Border:SetTexCoord(0, 1, 0, 1);
-        --]]
 
         local NormalTexture = button:CreateTexture(nil, "OVERLAY", nil, 2);
         button.NormalTexture = NormalTexture;

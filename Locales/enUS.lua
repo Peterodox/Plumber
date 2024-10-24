@@ -9,6 +9,8 @@ local L = addon.L;
 --Module Control Panel
 L["Module Control"] = "Module Control";
 L["Quick Slot Generic Description"] = "\n\n*Quick Slot is a set of clickable buttons that appear under certain conditions.";
+L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Edit Mode";
+L["Quick Slot High Contrast Mode"] = "Toggle High Contrast Mode";
 L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map - Map Filter - Plumber";
 
