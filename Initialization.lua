@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.4.6";
-local VERSION_DATE = 1729700000;
+local VERSION_TEXT = "v1.4.7";
+local VERSION_DATE = 1730000000;
 
 
 local addonName, addon = ...
@@ -102,6 +102,7 @@ local DefaultValues = {
     WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
         VotingResultsExpanded = true,
     BlizzFixFishingArtifact = true,     --Fix Fishing Artifact Traits Not Showing bug
+    QuestItemDestroyAlert = true,       --Show related quest info when destroying a quest-starting item
 
     --Custom Loot Window
     LootUI = false,

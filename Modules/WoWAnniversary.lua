@@ -239,6 +239,7 @@ function EL:ListenEvents(state)
         self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         self:SetScript("OnEvent", nil);
         self:WatchPlayerLocation(false);
+
     end
 end
 
@@ -751,6 +752,8 @@ do
 
                 local function OnLeaveZoneCallback()
                     EL:ListenEvents(false);
+                    EL:ShowQuickSlot(false);
+                    EL:ShowVoteCounter(false);
                 end
 
                 module:SetEnterZoneCallback(OnEnterZoneCallback);

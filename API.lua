@@ -1911,6 +1911,22 @@ do  --Transmog
     API.IsUncollectedTransmogByItemInfo = IsUncollectedTransmogByItemInfo
 end
 
+do  --Quest
+    local function GetQuestName(questID)
+        local questName = C_TaskQuest.GetQuestInfoByQuestID(questID);
+        if not questName then
+            questName = C_QuestLog.GetTitleForQuestID(questID);
+            if questName and questName ~= "" then
+                return questName
+            else
+                C_QuestLog.RequestLoadQuestByID(questID);
+            end
+        end
+        return questName
+    end
+    API.GetQuestName = GetQuestName;
+end
+
 do
     local GetItemCount = C_Item.GetItemCount
     local GetContainerNumSlots = C_Container.GetContainerNumSlots;

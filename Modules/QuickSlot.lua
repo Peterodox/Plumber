@@ -925,6 +925,7 @@ function QuickSlot:ShowUI()
     self:RegisterEvent("PLAYER_REGEN_DISABLED");
     self:RegisterEvent("PLAYER_REGEN_ENABLED");
     self:RegisterEvent("UI_SCALE_CHANGED");
+    self:RegisterEvent("LOADING_SCREEN_ENABLED");
 
     if self.spellcastType == 1 then
         self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
@@ -970,6 +971,7 @@ function QuickSlot:CloseUI()
         self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE");
         self:UnregisterEvent("UNIT_SPELLCAST_START");
         self:UnregisterEvent("UNIT_SPELLCAST_STOP");
+        self:UnregisterEvent("LOADING_SCREEN_ENABLED");
         self:SetInteractable(false);
         self.isChanneling = nil;
         self.defaultHeaderText = nil;
@@ -1021,6 +1023,8 @@ function QuickSlot:OnEvent(event, ...)
     elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" or event == "UNIT_SPELLCAST_STOP" then
         local _, _, spellID = ...
         self:OnSpellCastChanged(spellID, false);
+    elseif event == "LOADING_SCREEN_ENABLED" then
+        self:CloseUI();
     end
 end
 QuickSlot:SetScript("OnEvent", QuickSlot.OnEvent);

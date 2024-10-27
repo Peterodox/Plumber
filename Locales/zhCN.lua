@@ -208,6 +208,11 @@ L["ModuleName BlizzFixFishingArtifact"] = "幽光鱼竿修复";
 L["ModuleDescription BlizzFixFishingArtifact"] = "修复钓鱼神器幽光鱼竿特质不显示的问题。";
 
 
+--QuestItemDestroyAlert
+L["ModuleName QuestItemDestroyAlert"] = "删除任务物品确认";
+L["ModuleDescription QuestItemDestroyAlert"] = "当你试图摧毁一件可以提供任务的物品时，显示该任务的信息。\n\n|cffd4641c仅限于提供任务的物品，不适用于接受任务以后获得的任务物品。|r";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";

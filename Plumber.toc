@@ -49,6 +49,7 @@ Modules\GameTooltipExtension.xml
 Modules\LootUI.xml
 Modules\WoWAnniversary.lua
 Modules\UnderlightAngler.lua
+Modules\QuestItemDestroyAlert.lua
 
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua

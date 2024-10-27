@@ -208,6 +208,11 @@ L["ModuleName BlizzFixFishingArtifact"] = "Blitz Fix: Underlight Angler";
 L["ModuleDescription BlizzFixFishingArtifact"] = "Allow you to view the fishing artifact\'s traits again.";
 
 
+--QuestItemDestroyAlert
+L["ModuleName QuestItemDestroyAlert"] = "Quest Item Delete Confirmation";
+L["ModuleDescription QuestItemDestroyAlert"] = "Show the associate quest info when you attempt to destroy an item that starts a quest. \n\n|cffd4641cOnly works for items that start quests, not those you obtain after accepting a quest.|r";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
