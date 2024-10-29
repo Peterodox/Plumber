@@ -1,0 +1,29 @@
+## Interface: 11504
+## Version: 1.4.8
+
+## Title: Plumber
+
+## Notes: Provides a variety of quality-of-life features.|nMore details in the AddOn Settings.
+## Notes-zhCN: 提供多种便捷功能。|n请前往插件设置来查看更多信息。
+
+## Author: Peterodox
+## SavedVariables: PlumberDB, PlumberDevData
+
+## IconTexture: Interface\AddOns\Plumber\Art\Logo\PlumberLogo64
+
+
+Initialization.lua
+Locales\Localization.xml
+API.lua
+
+Modules\SharedWidgets.xml
+Modules\SharedTooltip.lua
+
+ControlCenter.lua
+
+Modules\Lockpicking.lua
+Modules\BlizzFix_EventToast.lua
+Modules\LootUI.xml
+Modules\QuestItemDestroyAlert.lua
+
+#Modules\TalkingHead.lua
