@@ -18,6 +18,7 @@ local securecallfunction = securecallfunction;
 
 local function Nop(...)
 end
+API.Nop = Nop;
 
 do  -- Table
     local function Mixin(object, ...)
@@ -511,7 +512,7 @@ do  -- Item
 end
 
 do  -- Tooltip Parser
-    local GetInfoByHyperlink = C_TooltipInfo.GetHyperlink;
+    local GetInfoByHyperlink = C_TooltipInfo and C_TooltipInfo.GetHyperlink;
 
     local function GetLineText(lines, index)
         if lines[index] then
@@ -1533,7 +1534,7 @@ end
 
 do  --Game UI
     local function IsInEditMode()
-        return EditModeManagerFrame and EditModeManagerFrame:IsShown();
+        return EditModeManagerFrame and EditModeManagerFrame:IsEditModeActive();
     end
     API.IsInEditMode = IsInEditMode;
 end
@@ -1909,6 +1910,10 @@ do  --Transmog
         end
     end
     API.IsUncollectedTransmogByItemInfo = IsUncollectedTransmogByItemInfo
+
+    if not addon.IsToCVersionEqualOrNewerThan(40000) then
+        API.IsUncollectedTransmogByItemInfo = Nop;
+    end
 end
 
 do  --Quest
@@ -1927,12 +1932,167 @@ do  --Quest
     API.GetQuestName = GetQuestName;
 end
 
+do  --Tooltip
+    if C_TooltipInfo then
+        addon.TooltipAPI = C_TooltipInfo;
+    else
+        --For Classic where C_TooltipInfo doesn't exist:
+
+        local TooltipAPI = {};
+        local CreateColor = CreateColor;
+        local TOOLTIP_NAME = "PlumberClassicVirtualTooltip";
+        local TP = CreateFrame("GameTooltip", TOOLTIP_NAME, nil, "GameTooltipTemplate");
+        local UIParent = UIParent;
+
+        TP:SetOwner(UIParent, 'ANCHOR_NONE');
+        TP:SetClampedToScreen(false);
+        TP:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 0, -128);
+        TP:Show();
+        TP:SetScript("OnUpdate", nil);
+
+
+        local UpdateFrame = CreateFrame("Frame");
+
+        local function UpdateTooltipInfo_OnUpdate(self, elapsed)
+            self.t = self.t + elapsed;
+            if self.t > 0.2 then
+                self.t = 0;
+                self:SetScript("OnUpdate", nil);
+                addon.CallbackRegistry:Trigger("SharedTooltip.TOOLTIP_DATA_UPDATE", 0);
+            end
+        end
+
+        function UpdateFrame:OnItemChanged(numLines)
+            self.t = 0;
+            self.numLines = numLines;
+            self:SetScript("OnUpdate", UpdateTooltipInfo_OnUpdate);
+        end
+
+        local function GetTooltipHyperlink()
+            local name, link = TP:GetItem();
+            if link then
+                return link
+            end
+
+            name, link = TP:GetSpell();
+            if link then
+                return "spell:"..link
+            end
+        end
+
+        local function GetTooltipTexts()
+            local numLines = TP:NumLines();
+            if numLines == 0 then return end;
+
+            local tooltipData = {};
+            tooltipData.dataInstanceID = 0;
+
+            local addItemLevel;
+            local itemLink = GetTooltipHyperlink();
+
+            if itemLink then
+                if itemLink ~= TP.hyperlink then
+                    UpdateFrame:OnItemChanged(numLines);
+                end
+
+                if API.IsEquippableItem(itemLink) then
+                    addItemLevel = API.GetItemLevel(itemLink);
+                end
+            end
+
+            TP.hyperlink = itemLink;
+            tooltipData.hyperlink = itemLink;
+
+            local lines = {};
+            local n = 0;
+
+            local fs, text;
+            for i = 1, numLines do
+                if i == 2 and addItemLevel then
+                    n = n + 1;
+                    lines[n] = {
+                        leftText = L["Format Item Level"]:format(addItemLevel);
+                        leftColor = CreateColor(1, 0.82, 0),
+                    };
+                end
+
+                fs = _G[TOOLTIP_NAME.."TextLeft"..i];
+                if fs then
+                    n = n + 1;
+
+                    local r, g, b = fs:GetTextColor();
+                    text = fs:GetText();
+                    local lineData = {
+                        leftText = text,
+                        leftColor = CreateColor(r, g, b),
+                        rightText = nil,
+                        wrapText = true,
+                        leftOffset = 0,
+                    };
+
+                    fs = _G[TOOLTIP_NAME.."TextRight"..i];
+                    if fs then
+                        text = fs:GetText();
+                        if text and text ~= "" then
+                            r, g, b = fs:GetTextColor();
+                            lineData.rightText = text;
+                            lineData.rightColor = CreateColor(r, g, b);
+                        end
+                    end
+
+                    lines[n] = lineData;
+                end
+            end
+
+            local sellPrice = API.GetItemSellPrice(itemLink);
+            if sellPrice then
+                n = n + 1;
+                lines[n] = {
+                    leftText = "",  --this will be ignored by our tooltip
+                    price = sellPrice,
+                };
+            end
+
+            tooltipData.lines = lines;
+            return tooltipData
+        end
+
+        do
+            local accessors = {
+                SetItemByID = "GetItemByID",
+                SetCurrencyByID = "GetCurrencyByID",
+                SetQuestItem = "GetQuestItem",
+                SetQuestCurrency = "GetQuestCurrency",
+                SetSpellByID = "GetSpellByID",
+                SetItemByGUID = "GetItemByGUID",
+                SetHyperlink = "GetHyperlink",
+            };
+
+            for accessor, getterName in pairs(accessors) do
+                if TP[accessor] then
+                    local function GetterFunc(...)
+                        TP:ClearLines();
+                        TP:SetOwner(UIParent, "ANCHOR_PRESERVE");
+                        TP[accessor](TP, ...);
+                        return GetTooltipTexts();
+                    end
+
+                    TooltipAPI[getterName] = GetterFunc;
+                end
+            end
+        end
+
+        addon.TooltipAPI = TooltipAPI;
+    end
+end
+
+
 do
     local GetItemCount = C_Item.GetItemCount
     local GetContainerNumSlots = C_Container.GetContainerNumSlots;
     local GetContainerItemID = C_Container.GetContainerItemID;
     local GetItemInfoInstant = C_Item.GetItemInfoInstant;
-    local GetBagItem = C_TooltipInfo.GetBagItem;
+    local GetBagItem = C_TooltipInfo and C_TooltipInfo.GetBagItem;
 
     local function GetItemBagPosition(itemID)
         local count = GetItemCount(itemID); --unused arg2: Include banks

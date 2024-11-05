@@ -97,6 +97,7 @@ local DefaultValues = {
     Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
     TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
     TooltipRepTokens = true,            --Show faction info for items that grant rep
+    PlayerChoiceFrameToken = true,      --Add owned token count to PlayerChoiceFrame
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
     WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
@@ -154,7 +155,6 @@ local DefaultValues = {
 
     --Deprecated:
     --DruidModelFix = true,               --Fixed by Blizzard in 10.2.0
-    --PlayerChoiceFrameToken = true,      --First implementation in 10.2.0  --We instead revamp the who PlayerChoiceFrame
     --BlizzFixWardrobeTrackingTip = true, --Hide Wardrobe tip that cannot be disabled   --Tip removed by Blizzard
 };
 

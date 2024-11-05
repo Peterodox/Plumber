@@ -7,11 +7,12 @@ local IsUncollectedTransmogByItemInfo = API.IsUncollectedTransmogByItemInfo;
 local ipairs = ipairs;
 
 local LootSlot = LootSlot;
+local CloseLoot = CloseLoot;
 local GetPhysicalScreenSize = GetPhysicalScreenSize;
 local InCombatLockdown = InCombatLockdown;
 local CreateFrame = CreateFrame;
 local IsModifiedClick = IsModifiedClick;
-local IsCosmeticItem = C_Item.IsCosmeticItem;
+local IsCosmeticItem = C_Item.IsCosmeticItem or API.Nop;
 local GetItemCount = C_Item.GetItemCount;
 local GetCursorPosition = GetCursorPosition;
 
@@ -75,7 +76,8 @@ do
             fontSize = nil;
         end
 
-        local fontFile, defaultFontSize = ObjectiveTrackerFont14:GetFont();
+        local baseFont = _G.ObjectiveTrackerFont14 or _G.GameTooltipHeader or _G.GameFontNormal;
+        local fontFile, defaultFontSize = baseFont:GetFont();
         local normalizedFontSize;
 
         if not fontSize then
@@ -390,7 +392,7 @@ do  --UI ItemButton
             data.oldQuantity = self.data.quantity;
             data.quantity = self.data.quantity + data.quantity;
         end
-
+        DT = data;
         if data.slotType == Defination.SLOT_TYPE_ITEM then
             self:SetItem(data);
         elseif data.slotType == Defination.SLOT_TYPE_CURRENCY then
@@ -589,6 +591,17 @@ do  --UI ItemButton
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
                 tooltip:SetLootCurrency(self.data.slotIndex);
             end
+
+            local comparisonTooltip = ShoppingTooltip1;
+            if comparisonTooltip and comparisonTooltip:IsShown() then
+                local left1 = tooltip:GetLeft() or 0;
+                local left2 = comparisonTooltip:GetLeft() or 0;
+                if left2 < left1 then
+                    tooltip:ClearAllPoints();
+                    tooltip:SetPoint("BOTTOMRIGHT", self, "TOPLEFT", 0, 0);
+                end
+            end
+
         elseif self.enableState == 2 then
             if self.data.link then
                 local width = self:GetWidth();
@@ -1220,7 +1233,7 @@ do  --UI Basic
             self.isUpdatingPage = nil;
             self.alpha = self:GetAlpha();
             self:SetScript("OnUpdate", OnUpdate_FadeOut);
-            self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+            self:UnregisterEvent("GLOBAL_MOUSE_UP");
         else
             self.t = 0;
             self:SetScript("OnUpdate", OnUpdate_FadeOut_IfNotFocused);
@@ -1475,19 +1488,20 @@ do  --UI Basic
     end
 
     function MainFrame:OnHide()
-        if not self:IsShown() then
-            self:ReleaseAll();
-        end
+        if self:IsShown() then return end;  --Due to hiding UIParent
+        self:ReleaseAll();
         self.isFocused = false;
         self.manualMode = nil;
-        self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+        self:StopQueue();
+        self:UnregisterEvent("GLOBAL_MOUSE_UP");
     end
     MainFrame:SetScript("OnHide", MainFrame.OnHide);
 
     function MainFrame:OnEvent(event, ...)
-        if event == "GLOBAL_MOUSE_DOWN" then
+        if event == "GLOBAL_MOUSE_UP" then
             local button = ...
             if button == "RightButton" and self:IsMouseOver() then
+                CloseLoot();
                 self:TryHide(true);
             end
         end

@@ -11,7 +11,6 @@ local MERCHANT_FRAME = "MerchantFrame";
 local PRICE_FRAME_OFFSET_X = 45;
 
 local GetMerchantNumItems = GetMerchantNumItems;
-local GetMerchantItemInfo = GetMerchantItemInfo;
 local GetMerchantItemCostInfo = GetMerchantItemCostInfo;
 local GetMerchantItemCostItem = GetMerchantItemCostItem;
 local GetNumBuybackItems = GetNumBuybackItems;
@@ -27,6 +26,24 @@ local ShopUI;
 local Controller = CreateFrame("Frame");
 local TokenDisplay;
 local VendorItemPriceFrame = {};
+
+local GetMerchantItemPrice;
+if C_MerchantFrame.GetItemInfo then
+    local GetMerchantItemInfo = C_MerchantFrame.GetItemInfo;
+    function GetMerchantItemPrice(index)
+        local info = GetMerchantItemInfo(index);
+        if info then
+            return info.price, info.hasExtendedCost
+        end
+    end
+else
+    local GetMerchantItemInfo = GetMerchantItemInfo;
+    function GetMerchantItemPrice(index)
+        local _, price, hasExtendedCost;
+        _, _, price, _, _, _, _, hasExtendedCost = GetMerchantItemInfo(index);
+        return price, hasExtendedCost
+    end
+end
 
 local function HideBlizzardUITexture()
     MerchantMoneyInset.Bg:SetTexture(nil);
@@ -175,6 +192,7 @@ function Controller:SetupTokenDisplay()
     if not TokenDisplay then
         TokenDisplay = addon.CreateTokenDisplay(ShopUI, "CoinBox");
         TokenDisplay.numberFont = "NumberFontNormal";
+        TokenDisplay:SetIncludeBank(true);
         TokenDisplay:ShowMoneyFrame(true);
     end
 end
@@ -217,7 +235,7 @@ function Controller:UpdateMerchantInfo()
     end
 
     for i = fromIndex + 1, fromIndex + numItemsThisPage do
-        name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i);
+        price, extendedCost = GetMerchantItemPrice(i);
 
         buttonIndex = buttonIndex + 1;
         merchantButton = _G["MerchantItem"..buttonIndex];
@@ -483,7 +501,7 @@ do  --For some Merchant UI addon users we only update the token frame
         end
 
         for i = fromIndex + 1, fromIndex + numItemsThisPage do
-            name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i);
+            price, extendedCost = GetMerchantItemPrice(i);
 
             buttonIndex = buttonIndex + 1;
 
@@ -596,23 +614,23 @@ function Debug_ShowCurrentMerchantItemList()
 
     local numMerchantItems = GetMerchantNumItems();
 
-    local name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID;
+    local currencyID;
     local itemID;
     local output, lineText;
-    local numCost, cost, itemTexture, itemValue, itemLink, currencyName;
+    local numCost, itemTexture, itemValue, itemLink, currencyName;
 
     for i = 1, numMerchantItems do
-        name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i);
+        local info = C_MerchantFrame.GetItemInfo(i);
         itemID = GetMerchantItemID(i);
         numCost = GetMerchantItemCostInfo(i);
 
         for n = 1, numCost do
             itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, n);
-            price = itemValue;
-            currencyID = currencyID or string.match(itemLink, "currency:(%d+)");
+            currencyID = info.currencyID or string.match(itemLink, "currency:(%d+)");
         end
 
-        lineText = strjoin(", ", name, itemID, price, currencyID);
+        currencyID = currencyID or "";
+        lineText = strjoin(", ", info.name, itemID, info.price, currencyID);
 
         if i == 1 then
             output = lineText;
