@@ -1380,6 +1380,8 @@ do  --Edit Mode
         self.inEditMode = nil;
         self:Disable();
         self:SetAlpha(0);
+        self:Hide();
+
         self.TakeAllButton:Enable();
 
         if self.Selection then

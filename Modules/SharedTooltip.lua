@@ -662,7 +662,7 @@ do
         CATALYST_CURRENCY_ID = 2813;    --Harmonized Silk
 
         CrestSources = {
-            RAID_DIFFICUTY_M..", +9",
+            RAID_DIFFICUTY_M..", +8",
             RAID_DIFFICUTY_H..", +4",
             RAID_DIFFICUTY_N..", +3",
             RAID_DIFFICUTY_LFR,

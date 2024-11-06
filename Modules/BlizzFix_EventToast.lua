@@ -21,6 +21,8 @@ local MODULE_ENABLED = false;
 local CURRENT_TOAST;
 local HITBOX_MAX_WIDTH = 160;
 
+local _G = _G;
+
 local Module = CreateFrame("Frame");
 Module.ignoreInLayout = true;
 Module:Hide();
@@ -142,36 +144,65 @@ local function EventToastManager_OnSetupButton(uiTextureKit)
     --]]
 end
 
-function Module:OnShow()
+local function TopBannerManager_OnShowCallback(banner)
+    if MODULE_ENABLED then
+        Module:StartWatching();
+    end
+end
+
+function Module:GetActiveBanner()
+    if _G.TopBannerQueue and #_G.TopBannerQueue > 0 then
+        return _G.TopBannerMgr.currentBanner
+    end
+
+    return BlizzardFrame.currentDisplayingToast
+end
+
+function Module:StartWatching()
     self:RegisterEvent("GLOBAL_MOUSE_DOWN");
-    self.t = 0;
-    self.tooltipShown = false;
+    self.interval = 0;
+    self.totalTime = 0;
     self:SetScript("OnUpdate", self.OnUpdate);
+    self:Show();
+end
+
+function Module:OnShow()
+    print("MANAGER_SHOW");
 end
 
 function Module:OnHide()
     self:SetScript("OnUpdate", nil);
     self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
-    self.t = 0;
-    self.tooltipShown = false;
+    self.interval = 0;
+    self.totalTime = 0;
+    print("MANAGER_HIDE");
 end
 
 function Module:OnEvent(event, ...)
     if event == "GLOBAL_MOUSE_DOWN" then
         local button = ...
-        if button == "RightButton" and CURRENT_TOAST and CURRENT_TOAST:IsMouseOver() then
-            CloseActiveToasts();
-            HideGameTooltip();
-            self:OnHide();
+        if button == "RightButton" then
+            local activeBanner = self:GetActiveBanner();
+            if activeBanner and activeBanner:IsShown() then
+                if activeBanner:IsMouseOver() then
+                    activeBanner:Hide();
+                    CloseActiveToasts();
+                    HideGameTooltip();
+                end
+            else
+                self:Hide();
+            end
         end
     end
 end
 
 function Module:OnUpdate(elapsed)
-    self.t = self.t + elapsed;
-    if self.t > 0.2 then
-        self.t = 0;
-        if CURRENT_TOAST then
+    self.interval = self.interval + elapsed;
+    self.totalTime = self.totalTime + elapsed;
+
+    if self.interval > 0.2 then
+        self.interval = 0;
+        if CURRENT_TOAST and CURRENT_TOAST:IsShown() then
             local pause = false;
             local x, y = GetScaledCursorPosition();
             local mouseFocus = GetMouseFocus();
@@ -199,6 +230,13 @@ function Module:OnUpdate(elapsed)
             end
         end
     end
+
+    if self.totalTime > 10 then
+        self.totalTime = 8;
+        if self:GetActiveBanner() == nil then
+            self:Hide();
+        end
+    end
 end
 
 
@@ -212,15 +250,15 @@ function Module:EnableModule()
     if not self.hooked then
         self.hooked = true;
         hooksecurefunc(BlizzardFrame, "SetupButton", EventToastManager_OnSetupButton);
+        if TopBannerManager_Show then
+            hooksecurefunc("TopBannerManager_Show", TopBannerManager_OnShowCallback)
+        end
     end
 
     self:SetScript("OnShow", self.OnShow);
     self:SetScript("OnHide", self.OnHide);
     self:SetScript("OnEvent", self.OnEvent);
     self:SetScript("OnUpdate", self.OnUpdate);
-
-    self:SetParent(BlizzardFrame);
-    self:Show();
 
     if BlizzardFrame:IsShown() then
         SetAllToastsInteractable(false);
