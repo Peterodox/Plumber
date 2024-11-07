@@ -7,6 +7,7 @@ local GetDBBool = addon.GetDBBool;
 
 local ACTION_BUTTON_SIZE = 46;
 local ACTION_BUTTON_GAP = 4;
+local REPOSITION_BUTTON_OFFSET = 46;
 
 
 local UnitCastingInfo = UnitCastingInfo;
@@ -17,17 +18,20 @@ local math = math;
 local UIParent = UIParent;
 local CreateFrame = CreateFrame;
 local tinsert = table.insert;
+local atan2 = math.atan2;
 
 
 local QuickSlot = CreateFrame("Frame", nil, UIParent);
 addon.QuickSlot = QuickSlot;
 QuickSlot:Hide();
-QuickSlot:SetSize(8, 8);
+QuickSlot:SetSize(46, 46);
 QuickSlot:SetAlpha(0);
-QuickSlot:SetFrameStrata("MEDIUM");
+QuickSlot:SetFrameStrata("HIGH");
 QuickSlot.Buttons = {};
 QuickSlot.numActiveButtons = 0;
 QuickSlot.SpellXButton = {};
+QuickSlot:SetClampedToScreen(true);
+QuickSlot:SetClampRectInsets(-ACTION_BUTTON_SIZE, ACTION_BUTTON_SIZE, 8, -8);
 
 local ContextMenu;
 
@@ -44,7 +48,7 @@ local function ContextMenu_HighContrast_OnClick(self, button)
 end
 
 local ContextMenuData = {
-    {text = L["Quick Slot Edit Mode"], onClickFunc = ContextMenu_EditMode_OnClick},
+    {text = L["Quick Slot Reposition"], onClickFunc = ContextMenu_EditMode_OnClick},
     {text = L["Quick Slot High Contrast Mode"], onClickFunc = ContextMenu_HighContrast_OnClick,},
 };
 
@@ -73,11 +77,28 @@ function Positioner:GetButtonCenterGap()
     return radianGap
 end
 
+function Positioner:GetButtonSpan(numActiveButtons)
+    return (self.buttonSize + self.buttonGap) * numActiveButtons - self.buttonGap;
+end
+
+function Positioner:GetCustomPosition()
+    if self.db then
+        return self.db.quickslot_PositionX, self.db.quickslot_PositionY
+    end
+end
+
+function Positioner:SetCustomPosition(x, y)
+    self.db.quickslot_PositionX = x;
+    self.db.quickslot_PositionY = y;
+end
+
 function Positioner:GetFromRadian()
     return self.fromRadian
 end
 
 function Positioner:SetFromRadian(radian)
+    if not radian then return end;
+
     local snappedRadian = math.rad(45);
 
     if radian > snappedRadian then
@@ -98,8 +119,8 @@ function Positioner:SetFromRadian(radian)
 
     self.fromRadian = radian;
 
-    if PlumberDB then
-        PlumberDB.quickslotFromRadian = radian;
+    if self.db then
+        self.db.quickslotFromRadian = radian;
     end
 end
 
@@ -219,8 +240,6 @@ function Positioner:HideGuideLine()
     self:Hide();
     self:SetScript("OnUpdate", nil);
 end
-
-
 
 
 local function RealActionButton_OnLeave(self)
@@ -366,10 +385,8 @@ end
 
 
 function QuickSlot:Init()
-    if PlumberDB and PlumberDB.quickslotFromRadian then
-        Positioner:SetFromRadian(PlumberDB.quickslotFromRadian);
-    end
-
+    Positioner.db = PlumberDB;
+    Positioner:SetFromRadian(Positioner.db.quickslotFromRadian);
     self.side = 1;
 
     local Header = self:CreateFontString(nil, "OVERLAY", "GameTooltipText");
@@ -526,6 +543,16 @@ function QuickSlot:SetButtonData(buttonData)
     for i = self.numActiveButtons + 1, #self.Buttons do
         self.Buttons[i]:Hide();
     end
+
+    if self.numActiveButtons > 1 then
+        self.layoutIndex = 2;
+    else
+        self.layoutIndex = 1;
+    end
+
+    if not self.Init then
+        self:UpdateFrameLayout();
+    end
 end
 
 function QuickSlot:SetButtonOrder(side)
@@ -561,39 +588,52 @@ function QuickSlot:SetFrameLayout(layoutIndex)
     local buttonSize = Positioner.buttonSize;
     local buttonGap = Positioner.buttonGap;
 
+    local radius = math.floor( (0.5 * UIParent:GetHeight()*16/9 /3) + (buttonSize*0.5) + 0.5);
+    local track0Radius = radius;
+    local gapArc = buttonGap + buttonSize;
+    local fromRadian = Positioner:GetFromRadian();
+    local radianGap = gapArc/radius;
+    local radian;
+    local x, y;
+    local cx, cy = UIParent:GetCenter();
+
+    local cos = math.cos;
+    local sin = math.sin;
+
     if layoutIndex == 1 then
         --Normal, below the center
-        --CastingBar's position is changed conditionally
-
-        local anchorTo = Positioner:GetCastBar();
-        local y = anchorTo:GetTop();
-        local scale = anchorTo:GetScale();
+        x, y = Positioner:GetCustomPosition();
+        if not (x and y) then
+            --x = cx + radius * cos(fromRadian);
+            --y = cy + radius * sin(fromRadian);
+            x = cx + radius;
+        end
 
         self:ClearAllPoints();
-        self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 250); --(y + 30)*scale   --Default CastingBar moves up 29y when start casting
+        self:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
 
         for i, button in ipairs(self.Buttons) do
             button:ClearAllPoints();
-            button:SetPoint("LEFT", self, "LEFT", (i - 1) * (buttonSize +  buttonGap), 0);
+            button:SetPoint("CENTER", self, "CENTER", (i - 1) * (buttonSize +  buttonGap), 0);
         end
 
-        self.Header:ClearAllPoints();
-        self.Header:SetPoint("BOTTOM", self, "TOP", 0, 8);
-        self.headerMaxWidth = 0;
+        if self.numActiveButtons > 1 then
+            local buttonMiddlePoint = 0.5 * Positioner:GetButtonSpan(self.numActiveButtons or 1);
+            self.Header:ClearAllPoints();
+            self.Header:SetPoint("BOTTOM", self, "TOPLEFT", buttonMiddlePoint, 8);
+            self.headerMaxWidth = 0;
+        else
+            self.Header:ClearAllPoints();
+            self.Header:SetPoint("RIGHT", self, "LEFT", -16, 0);
+            self.headerMaxWidth = 240;
+        end
+
+        if self.RepositionButton then
+            self.RepositionButton:ClearAllPoints();
+            self.RepositionButton:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y + REPOSITION_BUTTON_OFFSET);
+        end
     else
         --Circular, on the right side
-        local radius = math.floor( (0.5 * UIParent:GetHeight()*16/9 /3) + (buttonSize*0.5) + 0.5);
-        local track0Radius = radius;
-        local gapArc = buttonGap + buttonSize;
-        local fromRadian = Positioner:GetFromRadian();
-        local radianGap = gapArc/radius;
-        local radian;
-        local x, y;
-        local cx, cy = UIParent:GetCenter();
-
-        local cos = math.cos;
-        local sin = math.sin;
-
         local trackIndex = 0;
 
         for i, button in ipairs(self.Buttons) do
@@ -642,6 +682,10 @@ function QuickSlot:SetFrameLayout(layoutIndex)
             --]]
         end
     end
+end
+
+function QuickSlot:UpdateFrameLayout()
+    self:SetFrameLayout(self.layoutIndex or 2);
 end
 
 function QuickSlot:SetInteractable(state, dueToCombat)
@@ -721,12 +765,12 @@ QuickSlot:SetScript("OnHide", QuickSlot.OnHide);
 
 local function GetCursorRadianToPoint(cx, cy, uiRatio)
     local x, y = GetCursorPosition();
-    x = x *uiRatio;
+    x = x * uiRatio;
     y = y * uiRatio;
-    return math.atan2(y - cy, x - cx);
+    return atan2(y - cy, x - cx);
 end
 
-local function RepositionButton_OnUpdate(self, elapsed)
+local function RepositionButton_OnUpdate_Radial(self, elapsed)
     self.t = self.t + elapsed;
     if self.t >= 0.016 then
         self.t = 0;
@@ -734,7 +778,7 @@ local function RepositionButton_OnUpdate(self, elapsed)
         if radian ~= self.radian then
             self.radian = radian;
             Positioner:SetFromRadian(self.frameRadian + radian - self.selfRadian);
-            QuickSlot:SetFrameLayout(2);
+            QuickSlot:UpdateFrameLayout();
             --[[
             if radian > -1.57 and radian < 1.57 then
                 QuickSlot:SetButtonOrder(1);
@@ -746,10 +790,22 @@ local function RepositionButton_OnUpdate(self, elapsed)
     end
 end
 
+local function RepositionButton_OnUpdate_FreeMove(self, elapsed)
+    self.t = self.t + elapsed;
+    if self.t >= 0.016 then
+        self.t = 0;
+        local x, y = GetCursorPosition();
+        x = self.cxOffset + x * self.uiRatio;
+        y = self.cyOffset + y * self.uiRatio - REPOSITION_BUTTON_OFFSET;
+        Positioner:SetCustomPosition(x, y);
+        QuickSlot:UpdateFrameLayout();
+    end
+end
+
 local function RepositionButton_OnMouseDown(self, button)
     if button == "RightButton" then
         Positioner:SetFromRadian(0);
-        QuickSlot:SetFrameLayout(2);
+        QuickSlot:UpdateFrameLayout();
         return
     end
     self.t = 0;
@@ -758,11 +814,24 @@ local function RepositionButton_OnMouseDown(self, button)
     self.radian = GetCursorRadianToPoint(self.cx, self.cy, self.uiRatio);
     self.selfRadian = Positioner:GetEditButtonRadian();
     self.frameRadian = Positioner:GetFromRadian();
-    self:SetScript("OnUpdate", RepositionButton_OnUpdate);
+
+    local cx0, cy0 = GetCursorPosition();
+    cx0 = cx0 * self.uiRatio;
+    cy0 = cy0 * self.uiRatio;
+    local x0, y0 = self:GetCenter();
+    self.cxOffset = x0 - cx0;
+    self.cyOffset = y0 - cy0;
+
+    local isRadial = QuickSlot.layoutIndex ~= 1;
+    if isRadial then
+        self:SetScript("OnUpdate", RepositionButton_OnUpdate_Radial);
+        Positioner:ShowGuideLineCircle(true);
+    else
+        self:SetScript("OnUpdate", RepositionButton_OnUpdate_FreeMove);
+        Positioner:ShowGuideLineCircle(false);
+    end
     QuickSlot:SetInteractable(false);
     self:LockHighlight();
-
-    Positioner:ShowGuideLineCircle(true);
 end
 
 local function RepositionButton_OnMouseUp(self)
@@ -780,8 +849,7 @@ local function RepositionButton_OnClick(self)
     local dRadian = Positioner:GetButtonCenterGap();
     local newRadian = oldRadian + delta*dRadian;
     Positioner:SetFromRadian(newRadian);
-
-    QuickSlot:SetFrameLayout(2);
+    QuickSlot:UpdateFrameLayout();
 end
 
 local function RepositionButton_SetRotation(self, radian)
@@ -822,7 +890,11 @@ function QuickSlot:EnableEditMode(state)
             b:SetSize(16, 16);
             self.RepositionButton = b;
             b:SetFrameStrata("DIALOG");
+            b:SetFrameLevel(500);
             b:SetFixedFrameStrata(true);
+            b:SetClampedToScreen(true);
+            local offset = 46;
+            b:SetClampRectInsets(-offset, offset, offset, -offset);
 
             local tex = "Interface/AddOns/Plumber/Art/Button/RepositionButton-Circle";
 
@@ -850,6 +922,9 @@ function QuickSlot:EnableEditMode(state)
             self.EditModeConfirmButton = b;
             b:SetFrameStrata("DIALOG");
             b:SetFixedFrameStrata(true);
+            b:SetClampedToScreen(true);
+            local offset = 24;
+            b:SetClampRectInsets(-offset, offset, offset, -offset);
 
             local tex = "Interface/AddOns/Plumber/Art/Button/EditMode-Confirm";
 
@@ -883,7 +958,14 @@ function QuickSlot:EnableEditMode(state)
                 button.Count:Hide();
             end
             self.isEditing = true;
-            self:SetFrameLayout(2);
+            self:UpdateFrameLayout();
+
+            self.EditModeConfirmButton:ClearAllPoints();
+            if self.layoutIndex == 1 then
+                self.EditModeConfirmButton:SetPoint("CENTER", self, "CENTER", -54, 0);
+            else
+                self.EditModeConfirmButton:SetPoint("CENTER", self.Header, "CENTER", 0, 0);
+            end
         end
     else
         if self.isEditing then
@@ -918,7 +1000,7 @@ function QuickSlot:ShowUI()
 
     if self.layoutDirty then
         self.layoutDirty = nil;
-        self:SetFrameLayout(2);
+        self:UpdateFrameLayout();
     end
 
     self:RegisterEvent("BAG_UPDATE");
@@ -1014,7 +1096,7 @@ function QuickSlot:OnEvent(event, ...)
             self:SetInteractable(true);
         end
     elseif event == "UI_SCALE_CHANGED" then
-        self:SetFrameLayout(2);
+        self:UpdateFrameLayout();
     elseif event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_START" then
         local _, _, spellID = ...
         QuickSlot:OnSpellCastChanged(spellID, true);

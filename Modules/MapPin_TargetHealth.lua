@@ -1,7 +1,7 @@
 local _, addon = ...
 
-local GetVignetteHealthPct = C_VignetteInfo.GetVignetteHealthPct;
-if not GetVignetteHealthPct then return end;
+local GetHealthPercent = C_VignetteInfo.GetHealthPercent;
+if not GetHealthPercent then return end;
 
 local GetVignetteInfo = C_VignetteInfo.GetVignetteInfo;
 local GetVignettes = C_VignetteInfo.GetVignettes;
@@ -17,7 +17,7 @@ local function TTT()
         if info then
             print(info.name, info.vignetteID, info.type);
             if info.type == 0 then
-                healthPct = GetVignetteHealthPct(info.vignetteGUID);
+                healthPct = GetHealthPercent(info.vignetteGUID);
                 print(healthPct)    --(v57361) Always nil
             end
         end

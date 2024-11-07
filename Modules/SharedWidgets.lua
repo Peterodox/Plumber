@@ -874,7 +874,9 @@ do  -- TokenFrame   -- Money   -- Coin
                 else
                     self.fromCopper = self.newValue;
                     self.updateTime = self.updateTime - 0.05;
+                    local _rawCopper = self.rawCopper;
                     self:SetAmount(self.fromCopper);
+                    self.rawCopper = _rawCopper;
                 end
             end
         end
@@ -885,10 +887,11 @@ do  -- TokenFrame   -- Money   -- Coin
             if not self.fromCopper then
                 self.fromCopper = 0;
             end
-            self.toCopper = self.fromCopper + addRawCopper;
+            self.rawCopper = self:GetAmount() + addRawCopper;
+            self.toCopper = self.rawCopper;
             self.updateTime = 0;
             self.totalTime = 0;
-            local copper = self.toCopper % 100;
+            local copper = self.toCopper % 10000;
             self.showCopperDuringAnimation = floor(copper) > 0;
             self:SetScript("OnUpdate", self.OnUpdate_AnimateValue);
         else

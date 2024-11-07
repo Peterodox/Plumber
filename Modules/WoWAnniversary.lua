@@ -239,7 +239,6 @@ function EL:ListenEvents(state)
         self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         self:SetScript("OnEvent", nil);
         self:WatchPlayerLocation(false);
-
     end
 end
 

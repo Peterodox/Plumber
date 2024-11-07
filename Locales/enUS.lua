@@ -11,6 +11,10 @@ L["Module Control"] = "Module Control";
 L["Quick Slot Generic Description"] = "\n\n*Quick Slot is a set of clickable buttons that appear under certain conditions.";
 L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Edit Mode";
 L["Quick Slot High Contrast Mode"] = "Toggle High Contrast Mode";
+L["Quick Slot Reposition"] = "Change Position";
+L["Quick Slot Layout"] = "Layout";
+L["Quick Slot Layout Linear"] = "Linear";
+L["Quick Slot Layout Radial"] = "Radial";
 L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map - Map Filter - Plumber";
 

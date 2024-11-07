@@ -163,7 +163,7 @@ ItemDataProvider.expirationTexts = {};
 
 function ItemDataProvider:GetItemCount(itemID, overwrite)
     if (not self.counts[itemID]) or overwrite then
-        self.counts[itemID] = GetItemCount(itemID, true);   --includeBank
+        self.counts[itemID] = GetItemCount(itemID, true, false, true, true);   --includeBank/ReagentBank/WarBank
     end
 
     return self.counts[itemID]
@@ -319,11 +319,30 @@ local function ShowButtonTooltip(owner, itemID, currencyID)
             end
 
             local numInBags = GetItemCount(itemID);
-            local numTotal = GetItemCount(itemID, true);
+            local numTotal = GetItemCount(itemID, true, false, true, true);
             if numInBags ~= numTotal then
-                local numInBanks = numTotal - numInBags;
-                tooltip:AddLeftLine(BANK, 1, 0.82, 0);
-                tooltip:AddRightLine(numInBanks, 1, 1, 1);
+                local _total, delta;
+
+                _total = GetItemCount(itemID, true, false, false, false);
+                delta = _total - numInBags;
+                if delta > 0 then
+                    tooltip:AddLeftLine(BANK, 1, 0.82, 0);
+                    tooltip:AddRightLine(delta, 1, 1, 1);
+                end
+
+                _total = GetItemCount(itemID, false, false, true, false);
+                delta = _total - numInBags;
+                if delta > 0 then
+                    tooltip:AddLeftLine(REAGENT_BANK, 1, 0.82, 0);
+                    tooltip:AddRightLine(delta, 1, 1, 1);
+                end
+
+                _total = GetItemCount(itemID, false, false, false, true);
+                delta = _total - numInBags;
+                if delta > 0 then
+                    tooltip:AddLeftLine(ACCOUNT_BANK_PANEL_TITLE, 1, 0.82, 0);
+                    tooltip:AddRightLine(delta, 1, 1, 1);
+                end
             end
 
             tooltip:Show();

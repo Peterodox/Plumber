@@ -167,7 +167,7 @@ function Module:StartWatching()
 end
 
 function Module:OnShow()
-    print("MANAGER_SHOW");
+    --print("MANAGER_SHOW");
 end
 
 function Module:OnHide()
@@ -175,7 +175,7 @@ function Module:OnHide()
     self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
     self.interval = 0;
     self.totalTime = 0;
-    print("MANAGER_HIDE");
+    --print("MANAGER_HIDE");
 end
 
 function Module:OnEvent(event, ...)

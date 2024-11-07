@@ -392,7 +392,7 @@ do  --UI ItemButton
             data.oldQuantity = self.data.quantity;
             data.quantity = self.data.quantity + data.quantity;
         end
-        DT = data;
+
         if data.slotType == Defination.SLOT_TYPE_ITEM then
             self:SetItem(data);
         elseif data.slotType == Defination.SLOT_TYPE_CURRENCY then
