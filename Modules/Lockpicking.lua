@@ -96,6 +96,10 @@ function Processor:OnEvent(event, ...)
         if tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
             HideActionButton();
         end
+    elseif event == "BANKFRAME_OPENED" then
+        self.atBank = true;
+    elseif event == "BANKFRAME_CLOSED" then
+        self.atBank = false;
     end
 end
 
@@ -113,7 +117,7 @@ end
 local function IsPlayerInteracingBank()
     --Merchant is checked by another function
     --Banker, GuildBanker, MailInfo
-    return IsInteractingWithNpcOfType(8) or IsInteractingWithNpcOfType(10) or IsInteractingWithNpcOfType(17)
+    return Processor.atBank or IsInteractingWithNpcOfType(8) or IsInteractingWithNpcOfType(10) or IsInteractingWithNpcOfType(17)
 end
 
 local function ShouldShowOverlay()
@@ -183,9 +187,10 @@ local function ActionButton_Bag_OnEnter(self)
 
         TooltipFrame:SetOwner(self, "ANCHOR_LEFT");
 
-        for i, lineData in ipairs(tooltipData.lines) do
-            AddLineDataText(TooltipFrame, lineData);
-        end
+        --for i, lineData in ipairs(tooltipData.lines) do
+        --    AddLineDataText(TooltipFrame, lineData);
+        --end
+        TooltipFrame:SetBagItem(self.bag, self.slot);
 
         TooltipFrame:AddLine(INSTRUCTION_PICK_LOCK, 0.400, 0.733, 1.000, true);    --Use a different color to distinguish it from other <Action> text in Pure Green
         TooltipFrame:Show();
@@ -454,9 +459,13 @@ local function EnableModule(state)
         TooltipFrame = GameTooltip;
         AddTooltipPostCall();
         GetUnlockSpellName();
+        Processor:RegisterEvent("BANKFRAME_OPENED");
+        Processor:RegisterEvent("BANKFRAME_CLOSED");
     else
         MODULE_ENABLED = false;
         Processor:StopAll();
+        Processor:unregisterEvent("BANKFRAME_OPENED");
+        Processor:unregisterEvent("BANKFRAME_CLOSED");
     end
 end
 
