@@ -150,9 +150,9 @@ local function TopBannerManager_OnShowCallback(banner)
     end
 end
 
-function Module:GetActiveBanner()
+function Module:GetActiveToast()
     if _G.TopBannerQueue and #_G.TopBannerQueue > 0 then
-        return _G.TopBannerMgr.currentBanner
+        return _G.TopBannerMgr.currentBanner and _G.TopBannerMgr.currentBanner.frame
     end
 
     return BlizzardFrame.currentDisplayingToast
@@ -182,7 +182,7 @@ function Module:OnEvent(event, ...)
     if event == "GLOBAL_MOUSE_DOWN" then
         local button = ...
         if button == "RightButton" then
-            local activeBanner = self:GetActiveBanner();
+            local activeBanner = self:GetActiveToast();
             if activeBanner and activeBanner:IsShown() then
                 if activeBanner:IsMouseOver() then
                     activeBanner:Hide();
@@ -233,7 +233,7 @@ function Module:OnUpdate(elapsed)
 
     if self.totalTime > 10 then
         self.totalTime = 8;
-        if self:GetActiveBanner() == nil then
+        if self:GetActiveToast() == nil then
             self:Hide();
         end
     end

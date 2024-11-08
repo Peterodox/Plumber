@@ -607,6 +607,7 @@ function QuickSlot:SetFrameLayout(layoutIndex)
             --x = cx + radius * cos(fromRadian);
             --y = cy + radius * sin(fromRadian);
             x = cx + radius;
+            y = cy;
         end
 
         self:ClearAllPoints();
@@ -804,7 +805,11 @@ end
 
 local function RepositionButton_OnMouseDown(self, button)
     if button == "RightButton" then
-        Positioner:SetFromRadian(0);
+        if QuickSlot.layoutIndex == 1 then
+            Positioner:SetCustomPosition(nil, nil);
+        else
+            Positioner:SetFromRadian(0);
+        end
         QuickSlot:UpdateFrameLayout();
         return
     end
@@ -991,6 +996,10 @@ function QuickSlot:EnableEditMode(state)
             return
         end
     end
+end
+
+function QuickSlot:CloseUIAfterEditing()
+    self.closeUIAfterEditing = true;
 end
 
 function QuickSlot:ShowUI()

@@ -779,6 +779,35 @@ do
         return time() > 1729400000
     end
 
+    local function OptionToggle_OnClick(self, button)
+        if EL:IsEventActive(WIDGET_ID_MOUNT_MANIAC_ACTIVE) then
+            return
+        end
+
+        if QuickSlot:IsShown() then
+            QuickSlot:EnableEditMode(false);
+        else
+            local function Nop()
+            end
+            local name = L["ModuleName WoWAnniversary"];
+            local icon = 132261;
+            local data = {
+                buttons = {
+                    {actionType = "spell", spellID = 0, icon = icon, name = name, onClickFunc = Nop, enabled = true},
+                },
+                systemName = QUICKSLOT_NAME,
+                spellcastType = 1,
+            };
+
+            QuickSlot:SetButtonData(data);
+            QuickSlot:ShowUI();
+            QuickSlot:SetHeaderText(name, true);
+            QuickSlot:SetDefaultHeaderText(name);
+            QuickSlot:EnableEditMode(true);
+            QuickSlot:CloseUIAfterEditing();
+        end
+    end
+
     local moduleData = {
         name = L["ModuleName WoWAnniversary"],
         dbKey = "WoWAnniversary",
@@ -788,6 +817,7 @@ do
         uiOrder = 1150,
         moduleAddedTime = 1729500000,
         validityCheck = ValidityCheck,
+        optionToggleFunc = OptionToggle_OnClick,
     };
 
     addon.ControlCenter:AddModule(moduleData);
