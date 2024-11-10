@@ -96,10 +96,6 @@ function Processor:OnEvent(event, ...)
         if tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
             HideActionButton();
         end
-    elseif event == "BANKFRAME_OPENED" then
-        self.atBank = true;
-    elseif event == "BANKFRAME_CLOSED" then
-        self.atBank = false;
     end
 end
 
@@ -116,8 +112,8 @@ end
 
 local function IsPlayerInteracingBank()
     --Merchant is checked by another function
-    --Banker, GuildBanker, MailInfo
-    return Processor.atBank or IsInteractingWithNpcOfType(8) or IsInteractingWithNpcOfType(10) or IsInteractingWithNpcOfType(17)
+    --Banker, GuildBanker, MailInfo, CharacterBanker, AccountBanker
+    return IsInteractingWithNpcOfType(8) or IsInteractingWithNpcOfType(10) or IsInteractingWithNpcOfType(17) or IsInteractingWithNpcOfType(67) or IsInteractingWithNpcOfType(68)
 end
 
 local function ShouldShowOverlay()
@@ -459,13 +455,9 @@ local function EnableModule(state)
         TooltipFrame = GameTooltip;
         AddTooltipPostCall();
         GetUnlockSpellName();
-        Processor:RegisterEvent("BANKFRAME_OPENED");
-        Processor:RegisterEvent("BANKFRAME_CLOSED");
     else
         MODULE_ENABLED = false;
         Processor:StopAll();
-        Processor:unregisterEvent("BANKFRAME_OPENED");
-        Processor:unregisterEvent("BANKFRAME_CLOSED");
     end
 end
 
