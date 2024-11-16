@@ -19,7 +19,7 @@ local GetNumLootItems = GetNumLootItems;
 local IsFishingLoot = IsFishingLoot;
 
 local GetMoney = GetMoney;
-local GetItemReagentQualityByItemInfo = C_TradeSkillUI.GetItemReagentQualityByItemInfo;
+local GetItemReagentQualityByItemInfo = C_TradeSkillUI.GetItemReagentQualityByItemInfo or API.Nop;
 local GetItemInfoInstant = C_Item.GetItemInfoInstant;
 local GetItemInfo = C_Item.GetItemInfo;
 local IsModifiedClick = IsModifiedClick;
