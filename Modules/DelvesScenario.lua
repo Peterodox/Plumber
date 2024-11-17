@@ -89,12 +89,13 @@ function EL:OnUpdate(elapsed)
     end
 end
 
-function EL:ProcessOnNextCycle(func)
+function EL:ProcessOnNextCycle(func, delay)
     if not self.queuedFuncs then
         self.queuedFuncs = {};
     end
 
-    self.t = -0.5;
+    delay = delay or 0.5;
+    self.t = -delay;
     self:SetScript("OnUpdate", self.OnUpdate);
 
     for _, queuedFunc in ipairs(self.queuedFuncs) do
@@ -563,7 +564,7 @@ do  --Seasonal Journey Progress
         end
     end
     EL:AddHandler("WALK_IN_DATA_UPDATE", function()
-        EL:ProcessOnNextCycle(OnDelveEntered);
+        EL:ProcessOnNextCycle(OnDelveEntered, 3);
     end);
 
     local function OnScenarioCompleted()

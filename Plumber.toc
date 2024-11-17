@@ -29,6 +29,7 @@ Modules\AutoJoinEvents.lua
 Modules\PlayerChoiceFrameToken.lua
 #Modules\DruidModelFix.lua
 Modules\QuickSlot.lua
+Modules\QuestAreaTrigger.lua
 Modules\Dreamseed.lua
 #Modules\EventMap.lua
 Modules\MapPin.xml
@@ -50,6 +51,7 @@ Modules\LootUI.xml
 Modules\WoWAnniversary.lua
 Modules\UnderlightAngler.lua
 Modules\QuestItemDestroyAlert.lua
+#Modules\SecretOfAzeroth.lua
 
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua

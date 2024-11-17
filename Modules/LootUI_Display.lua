@@ -1472,7 +1472,7 @@ do  --Edit Mode
     local OPTIONS_SCHEMATIC = {
         title = L["EditMode LootUI"],
         widgets = {
-            {type = "Slider", label = L["Font Size"], minValue = 12, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "LootUI_FontSize"},
+            {type = "Slider", label = L["Font Size"], minValue = 10, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "LootUI_FontSize"},
             {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueFunc = Options_FadeOutDelaySlider_FormatValue,  dbKey = "LootUI_FadeDelayPerItem"},
             {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},

@@ -1,4 +1,4 @@
-## Interface: 40400, 40401
+## Interface: 40401
 ## Version: 1.4.8
 
 ## Title: Plumber

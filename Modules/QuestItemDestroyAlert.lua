@@ -45,6 +45,12 @@ function EL:TOOLTIP_DATA_UPDATE(dataInstanceID)
     end
 end
 
+function EL:QUEST_DATA_LOAD_RESULT(questID, success)
+    if questID == self.questID and success then
+        self:DisplayQuest(questID);
+    end
+end
+
 function EL:CURSOR_CHANGED()
     if not CursorHasItem() then
         self:HideUI();
@@ -123,28 +129,32 @@ function EL:UpdateBagData()
     end
 end
 
-function EL:OnUpdate_UnregisterTooltipEvent(elapsed)
+function EL:OnUpdate_UnregisterDynamicEvents(elapsed)
     self.t = self.t + elapsed;
     if self.t > 1.0 then
         self.t = nil;
         self:SetScript("OnUpdate", nil);
         self:UnregisterEvent("TOOLTIP_DATA_UPDATE");
+        self:UnregisterEvent("QUEST_DATA_LOAD_RESULT");
     end
 end
 
-function EL:ListenTooltipEvent()
+function EL:ListenDynamicEvents()
     self:RegisterEvent("CURSOR_CHANGED");
     self:RegisterEvent("TOOLTIP_DATA_UPDATE");
+    self:RegisterEvent("QUEST_DATA_LOAD_RESULT");
     self.t = 0;
-    self:SetScript("OnUpdate", self.OnUpdate_UnregisterTooltipEvent);
+    self:SetScript("OnUpdate", self.OnUpdate_UnregisterDynamicEvents);
 end
 
 function EL:DisplayQuest(questID)
+    self.questID = questID;
+
     local questName;
     local questLogIndex = GetLogIndexForQuestID(questID);
     local tooltipData = GetHyperlink("quest:"..questID);
     self.dataInstanceID = tooltipData and tooltipData.dataInstanceID or nil;
-    self:ListenTooltipEvent();
+    self:ListenDynamicEvents();
 
     local tooltipText;
     if tooltipData and tooltipData.lines then
@@ -177,7 +187,10 @@ function EL:DisplayQuest(questID)
         tooltipText = tooltipText .. "\n\n".."|cff88aaff"..ACCOUNT_COMPLETED_QUEST_NOTICE.."|r";
     end
 
-    --print(questID, questName);
+    if not questName then
+        C_QuestLog.RequestLoadQuestByID(questID);
+    end
+
     --[[
     if questLogIndex then
         --On quest
@@ -219,7 +232,6 @@ function EL:DisplayQuest(questID)
     if popup then
         self:DisplayTooltip(popup, questName, tooltipText);
     else
-        print("NO POPUP")
         self:DisplayTooltip(nil);
     end
 end
