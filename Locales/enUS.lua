@@ -217,6 +217,14 @@ L["ModuleName QuestItemDestroyAlert"] = "Quest Item Delete Confirmation";
 L["ModuleDescription QuestItemDestroyAlert"] = "Show the associate quest info when you attempt to destroy an item that starts a quest. \n\n|cffd4641cOnly works for items that start quests, not those you obtain after accepting a quest.|r";
 
 
+--SpellcastingInfo
+L["ModuleName SpellcastingInfo"] = "Target Spellcasting Info";
+L["ModuleDescription SpellcastingInfo"] = "- Show the spell tooltip when hovering over the Cast Bar on Target Frame.\n\n- Save the monster's abilities that can be later viewed by right-clicking on the Target Frame.";
+L["Abilities"] = ABILITIES or "Abilities";
+L["Spell Colon"] = "Spell: ";   --Display SpellID
+L["Icon Colon"] = "Icon: ";     --Display IconFileID
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";

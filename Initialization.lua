@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.4.8";
-local VERSION_DATE = 1731800000;
+local VERSION_TEXT = "v1.4.9";
+local VERSION_DATE = 1732700000;
 
 
 local addonName, addon = ...
@@ -104,6 +104,7 @@ local DefaultValues = {
         VotingResultsExpanded = true,
     BlizzFixFishingArtifact = true,     --Fix Fishing Artifact Traits Not Showing bug
     QuestItemDestroyAlert = true,       --Show related quest info when destroying a quest-starting item
+    SpellcastingInfo = false,           --Show the spell info when hovering over target/focus cast bars. Logging target spells and displayed it on UnitPopupMenu
 
     --Custom Loot Window
     LootUI = false,
@@ -160,6 +161,8 @@ local DefaultValues = {
 
 local function LoadDatabase()
     PlumberDB = PlumberDB or {};
+    PlumberStorage = PlumberStorage or {};  --Save large data (Spell)
+
     DB = PlumberDB;
 
     for dbKey, value in pairs(DefaultValues) do

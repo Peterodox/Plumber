@@ -1,7 +1,6 @@
 local _, addon = ...
 
 local SpellFaction = {};
-addon.ReputationItemData = Data;
 
 local GetItemSpell = C_Item.GetItemSpell;
 local ItemFaction = {};

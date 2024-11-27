@@ -1,6 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local CallbackRegistry = addon.CallbackRegistry;
 
 local tonumber = tonumber;
 local match = string.match;
@@ -98,6 +99,23 @@ do  -- String
     end
     API.GetUnitCreatureID = GetUnitCreatureID;
 
+    local ValidUnitTypes = {
+        Creature = true,
+        Pet = true,
+        GameObject = true,
+        Vehicle = true,
+    };
+
+    local function GetUnitIDGeneral(unit)
+        local guid = UnitGUID(unit);
+        if guid then
+            local unitType, id = match(guid, "(%a+)%-0%-%d*%-%d*%-%d*%-(%d*)");
+            if id and unitType and ValidUnitTypes[unitType] then
+                return tonumber(id)
+            end
+        end
+    end
+    API.GetUnitIDGeneral = GetUnitIDGeneral;
 
     local function GetGlobalObject(objNameKey)
         --Get object via string "FrameName.Key1.Key2"
@@ -2084,8 +2102,159 @@ do  --Tooltip
 
         addon.TooltipAPI = TooltipAPI;
     end
+
+
+    local function SetTooltipWithPostCall(tooltip, tooltipPostCall, getterName, ...)
+        local tooltipInfo = {
+            getterName = getterName,
+            getterArgs = { ... };
+        };
+        tooltipInfo.tooltipPostCall = tooltipPostCall;
+        tooltip:ProcessInfo(tooltipInfo);
+    end
+    API.SetTooltipWithPostCall = SetTooltipWithPostCall;
 end
 
+do  --AsyncCallback
+    local AsyncCallback = CreateFrame("Frame");
+
+    --LoadQuestAPI is not available in 60 Classic
+    --In this case we will run all callbacks when the time is up
+    AsyncCallback.WoWAPI_LoadQuest = C_QuestLog.RequestLoadQuestByID;
+    AsyncCallback.WoWAPI_LoadItem = C_Item.RequestLoadItemDataByID;
+    AsyncCallback.WoWAPI_LoadSpell = C_Spell.RequestLoadSpellData;
+
+    function AsyncCallback:RunAllCallbacks(list)
+        for id, callbacks in pairs(list) do
+            for _, callbackInfo in ipairs(callbacks) do
+                if (callbackInfo.oneTime and not callbackInfo.processed) or (callbackInfo.oneTime == false) then
+                    callbackInfo.processed = true;
+                    callbackInfo.func(id);
+                end
+            end
+        end
+    end
+
+    function AsyncCallback:OnEvent(event, ...)
+        local id, success = ...
+        local list;
+
+        if event == "QUEST_DATA_LOAD_RESULT" then
+            list = self.questCallbacks;
+        elseif event == "ITEM_DATA_LOAD_RESULT" then
+            list = self.itemCallbacks;
+        elseif event == "SPELL_DATA_LOAD_RESULT" then
+            list = self.spellCallbacks;
+        end
+
+        if list and id and success then
+            if list[id] then
+                for _, callbackInfo in ipairs(list[id]) do
+                    if (callbackInfo.oneTime and not callbackInfo.processed) or (callbackInfo.oneTime == false) then
+                        callbackInfo.processed = true;
+                        callbackInfo.func(id);
+                    end
+                end
+            end
+        end
+
+        self.t = 0;
+    end
+    AsyncCallback:SetScript("OnEvent", AsyncCallback.OnEvent);
+
+    function AsyncCallback:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.5 then
+            self.t = nil;
+            self:SetScript("OnUpdate", nil);
+
+            if self.questCallbacks then
+                if self.LoadQuest then
+                    self:UnregisterEvent("QUEST_DATA_LOAD_RESULT");
+                end
+                if self.runCallbackAfter then
+                    self:RunAllCallbacks(self.questCallbacks);
+                end
+                self.questCallbacks = nil;
+            end
+
+            if self.itemCallbacks then
+                if self.LoadItem then
+                    self:UnregisterEvent("ITEM_DATA_LOAD_RESULT");
+                end
+                self:RunAllCallbacks(self.itemCallbacks);
+                self.itemCallbacks = nil;
+            end
+
+            if self.spellCallbacks then
+                if self.LoadSpell then
+                    self:UnregisterEvent("SPELL_DATA_LOAD_RESULT");
+                end
+                self:RunAllCallbacks(self.spellCallbacks);
+                self.spellCallbacks = nil;
+            end
+        end
+    end
+
+    function AsyncCallback:AddCallback(key, id, callback, oneTime)
+        if not self[key] then
+            self[key] = {};
+        end
+
+        if not self[key][id] then
+            self[key][id] = {};
+        end
+
+        if oneTime == nil then
+            oneTime = true;
+        end
+
+        local callbackInfo = {
+            func = callback,
+            oneTime = oneTime,
+            processed = false,
+        };
+
+        tinsert(self[key][id], callbackInfo);
+    end
+
+
+    function CallbackRegistry:LoadQuest(id, callback, oneTime)
+        AsyncCallback:AddCallback("questCallbacks", id, callback, oneTime);
+        if AsyncCallback.WoWAPI_LoadQuest then
+            AsyncCallback:RegisterEvent("QUEST_DATA_LOAD_RESULT");
+            AsyncCallback.WoWAPI_LoadQuest(id);
+        else
+            AsyncCallback.runCallbackAfter = true;
+        end
+        AsyncCallback.t = 0;
+        AsyncCallback:SetScript("OnUpdate", AsyncCallback.OnUpdate);
+    end
+
+    function CallbackRegistry:LoadItem(id, callback, oneTime)
+        AsyncCallback:AddCallback("itemCallbacks", id, callback, oneTime);
+        if AsyncCallback.WoWAPI_LoadItem then
+            AsyncCallback:RegisterEvent("ITEM_DATA_LOAD_RESULT");
+            AsyncCallback.WoWAPI_LoadItem(id);
+        else
+            AsyncCallback.runCallbackAfter = true;
+        end
+        AsyncCallback.t = 0;
+        AsyncCallback:SetScript("OnUpdate", AsyncCallback.OnUpdate);
+    end
+
+    function CallbackRegistry:LoadSpell(id, callback, oneTime)
+        AsyncCallback:AddCallback("spellCallbacks", id, callback, oneTime);
+        if AsyncCallback.WoWAPI_LoadSpell then
+            AsyncCallback:RegisterEvent("SPELL_DATA_LOAD_RESULT");
+            AsyncCallback.WoWAPI_LoadSpell(id);
+        else
+            AsyncCallback.runCallbackAfter = true;
+        end
+        AsyncCallback.t = 0;
+        AsyncCallback:SetScript("OnUpdate", AsyncCallback.OnUpdate);
+    end
+end
 
 do
     local GetItemCount = C_Item.GetItemCount

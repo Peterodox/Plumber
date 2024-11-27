@@ -72,7 +72,7 @@ do
     end
 
     function Formatter:CalculateDimensions(fontSize)
-        if not (fontSize and fontSize >= 12 and fontSize <= 16) then
+        if not (fontSize and fontSize >= 10 and fontSize <= 16) then
             fontSize = nil;
         end
 
@@ -107,6 +107,14 @@ do
         self.BUTTON_SPACING = 12;
 
         self.numberWidths = {};
+
+        if MainFrame.Header then
+            if fontSize < defaultFontSize then
+                MainFrame.Header:SetFont(fontFile, fontSize, "");
+            else
+                MainFrame.Header:SetFont(fontFile, defaultFontSize, "");
+            end
+        end
     end
 
     function Formatter:GetNumberWidth(number)
@@ -1338,6 +1346,9 @@ do  --UI Basic
     function MainFrame:Init()
         self.Init = nil;
 
+        local Header = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        self.Header = Header;
+
         Formatter:Init()
 
         self.itemFramePool = API.CreateObjectPool(CreateItemFrame);
@@ -1383,8 +1394,6 @@ do  --UI Basic
 
         self:InitBackground();
 
-        local Header = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        self.Header = Header;
         Header:SetJustifyH("CENTER");
         Header:SetPoint("BOTTOM", self, "TOP", 0, Formatter.BUTTON_SPACING);
         Header:SetText(L["You Received"]);

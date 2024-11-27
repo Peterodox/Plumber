@@ -18,7 +18,7 @@ local function TTT()
             print(info.name, info.vignetteID, info.type);
             if info.type == 0 then
                 healthPct = GetHealthPercent(info.vignetteGUID);
-                print(healthPct)    --(v57361) Always nil
+                print(healthPct)    --(v57788) Always nil
             end
         end
     end

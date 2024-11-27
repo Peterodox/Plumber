@@ -217,6 +217,14 @@ L["ModuleName QuestItemDestroyAlert"] = "删除任务物品确认";
 L["ModuleDescription QuestItemDestroyAlert"] = "当你试图摧毁一件可以提供任务的物品时，显示该任务的信息。\n\n|cffd4641c仅限于提供任务的物品，不适用于接受任务以后获得的任务物品。|r";
 
 
+--SpellcastingInfo
+L["ModuleName SpellcastingInfo"] = "目标施法信息";
+L["ModuleDescription SpellcastingInfo"] = "- 将鼠标悬停在目标框体施法条上可显示正在读条的法术信息。\n\n- 保存目标怪物的技能。你可以在目标框体的右键菜单-技能里找到它们。";
+L["Abilities"] = "技能";
+L["Spell Colon"] = "法术: ";
+L["Icon Colon"] = "图标: ";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
