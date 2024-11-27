@@ -219,7 +219,7 @@ L["ModuleDescription QuestItemDestroyAlert"] = "Show the associate quest info wh
 
 --SpellcastingInfo
 L["ModuleName SpellcastingInfo"] = "Target Spellcasting Info";
-L["ModuleDescription SpellcastingInfo"] = "- Show the spell tooltip when hovering over the Cast Bar on Target Frame.\n\n- Save the monster's abilities that can be later viewed by right-clicking on the Target Frame.";
+L["ModuleDescription SpellcastingInfo"] = "- Show the spell tooltip when hovering over the Cast Bar on the Target Frame.\n\n- Save the monster's abilities that can be later viewed by right-clicking on the Target Frame.";
 L["Abilities"] = ABILITIES or "Abilities";
 L["Spell Colon"] = "Spell: ";   --Display SpellID
 L["Icon Colon"] = "Icon: ";     --Display IconFileID
