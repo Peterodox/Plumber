@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.3.8
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.4.9
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -9,6 +9,12 @@ local L = addon.L;
 --Module Control Panel
 L["Module Control"] = "Управление модулем";
 L["Quick Slot Generic Description"] = "\n\n*Быстрый слот - это набор интерактивных кнопок, которые появляются при определенных условиях.";
+L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Режим редактирования";
+L["Quick Slot High Contrast Mode"] = "Включить режим высокой контрастности";
+L["Quick Slot Reposition"] = "Изменить позицию";
+L["Quick Slot Layout"] = "Макет";
+L["Quick Slot Layout Linear"] = "Линейный";
+L["Quick Slot Layout Radial"] = "Радиальный";
 L["Restriction Combat"] = "Не работает в бою";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*Вы можете изменить размер штифта на карте мира - Фильтр карты - Plumber";
 
@@ -194,6 +200,59 @@ L["ModuleName Delves_SeasonProgress"] = "Вылазки: Путешествие 
 L["ModuleDescription Delves_SeasonProgress"] = "Отображение шкалы прогресса в верхней части экрана каждый раз, когда вы получаете опыт для вылазки";
 
 
+--WoW Anniversary
+L["ModuleName WoWAnniversary"] = "Годовщина WoW";
+L["ModuleDescription WoWAnniversary"] = "- Легко призовите средство передвижения во время события Ездомания.\n\n- Показать результаты голосования во время мероприятия Модной лихорадки. ";
+L["Voting Result Header"] = "Результаты";
+L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "У вас нет этого средства передвижения.";
+
+
+--BlizzFixFishingArtifact
+L["ModuleName BlizzFixFishingArtifact"] = "Blitz Fix: Удочка Темносвета";
+L["ModuleDescription BlizzFixFishingArtifact"] = "Разрешить вам снова просматривать характеристики рыболовного артефакта.";
+
+
+--QuestItemDestroyAlert
+L["ModuleName QuestItemDestroyAlert"] = "Подтверждение удаления предмета задания";
+L["ModuleDescription QuestItemDestroyAlert"] = "Показывать информацию о связанном задании при попытке уничтожить предмет, который начинает задание. \n\n|cffd4641cРаботает только для предметов, которые начинают задания, а не для тех, которые вы получаете после принятия задания.|r";
+
+
+--SpellcastingInfo
+L["ModuleName SpellcastingInfo"] = "Информация о заклинании цели";
+L["ModuleDescription SpellcastingInfo"] = "- Показывать подсказку заклинания при наведении курсора на панель заклинаний в рамке цели.\n\n- Сохраните способности монстра, которые можно будет просмотреть позже, щелкнув правой кнопкой мыши по рамке цели.";
+L["Abilities"] = ABILITIES or "Способности";
+L["Spell Colon"] = "Заклинание: ";   --Display SpellID
+L["Icon Colon"] = "Иконка: ";     --Display IconFileID
+
+
+--Loot UI
+L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Окно добычи";
+L["ModuleDescription LootUI"] = "Заменить стандартное окно добычи и предоставить некоторые дополнительные функции:\n\n- Быстрый сбор предметов.\n\n- Исправлена ​​ошибка сбоя автоматического сбора добычи.\n\n- Показывать кнопку взять все при ручном сборе.";
+L["Take All"] = "Взять все";     --Take all items from a loot window
+L["You Received"] = YOU_RECEIVED_LABEL or "Вы получили";
+L["Reach Currency Cap"] = "Достигнуты валютные ограничения";
+L["Sample Item 4"] = "Потрясающий эпический предмет";
+L["Sample Item 3"] = "Потрясающий редкий предмет";
+L["Sample Item 2"] = "Потрясающий необычный предмет";
+L["Sample Item 1"] = "Обычный предмет";
+L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Окно добычи");
+L["Manual Loot Instruction Format"] = "Чтобы временно отменить автоматическую добычу определенного предмета, нажмите и удерживайте |cffffffff%s|r клавишу, пока не появится окно добычи.";
+L["LootUI Option Force Auto Loot"] = "Принудительная автоматическая добыча";
+L["LootUI Option Force Auto Loot Tooltip"] = "Всегда включайте автоматическую добычу, чтобы избежать случайных сбоев в работе автоматической добычи.";
+L["LootUI Option Owned Count"] = "Показать количество принадлежащих предметов";
+L["LootUI Option New Transmog"] = "Отметить Несобранный внешний вид";
+L["LootUI Option New Transmog Tooltip"] = "Добавьте маркер %s, если вы не собрали внешний вид предмета.";
+L["LootUI Option Use Hotkey"] = "Нажмите клавишу, чтобы взять все предметы";
+L["LootUI Option Use Hotkey Tooltip"] = "В режиме ручного сбора добычи нажмите следующую горячую клавишу, чтобы забрать все предметы.";
+L["LootUI Option Fade Delay"] = "Задержка исчезновения для каждого предмета";
+L["LootUI Option Replace Default"] = "Заменить оповещение о добыче по умолчанию";
+L["LootUI Option Replace Default Tooltip"] = "Заменить стандартные оповещения о добыче, которые обычно появляются над панелями действий.";
+L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Открыть окно добычи с помощью мыши";
+L["LootUI Option Loot Under Mouse Tooltip"] = "В режиме |cffffffffручного сбора добычи|r окно будет отображаться под текущим местоположением мыши.";
+L["LootUI Option Use Default UI"] = "Использовать окно добычи по умолчанию";
+L["LootUI Option Use Default UI Tooltip"] = "Использовать стандартное окно добычи WoW.\n\n|cffff4800Включение этой опции отменяет все настройки выше.|r";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Перемещение по горизонтали";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Перемещение по вертикали";
@@ -204,6 +263,7 @@ L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Известность ";  --Th
 L["Paragon Reputation"] = "Парагон";
 L["Level Maxed"] = "(Максимально)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Текущий:";
+L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "У вас есть невостребованные награды";
 
 
 
@@ -229,6 +289,10 @@ L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameO
 L["Bountiful Delve"] =  "Многообещающая вылазка";
 L["Special Assignment"] = "Особое поручение";
 
+
+L["Match Pattern Gold"] = "([%d%,]+) Золото";
+L["Match Pattern Silver"] = "([%d]+) Серебро";
+L["Match Pattern Copper"] = "([%d]+) Медь";
 
 L["Match Patter Rep 1"] = "Отношение (.+) к вашему отряду улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Patter Rep 2"] = "Отношение (.+) к вам улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED
