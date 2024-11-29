@@ -49,6 +49,8 @@ local POILocation = {}; --See the bottom of this file
 
 local DelvesPinMixin = {};
 do
+    local ICON_WIDTH, ICON_HEIGHT = 20, 20;
+
     function DelvesPinMixin:PostMouseEnter()
         if self.data.uiMapID and self.data.poiID then
             local poiInfo = GetAreaPOIInfo(self.data.uiMapID, self.data.poiID);
@@ -83,7 +85,11 @@ do
     function DelvesPinMixin:Update()
         self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/Delve-Bountiful", "LINEAR");
         self:SetTexCoord(0, 1, 0, 1);
-        self.Texture:SetSize(20, 20);
+        self:SetSizeScale(1);
+    end
+
+    function DelvesPinMixin:SetSizeScale(scale)
+        self.Texture:SetSize(ICON_WIDTH * scale, ICON_HEIGHT * scale);
     end
 end
 

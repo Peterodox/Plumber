@@ -1,5 +1,5 @@
 local VERSION_TEXT = "v1.4.9";
-local VERSION_DATE = 1732700000;
+local VERSION_DATE = 1732800000;
 
 
 local addonName, addon = ...
@@ -122,6 +122,7 @@ local DefaultValues = {
 
     --Unified Map Pin System
     WorldMapPin_TWW = true,             --Master Switch for TWW Map Pins
+        WorldMapPin_Size = 1,           --1: Default
         WorldMapPin_TWW_Delve = true,   --Show Bountiful Delves on continent map
         WorldMapPin_TWW_Quest = true,   --Show Special Assignment on continent map
 

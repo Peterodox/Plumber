@@ -1,6 +1,8 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local SetDBValue = addon.SetDBValue;
+local GetDBValue = addon.GetDBValue;
 local Mixin = API.Mixin;
 
 local MapFrame = WorldMapFrame;
@@ -45,12 +47,12 @@ do  --BlizzardUIUtil
                     for _, option in ipairs(options) do
                         --rootDescription:CreateButton("Button", function() print("Text here!" end);
                         local function IsSelected()
-                            return addon.GetDBValue(option.dbKey);
+                            return GetDBValue(option.dbKey);
                         end
 
                         local function SetSelected()
-                            local newState = not addon.GetDBValue(option.dbKey);
-                            addon.SetDBValue(option.dbKey, newState);
+                            local newState = not GetDBValue(option.dbKey);
+                            SetDBValue(option.dbKey, newState);
                             PinController:EnableMapDataProvider(option.dbKey, newState);
                             PinController:RequestUpdate();
                         end
@@ -72,6 +74,21 @@ do  --BlizzardUIUtil
 
                             return width, height;
                         end);
+                    end
+
+                    local submenu = rootDescription:CreateButton(L["Pin Size"]);
+
+                    local function IsSelected(index)
+                        return index == PinController:GetPinSizeIndex()
+                    end
+
+                    local function SetSelected(index)
+                        SetDBValue("WorldMapPin_Size", index, true);
+                        return (MenuResponse and MenuResponse.Refresh) or 2
+                    end
+
+                    for index, text in ipairs(PinController:GetPinSizeChoices()) do
+                        submenu:CreateRadio(text, IsSelected, SetSelected, index);
                     end
                 end
             end);
@@ -109,7 +126,7 @@ do  --PinController
         if self.mapDataProviders then
             for mapID, dataProviders in pairs(self.mapDataProviders) do
                 for _, dataProvider in ipairs(dataProviders) do
-                    dataProvider.enabled = addon.GetDBValue(dataProvider.OptionData.dbKey);
+                    dataProvider.enabled = GetDBValue(dataProvider.OptionData.dbKey);
                 end
             end
         end
@@ -135,6 +152,7 @@ do  --PinController
     function PinController:UpdatePinForMap(mapID)
         local pin, pinData;
         local anyPins = false;
+        local pinSizeScale = self:GetPinSizeScale();
 
         for i, dataProvider in ipairs(self.mapDataProviders[mapID]) do
             if dataProvider.enabled then
@@ -142,8 +160,9 @@ do  --PinController
                 if pinData then
                     for _, data in ipairs(pinData) do
                         pin = MapFrame:AcquirePin(PIN_TEMPLATE_NAME, data);
-                        if (not anyPins) and pin then
+                        if pin then
                             anyPins = true;
+                            pin:SetSizeScale(pinSizeScale);
                         end
                     end
                 end
@@ -206,6 +225,43 @@ do  --PinController
     function PinController:UpdatePinScale()
 
     end
+
+
+    --Custom Pin Size
+    local PinSizeIndexSizeScale = {
+        --[pinSizeIndex] = scale,
+        [1] = 1.0,
+        [2] = 1.25,
+        [3] = 1.5,
+    };
+
+    function PinController:GetPinSizeChoices()
+        local tbl = {};
+        for i, scale in ipairs(PinSizeIndexSizeScale) do
+            tbl[i] = string.format("%.0f%%", scale * 100);
+        end
+        return tbl
+    end
+
+    function PinController:GetPinSizeIndex()
+        return self.pinSizeIndex or 1
+    end
+
+    function PinController:GetPinSizeScale()
+        return self.pinSizeScale or 1
+    end
+
+    function PinController:SetPinSizeIndex(index, useInput)
+        if not (index and PinSizeIndexSizeScale[index]) then
+            index = 1;
+        end
+        self.pinSizeIndex = index;
+        self.pinSizeScale = PinSizeIndexSizeScale[index];
+        if useInput then
+            MapTracker:OnMapChanged();
+        end
+    end
+    addon.CallbackRegistry:Register("SettingChanged.WorldMapPin_Size", PinController.SetPinSizeIndex, PinController);
 end
 
 

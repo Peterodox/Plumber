@@ -43,6 +43,8 @@ local POILocation = {};
 
 local QuestPinMixin = {};
 do
+    local ICON_WIDTH, ICON_HEIGHT = 20, 25;
+
     local function WidgetTextRule(text)
         if string.find(text, "%d") then
             return true
@@ -99,7 +101,7 @@ do
 
     function QuestPinMixin:Update()
         self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/WorldQuest-Capstone", "LINEAR");
-        self.Texture:SetSize(20, 25);
+        self:SetSizeScale(1);
 
         local isLocked = not self.data.isQuest; --poiInfo.atlasName == worldquest-Capstone-questmarker-epic-Locked
 
@@ -108,6 +110,10 @@ do
         else
             self:SetTexCoord(0.5, 1, 0, 0.625);
         end
+    end
+
+    function QuestPinMixin:SetSizeScale(scale)
+        self.Texture:SetSize(ICON_WIDTH * scale, ICON_HEIGHT * scale);
     end
 end
 
