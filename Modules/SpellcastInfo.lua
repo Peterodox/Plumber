@@ -8,6 +8,7 @@ local GetUnitIDGeneral = API.GetUnitIDGeneral;      --Creature/Pet/GameObject/Ve
 
 local IMPORTANT_CAST_TIME = 1000;                   --Important spell (millisecond). No info when the cast/channel time is below this value
 
+local IsInInstance = IsInInstance;                  --Save open world boss unit
 local UnitExists = UnitExists;
 local UnitIsBossMob = UnitIsBossMob;                --Don't save boss spell
 local UnitCastingInfo = UnitCastingInfo;
@@ -135,7 +136,7 @@ do
 
     function EL:OnEvent(event, ...)
         if event == "PLAYER_TARGET_CHANGED" then
-            if UnitExists("target") and not UnitIsBossMob("target") then
+            if UnitExists("target") and (self.inInOpenWorld or (not UnitIsBossMob("target"))) then
                 CURRENT_UID = GetUnitIDGeneral("target");
                 if CURRENT_UID then
                     local spellID = GetUnitCastingSpellID("target");
@@ -155,6 +156,8 @@ do
             SpellDatabase:AddSpell(CURRENT_UID, spellID);
         elseif event == "PLAYER_LOGOUT" then
             SpellDatabase:SaveDatabase();
+        elseif event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" then
+            self:UpdateInInstance();
         end
     end
 
@@ -167,9 +170,12 @@ do
 
         self:RegisterEvent("PLAYER_TARGET_CHANGED");
         self:RegisterEvent("PLAYER_LOGOUT");
+        self:RegisterEvent("PLAYER_ENTERING_WORLD");
+        self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
 
         self:SetScript("OnEvent", self.OnEvent);
 
+        self:UpdateInInstance();
         self:OnEvent("PLAYER_TARGET_CHANGED");
     end
 
@@ -178,6 +184,8 @@ do
             self:UnregisterEvent(event);
         end
         self:UnregisterEvent("PLAYER_TARGET_CHANGED");
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD");
+        self:UnregisterEvent("ZONE_CHANGED_NEW_AREA");
         --Keep PLAYER_LOGOUT so it saves sessionData
     end
 
@@ -199,6 +207,10 @@ do
             return
         end
         return true
+    end
+
+    function EL:UpdateInInstance()
+        self.inInOpenWorld = not IsInInstance();
     end
 end
 
