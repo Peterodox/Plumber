@@ -201,7 +201,7 @@ do
         dbKey = "TooltipChestKeys",
         description = addon.L["ModuleDescription TooltipChestKeys"],
         toggleFunc = EnableModule,
-        categoryID = 1,
+        categoryID = 3,
         uiOrder = 1110,
         moduleAddedTime = 1718500000,
     };

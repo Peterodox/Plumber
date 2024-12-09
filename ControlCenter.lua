@@ -19,7 +19,8 @@ local CATEGORY_ORDER = {
 
     [1] = "General",
     [2] = "NPC Interaction",
-    [3] = "Class",
+    [3] = "Tooltip",
+    [4] = "Class",
 
     --Patch Feature uses the tocVersion and #00
     [10020000] = "Dragonflight",

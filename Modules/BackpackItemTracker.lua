@@ -1014,12 +1014,12 @@ local function SettingsFrame_ToggleUIAtCursorPosition()
     end
 end
 
-do
-    --Tray Button: [itemCount][itemIcon]
+do  --Tray Button: [itemCount][itemIcon]
     TrackerFrame.TrayButtons = {};
 
     local ICON_SIZE = 12;
     local TEXT_ICON_GAP = 2;
+    local FONT_OBJECT = "GameFontHighlightSmall";
 
     local TrayButtonMixin = {};
 
@@ -1029,7 +1029,7 @@ do
         self.Icon:SetPoint("RIGHT", self, "RIGHT", 0, 0);
         self.Icon:SetTexCoord(0.0625, 0.9375, 0.0625, 0.9375);
 
-        self.Count = self:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall");
+        self.Count = self:CreateFontString(nil, "ARTWORK", FONT_OBJECT);
         self.Count:SetJustifyH("RIGHT");
         self.Count:SetPoint("RIGHT", self.Icon, "LEFT", -TEXT_ICON_GAP, 0);
 
@@ -1287,6 +1287,14 @@ do
             self:SaveUserTrackList();
             self:BuildTrackList();
             self:UpdateTray(true);
+        end
+    end
+
+    function TrackerFrame:SetTrayButtonFont(fontObject)
+        FONT_OBJECT = fontObject;
+        for _, button in pairs(self.TrayButtons) do
+            button.Count:SetFontObject(fontObject);
+            button.Count:SetJustifyH("RIGHT");
         end
     end
 end
@@ -1871,7 +1879,7 @@ function TrackerFrame:UpdateTray(manual)
             if manual and not wasTracked[itemID] then
                 API.UIFrameFadeIn(button, 0.5);
             end
-            
+
             if resetPoint then
                 button:SetHeight(TRAY_BUTTON_HEIGHT);
                 button:ClearAllPoints();
@@ -1910,7 +1918,7 @@ function TrackerFrame:UpdateTray(manual)
             fullWidth = TRAY_FRAME_MAX_WDITH;
         end
 
-        self:SetWidth(fullWidth);
+        self:SetFrameWidth(fullWidth);
         self.Border:SetWidth(math.max(fullWidth, RECEPTOR_MIN_WIDTH));
     end
 
@@ -1923,6 +1931,10 @@ function TrackerFrame:UpdateTray(manual)
     end
 
     self:UpdateBackgroundVisibility();
+end
+
+function TrackerFrame:SetFrameWidth(width)
+    self:SetWidth(width);
 end
 
 function TrackerFrame:CalculateHeight()
@@ -2273,76 +2285,64 @@ function TrackerFrame:ParentTo_LiteBag()
 end
 
 function TrackerFrame:ParentTo_Baganator()
-    local backpackView1 = Baganator_SingleViewBackpackViewFrame;
-    local backpackView2 = Baganator_CategoryViewBackpackViewFrame;
+    if not (Baganator and Baganator.API) then return end;
 
-    local parent = backpackView1;
+    local RegisterRegion = Baganator.API.RegisterRegion;
+    local RequestLayoutUpdate = Baganator.API.RequestLayoutUpdate;
 
-    if not parent then return end;
+    if not RegisterRegion then return end;
 
     self.isBlizzardBag = false;
-    self:SetShowBackground(true);
-    self:SetParent(parent);
+    self:SetShowBackground(false);
     self:SetScript("OnShow", TrackerFrame_Update_OnShow);
     self:Show();
     self:SetClampedToScreen(false);
     self:ClearAllPoints();
+    self.Border:ClearAllPoints();
+    self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
 
-    local isSingleView = true;
-    local anchorTo = backpackView1;
+    local RegionDummy = CreateFrame("Frame");
+    RegionDummy:SetSize(16, 12);
+    self:SetParent(RegionDummy);
+    self:SetPoint("LEFT", RegionDummy, "LEFT", 0, -1);
 
-    local function Callback_AllocateBags()
-        if isSingleView and anchorTo.lastBagDetails then
-            local numButtons = anchorTo.lastBagDetails.special and #anchorTo.lastBagDetails.special or 0;
-            local fromOffset = 0;
-            local iconButtonWidth = 32;
-            local buttonSpacing = 5;
-            local offset = (numButtons) * (iconButtonWidth + buttonSpacing) + fromOffset;
-            if anchorTo.BagLive then
-                self:ClearAllPoints();
-                self:SetPoint("LEFT", anchorTo.BagLive, "LEFT", offset, 0);
-                self:SetPoint("BOTTOM", anchorTo, "BOTTOM", 0, 9);
-            end
+    self:SetTrayButtonFont("GameFontHighlight");
+
+    local label = "Plumber";
+    local id = "plumber";
+    local viewType = "backpack";
+    local position = "bottom_left";
+    local region = RegionDummy;
+    RegisterRegion(label, id, viewType, position, region);
+
+    if RequestLayoutUpdate then
+        --Our frame can still overlap with money frame if the user tracks a lot of stuff
+        function TrackerFrame:SetFrameWidth(width)
+            TrackerFrame:SetWidth(width);
+            RegionDummy:SetWidth(width);
+            RequestLayoutUpdate();
         end
     end
 
+    if Baganator.CallbackRegistry then
+        local currentText;
 
-    --Supporting Category Group View
-
-    if backpackView1 and backpackView1:GetScript("OnShow") ~= nil then
-        backpackView1:HookScript("OnShow", function()
-            if not isSingleView then
-                isSingleView = true;
-                self:ClearAllPoints();
-                self.Border:ClearAllPoints();
-                self:SetParent(backpackView1);
-                Callback_AllocateBags();
+        function TrackerFrame:SearchItemByID(itemID)
+            if itemID then
+                local itemName = C_Item.GetItemNameByID(itemID);
+                if currentText and currentText ~= "" and string.find(string.lower(itemName), string.lower(currentText)) then
+                    Baganator.CallbackRegistry:TriggerEvent("SearchTextChanged", "");
+                else
+                    if itemName and itemName ~= "" then
+                        Baganator.CallbackRegistry:TriggerEvent("SearchTextChanged", string.lower(itemName));
+                    end
+                end
             end
-        end);
-    end
-
-    if backpackView2 and backpackView2:GetScript("OnShow") ~= nil then
-        backpackView2:HookScript("OnShow", function()
-            if isSingleView then
-                isSingleView = false;
-                self:ClearAllPoints();
-                self.Border:ClearAllPoints();
-                self:SetParent(backpackView2);
-                self:SetPoint("LEFT", backpackView2, "BOTTOMLEFT", 17, 17);
-                self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
-            end
-        end);
-    end
-
-
-    if anchorTo then
-        if anchorTo.AllocateBags then
-            hooksecurefunc(backpackView1, "AllocateBags", Callback_AllocateBags)
         end
-        self:SetPoint("LEFT", anchorTo, "BOTTOMLEFT", 54, 17);
-        self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
-    else
-        self:Hide();
+
+        Baganator.CallbackRegistry:RegisterCallback("SearchTextChanged",  function(_, text)
+            currentText = text;
+        end)
     end
 end
 
@@ -2361,7 +2361,6 @@ function TrackerFrame:ParentTo_BetterBags()
     RepositionUtil.parent = parent;
     self:ClearAllPoints();
     self.Border:ClearAllPoints();
-
     self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
 
     local anchorOutside = true;
@@ -2396,10 +2395,8 @@ local GetAddOnSearchBox = {
         return box
     end,
 
-    Baganator = function()
-        local bagFarme = Baganator_SingleViewBackpackViewFrame;
-        return bagFarme and bagFarme.SearchBox
-    end,
+    Nop = function()
+    end
 };
 
 
@@ -2453,14 +2450,9 @@ local function AnchorToCompatibleAddOn()
             --This addon is using stock searchbox
         end
     elseif IsAddOnLoaded("Baganator") then
-        --Baganator is being actively developed
-        --Available space (width) is affected by Bag Columns, we ignore it for now
-        local bagFrame = Baganator_SingleViewBackpackViewFrame;
-        if bagFrame then
-            TrackerFrame.UpdateAnchor = DoesNothing;
-            TrackerFrame:ParentTo_Baganator();
-            GetSearchBox = GetAddOnSearchBox.Baganator;
-        end
+        TrackerFrame.UpdateAnchor = DoesNothing;
+        TrackerFrame:ParentTo_Baganator();
+        GetSearchBox = GetAddOnSearchBox.Nop;
     elseif IsAddOnLoaded("BetterBags") then --New Adibags(Still WIP)
         local bagFrame = BetterBagsBagBackpack;     --WTF is this name
         if bagFrame then

@@ -89,7 +89,7 @@ do
         dbKey = ItemSubModule:GetDBKey(),
         description = addon.L["ModuleDescription TooltipSnapdragonTreats"],
         toggleFunc = EnableModule,
-        categoryID = 1,
+        categoryID = 3,
         uiOrder = 1150,
         moduleAddedTime = 1726674500,
     };

@@ -27,6 +27,8 @@ L["Module Category General"] = "General";
 --- order: 2
 L["Module Category NPC Interaction"] = "NPC Interaction";
 --- order: 3
+L["Module Category Tooltip"] = "Tooltip";   --Additional Info on Tooltips
+--- order: 4
 L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
@@ -161,17 +163,17 @@ L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
 
 
 --Tooltip Chest Keys
-L["ModuleName TooltipChestKeys"] = "Tooltip: Chest Keys";
+L["ModuleName TooltipChestKeys"] = "Chest Keys";
 L["ModuleDescription TooltipChestKeys"] = "Show info on the key required to open the current chest or door.";
 
 
 --Tooltip Reputation Tokens
-L["ModuleName TooltipRepTokens"] = "Tooltip: Reputation Tokens";
+L["ModuleName TooltipRepTokens"] = "Reputation Tokens";
 L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increase reputation.";
 
 
 --Tooltip Mount Recolor
-L["ModuleName TooltipSnapdragonTreats"] = "Tooltip: Snapdragon Treats";
+L["ModuleName TooltipSnapdragonTreats"] = "Snapdragon Treats";
 L["ModuleDescription TooltipSnapdragonTreats"] = "Add additional info to Snapdragon Treats.";
 L["Color Applied"] = "This is the currently applied color.";
 

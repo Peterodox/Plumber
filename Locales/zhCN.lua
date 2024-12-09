@@ -27,6 +27,8 @@ L["Module Category General"] = "常规";
 --- order: 2
 L["Module Category NPC Interaction"] = "NPC 交互";
 --- order: 3
+L["Module Category Tooltip"] = "鼠标提示";   --Additional Info on Tooltips
+--- order: 4
 L["Module Category Class"] = "职业";   --Player Class (rogue, paladin...)
 
 L["Module Category Dragonflight"] = "巨龙时代";
@@ -161,13 +163,19 @@ L["Seed Color Uncommon"] = "绿色";
 
 
 --Tooltip Chest Keys
-L["ModuleName TooltipChestKeys"] = "鼠标提示：宝箱钥匙";
+L["ModuleName TooltipChestKeys"] = "宝箱钥匙";
 L["ModuleDescription TooltipChestKeys"] = "显示打开某些宝箱所需的钥匙信息。";
 
 
 --Tooltip Reputation Tokens
-L["ModuleName TooltipRepTokens"] = "鼠标提示：声望兑换物";
+L["ModuleName TooltipRepTokens"] = "声望兑换物";
 L["ModuleDescription TooltipRepTokens"] = "如果当前物品可以被直接使用来提升某一阵营的声望，显示此声望信息";
+
+
+--Tooltip Mount Recolor
+L["ModuleName TooltipSnapdragonTreats"] = "毒鳍龙";
+L["ModuleDescription TooltipSnapdragonTreats"] = "在毒鳍龙鼠标提示上显示额外信息。";
+L["Color Applied"] = "你正在使用这个配色。";
 
 
 --Merchant UI Price

@@ -50,7 +50,7 @@ do
         dbKey = ItemSubModule:GetDBKey(),
         description = addon.L["ModuleDescription TooltipRepTokens"],
         toggleFunc = EnableModule,
-        categoryID = 1,
+        categoryID = 3,
         uiOrder = 1111,
         moduleAddedTime = 1726674500,
     };
