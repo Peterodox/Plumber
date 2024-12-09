@@ -1,5 +1,11 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
     <Script file="GameTooltip_Key.lua"/>
+
+    <!--This one controls all modules involving Enum.TooltipDataType.Item-->
+    <Script file="GameTooltip_ItemManager.lua"/>
+
+    <!--Item Modules-->
     <Script file="GameTooltip_ReputationItem_Data.lua"/>
 	<Script file="GameTooltip_ReputationItem.lua"/>
+    <Script file="GameTooltip_MountRecolor.lua"/>
 </Ui>

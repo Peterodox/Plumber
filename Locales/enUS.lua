@@ -170,6 +170,12 @@ L["ModuleName TooltipRepTokens"] = "Tooltip: Reputation Tokens";
 L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increase reputation.";
 
 
+--Tooltip Mount Recolor
+L["ModuleName TooltipSnapdragonTreats"] = "Tooltip: Snapdragon Treats";
+L["ModuleDescription TooltipSnapdragonTreats"] = "Add additional info to Snapdragon Treats.";
+L["Color Applied"] = "This is the currently applied color.";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Merchant Price";
 L["ModuleDescription MerchantPrice"] = "Modify Merchant UI's behaviors:\n\n- Grey out only the insufficient currencies.\n\n- Show all required items in the coin box.";
