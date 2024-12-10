@@ -2256,7 +2256,7 @@ do  --AsyncCallback
     end
 end
 
-do
+do  --Container Item Processor
     local GetItemCount = C_Item.GetItemCount
     local GetContainerNumSlots = C_Container.GetContainerNumSlots;
     local GetContainerItemID = C_Container.GetContainerItemID;
@@ -2401,6 +2401,16 @@ do
     end
 end
 
+do  -- Chat Message
+    local ADDON_ICON = "|TInterface\\AddOns\\Plumber\\Art\\Logo\\PlumberLogo32:0:0|t";
+    local function PrintMessage(msg)
+        if not msg then
+            msg = "";
+        end
+        print(ADDON_ICON.." |cffb8c8d1Plumber:|r "..msg);
+    end
+    API.PrintMessage = PrintMessage;
+end
 
 --[[
 local DEBUG = CreateFrame("Frame");

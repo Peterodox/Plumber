@@ -174,7 +174,7 @@ L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can
 
 --Tooltip Mount Recolor
 L["ModuleName TooltipSnapdragonTreats"] = "Snapdragon Treats";
-L["ModuleDescription TooltipSnapdragonTreats"] = "Add additional info to Snapdragon Treats.";
+L["ModuleDescription TooltipSnapdragonTreats"] = "Show additional info for Snapdragon Treats.";
 L["Color Applied"] = "This is the currently applied color.";
 
 
@@ -232,6 +232,16 @@ L["Abilities"] = ABILITIES or "Abilities";
 L["Spell Colon"] = "Spell: ";   --Display SpellID
 L["Icon Colon"] = "Icon: ";     --Display IconFileID
 
+
+--Chat Options
+L["ModuleName ChatOptions"] = "Chat Channel Options";
+L["ModuleDescription ChatOptions"] = "Add Leave buttons to the menu that appears when you right-click on the channel name in the chat window.";
+L["Chat Leave"] = CHAT_LEAVE or "Leave";
+L["Chat Leave All Characters"] = "Leave On All Characters";
+L["Chat Leave All Characters Tooltip"] = "You will automatically leave this channel when you log in on a character.";
+L["Chat Auto Leave Alert Format"] = "Do you wish to automatically leave |cffffc0c0[%s]|r on all your characters?";
+L["Chat Auto Leave Cancel Format"] = "Auto Leave Disabled for %s. Please use /join command to rejoin the channel.";
+L["Click To Disable"] = "Click to Disable";
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";

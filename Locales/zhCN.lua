@@ -233,6 +233,17 @@ L["Spell Colon"] = "法术: ";
 L["Icon Colon"] = "图标: ";
 
 
+--Chat Options
+L["ModuleName ChatOptions"] = "聊天频道选项";
+L["ModuleDescription ChatOptions"] = "在聊天频道的右键菜单上增加离开按钮。";
+L["Chat Leave"] = "离开频道";
+L["Chat Leave All Characters"] = "在所有角色上离开此频道";
+L["Chat Leave All Characters Tooltip"] = "当你登录一个角色后自动离开此频道。";
+L["Chat Auto Leave Alert Format"] = "你是否希望你所有角色都自动离开 |cffffc0c0[%s]|r ？";
+L["Chat Auto Leave Cancel Format"] = "此频道的自动离开已禁用： %s。请使用 /join 命令重新加入频道。";
+L["Click To Disable"] = "点击禁用";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
