@@ -4,7 +4,7 @@
 	<Script file="MapPin_Delves.lua"/>
 	<Script file="MapPin_TWW_Quest.lua"/>
 	<Script file="MapPin_Dreamseed.lua"/>
-	<Script file="MapPin_TargetHealth.lua"/>
+	<!--Script file="MapPin_TargetHealth.lua"/-->	<!--API isn't functioning-->
 
 
 	<Frame name="PlumberWorldMapPinTemplate" enableMouseMotion="true" enableMouse="false" mixin="PlumberWorldMapPinMixin" virtual="true">

@@ -2,7 +2,7 @@
 	<Script file="SharedWidgets.lua"/>
 
     <Frame name="PlumberBarPulseTemplate" virtual="true">
-    <!--Derivative of Blizzard FullResourcePulseFrame-->
+        <!--Derivative of Blizzard FullResourcePulseFrame-->
         <Size x="16" y="32"/>
         <Layers>
             <Layer level="OVERLAY">
@@ -365,4 +365,107 @@
             </Frame>
         </Frames>
     </Frame>
+
+    <Button name="PlumberPeudoActionButtonTemplate" virtual="true">
+        <Size x="46" y="46"/>
+        <Layers>
+            <Layer level="BORDER">
+                <Texture parentKey="Icon">
+                    <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+                    <Size x="40" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+                <MaskTexture file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT" x="0" y="0"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+                    </Anchors>
+                    <MaskedTextures>
+                        <MaskedTexture childKey="Icon"/>
+                    </MaskedTextures>
+                </MaskTexture>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="6">
+                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <NormalTexture parentKey="NormalTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Border">
+            <Size x="64" y="64"/>
+            <Anchors>
+                <Anchor point="CENTER"/>
+            </Anchors>
+        </NormalTexture>
+        <PushedTexture parentKey="PushedTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Highlight-Full">
+            <Size x="64" y="64"/>
+            <Anchors>
+                <Anchor point="CENTER"/>
+            </Anchors>
+        </PushedTexture>
+        <HighlightTexture parentKey="HighlightTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Highlight-Inner">
+            <Size x="64" y="64"/>
+            <Anchors>
+                <Anchor point="CENTER"/>
+            </Anchors>
+        </HighlightTexture>
+        <Frames>
+            <Cooldown parentKey="Cooldown" hideCountdownNumbers="true" reverse="false" useCircularEdge="true" hidden="true" useParentLevel="true" drawSwipe="true" drawEdge="false">
+                <Size x="40" y="40"/>
+                <Anchors>
+                    <Anchor point="CENTER"/>
+                </Anchors>
+                <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-CooldownSwipe"/>
+                <!--EdgeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Edge"/-->
+                <KeyValues>
+                    <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+                </KeyValues>
+            </Cooldown>
+        </Frames>
+    </Button>
+
+    <Button name="PlumberSmallItemButtonTemplate" hidden="true" virtual="true">
+        <Size x="32" y="32"/>
+        <Layers>
+            <Layer level="BORDER">
+                <Texture parentKey="Icon">
+                    <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+                    <Size x="30" y="30"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+                <MaskTexture parentKey="IconMask" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+                    <Size x="30" y="30"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT" x="0" y="0"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+                    </Anchors>
+                    <MaskedTextures>
+                        <MaskedTexture childKey="Icon"/>
+                    </MaskedTextures>
+                </MaskTexture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Border" file="Interface\AddOns\Plumber\Art\Button\SmallCircle-Border">
+                    <Size x="64" y="64"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="6">
+                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="2" y="-2"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
 </Ui>

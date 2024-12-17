@@ -22,8 +22,10 @@ local C_Item = C_Item;
 local GetItemCount = C_Item.GetItemCount;
 local GetItemIconByID = C_Item.GetItemIconByID;
 local GetCVarBool = C_CVar.GetCVarBool;
+local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local CreateFrame = CreateFrame;
 local UIParent = UIParent;
+local GameTooltip = GameTooltip;
 
 
 local function DisableSharpening(texture)
@@ -31,6 +33,8 @@ local function DisableSharpening(texture)
     texture:SetSnapToPixelGrid(false);
 end
 API.DisableSharpening = DisableSharpening;
+
+local DelayedTooltip = CreateFrame("Frame");
 
 do  -- Slice Frame
     local NineSliceLayouts = {
@@ -659,7 +663,6 @@ do  -- TokenFrame   -- Money   -- Coin
 
     local BreakUpLargeNumbers = BreakUpLargeNumbers;
     local GetMoney = GetMoney;
-    local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 
 
     local MoneyDisplayMixin = {};
@@ -1568,50 +1571,8 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
     end
 
     local function CreatePeudoActionButton(parent)
-        local button = CreateFrame("Button", nil, parent);
-        button:SetSize(46, 46);     --Stock ActionButton is 45x45
-
-        local NormalTexture = button:CreateTexture(nil, "OVERLAY", nil, 2);
-        button.NormalTexture = NormalTexture;
-        NormalTexture:SetSize(64, 64);
-        NormalTexture:SetPoint("CENTER", button, "CENTER", 0, 0);
-        NormalTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Border");
-        NormalTexture:SetTexCoord(0, 1, 0, 1);
-        button:SetNormalTexture(NormalTexture);
-
-        local PushedTexture = button:CreateTexture(nil, "OVERLAY", nil, 2);
-        button.PushedTexture = PushedTexture;
-        PushedTexture:SetSize(64, 64);
-        PushedTexture:SetPoint("CENTER", button, "CENTER", 0, 0);
-        PushedTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Highlight-Full");
-        PushedTexture:SetTexCoord(0, 1, 0, 1);
-        button:SetPushedTexture(PushedTexture);
-
-        local HighlightTexture = button:CreateTexture(nil, "OVERLAY", nil, 5);
-        button.HighlightTexture = HighlightTexture;
-        HighlightTexture:SetSize(64, 64);
-        HighlightTexture:SetPoint("CENTER", button, "CENTER", 0, 0);
-        HighlightTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/ActionButtonCircle-Highlight-Inner");
-        HighlightTexture:SetTexCoord(0, 1, 0, 1);
-        button:SetHighlightTexture(HighlightTexture, "BLEND");
-
-        button.Icon = button:CreateTexture(nil, "BORDER");
-        button.Icon:SetSize(40, 40);
-        button.Icon:SetPoint("CENTER", button, "CENTER", 0, 0);
-        button.Icon:SetTexCoord(0.0625, 0.9375, 0.0625, 0.9375);
-
-        local mask = button:CreateMaskTexture(nil, "ARTWORK", nil, 2);
-        mask:SetPoint("TOPLEFT", button.Icon, "TOPLEFT", 0, 0);
-        mask:SetPoint("BOTTOMRIGHT", button.Icon, "BOTTOMRIGHT", 0, 0);
-        mask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Circle", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
-        button.Icon:AddMaskTexture(mask);
-
-        button.Count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormal", 6);
-        button.Count:SetJustifyH("RIGHT");
-        button.Count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2);
-
+        local button = CreateFrame("Button", nil, parent, "PlumberPeudoActionButtonTemplate");
         Mixin(button, PeudoActionButtonMixin);
-
         return button
     end
     addon.CreatePeudoActionButton = CreatePeudoActionButton;
@@ -5174,4 +5135,268 @@ do  --Progress Bar With Level
         return f
     end
     addon.CreateLevelProgressBar = CreateLevelProgressBar;
+end
+
+do  --DelayedTooltip
+    function DelayedTooltip:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.5 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            self:ProcessTooltip();
+        end
+    end
+
+    function DelayedTooltip:ProcessTooltip()
+        if self.owner and self.owner:IsVisible() and self.owner:IsMouseMotionFocus() then
+            if self.owner.ShowTooltip then
+                self.owner.ShowTooltip(self.owner);
+            end
+        end
+        self.owner = nil;
+    end
+
+    function DelayedTooltip:OnObjectEnter(owner)
+        self.owner = owner;
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function DelayedTooltip:OnObjectLeave(owner)
+        if self.owner == owner then
+            self.owner = nil;
+        end
+    end
+end
+
+do  --Displayed required items on nameplate widget set
+    --The frame itself has events
+    local NameplateTokenMixin = {};
+
+    function NameplateTokenMixin:SetStyle(styleID)
+        if styleID == self.styleID then return end;
+
+        local selfSize, iconSize, borderSize, borderTexture;
+        local mask = "Interface/AddOns/Plumber/Art/BasicShape/";
+        self.Count:ClearAllPoints();
+        self.Border:ClearAllPoints();
+
+        if styleID == 2 then
+            --Circle, Quantity on the bottom-right
+            selfSize = 32;
+            iconSize = 30;
+            borderSize = 64;
+            borderTexture = "Interface/AddOns/Plumber/Art/Button/SmallCircle-Border";
+            mask = mask.."Mask-Circle";
+            self.Icon:SetPoint("CENTER", self, "CENTER", 0, 0);
+            self.Count:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 2, -2);
+            self.Border:SetPoint("CENTER", self, "CENTER", 0, 0);
+            self.dynamicSize = false;
+        else
+            --Square, Quantity on the right
+            selfSize = 20;
+            iconSize = 16;
+            borderSize = 32;
+            borderTexture = "Interface/AddOns/Plumber/Art/Button/SmallSquare-Border";
+            mask = mask.."Mask-Chamfer";
+            self.Icon:SetPoint("RIGHT", self, "RIGHT", -2, 0);
+            self.Count:SetPoint("RIGHT", self.Icon, "LEFT", -3, 0);
+            self.Border:SetPoint("CENTER", self.Icon, "CENTER", 0, 0);
+            self.dynamicSize = true;
+            self.sizeConstant = 20;
+        end
+
+        self:SetSize(selfSize, selfSize);
+        self.Icon:SetSize(iconSize, iconSize);
+        self.Border:SetSize(borderSize, borderSize);
+        self.Border:SetTexture(borderTexture);
+        self.IconMask:SetTexture(mask, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+    end
+
+    function NameplateTokenMixin:OnLoad()
+        self:SetScript("OnShow", self.OnShow);
+        self:SetScript("OnHide", self.OnHide);
+        self:SetScript("OnEnter", self.OnEnter);
+        self:SetScript("OnLeave", self.OnLeave);
+        self:Release();
+        DisableSharpening(self.Border);
+        DisableSharpening(self.Icon);
+    end
+
+    function NameplateTokenMixin:SetItem(itemID)
+        if itemID == self.id then return end;
+        self.id = itemID;
+        self.type = "item";
+        local icon = GetItemIconByID(itemID) or 134400;
+        self.Icon:SetTexture(icon);
+        self:UpdateCount();
+    end
+
+    function NameplateTokenMixin:SetCurrency(currencyID)
+        if currencyID == self.id then return end;
+        self.id = currencyID;
+        self.type = "currency";
+
+        local info = GetCurrencyInfo(currencyID);
+        local icon, quantity;
+        if info then
+            icon = info.iconFileID;
+            quantity = info.quantity;
+        else
+            icon = 134400;
+            quantity = 0;
+        end
+        self.Icon:SetTexture(icon);
+        self:UpdateCount(quantity);
+    end
+
+    function NameplateTokenMixin:OnShow()
+        if self.type == "item" then
+            self:RegisterEvent("BAG_UPDATE_DELAYED");
+        elseif self.type == "currency" then
+            self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+        end
+
+        if self.requiredWidgetID then
+            self:RegisterEvent("UPDATE_UI_WIDGET");
+        end
+
+        self:SetScript("OnEvent", self.OnEvent);
+    end
+
+    function NameplateTokenMixin:OnHide()
+        self:UnregisterEvent("BAG_UPDATE_DELAYED");
+        self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+        self:UnregisterEvent("UPDATE_UI_WIDGET");
+        self:SetScript("OnEvent", nil);
+        self.t = 0;
+    end
+
+    function NameplateTokenMixin:OnEvent(event, ...)
+        if event == "BAG_UPDATE_DELAYED" then
+            self:RequestUpdateCount();
+        elseif event == "CURRENCY_DISPLAY_UPDATE" then
+            local currencyID = ...
+            if currencyID == self.currencyID then
+                self:RequestUpdateCount();
+            end
+        elseif event == "UPDATE_UI_WIDGET" then
+            local widgetInfo = ...
+            if widgetInfo.widgetID == self.requiredWidgetID then
+                self:EvaluateVisibility();
+            end
+        end
+    end
+
+    function NameplateTokenMixin:OnUpdate(elapsed)
+        if self.quantityDirty then
+            self.t =  self.t + elapsed;
+            if self.t > 0.016 then
+                self.t = 0;
+                self:UpdateCount();
+            end
+        end
+
+        if self.toAlpha then
+            self.alpha = self.alpha + 5 * elapsed;
+            if self.alpha > 1 then
+                self.alpha = 1;
+                self.toAlpha = nil;
+            end
+            self:SetAlpha(self.alpha);
+        end
+
+        if not (self.quantityDirty or self.toAlpha) then
+            self:SetScript("OnUpdate", nil);
+        end
+    end
+
+    function NameplateTokenMixin:RequestUpdateCount()
+        self.t = 0;
+        self.quantityDirty = true;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function NameplateTokenMixin:UpdateCount(quantity)
+        self.quantityDirty = nil;
+        if not quantity then
+            if self.type == "item" then
+                quantity = GetItemCount(self.id);
+            elseif self.type == "currency" then
+                local info = GetCurrencyInfo(self.id);
+                quantity = info and info.quantity or 0;
+            end
+        end
+        self.Count:SetText(quantity);
+        if quantity > 0 then
+            self.Icon:SetVertexColor(1, 1, 1);
+            self.Count:SetTextColor(1, 1, 1);
+        else
+            self.Icon:SetVertexColor(0.4, 0.4, 0.4);
+            self.Count:SetTextColor(0.5, 0.5, 0.5);
+        end
+        if self.dynamicSize then
+            self:SetWidth(self.Count:GetWidth() + self.sizeConstant);
+        end
+    end
+
+    function NameplateTokenMixin:FadeIn()
+        self.toAlpha = true;
+        self:Show();
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function NameplateTokenMixin:Release()
+        self:ClearAllPoints();
+        self:Hide();
+        self:SetAlpha(0);
+        self.id = nil;
+        self.type = nil;
+        self.alpha = 0;
+        self:SetScript("OnUpdate", nil);
+    end
+
+    function NameplateTokenMixin:OnEnter()
+        GameTooltip:Hide();
+        DelayedTooltip:OnObjectEnter(self);
+    end
+
+    function NameplateTokenMixin:OnLeave()
+        GameTooltip:Hide();
+        DelayedTooltip:OnObjectLeave(self);
+    end
+
+    function NameplateTokenMixin:ShowTooltip()
+        if not self.visible then return end;
+
+        local method;
+
+        if self.type == "item" then
+            method = "SetItemByID";
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+
+        elseif self.type == "currency" then
+            method = "GetCurrencyByID";
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        end
+
+        if method then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip[method](GameTooltip, self.id);
+        end
+    end
+
+    function NameplateTokenMixin:SetInteractable(state)
+        state = state or false;
+        self:EnableMouse(false);        --Pass Through Clicks
+        self:EnableMouseMotion(state);
+    end
+
+    function API.CreateNameplateToken(parent)
+        local f = CreateFrame("Frame", nil, parent, "PlumberSmallItemButtonTemplate");
+        Mixin(f, NameplateTokenMixin);
+        f:OnLoad();
+        f:SetInteractable(true);
+        return f
+    end
 end

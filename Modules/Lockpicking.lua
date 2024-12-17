@@ -299,11 +299,16 @@ local function SetupActionButton(bag, slot, tradeItem)
 end
 
 local function IsMouseoverItemLocked()
-    local line2 = TooltipFrame.TextLeft2;
-    if line2 and line2:GetText() == TEXT_LOCKED then
-        local r, g, b = line2:GetTextColor();
-        if not IsWarningColor(r, g, b) then
-            return true
+    local line;
+    for i = 2, 3 do
+        line = TooltipFrame["TextLeft"..i];
+        if line and line:GetText() == TEXT_LOCKED then
+            local r, g, b = line:GetTextColor();
+            if IsWarningColor(r, g, b) then
+                return false
+            else
+                return true
+            end
         end
     end
 end

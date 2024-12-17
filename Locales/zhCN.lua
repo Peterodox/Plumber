@@ -244,6 +244,11 @@ L["Chat Auto Leave Cancel Format"] = "此频道的自动离开已禁用： %s。
 L["Click To Disable"] = "点击禁用";
 
 
+--NameplateWidget
+L["ModuleName NameplateWidget"] = "姓名版: 钥焰";
+L["ModuleDescription NameplateWidget"] = "在钥焰的姓名版进度条上显示你拥有的光耀残渣的数量。";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";

@@ -243,6 +243,12 @@ L["Chat Auto Leave Alert Format"] = "Do you wish to automatically leave |cffffc0
 L["Chat Auto Leave Cancel Format"] = "Auto Leave Disabled for %s. Please use /join command to rejoin the channel.";
 L["Click To Disable"] = "Click to Disable";
 
+
+--NameplateWidget
+L["ModuleName NameplateWidget"] = "Nameplate: Keyflame";
+L["ModuleDescription NameplateWidget"] = "Show the number of owned Radiant Remnant on the nameplate.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";

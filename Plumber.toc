@@ -1,5 +1,5 @@
 ## Interface: 110005, 110007
-## Version: 1.5.0
+## Version: 1.5.1
 
 ## Title: Plumber
 
@@ -53,6 +53,7 @@ Modules\UnderlightAngler.lua
 Modules\QuestItemDestroyAlert.lua
 Modules\SpellcastInfo.lua
 Modules\ChatOptions.lua
+Modules\NameplateResources.lua
 
 #Modules\QuestSpecialItemCooldown.lua
 #Modules\SecretOfAzeroth.lua

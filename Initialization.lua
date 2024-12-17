@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.5.0";
-local VERSION_DATE = 1733800000;
+local VERSION_TEXT = "v1.5.1";
+local VERSION_DATE = 1734400000;
 
 
 local addonName, addon = ...
@@ -107,6 +107,8 @@ local DefaultValues = {
     QuestItemDestroyAlert = true,       --Show related quest info when destroying a quest-starting item
     SpellcastingInfo = false,           --Show the spell info when hovering over target/focus cast bars. Logging target spells and displayed it on UnitPopupMenu
     ChatOptions = true,                 --Add Leave button to Channel Context Menu
+    NameplateWidget = true,             --Show required items on nameplate widget set
+
 
     --Custom Loot Window
     LootUI = false,
