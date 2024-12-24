@@ -5,7 +5,7 @@ local StaticPopupUtil = addon.StaticPopupUtil;
 local JoinText = addon.API.JoinText;
 local match = string.match;
 
-local POPUP_WHICH = "PARTY_INVITE";
+local POPUP_PARTY = "PARTY_INVITE";
 local FACTION_A = FACTION_ALLIANCE or "Alliance";
 local FACTION_H = FACTION_HORDE or "Horde";
 local EL = CreateFrame("Frame");
@@ -17,6 +17,7 @@ Portrait:SetColorTexture(1, 1, 1);
 --]]
 
 local WhoButton;
+local GuildInviteWidget;
 local function WhoButton_Hide()
     if WhoButton and WhoButton:IsVisible() then
         WhoButton:Hide();
@@ -37,17 +38,25 @@ function EL:GUILD_INVITE_REQUEST(inviter, guildName, guildAchievementPoints, old
         C_Timer.After(0, function()
             self.pauseUpdate = nil;
 
+            if not (GuildInviteFrame and GuildInviteFrame:IsVisible()) then
+                --Not a StaticPopup, see GuildInviteFrame.lua 
+                return
+            end
+
+            if not GuildInviteWidget then
+                GuildInviteWidget = addon.CreateSimpleTooltip(GuildInviteFrame);
+                GuildInviteWidget:SetPoint("BOTTOM", GuildInviteFrame, "TOP", 0, 4);
+                GuildInviteWidget:SetScript("OnHide", function()
+                    GuildInviteWidget:Hide();
+                end);
+            end
+
             local NORMAL_TEXT = "|TInterface\\AddOns\\Plumber\\Art\\GossipIcons\\MagnifyingGlass:0:0:0:-4:32:32:0:32:0:32:128:128:128|t |cffffd200"..L["Click To Search Player"].."|r";
             local HIGHLIGHTED_TEXT = "|TInterface\\AddOns\\Plumber\\Art\\GossipIcons\\MagnifyingGlass:0:0:0:-4:32:32:0:32:0:32:255:255:255|t |cffffffff"..L["Click To Search Player"].."|r";
 
-            local tooltipFrame;
-
-            if StaticPopupUtil:ShowSimpleTooltip(POPUP_WHICH, NORMAL_TEXT, nil, "TOP") then
-                tooltipFrame = StaticPopupUtil:GetTooltipFrame();
-                if not tooltipFrame  then
-                    return
-                end
-            end
+            local tooltipFrame = GuildInviteWidget;
+            tooltipFrame:SetText(NORMAL_TEXT);
+            tooltipFrame:Show();
 
             local function WhoButton_OnEnter()
                 tooltipFrame:SetText(HIGHLIGHTED_TEXT);
@@ -65,6 +74,7 @@ function EL:GUILD_INVITE_REQUEST(inviter, guildName, guildAchievementPoints, old
                 f:RegisterEvent("WHO_LIST_UPDATE");
                 f:SetScript("OnEvent", function(_, event)
                     f:UnregisterEvent(event);
+                    f:SetScript("OnEvent", nil);
                     if not (WhoFrame and WhoFrame:IsVisible()) then
                         C_FriendList.SetWhoToUi(false);
                     end
@@ -227,7 +237,7 @@ function EL:ProcessLastInviter()
             text = level;
         end
 
-        if StaticPopupUtil:ShowSimpleTooltip(POPUP_WHICH, text, nil, "TOP") then
+        if StaticPopupUtil:ShowSimpleTooltip(POPUP_PARTY, text, nil, "TOP") then
             StaticPopupUtil:AddTooltipInfoCallback(dataInstanceID, function ()
                 EL:ProcessLastInviter();
             end)
@@ -239,12 +249,14 @@ function EL:EnableModule(state)
     if state then
         self.enabled = true;
         self:RegisterEvent("PARTY_INVITE_REQUEST");
+        self:RegisterEvent("GUILD_INVITE_REQUEST");
         self:SetScript("OnEvent", self.OnEvent);
     elseif self.enabled then
         self.enabled = nil;
         self:UnregisterEvent("PARTY_INVITE_REQUEST");
+        self:UnregisterEvent("GUILD_INVITE_REQUEST");
         self:SetScript("OnEvent", nil);
-        StaticPopupUtil:HidePopupWidget(POPUP_WHICH);
+        StaticPopupUtil:HidePopupWidget(POPUP_PARTY);
     end
 end
 
@@ -332,7 +344,7 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 1146,
-        moduleAddedTime = 1734950000,
+        moduleAddedTime = 1735040000,
         optionToggleFunc = OptionToggle_OnClick,
     };
 

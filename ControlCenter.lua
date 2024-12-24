@@ -435,7 +435,7 @@ local function CreateUI()
             --should be finished here
         else
             if (a.categoryID == b.categoryID) and (a ~= b) then
-                print("Plumber: Duplicated Module uiOrder", a.uiOrder, a.name, b.name);
+                --print("Plumber: Duplicated Module uiOrder", a.uiOrder, a.name, b.name);   --debug
             end
         end
 

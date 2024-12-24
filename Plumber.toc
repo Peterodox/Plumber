@@ -1,5 +1,5 @@
 ## Interface: 110005, 110007
-## Version: 1.5.1
+## Version: 1.5.2
 
 ## Title: Plumber
 
