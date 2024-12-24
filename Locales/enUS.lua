@@ -249,6 +249,17 @@ L["ModuleName NameplateWidget"] = "Nameplate: Keyflame";
 L["ModuleDescription NameplateWidget"] = "Show the number of owned Radiant Remnant on the nameplate.";
 
 
+--PartyInviterInfo
+L["ModuleName PartyInviterInfo"] = "Group Inviter Info";
+L["ModuleDescription PartyInviterInfo"] = "Show the inviter's level and class when you are invited to a group or a guild.";
+L["Additional Info"] = "Additional Info";
+L["Race"] = RACE or "Race";
+L["Faction"] = FACTION or "Faction";
+L["Click To Search Player"] = "Search This Player";
+L["Searching Player In Progress"] = FRIENDS_FRIENDS_WAITING or "Searching...";
+L["Player Not Found"] = ERR_FRIEND_NOT_FOUND or "Player not found.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
@@ -275,6 +286,14 @@ L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window
 L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r mode, the window will appear under the current mouse location";
 L["LootUI Option Use Default UI"] = "Use Default Loot Window";
 L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
+
+
+
+--Quick Slot For Third-party Dev
+L["Quickslot Module Info"] = "Module Info";
+L["QuickSlot Error 1"] = "Quick Slot: You have already added this controller.";
+L["QuickSlot Error 2"] = "Quick Slot: The controller is missing \"%s\"";
+L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" already exists.";
 
 
 --Generic

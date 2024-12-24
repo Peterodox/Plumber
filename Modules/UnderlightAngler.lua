@@ -71,7 +71,7 @@ do
         description = addon.L["ModuleDescription BlizzFixFishingArtifact"],
         toggleFunc = EnableModule,
         categoryID = 2,
-        uiOrder = 10,
+        uiOrder = 15,
         moduleAddedTime = 1728990000,
     };
 

@@ -102,6 +102,8 @@ function ChatOptions:Hook()
                                         ChatOptions:SetAutoLeaveChannel(channelID, true);
                                     end;
                                 };
+
+                                ChatOptions:SetupStaticPopup();
                                 StaticPopup_Show(STATIC_POPUP_WHICH, nil, nil, data);
                             end
                         end
@@ -135,7 +137,11 @@ function ChatOptions:Hook()
             end
         end);
     end
+end
 
+function ChatOptions:SetupStaticPopup()
+    if self.popupInserted then return end;
+    self.popupInserted = true;
     if StaticPopupDialogs then
         StaticPopupDialogs[STATIC_POPUP_WHICH] = {
             text = "",		-- supplied dynamically.

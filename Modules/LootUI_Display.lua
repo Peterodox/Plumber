@@ -1675,7 +1675,7 @@ do
 
 
     local function OptionToggle_OnClick(self, button)
-        if MainFrame.OptionFrame and MainFrame.OptionFrame:IsShown() then
+        if MainFrame.OptionFrame and MainFrame.OptionFrame:IsShown() and (MainFrame.OptionFrame:IsOwner(self) or MainFrame.OptionFrame:IsOwner(MainFrame)) then
             MainFrame:ShowOptions(false);
             MainFrame:ExitEditMode();
         else

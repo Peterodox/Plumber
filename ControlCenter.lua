@@ -433,6 +433,10 @@ local function CreateUI()
         if a.uiOrder ~= b.uiOrder then
             return a.uiOrder < b.uiOrder
             --should be finished here
+        else
+            if (a.categoryID == b.categoryID) and (a ~= b) then
+                print("Plumber: Duplicated Module uiOrder", a.uiOrder, a.name, b.name);
+            end
         end
 
         return a.name < b.name

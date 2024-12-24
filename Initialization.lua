@@ -108,6 +108,9 @@ local DefaultValues = {
     SpellcastingInfo = false,           --Show the spell info when hovering over target/focus cast bars. Logging target spells and displayed it on UnitPopupMenu
     ChatOptions = true,                 --Add Leave button to Channel Context Menu
     NameplateWidget = true,             --Show required items on nameplate widget set
+    PartyInviterInfo = false,           --Show the inviter's level and class
+        PartyInviter_Race = false,
+        PartyInviter_Faction = false,
 
 
     --Custom Loot Window

@@ -61,6 +61,21 @@ do  -- Table
         return tbl
     end
     API.ReverseList = ReverseList;
+
+    local function CopyTable(tbl)
+        --Blizzard TableUtil.lua
+        if not tbl then return; end;
+        local copy = {};
+        for k, v in pairs(tbl) do
+            if type(v) == "table" then
+                copy[k] = CopyTable(v);
+            else
+                copy[k] = v;
+            end
+        end
+        return copy;
+    end
+    API.CopyTable = CopyTable;
 end
 
 do  -- String
@@ -131,6 +146,15 @@ do  -- String
         return obj
     end
     API.GetGlobalObject = GetGlobalObject;
+
+    local function JoinText(delimiter, l, r)
+        if l and r then
+            return l..delimiter..r
+        else
+            return l or r
+        end
+    end
+    API.JoinText = JoinText;
 end
 
 do  -- DEBUG

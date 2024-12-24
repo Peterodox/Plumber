@@ -1,0 +1,4 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="QuickSlot.lua"/>
+	<Script file="QuickSlot_External.lua"/>
+</Ui>

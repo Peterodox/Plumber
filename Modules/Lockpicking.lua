@@ -11,6 +11,7 @@ if classID ~= 4 and raceID ~= 37 then return end;
 local API = addon.API;
 local IsWarningColor = API.IsWarningColor;
 
+local _G = _G;
 local InCombatLockdown = InCombatLockdown;
 local IsSpellKnown = IsSpellKnown;
 local SpellIsTargeting = SpellIsTargeting;
@@ -26,6 +27,7 @@ local SPELL_ID_PICK_LOCK = ((classID == 4) and 1804) or (312890);    --Rogue: Lo
 local SPELL_NAME_PICK_LOCK = nil;   --Localized with GetSpellInfo
 local INSTRUCTION_PICK_LOCK = addon.L["Instruction Pick Lock"];
 local NOT_TRADED_ITEM_SLOT_INDEX = 7;  --TRADE_ENCHANT_SLOT
+local TOOLTIP_DATA_TYPE = Enum.TooltipDataType and Enum.TooltipDataType.Item or 0;
 
 
 local MODULE_ENABLED = false;
@@ -298,10 +300,16 @@ local function SetupActionButton(bag, slot, tradeItem)
     return ActionButton
 end
 
-local function IsMouseoverItemLocked()
+local function IsMouseoverItemLocked(lineIndex)
+    local toIndex;
+    if lineIndex then
+        toIndex = 2;
+    else
+        toIndex = TooltipFrame:NumLines();
+    end
     local line;
-    for i = 2, 3 do
-        line = TooltipFrame["TextLeft"..i];
+    for i = 2, toIndex do
+        line = _G["GameTooltipTextLeft"..i];
         if line and line:GetText() == TEXT_LOCKED then
             local r, g, b = line:GetTextColor();
             if IsWarningColor(r, g, b) then
@@ -371,15 +379,26 @@ function Processor:ProcessItem()
             if info.getterName == "GetBagItem" then
                 local bag, slot = info.getterArgs[1], info.getterArgs[2];
                 if bag and slot then
-                    if IsMouseoverItemLocked() then
-                        SetupButtonAndTooltip(bag, slot);
-                        return
+                    local tooltipData = TooltipFrame.infoList and TooltipFrame.infoList[1] and TooltipFrame.infoList[1].tooltipData;
+                    if tooltipData and tooltipData.type == TOOLTIP_DATA_TYPE then
+                        local itemID = tooltipData.id;
+                        local lineIndex;
+                        if itemID == 220376 then
+                            --Bismuth Lockbox can have upgrade track on its item tooltip
+                        else
+                            lineIndex = 2;
+                        end
+                        if IsMouseoverItemLocked(lineIndex) then
+                            SetupButtonAndTooltip(bag, slot);
+                            return
+                        end
                     end
                 end
             elseif info.getterName == "GetTradeTargetItem" then
                 local tradeSlotIndex = info.getterArgs[1];
                 if tradeSlotIndex and tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
-                    if IsMouseoverItemLocked() then
+                    local lineIndex = 2;
+                    if IsMouseoverItemLocked(lineIndex) then
                         SetupButtonAndTooltip(nil, nil, true);
                         return
                     end

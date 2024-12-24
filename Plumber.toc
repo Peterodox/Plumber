@@ -28,7 +28,7 @@ Modules\BackpackItemTracker.lua
 Modules\AutoJoinEvents.lua
 Modules\PlayerChoiceFrameToken.lua
 #Modules\DruidModelFix.lua
-Modules\QuickSlot.lua
+Modules\QuickSlot.xml
 Modules\QuestAreaTrigger.lua
 Modules\Dreamseed.lua
 #Modules\EventMap.lua
@@ -50,10 +50,10 @@ Modules\GameTooltipExtension.xml
 Modules\LootUI.xml
 Modules\WoWAnniversary.lua
 Modules\UnderlightAngler.lua
-Modules\QuestItemDestroyAlert.lua
 Modules\SpellcastInfo.lua
 Modules\ChatOptions.lua
 Modules\NameplateResources.lua
+Modules\StaticPopupEnhancement.xml
 
 #Modules\QuestSpecialItemCooldown.lua
 #Modules\SecretOfAzeroth.lua

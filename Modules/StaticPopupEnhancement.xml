@@ -1,0 +1,5 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <Script file="StaticPopup_Basic.lua"/>
+    <Script file="StaticPopup_QuestItemDestroyAlert.lua"/>
+    <Script file="StaticPopup_PartyInvite.lua"/>
+</Ui>

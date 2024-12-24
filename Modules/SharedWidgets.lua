@@ -3818,7 +3818,6 @@ do  --Frame Reposition Button
 end
 
 do  --Slider
-    local Round = API.Round;
     local SliderFrameMixin = {};
 
     local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Frame/Slider";
@@ -4451,6 +4450,12 @@ do  --EditMode
     end
 
     function EditModeSettingsDialogMixin:ReleaseAllWidgets()
+        for _, widget in ipairs(self.activeWidgets) do
+            if widget.isCustomWidget then
+                widget:Hide();
+                widget:ClearAllPoints();
+            end
+        end
         self.activeWidgets = {};
 
         self.checkboxPool:ReleaseAll();
@@ -4478,13 +4483,16 @@ do  --EditMode
                 if widget.widgetType == "Divider" then
                     preOffset = 2;
                     postOffset = 2;
+                elseif widget.widgetType == "Custom" then
+                    preOffset = 0;
+                    postOffset = 2;
                 else
                     preOffset = 0;
                     postOffset = 0;
                 end
 
                 height = height + preOffset;
-
+                widget:ClearAllPoints();
                 if widget.align and widget.align ~= "left" then
                     if widget.align == "center" then
                         if widget.effectiveWidth then
@@ -4632,6 +4640,15 @@ do  --EditMode
                         widget = self:CreateHeader(widgetData);
                     elseif widgetData.type == "Keybind" then
                         widget = self:CreateKeybindButton(widgetData);
+                    elseif widgetData.type == "Custom" then
+                        widget = widgetData.onAcquire();
+                        if widget then
+                            widget:SetParent(self);
+                            widget:ClearAllPoints();
+                            widget:Show();
+                            widget.isCustomWidget = true;
+                            widget.align = widgetData.align or "center";
+                        end
                     end
 
                     if widget then
@@ -4661,6 +4678,16 @@ do  --EditMode
 
     function EditModeSettingsDialogMixin:OnDragStop()
         self:StopMovingOrSizing();
+        self:ConvertAnchor();
+    end
+
+    function EditModeSettingsDialogMixin:ConvertAnchor()
+        --Convert any anchor to the top left
+        --so that changing frame height don't affect the positions of most buttons
+        local left = self:GetLeft();
+        local top = self:GetTop();
+        self:ClearAllPoints();
+        self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top);
     end
 
     function EditModeSettingsDialogMixin:SetTitle(title)
@@ -4669,6 +4696,10 @@ do  --EditMode
 
     function EditModeSettingsDialogMixin:IsOwner(parent)
         return parent == self.parent
+    end
+
+    function EditModeSettingsDialogMixin:IsFromSchematic(schematic)
+        return schematic and self.schematic == schematic;
     end
 
     function EditModeSettingsDialogMixin:HideOption(parent)
@@ -4742,6 +4773,10 @@ do  --EditMode
             f.keybindButtonPool = API.CreateObjectPool(CreateKeybindButton);
         end
 
+        if EditModeSettingsDialog:IsShown() and not EditModeSettingsDialog:IsOwner(parent) then
+            EditModeSettingsDialog:Exit();
+        end
+
         if (schematic ~= EditModeSettingsDialog.schematic) then
             EditModeSettingsDialog.requireResetPosition = true;
             EditModeSettingsDialog.schematic = schematic;
@@ -4757,6 +4792,21 @@ do  --EditMode
         return EditModeSettingsDialog
     end
     addon.SetupSettingsDialog = SetupSettingsDialog;
+
+    local function ToggleSettingsDialog(parent, schematic, forceUpdate)
+        if EditModeSettingsDialog and EditModeSettingsDialog:IsShown() and EditModeSettingsDialog:IsOwner(parent) then
+            EditModeSettingsDialog:Exit();
+        else
+            local f = SetupSettingsDialog(parent, schematic, forceUpdate);
+            if f then
+                f:Show();
+                f:ClearAllPoints();
+                f:SetPoint("LEFT", UIParent, "CENTER", 256, 0);
+                return f
+            end
+        end
+    end
+    addon.ToggleSettingsDialog = ToggleSettingsDialog;
 end
 
 do  --Radial Progress Bar
@@ -5399,4 +5449,78 @@ do  --Displayed required items on nameplate widget set
         f:SetInteractable(true);
         return f
     end
+end
+
+do  --Simple Tooltip (2 FontString)
+    local SimpleTooltipMixin = {};
+
+    function SimpleTooltipMixin:SetText(title, description)
+        local textHeight, textWidth;
+        if not (title or description) then
+            self.Text1:SetText(nil);
+            self.Text2:SetText(nil);
+            textHeight = 12;
+            textWidth = 12;
+        else
+            self.Text2:ClearAllPoints();
+            if description then
+                self.Text2:SetPoint("TOPLEFT", self.Text1, "BOTTOMLEFT", 0, -self.titleDescGap);
+                self.Text1:SetText(title);
+                self.Text2:SetText(description);
+                textHeight = self.Text1:GetHeight() + self.titleDescGap + self.Text2:GetHeight();
+                textWidth = math.max(self.Text1:GetWrappedWidth(), self.Text2:GetWrappedWidth());
+            else
+                self.Text2:SetPoint("TOPLEFT", self, "TOPLEFT", self.padding, -self.padding);
+                self.Text1:SetText(nil);
+                self.Text2:SetText(title);
+                textHeight = self.Text2:GetHeight();
+                textWidth = self.Text2:GetWrappedWidth();
+            end
+        end
+        self:SetSize(API.Round(textWidth + 2*self.padding), API.Round(textHeight + 2*self.padding));
+    end
+
+    function SimpleTooltipMixin:SetPadding()
+        self.padding = 8;
+    end
+
+    function SimpleTooltipMixin:SetTitleDescGap(titleDescGap)
+        self.titleDescGap = titleDescGap;
+    end
+
+    function SimpleTooltipMixin:SetMaxLineWidth(width)
+        self.Text1:SetWidth(width);
+        self.Text2:SetWidth(width);
+    end
+
+    local function CreateSimpleTooltip(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f.padding = 8;
+        f.titleDescGap = 4;
+
+        Mixin(f, SimpleTooltipMixin);
+
+        local bg = addon.CreateNineSliceFrame(f, "NineSlice_GenericBox_Black");
+        bg:SetUsingParentLevel(true);
+        bg:SetCornerSize(8);
+        bg:SetAllPoints(true);
+
+        f.Text1 = f:CreateFontString(nil, "OVERLAY", "GameTooltipHeaderText");
+        f.Text1:SetJustifyH("LEFT");
+        f.Text1:SetJustifyV("TOP");
+        f.Text1:SetPoint("TOPLEFT", f, "TOPLEFT", f.padding, -f.padding);
+        f.Text1:SetTextColor(1, 0.82, 0);
+        f.Text1:SetSpacing(2);
+
+        f.Text2 = f:CreateFontString(nil, "OVERLAY", "GameTooltipText");
+        f.Text2:SetJustifyH("LEFT");
+        f.Text2:SetJustifyV("TOP");
+        f.Text2:SetPoint("TOPLEFT", f.Text1, "BOTTOMLEFT", 0, -f.titleDescGap);
+        f.Text2:SetSpacing(2);
+
+        f:SetMaxLineWidth(290);
+
+        return f
+    end
+    addon.CreateSimpleTooltip = CreateSimpleTooltip;
 end

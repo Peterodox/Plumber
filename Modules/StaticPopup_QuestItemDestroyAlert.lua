@@ -1,6 +1,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local StaticPopupUtil = addon.StaticPopupUtil;
 
 local GetContainerNumSlots = C_Container.GetContainerNumSlots;
 local GetItemNameByID = C_Item.GetItemNameByID;
@@ -11,6 +12,7 @@ local GetNumQuestLeaderBoards = GetNumQuestLeaderBoards;
 local GetQuestLogLeaderBoard = GetQuestLogLeaderBoard;
 local CursorHasItem = CursorHasItem;
 
+local POPUP_WHICH = "DELETE_QUEST_ITEM";
 local EL = CreateFrame("Frame");
 
 EL.ItemNameToQuest = {};
@@ -39,12 +41,6 @@ function EL:BANKFRAME_CLOSED()
     self.isAtBank = false;
 end
 
-function EL:TOOLTIP_DATA_UPDATE(dataInstanceID)
-    if dataInstanceID == self.dataInstanceID and self.questID then
-        self:DisplayQuest(self.questID);
-    end
-end
-
 function EL:QUEST_DATA_LOAD_RESULT(questID, success)
     if questID == self.questID and success then
         self:DisplayQuest(questID);
@@ -60,9 +56,8 @@ end
 function EL:HideUI()
     self:UnregisterEvent("TOOLTIP_DATA_UPDATE");
     self:UnregisterEvent("CURSOR_CHANGED");
-    self.dataInstanceID = nil;
     self.questID = nil;
-    self:DisplayTooltip(nil);
+    StaticPopupUtil:HidePopupWidget(POPUP_WHICH);
 end
 
 function EL:EnableModule(state)
@@ -73,7 +68,7 @@ function EL:EnableModule(state)
         self:RegisterEvent("BANKFRAME_CLOSED");
         self:SetScript("OnEvent", self.OnEvent);
     elseif self.enabled then
-        self.enabled = false;
+        self.enabled = nil;
         self:UnregisterEvent("DELETE_ITEM_CONFIRM");
         self:UnregisterEvent("BANKFRAME_OPENED");
         self:UnregisterEvent("BANKFRAME_CLOSED");
@@ -134,14 +129,12 @@ function EL:OnUpdate_UnregisterDynamicEvents(elapsed)
     if self.t > 1.0 then
         self.t = nil;
         self:SetScript("OnUpdate", nil);
-        self:UnregisterEvent("TOOLTIP_DATA_UPDATE");
         self:UnregisterEvent("QUEST_DATA_LOAD_RESULT");
     end
 end
 
 function EL:ListenDynamicEvents()
     self:RegisterEvent("CURSOR_CHANGED");
-    self:RegisterEvent("TOOLTIP_DATA_UPDATE");
     self:RegisterEvent("QUEST_DATA_LOAD_RESULT");
     self.t = 0;
     self:SetScript("OnUpdate", self.OnUpdate_UnregisterDynamicEvents);
@@ -153,11 +146,13 @@ function EL:DisplayQuest(questID)
     local questName;
     local questLogIndex = GetLogIndexForQuestID(questID);
     local tooltipData = GetHyperlink("quest:"..questID);
-    self.dataInstanceID = tooltipData and tooltipData.dataInstanceID or nil;
     self:ListenDynamicEvents();
 
     local tooltipText;
+    local dataInstanceID;
+
     if tooltipData and tooltipData.lines then
+        dataInstanceID = tooltipData.dataInstanceID;
         local colorizedText;
         for i, line in ipairs(tooltipData.lines) do
             if i == 1 then
@@ -217,22 +212,10 @@ function EL:DisplayQuest(questID)
     end
     --]]
 
-    --Find Static Popup
-    local _G = _G;
-    local f, popup;
-
-    for i = 1, 3 do
-        f = _G["StaticPopup"..i];
-        if f and f:IsShown() and f.which == "DELETE_QUEST_ITEM" then
-            popup = f;
-            break
-        end
-    end
-
-    if popup then
-        self:DisplayTooltip(popup, questName, tooltipText);
-    else
-        self:DisplayTooltip(nil);
+    if StaticPopupUtil:ShowSimpleTooltip(POPUP_WHICH, questName, tooltipText, "BOTTOM") then
+        StaticPopupUtil:AddTooltipInfoCallback(dataInstanceID, function()
+            EL:DisplayQuest(questID);
+        end);
     end
 end
 
@@ -241,55 +224,6 @@ function EL:StoreItemQuest(itemID, questID)
     if itemName and itemName ~= "" and questID ~= 0 then
         self.ItemNameToQuest[itemName] = questID;
         return true
-    end
-end
-
-local SIDE_SPACING = 8;
-local TITLE_DESC_GAP = 4;
-local MAX_TEXT_WIDTH = 256;
-
-function EL:DisplayTooltip(anchorTo, title, description)
-    local f = self.Tooltip;
-    if title then
-        if not f then
-            f = CreateFrame("Frame", nil, UIParent);
-            self.Tooltip = f;
-            local bg = addon.CreateNineSliceFrame(f, "NineSlice_GenericBox_Black");
-            bg:SetCornerSize(8);
-            bg:SetFrameLevel(f:GetFrameLevel() - 1);
-            bg:SetAllPoints(true);
-
-            f.Title = f:CreateFontString(nil, "OVERLAY", "GameTooltipHeaderText");
-            f.Title:SetJustifyH("LEFT");
-            f.Title:SetJustifyV("TOP");
-            f.Title:SetWidth(MAX_TEXT_WIDTH);
-            f.Title:SetPoint("TOPLEFT", f, "TOPLEFT", SIDE_SPACING, -SIDE_SPACING);
-            f.Title:SetTextColor(1, 0.82, 0);
-
-            f.Desc = f:CreateFontString(nil, "OVERLAY", "GameTooltipText");
-            f.Desc:SetJustifyH("LEFT");
-            f.Desc:SetJustifyV("TOP");
-            f.Desc:SetWidth(MAX_TEXT_WIDTH);
-            f.Desc:SetPoint("TOPLEFT", f.Title, "BOTTOMLEFT", 0, -TITLE_DESC_GAP);
-        end
-
-        f.Title:SetText(title);
-        f.Desc:SetText(description);
-
-        local textHeight = f.Title:GetHeight() + TITLE_DESC_GAP + f.Desc:GetHeight();
-        local textWidth = math.max(f.Title:GetWrappedWidth(), f.Desc:GetWrappedWidth());
-        f:SetSize(API.Round(textWidth + 2*SIDE_SPACING), API.Round(textHeight + 2*SIDE_SPACING));
-        f:Show();
-        f:ClearAllPoints();
-
-        local bottom = anchorTo:GetBottom();
-        f:SetPoint("TOP", UIParent, "BOTTOM", 0, bottom - 12);
-        --f:SetPoint("TOP", anchorTo, "BOTTOM", 0, -12);
-    else
-        if f then
-            f:Hide();
-            f:ClearAllPoints();
-        end
     end
 end
 

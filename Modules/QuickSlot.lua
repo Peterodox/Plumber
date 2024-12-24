@@ -287,7 +287,23 @@ local function RealActionButton_PostClick(self, button)
             menu:SetOwner(owner);
             menu:ClearAllPoints();
             menu:SetPoint("LEFT", owner, "RIGHT", 12, 0);
-            menu:SetContent(ContextMenuData);
+
+            local menuData;
+            if QuickSlot.buttonData.developerInfo then
+                menuData = API.CopyTable(ContextMenuData);
+                tinsert(menuData, {
+                    type = "divider",
+                });
+                tinsert(menuData, {
+                    --type == "info",
+                    color = {0.5, 0.5, 0.5},
+                    text = L["Quickslot Module Info"];
+                    tooltip = QuickSlot.buttonData.developerInfo,
+                });
+            else
+                menuData = ContextMenuData;
+            end
+            menu:SetContent(menuData);
             menu:Show();
         end
     end
@@ -341,7 +357,7 @@ local function ItemButton_OnEnter(self)
 
         local macroText;
         if self.onClickFunc then
-            
+
         elseif self.macroText then
             macroText = self.macroText;
         else
@@ -349,7 +365,9 @@ local function ItemButton_OnEnter(self)
                 macroText = string.format("/use item:%s", self.id);
             elseif self.actionType == "spell" then
                 local spellName = C_Spell.GetSpellName(self.id);
-                macroText = string.format("/cast %s", spellName);
+                if spellName then
+                    macroText = string.format("/cast %s", spellName);
+                end
             end
         end
         RealActionButton:SetAttribute("type1", "macro");

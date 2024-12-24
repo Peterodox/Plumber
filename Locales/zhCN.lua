@@ -249,6 +249,17 @@ L["ModuleName NameplateWidget"] = "姓名版: 钥焰";
 L["ModuleDescription NameplateWidget"] = "在钥焰的姓名版进度条上显示你拥有的光耀残渣的数量。";
 
 
+--PartyInviterInfo
+L["ModuleName PartyInviterInfo"] = "队伍邀请人信息";
+L["ModuleDescription PartyInviterInfo"] = "显示队伍以及公会邀请人的等级、职业等信息。";
+L["Additional Info"] = "额外信息";
+L["Race"] = "种族";
+L["Faction"] = "阵营";
+L["Click To Search Player"] = "搜索此玩家";
+L["Searching Player In Progress"] = "搜索中...";
+L["Player Not Found"] = "未找到玩家。";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
