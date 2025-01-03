@@ -15,6 +15,7 @@ local IsModifiedClick = IsModifiedClick;
 local IsCosmeticItem = C_Item.IsCosmeticItem or API.Nop;
 local GetItemCount = C_Item.GetItemCount;
 local GetCursorPosition = GetCursorPosition;
+local IsDressableItemByID = C_Item.IsDressableItemByID or API.Nop;
 
 
 -- User Settings
@@ -634,7 +635,7 @@ do  --UI ItemButton
         if button == "LeftButton" then
             if IsModifiedClick("DRESSUP") and not InCombatLockdown() then
                 local itemID = self.data.slotType == Defination.SLOT_TYPE_ITEM and self.data.id;
-                if itemID and C_Item.IsDressableItemByID(itemID) then
+                if itemID and IsDressableItemByID(itemID) then
                     DressUpVisual(self.data.link);
                     return
                 end

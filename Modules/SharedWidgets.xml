@@ -415,7 +415,7 @@
             </Anchors>
         </HighlightTexture>
         <Frames>
-            <Cooldown parentKey="Cooldown" hideCountdownNumbers="true" reverse="false" useCircularEdge="true" hidden="true" useParentLevel="true" drawSwipe="true" drawEdge="false">
+            <Cooldown parentKey="Cooldown" hideCountdownNumbers="false" reverse="false" useCircularEdge="true" hidden="true" useParentLevel="true" drawSwipe="true" drawEdge="false">
                 <Size x="40" y="40"/>
                 <Anchors>
                     <Anchor point="CENTER"/>

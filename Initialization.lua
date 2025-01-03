@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.5.2";
-local VERSION_DATE = 1735000000;
+local VERSION_TEXT = "v1.5.3";
+local VERSION_DATE = 1735800000;
 
 
 local addonName, addon = ...
@@ -116,14 +116,15 @@ local DefaultValues = {
     --Custom Loot Window
     LootUI = false,
         LootUI_FontSize = 14,
+        LootUI_FadeDelayPerItem = 0.25,
+        LootUI_ItemsPerPage = 6,
         LootUI_ShowItemCount = false,
+        LootUI_NewTransmogIcon = true,
+        LootUI_ForceAutoLoot = true,
+        LootUI_LootUnderMouse = false;
         LootUI_UseHotkey = true,
         LootUI_HotkeyName = "E",
-        LootUI_ForceAutoLoot = true,
-        LootUI_NewTransmogIcon = true,
-        LootUI_FadeDelayPerItem = 0.25,
         LootUI_ReplaceDefaultAlert = false,
-        LootUI_LootUnderMouse = false;
         LootUI_UseStockUI = false,
 
 

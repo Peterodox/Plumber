@@ -418,6 +418,7 @@ do  --Event Handler
 
         self:ListenDynamicEvents(true);
         self:RegisterEvent("UI_ERROR_MESSAGE");
+        self:RegisterEvent("LOOT_BIND_CONFIRM");
         self:RegisterEvent("LOOT_SLOT_CHANGED");
         self:RegisterEvent("LOOT_SLOT_CLEARED");
         if acquiredFromItem then
@@ -460,6 +461,7 @@ do  --Event Handler
         end
         MainFrame.errorMode = nil;
         self:UnregisterEvent("UI_ERROR_MESSAGE");
+        self:UnregisterEvent("LOOT_BIND_CONFIRM");
         self:UnregisterEvent("LOOT_SLOT_CHANGED");
         self:UnregisterEvent("LOOT_SLOT_CLEARED");
     end
@@ -654,7 +656,7 @@ do  --Event Handler
             self:OnLootClosed();
         elseif event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then
             MainFrame:OnUIScaleChanged();
-        elseif event == "UI_ERROR_MESSAGE" then
+        elseif event == "UI_ERROR_MESSAGE" or event == "LOOT_BIND_CONFIRM" then
             --ERR_INV_FULL, ERR_LOOT_CANT_LOOT_THAT, ERR_LOOT_CANT_LOOT_THAT_NOW, ERR_LOOT_ROLL_PENDING
             if self.lootOpened then
                 local errorType, message = ...
@@ -902,6 +904,7 @@ do  --UI Notification Mode
 
                 if foundIndex then
                     tremove(self.lootQueue, dataIndex);
+                    numQueued = numQueued - 1;
                 else
                     dataIndex = dataIndex + 1;
                 end
@@ -1408,9 +1411,7 @@ do  --Edit Mode
     end
 
     local function GetValidFadeOutDelay(value)
-        if not value then
-            value = 0.25;
-        end
+        value = value or 0.25;
         return API.Clamp(value, 0.25, 1.0);
     end
 
@@ -1422,6 +1423,18 @@ do  --Edit Mode
 
     local function Options_FadeOutDelaySlider_FormatValue(value)
         return string.format("%.2f", value);
+    end
+
+    local function GetValidItemsPerPage(value)
+        value = math.floor(value or 5);
+        value = API.Clamp(value, 5, 8);
+        return value
+    end
+
+    local function Options_ItemsPerPageSlider_OnValueChanged(value)
+        value = GetValidItemsPerPage(value);
+        PlumberDB.LootUI_ItemsPerPage = value;
+        MAX_ITEM_PER_PAGE = value;
     end
 
     local function Options_ForceAutoLoot_OnClick(self, state)
@@ -1472,8 +1485,9 @@ do  --Edit Mode
     local OPTIONS_SCHEMATIC = {
         title = L["EditMode LootUI"],
         widgets = {
-            {type = "Slider", label = L["Font Size"], minValue = 10, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "LootUI_FontSize"},
-            {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueFunc = Options_FadeOutDelaySlider_FormatValue,  dbKey = "LootUI_FadeDelayPerItem"},
+            {type = "Slider", label = L["Font Size"], minValue = 10, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue, dbKey = "LootUI_FontSize"},
+            {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueFunc = Options_FadeOutDelaySlider_FormatValue, dbKey = "LootUI_FadeDelayPerItem"},
+            {type = "Slider", label = L["LootUI Option Items Per Page"], minValue = 5, maxValue = 8, valueStep = 1, onValueChangedFunc = Options_ItemsPerPageSlider_OnValueChanged, dbKey = "LootUI_ItemsPerPage", tooltip = L["LootUI Option Items Per Page Tooltip"]},
             {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},
 
@@ -1559,6 +1573,11 @@ do  --Edit Mode
         AUTO_HIDE_DELAY = GetValidFadeOutDelay(value);
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_FadeDelayPerItem", SettingChanged_FadeDelayPerItem);
+
+    local function SettingChanged_ItemsPerPage(value, userInput)
+        MAX_ITEM_PER_PAGE = GetValidItemsPerPage(value);
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_ItemsPerPage", SettingChanged_ItemsPerPage);
 
     local function SettingChanged_ReplaceDefaultAlert(state, userInput)
         REPLACE_LOOT_ALERT = state;

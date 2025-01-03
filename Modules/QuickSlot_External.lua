@@ -30,7 +30,7 @@ do  --ControllerMixin
         if forceUpdate then
             QuickSlot.buttonData = nil;
         else
-            if QuickSlot.buttonData == self and QuickSlot:IsShown() then
+            if QuickSlot.buttonData == self and QuickSlot:IsShown() and (not QuickSlot.isClosing) then
                 return
             end
         end
@@ -93,7 +93,7 @@ PlumberAPI_AddQuickSlotController = AddQuickSlotController;
 
 
 do
-    --[[
+   --[[
     local TestModule = {
         key = "key",
         title = nil,
@@ -101,8 +101,8 @@ do
         spellcastType = 1,
         developerInfo = "What does this module do. Developed by Whom",
         buttons = {
-            {actionType = "spell", spellID = 2061, icon = nil, name = "Custom Name", onClickFunc = nil, enabled = true},
-            {actionType = "item", itemID = 208067, spellID = 417645},
+            {actionType = "spell", spellID = 1966, icon = nil, name = "Custom Name", onClickFunc = nil, enabled = true},
+            {actionType = "item", itemID = 226107, spellID = nil},
         },
     };
 

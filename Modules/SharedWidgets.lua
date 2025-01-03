@@ -1479,6 +1479,8 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
             self.Icon:SetVertexColor(1, 1, 1);
         elseif index == 2 then
             self.Icon:SetVertexColor(0.4, 0.4, 0.4);
+        elseif index == 3 then
+            self.Icon:SetVertexColor(0.8, 0.8, 0.8);
         else
             self.Icon:SetVertexColor(1, 1, 1);
         end
@@ -1515,9 +1517,11 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
                 self.Count:SetText("");
             end
         elseif self.actionType == "spell" then
-            local currentCharges, maxCharges = GetSpellCharges(self.id);
+            local chargeInfo = GetSpellCharges(self.id);
+            local currentCharges = chargeInfo and chargeInfo.currentCharges;
             if currentCharges then
                 count = currentCharges;
+                self.Count:SetText(count);
             else
                 count = 1;
                 self.Count:SetText("");
@@ -1527,7 +1531,11 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         if count > 0 then
             self:SetIconState(1);
         else
-            self:SetIconState(2);
+            if self.actionType == "item" then
+                self:SetIconState(2);
+            else
+                self:SetIconState(3);
+            end
         end
 
         self.charges = count;
@@ -3944,6 +3952,23 @@ do  --Slider
         DisableSharpening(self.Slider.Right);
 
         self:SetLabelWidth(144);
+
+        local function OnEnter()
+            self:OnEnter();
+        end
+
+        local function OnLeave()
+            self:OnLeave();
+        end
+
+        self:SetScript("OnEnter", OnEnter);
+        self:SetScript("OnLeave", OnLeave);
+        self.Back:SetScript("OnEnter", OnEnter);
+        self.Back:SetScript("OnLeave", OnLeave);
+        self.Forward:SetScript("OnEnter", OnEnter);
+        self.Forward:SetScript("OnLeave", OnLeave);
+        self.Slider:SetScript("OnEnter", OnEnter);
+        self.Slider:SetScript("OnLeave", OnLeave);
     end
 
     function SliderFrameMixin:Enable()
@@ -4014,6 +4039,33 @@ do  --Slider
         self.Label:SetWidth(width);
         self:SetWidth(242 + width);
         self.Slider:SetPoint("LEFT", self, "LEFT", 28 + width, 0);
+    end
+
+    function SliderFrameMixin:OnEnter()
+        if self.tooltip then
+            local f = GameTooltip;
+            f:Hide();
+            f:SetOwner(self, "ANCHOR_RIGHT");
+            f:SetText(self.Label:GetText(), 1, 1, 1, true);
+            f:AddLine(self.tooltip, 1, 0.82, 0, true);
+            if self.tooltip2 then
+                local tooltip2;
+                if type(self.tooltip2) == "function" then
+                    tooltip2 = self.tooltip2();
+                else
+                    tooltip2 = self.tooltip2;
+                end
+                if tooltip2 then
+                    f:AddLine(" ", 1, 0.82, 0, true);
+                    f:AddLine(tooltip2, 1, 0.82, 0, true);
+                end
+            end
+            f:Show();
+        end
+    end
+
+    function SliderFrameMixin:OnLeave()
+        GameTooltip:Hide();
     end
 
     local function FormatValue(value)
@@ -4565,8 +4617,14 @@ do  --EditMode
             slider:SetObeyStepOnDrag(false);
         end
 
-        slider:SetFormatValueFunc(widgetData.formatValueFunc);
+        if widgetData.formatValueFunc then
+            slider:SetFormatValueFunc(widgetData.formatValueFunc);
+        else
+            slider:SetFormatValueFunc(function(value) return value end);
+        end
+
         slider:SetOnValueChangedFunc(widgetData.onValueChangedFunc);
+        slider.tooltip = widgetData.tooltip;
 
         if widgetData.dbKey and addon.GetDBValue(widgetData.dbKey) then
             slider:SetValue(addon.GetDBValue(widgetData.dbKey));

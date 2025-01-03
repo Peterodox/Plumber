@@ -1,5 +1,5 @@
-## Interface: 110005, 110007
-## Version: 1.5.2
+## Interface: 110007
+## Version: 1.5.3
 
 ## Title: Plumber
 
@@ -54,6 +54,7 @@ Modules\SpellcastInfo.lua
 Modules\ChatOptions.lua
 Modules\NameplateResources.lua
 Modules\StaticPopupEnhancement.xml
+#Modules\MovieSubtitle.lua
 
 #Modules\QuestSpecialItemCooldown.lua
 #Modules\SecretOfAzeroth.lua
