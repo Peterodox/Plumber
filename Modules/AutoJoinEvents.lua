@@ -96,7 +96,6 @@ local function EnableModule(state)
 end
 
 do
-
     local moduleData = {
         name = addon.L["ModuleName AutoJoinEvents"],
         dbKey = "AutoJoinEvents",

@@ -111,6 +111,7 @@ local DefaultValues = {
     PartyInviterInfo = false,           --Show the inviter's level and class
         PartyInviter_Race = false,
         PartyInviter_Faction = false,
+    PlayerTitleUI = false,              --Add search box and filter to TitleManagerPane
 
 
     --Custom Loot Window

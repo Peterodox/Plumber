@@ -2436,6 +2436,93 @@ do  -- Chat Message
     API.PrintMessage = PrintMessage;
 end
 
+do  --11.0 Menu Formatter
+    function API.ShowBlizzardMenu(ownerRegion, schematic, contextData)
+        contextData = contextData or {};
+
+        local menu = MenuUtil.CreateContextMenu(ownerRegion, function(ownerRegion, rootDescription)
+            rootDescription:SetTag(schematic.tag, contextData);
+
+            for _, info in ipairs(schematic.objects) do
+                local elementDescription;
+                if info.type == "Title" then
+                    elementDescription = rootDescription:CreateTitle();
+                    elementDescription:AddInitializer(function(f, description, menu)
+                        f.fontString:SetText(info.name);
+                    end);
+                elseif info.type == "Divider" then
+                    elementDescription = rootDescription:CreateDivider();
+                elseif info.type == "Spacer" then
+                    elementDescription = rootDescription:CreateSpacer();
+                elseif info.type == "Button" then
+                    elementDescription = rootDescription:CreateButton(info.name, info.OnClick);
+                elseif info.type == "Checkbox" then
+                    elementDescription = rootDescription:CreateCheckbox(info.name, info.IsSelected, info.ToggleSelected);
+                end
+
+                if info.tooltip then
+                    elementDescription:SetTooltip(function(tooltip, elementDescription)
+                        GameTooltip_SetTitle(tooltip, MenuUtil.GetElementText(elementDescription));
+                        GameTooltip_AddNormalLine(tooltip, info.tooltip);
+                        --GameTooltip_AddInstructionLine(tooltip, "Test Tooltip Instruction");
+                        --GameTooltip_AddErrorLine(tooltip, "Test Tooltip Colored Line");
+                    end);
+                end
+
+                if info.rightText or info.rightTexture then
+                    local rightText;
+                    if type(info.rightText) == "function" then
+                        rightText = info.rightText();
+                    else
+                        rightText = info.rightText;
+                    end
+                    elementDescription:AddInitializer(function(button, description, menu)
+                        local rightWidth = 0;
+
+                        if info.rightTexture then
+                            local iconSize = 18;
+                            local rightTexture = button:AttachTexture();
+                            rightTexture:SetSize(iconSize, iconSize);
+                            rightTexture:SetPoint("RIGHT");
+                            rightTexture:SetTexture(info.rightTexture);
+                            rightWidth = rightWidth + iconSize;
+                            rightWidth = 20;
+                        end
+
+                        local fontString = button.fontString;
+                        fontString:SetTextColor(NORMAL_FONT_COLOR:GetRGB());
+
+                        local fontString2;
+                        if info.rightText then
+                            fontString2 = button:AttachFontString();
+                            fontString2:SetHeight(20);
+                            fontString2:SetPoint("RIGHT", button, "RIGHT", 0, 0);
+                            fontString2:SetJustifyH("RIGHT");
+                            fontString2:SetText(rightText);
+                            fontString2:SetTextColor(0.5, 0.5, 0.5);
+                            rightWidth = fontString2:GetWrappedWidth() + 20;
+                        end
+
+                        local width = fontString:GetWrappedWidth() + rightWidth;
+                        local height = 20;
+
+                        return width, height;
+                    end);
+                end
+            end
+        end);
+
+        if schematic.onMenuClosedCallback then
+            menu:SetClosedCallback(schematic.onMenuClosedCallback);
+        end
+
+        return menu
+    end
+end
+
+
+
+
 --[[
 local DEBUG = CreateFrame("Frame");
 DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");

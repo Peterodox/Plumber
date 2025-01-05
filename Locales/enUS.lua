@@ -260,6 +260,15 @@ L["Searching Player In Progress"] = FRIENDS_FRIENDS_WAITING or "Searching...";
 L["Player Not Found"] = ERR_FRIEND_NOT_FOUND or "Player not found.";
 
 
+--PlayerTitleUI
+L["ModuleName PlayerTitleUI"] = "Title Manager";
+L["ModuleDescription PlayerTitleUI"] = "Add a search box and a filter to the default Character Pane.";
+L["Right Click To Reset Filter"] = "Right click to reset.";
+L["Earned"] = ACHIEVEMENTFRAME_FILTER_COMPLETED or "Earned";
+L["Unearned"] = "Unearned";
+L["Unearned Filter Tooltip"] = "You may see duplicated titles that are unavailable to your faction.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
@@ -290,7 +299,6 @@ L["LootUI Option Use Default UI"] = "Use Default Loot Window";
 L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
 
 
-
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "Module Info";
 L["QuickSlot Error 1"] = "Quick Slot: You have already added this controller.";
@@ -309,6 +317,7 @@ L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
+L["Total Colon"] = FROM_TOTAL or "Total:";
 
 
 
