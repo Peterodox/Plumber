@@ -48,7 +48,6 @@ Modules\DelvesDashboard.lua
 Modules\ExpansionLandingPage.xml
 Modules\GameTooltipExtension.xml
 Modules\LootUI.xml
-Modules\WoWAnniversary.lua
 Modules\UnderlightAngler.lua
 Modules\SpellcastInfo.lua
 Modules\ChatOptions.lua
@@ -61,3 +60,4 @@ Modules\PlayerTitleUI.lua
 #Modules\SecretOfAzeroth.lua
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua
+#Modules\WoWAnniversary.lua
