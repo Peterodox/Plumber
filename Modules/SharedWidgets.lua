@@ -1094,7 +1094,13 @@ do  -- TokenFrame   -- Money   -- Coin
         if self.tokenType == 0 and self.currencyID then
             GameTooltip:SetCurrencyByID(self.currencyID);
         elseif self.tokenType == 1 and self.itemID then
-            GameTooltip:SetItemByID(self.itemID);
+            if self.merchantSlot and self.metchantCostIndex then
+                GameTooltip:SetMerchantCostItem(self.merchantSlot, self.metchantCostIndex)
+            elseif self.link then
+                GameTooltip:SetHyperlink(self.link);
+            else
+                GameTooltip:SetItemByID(self.itemID);
+            end
             AppendItemCount(GameTooltip, self.itemID);
             self.UpdateTooltip = function()
                 TokenButton_OnEnter(self)
@@ -1116,10 +1122,14 @@ do  -- TokenFrame   -- Money   -- Coin
         --For Vendors
         local numRequired = currencyData[3];
         local icon = currencyData[4];
+        local link = currencyData[5];
         local quantity;
         local grayColor = false;    --0.6   NumberFontNormalRightGray
 
         tokenButton.tokenType = tokenType;
+        tokenButton.link = link;
+        tokenButton.merchantSlot = currencyData[6];
+        tokenButton.metchantCostIndex = currencyData[7];
 
         if tokenType == TOKEN_TYPE_CURRENCY then
             --Currency

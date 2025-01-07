@@ -244,11 +244,9 @@ do  --Filter
 
     function Module:ResetFilter()
         if self.getTitleFunc ~= GetTitles.Earned then
-           self.getTitleFunc = GetTitles.Earned;
            self.showEarned = true;
            self.showUnearned = false;
-           FilterButton:SetVisual(1);
-           self:UpdateIfShown();
+           self:UpdateAfterFilterChange();
         end
     end
 
@@ -617,7 +615,7 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 1163,
-        moduleAddedTime = 1736064000,
+        moduleAddedTime = 1736240000,
     };
 
     addon.ControlCenter:AddModule(moduleData);

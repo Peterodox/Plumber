@@ -260,6 +260,15 @@ L["Searching Player In Progress"] = "搜索中...";
 L["Player Not Found"] = "未找到玩家。";
 
 
+--PlayerTitleUI
+L["ModuleName PlayerTitleUI"] = "头衔管理";
+L["ModuleDescription PlayerTitleUI"] = "在游戏自带头衔选择界面上增加搜索栏和筛选器。";
+L["Right Click To Reset Filter"] = "右键单击来重置。";
+L["Earned"] = "已获得";
+L["Unearned"] = "未获得";
+L["Unearned Filter Tooltip"] = "某些头衔可能重复，且无法由当前阵营获取。";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
