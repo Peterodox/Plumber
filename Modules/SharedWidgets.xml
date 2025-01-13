@@ -423,7 +423,7 @@
                 <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-CooldownSwipe"/>
                 <!--EdgeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Edge"/-->
                 <KeyValues>
-                    <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+                    <KeyValue key="noCooldownCount" value="false" type="boolean"/> <!--OmniCC-->
                 </KeyValues>
             </Cooldown>
         </Frames>

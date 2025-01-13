@@ -15,12 +15,13 @@ local PlayerChoiceXCurrency = {
 };
 
 do  --Radian Echo
-    local RadianEcho = {1, 220520};
     local target = PlayerChoiceXCurrency[832];
     PlayerChoiceXCurrency[827] = target;    --Worldsoul Memory: Primal Predators
     PlayerChoiceXCurrency[829] = target;    --Worldsoul Memory: A Wounded Soul
     PlayerChoiceXCurrency[830] = target;    --Worldsoul Memory: Old Gods Forsaken
     PlayerChoiceXCurrency[831] = target;    --Worldsoul Memory: Ancient Explorers
+    PlayerChoiceXCurrency[831] = target;    --Worldsoul Memory: Ancient Explorers
+    PlayerChoiceXCurrency[854] = target;    --Worldsoul Memory: Early Cartel Wars
 end
 
 

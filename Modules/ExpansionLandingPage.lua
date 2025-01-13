@@ -87,6 +87,10 @@ do
         SetPortraitTextureFromCreatureDisplayID(self.Icon, creatureDisplayID);
     end
 
+    function FactionProgressMixin:SetIconByFileID(fileID)
+        self.Icon:SetTexture(fileID)
+    end
+
     function FactionProgressMixin:SetFaction(factionID)
         self.factionID = factionID;
         self:Update();
@@ -100,9 +104,13 @@ do
             isParagon = true;
             local paragonTimes;
             currentValue, maxValue, paragonTimes = GetParagonValuesAndLevel(self.factionID);
+            self.reputationType = 2;    --Friendship
         else
             isParagon = false;
-            level, isFull, currentValue, maxValue = API.GetFriendshipProgress(self.factionID);
+            local info = API.GetReputationProgress(self.factionID);
+            level, isFull, currentValue, maxValue = info.level, info.isFull, info.currentValue, info.maxValue;
+            self.factionName = info.name;
+            self.reputationType = info.reputationType;
         end
 
         self.isParagon = isParagon;
@@ -120,6 +128,8 @@ do
 
 
         self.ProgressBar:SetValue(currentValue, maxValue);
+        self.currentValue = currentValue;
+        self.maxValue = maxValue;
     end
 
     function FactionProgressMixin:ShowParagonTooltip()
@@ -147,7 +157,20 @@ do
             self:ShowParagonTooltip();
         else
             local tooltip = GameTooltip;
-            ReputationEntryMixin.ShowFriendshipReputationTooltip(self, self.factionID, "ANCHOR_RIGHT", false);
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            if self.reputationType == 2 then
+                ReputationEntryMixin.ShowFriendshipReputationTooltip(self, self.factionID, "ANCHOR_RIGHT", false);
+            elseif self.reputationType == 1 then
+                GameTooltip_SetTitle(tooltip, self.factionName);
+                if C_Reputation.IsAccountWideReputation(self.factionID) then
+                    local wrapText = false;
+	                GameTooltip_AddColoredLine(tooltip, REPUTATION_TOOLTIP_ACCOUNT_WIDE_LABEL, ACCOUNT_WIDE_FONT_COLOR, wrapText);
+                end
+                tooltip:AddLine(API.GetFactionStatusText(self.factionID, 1, 1, 1, true));
+            else
+                tooltip:Hide();
+                return
+            end
             tooltip:AddLine(" ");
             GameTooltip_AddColoredLine(tooltip, (IsFactionWatched(self.factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"], GREEN_FONT_COLOR);
             tooltip:Show();
@@ -181,7 +204,7 @@ do
         Icon:SetSize(38, 38);
         f.Icon = Icon;
 
-        Mixin(f, FactionProgressMixin);
+        API.Mixin(f, FactionProgressMixin);
 
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
@@ -193,12 +216,23 @@ end
 
 
 local MajorFactionButtonMod = {};
+MajorFactionButtonMod.Containers = {};
 do
-    local SPIDER_DATA = {
-        --factionID, creatureDisplayID
-        {2601, 116208},     --Weaver
-        {2605, 114775},     --General Anub'azal
-        {2607, 114268},     --Vizier
+    local SubFactionData = {
+        --[MajorFactionID] = {SubFactionID, iconType (1:CreatureDisplayID, 2:TextureFileID)}
+        [2600] = {  --The Severed Threads
+            {2601, 1, 116208},     --Weaver
+            {2605, 1, 114775},     --General Anub'azal
+            {2607, 1, 114268},     --Vizier
+        },
+
+        [2653] = {  --The Cartels of Undermine
+            --{2669, 0},     --Darkfuse Solutions
+            {2673, 2, 6383479},     --Bilgewater Cartel
+            {2677, 2, 6383482},     --Steamwheedle Cartel
+            {2675, 2, 6383480},     --Blackwater Cartel
+            {2671, 2, 6383483},     --Venture Co.
+        },
     };
 
     function MajorFactionButtonMod:GetFactionButton(factionID)
@@ -209,7 +243,7 @@ do
         local dataProvider = ScrollBox:GetDataProvider();
 
         local dataIndex, foundElementData = dataProvider:FindByPredicate(function(elementData)
-            return elementData.factionID == factionID;   --The Severed Threads
+            return elementData.factionID == factionID;
         end)
 
         local view = ScrollBox:GetView();
@@ -218,68 +252,72 @@ do
         return frame
     end
 
-    function MajorFactionButtonMod:ModifyFactionButton_Web()
+    function MajorFactionButtonMod:ModifyFactionButtons()
         HiddenObjectUtil:Release();
+        local frame, container;
+        for factionID, subFactions in pairs(SubFactionData) do
+            frame = self:GetFactionButton(factionID)
+            if frame then
+                local button = frame.UnlockedState;
 
-        local frame = self:GetFactionButton(2600);      --The Severed Threads
-        local container = self.WidgetContainer_Web;
+                --HiddenObjectUtil:AddObject(button.Title);
+                --HiddenObjectUtil:AddObject(button.RenownLevel);
+                --HiddenObjectUtil:FadeOutObjects(1);
 
-        if frame then
-            local button = frame.UnlockedState;
+                local barSize = FACTION_FRAME_WIDTH;
+                local barGap = 0;
+                local rightPadding = 8;
+                local shrinkTop = 8;
+                local shrinkAll = 4;
 
-            --HiddenObjectUtil:AddObject(button.Title);
-            --HiddenObjectUtil:AddObject(button.RenownLevel);
-            --HiddenObjectUtil:FadeOutObjects(1);
+                container = self.Containers[factionID];
+                if not container then
+                    container = CreateFrame("Frame", nil, button);
+                    self.Containers[factionID] = container;
+                    container:SetSize(100, barSize);
+                    container.widgets = {};
 
-            local barSize = FACTION_FRAME_WIDTH;
-            local barGap = 0;
-            local rightPadding = 8;
-            local shrinkTop = 8;
-            local shrinkAll = 4;
+                    for i, data in ipairs(subFactions) do
+                        local f = CreateFactionProgress(container);
+                        container.widgets[i] = f;
+                        f:SetFaction(data[1]);
+                        if data[2] == 1 then
+                            f:SetIconByCreatureDisplayID(data[3]);
+                        else
+                            f:SetIconByFileID(data[3]);
+                        end
+                        f:SetPoint("LEFT", container, "LEFT", (i - 1) * (barSize + barGap), 0);
+                        f:SetHitRectInsets(shrinkAll, shrinkAll, shrinkTop, 0);     --hopefully reduce our influence on the FactionButton
+                    end
 
-            if not container then
-                container = CreateFrame("Frame", nil, button);
-                self.WidgetContainer_Web = container;
-                container:SetSize(100, barSize);
-                self.widgets_Web = {};
+                    container:SetSize(-barGap + rightPadding + (barSize + barGap) * #subFactions, barSize);
+                    container:EnableMouse(true);
+                    container:SetHitRectInsets(shrinkAll, 0, shrinkTop, 0);
 
-                for i, data in ipairs(SPIDER_DATA) do
-                    local f = CreateFactionProgress(container);
-                    self.widgets_Web[i] = f;
-                    f:SetFaction(data[1]);
-                    f:SetIconByCreatureDisplayID(data[2]);
-                    f:SetPoint("LEFT", container, "LEFT", (i - 1) * (barSize + barGap), 0);
-                    f:SetHitRectInsets(shrinkAll, shrinkAll, shrinkTop, 0);     --hopefully reduce our influence on the FactionButton
-                end
-
-                container:SetSize(-barGap + rightPadding + (barSize + barGap) * #SPIDER_DATA, barSize);
-                container:EnableMouse(true);
-                container:SetHitRectInsets(shrinkAll, 0, shrinkTop, 0);
-
-                local scrollOverlay = ExpansionLandingPage.Overlay.WarWithinLandingOverlay.ScrollFadeOverlay;
-                container.scrollOverlay = scrollOverlay;
-            else
-                for i, widget in ipairs(self.widgets_Web) do
-                    widget:Update();
-                    if widget:IsMouseMotionFocus() then
-                        widget:OnEnter();
+                    local scrollOverlay = ExpansionLandingPage.Overlay.WarWithinLandingOverlay.ScrollFadeOverlay;
+                    container.scrollOverlay = scrollOverlay;
+                else
+                    for i, widget in ipairs(container.widgets) do
+                        widget:Update();
+                        if widget:IsMouseMotionFocus() then
+                            widget:OnEnter();
+                        end
                     end
                 end
-            end
 
-            container:ClearAllPoints();
-            container:SetParent(button);
-            container:SetPoint("RIGHT", button, "RIGHT", 0, -32);
-            container.scrollOverlay:Hide();
-            container:Show();
-        else
-            self:HideWidgets();
+                container:ClearAllPoints();
+                container:SetParent(button);
+                container:SetPoint("RIGHT", button, "RIGHT", 0, -32);
+                container.scrollOverlay:Hide();
+                container:Show();
+            else
+                self:HideWidgets();
+            end
         end
     end
 
     function MajorFactionButtonMod:HideWidgets()
-        local container = self.WidgetContainer_Web;
-        if container then
+        for factionID, container in pairs(self.Containers) do
             container:Hide();
             container:ClearAllPoints();
             container.scrollOverlay:Show();
@@ -290,7 +328,6 @@ do
         --ExpansionLandingPage is not loaded when this file is loaded
 
         local self = MajorFactionButtonMod;
-        local container = self.WidgetContainer_Web;
 
         if state then
             if not self.factionEventListener then
@@ -300,7 +337,7 @@ do
                 factionEventListener:SetScript("OnShow", function()
                     factionEventListener:RegisterEvent("UPDATE_FACTION");
                     factionEventListener:RegisterEvent("MAJOR_FACTION_UNLOCKED");
-                    MajorFactionButtonMod:ModifyFactionButton_Web()
+                    MajorFactionButtonMod:ModifyFactionButtons()
                 end);
 
                 factionEventListener:SetScript("OnHide", function()
@@ -313,7 +350,7 @@ do
                         self.pauseUpdate = true;
                         C_Timer.After(0.05, function()
                             self.pauseUpdate = nil;
-                            MajorFactionButtonMod:ModifyFactionButton_Web()
+                            MajorFactionButtonMod:ModifyFactionButtons()
                         end);
                     end
                 end);
@@ -324,9 +361,7 @@ do
                 self.factionEventListener:Hide();
             end
 
-            if container then
-                self:HideWidgets();
-            end
+            self:HideWidgets();
         end
     end
 end

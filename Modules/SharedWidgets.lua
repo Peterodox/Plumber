@@ -1588,6 +1588,11 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         end
     end
 
+    function PeudoActionButtonMixin:HideCooldownNumber(state)
+        self.Cooldown:SetHideCountdownNumbers(state);
+        --TO-DO --For OmniCC: https://github.com/tullamods/OmniCC/blob/f4cb9745a077920b12fca43d2bb74e7fc1141fab/OmniCC/core/cooldown.lua#L408
+    end
+
     local function CreatePeudoActionButton(parent)
         local button = CreateFrame("Button", nil, parent, "PlumberPeudoActionButtonTemplate");
         Mixin(button, PeudoActionButtonMixin);

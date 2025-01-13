@@ -1591,11 +1591,15 @@ do  --Reputation
     local UnitSex = UnitSex;
     local GetText = GetText;
 
-    local function GetFriendshipProgress(factionID)
-        local repInfo = factionID and GetFriendshipReputation(factionID);
-        if repInfo and repInfo.friendshipFactionID and  repInfo.friendshipFactionID > 0 then
-            local currentValue, maxValue;
+    local function GetReputationProgress(factionID)
+        if not factionID then return end;
 
+        local level, isFull, currentValue, maxValue, name, reputationType;
+
+        local repInfo = GetFriendshipReputation(factionID);
+        if repInfo and repInfo.friendshipFactionID and repInfo.friendshipFactionID > 0 then
+            reputationType = 2;
+            name = repInfo.name;
             if repInfo.nextThreshold then
                 currentValue = repInfo.standing - repInfo.reactionThreshold;
                 maxValue = repInfo.nextThreshold - repInfo.reactionThreshold;
@@ -1609,13 +1613,47 @@ do  --Reputation
             end
 
             local rankInfo = GetFriendshipReputationRanks(repInfo.friendshipFactionID);
-            local level = rankInfo.currentLevel;
-            local isFull = level >= rankInfo.maxLevel;
+            level = rankInfo.currentLevel;
+            isFull = level >= rankInfo.maxLevel;
+        end
 
-            return level, isFull, currentValue, maxValue
+        if not reputationType then
+            repInfo = GetFactionInfoByID(factionID);
+            if repInfo then
+                reputationType = 1;
+                name = repInfo.name;
+                if repInfo.currentReactionThreshold then
+                    currentValue = repInfo.currentStanding - repInfo.currentReactionThreshold;
+                    maxValue = repInfo.nextReactionThreshold - repInfo.currentReactionThreshold;
+                    if maxValue == 0 then
+                        currentValue = 1;
+                        maxValue = 1;
+                    end
+                else
+                    currentValue = 1;
+                    maxValue = 1;
+                end
+
+                local zeroLevel = 4;    --Neutral
+                level = repInfo.reaction;
+                level = level - zeroLevel;
+                isFull = level >= 8; --TEMP DEBUG
+            end
+        end
+
+        if reputationType then
+            local tbl = {
+                level = level,
+                currentValue = currentValue,
+                maxValue = maxValue,
+                isFull = isFull,
+                name = name,
+                reputationType = reputationType,    --1:Standard, 2:Friendship
+            };
+            return tbl
         end
     end
-    API.GetFriendshipProgress = GetFriendshipProgress;
+    API.GetReputationProgress = GetReputationProgress;
 
 
     local function GetParagonValuesAndLevel(factionID)
@@ -1697,8 +1735,8 @@ do  --Reputation
         end
 
         local rolloverText; --(0/24000)
-        if barValue and barMax and (not isCapped) then
-            rolloverText = string.format("(%s/%s)", barValue, barMax);
+        if barMin and barValue and barMax and (not isCapped) then
+            rolloverText = string.format("(%s/%s)", barValue - barMin, barMax - barMin);
         end
 
         local text;
