@@ -55,13 +55,25 @@ do
             if self.scrollOffset < 0 then
                 self.scrollOffset = 0;
             end
-            self.ScrollChild:SetPoint("TOPLEFT", self, "TOPLEFT", 0, self.scrollOffset);
+            ControlCenter:SetScrollOffset(self.scrollOffset, true);
         elseif self.scrollOffset < self.scrollRange and delta < 0 then
             self.scrollOffset = self.scrollOffset + OFFSET_PER_SCROLL;
             if self.scrollOffset > self.scrollRange then
                 self.scrollOffset = self.scrollRange;
             end
-            self.ScrollChild:SetPoint("TOPLEFT", self, "TOPLEFT", 0, self.scrollOffset);
+            ControlCenter:SetScrollOffset(self.scrollOffset, true);
+        end
+    end
+
+    function ControlCenter:SetScrollOffset(offset, fromMouseWheel)
+        self.ScrollFrame.ScrollChild:SetPoint("TOPLEFT", self.ScrollFrame, "TOPLEFT", 0, offset);
+        self.ScrollFrame.scrollOffset = offset;
+        self:UpdateScrollBar(fromMouseWheel);
+    end
+
+    function ControlCenter:UpdateScrollBar(fromMouseWheel)
+        if self.scrollable then
+            self.ScrollBar:SetScrollPercentage(self.ScrollFrame.scrollOffset/self.ScrollFrame.scrollRange, fromMouseWheel);
         end
     end
 
@@ -76,6 +88,11 @@ do
                 self.ScrollFrame.scrollOffset = 0;
             end
             self.ScrollFrame.scrollRange = scrollRange;
+
+            if self.ScrollBar then
+                local frameHeight = ControlCenter:GetHeight();
+                self.ScrollBar:SetVisibleExtentPercentage(frameHeight/(frameHeight + scrollRange));
+            end
         else
             if self.scrollable then
                 self.scrollable = false;
@@ -88,6 +105,13 @@ do
         end
     end
 
+    function ControlCenter:SetScrollPercentage(scrollPercentage)
+        if self.scrollable then
+            local offset = self.ScrollFrame.scrollRange * scrollPercentage;
+            self:SetScrollOffset(offset, true);
+        end
+    end
+
     function ControlCenter:UpdateScrollRange()
         local frameHeight = self.ScrollFrame:GetHeight();
         local firstButton = self.CategoryButtons[1];
@@ -96,6 +120,9 @@ do
         local contentHeight = 2 * PADDING + firstButton:GetTop() - lastObject:GetBottom();
 
         self:SetScrollRange(math.ceil(contentHeight - frameHeight));
+        if self.ShowScrollBar then
+            self:ShowScrollBar(self.scrollable);
+        end
     end
 
     function ControlCenter:OnMouseWheel(delta)
@@ -362,6 +389,10 @@ local function CreateUI()
     dividerBottom:SetTexture("Interface/AddOns/Plumber/Art/Frame/Divider_DropShadow_Vertical");
     dividerMiddle:SetTexture("Interface/AddOns/Plumber/Art/Frame/Divider_DropShadow_Vertical");
 
+    ControlCenter.dividers = {
+        dividerTop, dividerMiddle, dividerBottom,
+    };
+
     API.DisableSharpening(dividerTop);
     API.DisableSharpening(dividerBottom);
     API.DisableSharpening(dividerMiddle);
@@ -530,6 +561,20 @@ local function CreateUI()
     db.settingsOpenTime = time();
 
 
+    local ScrollBar = CreateFrame("EventFrame", nil, container, "MinimalScrollBar");
+    ScrollBar:SetPoint("TOP", dividerTop, "TOP", 0, 0)
+    ScrollBar:SetPoint("BOTTOM", dividerBottom, "BOTTOM", 0, 0);
+    ControlCenter.ScrollBar = ScrollBar
+
+    function ScrollBar:SetScrollPercentage(scrollPercentage, fromMouseWheel)
+        ScrollControllerMixin.SetScrollPercentage(ScrollBar, scrollPercentage);
+        ScrollBar:Update();
+        if not fromMouseWheel then
+            ControlCenter:SetScrollPercentage(scrollPercentage);
+        end
+    end
+
+
     function ControlCenter:UpdateLayout()
         local frameWidth = math.floor(self:GetWidth() + 0.5);
         if frameWidth == self.frameWidth then
@@ -546,6 +591,21 @@ local function CreateUI()
         preview:SetSize(previewSize, previewSize);
 
         ScrollFrame:SetWidth(leftSectorWidth);
+    end
+
+    function ControlCenter:ShowScrollBar(state)
+        if state then
+            ScrollBar:Show();
+            dividerTop:SetShown(false);
+            dividerMiddle:SetShown(false);
+            dividerBottom:SetShown(false);
+            self:UpdateScrollBar(true);
+        else
+            ScrollBar:Hide();
+            dividerTop:SetShown(true);
+            dividerMiddle:SetShown(true);
+            dividerBottom:SetShown(true);
+        end
     end
 end
 

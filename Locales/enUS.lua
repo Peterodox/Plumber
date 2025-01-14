@@ -178,6 +178,11 @@ L["ModuleDescription TooltipSnapdragonTreats"] = "Show additional info for Snapd
 L["Color Applied"] = "This is the currently applied color.";
 
 
+--Tooltip Item Reagents
+L["ModuleName TooltipItemReagents"] = "Reagents";
+L["ModuleDescription TooltipItemReagents"] = "If an item can be used to combine into something new, display all \"reagents\" used in the process.";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Merchant Price";
 L["ModuleDescription MerchantPrice"] = "Modify Merchant UI's behaviors:\n\n- Grey out only the insufficient currencies.\n\n- Show all required items in the coin box.";
