@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.5.3
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.5.5
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -216,7 +216,7 @@ L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "У вас нет эт
 
 
 --BlizzFixFishingArtifact
-L["ModuleName BlizzFixFishingArtifact"] = "Blitz Fix: Удочка Темносвета";
+L["ModuleName BlizzFixFishingArtifact"] = "Исправление: Удочка Темносвета";
 L["ModuleDescription BlizzFixFishingArtifact"] = "Разрешить вам снова просматривать характеристики рыболовного артефакта.";
 
 
@@ -258,6 +258,15 @@ L["Faction"] = FACTION or "Фракция";
 L["Click To Search Player"] = "Поиск этого игрока";
 L["Searching Player In Progress"] = FRIENDS_FRIENDS_WAITING or "Идет поиск...";
 L["Player Not Found"] = ERR_FRIEND_NOT_FOUND or "Игрок не найден.";
+
+
+--PlayerTitleUI
+L["ModuleName PlayerTitleUI"] = "Управление званиями";
+L["ModuleDescription PlayerTitleUI"] = "Добавить поле поиска и фильтр на панель персонажа по умолчанию.";
+L["Right Click To Reset Filter"] = "ПКМ чтобы сбросить настройки.";
+L["Earned"] = ACHIEVEMENTFRAME_FILTER_COMPLETED or "Получено";
+L["Unearned"] = "Не получено";
+L["Unearned Filter Tooltip"] = "Вы можете увидеть дублирующиеся звания, которые недоступны вашей фракции.";
 
 
 --Loot UI
