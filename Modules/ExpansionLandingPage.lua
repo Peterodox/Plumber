@@ -311,12 +311,21 @@ do
                 container.scrollOverlay:Hide();
                 container:Show();
             else
-                self:HideWidgets();
+                self:HideFactionWidgets(factionID);
             end
         end
     end
 
-    function MajorFactionButtonMod:HideWidgets()
+    function MajorFactionButtonMod:HideFactionWidgets(factionID)
+        local container = self.Containers[factionID];
+        if container then
+            container:Hide();
+            container:ClearAllPoints();
+            container.scrollOverlay:Show();
+        end
+    end
+
+    function MajorFactionButtonMod:HideAllWidgets()
         for factionID, container in pairs(self.Containers) do
             container:Hide();
             container:ClearAllPoints();
@@ -361,7 +370,7 @@ do
                 self.factionEventListener:Hide();
             end
 
-            self:HideWidgets();
+            self:HideAllWidgets();
         end
     end
 end

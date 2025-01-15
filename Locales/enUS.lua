@@ -180,7 +180,8 @@ L["Color Applied"] = "This is the currently applied color.";
 
 --Tooltip Item Reagents
 L["ModuleName TooltipItemReagents"] = "Reagents";
-L["ModuleDescription TooltipItemReagents"] = "If an item can be used to combine into something new, display all \"reagents\" used in the process.";
+L["ModuleDescription TooltipItemReagents"] = "If an item can be used to combine into something new, display all \"reagents\" used in the process.\n\nPress and hold Shift to display the crafted item if supported.";
+L["Can Create Multiple Item Format"] = "You have the resources to create |cffffffff%d|r items.";
 
 
 --Merchant UI Price

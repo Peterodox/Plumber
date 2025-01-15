@@ -1,6 +1,8 @@
 local _, addon = ...
+local L = addon.L;
 local GameTooltipItemManager = addon.GameTooltipItemManager;
 
+local floor = math.floor;
 local GetItemSpell = C_Item.GetItemSpell;
 local GetRecipeSchematic = C_TradeSkillUI.GetRecipeSchematic;
 local GetItemNameByID = C_Item.GetItemNameByID;
@@ -10,15 +12,18 @@ local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local GetItemInfoInstant = C_Item.GetItemInfoInstant;
 local IsShiftKeyDown = IsShiftKeyDown;
 
-local ItemReagentCache = {};
-local ItemSubModule = {};
 
+local ItemReagentCache = {};
+local QuantityOverride = {};
 local TextureInfoTable = {
     width = 14,
     height = 14,
     margin = { left = 0, right = 4, top = 0, bottom = 0 },
     texCoords = { left = 0.0625, right = 0.9375, top = 0.0625, bottom = 0.9375 },
 };
+
+
+local ItemSubModule = {};
 
 function ItemSubModule:ProcessItem(tooltip, itemID)
     if self.enabled then
@@ -28,17 +33,26 @@ function ItemSubModule:ProcessItem(tooltip, itemID)
             if spellID and classID ~= 8 then    --ItemEnhancement: Enchant Scroll
                 local schematic = GetRecipeSchematic(spellID, false);
                 if schematic and schematic.reagentSlotSchematics then
+                    local recipeID = schematic.recipeID;
                     local numReagents = 0;
                     local reagents = {};
-
+                    local reagentItemID;
+                    local tbl;
                     for k, v in ipairs(schematic.reagentSlotSchematics) do
                         if v.required and v.reagents and v.reagents[1] and (v.reagents[1].itemID or v.reagents[1].currencyID) then
                             numReagents = numReagents + 1;
-                            reagents[numReagents] = {
-                                quantityRequired = v.quantityRequired or 1,
-                                itemID = v.reagents[1].itemID,
-                                currencyID = v.reagents[1].currencyID,
-                            };
+                            reagentItemID = v.reagents[1].itemID;
+                            tbl = {};
+                            tbl.quantityRequired = v.quantityRequired or 1;
+                            if reagentItemID then
+                                tbl.itemID = reagentItemID;
+                                if QuantityOverride[recipeID] and QuantityOverride[recipeID][reagentItemID] then
+                                    tbl.quantityRequired = QuantityOverride[recipeID][reagentItemID];
+                                end
+                            else
+                                tbl.currencyID = v.reagents[1].currencyID;
+                            end
+                            reagents[numReagents] = tbl;
                         end
                     end
 
@@ -63,7 +77,7 @@ function ItemSubModule:ProcessItem(tooltip, itemID)
         if ItemReagentCache[itemID] then
             tooltip:AddLine(" ");
             local info = ItemReagentCache[itemID];
-            local name, count, quantityText, icon;
+            local name, count, quantityText, icon, maxOutput, numOuput;
             local requireUpdate;
             local isMultipleReagent = #info.reagents > 1;
             for k, v in ipairs(info.reagents) do
@@ -91,8 +105,17 @@ function ItemSubModule:ProcessItem(tooltip, itemID)
                     quantityText = count.."/"..v.quantityRequired;
                     if count >= v.quantityRequired then
                         tooltip:AddDoubleLine(name, quantityText, 1, 1, 1, 1, 1, 1);
+                        numOuput = floor(count / v.quantityRequired);
+                        if maxOutput then
+                            if numOuput < maxOutput then
+                                maxOutput = numOuput;
+                            end
+                        else
+                            maxOutput = numOuput;
+                        end
                     else
                         tooltip:AddDoubleLine(name, quantityText, 1, 0.125, 0.125, 1, 0.125, 0.125);
+                        maxOutput = 0;
                     end
                     tooltip:AddTexture(icon, TextureInfoTable);
                 end
@@ -104,6 +127,11 @@ function ItemSubModule:ProcessItem(tooltip, itemID)
                     requireUpdate = true;
                 end
                 GameTooltipItemManager:AppendItemInfo(tooltip, info.outputItemID);
+            end
+
+            if maxOutput and maxOutput > 1 and info.outputItemID then
+                tooltip:AddLine(" ");
+                tooltip:AddLine(string.format(L["Can Create Multiple Item Format"], maxOutput), 1, 0.82, 0, true);
             end
 
             if requireUpdate and tooltip.RefreshDataNextUpdate then
@@ -149,8 +177,19 @@ do
         toggleFunc = EnableModule,
         categoryID = 3,
         uiOrder = 10,
-        moduleAddedTime = 1726674500,
+        moduleAddedTime = 1736940000,
     };
 
     addon.ControlCenter:AddModule(moduleData);
+end
+
+
+
+
+do  --QuantityOverride
+    --[recipeID] = {[itemID] = quantityRequired}
+
+    QuantityOverride[428667] = {
+        [211297] = 2,   --Fractured Spark of Omens
+    };
 end

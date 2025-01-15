@@ -178,6 +178,12 @@ L["ModuleDescription TooltipSnapdragonTreats"] = "在毒鳍龙鼠标提示上显
 L["Color Applied"] = "你正在使用这个配色。";
 
 
+--Tooltip Item Reagents
+L["ModuleName TooltipItemReagents"] = "合成材料";
+L["ModuleDescription TooltipItemReagents"] = "如果一个物品可被使用来合成新物品，显示所有所需的物品和你拥有的数量。\n\n如果游戏支持的话，按住Shift键可显示最终物品的信息。";
+L["Can Create Multiple Item Format"] = "你拥有的材料能够合成|cffffffff%d|r件物品。";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "商品价格";
 L["ModuleDescription MerchantPrice"] = "改变商人界面的默认行为：\n\n- 只把数量不足的货币变灰。\n\n- 在钱币方框内显示当前页面所需的所有货币。";

@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.5.5";
-local VERSION_DATE = 1736700000;
+local VERSION_TEXT = "v1.5.6";
+local VERSION_DATE = 1736900000;
 
 
 local addonName, addon = ...
@@ -98,7 +98,7 @@ local DefaultValues = {
     TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
     TooltipRepTokens = true,            --Show faction info for items that grant rep
     TooltipSnapdragonTreats = true,     --Show info on Snapdragon Treats (An item that changes this mount's color)
-    TooltipItemReagents = true,         --For items with "use to combine": show the reagent count
+    TooltipItemReagents = false,        --For items with "use to combine": show the reagent count
     PlayerChoiceFrameToken = true,      --Add owned token count to PlayerChoiceFrame
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
