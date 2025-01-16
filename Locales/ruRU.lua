@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.5.5
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.5.6
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -176,6 +176,12 @@ L["ModuleDescription TooltipRepTokens"] = "Показывать информац
 L["ModuleName TooltipSnapdragonTreats"] = "Угощение для морского варана";
 L["ModuleDescription TooltipSnapdragonTreats"] = "Показать дополнительную информацию о угощении для морского варана.";
 L["Color Applied"] = "Это текущий цвет.";
+
+
+--Tooltip Item Reagents
+L["ModuleName TooltipItemReagents"] = "Реагенты";
+L["ModuleDescription TooltipItemReagents"] = "Если предметы можно использовать для объединения во что-то новое, показать все \"реагенты\" использованые в процессе.\n\nНажмите и удерживайте Shift, чтобы отобразить созданный предмет, если поддерживается.";
+L["Can Create Multiple Item Format"] = "У вас есть ресурсы для создания |cffffffff%d|r предмета.";
 
 
 --Merchant UI Price
