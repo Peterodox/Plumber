@@ -184,6 +184,13 @@ L["ModuleDescription TooltipItemReagents"] = "如果一个物品可被使用来�
 L["Can Create Multiple Item Format"] = "你拥有的材料能够合成|cffffffff%d|r件物品。";
 
 
+--Plunderstore
+L["ModuleName Plunderstore"] = "霸业风暴：珍宝商店";
+L["ModuleDescription Plunderstore"] = "调整从队伍查找器界面打开的珍宝商店：\n\n- 允许仅显示未收集物品。\n\n- 在类别按钮上显示未收集物品的数量。\n\n- 在武器和护甲的鼠标提示上显示其穿戴位置。\n\n- 允许你在试衣间里显示可穿戴的物品。";
+L["Store Full Purchase Price Format"] = "再获取|cffffffff%s|r枚珍宝就能购买商店里所有物品。";
+L["Store Item Fully Collected"] = "你已经拥有商店里的所有物品！";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "商品价格";
 L["ModuleDescription MerchantPrice"] = "改变商人界面的默认行为：\n\n- 只把数量不足的货币变灰。\n\n- 在钱币方框内显示当前页面所需的所有货币。";

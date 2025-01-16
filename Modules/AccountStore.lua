@@ -241,7 +241,7 @@ local function ModifyCard_TransmogSet(self)
     end
 
     if self:IsMouseOver() then
-        SetupMagnifierForCard(self, itemID);
+        OnEnter();
     end
 end
 
