@@ -54,6 +54,7 @@ Modules\ChatOptions.lua
 Modules\NameplateResources.lua
 Modules\StaticPopupEnhancement.xml
 Modules\PlayerTitleUI.lua
+Modules\AccountStore.lua
 
 #Modules\MovieSubtitle.lua
 #Modules\QuestSpecialItemCooldown.lua

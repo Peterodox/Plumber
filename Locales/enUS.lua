@@ -184,6 +184,13 @@ L["ModuleDescription TooltipItemReagents"] = "If an item can be used to combine 
 L["Can Create Multiple Item Format"] = "You have the resources to create |cffffffff%d|r items.";
 
 
+--Plunderstore
+L["ModuleName Plunderstore"] = "Plunderstore";
+L["ModuleDescription Plunderstore"] = "Modify the store opened via Group Finder:\n\n- Added a checkbox to hide collected items.\n\n- Display the number of uncollected items on the category buttons.\n\n- Added weapon and armor equip location to their tooltips.\n\n- Allow you to view equippable items in the Dressing Room.";
+L["Store Full Purchase Price Format"] = "Earn |cffffffff%s|r Plunder to purchase everything in the store.";
+L["Store Item Fully Collected"] = "You have collected everything in the store!";
+
+
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Merchant Price";
 L["ModuleDescription MerchantPrice"] = "Modify Merchant UI's behaviors:\n\n- Grey out only the insufficient currencies.\n\n- Show all required items in the coin box.";

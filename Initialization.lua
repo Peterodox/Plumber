@@ -113,6 +113,8 @@ local DefaultValues = {
         PartyInviter_Race = false,
         PartyInviter_Faction = false,
     PlayerTitleUI = false,              --Add search box and filter to TitleManagerPane
+    Plunderstore = true,
+        Plunderstore_HideCollected = true,
 
 
     --Custom Loot Window
