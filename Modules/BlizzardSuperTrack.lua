@@ -224,7 +224,7 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 1168,
-        moduleAddedTime = 1737020000,
+        moduleAddedTime = 1737460000,
     };
 
     addon.ControlCenter:AddModule(moduleData);

@@ -282,6 +282,11 @@ L["Unearned"] = "未获得";
 L["Unearned Filter Tooltip"] = "某些头衔可能重复，且无法由当前阵营获取。";
 
 
+--BlizzardSuperTrack
+L["ModuleName BlizzardSuperTrack"] = "导航：事件倒计时";
+L["ModuleDescription BlizzardSuperTrack"] = "如果你正在追踪的地图标记的鼠标提示里包含时间信息，在屏幕导航下方显示此时间。";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";

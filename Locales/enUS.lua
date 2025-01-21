@@ -282,6 +282,11 @@ L["Unearned"] = "Unearned";
 L["Unearned Filter Tooltip"] = "You may see duplicated titles that are unavailable to your faction.";
 
 
+--BlizzardSuperTrack
+L["ModuleName BlizzardSuperTrack"] = "Waypoint: Event Timer";
+L["ModuleDescription BlizzardSuperTrack"] = "Add a timer to your active waypoint if its map pin tooltip has one.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
