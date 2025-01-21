@@ -407,7 +407,7 @@ do  -- Time
 
     local function SecondsToClock(seconds)
         --Clock: 00:00
-        return format("%s:%02d", math.floor(seconds / 60), math.floor(seconds % 60))
+        return format("%s:%02d", floor(seconds / 60), floor(seconds % 60))
     end
     API.SecondsToClock = SecondsToClock;
 
@@ -509,6 +509,7 @@ do  -- Time
 
     local function ConvertTextToSeconds(durationText)
         if not durationText then return 0 end;
+        if not match(durationText, "%d") then return 0 end;
 
         local hours = tonumber(match(durationText, PATTERN_HOURS) or 0);
         local minutes = tonumber(match(durationText, PATTERN_MINUTES) or 0);

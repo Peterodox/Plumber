@@ -110,6 +110,47 @@ do
             end
         end
     end
+
+    function GameTooltipItemManager:DebugAddField(tooltip, tbl, field, label, enumLookup)
+        local leftText, rightText;
+        if label then
+            leftText = string.format("- %s: %s", label, field);
+        else
+            leftText = field;
+        end
+
+        local value = tbl[field];
+
+        if value and enumLookup then
+            for k, v in pairs(Enum[enumLookup]) do
+                if v == value then
+                    rightText = string.format("%s (%s)", value, k);
+                    break
+                end
+            end
+        else
+            rightText = value;
+        end
+
+        if type(rightText) == "boolean" then
+            self:DebugPrintBool(tooltip, leftText, rightText);
+        else
+            if rightText then
+                tooltip:AddDoubleLine(leftText, rightText, 1, 0.82, 0, 1, 1, 1);
+            else
+                tooltip:AddDoubleLine(leftText, tostring(rightText), 1, 0.82, 0, 1, 0.125, 0.125);
+            end
+        end
+
+    end
+
+    function GameTooltipItemManager:DebugPrintBool(tooltip, leftText, bool)
+        if bool then
+            tooltip:AddDoubleLine(leftText, tostring(bool), 1, 0.82, 0, 0.098, 1.000, 0.098);
+        else
+            tooltip:AddDoubleLine(leftText, tostring(bool), 1, 0.82, 0, 1, 0.125, 0.125);
+        end
+    end
 end
 
 

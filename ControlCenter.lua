@@ -701,14 +701,14 @@ if Settings then
 end
 
 
-do
+do  --Our SuperTracking system is unused
     function ControlCenter:ShouldShowNavigatorOnDreamseedPins()
         return PlumberDB.Navigator_Dreamseed and not PlumberDB.Navigator_MasterSwitch
     end
 
     function ControlCenter:EnableSuperTracking()
-        PlumberDB.Navigator_MasterSwitch = true;
-        local SuperTrackFrame = addon.GetSuperTrackFrame();
-        SuperTrackFrame:TryEnableByModule();
+        --PlumberDB.Navigator_MasterSwitch = true;
+        --local SuperTrackFrame = addon.GetSuperTrackFrame();
+        --SuperTrackFrame:TryEnableByModule();
     end
 end

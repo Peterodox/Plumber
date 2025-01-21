@@ -14,6 +14,7 @@ local IsShiftKeyDown = IsShiftKeyDown;
 
 
 local ItemReagentCache = {};
+local ItemRecipeIDCache = {};   --Debug
 local QuantityOverride = {};
 local TextureInfoTable = {
     width = 14,
@@ -34,6 +35,7 @@ function ItemSubModule:ProcessItem(tooltip, itemID)
                 local schematic = GetRecipeSchematic(spellID, false);
                 if schematic and schematic.reagentSlotSchematics then
                     local recipeID = schematic.recipeID;
+                    ItemRecipeIDCache[itemID] = recipeID;
                     local numReagents = 0;
                     local reagents = {};
                     local reagentItemID;
@@ -59,6 +61,7 @@ function ItemSubModule:ProcessItem(tooltip, itemID)
                     if numReagents > 0 then
                         local info = {};
                         info.reagents = reagents;
+                        info.spellID = spellID;
                         if schematic.outputItemID then
                             info.outputItemID = schematic.outputItemID;
                         end
@@ -138,6 +141,39 @@ function ItemSubModule:ProcessItem(tooltip, itemID)
                 tooltip:RefreshDataNextUpdate();
             end
 
+            --debug
+            --[[
+            if true then
+                --/dump C_TradeSkillUI.GetRecipeSchematic(428667, false).reagentSlotSchematics
+                tooltip:AddLine(" ");
+
+                local _, itemType, itemSubType, itemEquipLoc, icon, classID, subClassID = C_Item.GetItemInfoInstant(itemID);
+                local idFormat = "%s |cffffffff%s|r";
+                tooltip:AddDoubleLine("ItemID", itemID, 1, 0.82, 0, 1, 1, 1);
+                tooltip:AddDoubleLine("SpellID", info.spellID, 1, 0.82, 0, 1, 1, 1);
+                tooltip:AddDoubleLine(idFormat:format(itemType, classID), idFormat:format(itemSubType, subClassID));
+                GameTooltipItemManager:DebugPrintBool(tooltip, "IsConsumableItem", C_Item.IsConsumableItem(itemID));
+                GameTooltipItemManager:DebugPrintBool(tooltip, "IsUsableItem", C_Item.IsUsableItem(itemID));
+
+                local schematic = GetRecipeSchematic(info.spellID, false);
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "name");
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "recipeID");
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "recipeType", nil, "TradeskillRecipeType");
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "quantityMin");
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "quantityMax");
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "isRecraft");
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "hasCraftingOperationInfo");
+                GameTooltipItemManager:DebugAddField(tooltip, schematic, "outputItemID");
+
+                for k, v in ipairs(schematic.reagentSlotSchematics) do
+                    tooltip:AddLine(" ");
+                    GameTooltipItemManager:DebugAddField(tooltip, v, "reagentType", k, "CraftingReagentType");
+                    GameTooltipItemManager:DebugAddField(tooltip, v, "dataSlotType", k, "TradeskillSlotDataType");
+                    GameTooltipItemManager:DebugAddField(tooltip, v, "quantityRequired", k);
+                end
+            end
+            --]]
+
             return true
         end
 
@@ -190,6 +226,10 @@ do  --QuantityOverride
     --[recipeID] = {[itemID] = quantityRequired}
 
     QuantityOverride[428667] = {
-        [211297] = 2,   --Fractured Spark of Omens
+        [211297] = 2,   --Fractured Spark TWW S1
+    };
+
+    QuantityOverride[467635] = {
+        [230905] = 2,   --Fractured Spark TWW S2
     };
 end

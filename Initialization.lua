@@ -115,6 +115,7 @@ local DefaultValues = {
     PlayerTitleUI = false,              --Add search box and filter to TitleManagerPane
     Plunderstore = true,
         Plunderstore_HideCollected = true,
+    BlizzardSuperTrack = false,         --Add timer to the SuperTrackedFrame when tracking a POI with time format
 
 
     --Custom Loot Window

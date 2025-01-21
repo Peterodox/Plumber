@@ -19,7 +19,7 @@ API.lua
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
 #Modules\DirectionArrow.lua
-Modules\SuperTrack.xml
+#Modules\SuperTrack.xml
 
 ControlCenter.lua
 
@@ -33,7 +33,6 @@ Modules\QuestAreaTrigger.lua
 Modules\Dreamseed.lua
 #Modules\EventMap.lua
 Modules\MapPin.xml
-Modules\Navigator_Dreamseed.lua
 Modules\RareAnnouncement.lua
 Modules\PlayerChoiceUI.lua
 Modules\Lockpicking.lua
@@ -54,6 +53,7 @@ Modules\ChatOptions.lua
 Modules\NameplateResources.lua
 Modules\StaticPopupEnhancement.xml
 Modules\PlayerTitleUI.lua
+Modules\BlizzardSuperTrack.lua
 Modules\AccountStore.lua
 
 #Modules\MovieSubtitle.lua
@@ -62,3 +62,4 @@ Modules\AccountStore.lua
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua
 #Modules\WoWAnniversary.lua
+#Modules\Navigator_Dreamseed.lua
