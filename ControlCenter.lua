@@ -23,12 +23,14 @@ local CATEGORY_ORDER = {
     [4] = "Class",
 
     --Patch Feature uses the tocVersion and #00
-    [10020000] = "Dragonflight",
+    [1002] = "Dragonflight",
+
+    [1208] = "Plumber",
 };
 
 
 local DEFAULT_COLLAPSED_CATEGORY = {
-    [10020000] = true;
+    [1002] = true;
 };
 
 
@@ -37,6 +39,7 @@ addon.ControlCenter = ControlCenter;
 ControlCenter:SetSize(FRAME_WIDTH, FRAME_WIDTH * RATIO);
 ControlCenter:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
 ControlCenter.modules = {};
+ControlCenter.newDBKeys = {};
 ControlCenter:Hide();
 
 local ScrollFrame = CreateFrame("Frame", nil, ControlCenter);
@@ -625,11 +628,19 @@ end
 function ControlCenter:InitializeModules()
     --Initial Enable/Disable Modules
     local db = PlumberDB;
-    local enabled;
+    local enabled, isForceEnabled;
 
     for _, moduleData in pairs(self.modules) do
+        isForceEnabled = false;
         if (not moduleData.validityCheck) or (moduleData.validityCheck()) then
             enabled = db[moduleData.dbKey];
+
+            if (not enabled) and (self.newDBKeys[moduleData.dbKey]) then
+                enabled = true;
+                isForceEnabled = true;
+                db[moduleData.dbKey] = true;
+            end
+
             if moduleData.requiredDBValues then
                 for dbKey, value in pairs(moduleData.requiredDBValues) do
                     if db[dbKey] ~= nil and db[dbKey] ~= value then
@@ -637,9 +648,16 @@ function ControlCenter:InitializeModules()
                     end
                 end
             end
+
             moduleData.toggleFunc(enabled);
+
+            if enabled and isForceEnabled then
+                API.PrintMessage(string.format(L["New Feature Auto Enabled Format"], moduleData.name));     --Todo: click link to view detail |cff71d5ff
+            end
         end
     end
+
+    self.newDBKeys = {};
 end
 
 function ControlCenter:UpdateCategoryButtons()
@@ -711,4 +729,27 @@ do  --Our SuperTracking system is unused
         --local SuperTrackFrame = addon.GetSuperTrackFrame();
         --SuperTrackFrame:TryEnableByModule();
     end
+end
+
+
+do
+    addon.CallbackRegistry:Register("NewDBKeysAdded", function(newDBKeys)
+        ControlCenter.newDBKeys = newDBKeys;
+    end);
+
+
+    local function ToggleFunc_EnableNewByDefault(state)
+
+    end
+
+    local moduleData = {
+        name = L["ModuleName EnableNewByDefault"],
+        dbKey = "EnableNewByDefault",
+        description = L["ModuleDescription EnableNewByDefault"],
+        toggleFunc = ToggleFunc_EnableNewByDefault,
+        categoryID = 1208,
+        uiOrder = 1,
+    };
+
+    ControlCenter:AddModule(moduleData);
 end

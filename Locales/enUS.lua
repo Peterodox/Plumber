@@ -32,6 +32,7 @@ L["Module Category Tooltip"] = "Tooltip";   --Additional Info on Tooltips
 L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
+L["Module Category Plumber"] = "Plumber";   --This addon's name
 
 --Deprecated
 L["Module Category Dreamseeds"] = "Dreamseeds";     --Added in patch 10.2.0
@@ -338,6 +339,13 @@ L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
 L["Total Colon"] = FROM_TOTAL or "Total:";
+
+
+--Plumber AddOn Settings
+L["ModuleName EnableNewByDefault"] = "Always Enable New Features";
+L["ModuleDescription EnableNewByDefault"] = "Always enable newly added features.\n\n*You will see a notification in the chat window when a new module is enabled this way.";
+L["New Feature Auto Enabled Format"] = "New Module %s has been enabled.";
+L["Click To See Details"] = "Click to see details";
 
 
 

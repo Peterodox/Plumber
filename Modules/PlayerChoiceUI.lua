@@ -1006,7 +1006,7 @@ do
         dbKey = "AlternativePlayerChoiceUI",
         description = L["ModuleDescription AlternativePlayerChoiceUI"],
         toggleFunc = EnableModule,
-        categoryID = 10020000,
+        categoryID = 1002,
         uiOrder = 3,
     };
 

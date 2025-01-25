@@ -342,7 +342,7 @@ do
         dbKey = "EmeraldBountySeedList",
         description = addon.L["ModuleDescription EmeraldBountySeedList"],
         toggleFunc = EnableModule,
-        categoryID = 10020000,
+        categoryID = 1002,
         uiOrder = 1,
     };
 

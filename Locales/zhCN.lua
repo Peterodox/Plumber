@@ -332,6 +332,13 @@ L["Current Colon"] = "当前：";
 L["Unclaimed Reward Alert"] = "你有未领取的巅峰宝箱";
 
 
+--Plumber AddOn Settings
+L["ModuleName EnableNewByDefault"] = "默认开启新功能";
+L["ModuleDescription EnableNewByDefault"] = "自动开启所有新加入的功能。\n\n*如果一个功能因此自动启用，你将会在聊天窗口内看到相关提示。";
+L["New Feature Auto Enabled Format"] = "已开启新功能 %s";
+L["Click To See Details"] = "点击以查看详情";
+
+
 
 
 -- !! Do NOT translate the following entries

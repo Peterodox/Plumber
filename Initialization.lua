@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.5.8";
-local VERSION_DATE = 1737460000;
+local VERSION_TEXT = "v1.5.9";
+local VERSION_DATE = 1737800000;
 
 
 local addonName, addon = ...
@@ -165,6 +165,9 @@ local DefaultValues = {
         QuickSlotHighContrastMode = false,
 
 
+    EnableNewByDefault = false,             --Always enable newly added features
+
+
     --Declared elsewhere:
         --DreamseedChestABTesting = math.random(100) >= 50
 
@@ -180,14 +183,23 @@ local function LoadDatabase()
 
     DB = PlumberDB;
 
+    local alwaysEnableNew = DB.EnableNewByDefault or false;
+    local newDBKeys = {};
+
     for dbKey, value in pairs(DefaultValues) do
         if DB[dbKey] == nil then
             DB[dbKey] = value;
+            if alwaysEnableNew and type(value) == "boolean" then
+                --Not all Booleans are the master switch of individual module
+                --Send these new ones to ControlCenter
+                --Test: /run PlumberDB = {EnableNewByDefault = true}
+                newDBKeys[dbKey] = true;
+            end
         end
     end
 
     for dbKey, value in pairs(DB) do
-        addon.CallbackRegistry:Trigger("SettingChanged."..dbKey, value);
+        CallbackRegistry:Trigger("SettingChanged."..dbKey, value);
     end
 
     if not DB.installTime or type(DB.installTime) ~= "number" then
@@ -195,6 +207,8 @@ local function LoadDatabase()
     end
 
     DefaultValues = nil;
+
+    CallbackRegistry:Trigger("NewDBKeysAdded", newDBKeys);
 end
 
 local EL = CreateFrame("Frame");
