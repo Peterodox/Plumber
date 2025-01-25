@@ -315,6 +315,8 @@ L["LootUI Option Loot Under Mouse"] = "鼠标位置打开拾取窗口";
 L["LootUI Option Loot Under Mouse Tooltip"] = "处于|cffffffff手动拾取|r模式时, 在鼠标位置打开拾取窗口。";
 L["LootUI Option Use Default UI"] = "使用默认拾取窗口";
 L["LootUI Option Use Default UI Tooltip"] = "使用WoW默认的拾取窗口。\n\n|cffff4800勾选此选项会使以上所有选项无效。|r";
+L["LootUI Option Background Opacity"] = "不透明度";
+L["LootUI Option Background Opacity Tooltip"] = "改变通知模式下背景的不透明度。\n\n此选项不影响手动拾取模式。";
 
 
 --Generic

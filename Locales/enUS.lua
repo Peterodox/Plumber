@@ -305,16 +305,18 @@ L["LootUI Option Owned Count"] = "Show Number Of Owned Items";
 L["LootUI Option New Transmog"] = "Mark Uncollected Appearance";
 L["LootUI Option New Transmog Tooltip"] = "Add a marker %s if you have not collected the item's appearance.";
 L["LootUI Option Use Hotkey"] = "Press Key To Take All Items";
-L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Looting mode, press the following hotkey to take all items.";
+L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Loot Mode, press the following hotkey to take all items.";
 L["LootUI Option Fade Delay"] = "Fade Out Delay Per Item";
 L["LootUI Option Items Per Page"] = "Items Per Page";
 L["LootUI Option Items Per Page Tooltip"] = "Adjust the amount of items that can be displayed on one page when receiving loots.\n\nThis option doesn't affect Manual Loot Mode or Edit Mode.";
 L["LootUI Option Replace Default"] = "Replace Default Loot Alert";
 L["LootUI Option Replace Default Tooltip"] = "Replace the default loot alerts that usually appear above the action bars.";
 L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window at Mouse";
-L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r mode, the window will appear under the current mouse location";
+L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r Mode, the window will appear under the current mouse location";
 L["LootUI Option Use Default UI"] = "Use Default Loot Window";
 L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
+L["LootUI Option Background Opacity"] = "Opacity";
+L["LootUI Option Background Opacity Tooltip"] = "Set the background's opacity in Loot Notification Mode.\n\nThis option doesn't affect Manual Loot Mode.";
 
 
 --Quick Slot For Third-party Dev

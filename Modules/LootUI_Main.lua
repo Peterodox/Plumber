@@ -801,6 +801,13 @@ do  --UI Background
         self.Background:SetAlpha(alpha);
     end
 
+    function BackgroundMixin:ShowBorderLine(state)
+        self.LeftLine:SetShown(state);
+        self.LeftLineEnd:SetShown(state);
+        self.TopLine:SetShown(state);
+        self.TopLineEnd:SetShown(state);
+    end
+
     function BackgroundMixin:UpdatePixel()
         local scale = 1;
         local px = API.GetPixelForScale(scale, 1);
@@ -877,6 +884,14 @@ do  --UI Background
         tt:SetAllPoints(true);
         tt:SetColorTexture(1, 0, 0, 0.5);
         --]]
+    end
+
+    function MainFrame:SetBackgroundAlpha(alpha)
+        if self.BackgroundFrame then
+            self.BackgroundFrame:ShowBorderLine(alpha > 0);
+            alpha = 0.9 * alpha;
+            self.BackgroundFrame:SetBackgroundAlpha(alpha);
+        end
     end
 
     function MainFrame:SetBackgroundSize(width, height)

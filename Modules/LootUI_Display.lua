@@ -39,8 +39,9 @@ local GetReputationChangeFromText = API.GetReputationChangeFromText;
 
 
 local MAX_ITEM_PER_PAGE = 5;
-local EVENT_DURATION = 1.5;     --Unregister ChatMSG x seconds after LOOT_CLOSED
-local AUTO_HIDE_DELAY = 3.0;    --Determined by the number of items. From 2.0s to 3.0s
+local EVENT_DURATION = 1.5;         --Unregister ChatMSG x seconds after LOOT_CLOSED
+local AUTO_HIDE_DELAY = 3.0;        --Determined by the number of items. From 2.0s to 3.0s
+local BG_OPACITY = 0.5;             --Base Alpha: 0.9 (This parameter doesn't affect Manual Mode due to readability concern) / Opacity
 
 
 local EL = CreateFrame("Frame");
@@ -1063,9 +1064,8 @@ do  --UI Manually Pickup Mode
         if state then
             self.Header:Hide();
             self.TakeAllButton:Show();
-            self.BackgroundFrame:SetBackgroundAlpha(0.90);
+            self:SetBackgroundAlpha(1);
             self.isFocused = false;
-
             if LOOT_UNDER_MOUSE then
                 self:PositionUnderMouse();
             end
@@ -1074,8 +1074,7 @@ do  --UI Manually Pickup Mode
         else
             self.Header:Show();
             self.TakeAllButton:Hide();
-            self.BackgroundFrame:SetBackgroundAlpha(0.50);
-
+            self:SetBackgroundAlpha(BG_OPACITY);
             if LOOT_UNDER_MOUSE then
                 self:LoadPosition();
             end
@@ -1302,7 +1301,6 @@ end
 
 
 do  --Edit Mode
-    local L = addon.L;
     local SHOW_ITEM_COUNT = false;
 
     local SAMPLE_ITEMS = {
@@ -1344,6 +1342,7 @@ do  --Edit Mode
         self:LayoutActiveFrames();
         self:Show();
         self:SetAlpha(1);
+        self:SetBackgroundAlpha(BG_OPACITY);
 
         self.manualMode = nil;
         self.Header:Hide();
@@ -1368,6 +1367,7 @@ do  --Edit Mode
             self.Selection = addon.CreateEditModeSelection(self, uiName, hideLabel);
         end
         self.Selection:ShowHighlighted();
+        self.Selection:SetAlpha(1);
 
         self:LoadPosition();
         self:UnregisterEvent("GLOBAL_MOUSE_UP");
@@ -1406,10 +1406,6 @@ do  --Edit Mode
         end);
     end
 
-    local function Options_FontSizeSlider_FormatValue(value)
-        return string.format("%.0f", value);
-    end
-
     local function GetValidFadeOutDelay(value)
         value = value or 0.25;
         return API.Clamp(value, 0.25, 1.0);
@@ -1419,10 +1415,6 @@ do  --Edit Mode
         value = GetValidFadeOutDelay(value);
         PlumberDB.LootUI_FadeDelayPerItem = value;
         FADE_DELAY_PER_ITEM = value;
-    end
-
-    local function Options_FadeOutDelaySlider_FormatValue(value)
-        return string.format("%.2f", value);
     end
 
     local function GetValidItemsPerPage(value)
@@ -1435,6 +1427,28 @@ do  --Edit Mode
         value = GetValidItemsPerPage(value);
         PlumberDB.LootUI_ItemsPerPage = value;
         MAX_ITEM_PER_PAGE = value;
+    end
+
+    local function Options_OpacitySlider_OnValueChanged(value)
+        value = API.Clamp(value, 0, 1);
+        if value < 0.01 then
+            value = 0;
+        end
+        BG_OPACITY = value;
+        PlumberDB.LootUI_BackgroundAlpha = value;
+        MainFrame:SetBackgroundAlpha(BG_OPACITY);
+    end
+
+    local function Options_OpacitySlider_OnMouseDown()
+        if MainFrame.Selection then
+            MainFrame.Selection:SetAlpha(0);
+        end
+    end
+
+    local function Options_OpacitySlider_OnMouseUp(slider)
+        if MainFrame.Selection and (not slider:IsMouseMotionFocus()) then
+            MainFrame.Selection:SetAlpha(1);
+        end
     end
 
     local function Options_ForceAutoLoot_OnClick(self, state)
@@ -1485,9 +1499,12 @@ do  --Edit Mode
     local OPTIONS_SCHEMATIC = {
         title = L["EditMode LootUI"],
         widgets = {
-            {type = "Slider", label = L["Font Size"], minValue = 10, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue, dbKey = "LootUI_FontSize"},
-            {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueFunc = Options_FadeOutDelaySlider_FormatValue, dbKey = "LootUI_FadeDelayPerItem"},
+            {type = "Slider", label = L["Font Size"], minValue = 10, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueMethod = "Decimal1", dbKey = "LootUI_FontSize"},
+            {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueMethod = "Decimal2", dbKey = "LootUI_FadeDelayPerItem"},
             {type = "Slider", label = L["LootUI Option Items Per Page"], minValue = 5, maxValue = 8, valueStep = 1, onValueChangedFunc = Options_ItemsPerPageSlider_OnValueChanged, dbKey = "LootUI_ItemsPerPage", tooltip = L["LootUI Option Items Per Page Tooltip"]},
+            {type = "Slider", label = L["LootUI Option Background Opacity"], minValue = 0.0, maxValue = 1.0, valueStep = 0.1, onValueChangedFunc = Options_OpacitySlider_OnValueChanged,
+                formatValueMethod = "Percentage", dbKey = "LootUI_BackgroundAlpha", tooltip = L["LootUI Option Background Opacity Tooltip"],
+                onMouseDownFunc = Options_OpacitySlider_OnMouseDown, onMouseUpFunc = Options_OpacitySlider_OnMouseUp, onEnterFunc = Options_OpacitySlider_OnMouseDown, onLeaveFunc = Options_OpacitySlider_OnMouseUp},
             {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},
 
@@ -1578,6 +1595,11 @@ do  --Edit Mode
         MAX_ITEM_PER_PAGE = GetValidItemsPerPage(value);
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_ItemsPerPage", SettingChanged_ItemsPerPage);
+
+    local function SettingChanged_BackgroundAlpha(value, userInput)
+        Options_OpacitySlider_OnValueChanged(value or 0.5);
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_BackgroundAlpha", SettingChanged_BackgroundAlpha);
 
     local function SettingChanged_ReplaceDefaultAlert(state, userInput)
         REPLACE_LOOT_ALERT = state;

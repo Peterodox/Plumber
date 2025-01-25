@@ -123,6 +123,7 @@ local DefaultValues = {
         LootUI_FontSize = 14,
         LootUI_FadeDelayPerItem = 0.25,
         LootUI_ItemsPerPage = 6,
+        LootUI_BackgroundAlpha = 0.5,
         LootUI_ShowItemCount = false,
         LootUI_NewTransmogIcon = true,
         LootUI_ForceAutoLoot = true,

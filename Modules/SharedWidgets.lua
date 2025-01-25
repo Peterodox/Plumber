@@ -1115,6 +1115,45 @@ do  -- TokenFrame   -- Money   -- Coin
         GameTooltip:Hide();
     end
 
+    local function TokenButton_OnClick(self)
+        if (not self.owner.clickable) or InCombatLockdown() then return end;
+
+        if IsModifiedClick("CHATLINK") then
+            local link;
+            if self.tokenType == 0 and self.currencyID then
+                link = C_CurrencyInfo.GetCurrencyLink(self.currencyID);
+            elseif self.tokenType == 1 and self.itemID then
+                local _;
+                _, link = C_Item.GetItemInfo(self.itemID);
+            end
+            local linkedToChat = link and HandleModifiedItemClick(link);
+            if linkedToChat then
+                return
+            end
+        end
+
+        if self.tokenType == 0 and self.currencyID then
+            local info = C_CurrencyInfo.GetCurrencyInfo(self.currencyID);
+            if not info then return end;
+
+            if not(info.discovered or info.isAccountWide or info.isAccountTransferable) then return end;
+
+            local onlyShow = false;      --If true, don't hide the frame when shown
+            ToggleCharacter("TokenFrame", onlyShow);
+
+            --[[    --Taint!!
+            C_Timer.After(0, function()
+                if not InCombatLockdown() then
+                    local function FindSelectedTokenButton(elementData)
+                        return elementData.currencyID == self.currencyID;
+                    end
+                    TokenFrame.ScrollBox:ScrollToElementDataByPredicate(FindSelectedTokenButton);
+                end
+            end);
+            --]]
+        end
+    end
+
     function TokenDisplayMixin:SetupTokenButton(tokenButton, currencyData, currencyInfoCache)
         local tokenType = currencyData[1];
         local id = currencyData[2];
@@ -1198,8 +1237,8 @@ do  -- TokenFrame   -- Money   -- Coin
 
     function TokenDisplayMixin:AcquireTokenButton(index)
         if not self.tokenButtons[index] then
-            local button = CreateFrame("Frame", nil, self);
-
+            local button = CreateFrame("Button", nil, self);
+            button.owner = self;
             button:SetSize(TOKEN_BUTTON_ICON_SIZE, TOKEN_BUTTON_HEIGHT);
 
             button.Icon = button:CreateTexture(nil, "ARTWORK");
@@ -1213,6 +1252,7 @@ do  -- TokenFrame   -- Money   -- Coin
 
             button:SetScript("OnEnter", TokenButton_OnEnter);
             button:SetScript("OnLeave", TokenButton_OnLeave);
+            button:SetScript("OnClick", TokenButton_OnClick);
 
             self.tokenButtons[index] = button;
         end
@@ -1354,6 +1394,11 @@ do  -- TokenFrame   -- Money   -- Coin
 
     function TokenDisplayMixin:SetIncludeBank(includeBank)
         self.includeBank = includeBank == true;
+    end
+
+    function TokenDisplayMixin:SetButtonClickable(state)
+        --Click to open WoW's TokenFrame
+        self.clickable = state;
     end
 
 
@@ -3912,13 +3957,45 @@ do  --Slider
     function SliderScripts:OnMouseDown()
         if self:IsEnabled() then
             self:LockHighlight();
+            self:GetParent().isDraggingThumb = true;
+            if self.onMouseDownFunc then
+                self.onMouseDownFunc(self);
+            end
+        else
+            self:GetParent().isDraggingThumb = false;
         end
     end
 
     function SliderScripts:OnMouseUp()
         self:UnlockHighlight();
+        self:GetParent().isDraggingThumb = false;
+        if self.onMouseUpFunc then
+            self.onMouseUpFunc(self);
+        end
     end
 
+
+    local ValueFormatter = {};
+
+    function ValueFormatter.NoChange(value)
+        return value
+    end
+
+    function ValueFormatter.Percentage(value)
+        return string.format("%.0f%%", value * 100);
+    end
+
+    function ValueFormatter.Decimal0(value)
+        return string.format("%.0f", value);
+    end
+
+    function ValueFormatter.Decimal1(value)
+        return string.format("%.1f", value);
+    end
+
+    function ValueFormatter.Decimal2(value)
+        return string.format("%.2f", value);
+    end
 
     local function BackForwardButton_OnClick(self)
         if self.delta then
@@ -3984,6 +4061,8 @@ do  --Slider
         self.Forward:SetScript("OnLeave", OnLeave);
         self.Slider:SetScript("OnEnter", OnEnter);
         self.Slider:SetScript("OnLeave", OnLeave);
+
+        self:SetFormatValueFunc(nil);
     end
 
     function SliderFrameMixin:Enable()
@@ -4041,13 +4120,28 @@ do  --Slider
     end
 
     function SliderFrameMixin:SetFormatValueFunc(formatValueFunc)
+        if not formatValueFunc then
+            formatValueFunc = ValueFormatter.NoChange;
+        end
         self.Slider.formatValueFunc = formatValueFunc;
         self.RightText:SetText(formatValueFunc(self:GetValue() or 0));
+    end
+
+    function SliderFrameMixin:SetFormatValueMethod(method)
+        self:SetFormatValueFunc(ValueFormatter[method]);
     end
 
     function SliderFrameMixin:SetOnValueChangedFunc(onValueChangedFunc)
         self.Slider.onValueChangedFunc = onValueChangedFunc;
         self.onValueChangedFunc = onValueChangedFunc;
+    end
+
+    function SliderFrameMixin:SetOnMouseDownFunc(onMouseDownFunc)
+        self.Slider.onMouseDownFunc = onMouseDownFunc;
+    end
+
+    function SliderFrameMixin:SetOnMouseUpFunc(onMouseUpFunc)
+        self.Slider.onMouseUpFunc = onMouseUpFunc;
     end
 
     function SliderFrameMixin:SetLabelWidth(width)
@@ -4077,14 +4171,20 @@ do  --Slider
             end
             f:Show();
         end
+        if self.onEnterFunc then
+            self.onEnterFunc(self);
+        end
     end
 
     function SliderFrameMixin:OnLeave()
         GameTooltip:Hide();
+        if self.onLeaveFunc and not self.isDraggingThumb then
+            self.onLeaveFunc(self);
+        end
     end
 
-    local function FormatValue(value)
-        return value
+    function SliderFrameMixin:IsDraggingThumb()
+        return self.isDraggingThumb
     end
 
     local function CreateSlider(parent)
@@ -4095,7 +4195,6 @@ do  --Slider
         f.Slider.Back = f.Back;
         f.Slider.Forward = f.Forward;
 
-        f:SetFormatValueFunc(FormatValue);
         f:OnLoad();
 
         return f
@@ -4634,12 +4733,20 @@ do  --EditMode
 
         if widgetData.formatValueFunc then
             slider:SetFormatValueFunc(widgetData.formatValueFunc);
+        elseif widgetData.formatValueMethod then
+            slider:SetFormatValueMethod(widgetData.formatValueMethod);
         else
-            slider:SetFormatValueFunc(function(value) return value end);
+            slider:SetFormatValueFunc(nil);
         end
 
         slider:SetOnValueChangedFunc(widgetData.onValueChangedFunc);
+        slider:SetOnMouseDownFunc(widgetData.onMouseDownFunc);
+        slider:SetOnMouseUpFunc(widgetData.onMouseUpFunc);
+
         slider.tooltip = widgetData.tooltip;
+        slider.onEnterFunc = widgetData.onEnterFunc;
+        slider.onLeaveFunc = widgetData.onLeaveFunc;
+        slider.isDraggingThumb = false;
 
         if widgetData.dbKey and addon.GetDBValue(widgetData.dbKey) then
             slider:SetValue(addon.GetDBValue(widgetData.dbKey));

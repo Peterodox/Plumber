@@ -194,6 +194,7 @@ function Controller:SetupTokenDisplay()
         TokenDisplay.numberFont = "NumberFontNormal";
         TokenDisplay:SetIncludeBank(true);
         TokenDisplay:ShowMoneyFrame(true);
+        TokenDisplay:SetButtonClickable(true);
     end
 end
 
