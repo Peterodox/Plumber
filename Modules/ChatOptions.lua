@@ -188,9 +188,30 @@ function ChatOptions:GetCurrentChannelName()
     end
 end
 
-local function CreateHyperlink(channelName, channelID, shortcut)
-    return string.format("Auto Leave \"%s\"  |cffffd100|Haddon:plumber:rejoinchat:%s:%s|h[%s]|h|r", channelName, channelID, shortcut, L["Click To Disable"])
+
+local CustomLink = {};
+do
+    CustomLink.typeName = "rejoinchat";
+    CustomLink.colorCode = "ffd100";
+
+    function CustomLink.callback(channelID, shortcut)
+        channelID = channelID and tonumber(channelID);
+        if channelID and ChatOptions:ShouldAutoLeaveChannel(channelID) and shortcut then
+            ChatOptions:SetAutoLeaveChannel(channelID, false);
+            API.PrintMessage(string.format(L["Chat Auto Leave Cancel Format"], shortcut));
+        end
+    end
+
+    API.AddCustomLinkType(CustomLink.typeName, CustomLink.callback, CustomLink.colorCode);
+
+    function CustomLink.GenerateLink(channelName, channelID, shortcut)
+        local link = API.GenerateCustomLink(CustomLink.typeName, L["Click To Disable"], channelID, shortcut);
+        if link then
+            return string.format(L["Auto Leave Channel Format"], channelName).."  "..link
+        end
+    end
 end
+
 
 function ChatOptions:ShouldAutoLeaveChannel(channelID)
     return self.channelsToLeave and self.channelsToLeave[channelID] == true
@@ -223,7 +244,7 @@ function ChatOptions:AutoLeaveChannels()
     if channelsToLeave then
         print(" ");
         for _, info in ipairs(channelsToLeave) do
-            API.PrintMessage(CreateHyperlink(info.name, info.channelID, info.shortcut));
+            API.PrintMessage(CustomLink.GenerateLink(info.name, info.channelID, info.shortcut));
             LeaveChannelByName(info.shortcut);
         end
         print(" ");

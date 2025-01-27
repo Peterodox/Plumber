@@ -255,7 +255,8 @@ L["Chat Leave All Characters"] = "Leave On All Characters";
 L["Chat Leave All Characters Tooltip"] = "You will automatically leave this channel when you log in on a character.";
 L["Chat Auto Leave Alert Format"] = "Do you wish to automatically leave |cffffc0c0[%s]|r on all your characters?";
 L["Chat Auto Leave Cancel Format"] = "Auto Leave Disabled for %s. Please use /join command to rejoin the channel.";
-L["Click To Disable"] = "Click to Disable";
+L["Auto Leave Channel Format"] = "Auto Leave \"%s\"";
+L["Click To Disable"] = "Click to disable";
 
 
 --NameplateWidget
@@ -361,7 +362,6 @@ L["currency-2915"] = "Carved";
 L["currency-2916"] = "Runed";
 L["currency-2917"] = "Gilded";
 
-
 L["Scenario Delves"] = "Delves";
 L["GameObject Door"] = "Door";
 L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
@@ -371,10 +371,18 @@ L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID onc
 L["Bountiful Delve"] =  "Bountiful Delves";
 L["Special Assignment"] = "Special Assignments";
 
-
 L["Match Pattern Gold"] = "([%d%,]+) Gold";
 L["Match Pattern Silver"] = "([%d]+) Silver";
 L["Match Pattern Copper"] = "([%d]+) Copper";
 
-L["Match Patter Rep 1"] = "Your Warband's reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
-L["Match Patter Rep 2"] = "Reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED
+L["Match Pattern Rep 1"] = "Your Warband's reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Pattern Rep 2"] = "Reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED
+
+L["Match Pattern Item Level"] = "^Item Level (%d+)";
+L["Match Pattern Item Upgrade Tooltip"] = "^Upgrade Level: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Upgrade Track 1"] = "Adventurer";
+L["Upgrade Track 2"] = "Explorer";
+L["Upgrade Track 3"] = "Veteran";
+L["Upgrade Track 4"] = "Champion";
+L["Upgrade Track 5"] = "Hero";
+L["Upgrade Track 6"] = "Myth";

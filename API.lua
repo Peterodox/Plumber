@@ -1769,9 +1769,9 @@ do  --Reputation
 
     local function GetReputationChangeFromText(text)
         local name, amount;
-        name, amount = match(text, L["Match Patter Rep 1"]);
+        name, amount = match(text, L["Match Pattern Rep 1"]);
         if not name then
-            name, amount = match(text, L["Match Patter Rep 2"]);
+            name, amount = match(text, L["Match Pattern Rep 2"]);
         end
         if name then
             if amount then
@@ -2473,6 +2473,49 @@ do  -- Chat Message
         print(ADDON_ICON.." |cffb8c8d1Plumber:|r "..msg);
     end
     API.PrintMessage = PrintMessage;
+end
+
+do  --Custom Hyperlink ItemRef
+    local CustomLinkUtil = {};
+
+    function API.AddCustomLinkType(typeName, callback, colorCode)
+        CustomLinkUtil[typeName] = {
+            callback = callback,
+            colorCode = colorCode,
+        };
+    end
+
+    function API.GenerateCustomLink(typeName, displayedText, ...)
+        if CustomLinkUtil[typeName] then
+            if not CustomLinkUtil.registered then
+                CustomLinkUtil.registered = true;
+                EventRegistry:RegisterCallback("SetItemRef", function(_, link, text, button, chatFrame)
+                    if link then
+                        local _typeName, subText = match(link, "plumber:([^:]+):([^|]+)");
+                        if _typeName and CustomLinkUtil[_typeName] then
+                            local args = {};
+                            for arg in string.gmatch(subText, "[^:]+") do
+                                tinsert(args, arg);
+                            end
+                            CustomLinkUtil[_typeName].callback(unpack(args));
+                        end
+                    end
+                end);
+            end
+
+            --|cffxxxxxx|Htype:payload|h[text]|h|r
+            local args = {...};
+            local link = "|Haddon:plumber:"..typeName;
+
+            for i, v in ipairs(args) do
+                link = link..":"..v;
+            end
+
+            link = format("|cff%s%s|h[%s]|h|r", CustomLinkUtil[typeName].colorCode or "ffd100", link, displayedText);
+
+            return link
+        end
+    end
 end
 
 do  --11.0 Menu Formatter

@@ -55,6 +55,7 @@ Modules\StaticPopupEnhancement.xml
 Modules\PlayerTitleUI.lua
 Modules\BlizzardSuperTrack.lua
 Modules\AccountStore.lua
+Modules\EquipmentFlyout.xml
 
 #Modules\MovieSubtitle.lua
 #Modules\QuestSpecialItemCooldown.lua

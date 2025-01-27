@@ -100,5 +100,5 @@ L["Bountiful Delve"] =  "Profundidad pródiga";
 L["Special Assignment"] = "Tarea especial";
 
 
-L["Match Patter Rep 1"] = "La reputación de tu banda guerrera con la facción (.+) ha aumentado ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
-L["Match Patter Rep 2"] = "Tu reputación con (.+) ha aumentado ([%d%,]+)";   --FACTION_STANDING_INCREASED
+L["Match Pattern Rep 1"] = "La reputación de tu banda guerrera con la facción (.+) ha aumentado ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Pattern Rep 2"] = "Tu reputación con (.+) ha aumentado ([%d%,]+)";   --FACTION_STANDING_INCREASED
