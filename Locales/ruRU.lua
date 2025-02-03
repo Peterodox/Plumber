@@ -376,5 +376,5 @@ L["Match Pattern Gold"] = "([%d%,]+) Золото";
 L["Match Pattern Silver"] = "([%d]+) Серебро";
 L["Match Pattern Copper"] = "([%d]+) Медь";
 
-L["Match Patter Rep 1"] = "Отношение (.+) к вашему отряду улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
-L["Match Patter Rep 2"] = "Отношение (.+) к вам улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED
+L["Match Pattern Rep 1"] = "Отношение (.+) к вашему отряду улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Pattern Rep 2"] = "Отношение (.+) к вам улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED
