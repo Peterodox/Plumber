@@ -1095,6 +1095,11 @@ do  -- Map
     API.ConvertMapPositionToContinentPosition = ConvertMapPositionToContinentPosition;
 
 
+    function API.GetPlayerMap()
+        return GetBestMapForUnit("player");
+    end
+
+
     --Calculate a list of map positions (cache data) and run callback
     local Converter;
 
@@ -2476,6 +2481,24 @@ do  -- Chat Message
 end
 
 do  --Custom Hyperlink ItemRef
+
+    --[[--Example
+        local CustomLink = {};
+    
+        CustomLink.typeName = "Test";
+        CustomLink.colorCode = "66bbff";	--LINK_FONT_COLOR
+    
+        function CustomLink.callback(arg1, arg2, arg3)
+            print(arg1, arg2, arg3);
+        end
+    
+        API.AddCustomLinkType(CustomLink.typeName, CustomLink.callback, CustomLink.colorCode);
+    
+        function CustomLink.GenerateLink(arg1, arg2, arg3)
+            return API.GenerateCustomLink(CustomLink.typeName, L["Click To See Details"], arg1, arg2, arg3);
+        end
+    --]]
+
     local CustomLinkUtil = {};
 
     function API.AddCustomLinkType(typeName, callback, colorCode)

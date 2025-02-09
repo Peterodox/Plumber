@@ -226,12 +226,12 @@ do
             {2607, 1, 114268},     --Vizier
         },
 
-        [2653] = {  --The Cartels of Undermine
+        [2653] = {  --The Cartels of Undermine  --interface/icons/inv_1115_reputationcurrencies_
             --{2669, 0},     --Darkfuse Solutions
-            {2673, 2, 6383479},     --Bilgewater Cartel
-            {2677, 2, 6383482},     --Steamwheedle Cartel
-            {2675, 2, 6383480},     --Blackwater Cartel
-            {2671, 2, 6383483},     --Venture Co.
+            {2673, 2, 6439627},     --Bilgewater Cartel 6383479
+            {2677, 2, 6439630},     --Steamwheedle Cartel 6383482
+            {2675, 2, 6439628},     --Blackwater Cartel 6383480
+            {2671, 2, 6439631},     --Venture Co. 6383483
         },
     };
 
