@@ -328,6 +328,11 @@ L["QuickSlot Error 2"] = "Quick Slot: The controller is missing \"%s\"";
 L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" already exists.";
 
 
+--Plumber Macro
+L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. Macro";
+L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Move Vertically";

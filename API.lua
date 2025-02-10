@@ -2625,6 +2625,62 @@ do  --11.0 Menu Formatter
     end
 end
 
+do  --Slash Commands
+    local SlashCmdUtil = {};
+    SlashCmdUtil.functions = {};
+    SlashCmdUtil.alias = "plmr";
+    SlashCmdUtil.cmdID = {
+        DrawerMacro = 1,
+    };
+
+    function SlashCmdUtil.Process(input)
+        if input and type(input) == "string" then
+            input = " "..input;
+            local token;
+            local args = {};
+            for arg in string.gmatch(input, "%s+([%S]+)") do
+                if not token then
+                    token = arg;
+                else
+                    tinsert(args, arg);
+                end
+            end
+
+            if token and SlashCmdUtil.functions[token] then
+                SlashCmdUtil.functions[token](unpack(args));
+            end
+        end
+    end
+
+    function SlashCmdUtil.CreateSlashCommand(func, alias1, alias2)
+        local name = "PLUMBERCMD";
+        if alias1 then
+            _G["SLASH_"..name.."1"] = "/"..alias1;
+        end
+        if alias2 then
+            _G["SLASH_"..name.."2"] = "/"..alias2;
+        end
+        SlashCmdList[name] = func;
+    end
+
+    function API.AddSlashSubcommand(name, func)
+        if not SlashCmdUtil.cmdID[name] then return end;
+
+        if not SlashCmdUtil.cmdAdded then
+            SlashCmdUtil.CreateSlashCommand(SlashCmdUtil.Process, SlashCmdUtil.alias);
+        end
+
+        local token = tostring(SlashCmdUtil.cmdID[name]);
+        SlashCmdUtil.functions[token] = func;
+    end
+
+    function API.GetSlashSubcommand(name)
+        if SlashCmdUtil.cmdID[name] then
+            return string.format("/%s %s", SlashCmdUtil.alias, SlashCmdUtil.cmdID[name]);
+        end
+    end
+end
+
 
 
 
