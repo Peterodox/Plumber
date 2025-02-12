@@ -104,6 +104,14 @@ EL.macroIndexMax = 138;
 
 function EL:CheckSupportedMacros()
     self:UnregisterAllEvents();
+    if not EL.macroFrameHooked then
+        self:RegisterEvent("UPDATE_MACROS");
+    end
+
+    for command, info in pairs(PlumberMacros) do
+        info.currentState = nil;
+    end
+
     self.macroEvents = {};
     self.activeCommands = {};
     MacroInterpreter.macroCommand = {};
@@ -233,6 +241,21 @@ function EL:CheckQueue()
     self:UpdateMacros();
 end
 
+function EL:OnUpdate_UpdateMacros(elapsed)
+    self.t = self.t + elapsed;
+    if self.t > 0 then
+        self.t = nil;
+        self:SetScript("OnUpdate", nil);
+        self:CheckSupportedMacros();
+        self:UpdateMacros();
+    end
+end
+
+function EL:RequestUpdateMacros()
+    self.t = 0;
+    self:SetScript("OnUpdate", self.OnUpdate_UpdateMacros);
+end
+
 function EL:ListenEvents(state)
     if state then
         self:RegisterEvent("PLAYER_ENTERING_WORLD");
@@ -245,11 +268,21 @@ EL:ListenEvents(true);
 
 function EL:OnEvent(event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
-        self:CheckSupportedMacros();
-        self:UpdateMacros();
         self:UnregisterEvent(event);
+        self:RequestUpdateMacros();
     elseif event == "PLAYER_REGEN_ENABLED" then
         self:CheckQueue();
+    elseif event == "UPDATE_MACROS" then
+        --self:RequestUpdateMacros();   --this event fires when selecting any macro, without changing its content, so we update our macro after MarcoFrame is closed
+        if not self.macroFrameHooked then
+            if MacroFrame then
+                self.macroFrameHooked = true;
+                self:UnregisterEvent(event);
+                MacroFrame:HookScript("OnHide", function()
+                    self:RequestUpdateMacros();
+                end);
+            end
+        end
     elseif self.macroEvents and self.macroEvents[event] then
         self:UpdateMacroByEvent(event);
     end
@@ -434,41 +467,44 @@ local function SlashFunc_DrawerMacro()
                 end
 
                 local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
-                if drawerInfo then
-                    --for _, info in ipairs(drawerInfo) do
-                    --    print(string.format("|T%s:16:16|t %s", info.icon, info.text));
-                    --end
-                    SpellFlyout.flyoutID = id;
-                    SpellFlyout:SetActions(drawerInfo);
-                    SpellFlyout:SetOwner(focus);
-                    SpellFlyout:SetScale(focus:GetParent():GetScale());
-                    SpellFlyout:ClearAllPoints();
+                SpellFlyout.flyoutID = id;
+                SpellFlyout:SetActions(drawerInfo);
+                SpellFlyout:SetOwner(focus);
+                SpellFlyout:SetScale(focus:GetParent():GetScale());
+                SpellFlyout:ClearAllPoints();
 
-                    local direction = focus.bar and focus.bar.flyoutDirection or "UP";
-                    if direction == "LEFT" then
-                        local _, y = focus:GetCenter();
-                        local left = focus:GetLeft();
-                        SpellFlyout:SetPoint("RIGHT", UIParent, "BOTTOMLEFT", left - 4, y);
-                        SpellFlyout:SetArrowDirection("right");
-                    elseif direction == "RIGHT" then
-                        local _, y = focus:GetCenter();
-                        local right = focus:GetRight();
-                        SpellFlyout:SetPoint("LEFT", UIParent, "BOTTOMLEFT", right + 4, y);
-                        SpellFlyout:SetArrowDirection("left");
-                    elseif direction == "DOWN" then
-                        local top = focus:GetBottom();
-                        local left = focus:GetLeft();
-                        SpellFlyout:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left - 2, top - 4);
-                        SpellFlyout:SetArrowDirection("up");
-                    else --UP
-                        local top = focus:GetTop();
-                        local left = focus:GetLeft();
-                        SpellFlyout:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left - 2, top + 4);
-                        SpellFlyout:SetArrowDirection("down");
-                    end
-
-                    SpellFlyout:Show();
+                local direction = focus.bar and focus.bar.flyoutDirection or "UP";
+                if direction == "LEFT" then
+                    local _, y = focus:GetCenter();
+                    local left = focus:GetLeft();
+                    SpellFlyout:SetPoint("RIGHT", UIParent, "BOTTOMLEFT", left - 4, y);
+                    SpellFlyout:SetArrowDirection("right");
+                elseif direction == "RIGHT" then
+                    local _, y = focus:GetCenter();
+                    local right = focus:GetRight();
+                    SpellFlyout:SetPoint("LEFT", UIParent, "BOTTOMLEFT", right + 4, y);
+                    SpellFlyout:SetArrowDirection("left");
+                elseif direction == "DOWN" then
+                    local top = focus:GetBottom();
+                    local left = focus:GetLeft();
+                    SpellFlyout:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left - 2, top - 4);
+                    SpellFlyout:SetArrowDirection("up");
+                else --UP
+                    local top = focus:GetTop();
+                    local left = focus:GetLeft();
+                    SpellFlyout:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left - 2, top + 4);
+                    SpellFlyout:SetArrowDirection("down");
                 end
+
+                SpellFlyout:Show();
+
+                --[[
+                if drawerInfo then
+                    for _, info in ipairs(drawerInfo) do
+                        print(string.format("|T%s:16:16|t %s", info.icon, info.text));
+                    end
+                end
+                --]]
             end
         end
     end

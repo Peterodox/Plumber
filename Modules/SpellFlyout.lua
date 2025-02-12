@@ -275,6 +275,9 @@ do  --FlyoutButtonMixin
             tooltip:SetOwner(self, "ANCHOR_RIGHT");
             tooltip[self.tooltipMethod](tooltip, self.id);
             tooltip:Show();
+            self.UpdateTooltip = self.ShowTooltip;
+        else
+            self.UpdateTooltip = nil;
         end
     end
 
