@@ -5,6 +5,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local SpellFlyout = addon.SpellFlyout;
 
 local find = string.find;
 local match = string.match;
@@ -69,7 +70,27 @@ do
         name = L["PlumberMacro Drawer"],
         type = ModifyType.None,
         conditionFunc = function ()
-            return nil
+            return true
+        end,
+
+        initFunc = function(body)
+            if not find(body, SlashCmd.DrawerMacro) then
+                local extraLine = "\n"..SlashCmd.DrawerMacro;
+                local numRequired = strlenutf8(extraLine) + 1;
+                local numTotal = strlenutf8(body);
+                if numTotal + numRequired >= 255 then
+                    local pattern = "$";
+                    local n = 0;
+                    while n < numRequired do
+                        n = n + 1;
+                        pattern = "."..pattern;
+                    end
+                    body = gsub(body, pattern, extraLine);
+                else
+                    body = body..extraLine;
+                end
+            end
+            return body
         end,
     };
 end
@@ -149,7 +170,7 @@ function EL:UpdateMacros(commands)
         commands = commands or self.activeCommands;
 
         local inCombat = InCombatLockdown();
-        local anyChange, newState, payload;
+        local anyChange, newState, returns;
         local name, icon, body;
         local commandData;
         local prefix;
@@ -160,17 +181,18 @@ function EL:UpdateMacros(commands)
                 anyChange = true;
                 if not inCombat then
                     PlumberMacros[command].currentState = newState;
-                    commandData = PlumberMacros[command]
+                    commandData = PlumberMacros[command];
+                    returns = nil;
                     if newState then
-                        payload = commandData.trueReturn;
+                        returns = commandData.trueReturn;
                     else
-                        payload = commandData.falseReturn;
+                        returns = commandData.falseReturn;
                     end
 
                     for _, index in ipairs(list) do
                         name, icon, body = GetMacroInfo(index);
-                        if payload.icon then
-                            icon = payload.icon;
+                        if returns and returns.icon then
+                            icon = returns.icon;
                             if icon == 0 then
                                 icon = 134400;
                             end
@@ -190,6 +212,9 @@ function EL:UpdateMacros(commands)
                             end
                         end
 
+                        if commandData.initFunc then
+                            body = commandData.initFunc(body);
+                        end
                         EditMacro(index, name, icon, body);
                     end
                 end
@@ -257,36 +282,123 @@ do  --MacroInterpreter
             print("Plumber AddOn Alert: WoW\'s TooltipDataProcessor methods changed.")
         end
     end
-    
-    function MacroInterpreter.drawer(tooltip, body)
+
+    function MacroInterpreter:GetDrawerInfo(body)
+        local tbl;
+        local n = 0;
+        local processed, usable;
+        local name, icon, actionType, id, macroText;
+
         for line in string.gmatch(body, "#(/[^\n]+)") do
-            local processed = false;
-            local usable = false;
-            local text;
-            local spellID = match(line, "/cast%s+spell:(%d+)");
-            if spellID then
-                processed = true;
-                text = C_Spell.GetSpellName(tonumber(spellID));
-                if IsPlayerSpell(spellID) then
-                    usable = true;
+            processed = false;
+            usable = false;
+            actionType = nil;
+            id = nil;
+            icon = nil;
+            macroText = nil;
+
+            if not processed then
+                id = match(line, "/cast%s+spell:(%d+)");
+                id = tonumber(id);
+                if id then
+                    processed = true;
+                    actionType = "spell";
+                    name = C_Spell.GetSpellName(tonumber(id));
                 end
             end
 
             if not processed then
-                local spellName = match(line, "/cast%s+(.+)");
-                if spellName then
-                    text = spellName;
-                    if C_Spell.GetSpellInfo(spellName) ~= nil then
-                        usable = true;
-                    end
+                name = match(line, "/cast%s+(.+)");
+                if name then
+                    processed = true;
+                    actionType = "spell";
                 end
             end
 
-            if text then
-                if usable then
-                    tooltip:AddLine(text, 1, 0.82, 0);
-                else
-                    tooltip:AddLine(text, 1, 0.282, 0);
+            if not processed then
+                id = match(line, "/use%s+item:(%d+)");
+                id = tonumber(id);
+                if id then
+                    processed = true;
+                    actionType = "item";
+                end
+            end
+
+            if not processed then
+                name = match(line, "/use%s+(.+)");
+                if name then
+                    processed = true;
+                    actionType = "item";
+                end
+            end
+
+            if actionType then
+                if actionType == "spell" then
+                    if (not id) and name then
+                        local spellInfo = C_Spell.GetSpellInfo(name);
+                        if spellInfo then
+                            usable = true;
+                            id = spellInfo.spellID;
+                            icon = spellInfo.iconID;
+                        end
+                    end
+                    if not icon then
+                        icon = C_Spell.GetSpellTexture(id);
+                    end
+                    if id and IsPlayerSpell(id) then
+                        usable = true;
+                    end
+                    if name then
+                        macroText = "/cast "..name;
+                    end
+                elseif actionType == "item" then
+                    if (not id) and name then
+                        id = C_Item.GetItemIDForItemInfo(name);
+                    end
+                    if id and API.DoesItemReallyExist(id) then
+                        name = C_Item.GetItemNameByID(id);
+                        icon = C_Item.GetItemIconByID(id);
+                        usable = true;
+                    end
+                    if name then
+                        macroText = "/use "..name;
+                    end
+                end
+
+                if id then
+                    if not tbl then
+                        tbl = {};
+                    end
+                    n = n + 1;
+                    tbl[n] = {
+                        text = name,
+                        icon = icon,
+                        actionType = actionType,
+                        id = id,
+                        usable = usable,
+                        macroText = macroText,
+                    };
+                end
+            end
+        end
+
+        return tbl
+    end
+
+    function MacroInterpreter.drawer(tooltip, body)
+        local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+        if drawerInfo then
+            if InCombatLockdown() then
+                tooltip:AddLine(L["PlumberMacro Error Combat"], 1, 0.1, 0.1);
+            end
+
+            for _, info in ipairs(drawerInfo) do
+                if info.text then
+                    if info.usable then
+                        tooltip:AddLine(info.text, 1, 0.82, 0);
+                    else
+                        tooltip:AddLine(info.text, 0.6, 0.6, 0.6);
+                    end
                 end
             end
         end
@@ -308,13 +420,55 @@ end
 
 
 local function SlashFunc_DrawerMacro()
+    --if InCombatLockdown() then return end;
+
     local focus = API.GetMouseFocus();
-    if focus and focus.bindingAction and focus.action then
+    if focus and focus.bindingAction and focus.action and type(focus.action) == "number" then
         local actionType, id, subType = GetActionInfo(focus.action);
         if actionType == "macro" then
             local body = GetMacroBody(id);
             if body and find(body, "#plumber:drawer") then
+                if SpellFlyout.flyoutID == id then
+                    SpellFlyout:Hide();
+                    return
+                end
 
+                local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+                if drawerInfo then
+                    --for _, info in ipairs(drawerInfo) do
+                    --    print(string.format("|T%s:16:16|t %s", info.icon, info.text));
+                    --end
+                    SpellFlyout.flyoutID = id;
+                    SpellFlyout:SetActions(drawerInfo);
+                    SpellFlyout:SetOwner(focus);
+                    SpellFlyout:SetScale(focus:GetParent():GetScale());
+                    SpellFlyout:ClearAllPoints();
+
+                    local direction = focus.bar and focus.bar.flyoutDirection or "UP";
+                    if direction == "LEFT" then
+                        local _, y = focus:GetCenter();
+                        local left = focus:GetLeft();
+                        SpellFlyout:SetPoint("RIGHT", UIParent, "BOTTOMLEFT", left - 4, y);
+                        SpellFlyout:SetArrowDirection("right");
+                    elseif direction == "RIGHT" then
+                        local _, y = focus:GetCenter();
+                        local right = focus:GetRight();
+                        SpellFlyout:SetPoint("LEFT", UIParent, "BOTTOMLEFT", right + 4, y);
+                        SpellFlyout:SetArrowDirection("left");
+                    elseif direction == "DOWN" then
+                        local top = focus:GetBottom();
+                        local left = focus:GetLeft();
+                        SpellFlyout:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left - 2, top - 4);
+                        SpellFlyout:SetArrowDirection("up");
+                    else --UP
+                        local top = focus:GetTop();
+                        local left = focus:GetLeft();
+                        SpellFlyout:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left - 2, top + 4);
+                        SpellFlyout:SetArrowDirection("down");
+                    end
+
+                    SpellFlyout:Show();
+                end
             end
         end
     end

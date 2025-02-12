@@ -468,4 +468,85 @@
             </Layer>
         </Layers>
     </Button>
+
+    <Button name="PlumberActionBarButtonTemplate" propagateMouseInput="Clicks" virtual="true">
+        <Size x="45" y="45"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Icon"/>
+                <MaskTexture parentKey="IconMask" atlas="UI-HUD-ActionBar-IconFrame-Mask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.Icon"/>
+                    </Anchors>
+                    <MaskedTextures>
+                        <MaskedTexture childKey="Icon"/>
+                    </MaskedTextures>
+                </MaskTexture>
+                <Texture parentKey="SlotBackground" atlas="UI-HUD-ActionBar-IconFrame-Background" setAllPoints="true" hidden="false"/>
+                <Texture parentKey="SlotArt" atlas="ui-hud-actionbar-iconframe-slot" setAllPoints="true" hidden="true"/>
+            </Layer>
+            <Layer level="ARTWORK" textureSubLevel="1">
+                <Texture parentKey="Flash" atlas="UI-HUD-ActionBar-IconFrame-Flash" useAtlasSize="true" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="6">
+                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
+                    <Size x="36" y="10"/>
+                    <Anchors>
+                        <Anchor point="BOTTOM" x="0" y="2"/>
+                    </Anchors>
+                </FontString>
+                <Texture parentKey="Border" atlas="UI-HUD-ActionBar-IconFrame-Border" useAtlasSize="true" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <NormalTexture parentKey="NormalTexture" atlas="UI-HUD-ActionBar-IconFrame-AddRow">
+            <Size x="51" y="51"/>
+            <Anchors>
+                <Anchor point="TOPLEFT"/>
+            </Anchors>
+        </NormalTexture>
+        <PushedTexture parentKey="PushedTexture" atlas="UI-HUD-ActionBar-IconFrame-AddRow-Down">
+            <Size x="51" y="51"/>
+            <Anchors>
+                <Anchor point="TOPLEFT"/>
+            </Anchors>
+        </PushedTexture>
+        <HighlightTexture parentKey="HighlightTexture" atlas="UI-HUD-ActionBar-IconFrame-Mouseover">
+            <Size x="46" y="45"/>
+            <Anchors>
+                <Anchor point="TOPLEFT"/>
+            </Anchors>
+        </HighlightTexture>
+        <!--CheckedTexture parentKey="CheckedTexture" atlas="UI-HUD-ActionBar-IconFrame-Mouseover">
+            <Size x="46" y="45"/>
+            <Anchors>
+                <Anchor point="TOPLEFT"/>
+            </Anchors>
+        </CheckedTexture-->
+        <Frames>
+            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawBling="false" useParentLevel="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="3" y="-3"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="-3" y="3"/>
+                </Anchors>        
+                <SwipeTexture>
+                    <Color r="1" g="1" b="1" a="0.8"/>
+                </SwipeTexture>
+            </Cooldown>
+        </Frames>
+    </Button>
 </Ui>

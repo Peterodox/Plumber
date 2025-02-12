@@ -181,7 +181,7 @@ do  -- DEBUG
     API.SaveDataUnderKey = SaveDataUnderKey;
 end
 
-do  --Math
+do  -- Math
     local function Clamp(value, min, max)
         if value > max then
             return max
@@ -552,6 +552,10 @@ do  -- Item
         return spellID
     end
     API.GetItemSpellID = GetItemSpellID;
+
+    function API.IsToyItem(item)
+       return C_ToyBox.GetToyInfo(item) ~= nil
+    end
 end
 
 do  -- Tooltip Parser
@@ -697,7 +701,7 @@ do  -- Holiday
     API.GetActiveMajorHolidayInfo = GetActiveMajorHolidayInfo;
 end
 
-do  --Fade Frame
+do  -- Fade Frame
     local abs = math.abs;
     local tinsert = table.insert;
     local wipe = wipe;
@@ -1298,7 +1302,7 @@ do  -- Map
     API.IsInDelves = IsInDelves;
 end
 
-do  --Instance --Map
+do  -- Instance -- Map
     local GetInstanceInfo = GetInstanceInfo;
 
     local function GetMapID()
@@ -1308,7 +1312,7 @@ do  --Instance --Map
     API.GetMapID = GetMapID;
 end
 
-do  --Pixel
+do  -- Pixel
     local GetPhysicalScreenSize = GetPhysicalScreenSize;
 
     local function GetPixelForScale(scale, pixelSize)
@@ -1328,7 +1332,7 @@ do  --Pixel
     API.GetPixelForWidget = GetPixelForWidget;
 end
 
-do  --Easing
+do  -- Easing
     local EasingFunctions = {};
     addon.EasingFunctions = EasingFunctions;
 
@@ -1371,7 +1375,7 @@ do  --Easing
     end
 end
 
-do  --Currency
+do  -- Currency
     local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
     local CurrencyDataProvider = CreateFrame("Frame");
     CurrencyDataProvider.cache = {};
@@ -1450,7 +1454,7 @@ do  --Currency
     end
 end
 
-do  --Chat Message
+do  -- Chat Message
     --Check if the a rare spawn info has been announced by other players
     local function SearchChatHistory(searchFunc)
         local pool = ChatFrame1 and ChatFrame1.fontStringPool;
@@ -1470,7 +1474,7 @@ do  --Chat Message
     API.SearchChatHistory = SearchChatHistory;
 end
 
-do  --Cursor Position
+do  -- Cursor Position
     local UI_SCALE_RATIO = 1;
     local UIParent = UIParent;
     local EL = CreateFrame("Frame");
@@ -1488,7 +1492,7 @@ do  --Cursor Position
     API.GetScaledCursorPosition = GetScaledCursorPosition;
 end
 
-do  --TomTom Compatibility
+do  -- TomTom Compatibility
     local TomTomUtil = {};
     addon.TomTomUtil = TomTomUtil;
 
@@ -1580,14 +1584,14 @@ do  --TomTom Compatibility
     end
 end
 
-do  --Game UI
+do  -- Game UI
     local function IsInEditMode()
         return EditModeManagerFrame and EditModeManagerFrame:IsEditModeActive();
     end
     API.IsInEditMode = IsInEditMode;
 end
 
-do  --Reputation
+do  -- Reputation
     local C_Reputation = C_Reputation;
     local C_MajorFactions = C_MajorFactions;
     local GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation;
@@ -1789,7 +1793,7 @@ do  --Reputation
     API.GetReputationChangeFromText = GetReputationChangeFromText;
 end
 
-do  --Spell
+do  -- Spell
     if true then    --IS_TWW
         local GetSpellInfo_Table = C_Spell.GetSpellInfo;
         local SPELL_INFO_KEYS = {"name", "rank", "iconID", "castTime", "minRange", "maxRange", "spellID", "originalIconID"};
@@ -1811,7 +1815,7 @@ do  --Spell
     end
 end
 
-do  --System
+do  -- System
     if true then    --IS_TWW
         local GetMouseFoci = GetMouseFoci;
 
@@ -1848,7 +1852,7 @@ do  --System
     end
 end
 
-do  --Player
+do  -- Player
     local function GetPlayerMaxLevel()
         local serverExpansionLevel = GetServerExpansionLevel();
 		local maxLevel = GetMaxLevelForExpansionLevel(serverExpansionLevel);
@@ -1864,7 +1868,7 @@ do  --Player
     API.IsPlayerAtMaxLevel = IsPlayerAtMaxLevel;
 end
 
-do  --Scenario
+do  -- Scenario
     --[[
     local SCENARIO_DELVES = addon.L["Scenario Delves"] or "Delves";
 
@@ -1878,7 +1882,7 @@ do  --Scenario
     --]]
 end
 
-do  --ObjectPool
+do  -- ObjectPool
     local ObjectPoolMixin = {};
 
     function ObjectPoolMixin:RemoveObject(obj)
@@ -1984,7 +1988,7 @@ do  --ObjectPool
     API.CreateObjectPool = CreateObjectPool;
 end
 
-do  --Transmog
+do  -- Transmog
     local GetItemInfo = C_TransmogCollection.GetItemInfo;
     local PlayerKnowsSource = C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance;
 
@@ -2002,7 +2006,7 @@ do  --Transmog
     end
 end
 
-do  --Quest
+do  -- Quest
     local function GetQuestName(questID)
         local questName = C_TaskQuest.GetQuestInfoByQuestID(questID);
         if not questName then
@@ -2018,7 +2022,7 @@ do  --Quest
     API.GetQuestName = GetQuestName;
 end
 
-do  --Tooltip
+do  -- Tooltip
     if C_TooltipInfo then
         addon.TooltipAPI = C_TooltipInfo;
     else
@@ -2183,7 +2187,7 @@ do  --Tooltip
     API.SetTooltipWithPostCall = SetTooltipWithPostCall;
 end
 
-do  --AsyncCallback
+do  -- AsyncCallback
     local AsyncCallback = CreateFrame("Frame");
 
     --LoadQuestAPI is not available in 60 Classic
@@ -2324,7 +2328,7 @@ do  --AsyncCallback
     end
 end
 
-do  --Container Item Processor
+do  -- Container Item Processor
     local GetItemCount = C_Item.GetItemCount
     local GetContainerNumSlots = C_Container.GetContainerNumSlots;
     local GetContainerItemID = C_Container.GetContainerItemID;
@@ -2467,6 +2471,11 @@ do  --Container Item Processor
         Processor.t = 0;
         Processor:SetScript("OnUpdate", Processor.OnUpdate_Queue);
     end
+
+    function API.DoesItemReallyExist(item)
+        local a = item and GetItemInfoInstant(item);
+        return a ~= nil
+    end
 end
 
 do  -- Chat Message
@@ -2480,7 +2489,7 @@ do  -- Chat Message
     API.PrintMessage = PrintMessage;
 end
 
-do  --Custom Hyperlink ItemRef
+do  -- Custom Hyperlink ItemRef
 
     --[[--Example
         local CustomLink = {};
@@ -2541,7 +2550,7 @@ do  --Custom Hyperlink ItemRef
     end
 end
 
-do  --11.0 Menu Formatter
+do  -- 11.0 Menu Formatter
     function API.ShowBlizzardMenu(ownerRegion, schematic, contextData)
         contextData = contextData or {};
 
@@ -2625,7 +2634,7 @@ do  --11.0 Menu Formatter
     end
 end
 
-do  --Slash Commands
+do  -- Slash Commands
     local SlashCmdUtil = {};
     SlashCmdUtil.functions = {};
     SlashCmdUtil.alias = "plmr";

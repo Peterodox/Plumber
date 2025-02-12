@@ -18,6 +18,7 @@ API.lua
 
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
+Modules\SpellFlyout.lua
 #Modules\DirectionArrow.lua
 #Modules\SuperTrack.xml
 

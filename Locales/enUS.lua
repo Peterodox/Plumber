@@ -331,6 +331,8 @@ L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" alre
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. Macro";
 L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
+L["PlumberMacro Error Combat"] = "Unavailable in combat";
+L["PlumberMacro Error NoAction"] = "No supported actions";
 
 
 --Generic

@@ -236,7 +236,6 @@ do  -- Slice Frame
         frame.TextureSlice:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", offset, -offset);
         frame.TextureSlice:SetTexture("Interface/AddOns/Plumber/Art/Frame/PixelBorder_Dashed_Moving");
     end
-
     addon.CreateTextureSlice = CreateTextureSlice;
 end
 
@@ -1852,6 +1851,16 @@ do  --(In)Secure Button Pool
         self:SetScript("PostClick", nil);
         self:SetScript("OnMouseDown", nil);
         self:SetScript("OnMouseUp", nil);
+    end
+
+    function SecureButtonMixin:CoverParent(padding)
+        padding = padding or 0;
+        local parent = self:GetParent();
+        if parent then
+            self:ClearAllPoints();
+            self:SetPoint("TOPLEFT", parent, "TOPLEFT", -padding, padding);
+            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", padding, -padding);
+        end
     end
 
     local function CreateSecureActionButton()
