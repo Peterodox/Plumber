@@ -1,6 +1,9 @@
 -- Conditionally modify macros
--- Applications:
--- 1. Mounts: G-99 Breakneck, Undermine. Change the icon, summon the car.
+-- Make a Plumber Macro by adding #plumber:[command] to the top of the macro body
+-- Implementations:
+-- 1. plumber:drawer        Create a custom SpellFlyout by adding # to your regular macro. E.g. #/use:Dalaran Hearthsone
+-- 2. plumber:drive         Added to your regular mount macro. Summon G-99 Breakneck in Undermine. Change the icon.
+
 
 local _, addon = ...
 local L = addon.L;
@@ -38,6 +41,7 @@ do
         name = L["PlumberMacro Drive"],
         type = ModifyType.Add,
         spellID = 460013,
+
         events = {
             "SPELLS_CHANGED",
         },
@@ -57,6 +61,12 @@ do
             return false
         end,
 
+        addFunc = function()
+            local spellName = (C_Spell.GetSpellName(PlumberMacros["drive"].spellID)) or "G-99 Breakneck";
+            return "/cast spell:460013\n/cast [noswimming] "..spellName
+            --The first /cast doesn't get executed but it's necessary to make GetActionInfo() return the macroIndex instead of spellID
+        end,
+
         trueReturn = {
             icon = 1408996,
         },
@@ -69,6 +79,7 @@ do
     PlumberMacros["drawer"] = {
         name = L["PlumberMacro Drawer"],
         type = ModifyType.None,
+
         conditionFunc = function ()
             return true
         end,
@@ -108,8 +119,8 @@ function EL:CheckSupportedMacros()
         self:RegisterEvent("UPDATE_MACROS");
     end
 
-    for command, info in pairs(PlumberMacros) do
-        info.currentState = nil;
+    for command, commandData in pairs(PlumberMacros) do
+        commandData.currentState = nil;
     end
 
     self.macroEvents = {};
@@ -206,7 +217,7 @@ function EL:UpdateMacros(commands)
                             end
                         end
 
-                        if commandData.type == ModifyType.Add then
+                        if commandData.type == ModifyType.Add and commandData.addFunc then
                             prefix = "#plumber:"..command;
                             body = gsub(body, ".+##", "");
                             body = gsub(body, prefix, "");
@@ -214,7 +225,8 @@ function EL:UpdateMacros(commands)
                                 body = gsub(body, "^\n", "");
                             end
                             if newState then
-                                body = prefix.."\n/cast G-99 Breakneck\n##\n"..body;
+                                local extraLine = commandData.addFunc();
+                                body = prefix.."\n"..extraLine.."\n##\n"..body;
                             else
                                 body = prefix.."\n"..body;
                             end
@@ -251,9 +263,21 @@ function EL:OnUpdate_UpdateMacros(elapsed)
     end
 end
 
-function EL:RequestUpdateMacros()
-    self.t = 0;
+function EL:RequestUpdateMacros(delay)
+    delay = delay and -delay or 0;
+    self.t = delay;
     self:SetScript("OnUpdate", self.OnUpdate_UpdateMacros);
+end
+
+function EL:LoadSpellAndItem()
+    for _, commandData in pairs(PlumberMacros) do
+        if commandData.spellID then
+            C_Spell.RequestLoadSpellData(commandData.spellID);
+        end
+        if commandData.itemID then
+            C_Item.RequestLoadItemDataByID(commandData.itemID);
+        end
+    end
 end
 
 function EL:ListenEvents(state)
@@ -269,7 +293,8 @@ EL:ListenEvents(true);
 function EL:OnEvent(event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent(event);
-        self:RequestUpdateMacros();
+        self:LoadSpellAndItem();
+        self:RequestUpdateMacros(0.5);
     elseif event == "PLAYER_REGEN_ENABLED" then
         self:CheckQueue();
     elseif event == "UPDATE_MACROS" then
