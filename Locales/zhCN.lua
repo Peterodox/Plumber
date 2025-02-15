@@ -32,6 +32,7 @@ L["Module Category Tooltip"] = "鼠标提示";   --Additional Info on Tooltips
 L["Module Category Class"] = "职业";   --Player Class (rogue, paladin...)
 
 L["Module Category Dragonflight"] = "巨龙时代";
+L["Module Category Plumber"] = "Plumber";   --This addon's name
 
 --Deprecated
 L["Module Category Dreamseeds"] = "梦境之种";     --Added in patch 10.2.0
@@ -254,6 +255,7 @@ L["Chat Leave All Characters"] = "在所有角色上离开此频道";
 L["Chat Leave All Characters Tooltip"] = "当你登录一个角色后自动离开此频道。";
 L["Chat Auto Leave Alert Format"] = "你是否希望你所有角色都自动离开 |cffffc0c0[%s]|r ？";
 L["Chat Auto Leave Cancel Format"] = "此频道的自动离开已禁用： %s。请使用 /join 命令重新加入频道。";
+L["Auto Leave Channel Format"] = "自动离开 \"%s\"";
 L["Click To Disable"] = "点击禁用";
 
 
@@ -317,6 +319,20 @@ L["LootUI Option Use Default UI"] = "使用默认拾取窗口";
 L["LootUI Option Use Default UI Tooltip"] = "使用WoW默认的拾取窗口。\n\n|cffff4800勾选此选项会使以上所有选项无效。|r";
 L["LootUI Option Background Opacity"] = "不透明度";
 L["LootUI Option Background Opacity Tooltip"] = "改变通知模式下背景的不透明度。\n\n此选项不影响手动拾取模式。";
+
+
+--Quick Slot For Third-party Dev
+L["Quickslot Module Info"] = "模块信息";
+L["QuickSlot Error 1"] = "快捷按钮：You have already added this controller.";
+L["QuickSlot Error 2"] = "快捷按钮：YThe controller is missing \"%s\"";
+L["QuickSlot Error 3"] = "快捷按钮：A controller with the same key \"%s\" already exists.";
+
+
+--Plumber Macro
+L["PlumberMacro Drive"] = "Plumber赛车坐骑宏";
+L["PlumberMacro Drawer"] = "Plumber技能收纳宏";
+L["PlumberMacro Error Combat"] = "战斗中不可用";
+L["PlumberMacro Error NoAction"] = "无可用技能";
 
 
 --Generic

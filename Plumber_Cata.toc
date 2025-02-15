@@ -1,5 +1,5 @@
-## Interface: 40401
-## Version: 1.5.9
+## Interface: 40401, 40402
+## Version: 1.6.0
 
 ## Title: Plumber
 

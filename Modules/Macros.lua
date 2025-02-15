@@ -306,6 +306,11 @@ function EL:OnEvent(event, ...)
                 MacroFrame:HookScript("OnHide", function()
                     self:RequestUpdateMacros();
                 end);
+                if MacroSaveButton then
+                    MacroSaveButton:HookScript("OnClick", function()
+                        self:RequestUpdateMacros();
+                    end);
+                end
             end
         end
     elseif self.macroEvents and self.macroEvents[event] then
@@ -329,7 +334,7 @@ do  --MacroInterpreter
                     local action = tooltip.infoList[1].getterArgs[1];
                     if action then
                         local actionType, id, subType = GetActionInfo(action);
-                        if actionType == "macro" then
+                        if actionType == "macro" and subType == "" then
                             self:TooltipSetMacro(tooltip, id);
                         end
                     end

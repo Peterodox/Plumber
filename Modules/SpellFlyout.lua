@@ -2,12 +2,14 @@ local _, addon = ...
 local API = addon.API;
 local L = addon.L;
 
+local tinsert = table.insert;
 local InCombatLockdown = InCombatLockdown;
-
 
 local FlyoutButtonMixin = {};
 local SpellFlyout = CreateFrame("Frame", nil, UIParent);
 addon.SpellFlyout = SpellFlyout;
+SpellFlyout.UpdateSpellCooldowns = addon.QuickSlot.UpdateSpellCooldowns;
+SpellFlyout.UpdateItemCooldowns = addon.QuickSlot.UpdateItemCooldowns;
 
 
 do --SpellFlyout
@@ -19,6 +21,8 @@ do --SpellFlyout
         self.owner = nil;
         self.activeAction = nil;
         self.actions = nil;
+        self.SpellButtons = nil;
+        self.ItemButtons = nil;
         addon.HideSecureActionButton("SpellFlyout");
         self:Hide();
         self:ClearAllPoints();
@@ -67,6 +71,10 @@ do --SpellFlyout
             end
         elseif event == "ACTIONBAR_SLOT_CHANGED" then
             self:Hide();
+        elseif event == "SPELL_UPDATE_COOLDOWN" then
+            self:UpdateSpellCooldowns();
+        elseif event == "BAG_UPDATE_COOLDOWN" then
+            self:UpdateItemCooldowns();
         end
     end
 
@@ -75,6 +83,8 @@ do --SpellFlyout
         self:RegisterEvent("PLAYER_REGEN_DISABLED");
         self:RegisterEvent("PLAYER_REGEN_ENABLED");
         self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
+        self:RegisterEvent("SPELL_UPDATE_COOLDOWN");
+        self:RegisterEvent("BAG_UPDATE_COOLDOWN");
         local ActionButton = addon.AcquireSecureActionButton("SpellFlyout");
         if ActionButton then
             ActionButton:SetParent(self);
@@ -91,6 +101,8 @@ do --SpellFlyout
         self:UnregisterEvent("PLAYER_REGEN_DISABLED");
         self:UnregisterEvent("PLAYER_REGEN_ENABLED");
         self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED");
+        self:UnregisterEvent("SPELL_UPDATE_COOLDOWN");
+        self:UnregisterEvent("BAG_UPDATE_COOLDOWN");
     end
 
     function SpellFlyout:OnMouseDown(button)
@@ -184,6 +196,8 @@ do --SpellFlyout
     function SpellFlyout:SetActions(actions)
         self:ReleaseButtons();
         self.actions = actions;
+        self.SpellButtons = {};
+        self.ItemButtons = {};
 
         if self.Init then
             self:Init();
@@ -198,6 +212,7 @@ do --SpellFlyout
             local h, v = 0, 1;
             local button;
             local level = baseFrameLevel + 5;
+            local anySpell, anyItem;
 
             for _, action in ipairs(actions) do
                 button = self.buttonPool:Acquire();
@@ -205,11 +220,26 @@ do --SpellFlyout
                 button:SetPoint("LEFT", self, "LEFT", gap + h * (buttonSize + gap), 0);
                 button:SetFrameLevel(level);
                 h = h + 1;
+                if action.actionType == "spell" then
+                    anySpell = true;
+                    tinsert(self.SpellButtons, button);
+                elseif action.actionType == "item" then
+                    anyItem = true;
+                    tinsert(self.ItemButtons, button);
+                end
             end
 
             self:SetSize(h * (buttonSize + gap) + gap, v * (buttonSize + gap) + gap);
+
             if InCombatLockdown() then
                 self:DisplayNote(L["PlumberMacro Error Combat"], false);
+            end
+            
+            if anySpell then
+                self:UpdateSpellCooldowns();
+            end
+            if anyItem then
+                self:UpdateItemCooldowns();
             end
         else
             self:DisplayNote(L["PlumberMacro Error NoAction"], true);
@@ -287,5 +317,7 @@ do  --FlyoutButtonMixin
         self.actionType = nil;
         self.tooltipMethod = nil;
         self.macroText = nil;
+        self.Cooldown:Clear();
+        self.Cooldown:Hide();
     end
 end

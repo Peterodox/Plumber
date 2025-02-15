@@ -1216,6 +1216,7 @@ do  --Spell Cooldown
     end
 
     function QuickSlot:UpdateSpellCooldowns()
+        if not self.SpellButtons then return end;
         local cooldownInfo, chargeInfo, startTime, duration, modRate, fromChargeCooldown;
         for _, button in ipairs(self.SpellButtons) do
             if button.id and button.actionType == "spell" then
