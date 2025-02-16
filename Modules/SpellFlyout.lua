@@ -4,6 +4,7 @@ local L = addon.L;
 
 local tinsert = table.insert;
 local InCombatLockdown = InCombatLockdown;
+local IsPlayerSpell = IsPlayerSpell;
 
 local FlyoutButtonMixin = {};
 local SpellFlyout = CreateFrame("Frame", nil, UIParent);
@@ -12,7 +13,7 @@ SpellFlyout.UpdateSpellCooldowns = addon.QuickSlot.UpdateSpellCooldowns;
 SpellFlyout.UpdateItemCooldowns = addon.QuickSlot.UpdateItemCooldowns;
 
 
-do --SpellFlyout
+do --SpellFlyout Main
     SpellFlyout:Hide();
     SpellFlyout:SetFrameStrata("FULLSCREEN");
 
@@ -75,8 +76,12 @@ do --SpellFlyout
             self:UpdateSpellCooldowns();
         elseif event == "BAG_UPDATE_COOLDOWN" then
             self:UpdateItemCooldowns();
+        elseif event == "PLAYER_ENTERING_WORLD" then
+            self:UnregisterEvent(event);
+            self:UpdateCompatibleAddOns();
         end
     end
+    SpellFlyout:SetScript("OnEvent", SpellFlyout.OnEvent);
 
     function SpellFlyout:OnShow()
         self:RegisterEvent("GLOBAL_MOUSE_DOWN");
@@ -113,18 +118,14 @@ do --SpellFlyout
 
     function SpellFlyout:Init()
         self.Init = nil;
+
         local function CreateButton()
             local button = CreateFrame("Button", nil, self, "PlumberActionBarButtonTemplate");
             API.Mixin(button, FlyoutButtonMixin);
             button:OnLoad();
             return button
         end
-        local function RemoveButton(button)
-            button:Hide();
-            button:ClearAllPoints();
-            button:ClearAction();
-        end
-        self.buttonPool = API.CreateObjectPool(CreateButton, RemoveButton);
+        self.buttonPool = API.CreateObjectPool(CreateButton);
 
         local bg = addon.CreateNineSliceFrame(self, "NineSlice_GenericBox_Black");
         bg:SetUsingParentLevel(true);
@@ -264,6 +265,102 @@ do --SpellFlyout
 end
 
 
+do  --Action Bar Addon Supports
+    local ActionGetter = {};
+
+    local DirectionGetter = {};
+    DirectionGetter.methodsToTry = {};
+
+    local ScaleGetter = {};
+    ScaleGetter.methodsToTry = {};
+
+
+    function SpellFlyout:UpdateCompatibleAddOns()
+        local addons = {
+            --LibActionButton-1.0
+            "ElvUI", "NDui",
+        };
+
+        local anySupported;
+        local IsAddOnLoaded = C_AddOns.IsAddOnLoaded;
+        for _, addonName in ipairs(addons) do
+            if IsAddOnLoaded(addonName) then
+                anySupported = true;
+                tinsert(DirectionGetter.methodsToTry, DirectionGetter[addonName]);
+            end
+        end
+
+        if anySupported then
+            SpellFlyout.GetFlyoutDirectionFromMouseFocus = DirectionGetter.Hybrid;
+        end
+    end
+    SpellFlyout:RegisterEvent("PLAYER_ENTERING_WORLD");
+
+
+    -- ActionGetter
+    function ActionGetter.Blizzard(focus)
+        if focus.action and type(focus.action) == "number" then
+            return focus.action
+        end
+    end
+
+    function ActionGetter.LibActionButton(focus)
+        local action = ActionGetter.Blizzard(focus);
+        if action and action ~= 0 then
+            return action
+        end
+        if focus._state_type == "action" and type(focus._state_action) == "number" then
+            return focus._state_action;
+        end
+    end
+    SpellFlyout.GetActionFromMouseFocus = ActionGetter.LibActionButton;
+
+
+    -- DirectionGetter
+    function DirectionGetter.Blizzard(focus)
+        return focus.bar and focus.bar.flyoutDirection or "UP"
+    end
+    SpellFlyout.GetFlyoutDirectionFromMouseFocus = DirectionGetter.Blizzard;
+
+    function DirectionGetter.Hybrid(focus)
+        if focus.bar and focus.bar.flyoutDirection then
+            return focus.bar and focus.bar.flyoutDirection
+        end
+        for _, method in ipairs(DirectionGetter.methodsToTry) do
+            local direction = method(focus);
+            if direction then
+                return direction
+            end
+        end
+    end
+
+    function DirectionGetter.ElvUI(focus)
+        local bar = focus:GetParent();
+        local direction = (bar.db and bar.db.flyoutDirection) or "AUTOMATIC";
+        if direction == "AUTOMATIC" then
+            local E = unpack(ElvUI);
+            local point = E:GetScreenQuadrant(bar);
+            if point == "RIGHT" then
+                return "LEFT"
+            elseif point == "LEFT" then
+                return "RIGHT"
+            elseif point == "BOTTOM" then
+                return "UP"
+            elseif point == "TOP" then
+                return "DOWN"
+            end
+        end
+    end
+
+
+    -- ScaleGetter
+    function ScaleGetter.Blizzard(focus)
+        return focus:GetParent():GetScale()
+    end
+    SpellFlyout.GetFlyoutScaleFromMouseFocus = ScaleGetter.Blizzard;
+end
+
+
 do  --FlyoutButtonMixin
     function FlyoutButtonMixin:OnLoad()
         self.NormalTexture:SetDrawLayer("OVERLAY");
@@ -278,14 +375,31 @@ do  --FlyoutButtonMixin
         self.Icon:SetTexture(action.icon);
         self.actionType = action.actionType;
         self.macroText = action.macroText;
+        self.text = action.text;
+
         if self.actionType == "spell" then
             self.tooltipMethod = "SetSpellByID";
+            if not IsPlayerSpell(self.id) then
+                self:SetUsableVisual(false);
+            end
         elseif self.actionType == "item" then
             if API.IsToyItem(self.id) then
                 self.tooltipMethod = "SetToyByItemID";
             else
                 self.tooltipMethod = "SetItemByID";
             end
+        elseif self[action.actionType] then
+            self[action.actionType](self, action.id);
+        end
+    end
+
+    function FlyoutButtonMixin:SetUsableVisual(state)
+        if state then
+            self.Icon:SetVertexColor(1, 1, 1);
+            self.Icon:SetDesaturated(false);
+        else
+            self.Icon:SetVertexColor(0.8, 0.8, 0.8);
+            self.Icon:SetDesaturated(true);
         end
     end
 
@@ -306,6 +420,12 @@ do  --FlyoutButtonMixin
             tooltip[self.tooltipMethod](tooltip, self.id);
             tooltip:Show();
             self.UpdateTooltip = self.ShowTooltip;
+        elseif self.tooltipText then
+            local tooltip = GameTooltip;
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            tooltip:SetText(self.tooltipText, 1, 1, 1, true);
+            tooltip:Show();
+            self.UpdateTooltip = nil;
         else
             self.UpdateTooltip = nil;
         end
@@ -317,7 +437,52 @@ do  --FlyoutButtonMixin
         self.actionType = nil;
         self.tooltipMethod = nil;
         self.macroText = nil;
+        self.text = nil;
+        self.tooltipText = nil;
         self.Cooldown:Clear();
         self.Cooldown:Hide();
+        self:SetUsableVisual(true);
+    end
+
+    function FlyoutButtonMixin:OnRemoved()
+        self:ClearAction();
+    end
+
+
+    --Default Actions
+    function FlyoutButtonMixin:SetRandomFavoritePet()
+        self.tooltipMethod = "SetSpellByID";
+        self.id = 243819;
+        self.Icon:SetTexture(C_Spell.GetSpellTexture(self.id));
+    end
+
+    function FlyoutButtonMixin:SetRandomPet()
+        self.tooltipText = SUMMON_RANDOM_PET;
+        self.Icon:SetTexture(613074);
+    end
+
+    function FlyoutButtonMixin:SetDismissPet()
+        self.tooltipText = L["Dismiss Battle Pet"];
+        self.Icon:SetTexture(653220);
+    end
+
+    function FlyoutButtonMixin:SetSummonPet(petNameOrGUID)
+        local speciesID, petGUID = C_PetJournal.FindPetIDByName(petNameOrGUID);
+        if petGUID then
+            self.tooltipMethod = "SetCompanionPet";
+            self.id = petGUID;
+            local icon = select(9, C_PetJournal.GetPetInfoByPetID(petGUID));
+            self.Icon:SetTexture(icon);
+        elseif speciesID then   --Summoning not owned pet causes errors
+            local speciesName, icon = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
+            self.tooltipText = speciesName;
+            self.Icon:SetTexture(icon);
+            self:SetUsableVisual(false);
+            self.macroText = nil;
+        end
+    end
+
+    function FlyoutButtonMixin:SetCustomEmote(customEmote)
+        self.tooltipText = (EMOTE or "Emote")..": "..customEmote;
     end
 end

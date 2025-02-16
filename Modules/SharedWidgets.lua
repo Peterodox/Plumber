@@ -1909,6 +1909,12 @@ do  --(In)Secure Button Pool
         button.isActive = true;
         SecureButtonContainer:RegisterEvent("PLAYER_REGEN_DISABLED");
 
+        if GetCVarBool("ActionButtonUseKeyDown") then
+            button:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+        else
+            button:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        end
+
         return button
     end
     addon.AcquireSecureActionButton = AcquireSecureActionButton;

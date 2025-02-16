@@ -19,7 +19,7 @@ local InCombatLockdown = InCombatLockdown;
 local GetMacroBody = GetMacroBody;
 local GetMacroInfo = GetMacroInfo;
 local EditMacro = EditMacro;
-local GetActiveAbilities = C_ZoneAbility.GetActiveAbilities;
+local GetActiveAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or API.Nop;
 local FindSpellOverrideByID = FindSpellOverrideByID;
 local GetActionInfo = GetActionInfo;
 
@@ -323,6 +323,15 @@ EL:SetScript("OnEvent", EL.OnEvent);
 do  --MacroInterpreter
     MacroInterpreter.macroCommand = {};
 
+    local MacroHandlers = {
+        ["(/randomfavoritepet)"] = "SetRandomFavoritePet",
+        ["(/randompet)"] = "SetRandomPet",
+        ["/summonpet%s+(.+)"] = "SetSummonPet",
+        ["(/dismisspet)"] = "SetDismissPet",
+        ["/emote%s+(.+)"] = "SetCustomEmote",
+        ["/e%s+(.+)"] = "SetCustomEmote",
+    };
+
     function MacroInterpreter:Init()
         self.Init = function() end;
 
@@ -395,6 +404,20 @@ do  --MacroInterpreter
                 end
             end
 
+            if not processed then   --generic macro command match
+                local arg;
+                for pattern, handler in pairs(MacroHandlers) do
+                    arg = match(line, pattern);
+                    if arg then
+                        id = arg;
+                        actionType = handler;
+                        icon = 136243;  --trade_engineering
+                        processed = true;
+                        break
+                    end
+                end
+            end
+
             if actionType then
                 if actionType == "spell" then
                     if (not id) and name then
@@ -405,7 +428,7 @@ do  --MacroInterpreter
                             icon = spellInfo.iconID;
                         end
                     end
-                    if not icon then
+                    if id and (not icon) then
                         icon = C_Spell.GetSpellTexture(id);
                     end
                     if id and IsPlayerSpell(id) then
@@ -426,9 +449,13 @@ do  --MacroInterpreter
                     if name then
                         macroText = "/use "..name;
                     end
+                else
+                    name = line;
+                    macroText = line;
+                    usable = true;
                 end
 
-                if id then
+                if id and id ~= 0 then
                     if not tbl then
                         tbl = {};
                     end
@@ -482,12 +509,14 @@ do  --MacroInterpreter
 end
 
 
+
 local function SlashFunc_DrawerMacro()
     --if InCombatLockdown() then return end;
 
     local focus = API.GetMouseFocus();
-    if focus and focus.bindingAction and focus.action and type(focus.action) == "number" then
-        local actionType, id, subType = GetActionInfo(focus.action);
+    local action = focus and SpellFlyout.GetActionFromMouseFocus(focus);
+    if action then
+        local actionType, id, subType = GetActionInfo(action);
         if actionType == "macro" then
             local body = GetMacroBody(id);
             if body and find(body, "#plumber:drawer") then
@@ -500,10 +529,10 @@ local function SlashFunc_DrawerMacro()
                 SpellFlyout.flyoutID = id;
                 SpellFlyout:SetActions(drawerInfo);
                 SpellFlyout:SetOwner(focus);
-                SpellFlyout:SetScale(focus:GetParent():GetScale());
+                SpellFlyout:SetScale(SpellFlyout.GetFlyoutScaleFromMouseFocus(focus) or 1);
                 SpellFlyout:ClearAllPoints();
 
-                local direction = focus.bar and focus.bar.flyoutDirection or "UP";
+                local direction = SpellFlyout.GetFlyoutDirectionFromMouseFocus(focus);
                 if direction == "LEFT" then
                     local _, y = focus:GetCenter();
                     local left = focus:GetLeft();

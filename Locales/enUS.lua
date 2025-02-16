@@ -333,6 +333,7 @@ L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. Macro";
 L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
 L["PlumberMacro Error Combat"] = "Unavailable in combat";
 L["PlumberMacro Error NoAction"] = "No supported actions";
+L["Dismiss Battle Pet"] = "Dismiss Battle Pet";
 
 
 --Generic
