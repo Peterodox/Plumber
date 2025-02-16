@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.5.9
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.0
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -255,6 +255,7 @@ L["Chat Leave All Characters"] = "Покинуть на всех персона�
 L["Chat Leave All Characters Tooltip"] = "Вы автоматически покинете этот канал, когда войдете в игру персонажем.";
 L["Chat Auto Leave Alert Format"] = "Хотите ли вы автоматически покинуть |cffffc0c0[%s]|r на всех ваших персонажах?";
 L["Chat Auto Leave Cancel Format"] = "Автоматический выход отключен для %s. Используйте команду /join, чтобы снова присоединиться к каналу.";
+L["Auto Leave Channel Format"] = "Автоматический выход \"%s\"";
 L["Click To Disable"] = "Нажмите, чтобы отключить";
 
 
@@ -327,6 +328,13 @@ L["QuickSlot Error 2"] = "Быстрый слот: Контроллер отсу
 L["QuickSlot Error 3"] = "Быстрый слот: контроллер с той же клавишей \"%s\" уже существует.";
 
 
+--Plumber Macro
+L["PlumberMacro Drive"] = "Макрос Plumber Р.А.З.Г.О.Н.";
+L["PlumberMacro Drawer"] = "Plumber макрос ящика";
+L["PlumberMacro Error Combat"] = "Недоступно в бою";
+L["PlumberMacro Error NoAction"] = "Нет поддерживаемых действий";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Перемещение по горизонтали";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Перемещение по вертикали";
@@ -361,7 +369,6 @@ L["currency-2915"] = "Резной";
 L["currency-2916"] = "Рунический";
 L["currency-2917"] = "Позолоченный";
 
-
 L["Scenario Delves"] = "Вылазка";
 L["GameObject Door"] = "Дверь";
 L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameObjectID once it shows up in the database
@@ -371,10 +378,18 @@ L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameO
 L["Bountiful Delve"] =  "Многообещающая вылазка";
 L["Special Assignment"] = "Особое поручение";
 
-
 L["Match Pattern Gold"] = "([%d%,]+) Золото";
 L["Match Pattern Silver"] = "([%d]+) Серебро";
 L["Match Pattern Copper"] = "([%d]+) Медь";
 
 L["Match Pattern Rep 1"] = "Отношение (.+) к вашему отряду улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "Отношение (.+) к вам улучшилось на ([%d%,]+)";   --FACTION_STANDING_INCREASED
+
+L["Match Pattern Item Level"] = "^Уровень предмета (%d+)";
+L["Match Pattern Item Upgrade Tooltip"] = "^Уровень улучшения: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Upgrade Track 1"] = "Исследователь";
+L["Upgrade Track 2"] = "Искатель приключений";
+L["Upgrade Track 3"] = "Ветеран";
+L["Upgrade Track 4"] = "Защитник";
+L["Upgrade Track 5"] = "Герой";
+L["Upgrade Track 6"] = "Эпохальный";
