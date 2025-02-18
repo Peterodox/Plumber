@@ -1853,13 +1853,17 @@ do  --(In)Secure Button Pool
         self:SetScript("OnMouseUp", nil);
     end
 
-    function SecureButtonMixin:CoverParent(padding)
+    function SecureButtonMixin:CoverObject(object, padding)
         padding = padding or 0;
+        self:ClearAllPoints();
+        self:SetPoint("TOPLEFT", object, "TOPLEFT", -padding, padding);
+        self:SetPoint("BOTTOMRIGHT", object, "BOTTOMRIGHT", padding, -padding);
+    end
+
+    function SecureButtonMixin:CoverParent(padding)
         local parent = self:GetParent();
         if parent then
-            self:ClearAllPoints();
-            self:SetPoint("TOPLEFT", parent, "TOPLEFT", -padding, padding);
-            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", padding, -padding);
+            self:CoverObject(parent, padding);
         end
     end
 

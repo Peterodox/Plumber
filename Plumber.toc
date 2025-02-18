@@ -28,7 +28,8 @@ Modules\BackpackItemTracker.lua
 Modules\AutoJoinEvents.lua
 Modules\PlayerChoiceFrameToken.lua
 Modules\QuickSlot.xml
-Modules\SpellFlyout.lua
+#Modules\SpellFlyout.lua
+Modules\SpellFlyout_Secure.lua
 Modules\QuestAreaTrigger.lua
 Modules\Dreamseed.lua
 #Modules\EventMap.lua

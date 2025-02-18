@@ -8,13 +8,15 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
-local SpellFlyout = addon.SpellFlyout;
+--local SpellFlyout = addon.SpellFlyout;  --Unused, Insecure
+local SecureSpellFlyout = addon.SecureSpellFlyout;
 
 local find = string.find;
 local match = string.match;
 local gsub = string.gsub;
 local tinsert = table.insert;
 local ipairs = ipairs;
+local strlenutf8 = strlenutf8;
 local InCombatLockdown = InCombatLockdown;
 local GetMacroBody = GetMacroBody;
 local GetMacroInfo = GetMacroInfo;
@@ -22,6 +24,18 @@ local EditMacro = EditMacro;
 local GetActiveAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or API.Nop;
 local FindSpellOverrideByID = FindSpellOverrideByID;
 local GetActionInfo = GetActionInfo;
+
+local DoesItemReallyExist = API.DoesItemReallyExist;
+local GetItemIDForItemInfo = C_Item.GetItemIDForItemInfo;
+local GetItemNameByID = C_Item.GetItemNameByID;
+local GetItemIconByID = C_Item.GetItemIconByID;
+local RequestLoadItemDataByID = C_Item.RequestLoadItemDataByID;
+local RequestLoadSpellData = C_Spell.RequestLoadSpellData;
+local GetSpellName = C_Spell.GetSpellName;
+local GetSpellTexture = C_Spell.GetSpellTexture;
+local GetSpellInfo = C_Spell.GetSpellInfo;
+local IsPlayerSpell = IsPlayerSpell;
+
 
 local MacroInterpreter = {};   --Add info to tooltip
 
@@ -32,8 +46,26 @@ local ModifyType = {
 };
 
 local SlashCmd = {};
-SlashCmd.DrawerMacro = API.GetSlashSubcommand("DrawerMacro");
+--SlashCmd.DrawerMacro = API.GetSlashSubcommand("DrawerMacro");
 
+
+local function AddExtraLineToMacroBody(extraLine, body)
+    extraLine = "\n\n"..extraLine;
+    local numRequired = strlenutf8(extraLine) + 1;
+    local numTotal = strlenutf8(body);
+    if numTotal + numRequired >= 255 then
+        local pattern = "$";
+        local n = 0;
+        while n < numRequired do
+            n = n + 1;
+            pattern = "."..pattern;
+        end
+        body = gsub(body, pattern, extraLine);
+    else
+        body = body..extraLine;
+    end
+    return body
+end
 
 local PlumberMacros = {};
 do
@@ -62,7 +94,7 @@ do
         end,
 
         addFunc = function()
-            local spellName = (C_Spell.GetSpellName(PlumberMacros["drive"].spellID)) or "G-99 Breakneck";
+            local spellName = (GetSpellName(PlumberMacros["drive"].spellID)) or "G-99 Breakneck";
             return "/cast spell:460013\n/cast [noswimming] "..spellName
             --The first /cast doesn't get executed but it's necessary to make GetActionInfo() return the macroIndex instead of spellID
         end,
@@ -83,26 +115,6 @@ do
         conditionFunc = function ()
             return true
         end,
-
-        initFunc = function(body)
-            if not find(body, SlashCmd.DrawerMacro) then
-                local extraLine = "\n"..SlashCmd.DrawerMacro;
-                local numRequired = strlenutf8(extraLine) + 1;
-                local numTotal = strlenutf8(body);
-                if numTotal + numRequired >= 255 then
-                    local pattern = "$";
-                    local n = 0;
-                    while n < numRequired do
-                        n = n + 1;
-                        pattern = "."..pattern;
-                    end
-                    body = gsub(body, pattern, extraLine);
-                else
-                    body = body..extraLine;
-                end
-            end
-            return body
-        end,
     };
 end
 
@@ -115,9 +127,6 @@ EL.macroIndexMax = 138;
 
 function EL:CheckSupportedMacros()
     self:UnregisterAllEvents();
-    if not EL.macroFrameHooked then
-        self:RegisterEvent("UPDATE_MACROS");
-    end
 
     for command, commandData in pairs(PlumberMacros) do
         commandData.currentState = nil;
@@ -244,7 +253,47 @@ function EL:UpdateMacros(commands)
         if anyChange and inCombat then
             self:RegisterEvent("PLAYER_REGEN_ENABLED");
         end
+
+        self:UpdateDrawers();
     end
+end
+
+
+local DrawerUpdateFlag = {
+    Combat = 0,
+    Started = 1,
+    Success = 2,
+};
+
+function EL:UpdateDrawers()
+    if InCombatLockdown() then
+        self.drawerUpdateFlag = DrawerUpdateFlag.Combat;
+        return
+    end
+    self.drawerUpdateFlag = DrawerUpdateFlag.Started;
+
+    SecureSpellFlyout:ReleaseClickHandlers();
+    local drawers = self.activeCommands and self.activeCommands["drawer"];
+    if drawers and #drawers > 0 then
+        local name, icon, body, drawerInfo;
+        local handlerName;
+        for _, macroIndex in ipairs(drawers) do
+            name, icon, body = GetMacroInfo(macroIndex);
+            drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+            if drawerInfo then
+                handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
+                if handlerName then
+                    body = gsub(body, "/plmr 1", "");   --Legacy. Remove it in future update
+                    body = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
+                    local extraLine = "/click "..handlerName;
+                    body = AddExtraLineToMacroBody(extraLine, body);
+                    EditMacro(macroIndex, name, icon, body);
+                end
+            end
+        end
+    end
+
+    self.drawerUpdateFlag = DrawerUpdateFlag.Success;
 end
 
 function EL:CheckQueue()
@@ -272,10 +321,10 @@ end
 function EL:LoadSpellAndItem()
     for _, commandData in pairs(PlumberMacros) do
         if commandData.spellID then
-            C_Spell.RequestLoadSpellData(commandData.spellID);
+            RequestLoadSpellData(commandData.spellID);
         end
         if commandData.itemID then
-            C_Item.RequestLoadItemDataByID(commandData.itemID);
+            RequestLoadItemDataByID(commandData.itemID);
         end
     end
 end
@@ -283,12 +332,32 @@ end
 function EL:ListenEvents(state)
     if state then
         self:RegisterEvent("PLAYER_ENTERING_WORLD");
-        self:RegisterEvent("UPDATE_MACROS");
     else
         self:UnregisterAllEvents();
     end
 end
 EL:ListenEvents(true);
+
+
+if MacroFrame_LoadUI then
+    --UPDATE_MACROS fires when selecting any macro, without changing its content, so we update our macro after MarcoFrame is closed
+    hooksecurefunc("MacroFrame_LoadUI", function()
+        if not EL.macroFrameHooked then
+            if MacroFrame then
+                EL.macroFrameHooked = true;
+                MacroFrame:HookScript("OnHide", function()
+                    EL:RequestUpdateMacros();
+                end);
+                if MacroSaveButton then
+                    MacroSaveButton:HookScript("OnClick", function()
+                        EL:RequestUpdateMacros();
+                    end);
+                end
+            end
+        end
+    end);
+end
+
 
 function EL:OnEvent(event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
@@ -297,22 +366,6 @@ function EL:OnEvent(event, ...)
         self:RequestUpdateMacros(0.5);
     elseif event == "PLAYER_REGEN_ENABLED" then
         self:CheckQueue();
-    elseif event == "UPDATE_MACROS" then
-        --self:RequestUpdateMacros();   --this event fires when selecting any macro, without changing its content, so we update our macro after MarcoFrame is closed
-        if not self.macroFrameHooked then
-            if MacroFrame then
-                self.macroFrameHooked = true;
-                self:UnregisterEvent(event);
-                MacroFrame:HookScript("OnHide", function()
-                    self:RequestUpdateMacros();
-                end);
-                if MacroSaveButton then
-                    MacroSaveButton:HookScript("OnClick", function()
-                        self:RequestUpdateMacros();
-                    end);
-                end
-            end
-        end
     elseif self.macroEvents and self.macroEvents[event] then
         self:UpdateMacroByEvent(event);
     end
@@ -375,7 +428,7 @@ do  --MacroInterpreter
                 if id then
                     processed = true;
                     actionType = "spell";
-                    name = C_Spell.GetSpellName(tonumber(id));
+                    name = GetSpellName(tonumber(id));
                 end
             end
 
@@ -421,7 +474,7 @@ do  --MacroInterpreter
             if actionType then
                 if actionType == "spell" then
                     if (not id) and name then
-                        local spellInfo = C_Spell.GetSpellInfo(name);
+                        local spellInfo = GetSpellInfo(name);
                         if spellInfo then
                             usable = true;
                             id = spellInfo.spellID;
@@ -429,7 +482,7 @@ do  --MacroInterpreter
                         end
                     end
                     if id and (not icon) then
-                        icon = C_Spell.GetSpellTexture(id);
+                        icon = GetSpellTexture(id);
                     end
                     if id and IsPlayerSpell(id) then
                         usable = true;
@@ -439,11 +492,11 @@ do  --MacroInterpreter
                     end
                 elseif actionType == "item" then
                     if (not id) and name then
-                        id = C_Item.GetItemIDForItemInfo(name);
+                        id = GetItemIDForItemInfo(name);
                     end
-                    if id and API.DoesItemReallyExist(id) then
-                        name = C_Item.GetItemNameByID(id);
-                        icon = C_Item.GetItemIconByID(id);
+                    if id and DoesItemReallyExist(id) then
+                        name = GetItemNameByID(id);
+                        icon = GetItemIconByID(id);
                         usable = true;
                     end
                     if name then
@@ -478,8 +531,10 @@ do  --MacroInterpreter
     function MacroInterpreter.drawer(tooltip, body)
         local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
         if drawerInfo then
-            if InCombatLockdown() then
-                tooltip:AddLine(L["PlumberMacro Error Combat"], 1, 0.1, 0.1);
+            if EL.drawerUpdateFlag == DrawerUpdateFlag.Combat then
+                tooltip:AddLine(L["PlumberMacro DrawerFlag Combat"], 1, 0.1, 0.1, true);
+            elseif EL.drawerUpdateFlag == DrawerUpdateFlag.Started then
+                tooltip:AddLine(L["PlumberMacro DrawerFlag Stuck"], 1, 0.1, 0.1, true);
             end
 
             for _, info in ipairs(drawerInfo) do
@@ -510,6 +565,7 @@ end
 
 
 
+--[[
 local function SlashFunc_DrawerMacro()
     --if InCombatLockdown() then return end;
 
@@ -556,19 +612,12 @@ local function SlashFunc_DrawerMacro()
                 end
 
                 SpellFlyout:Show();
-
-                --[[
-                if drawerInfo then
-                    for _, info in ipairs(drawerInfo) do
-                        print(string.format("|T%s:16:16|t %s", info.icon, info.text));
-                    end
-                end
-                --]]
             end
         end
     end
 end
 API.AddSlashSubcommand("DrawerMacro", SlashFunc_DrawerMacro);
+--]]
 
 --[[
     GetActionText(actionSlot)   for Macros

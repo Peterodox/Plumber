@@ -22,6 +22,6 @@ Modules\SharedTooltip.lua
 ControlCenter.lua
 
 Modules\LootUI.xml
-#Modules\QuickSlot.xml
-#Modules\SpellFlyout.lua
-#Modules\Macros.lua
+Modules\QuickSlot.xml
+Modules\SpellFlyout_Secure.lua
+Modules\Macros.lua

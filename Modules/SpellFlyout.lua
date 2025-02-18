@@ -1,3 +1,5 @@
+--Unused
+
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
@@ -5,6 +7,8 @@ local L = addon.L;
 local tinsert = table.insert;
 local InCombatLockdown = InCombatLockdown;
 local IsPlayerSpell = IsPlayerSpell;
+local CreateFrame = CreateFrame;
+local UIParent = UIParent;
 
 local FlyoutButtonMixin = {};
 local SpellFlyout = CreateFrame("Frame", nil, UIParent);
@@ -12,6 +16,12 @@ addon.SpellFlyout = SpellFlyout;
 SpellFlyout.UpdateSpellCooldowns = addon.QuickSlot.UpdateSpellCooldowns;
 SpellFlyout.UpdateItemCooldowns = addon.QuickSlot.UpdateItemCooldowns;
 
+
+local function SetupClampedFrame(frame)
+    local offset = 4;
+    frame:SetClampedToScreen(true);
+    frame:SetClampRectInsets(-offset, offset, offset, -offset);
+end
 
 do --SpellFlyout Main
     SpellFlyout:Hide();
@@ -62,13 +72,14 @@ do --SpellFlyout Main
                 self:Hide();
             end
         elseif event == "PLAYER_REGEN_DISABLED" then
+            self.ActionButton = nil;
             if self:IsVisible() then
                 self:DisplayNote(L["PlumberMacro Error Combat"], false);
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             if self:IsVisible() then
-                self:SetActions(self.actions);
                 self:OnShow();
+                self:SetActions(self.actions);
             end
         elseif event == "ACTIONBAR_SLOT_CHANGED" then
             self:Hide();
@@ -93,9 +104,6 @@ do --SpellFlyout Main
         local ActionButton = addon.AcquireSecureActionButton("SpellFlyout");
         if ActionButton then
             ActionButton:SetParent(self);
-            ActionButton:CoverParent();
-            ActionButton:SetFrameLevel(self:GetFrameLevel() + 1);
-            ActionButton:Show();
         end
         self.ActionButton = ActionButton;
     end
@@ -161,8 +169,7 @@ do --SpellFlyout Main
         self:SetScript("OnEvent", self.OnEvent);
         self:SetScript("OnMouseDown", self.OnMouseDown);
 
-        self:SetClampedToScreen(true);
-        self:SetClampRectInsets(-4, 4, 4, -4);
+        SetupClampedFrame(self);
     end
 
     function SpellFlyout:DisplayNote(text, updateSize)
@@ -252,11 +259,16 @@ do --SpellFlyout Main
         self.owner = owner;
     end
 
-    function SpellFlyout:SetMacroText(macroText)
+    function SpellFlyout:SetMacroText(flyoutButton, macroText)
         if self.ActionButton then
-            if macroText then
-                self.ActionButton:SetAttribute("type1", "macro");
+            if flyoutButton and macroText then
+                self.ActionButton:SetAttribute("type", "macro");
                 self.ActionButton:SetMacroText(macroText);
+                self.ActionButton:SetFrameLevel(flyoutButton:GetFrameLevel() + 1);
+                self.ActionButton:SetPropagateMouseClicks(true);
+                self.ActionButton:SetPropagateMouseMotion(true);
+                self.ActionButton:CoverObject(flyoutButton, 1);
+                self.ActionButton:Show();
             else
                 self.ActionButton:ClearActions();
             end
@@ -363,6 +375,15 @@ end
 
 do  --FlyoutButtonMixin
     function FlyoutButtonMixin:OnLoad()
+        local file = "Interface/AddOns/Plumber/Art/Frame/SpellFlyout";
+
+        self.NormalTexture:SetTexture(file);
+        self.NormalTexture:SetTexCoord(0/512, 96/512, 48/512, 144/512);
+        self.PushedTexture:SetTexture(file);
+        self.PushedTexture:SetTexCoord(96/512, 192/512, 48/512, 144/512);
+        self.HighlightTexture:SetTexture(file);
+        self.HighlightTexture:SetTexCoord(192/512, 288/512, 48/512, 144/512);
+
         self.NormalTexture:SetDrawLayer("OVERLAY");
         self.PushedTexture:SetDrawLayer("OVERLAY");
 
@@ -405,12 +426,13 @@ do  --FlyoutButtonMixin
 
     function FlyoutButtonMixin:OnEnter()
         self:ShowTooltip();
-        SpellFlyout:SetMacroText(self.macroText);
+        SpellFlyout:SetMacroText(self, self.macroText);
     end
 
     function FlyoutButtonMixin:OnLeave()
         GameTooltip:Hide();
         SpellFlyout:SetMacroText(nil);
+        self:SetButtonState("NORMAL");
     end
 
     function FlyoutButtonMixin:ShowTooltip()
