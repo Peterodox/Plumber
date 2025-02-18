@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.6.0";
-local VERSION_DATE = 1739600000;
+local VERSION_TEXT = "v1.6.1";
+local VERSION_DATE = 1739800000;
 
 
 local addonName, addon = ...
@@ -231,4 +231,6 @@ do
         return tocVersion >= targetVersion
     end
     addon.IsToCVersionEqualOrNewerThan = IsToCVersionEqualOrNewerThan;
+
+    addon.IS_CLASSIC = C_AddOns.GetAddOnMetadata(addonName, "X-Flavor") ~= "retail";
 end

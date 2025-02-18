@@ -28,9 +28,14 @@ local function SetupClampedFrame(frame)
 end
 
 
+local IS_CLASSIC = addon.IS_CLASSIC;
+local ACTION_BUTTON_SIZE = 45;
+if IS_CLASSIC then
+    ACTION_BUTTON_SIZE = 36;
+end
+
 --Flyout Cursor OffsetX = 24.0
 --Flyout Cursor OffsetY = 26.0
-
 
 
 do --SpellFlyout Main
@@ -99,9 +104,26 @@ do --SpellFlyout Main
     function SpellFlyout:Init()
         self.Init = nil;
 
-        local bg = addon.CreateNineSliceFrame(self, "NineSlice_GenericBox_Black");
+        --Create Background. TO-DO convert into a template?
+        --This texture has a large shadow
+        local bg = addon.CreateNineSliceFrame(self, "NineSlice_GenericBox_Black_Shadowed");
+        local buttonScale = ACTION_BUTTON_SIZE / 45;
         bg:SetUsingParentLevel(true);
-        bg:SetAllPoints(true);
+        bg:CoverParent(16 * buttonScale);
+        bg.pieces[1]:SetTexCoord(0/128, 48/128, 0/128, 48/128);
+        bg.pieces[2]:SetTexCoord(48/128, 80/128, 0/128, 48/128);
+        bg.pieces[3]:SetTexCoord(80/128, 128/128, 0/128, 48/128);
+        bg.pieces[4]:SetTexCoord(0/128, 48/128, 48/128, 80/128);
+        bg.pieces[5]:SetTexCoord(48/128, 80/128, 48/128, 80/128);
+        bg.pieces[6]:SetTexCoord(80/128, 128/128, 48/128, 80/128);
+        bg.pieces[7]:SetTexCoord(0/128, 48/128, 80/128, 128/128);
+        bg.pieces[8]:SetTexCoord(48/128, 80/128, 80/128, 128/128);
+        bg.pieces[9]:SetTexCoord(80/128, 128/128, 80/128, 128/128);
+        if IS_CLASSIC then
+           bg:SetCornerSize(48 * buttonScale);
+        else
+            bg:SetCornerSize(48);
+        end
 
         self:EnableMouse(true);
         self:EnableMouseMotion(true);
@@ -131,7 +153,7 @@ do --SpellFlyout Main
         end
 
         if actions and #actions > 0 then
-            local buttonSize = 45;
+            local buttonSize = ACTION_BUTTON_SIZE;
             local gap = 2;
             local h, v = 0, 1;
             local level = 9;
@@ -158,7 +180,7 @@ do --SpellFlyout Main
 
             self:SetSize(h * (buttonSize + gap) + gap, v * (buttonSize + gap) + gap);
 
-            local x, y = API.GetScaledCursorPosition();
+            local x, y = API.GetScaledCursorPositionForFrame(self);
             self:ClearAllPoints();
             self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 24.0, y + 26.0);
             self:SetFrameStrata("FULLSCREEN_DIALOG");
@@ -209,6 +231,10 @@ do  --VisualButtonMixin
 
         self:SetScript("OnEnter", self.OnEnter);
         self:SetScript("OnLeave", self.OnLeave);
+
+        if IS_CLASSIC then
+            self:SetEffectiveSize(ACTION_BUTTON_SIZE);
+        end
     end
 
     function VisualButtonMixin:SetAction(action)
@@ -299,6 +325,15 @@ do  --VisualButtonMixin
         end
     end
 
+    function VisualButtonMixin:SetEffectiveSize(size)
+        local s = size / 45;
+        self:SetSize(45 * s, 45 * s);
+        self.Icon:SetSize(40 * s, 40 * s);
+        self.NormalTexture:SetSize(48 * s, 48 * s);
+        self.PushedTexture:SetSize(48 * s, 48 * s);
+        self.HighlightTexture:SetSize(48 * s, 48 * s);
+    end
+
 
     --Default Actions
     function VisualButtonMixin:SetRandomFavoritePet()
@@ -341,7 +376,7 @@ end
 
 
 ---- Secure Objects ----
-local SecureRootContainer = CreateFrame("Frame", nil, UIParent, "SecureHandlerMouseUpDownTemplate, SecureHandlerShowHideTemplate", "SecureHandlerClickTemplate");
+local SecureRootContainer = CreateFrame("Frame", "PlumberSecureFlyoutContainer", UIParent, "SecureHandlerMouseUpDownTemplate, SecureHandlerShowHideTemplate", "SecureHandlerClickTemplate");    --Name is need for OverrideBindingClick
 SecureRootContainer:Hide();
 SecureRootContainer:SetAllPoints(true);
 SecureRootContainer:SetFrameStrata("BACKGROUND");
@@ -424,7 +459,7 @@ do
         ActionButtonPool:AddFrameRef(handler);  --SetFrameRef("SecureButton")
     end
 
-    local HANDLER_ONCLICK = [=[
+    local HANDLER_ONCLICK = string.format([=[
         local frame = self:GetFrameRef("MainFrame");
         local handlerID = self:GetID();
         local show = (not frame:IsShown()) or (handlerID ~= frame:GetID());
@@ -447,7 +482,7 @@ do
                 end
 
                 local numButtons = 0;
-                local buttonSize = 45;
+                local buttonSize = %d;
                 local gap = 2;
 
                 for i = 1, numActions do
@@ -468,8 +503,8 @@ do
                 local y = uiHeight * yRatio;
 
                 ActionButtonContainer:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 24.0, y + 26.0);
-                ActionButtonContainer:SetWidth(numButtons * (45 + 2) + 2);
-                ActionButtonContainer:SetHeight(1 * (45 + 2) + 2);
+                ActionButtonContainer:SetWidth(numButtons * (buttonSize + 2) + 2);
+                ActionButtonContainer:SetHeight(1 * (buttonSize + 2) + 2);
                 --ActionButtonContainer:RegisterAutoHide(2);
                 frame:Show();
                 ActionButtonContainer:Show();
@@ -477,7 +512,7 @@ do
         else
             frame:Hide();
         end
-    ]=]
+    ]=], ACTION_BUTTON_SIZE);
 
     function SecureControllerPool:AddActions(actions)
         local handler = self:AcquireClickHandler();
@@ -490,6 +525,9 @@ do
 
         handler:SetScript("PreClick", function()
             SpellFlyout:ShowActions(actions);
+            if not InCombatLockdown() then
+                ActionButtonPool:UpdateClicks();
+            end
         end);
 
         handler:SetAttribute("_onclick", HANDLER_ONCLICK);
@@ -531,12 +569,13 @@ do  --SecureHandler
                 index = n + i;
                 button = CreateFrame("Button", nil, ActionButtonContainer, "PlumberSecureActionBarButtonTemplate");
                 self.actionButtons[index] = button;
+                button:SetSize(ACTION_BUTTON_SIZE, ACTION_BUTTON_SIZE);
 
                 local vb = CreateFrame("Button", nil, UIParent, "PlumberActionBarButtonTemplate");
+                vb:Hide();
                 self.visualButtons[index] = vb;
                 button.VisualButton = vb;
                 API.Mixin(vb, VisualButtonMixin);
-                vb:SetSize(45, 45);
                 vb:SetFrameStrata("FULLSCREEN_DIALOG");
                 vb:OnLoad();
                 vb:SetScript("OnEnter", vb.OnEnter);
@@ -567,5 +606,5 @@ do  --SecureHandler
         end
     end
 
-    ActionButtonPool:InitButtons(16);
+    ActionButtonPool:InitButtons(16);   --255/16
 end

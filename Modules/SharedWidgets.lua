@@ -45,6 +45,7 @@ do  -- Slice Frame
         NineSlice_GenericBox = true,            --used by BackpackItemTracker
         NineSlice_GenericBox_Border = true,     --used by BackpackItemTracker
         NineSlice_GenericBox_Black = true,
+        NineSlice_GenericBox_Black_Shadowed = true,
     };
 
     local ThreeSliceLayouts = {
@@ -161,6 +162,10 @@ do  -- Slice Frame
             self.pieces[7]:SetSize(a, a);
             self.pieces[9]:SetSize(a, a);
         end
+    end
+
+    function SliceFrameMixin:SetCornerSizeByScale(scale)
+        self:SetCornerSize(16 * scale);
     end
 
     function SliceFrameMixin:SetTexture(tex)

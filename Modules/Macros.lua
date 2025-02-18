@@ -51,7 +51,7 @@ local SlashCmd = {};
 
 local function AddExtraLineToMacroBody(extraLine, body)
     extraLine = "\n\n"..extraLine;
-    local numRequired = strlenutf8(extraLine) + 1;
+    local numRequired = strlenutf8(extraLine) + 2;
     local numTotal = strlenutf8(body);
     if numTotal + numRequired >= 255 then
         local pattern = "$";

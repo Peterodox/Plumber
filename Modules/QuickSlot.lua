@@ -1185,8 +1185,8 @@ function QuickSlot:UpdateItemCooldowns()
 end
 
 do  --Spell Cooldown
-    local GetSpellCooldown = C_Spell.GetSpellCooldown;
-    local GetSpellCharges = C_Spell.GetSpellCharges;
+    local GetSpellCooldown = API.GetSpellCooldown;
+    local GetSpellCharges = API.GetSpellCharges;
 
     local Throttler = CreateFrame("Frame", nil, QuickSlot);
     QuickSlot.Throttler = Throttler;

@@ -1490,6 +1490,12 @@ do  -- Cursor Position
         return x*UI_SCALE_RATIO, y*UI_SCALE_RATIO
     end
     API.GetScaledCursorPosition = GetScaledCursorPosition;
+
+    function API.GetScaledCursorPositionForFrame(frame)
+        local uiScale = frame:GetEffectiveScale();
+        local x, y = GetCursorPosition();
+        return x / uiScale, y / uiScale;
+    end
 end
 
 do  -- TomTom Compatibility
@@ -1794,24 +1800,57 @@ do  -- Reputation
 end
 
 do  -- Spell
-    if true then    --IS_TWW
-        local GetSpellInfo_Table = C_Spell.GetSpellInfo;
-        local SPELL_INFO_KEYS = {"name", "rank", "iconID", "castTime", "minRange", "maxRange", "spellID", "originalIconID"};
-        local function GetSpellInfo_Flat(spellID)
-            local info = spellID and GetSpellInfo_Table(spellID);
-            if info then
-                local tbl = {};
-                local n = 0;
-                for _, key in ipairs(SPELL_INFO_KEYS) do
-                    n = n + 1;
-                    tbl[n] = info[key];
-                end
-                return unpack(tbl)
+    local GetSpellInfo_Table = C_Spell.GetSpellInfo;
+    local SPELL_INFO_KEYS = {"name", "rank", "iconID", "castTime", "minRange", "maxRange", "spellID", "originalIconID"};
+    local function GetSpellInfo_Flat(spellID)
+        local info = spellID and GetSpellInfo_Table(spellID);
+        if info then
+            local tbl = {};
+            local n = 0;
+            for _, key in ipairs(SPELL_INFO_KEYS) do
+                n = n + 1;
+                tbl[n] = info[key];
+            end
+            return unpack(tbl)
+        end
+    end
+    API.GetSpellInfo = GetSpellInfo_Flat;
+
+    if C_Spell.GetSpellCooldown then
+        API.GetSpellCooldown = C_Spell.GetSpellCooldown;
+    else
+        local GetSpellCooldown = GetSpellCooldown;
+        function API.GetSpellCooldown(spell)
+            local startTime, duration, isEnabled, modRate = GetSpellCooldown(spell);
+            if startTime ~= nil then
+                local tbl = {
+                    startTime = startTime,
+                    duration = duration,
+                    isEnabled = isEnabled,
+                    modRate = modRate,
+                };
+                return tbl
             end
         end
-        API.GetSpellInfo = GetSpellInfo_Flat;
+    end
+    
+    if C_Spell.GetSpellCharges then
+        API.GetSpellCharges = C_Spell.GetSpellCharges;
     else
-        API.GetSpellInfo = GetSpellInfo;
+        local GetSpellCharges = GetSpellCharges;
+        function API.GetSpellCharges(spell)
+            local currentCharges, maxCharges, cooldownStartTime, cooldownDuration, chargeModRate = GetSpellCharges(spell);
+            if currentCharges then
+                local tbl = {
+                    currentCharges = currentCharges,
+                    maxCharges = maxCharges,
+                    cooldownStartTime = cooldownStartTime,
+                    cooldownDuration = cooldownDuration,
+                    chargeModRate = chargeModRate,
+                };
+                return tbl
+            end
+        end
     end
 end
 

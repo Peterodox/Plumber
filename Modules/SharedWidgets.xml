@@ -505,12 +505,12 @@
                 </FontString>
             </Layer>
             <Layer level="OVERLAY">
-                <FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
+                <!--FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
                     <Size x="36" y="10"/>
                     <Anchors>
                         <Anchor point="BOTTOM" x="0" y="2"/>
                     </Anchors>
-                </FontString>
+                </FontString-->
             </Layer>
         </Layers>
         <NormalTexture parentKey="NormalTexture">
@@ -552,6 +552,13 @@
 
     <Button name="PlumberSecureActionBarButtonTemplate" inherits="SecureActionButtonTemplate" propagateMouseInput="Both" hidden="true" virtual="true">
         <Size x="45" y="45"/>
+        <!--Layers>
+            <Layer level="BACKGROUND" textureSubLevel="-1">
+                <Texture parentKey="DebugArea" setAllPoints="true">
+                    <Color r="1" a="0.5"/>
+                </Texture>
+            </Layer>
+        </Layers-->
         <Scripts>
             <OnShow>
                 if self.VisualButton then
