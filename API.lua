@@ -2007,6 +2007,10 @@ do  -- ObjectPool
         --Override
     end
 
+    function ObjectPoolMixin:GetActiveObjects()
+        return self.activeObjects
+    end
+
     local function CreateObjectPool(createObjectFunc)
         local pool = {};
         API.Mixin(pool, ObjectPoolMixin);

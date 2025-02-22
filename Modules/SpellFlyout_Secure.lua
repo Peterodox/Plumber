@@ -8,6 +8,7 @@ local IsPlayerSpell = IsPlayerSpell;
 local CreateFrame = CreateFrame;
 local GetCVarBool = C_CVar.GetCVarBool;
 local GetItemCount = C_Item.GetItemCount;
+local PlayerHasToy = PlayerHasToy or API.Nop;
 local find = string.find;
 local gsub = string.gsub;
 local UIParent = UIParent;
@@ -251,6 +252,7 @@ do  --VisualButtonMixin
             end
         elseif self.actionType == "item" then
             if API.IsToyItem(self.id) then
+                self.isToy = true;
                 self.tooltipMethod = "SetToyByItemID";
             else
                 self.tooltipMethod = "SetItemByID";
@@ -263,6 +265,9 @@ do  --VisualButtonMixin
     function VisualButtonMixin:UpdateCount()
         if self.actionType == "item" then
             local count = GetItemCount(self.id);
+            if self.isToy then
+                count = PlayerHasToy(self.id) and 1 or 0;
+            end
             if count > 1 then
                 self.Count:SetText(count);
             else
@@ -298,12 +303,14 @@ do  --VisualButtonMixin
             tooltip[self.tooltipMethod](tooltip, self.id);
             tooltip:Show();
             self.UpdateTooltip = self.ShowTooltip;
+            return true
         elseif self.tooltipText then
             local tooltip = GameTooltip;
             tooltip:SetOwner(self, "ANCHOR_RIGHT");
             tooltip:SetText(self.tooltipText, 1, 1, 1, true);
             tooltip:Show();
             self.UpdateTooltip = nil;
+            return true
         else
             self.UpdateTooltip = nil;
         end
@@ -318,9 +325,14 @@ do  --VisualButtonMixin
             self.macroText = nil;
             self.text = nil;
             self.tooltipText = nil;
-            self.Cooldown:Clear();
-            self.Cooldown:Hide();
-            self.Count:SetText(nil);
+            self.isToy = nil;
+            if self.Cooldown then
+                self.Cooldown:Clear();
+                self.Cooldown:Hide();
+            end
+            if self.Count then
+                self.Count:SetText(nil);
+            end
             self:SetUsableVisual(true);
         end
     end
@@ -334,6 +346,14 @@ do  --VisualButtonMixin
         self.HighlightTexture:SetSize(48 * s, 48 * s);
     end
 
+    function VisualButtonMixin:IsDataCached()
+        if self.actionType == "spell" then
+            return C_Spell.IsSpellDataCached(self.id);
+        elseif self.actionType == "item" then
+            return C_Item.IsItemDataCachedByID(self.id);
+        end
+        return true
+    end
 
     --Default Actions
     function VisualButtonMixin:SetRandomFavoritePet()
@@ -370,6 +390,16 @@ do  --VisualButtonMixin
 
     function VisualButtonMixin:SetCustomEmote(customEmote)
         self.tooltipText = (EMOTE or "Emote")..": "..customEmote;
+    end
+
+
+    function SpellFlyout:PopulateButtonMixin(externalMixin)
+        for k, v in pairs(VisualButtonMixin) do
+            if not externalMixin[k] then
+                externalMixin[k] = v;
+            end
+        end
+        return externalMixin
     end
 end
 

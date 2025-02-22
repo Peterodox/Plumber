@@ -37,7 +37,9 @@ local GetSpellInfo = C_Spell.GetSpellInfo;
 local IsPlayerSpell = IsPlayerSpell;
 
 
-local MacroInterpreter = {};   --Add info to tooltip
+local MacroInterpreter = {};    --Add info to tooltip
+local EditorUI = {};            --Attach to MacroFrame once it loaded
+
 
 local ModifyType = {
     None = 0,
@@ -339,20 +341,415 @@ end
 EL:ListenEvents(true);
 
 
+do  --MacroForge
+    local EditorSetup = {};
+
+    EditorSetup.itemButtonSize = 32;
+    EditorSetup.itemButtonGap = 4;
+
+    function EditorSetup.CreateIconButtonPool()
+        if not EditorUI.objectPools.iconButtonPool then
+            local file = "Interface/AddOns/Plumber/Art/Frame/MacroForge.png";
+
+            local IconButtonMixin = {};
+
+            local ReorderController = API.CreateDragReorderController(EditorUI.ExtraFrame);
+            EditorUI.ReorderController = ReorderController;
+
+            ReorderController:SetOnDragStartCallback(function()
+                ReorderController:SetObjects(EditorUI.objectPools.iconButtonPool:GetActiveObjects());
+                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
+            end);
+
+            ReorderController:SetOnDragEndCallback(function()
+                --debug
+                local body = "#plumber:drawer";
+                for _, object in ipairs(ReorderController.objects) do
+                    body = body.."\n#"..object.macroText;
+                end
+
+                MacroFrameText:SetText(body);
+
+                if not InCombatLockdown() then
+                    --MacroFrame:SaveMacro();
+                    local selectedMacroIndex = MacroFrame:GetSelectedIndex();
+                    local actualIndex = MacroFrame:GetMacroDataIndex(selectedMacroIndex);
+                    EditMacro(actualIndex, nil, nil, body);
+                end
+                EL:RequestUpdateMacros(0.0);
+            end);
+
+            ReorderController:SetBoundary(EditorUI.ExtraFrame);
+
+            ReorderController:SetInBoundaryCallback(function()
+                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
+            end);
+
+            ReorderController:SetOutBoundaryCallback(function()
+                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 2);
+            end);
+
+            function IconButtonMixin:SetEffectiveSize(w)
+                self:SetSize(w, w);
+                self.Border:SetSize(w*72/64, w*72/64);
+                self.Icon:SetSize(w*60/64, w*60/64);
+            end
+
+            local hl = EditorUI.HighlightFrame.Texture;
+            hl:SetTexture(file);
+            hl:SetTexCoord(344/512, 416/512, 0, 72/512);
+            API.DisableSharpening(hl);
+
+            function IconButtonMixin:OnEnter()
+                if ReorderController:IsDraggingObject() then
+                    return
+                end
+
+                EditorUI:HighlightIconButton(self);
+                if self:ShowTooltip() then
+                    local tooltip = GameTooltip;
+                    if self.tooltipMethod then
+                        tooltip:AddLine(" ");
+                    end
+                    tooltip:AddLine("<"..L["Drag To Reorder"]..">", 0.1, 1, 0.1, true);
+                    tooltip:Show();
+
+                    if self:IsDataCached() then
+                        self.UpdateTooltip = nil;
+                    else
+                        self.UpdateTooltip = self.OnEnter;
+                    end
+                end
+            end
+
+            function IconButtonMixin:OnLeave()
+                GameTooltip:Hide();
+                if ReorderController:IsDraggingObject() then
+                    return
+                end
+                EditorUI:HighlightIconButton(nil);
+            end
+
+            function IconButtonMixin:OnMouseDown(mouseButton)
+                if mouseButton == "LeftButton" then
+                    ReorderController:SetDraggedObject(self);
+                    ReorderController:PreDragStart();
+                    EditorUI:RaiseIconButtonLevel(self);
+                    GameTooltip:Hide();
+                end
+            end
+
+            function IconButtonMixin:OnMouseUp()
+                if ReorderController:IsDraggingObject() then
+                    EditorUI:TriggerMouseBlocker();
+                end
+                ReorderController:OnMouseUp();
+            end
+
+            function IconButtonMixin:OnLoad()
+                self:SetScript("OnEnter", self.OnEnter);
+                self:SetScript("OnLeave", self.OnLeave);
+                self:SetScript("OnMouseDown", self.OnMouseDown);
+                self:SetScript("OnMouseUp", self.OnMouseUp);
+            end
+
+            function IconButtonMixin:OnRemoved()
+               self:ClearAction();
+            end
+
+            SecureSpellFlyout:PopulateButtonMixin(IconButtonMixin);
+
+            local function CreateObject()
+                local f = CreateFrame("Button", nil, EditorUI.ExtraFrame, "PlumberSmallIconButtonTemplate");
+
+                f.Border:SetTexture(file);
+                f.Border:SetTexCoord(272/512, 344/512, 0, 72/512);
+                API.DisableSharpening(f.Border);
+
+                API.Mixin(f, IconButtonMixin);
+                f:OnLoad();
+                f:SetEffectiveSize(EditorSetup.itemButtonSize);
+
+                return f
+            end
+            EditorUI.objectPools.iconButtonPool = API.CreateObjectPool(CreateObject);
+        end
+        return EditorUI.objectPools.iconButtonPool
+    end
+
+    function EditorSetup.drawer(body)
+        local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+        if drawerInfo and #drawerInfo > 0 then
+            local refresh = false;
+
+            if EditorUI.args.type ~= "drawer" then
+                EditorUI.args.type = "drawer";
+                refresh = true;
+            else
+                if EditorUI.args.drawerInfo then
+                    if #EditorUI.args.drawerInfo == #drawerInfo then
+                        for i, info in ipairs(EditorUI.args.drawerInfo) do
+                            if (info.actionType ~= drawerInfo[i].actionType) or (info.id ~= drawerInfo[i].id) then
+                                refresh = true;
+                                break
+                            end
+                        end
+                    else
+                        refresh = true;
+                    end
+                else
+                    refresh = true;
+                end
+            end
+
+            if refresh then
+                EditorUI:ReleaseElements();
+                local parent = MacroFrame;
+                local container = EditorUI.ExtraFrame;
+                local pool = EditorSetup.CreateIconButtonPool();
+                local size = EditorSetup.itemButtonSize;
+                local gap = EditorSetup.itemButtonGap;
+                local frameWidth = parent:GetWidth();
+                local span = #drawerInfo * (size + gap) - gap;
+                local requiredWidth = span + 48;
+                if requiredWidth > frameWidth then
+                    frameWidth = requiredWidth;
+                end
+                local fromX = 0.5*(frameWidth - span);
+                local button;
+                local baseFrameLevel = container:GetFrameLevel();
+
+                for i, info in ipairs(drawerInfo) do
+                    button = pool:Acquire();
+                    button.index = i;
+                    button:SetFrameLevel(baseFrameLevel + i);
+                    button:Show();
+                    button:SetAction(info);
+                    button:SetPoint("LEFT", container, "LEFT", fromX + (size + gap) * (i - 1), 0);
+                end
+
+                container:ClearAllPoints();
+                container:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -4);
+                container:SetWidth(frameWidth);
+
+                EditorUI.ReorderController:SetAnchorInfo(container, "LEFT", fromX, 0, EditorSetup.itemButtonGap, 0);
+            end
+        else
+            EditorUI:ReleaseElements();
+            EditorUI:DisplayNote(L["Drag And Drop Item Here"]);
+        end
+        EditorUI.args.drawerInfo = drawerInfo;
+    end
+    PlumberMacros["drawer"].editorSetupFunc = EditorSetup.drawer;
+
+
+    function EditorUI:OnLoad()
+        self.OnLoad = nil;
+
+        self:SetScript("OnShow", self.OnShow);
+        self:SetScript("OnHide", self.OnHide);
+
+        self.args = {};
+        self.objectPools = {};
+
+        if self.SourceEditBox then
+            self.SourceEditBox:HookScript("OnEditFocusGained", EditorUI.OnEditFocusGained);
+            self.SourceEditBox:HookScript("OnEditFocusLost", EditorUI.OnEditFocusLost);
+            self.SourceEditBox:HookScript("OnTextChanged", EditorUI.OnTextChanged);
+        end
+    end
+
+    function EditorUI:OnShow()
+        self.args = {};
+        if self.ExtraFrame then
+            self.ExtraFrame:UpdatePixel();
+        end
+        self:RequestSearchInEditBox();
+    end
+
+    function EditorUI:OnHide()
+        EL:RequestUpdateMacros();
+        self.isEditing = nil;
+        self.t = 0;
+        self:SetScript("OnUpdate", nil);
+        self:HideUI();
+        self:ReleaseElements();
+    end
+
+    function EditorUI.OnEditFocusGained(editBox)
+        EditorUI.isEditing = true;
+        EditorUI:RequestSearchInEditBox();
+    end
+
+    function EditorUI.OnEditFocusLost(editBox)
+        EditorUI.isEditing = nil;
+    end
+
+    function EditorUI.OnTextChanged(editBox, userInput)
+        if userInput then
+            EditorUI:RequestSearchInEditBox(0.5);
+        else
+            EditorUI:RequestSearchInEditBox();
+        end
+    end
+
+    function EditorUI:RequestSearchInEditBox(delay)
+        delay = delay or 0.016;
+        self.t = -delay;
+        self:SetScript("OnUpdate", EditorUI.OnUpdate_EditBox);
+    end
+
+    function EditorUI:OnUpdate_EditBox(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            self:SearchInEditBoxForSupportedCommand();
+        end
+    end
+
+    function EditorUI:HideUI()
+        self.args = {};
+        if self.ExtraFrame then
+            self.ExtraFrame:Hide();
+        end
+        if self.MouseBlocker then
+            self.MouseBlocker:Hide();
+        end
+    end
+
+    function EditorUI:TriggerMouseBlocker()
+        if self.MouseBlocker then
+            self.MouseBlocker:Show();
+            C_Timer.After(0, function()
+            self.MouseBlocker:Hide();
+            end)
+        end
+    end
+
+    function EditorUI:SearchInEditBoxForSupportedCommand()
+        local body = self.SourceEditBox:GetText();
+        local command = match(body, "#plumber:(%w+)");
+        if command and PlumberMacros[command] and self.ExtraFrame and PlumberMacros[command].editorSetupFunc then
+            self.ExtraFrame:Show();
+            PlumberMacros[command].editorSetupFunc(body);
+        else
+            self:HideUI();
+        end
+    end
+
+    function EditorUI:SetFrameHeight(height)
+        if self.ExtraFrame then
+            self.ExtraFrame:SetHeight(height);
+        end
+    end
+
+    function EditorUI:DisplayNote(text)
+        self.Note:SetText(text);
+    end
+
+    function EditorUI:HighlightIconButton(iconButton, colorIndex)
+        if self.HighlightFrame then
+            self.HighlightFrame:Hide();
+            self.HighlightFrame:ClearAllPoints();
+        end
+        if iconButton then
+            self.HighlightFrame:SetParent(iconButton);
+            self.HighlightFrame:SetPoint("TOPLEFT", iconButton.Border, "TOPLEFT", 0, 0);
+            self.HighlightFrame:SetPoint("BOTTOMRIGHT", iconButton.Border, "BOTTOMRIGHT", 0, 0);
+            self.HighlightFrame:Show();
+            self.HighlightFrame:SetFrameLevel(iconButton:GetFrameLevel() + 1);
+
+            if colorIndex == 1 then --Green
+                self.HighlightFrame.Texture:SetTexCoord(416/512, 488/512, 0, 72/512);
+            elseif colorIndex == 2 then --Red
+                self.HighlightFrame.Texture:SetTexCoord(416/512, 488/512, 72/512, 144/512);
+            else --Yellow
+                self.HighlightFrame.Texture:SetTexCoord(344/512, 416/512, 0, 72/512);
+            end
+        end
+    end
+
+    function EditorUI:RaiseIconButtonLevel(iconButton)
+        if self.objectPools.iconButtonPool then
+            local baseFrameLevel = self.ExtraFrame:GetFrameLevel() + 1;
+            for i, object in ipairs(self.objectPools.iconButtonPool.objects) do
+                if object == iconButton then
+                    object:SetFrameLevel(baseFrameLevel + 20);
+                else
+                    object:SetFrameLevel(baseFrameLevel + i);
+                end
+            end
+        end
+    end
+
+    function EditorUI:ReleaseElements()
+        self:DisplayNote(nil);
+        self:HighlightIconButton(nil);
+
+        if self.objectPools then
+            for _, pool in pairs(self.objectPools) do
+                pool:ReleaseAll();
+            end
+        end
+
+        if self.ReorderController then
+            self.ReorderController:Stop();
+        end
+    end
+end
+
+
 if MacroFrame_LoadUI then
     --UPDATE_MACROS fires when selecting any macro, without changing its content, so we update our macro after MarcoFrame is closed
     hooksecurefunc("MacroFrame_LoadUI", function()
-        if not EL.macroFrameHooked then
+        if not EditorUI.macroFrameHooked then
             if MacroFrame then
-                EL.macroFrameHooked = true;
-                MacroFrame:HookScript("OnHide", function()
-                    EL:RequestUpdateMacros();
-                end);
+                EditorUI.macroFrameHooked = true;
+
                 if MacroSaveButton then
                     MacroSaveButton:HookScript("OnClick", function()
                         EL:RequestUpdateMacros();
                     end);
                 end
+
+                if MacroFrameText and MacroFrameText:IsObjectType("EditBox") then
+                    EditorUI.SourceEditBox = MacroFrameText;
+                end
+
+                local f = CreateFrame("Frame", nil, MacroFrame);
+                API.Mixin(f, EditorUI);
+                EditorUI = f;
+                f:OnLoad();
+
+                local ef = API.CreateNewSliceFrame(f, "RoughWideFrame");
+                f.ExtraFrame = ef;
+                ef:Hide();
+                local offsetY = -4;
+                ef:SetPoint("TOPLEFT", MacroFrame, "BOTTOMLEFT", 0, offsetY);
+                ef:SetPoint("TOPRIGHT", MacroFrame, "BOTTOMRIGHT", 0, offsetY);
+                ef:EnableMouse(true);
+
+                f.Note = ef:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+                f.Note:SetJustifyH("CENTER");
+                f.Note:SetTextColor(0.8, 0.8, 0.8);
+                f.Note:SetPoint("LEFT", ef, "LEFT", 16, 0);
+                f.Note:SetPoint("RIGHT", ef, "RIGHT", -16, 0);
+                f.Note:SetSpacing(2);
+
+                f.HighlightFrame = CreateFrame("Frame", nil, ef);
+                f.HighlightFrame.Texture = f.HighlightFrame:CreateTexture(nil, "OVERLAY");
+                f.HighlightFrame.Texture:SetAllPoints(true);
+                f.HighlightFrame:Hide();
+
+                f.MouseBlocker = CreateFrame("Frame", nil, ef);
+                f.MouseBlocker:SetAllPoints(true);
+                f.MouseBlocker:SetFrameLevel(128);
+                f.MouseBlocker:SetFixedFrameLevel(true);
+                f.MouseBlocker:EnableMouse(true);
+
+                f:SetFrameHeight(80);
+                f:RequestSearchInEditBox();
             end
         end
     end);
@@ -482,7 +879,7 @@ do  --MacroInterpreter
                         end
                     end
                     if id and (not icon) then
-                        icon = GetSpellTexture(id);
+                        icon = GetSpellTexture(id) or 134400;
                     end
                     if id and IsPlayerSpell(id) then
                         usable = true;

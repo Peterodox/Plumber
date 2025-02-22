@@ -1,5 +1,6 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="SharedWidgets.lua"/>
+    <Script file="SharedWidgets_ReorderController.lua"/>
 
     <Frame name="PlumberBarPulseTemplate" virtual="true">
         <!--Derivative of Blizzard FullResourcePulseFrame-->
@@ -429,7 +430,7 @@
         </Frames>
     </Button>
 
-    <Button name="PlumberSmallItemButtonTemplate" hidden="true" virtual="true">
+    <Button name="PlumberSmallIconButtonTemplate" virtual="true">
         <Size x="32" y="32"/>
         <Layers>
             <Layer level="BORDER">
@@ -440,8 +441,7 @@
                         <Anchor point="CENTER"/>
                     </Anchors>
                 </Texture>
-                <MaskTexture parentKey="IconMask" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
-                    <Size x="30" y="30"/>
+                <MaskTexture parentKey="IconMask" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Chamfer" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT" x="0" y="0"/>
                         <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
@@ -452,13 +452,19 @@
                 </MaskTexture>
             </Layer>
             <Layer level="ARTWORK">
-                <Texture parentKey="Border" file="Interface\AddOns\Plumber\Art\Button\SmallCircle-Border">
-                    <Size x="64" y="64"/>
+                <Texture parentKey="Border">
+                    <Size x="72" y="72"/>
                     <Anchors>
                         <Anchor point="CENTER"/>
                     </Anchors>
                 </Texture>
             </Layer>
+        </Layers>
+    </Button>
+
+    <Button name="PlumberSmallItemButtonTemplate" inherits="PlumberSmallIconButtonTemplate" hidden="true" virtual="true">
+        <Size x="32" y="32"/>
+        <Layers>
             <Layer level="OVERLAY" textureSubLevel="6">
                 <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
                     <Anchors>

@@ -171,7 +171,8 @@ do
         if #self.widgetPool > 0 then
             widget = table.remove(self.widgetPool);
         else
-            widget = API.CreateNameplateToken(self);
+            local selfDrivenUpdate = true;
+            widget = API.CreateNameplateToken(self, selfDrivenUpdate);
             widget:SetStyle(1);
             API.Mixin(widget, WidgetMixin);
         end

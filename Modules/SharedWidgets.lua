@@ -5468,8 +5468,6 @@ do  --Displayed required items on nameplate widget set
     end
 
     function NameplateTokenMixin:OnLoad()
-        self:SetScript("OnShow", self.OnShow);
-        self:SetScript("OnHide", self.OnHide);
         self:SetScript("OnEnter", self.OnEnter);
         self:SetScript("OnLeave", self.OnLeave);
         self:Release();
@@ -5646,11 +5644,15 @@ do  --Displayed required items on nameplate widget set
         self:EnableMouseMotion(state);
     end
 
-    function API.CreateNameplateToken(parent)
+    function API.CreateNameplateToken(parent, selfDrivenUpdate)
         local f = CreateFrame("Frame", nil, parent, "PlumberSmallItemButtonTemplate");
         Mixin(f, NameplateTokenMixin);
         f:OnLoad();
         f:SetInteractable(true);
+        if selfDrivenUpdate then
+            f:SetScript("OnShow", f.OnShow);
+            f:SetScript("OnHide", f.OnHide);
+        end
         return f
     end
 end
@@ -5727,4 +5729,50 @@ do  --Simple Tooltip (2 FontString)
         return f
     end
     addon.CreateSimpleTooltip = CreateSimpleTooltip;
+end
+
+do  --SliceFrame
+    local NewSliceFrameMixin = {};
+
+    local LayoutInfo = {
+        RoughWideFrame = {
+            file = "Interface/AddOns/Plumber/Art/Frame/MacroForge.png",
+            imageWidth = 512, imageHeight = 512,
+            coords = {0, 264, 0, 72},
+            margins = {8, 8, 8, 8},
+            pixelOffset = 4,
+        };
+    };
+
+    function NewSliceFrameMixin:UpdatePixel()
+        local scale = API.GetPixelForScale(self:GetEffectiveScale());
+        self.Background:SetScale(scale);
+
+        local pixelOffset = self.pixelOffset;
+        local scale = self.Background:GetEffectiveScale()
+        local offset = API.GetPixelForScale(scale, pixelOffset);
+        self.Background:ClearAllPoints();
+        self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
+        self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);
+    end
+
+    function NewSliceFrameMixin:SetLayoutByName(layoutName)
+        local info = LayoutInfo[layoutName];
+        if info then
+            self.Background:SetTexture(info.file);
+            self.Background:SetTexCoord(info.coords[1]/info.imageWidth, info.coords[2]/info.imageWidth, info.coords[3]/info.imageHeight, info.coords[4]/info.imageHeight);
+            self.Background:SetTextureSliceMargins(unpack(info.margins));
+            self.Background.pixelOffset = info.pixelOffset or 0;
+        end
+    end
+
+    function API.CreateNewSliceFrame(parent, layoutName)
+        local f = CreateFrame("Frame", nil, parent);
+        f.Background = f:CreateTexture(nil, "BACKGROUND");
+        f.Background:SetTextureSliceMode(1);    --Tiled
+        API.Mixin(f, NewSliceFrameMixin);
+        f:SetLayoutByName(layoutName);
+        f:UpdatePixel();
+        return f
+    end
 end

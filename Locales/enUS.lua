@@ -336,12 +336,14 @@ L["PlumberMacro DrawerFlag Stuck"] = "Something went wrong when updating the dra
 L["PlumberMacro Error Combat"] = "Unavailable in combat";
 L["PlumberMacro Error NoAction"] = "No supported actions";
 L["Dismiss Battle Pet"] = "Dismiss Battle Pet";
+L["Drag And Drop Item Here"] = "Drag and drop an item here.";
+L["Drag To Reorder"] = "Left click and drag to reorder";
 
 
 --Generic
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Move Vertically";
-L["Reposition Button Tooltip"] = "Left-click and drag to move the window.";
+L["Reposition Button Tooltip"] = "Left click and drag to move the window";
 L["Font Size"] = FONT_SIZE or "Font Size";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Reset To Default Position";
 L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renown ";  --There is a space
