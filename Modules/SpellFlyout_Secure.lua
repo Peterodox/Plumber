@@ -243,7 +243,8 @@ do  --VisualButtonMixin
         self.Icon:SetTexture(action.icon);
         self.actionType = action.actionType;
         self.macroText = action.macroText;
-        self.text = action.text;
+        self.rawMacroText = action.rawMacroText;
+        self.tooltipLineText = action.tooltipLineText;
 
         if self.actionType == "spell" then
             self.tooltipMethod = "SetSpellByID";
@@ -323,7 +324,8 @@ do  --VisualButtonMixin
             self.actionType = nil;
             self.tooltipMethod = nil;
             self.macroText = nil;
-            self.text = nil;
+            self.rawMacroText = nil;
+            self.tooltipLineText = nil;
             self.tooltipText = nil;
             self.isToy = nil;
             if self.Cooldown then

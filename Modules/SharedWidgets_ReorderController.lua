@@ -66,6 +66,7 @@ function ReorderControllerMixin:Stop()
     self.t = 0;
     self.boundaryLeft, self.boundaryRight, self.boundaryTop, self.boundaryBottom = 0, 0, 0, 0;
     self.oldPositionIndex = nil;
+    self.inBoundary = nil;
     self:UnregisterEvent("GLOBAL_MOUSE_UP");
 end
 
@@ -117,7 +118,7 @@ function ReorderControllerMixin:OnUpdate_Dragging(elapsed)
     end
 
     self.t = self.t + elapsed;
-    if self.t > 0.25 then
+    if self.t > 0.20 then
         self.t = 0;
         self:EvaluateObjectPositions();
     end
@@ -165,6 +166,7 @@ function ReorderControllerMixin:DraggingStart()
 end
 
 function ReorderControllerMixin:DraggingEnd()
+    local inBoundary = self.inBoundary;
     self:Stop();
 
     if self.objectPositions then
@@ -173,7 +175,7 @@ function ReorderControllerMixin:DraggingEnd()
     end
 
     if self.onDragEndCallback then
-        self.onDragEndCallback();
+        self.onDragEndCallback(self.draggedObject, not inBoundary);
     end
 end
 
@@ -209,6 +211,10 @@ end
 
 function ReorderControllerMixin:SetObjects(objects)
     self.objects = objects;
+end
+
+function ReorderControllerMixin:SetPlaceholder(placeholder)
+    self.placeholder = placeholder;
 end
 
 function ReorderControllerMixin:SetBoundary(boundary)
@@ -281,6 +287,10 @@ function ReorderControllerMixin:EvaluateObjectPositions()
                 obj.x = relativeLeft + newX + 0.5*obj:GetWidth();
             else
                 obj.x = self.x + self.dx + 0.5 * self.draggedObjectWidth;
+                if self.placeholder then
+                    self.placeholder:ClearAllPoints();
+                    self.placeholder:SetPoint("LEFT", self.relativeTo, self.relativePoint, newX, self.relativeY);
+                end
             end
             obj.targetPosition = newX;
             offsetX = offsetX + obj:GetWidth() + gap;

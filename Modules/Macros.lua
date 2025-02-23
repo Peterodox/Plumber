@@ -24,6 +24,7 @@ local EditMacro = EditMacro;
 local GetActiveAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or API.Nop;
 local FindSpellOverrideByID = FindSpellOverrideByID;
 local GetActionInfo = GetActionInfo;
+local CreateFrame = CreateFrame;
 
 local DoesItemReallyExist = API.DoesItemReallyExist;
 local GetItemIDForItemInfo = C_Item.GetItemIDForItemInfo;
@@ -353,19 +354,38 @@ do  --MacroForge
 
             local IconButtonMixin = {};
 
+            local Placeholder = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
+            Placeholder:Hide();
+            Placeholder:SetSize(32, 32);
+            Placeholder.Border = Placeholder:CreateTexture(nil, "OVERLAY");
+            Placeholder.Border:SetPoint("CENTER", Placeholder, "CENTER", 0, 0);
+            Placeholder.Border:SetTexCoord(272/512, 344/512, 72/512, 144/512);
+            Placeholder.Border:SetTexture(file);
+            Placeholder.Icon = Placeholder:CreateTexture(nil, "OVERLAY");
+            EditorUI:AddRemovableElements(Placeholder);
+            API.DisableSharpening(Placeholder.Border);
+
             local ReorderController = API.CreateDragReorderController(EditorUI.ExtraFrame);
             EditorUI.ReorderController = ReorderController;
 
             ReorderController:SetOnDragStartCallback(function()
                 ReorderController:SetObjects(EditorUI.objectPools.iconButtonPool:GetActiveObjects());
                 EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
+                Placeholder:Show();
+                ReorderController:SetPlaceholder(Placeholder);
             end);
 
-            ReorderController:SetOnDragEndCallback(function()
+            ReorderController:SetOnDragEndCallback(function(draggedObject, delete)
+                Placeholder:Hide();
+
                 --debug
                 local body = "#plumber:drawer";
                 for _, object in ipairs(ReorderController.objects) do
-                    body = body.."\n#"..object.macroText;
+                    if delete and object == draggedObject then
+                        
+                    else
+                        body = body.."\n#"..object.rawMacroText;
+                    end
                 end
 
                 MacroFrameText:SetText(body);
@@ -383,10 +403,12 @@ do  --MacroForge
 
             ReorderController:SetInBoundaryCallback(function()
                 EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
+                Placeholder.Border:SetTexCoord(272/512, 344/512, 72/512, 144/512);
             end);
 
             ReorderController:SetOutBoundaryCallback(function()
                 EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 2);
+                Placeholder.Border:SetTexCoord(344/512, 416/512, 72/512, 144/512);
             end);
 
             function IconButtonMixin:SetEffectiveSize(w)
@@ -394,6 +416,8 @@ do  --MacroForge
                 self.Border:SetSize(w*72/64, w*72/64);
                 self.Icon:SetSize(w*60/64, w*60/64);
             end
+
+            IconButtonMixin.SetEffectiveSize(Placeholder, EditorSetup.itemButtonSize);
 
             local hl = EditorUI.HighlightFrame.Texture;
             hl:SetTexture(file);
@@ -696,6 +720,20 @@ do  --MacroForge
         if self.ReorderController then
             self.ReorderController:Stop();
         end
+
+        if self.otherElements then
+            for _, object in ipairs(self.otherElements) do
+                object:Hide();
+                object:ClearAllPoints();
+            end
+        end
+    end
+
+    function EditorUI:AddRemovableElements(object)
+        if not self.otherElements then
+            self.otherElements = {};
+        end
+        tinsert(self.otherElements, object);
     end
 end
 
@@ -729,6 +767,7 @@ if MacroFrame_LoadUI then
                 ef:SetPoint("TOPLEFT", MacroFrame, "BOTTOMLEFT", 0, offsetY);
                 ef:SetPoint("TOPRIGHT", MacroFrame, "BOTTOMRIGHT", 0, offsetY);
                 ef:EnableMouse(true);
+                ef:SetFrameStrata("HIGH");
 
                 f.Note = ef:CreateFontString(nil, "OVERLAY", "GameFontNormal");
                 f.Note:SetJustifyH("CENTER");
@@ -748,7 +787,7 @@ if MacroFrame_LoadUI then
                 f.MouseBlocker:SetFixedFrameLevel(true);
                 f.MouseBlocker:EnableMouse(true);
 
-                f:SetFrameHeight(80);
+                f:SetFrameHeight(72);
                 f:RequestSearchInEditBox();
             end
         end
@@ -911,12 +950,13 @@ do  --MacroInterpreter
                     end
                     n = n + 1;
                     tbl[n] = {
-                        text = name,
+                        tooltipLineText = name,
                         icon = icon,
                         actionType = actionType,
                         id = id,
                         usable = usable,
                         macroText = macroText,
+                        rawMacroText = line,
                     };
                 end
             end
@@ -935,11 +975,11 @@ do  --MacroInterpreter
             end
 
             for _, info in ipairs(drawerInfo) do
-                if info.text then
+                if info.tooltipLineText then
                     if info.usable then
-                        tooltip:AddLine(info.text, 1, 0.82, 0);
+                        tooltip:AddLine(info.tooltipLineText, 1, 0.82, 0);
                     else
-                        tooltip:AddLine(info.text, 0.6, 0.6, 0.6);
+                        tooltip:AddLine(info.tooltipLineText, 0.6, 0.6, 0.6);
                     end
                 end
             end
