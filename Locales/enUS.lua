@@ -338,6 +338,8 @@ L["PlumberMacro Error NoAction"] = "No supported actions";
 L["Dismiss Battle Pet"] = "Dismiss Battle Pet";
 L["Drag And Drop Item Here"] = "Drag and drop an item here.";
 L["Drag To Reorder"] = "Left click and drag to reorder";
+L["Unsupported Action Type Format"] = "Unsupported action type: %s";
+L["Drawer Add Action Format"] = "Add |cffffffff%s|r";
 
 
 --Generic

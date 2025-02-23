@@ -22,8 +22,10 @@ local GetMacroBody = GetMacroBody;
 local GetMacroInfo = GetMacroInfo;
 local EditMacro = EditMacro;
 local GetActiveAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or API.Nop;
+local GetMountInfoByID = C_MountJournal and C_MountJournal.GetMountInfoByID or API.Nop;
 local FindSpellOverrideByID = FindSpellOverrideByID;
 local GetActionInfo = GetActionInfo;
+local GetCursorInfo = GetCursorInfo;
 local CreateFrame = CreateFrame;
 
 local DoesItemReallyExist = API.DoesItemReallyExist;
@@ -342,7 +344,7 @@ end
 EL:ListenEvents(true);
 
 
-do  --MacroForge
+do  --EditorUI  --MacroForge
     local EditorSetup = {};
 
     EditorSetup.itemButtonSize = 32;
@@ -350,6 +352,8 @@ do  --MacroForge
 
     function EditorSetup.CreateIconButtonPool()
         if not EditorUI.objectPools.iconButtonPool then
+            EditorUI.objectPools.iconButtonPool = {};
+
             local file = "Interface/AddOns/Plumber/Art/Frame/MacroForge.png";
 
             local IconButtonMixin = {};
@@ -378,7 +382,6 @@ do  --MacroForge
             ReorderController:SetOnDragEndCallback(function(draggedObject, delete)
                 Placeholder:Hide();
 
-                --debug
                 local body = "#plumber:drawer";
                 for _, object in ipairs(ReorderController.objects) do
                     if delete and object == draggedObject then
@@ -387,16 +390,7 @@ do  --MacroForge
                         body = body.."\n#"..object.rawMacroText;
                     end
                 end
-
-                MacroFrameText:SetText(body);
-
-                if not InCombatLockdown() then
-                    --MacroFrame:SaveMacro();
-                    local selectedMacroIndex = MacroFrame:GetSelectedIndex();
-                    local actualIndex = MacroFrame:GetMacroDataIndex(selectedMacroIndex);
-                    EditMacro(actualIndex, nil, nil, body);
-                end
-                EL:RequestUpdateMacros(0.0);
+                EditorUI:SaveMacroBody(body);
             end);
 
             ReorderController:SetBoundary(EditorUI.ExtraFrame);
@@ -484,7 +478,7 @@ do  --MacroForge
             SecureSpellFlyout:PopulateButtonMixin(IconButtonMixin);
 
             local function CreateObject()
-                local f = CreateFrame("Button", nil, EditorUI.ExtraFrame, "PlumberSmallIconButtonTemplate");
+                local f = CreateFrame("Button", nil, EditorSetup.IconButtonContainer, "PlumberSmallIconButtonTemplate");
 
                 f.Border:SetTexture(file);
                 f.Border:SetTexCoord(272/512, 344/512, 0, 72/512);
@@ -501,7 +495,154 @@ do  --MacroForge
         return EditorUI.objectPools.iconButtonPool
     end
 
+    local SupportedCursorInfo = {
+        item = {
+            command = "/use",
+            argGetter = function(itemID, itemLink)
+                local name = GetItemNameByID(itemID);
+                return name, "item:"..itemID
+            end
+        },
+
+        spell = {
+            command = "/cast",
+            argGetter = function(spellIndex, bookType, spellID, baseSpellID)
+                local name = GetSpellName(spellID);
+                return name, "spell:"..spellID
+            end
+        },
+
+        battlepet = {
+            command = "/sp",
+            argGetter = function(petGUID)
+                local speciesID, customName, level, xp, maxXp, displayID, favorite, name = C_PetJournal.GetPetInfoByPetID(petGUID);
+                return name, "pet:"..speciesID
+            end
+        },
+
+        mount = {
+            command = "/use",
+            argGetter = function(mountID, mountIndex)
+                local name = GetMountInfoByID(mountID);
+                return name, "mount:"..mountID
+            end
+        },
+    };
+
+    function EditorSetup.drawerOnEvent(self, event, ...)
+        if event == "CURSOR_CHANGED" then
+            local infoType, arg1, arg2, arg3, arg4 = GetCursorInfo();
+
+            if infoType then
+                EditorSetup.ReceptorFrame:Show();
+                EditorSetup.IconButtonContainer:Hide();
+                local receptor = EditorSetup.ReceptorFrame;
+                local info = SupportedCursorInfo[infoType];
+                if info and (arg1 ~= nil) then
+                    receptor.PlusSign:Show();
+                    receptor.Instruction:Hide();
+                    local name, commandArg = info.argGetter(arg1, arg2, arg3, arg4);
+                    local newCommand = string.format("#%s %s", info.command, commandArg);
+
+                    local function Receptor_OnEnter(self)
+                        receptor.PlusSign:Hide();
+                        receptor.Instruction:Show();
+                        receptor.Instruction:SetText(string.format(L["Drawer Add Action Format"], "["..name.."]"));
+                        receptor.Instruction:SetTextColor(1, 0.82, 0);
+                        receptor.newCommand = newCommand;
+                    end
+
+                    local function Receptor_OnLeave(self)
+                        receptor.PlusSign:Show();
+                        receptor.Instruction:Hide();
+                        receptor.newCommand = nil;
+                    end
+
+                    local function Receptor_OnClick(self, button)
+                        if button == "RightButton" then
+                            if not InCombatLockdown() then
+                                ClearCursor();
+                            end
+                            return
+                        end
+
+                        local body = EditorUI.SourceEditBox:GetText();
+                        body = body.."\n"..newCommand;
+                        EditorUI:SaveMacroBody(body);
+                        if not InCombatLockdown() then
+                            ClearCursor();
+                        end
+                    end
+
+                    local function Receptor_OnReceiveDrag(self)
+                        Receptor_OnClick(self, "LeftButton");
+                    end
+
+                    receptor:SetScript("OnEnter", Receptor_OnEnter);
+                    receptor:SetScript("OnLeave", Receptor_OnLeave);
+                    receptor:SetScript("OnClick", Receptor_OnClick);
+                    receptor:SetScript("OnReceiveDrag", Receptor_OnReceiveDrag);
+
+                    if receptor:IsMouseMotionFocus() then
+                        Receptor_OnEnter(receptor);
+                    else
+                        Receptor_OnLeave(receptor);
+                    end
+                else
+                    receptor.PlusSign:Hide();
+                    receptor.Instruction:Show();
+                    receptor.Instruction:SetText(string.format(L["Unsupported Action Type Format"], infoType));
+                    receptor.Instruction:SetTextColor(0.6, 0.6, 0.6);
+                    receptor:SetScript("OnEnter", nil);
+                    receptor:SetScript("OnLeave", nil);
+                    receptor:SetScript("OnClick", nil);
+                    receptor:SetScript("OnReceiveDrag", nil);
+                end
+            else
+                EditorSetup.ReceptorFrame:Hide();
+                EditorSetup.IconButtonContainer:Show();
+            end
+        end
+    end
+
+    function EditorSetup.drawerRecepetor()
+        --drag and drop an item/spell to add it to the drawer
+        if not EditorSetup.IconButtonContainer then
+            local f = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
+            EditorSetup.IconButtonContainer = f;
+            f:SetHeight(72);
+            f:SetPoint("TOPLEFT", EditorUI.ExtraFrame, "TOPLEFT", 0, 0);
+            f:SetPoint("TOPRIGHT", EditorUI.ExtraFrame, "TOPRIGHT", 0, 0);
+        end
+
+        if not EditorSetup.ReceptorFrame then
+            local f = CreateFrame("Button", nil, EditorUI.ExtraFrame);
+            EditorSetup.ReceptorFrame = f;
+            f:SetAllPoints(true);
+            f:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+
+            local PlusSign = f:CreateTexture(nil, "OVERLAY");
+            f.PlusSign = PlusSign;
+            PlusSign:SetSize(32, 32);
+            PlusSign:SetPoint("CENTER", f, "CENTER", 0, 0);
+            PlusSign:SetTexture("Interface/AddOns/Plumber/Art/Frame/MacroForge.png");
+            PlusSign:SetTexCoord(0/512, 64/512, 72/512, 136/512)
+
+            local Instruction = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            f.Instruction = Instruction;
+            Instruction:Hide();
+            Instruction:SetJustifyH("CENTER");
+            Instruction:SetPoint("LEFT", f, "LEFT", 16, 0);
+            Instruction:SetPoint("RIGHT", f, "RIGHT", -16, 0);
+            Instruction:SetSpacing(2);
+        end
+    end
+
     function EditorSetup.drawer(body)
+        EditorSetup.drawerRecepetor();
+        EditorSetup.ReceptorFrame:Hide();
+        EditorSetup.IconButtonContainer:Show();
+
         local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
         if drawerInfo and #drawerInfo > 0 then
             local refresh = false;
@@ -529,7 +670,7 @@ do  --MacroForge
             if refresh then
                 EditorUI:ReleaseElements();
                 local parent = MacroFrame;
-                local container = EditorUI.ExtraFrame;
+                local container = EditorSetup.IconButtonContainer;
                 local pool = EditorSetup.CreateIconButtonPool();
                 local size = EditorSetup.itemButtonSize;
                 local gap = EditorSetup.itemButtonGap;
@@ -552,9 +693,9 @@ do  --MacroForge
                     button:SetPoint("LEFT", container, "LEFT", fromX + (size + gap) * (i - 1), 0);
                 end
 
-                container:ClearAllPoints();
-                container:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -4);
-                container:SetWidth(frameWidth);
+                EditorUI.ExtraFrame:ClearAllPoints();
+                EditorUI.ExtraFrame:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -4);
+                EditorUI.ExtraFrame:SetWidth(frameWidth);
 
                 EditorUI.ReorderController:SetAnchorInfo(container, "LEFT", fromX, 0, EditorSetup.itemButtonGap, 0);
             end
@@ -563,6 +704,8 @@ do  --MacroForge
             EditorUI:DisplayNote(L["Drag And Drop Item Here"]);
         end
         EditorUI.args.drawerInfo = drawerInfo;
+        EditorUI.ExtraFrame:RegisterEvent("CURSOR_CHANGED");
+        EditorUI.ExtraFrame:SetScript("OnEvent", EditorSetup.drawerOnEvent);
     end
     PlumberMacros["drawer"].editorSetupFunc = EditorSetup.drawer;
 
@@ -596,6 +739,7 @@ do  --MacroForge
         self.isEditing = nil;
         self.t = 0;
         self:SetScript("OnUpdate", nil);
+        self:SetScript("OnEvent", nil);
         self:HideUI();
         self:ReleaseElements();
     end
@@ -735,6 +879,17 @@ do  --MacroForge
         end
         tinsert(self.otherElements, object);
     end
+
+    function EditorUI:SaveMacroBody(body)
+        EditorUI.SourceEditBox:SetText(body);
+        if not InCombatLockdown() then
+            --MacroFrame:SaveMacro();
+            local selectedMacroIndex = MacroFrame:GetSelectedIndex();
+            local actualIndex = MacroFrame:GetMacroDataIndex(selectedMacroIndex);
+            EditMacro(actualIndex, nil, nil, body);
+        end
+        EL:RequestUpdateMacros(0.0);
+    end
 end
 
 
@@ -763,6 +918,9 @@ if MacroFrame_LoadUI then
                 local ef = API.CreateNewSliceFrame(f, "RoughWideFrame");
                 f.ExtraFrame = ef;
                 ef:Hide();
+                ef:SetScript("OnHide", function()
+                    ef:UnregisterAllEvents();
+                end);
                 local offsetY = -4;
                 ef:SetPoint("TOPLEFT", MacroFrame, "BOTTOMLEFT", 0, offsetY);
                 ef:SetPoint("TOPRIGHT", MacroFrame, "BOTTOMRIGHT", 0, offsetY);
@@ -816,6 +974,7 @@ do  --MacroInterpreter
         ["(/randomfavoritepet)"] = "SetRandomFavoritePet",
         ["(/randompet)"] = "SetRandomPet",
         ["/summonpet%s+(.+)"] = "SetSummonPet",
+        ["/sp%s+(.+)"] = "SetSummonPet",
         ["(/dismisspet)"] = "SetDismissPet",
         ["/emote%s+(.+)"] = "SetCustomEmote",
         ["/e%s+(.+)"] = "SetCustomEmote",
@@ -857,6 +1016,18 @@ do  --MacroInterpreter
             id = nil;
             icon = nil;
             macroText = nil;
+
+            if not processed then
+                local mountID = match(line, "/use%s+mount:(%d+)");
+                if not mountID then
+                    mountID = match(line, "/cast%s+mount:(%d+)");
+                end
+                if mountID then
+                    processed = true;
+                    actionType = "mount";
+                    id = tonumber(mountID);
+                end
+            end
 
             if not processed then
                 id = match(line, "/cast%s+spell:(%d+)");
@@ -938,6 +1109,14 @@ do  --MacroInterpreter
                     if name then
                         macroText = "/use "..name;
                     end
+                elseif actionType == "mount" then
+                    local  _name, _spellID, _icon, _isActive, _isUsable, _sourceType, _isFavorite, _isFactionSpecific, _faction, _shouldHideOnChar, _isCollected = GetMountInfoByID(id);
+                    icon = _icon;
+                    usable = _isCollected;
+                    name = _name;
+                    macroText = _name and gsub(line, "mount:%d+", _name) or line;
+                    actionType = "spell";
+                    id = _spellID;
                 else
                     name = line;
                     macroText = line;
