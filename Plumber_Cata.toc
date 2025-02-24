@@ -1,6 +1,6 @@
 ## X-Flavor: classic
 ## Interface: 40401, 40402
-## Version: 1.6.1
+## Version: 1.6.2
 
 ## Title: Plumber
 
