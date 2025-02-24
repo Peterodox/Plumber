@@ -2733,7 +2733,42 @@ do  -- Slash Commands
     end
 end
 
+do  -- Macro Util
+    local WoWAPI = {
+        IsSpellKnown = IsSpellKnownOrOverridesKnown or IsSpellKnown or IsPlayerSpell,
+        PlayerHasToy = PlayerHasToy or Nop,
+        GetItemCount = C_Item.GetItemCount,
+        GetItemCraftedQualityByItemInfo = C_TradeSkillUI and C_TradeSkillUI.GetItemCraftedQualityByItemInfo or Nop,
+        GetItemReagentQualityByItemInfo = C_TradeSkillUI and C_TradeSkillUI.GetItemReagentQualityByItemInfo or Nop,
+        IsConsumableItem = C_Item.IsConsumableItem or Nop,
+    };
 
+    function API.CanPlayerPerformAction(actionType, arg1, arg2)
+        if actionType == "spell" then
+            return WoWAPI.IsSpellKnown(arg1);
+        elseif actionType == "item" then
+            if API.IsToyItem(arg1) then
+                return WoWAPI.PlayerHasToy(arg1)
+            elseif WoWAPI.IsConsumableItem(arg1) then
+                --always return true for conumable items in case player needs to restock
+                return true
+            else
+                local count = WoWAPI.GetItemCount(arg1, true, true, true, true);
+                return count > 0
+            end
+        end
+
+        return true     --always return true for unrecognized action
+    end
+
+    function API.GetItemCraftingQuality(item)
+        local quality = WoWAPI.GetItemCraftedQualityByItemInfo(item);
+        if not quality then
+            quality = WoWAPI.GetItemReagentQualityByItemInfo(item);
+        end
+        return quality
+    end
+end
 
 
 --[[

@@ -1,6 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local CallbackRegistry = addon.CallbackRegistry;
 
 local tinsert = table.insert;
 local InCombatLockdown = InCombatLockdown;
@@ -9,6 +10,7 @@ local CreateFrame = CreateFrame;
 local GetCVarBool = C_CVar.GetCVarBool;
 local GetItemCount = C_Item.GetItemCount;
 local PlayerHasToy = PlayerHasToy or API.Nop;
+local GetItemCraftingQuality = API.GetItemCraftingQuality;
 local find = string.find;
 local gsub = string.gsub;
 local UIParent = UIParent;
@@ -37,6 +39,13 @@ end
 
 --Flyout Cursor OffsetX = 24.0
 --Flyout Cursor OffsetY = 26.0
+
+
+-- User Settings
+local CLOSE_AFTER_CLICK = true;
+local GRID_LAYOUT = true;           --Multi-row
+local MAX_BUTTON_PER_ROW = 4;
+------------------
 
 
 do --SpellFlyout Main
@@ -156,8 +165,9 @@ do --SpellFlyout Main
         if actions and #actions > 0 then
             local buttonSize = ACTION_BUTTON_SIZE;
             local gap = 2;
-            local h, v = 0, 1;
+            local h, v = 0, 0;
             local level = 9;
+            local n = 0;
             local action;
             local anySpell, anyItem;
 
@@ -165,10 +175,21 @@ do --SpellFlyout Main
                 button:ClearAction();
                 action = actions[index];
                 if action then
-                    button:SetAction(action);
-                    button:SetPoint("LEFT", self, "LEFT", gap + h * (buttonSize + gap), 0);
-                    button:SetFrameLevel(level);
+                    n = n + 1;
                     h = h + 1;
+
+                    if GRID_LAYOUT then
+                        if h > MAX_BUTTON_PER_ROW then
+                            h = 1;
+                            v = v + 1;
+                        end
+                    end
+
+                    button:SetAction(action);
+                    button:SetButtonState("NORMAL");
+                    button:SetPoint("TOPLEFT", self, "TOPLEFT", gap + (h - 1) * (buttonSize + gap), -gap - v * (buttonSize + gap));
+                    button:SetFrameLevel(level);
+
                     if action.actionType == "spell" then
                         anySpell = true;
                         tinsert(self.SpellButtons, button);
@@ -179,7 +200,11 @@ do --SpellFlyout Main
                 end
             end
 
-            self:SetSize(h * (buttonSize + gap) + gap, v * (buttonSize + gap) + gap);
+            if v > 0 then
+                h = MAX_BUTTON_PER_ROW;
+            end
+
+            self:SetSize(h * (buttonSize + gap) + gap, (v + 1) * (buttonSize + gap) + gap);
 
             local x, y = API.GetScaledCursorPositionForFrame(self);
             self:ClearAllPoints();
@@ -226,6 +251,8 @@ do  --VisualButtonMixin
         self.PushedTexture:SetTexCoord(96/512, 192/512, 48/512, 144/512);
         self.HighlightTexture:SetTexture(file);
         self.HighlightTexture:SetTexCoord(192/512, 288/512, 48/512, 144/512);
+        self.IconOverlay:SetTexture(file);
+        self.IconOverlay:SetTexCoord(0/512, 48/512, 144/512, 192/512);
 
         self.NormalTexture:SetDrawLayer("OVERLAY");
         self.PushedTexture:SetDrawLayer("OVERLAY");
@@ -251,6 +278,7 @@ do  --VisualButtonMixin
             if not IsPlayerSpell(self.id) then
                 self:SetUsableVisual(false);
             end
+
         elseif self.actionType == "item" then
             if API.IsToyItem(self.id) then
                 self.isToy = true;
@@ -258,6 +286,9 @@ do  --VisualButtonMixin
             else
                 self.tooltipMethod = "SetItemByID";
             end
+            local craftingQuality = GetItemCraftingQuality(self.id);
+            self:SetCraftingQuality(craftingQuality);
+
         elseif self[action.actionType] then
             self[action.actionType](self, action.id);
         end
@@ -285,6 +316,28 @@ do  --VisualButtonMixin
         else
             self.Icon:SetVertexColor(0.8, 0.8, 0.8);
             self.Icon:SetDesaturated(true);
+        end
+    end
+
+    function VisualButtonMixin:SetCraftingQuality(quality)
+        if quality then
+            self.IconOverlay:Show();
+            if quality == 1 then
+                self.IconOverlay:SetTexCoord(0/512, 48/512, 144/512, 192/512);
+            elseif quality == 2 then
+                self.IconOverlay:SetTexCoord(48/512, 96/512, 144/512, 192/512);
+            elseif quality == 3 then
+                self.IconOverlay:SetTexCoord(96/512, 144/512, 144/512, 192/512);
+            elseif quality == 4 then
+                self.IconOverlay:SetTexCoord(144/512, 192/512, 144/512, 192/512);
+            elseif quality == 5 then
+                self.IconOverlay:SetTexCoord(192/512, 240/512, 144/512, 192/512);
+            else
+                self.IconOverlay:Hide();
+                return
+            end
+        else
+            self.IconOverlay:Hide();
         end
     end
 
@@ -336,6 +389,7 @@ do  --VisualButtonMixin
                 self.Count:SetText(nil);
             end
             self:SetUsableVisual(true);
+            self:SetCraftingQuality(nil);
         end
     end
 
@@ -346,6 +400,7 @@ do  --VisualButtonMixin
         self.NormalTexture:SetSize(48 * s, 48 * s);
         self.PushedTexture:SetSize(48 * s, 48 * s);
         self.HighlightTexture:SetSize(48 * s, 48 * s);
+        self.IconOverlay:SetSize(24 * s, 24 * s);
     end
 
     function VisualButtonMixin:IsDataCached()
@@ -445,7 +500,7 @@ SetupClampedFrame(ActionButtonContainer);
 
 
 local SecureControllerPool = {};
-do
+do  --SecureControllerPool
     local VIRTUAL_BUTTON_NAME = "PLMR";
 
     SecureControllerPool.clickHandlers = {};
@@ -463,19 +518,24 @@ do
         end
     end
 
+    function SecureControllerPool:CreateClickHandler(id)
+        local name = VIRTUAL_BUTTON_NAME..id;
+        local handler = CreateFrame("Button", name, UIParent, "SecureHandlerClickTemplate");
+        handler:Hide();
+        handler:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0);
+        handler:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0);
+        self:SetupHandler(handler);
+        handler:SetID(id);
+        return handler
+    end
+
     function SecureControllerPool:AcquireClickHandler()
         local handler;
         if self.numIdleHandlers == 0 then
             self.numHandlers = self.numHandlers + 1;
             local id = self.numHandlers;
-            local name = VIRTUAL_BUTTON_NAME..self.numHandlers;
-            handler = CreateFrame("Button", name, UIParent, "SecureHandlerClickTemplate");
+            handler = self:CreateClickHandler(id);
             self.clickHandlers[id] = handler;
-            handler:Hide();
-            handler:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0);
-            handler:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0);
-            self:SetupHandler(handler);
-            handler:SetID(id);
         else
             handler = self.clickHandlers[self.numIdleHandlers];
             self.numIdleHandlers = self.numIdleHandlers - 1;
@@ -491,7 +551,7 @@ do
         ActionButtonPool:AddFrameRef(handler);  --SetFrameRef("SecureButton")
     end
 
-    local HANDLER_ONCLICK = string.format([=[
+    local HANDLER_ONCLICK_FORMAT = [=[
         local frame = self:GetFrameRef("MainFrame");
         local handlerID = self:GetID();
         local show = (not frame:IsShown()) or (handlerID ~= frame:GetID());
@@ -514,8 +574,12 @@ do
                 end
 
                 local numButtons = 0;
-                local buttonSize = %d;
+                local buttonSize = %s;
+                local useGridLayout = %s;
+                local maxButtonPerRow = %s;
                 local gap = 2;
+                local h = 0;
+                local v = 0;
 
                 for i = 1, numActions do
                     button = self:GetFrameRef("SecureButton"..i);
@@ -526,17 +590,28 @@ do
                         button:SetAttribute("macrotext", macroText);
                         button:SetFrameLevel(10);
                         button:ClearAllPoints();
-                        button:SetPoint("BOTTOMLEFT", ActionButtonContainer, "BOTTOMLEFT", gap + (i - 1) * (buttonSize + gap), 2);
+                        h = h + 1;
+                        if useGridLayout then
+                            if h > maxButtonPerRow then
+                                h = 1;
+                                v = v + 1;
+                            end
+                        end
+                        button:SetPoint("TOPLEFT", ActionButtonContainer, "TOPLEFT", gap + (h - 1) * (buttonSize + gap), -gap - v * (buttonSize + gap));
                         button:Show();
                     end
+                end
+
+                if v > 0 then
+                    h = maxButtonPerRow;
                 end
 
                 local x = uiWidth * xRatio;
                 local y = uiHeight * yRatio;
 
                 ActionButtonContainer:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 24.0, y + 26.0);
-                ActionButtonContainer:SetWidth(numButtons * (buttonSize + 2) + 2);
-                ActionButtonContainer:SetHeight(1 * (buttonSize + 2) + 2);
+                ActionButtonContainer:SetWidth(h * (buttonSize + gap) + gap);
+                ActionButtonContainer:SetHeight((v + 1) * (buttonSize + gap) + gap);
                 --ActionButtonContainer:RegisterAutoHide(2);
                 frame:Show();
                 ActionButtonContainer:Show();
@@ -544,16 +619,27 @@ do
         else
             frame:Hide();
         end
-    ]=], ACTION_BUTTON_SIZE);
+    ]=];
+
+    local HANDLER_ONCLICK = HANDLER_ONCLICK_FORMAT:format(ACTION_BUTTON_SIZE, tostring(GRID_LAYOUT), MAX_BUTTON_PER_ROW);
 
     function SecureControllerPool:AddActions(actions)
         local handler = self:AcquireClickHandler();
         local handlerName = handler:GetName();
         handler:SetAttribute("numActions", #actions);
 
-        for i, action in ipairs(actions) do
-            handler:SetAttribute("customMacroText"..i, action.macroText);
+        if CLOSE_AFTER_CLICK then
+            local closeFlyoutMacro = self:GetCloseFlyoutMacro();
+            closeFlyoutMacro = "\n"..closeFlyoutMacro;
+            for i, action in ipairs(actions) do
+                handler:SetAttribute("customMacroText"..i, (action.macroText or "")..closeFlyoutMacro);
+            end
+        else
+            for i, action in ipairs(actions) do
+                handler:SetAttribute("customMacroText"..i, action.macroText);
+            end
         end
+
 
         handler:SetScript("PreClick", function()
             SpellFlyout:ShowActions(actions);
@@ -566,6 +652,23 @@ do
 
         return handlerName
     end
+
+    function SecureControllerPool:GetCloseFlyoutMacro()
+        --We create a ClickHandler that closes the SecureRootContainer
+        --This handler will not be reused/released by other drawer macro
+        if not self.CloseFrameClickHandler then
+            local id = 0;
+            local handler = self:CreateClickHandler(id);
+            self.CloseFrameClickHandler = handler;
+            handler:SetAttribute("_onclick", [==[
+                local frame = self:GetFrameRef("MainFrame");
+                frame:Hide();
+            ]==]);
+            self.clickToCloseMacro = "/click "..handler:GetName();
+        end
+        return self.clickToCloseMacro
+    end
+
 
     function SpellFlyout:ReleaseClickHandlers()
         SecureControllerPool:ReleaseClickHandlers();
@@ -639,4 +742,10 @@ do  --SecureHandler
     end
 
     ActionButtonPool:InitButtons(16);   --255/16
+end
+
+do  --Settings Registry
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_CloseAfterClick", function(state)
+        CLOSE_AFTER_CLICK = state;
+    end);
 end

@@ -165,6 +165,10 @@ local DefaultValues = {
         QuickSlotHighContrastMode = false,
 
 
+    --SpellFlyout DrawerMacro
+        SpellFlyout_CloseAfterClick = false,
+
+
     EnableNewByDefault = false,             --Always enable newly added features
 
 

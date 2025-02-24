@@ -8,12 +8,14 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local CallbackRegistry = addon.CallbackRegistry;
 --local SpellFlyout = addon.SpellFlyout;  --Unused, Insecure
 local SecureSpellFlyout = addon.SecureSpellFlyout;
 
 local find = string.find;
 local match = string.match;
 local gsub = string.gsub;
+local format = string.format;
 local tinsert = table.insert;
 local ipairs = ipairs;
 local strlenutf8 = strlenutf8;
@@ -38,11 +40,13 @@ local GetSpellName = C_Spell.GetSpellName;
 local GetSpellTexture = C_Spell.GetSpellTexture;
 local GetSpellInfo = C_Spell.GetSpellInfo;
 local IsPlayerSpell = IsPlayerSpell;
+local CanPlayerPerformAction = API.CanPlayerPerformAction;
+local GetItemCraftingQuality = API.GetItemCraftingQuality;
 
 
 local MacroInterpreter = {};    --Add info to tooltip
 local EditorUI = {};            --Attach to MacroFrame once it loaded
-
+local EditorSetup = {};         --Setup the editor when viewing supported Plumber Macro
 
 local ModifyType = {
     None = 0,
@@ -282,9 +286,11 @@ function EL:UpdateDrawers()
     if drawers and #drawers > 0 then
         local name, icon, body, drawerInfo;
         local handlerName;
+        local checkUsability = true;
+        local ignoreUnsable = true;
         for _, macroIndex in ipairs(drawers) do
             name, icon, body = GetMacroInfo(macroIndex);
-            drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+            drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, ignoreUnsable);
             if drawerInfo then
                 handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
                 if handlerName then
@@ -345,371 +351,6 @@ EL:ListenEvents(true);
 
 
 do  --EditorUI  --MacroForge
-    local EditorSetup = {};
-
-    EditorSetup.itemButtonSize = 32;
-    EditorSetup.itemButtonGap = 4;
-
-    function EditorSetup.CreateIconButtonPool()
-        if not EditorUI.objectPools.iconButtonPool then
-            EditorUI.objectPools.iconButtonPool = {};
-
-            local file = "Interface/AddOns/Plumber/Art/Frame/MacroForge.png";
-
-            local IconButtonMixin = {};
-
-            local Placeholder = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
-            Placeholder:Hide();
-            Placeholder:SetSize(32, 32);
-            Placeholder.Border = Placeholder:CreateTexture(nil, "OVERLAY");
-            Placeholder.Border:SetPoint("CENTER", Placeholder, "CENTER", 0, 0);
-            Placeholder.Border:SetTexCoord(272/512, 344/512, 72/512, 144/512);
-            Placeholder.Border:SetTexture(file);
-            Placeholder.Icon = Placeholder:CreateTexture(nil, "OVERLAY");
-            EditorUI:AddRemovableElements(Placeholder);
-            API.DisableSharpening(Placeholder.Border);
-
-            local ReorderController = API.CreateDragReorderController(EditorUI.ExtraFrame);
-            EditorUI.ReorderController = ReorderController;
-
-            ReorderController:SetOnDragStartCallback(function()
-                ReorderController:SetObjects(EditorUI.objectPools.iconButtonPool:GetActiveObjects());
-                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
-                Placeholder:Show();
-                ReorderController:SetPlaceholder(Placeholder);
-            end);
-
-            ReorderController:SetOnDragEndCallback(function(draggedObject, delete)
-                Placeholder:Hide();
-
-                local body = "#plumber:drawer";
-                for _, object in ipairs(ReorderController.objects) do
-                    if delete and object == draggedObject then
-                        
-                    else
-                        body = body.."\n#"..object.rawMacroText;
-                    end
-                end
-                EditorUI:SaveMacroBody(body);
-            end);
-
-            ReorderController:SetBoundary(EditorUI.ExtraFrame);
-
-            ReorderController:SetInBoundaryCallback(function()
-                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
-                Placeholder.Border:SetTexCoord(272/512, 344/512, 72/512, 144/512);
-            end);
-
-            ReorderController:SetOutBoundaryCallback(function()
-                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 2);
-                Placeholder.Border:SetTexCoord(344/512, 416/512, 72/512, 144/512);
-            end);
-
-            function IconButtonMixin:SetEffectiveSize(w)
-                self:SetSize(w, w);
-                self.Border:SetSize(w*72/64, w*72/64);
-                self.Icon:SetSize(w*60/64, w*60/64);
-            end
-
-            IconButtonMixin.SetEffectiveSize(Placeholder, EditorSetup.itemButtonSize);
-
-            local hl = EditorUI.HighlightFrame.Texture;
-            hl:SetTexture(file);
-            hl:SetTexCoord(344/512, 416/512, 0, 72/512);
-            API.DisableSharpening(hl);
-
-            function IconButtonMixin:OnEnter()
-                if ReorderController:IsDraggingObject() then
-                    return
-                end
-
-                EditorUI:HighlightIconButton(self);
-                if self:ShowTooltip() then
-                    local tooltip = GameTooltip;
-                    if self.tooltipMethod then
-                        tooltip:AddLine(" ");
-                    end
-                    tooltip:AddLine("<"..L["Drag To Reorder"]..">", 0.1, 1, 0.1, true);
-                    tooltip:Show();
-
-                    if self:IsDataCached() then
-                        self.UpdateTooltip = nil;
-                    else
-                        self.UpdateTooltip = self.OnEnter;
-                    end
-                end
-            end
-
-            function IconButtonMixin:OnLeave()
-                GameTooltip:Hide();
-                if ReorderController:IsDraggingObject() then
-                    return
-                end
-                EditorUI:HighlightIconButton(nil);
-            end
-
-            function IconButtonMixin:OnMouseDown(mouseButton)
-                if mouseButton == "LeftButton" then
-                    ReorderController:SetDraggedObject(self);
-                    ReorderController:PreDragStart();
-                    EditorUI:RaiseIconButtonLevel(self);
-                    GameTooltip:Hide();
-                end
-            end
-
-            function IconButtonMixin:OnMouseUp()
-                if ReorderController:IsDraggingObject() then
-                    EditorUI:TriggerMouseBlocker();
-                end
-                ReorderController:OnMouseUp();
-            end
-
-            function IconButtonMixin:OnLoad()
-                self:SetScript("OnEnter", self.OnEnter);
-                self:SetScript("OnLeave", self.OnLeave);
-                self:SetScript("OnMouseDown", self.OnMouseDown);
-                self:SetScript("OnMouseUp", self.OnMouseUp);
-            end
-
-            function IconButtonMixin:OnRemoved()
-               self:ClearAction();
-            end
-
-            SecureSpellFlyout:PopulateButtonMixin(IconButtonMixin);
-
-            local function CreateObject()
-                local f = CreateFrame("Button", nil, EditorSetup.IconButtonContainer, "PlumberSmallIconButtonTemplate");
-
-                f.Border:SetTexture(file);
-                f.Border:SetTexCoord(272/512, 344/512, 0, 72/512);
-                API.DisableSharpening(f.Border);
-
-                API.Mixin(f, IconButtonMixin);
-                f:OnLoad();
-                f:SetEffectiveSize(EditorSetup.itemButtonSize);
-
-                return f
-            end
-            EditorUI.objectPools.iconButtonPool = API.CreateObjectPool(CreateObject);
-        end
-        return EditorUI.objectPools.iconButtonPool
-    end
-
-    local SupportedCursorInfo = {
-        item = {
-            command = "/use",
-            argGetter = function(itemID, itemLink)
-                local name = GetItemNameByID(itemID);
-                return name, "item:"..itemID
-            end
-        },
-
-        spell = {
-            command = "/cast",
-            argGetter = function(spellIndex, bookType, spellID, baseSpellID)
-                local name = GetSpellName(spellID);
-                return name, "spell:"..spellID
-            end
-        },
-
-        battlepet = {
-            command = "/sp",
-            argGetter = function(petGUID)
-                local speciesID, customName, level, xp, maxXp, displayID, favorite, name = C_PetJournal.GetPetInfoByPetID(petGUID);
-                return name, "pet:"..speciesID
-            end
-        },
-
-        mount = {
-            command = "/use",
-            argGetter = function(mountID, mountIndex)
-                local name = GetMountInfoByID(mountID);
-                return name, "mount:"..mountID
-            end
-        },
-    };
-
-    function EditorSetup.drawerOnEvent(self, event, ...)
-        if event == "CURSOR_CHANGED" then
-            local infoType, arg1, arg2, arg3, arg4 = GetCursorInfo();
-
-            if infoType then
-                EditorSetup.ReceptorFrame:Show();
-                EditorSetup.IconButtonContainer:Hide();
-                local receptor = EditorSetup.ReceptorFrame;
-                local info = SupportedCursorInfo[infoType];
-                if info and (arg1 ~= nil) then
-                    receptor.PlusSign:Show();
-                    receptor.Instruction:Hide();
-                    local name, commandArg = info.argGetter(arg1, arg2, arg3, arg4);
-                    local newCommand = string.format("#%s %s", info.command, commandArg);
-
-                    local function Receptor_OnEnter(self)
-                        receptor.PlusSign:Hide();
-                        receptor.Instruction:Show();
-                        receptor.Instruction:SetText(string.format(L["Drawer Add Action Format"], "["..name.."]"));
-                        receptor.Instruction:SetTextColor(1, 0.82, 0);
-                        receptor.newCommand = newCommand;
-                    end
-
-                    local function Receptor_OnLeave(self)
-                        receptor.PlusSign:Show();
-                        receptor.Instruction:Hide();
-                        receptor.newCommand = nil;
-                    end
-
-                    local function Receptor_OnClick(self, button)
-                        if button == "RightButton" then
-                            if not InCombatLockdown() then
-                                ClearCursor();
-                            end
-                            return
-                        end
-
-                        local body = EditorUI.SourceEditBox:GetText();
-                        body = body.."\n"..newCommand;
-                        EditorUI:SaveMacroBody(body);
-                        if not InCombatLockdown() then
-                            ClearCursor();
-                        end
-                    end
-
-                    local function Receptor_OnReceiveDrag(self)
-                        Receptor_OnClick(self, "LeftButton");
-                    end
-
-                    receptor:SetScript("OnEnter", Receptor_OnEnter);
-                    receptor:SetScript("OnLeave", Receptor_OnLeave);
-                    receptor:SetScript("OnClick", Receptor_OnClick);
-                    receptor:SetScript("OnReceiveDrag", Receptor_OnReceiveDrag);
-
-                    if receptor:IsMouseMotionFocus() then
-                        Receptor_OnEnter(receptor);
-                    else
-                        Receptor_OnLeave(receptor);
-                    end
-                else
-                    receptor.PlusSign:Hide();
-                    receptor.Instruction:Show();
-                    receptor.Instruction:SetText(string.format(L["Unsupported Action Type Format"], infoType));
-                    receptor.Instruction:SetTextColor(0.6, 0.6, 0.6);
-                    receptor:SetScript("OnEnter", nil);
-                    receptor:SetScript("OnLeave", nil);
-                    receptor:SetScript("OnClick", nil);
-                    receptor:SetScript("OnReceiveDrag", nil);
-                end
-            else
-                EditorSetup.ReceptorFrame:Hide();
-                EditorSetup.IconButtonContainer:Show();
-            end
-        end
-    end
-
-    function EditorSetup.drawerRecepetor()
-        --drag and drop an item/spell to add it to the drawer
-        if not EditorSetup.IconButtonContainer then
-            local f = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
-            EditorSetup.IconButtonContainer = f;
-            f:SetHeight(72);
-            f:SetPoint("TOPLEFT", EditorUI.ExtraFrame, "TOPLEFT", 0, 0);
-            f:SetPoint("TOPRIGHT", EditorUI.ExtraFrame, "TOPRIGHT", 0, 0);
-        end
-
-        if not EditorSetup.ReceptorFrame then
-            local f = CreateFrame("Button", nil, EditorUI.ExtraFrame);
-            EditorSetup.ReceptorFrame = f;
-            f:SetAllPoints(true);
-            f:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-
-            local PlusSign = f:CreateTexture(nil, "OVERLAY");
-            f.PlusSign = PlusSign;
-            PlusSign:SetSize(32, 32);
-            PlusSign:SetPoint("CENTER", f, "CENTER", 0, 0);
-            PlusSign:SetTexture("Interface/AddOns/Plumber/Art/Frame/MacroForge.png");
-            PlusSign:SetTexCoord(0/512, 64/512, 72/512, 136/512)
-
-            local Instruction = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            f.Instruction = Instruction;
-            Instruction:Hide();
-            Instruction:SetJustifyH("CENTER");
-            Instruction:SetPoint("LEFT", f, "LEFT", 16, 0);
-            Instruction:SetPoint("RIGHT", f, "RIGHT", -16, 0);
-            Instruction:SetSpacing(2);
-        end
-    end
-
-    function EditorSetup.drawer(body)
-        EditorSetup.drawerRecepetor();
-        EditorSetup.ReceptorFrame:Hide();
-        EditorSetup.IconButtonContainer:Show();
-
-        local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
-        if drawerInfo and #drawerInfo > 0 then
-            local refresh = false;
-
-            if EditorUI.args.type ~= "drawer" then
-                EditorUI.args.type = "drawer";
-                refresh = true;
-            else
-                if EditorUI.args.drawerInfo then
-                    if #EditorUI.args.drawerInfo == #drawerInfo then
-                        for i, info in ipairs(EditorUI.args.drawerInfo) do
-                            if (info.actionType ~= drawerInfo[i].actionType) or (info.id ~= drawerInfo[i].id) then
-                                refresh = true;
-                                break
-                            end
-                        end
-                    else
-                        refresh = true;
-                    end
-                else
-                    refresh = true;
-                end
-            end
-
-            if refresh then
-                EditorUI:ReleaseElements();
-                local parent = MacroFrame;
-                local container = EditorSetup.IconButtonContainer;
-                local pool = EditorSetup.CreateIconButtonPool();
-                local size = EditorSetup.itemButtonSize;
-                local gap = EditorSetup.itemButtonGap;
-                local frameWidth = parent:GetWidth();
-                local span = #drawerInfo * (size + gap) - gap;
-                local requiredWidth = span + 48;
-                if requiredWidth > frameWidth then
-                    frameWidth = requiredWidth;
-                end
-                local fromX = 0.5*(frameWidth - span);
-                local button;
-                local baseFrameLevel = container:GetFrameLevel();
-
-                for i, info in ipairs(drawerInfo) do
-                    button = pool:Acquire();
-                    button.index = i;
-                    button:SetFrameLevel(baseFrameLevel + i);
-                    button:Show();
-                    button:SetAction(info);
-                    button:SetPoint("LEFT", container, "LEFT", fromX + (size + gap) * (i - 1), 0);
-                end
-
-                EditorUI.ExtraFrame:ClearAllPoints();
-                EditorUI.ExtraFrame:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -4);
-                EditorUI.ExtraFrame:SetWidth(frameWidth);
-
-                EditorUI.ReorderController:SetAnchorInfo(container, "LEFT", fromX, 0, EditorSetup.itemButtonGap, 0);
-            end
-        else
-            EditorUI:ReleaseElements();
-            EditorUI:DisplayNote(L["Drag And Drop Item Here"]);
-        end
-        EditorUI.args.drawerInfo = drawerInfo;
-        EditorUI.ExtraFrame:RegisterEvent("CURSOR_CHANGED");
-        EditorUI.ExtraFrame:SetScript("OnEvent", EditorSetup.drawerOnEvent);
-    end
-    PlumberMacros["drawer"].editorSetupFunc = EditorSetup.drawer;
-
-
     function EditorUI:OnLoad()
         self.OnLoad = nil;
 
@@ -1003,11 +644,11 @@ do  --MacroInterpreter
         end
     end
 
-    function MacroInterpreter:GetDrawerInfo(body)
+    function MacroInterpreter:GetDrawerInfo(body, checkUsability, ignoreUnsable)
         local tbl;
         local n = 0;
         local processed, usable;
-        local name, icon, actionType, id, macroText;
+        local name, icon, actionType, id, macroText, craftingQuality;
 
         for line in string.gmatch(body, "#(/[^\n]+)") do
             processed = false;
@@ -1105,9 +746,14 @@ do  --MacroInterpreter
                         name = GetItemNameByID(id);
                         icon = GetItemIconByID(id);
                         usable = true;
-                    end
-                    if name then
-                        macroText = "/use "..name;
+                        macroText = format("/use \"item:%d\"", id);
+                        craftingQuality = GetItemCraftingQuality(id);
+                        if name and craftingQuality then
+                            name = format("%s T%s", name, craftingQuality);
+                            --name = format("%s|A:Professions-ChatIcon-Quality-Tier%s:0:0|a", name, craftingQuality);
+                            --local markup = CreateAtlasMarkupWithAtlasSize("Professions-ChatIcon-Quality-Tier"..craftingQuality, 0, 0, nil, nil, nil, 0.5)
+                            --name = name..markup
+                        end
                     end
                 elseif actionType == "mount" then
                     local  _name, _spellID, _icon, _isActive, _isUsable, _sourceType, _isFavorite, _isFactionSpecific, _faction, _shouldHideOnChar, _isCollected = GetMountInfoByID(id);
@@ -1123,10 +769,22 @@ do  --MacroInterpreter
                     usable = true;
                 end
 
+                if checkUsability and id then
+                    if not CanPlayerPerformAction(actionType, id) then
+                        --id = nil;
+                        usable = false;
+                    end
+                end
+
+                if ignoreUnsable and not usable then
+                    id = nil;
+                end
+
                 if id and id ~= 0 then
                     if not tbl then
                         tbl = {};
                     end
+
                     n = n + 1;
                     tbl[n] = {
                         tooltipLineText = name,
@@ -1145,7 +803,7 @@ do  --MacroInterpreter
     end
 
     function MacroInterpreter.drawer(tooltip, body)
-        local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+        local drawerInfo = MacroInterpreter:GetDrawerInfo(body, true);
         if drawerInfo then
             if EL.drawerUpdateFlag == DrawerUpdateFlag.Combat then
                 tooltip:AddLine(L["PlumberMacro DrawerFlag Combat"], 1, 0.1, 0.1, true);
@@ -1180,66 +838,374 @@ do  --MacroInterpreter
 end
 
 
+do  --Editor Setup
+    EditorSetup.itemButtonSize = 32;
+    EditorSetup.itemButtonGap = 4;
 
---[[
-local function SlashFunc_DrawerMacro()
-    --if InCombatLockdown() then return end;
+    function EditorSetup.CreateIconButtonPool()
+        if not EditorUI.objectPools.iconButtonPool then
+            EditorUI.objectPools.iconButtonPool = {};
 
-    local focus = API.GetMouseFocus();
-    local action = focus and SpellFlyout.GetActionFromMouseFocus(focus);
-    if action then
-        local actionType, id, subType = GetActionInfo(action);
-        if actionType == "macro" then
-            local body = GetMacroBody(id);
-            if body and find(body, "#plumber:drawer") then
-                if SpellFlyout.flyoutID == id then
-                    SpellFlyout:Hide();
+            local file = "Interface/AddOns/Plumber/Art/Frame/MacroForge.png";
+
+            local IconButtonMixin = {};
+
+            local Placeholder = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
+            Placeholder:Hide();
+            Placeholder:SetSize(32, 32);
+            Placeholder.Border = Placeholder:CreateTexture(nil, "OVERLAY");
+            Placeholder.Border:SetPoint("CENTER", Placeholder, "CENTER", 0, 0);
+            Placeholder.Border:SetTexCoord(272/512, 344/512, 72/512, 144/512);
+            Placeholder.Border:SetTexture(file);
+            Placeholder.Icon = Placeholder:CreateTexture(nil, "OVERLAY");
+            EditorUI:AddRemovableElements(Placeholder);
+            API.DisableSharpening(Placeholder.Border);
+
+            local ReorderController = API.CreateDragReorderController(EditorUI.ExtraFrame);
+            EditorUI.ReorderController = ReorderController;
+
+            ReorderController:SetOnDragStartCallback(function()
+                ReorderController:SetObjects(EditorUI.objectPools.iconButtonPool:GetActiveObjects());
+                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
+                Placeholder:Show();
+                ReorderController:SetPlaceholder(Placeholder);
+            end);
+
+            ReorderController:SetOnDragEndCallback(function(draggedObject, delete)
+                Placeholder:Hide();
+
+                local body = "#plumber:drawer";
+                for _, object in ipairs(ReorderController.objects) do
+                    if delete and object == draggedObject then
+                        
+                    else
+                        body = body.."\n#"..object.rawMacroText;
+                    end
+                end
+                EditorUI:SaveMacroBody(body);
+            end);
+
+            ReorderController:SetBoundary(EditorUI.ExtraFrame);
+
+            ReorderController:SetInBoundaryCallback(function()
+                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 1);
+                Placeholder.Border:SetTexCoord(272/512, 344/512, 72/512, 144/512);
+            end);
+
+            ReorderController:SetOutBoundaryCallback(function()
+                EditorUI:HighlightIconButton(ReorderController:GetDraggedObject(), 2);
+                Placeholder.Border:SetTexCoord(344/512, 416/512, 72/512, 144/512);
+            end);
+
+            function IconButtonMixin:SetEffectiveSize(w)
+                self:SetSize(w, w);
+                self.Border:SetSize(w*72/64, w*72/64);
+                self.Icon:SetSize(w*60/64, w*60/64);
+            end
+
+            IconButtonMixin.SetEffectiveSize(Placeholder, EditorSetup.itemButtonSize);
+
+            local hl = EditorUI.HighlightFrame.Texture;
+            hl:SetTexture(file);
+            hl:SetTexCoord(344/512, 416/512, 0, 72/512);
+            API.DisableSharpening(hl);
+
+            function IconButtonMixin:OnEnter()
+                if ReorderController:IsDraggingObject() then
                     return
                 end
 
-                local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
-                SpellFlyout.flyoutID = id;
-                SpellFlyout:SetActions(drawerInfo);
-                SpellFlyout:SetOwner(focus);
-                SpellFlyout:SetScale(SpellFlyout.GetFlyoutScaleFromMouseFocus(focus) or 1);
-                SpellFlyout:ClearAllPoints();
+                EditorUI:HighlightIconButton(self);
+                if self:ShowTooltip() then
+                    local tooltip = GameTooltip;
+                    if self.tooltipMethod then
+                        tooltip:AddLine(" ");
+                    end
+                    tooltip:AddLine("<"..L["Drag To Reorder"]..">", 0.1, 1, 0.1, true);
+                    tooltip:Show();
 
-                local direction = SpellFlyout.GetFlyoutDirectionFromMouseFocus(focus);
-                if direction == "LEFT" then
-                    local _, y = focus:GetCenter();
-                    local left = focus:GetLeft();
-                    SpellFlyout:SetPoint("RIGHT", UIParent, "BOTTOMLEFT", left - 4, y);
-                    SpellFlyout:SetArrowDirection("right");
-                elseif direction == "RIGHT" then
-                    local _, y = focus:GetCenter();
-                    local right = focus:GetRight();
-                    SpellFlyout:SetPoint("LEFT", UIParent, "BOTTOMLEFT", right + 4, y);
-                    SpellFlyout:SetArrowDirection("left");
-                elseif direction == "DOWN" then
-                    local top = focus:GetBottom();
-                    local left = focus:GetLeft();
-                    SpellFlyout:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left - 2, top - 4);
-                    SpellFlyout:SetArrowDirection("up");
-                else --UP
-                    local top = focus:GetTop();
-                    local left = focus:GetLeft();
-                    SpellFlyout:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left - 2, top + 4);
-                    SpellFlyout:SetArrowDirection("down");
+                    if self:IsDataCached() then
+                        self.UpdateTooltip = nil;
+                    else
+                        self.UpdateTooltip = self.OnEnter;
+                    end
                 end
+            end
 
-                SpellFlyout:Show();
+            function IconButtonMixin:OnLeave()
+                GameTooltip:Hide();
+                if ReorderController:IsDraggingObject() then
+                    return
+                end
+                EditorUI:HighlightIconButton(nil);
+            end
+
+            function IconButtonMixin:OnMouseDown(mouseButton)
+                if mouseButton == "LeftButton" then
+                    ReorderController:SetDraggedObject(self);
+                    ReorderController:PreDragStart();
+                    EditorUI:RaiseIconButtonLevel(self);
+                    GameTooltip:Hide();
+                end
+            end
+
+            function IconButtonMixin:OnMouseUp()
+                if ReorderController:IsDraggingObject() then
+                    EditorUI:TriggerMouseBlocker();
+                end
+                ReorderController:OnMouseUp();
+            end
+
+            function IconButtonMixin:OnLoad()
+                self:SetScript("OnEnter", self.OnEnter);
+                self:SetScript("OnLeave", self.OnLeave);
+                self:SetScript("OnMouseDown", self.OnMouseDown);
+                self:SetScript("OnMouseUp", self.OnMouseUp);
+            end
+
+            function IconButtonMixin:OnRemoved()
+               self:ClearAction();
+            end
+
+            SecureSpellFlyout:PopulateButtonMixin(IconButtonMixin);
+
+            local function CreateObject()
+                local f = CreateFrame("Button", nil, EditorSetup.IconButtonContainer, "PlumberSmallIconButtonTemplate");
+
+                f.Border:SetTexture(file);
+                f.Border:SetTexCoord(272/512, 344/512, 0, 72/512);
+                API.DisableSharpening(f.Border);
+
+                API.Mixin(f, IconButtonMixin);
+                f:OnLoad();
+                f:SetEffectiveSize(EditorSetup.itemButtonSize);
+
+                return f
+            end
+            EditorUI.objectPools.iconButtonPool = API.CreateObjectPool(CreateObject);
+        end
+        return EditorUI.objectPools.iconButtonPool
+    end
+
+    local SupportedCursorInfo = {
+        item = {
+            command = "/use",
+            argGetter = function(itemID, itemLink)
+                local name = GetItemNameByID(itemID);
+                return name, "item:"..itemID
+            end
+        },
+
+        spell = {
+            command = "/cast",
+            argGetter = function(spellIndex, bookType, spellID, baseSpellID)
+                local name = GetSpellName(spellID);
+                return name, "spell:"..spellID
+            end
+        },
+
+        battlepet = {
+            command = "/sp",
+            argGetter = function(petGUID)
+                local speciesID, customName, level, xp, maxXp, displayID, favorite, name = C_PetJournal.GetPetInfoByPetID(petGUID);
+                return name, "pet:"..speciesID
+            end
+        },
+
+        mount = {
+            command = "/use",
+            argGetter = function(mountID, mountIndex)
+                local name = GetMountInfoByID(mountID);
+                return name, "mount:"..mountID
+            end
+        },
+    };
+
+    local function Checkbox_CloseAfterClick_OnClick(self)
+        local state = self:GetChecked();
+        addon.SetDBValue("SpellFlyout_CloseAfterClick", state);
+        EL:RequestUpdateMacros(0.0);
+    end
+
+    function EditorSetup.DrawerOnEvent(self, event, ...)
+        if event == "CURSOR_CHANGED" then
+            local infoType, arg1, arg2, arg3, arg4 = GetCursorInfo();
+
+            if infoType then
+                EditorSetup.ReceptorFrame:Show();
+                EditorSetup.IconButtonContainer:Hide();
+                EditorUI.Note:Hide();
+                local receptor = EditorSetup.ReceptorFrame;
+                local info = SupportedCursorInfo[infoType];
+                if info and (arg1 ~= nil) then
+                    receptor.PlusSign:Show();
+                    receptor.Instruction:Hide();
+                    local name, commandArg = info.argGetter(arg1, arg2, arg3, arg4);
+                    local newCommand = format("#%s %s", info.command, commandArg);
+
+                    local function Receptor_OnEnter(self)
+                        receptor.PlusSign:Hide();
+                        receptor.Instruction:Show();
+                        receptor.Instruction:SetText(format(L["Drawer Add Action Format"], "["..name.."]"));
+                        receptor.Instruction:SetTextColor(1, 0.82, 0);
+                        receptor.newCommand = newCommand;
+                    end
+
+                    local function Receptor_OnLeave(self)
+                        receptor.PlusSign:Show();
+                        receptor.Instruction:Hide();
+                        receptor.newCommand = nil;
+                    end
+
+                    local function Receptor_OnClick(self, button)
+                        if button == "RightButton" then
+                            if not InCombatLockdown() then
+                                ClearCursor();
+                            end
+                            return
+                        end
+
+                        local body = EditorUI.SourceEditBox:GetText();
+                        body = body.."\n"..newCommand;
+                        EditorUI:SaveMacroBody(body);
+                        if not InCombatLockdown() then
+                            ClearCursor();
+                        end
+                    end
+
+                    local function Receptor_OnReceiveDrag(self)
+                        Receptor_OnClick(self, "LeftButton");
+                    end
+
+                    receptor:SetScript("OnEnter", Receptor_OnEnter);
+                    receptor:SetScript("OnLeave", Receptor_OnLeave);
+                    receptor:SetScript("OnClick", Receptor_OnClick);
+                    receptor:SetScript("OnReceiveDrag", Receptor_OnReceiveDrag);
+
+                    if receptor:IsMouseMotionFocus() then
+                        Receptor_OnEnter(receptor);
+                    else
+                        Receptor_OnLeave(receptor);
+                    end
+                else
+                    receptor.PlusSign:Hide();
+                    receptor.Instruction:Show();
+                    receptor.Instruction:SetText(format(L["Unsupported Action Type Format"], infoType));
+                    receptor.Instruction:SetTextColor(0.6, 0.6, 0.6);
+                    receptor:SetScript("OnEnter", nil);
+                    receptor:SetScript("OnLeave", nil);
+                    receptor:SetScript("OnClick", nil);
+                    receptor:SetScript("OnReceiveDrag", nil);
+                end
+            else
+                EditorSetup.ReceptorFrame:Hide();
+                EditorSetup.IconButtonContainer:Show();
+                EditorUI.Note:Show();
             end
         end
     end
+
+    function EditorSetup.DrawerRecepetor()
+        --drag and drop an item/spell to add it to the drawer
+        if not EditorSetup.IconButtonContainer then
+            local f = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
+            EditorSetup.IconButtonContainer = f;
+            f:SetHeight(72);
+            f:SetPoint("TOPLEFT", EditorUI.ExtraFrame, "TOPLEFT", 0, 0);
+            f:SetPoint("TOPRIGHT", EditorUI.ExtraFrame, "TOPRIGHT", 0, 0);
+        end
+
+        if not EditorSetup.ReceptorFrame then
+            local f = CreateFrame("Button", nil, EditorUI.ExtraFrame);
+            EditorSetup.ReceptorFrame = f;
+            f:SetAllPoints(true);
+            f:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+
+            local PlusSign = f:CreateTexture(nil, "OVERLAY");
+            f.PlusSign = PlusSign;
+            PlusSign:SetSize(32, 32);
+            PlusSign:SetPoint("CENTER", f, "CENTER", 0, 0);
+            PlusSign:SetTexture("Interface/AddOns/Plumber/Art/Frame/MacroForge.png");
+            PlusSign:SetTexCoord(0/512, 64/512, 72/512, 136/512)
+
+            local Instruction = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            f.Instruction = Instruction;
+            Instruction:Hide();
+            Instruction:SetJustifyH("CENTER");
+            Instruction:SetPoint("LEFT", f, "LEFT", 16, 0);
+            Instruction:SetPoint("RIGHT", f, "RIGHT", -16, 0);
+            Instruction:SetSpacing(2);
+        end
+    end
+
+    function EditorSetup.Drawer(body)
+        EditorSetup.DrawerRecepetor();
+        EditorSetup.ReceptorFrame:Hide();
+        EditorSetup.IconButtonContainer:Show();
+
+        local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+        if drawerInfo and #drawerInfo > 0 then
+            local refresh = false;
+
+            if EditorUI.args.type ~= "drawer" then
+                EditorUI.args.type = "drawer";
+                refresh = true;
+            else
+                if EditorUI.args.drawerInfo then
+                    if #EditorUI.args.drawerInfo == #drawerInfo then
+                        for i, info in ipairs(EditorUI.args.drawerInfo) do
+                            if (info.actionType ~= drawerInfo[i].actionType) or (info.id ~= drawerInfo[i].id) then
+                                refresh = true;
+                                break
+                            end
+                        end
+                    else
+                        refresh = true;
+                    end
+                else
+                    refresh = true;
+                end
+            end
+
+            if refresh then
+                EditorUI:ReleaseElements();
+                local parent = MacroFrame;
+                local container = EditorSetup.IconButtonContainer;
+                local pool = EditorSetup.CreateIconButtonPool();
+                local size = EditorSetup.itemButtonSize;
+                local gap = EditorSetup.itemButtonGap;
+                local frameWidth = parent:GetWidth();
+                local span = #drawerInfo * (size + gap) - gap;
+                local requiredWidth = span + 48;
+                if requiredWidth > frameWidth then
+                    frameWidth = requiredWidth;
+                end
+                local fromX = 0.5*(frameWidth - span);
+                local button;
+                local baseFrameLevel = container:GetFrameLevel();
+
+                for i, info in ipairs(drawerInfo) do
+                    button = pool:Acquire();
+                    button.index = i;
+                    button:SetFrameLevel(baseFrameLevel + i);
+                    button:Show();
+                    button:SetAction(info);
+                    button:SetPoint("LEFT", container, "LEFT", fromX + (size + gap) * (i - 1), 0);
+                end
+
+                EditorUI.ExtraFrame:ClearAllPoints();
+                EditorUI.ExtraFrame:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -4);
+                EditorUI.ExtraFrame:SetWidth(frameWidth);
+
+                EditorUI.ReorderController:SetAnchorInfo(container, "LEFT", fromX, 0, EditorSetup.itemButtonGap, 0);
+            end
+        else
+            EditorUI:ReleaseElements();
+            EditorUI:DisplayNote(L["Drag And Drop Item Here"]);
+        end
+        EditorUI.args.drawerInfo = drawerInfo;
+        EditorUI.ExtraFrame:RegisterEvent("CURSOR_CHANGED");
+        EditorUI.ExtraFrame:SetScript("OnEvent", EditorSetup.DrawerOnEvent);
+    end
+    PlumberMacros["drawer"].editorSetupFunc = EditorSetup.Drawer;
 end
-API.AddSlashSubcommand("DrawerMacro", SlashFunc_DrawerMacro);
---]]
-
---[[
-    GetActionText(actionSlot)   for Macros
-
-    --ActionBarButton
-    /dump GetMouseFoci()[1].buttonType
-    /dump GetMouseFoci()[1]:GetAttribute("flyoutDirection")
-    /dump GetMouseFoci()[1].action
---]]

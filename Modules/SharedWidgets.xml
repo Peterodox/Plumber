@@ -503,20 +503,26 @@
                     </Anchors>
                 </Texture>
             </Layer-->
-            <Layer level="OVERLAY" textureSubLevel="6">
+            <Layer level="ARTWORK" textureSubLevel="1">
                 <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
                     <Anchors>
                         <Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
                     </Anchors>
                 </FontString>
             </Layer>
-            <Layer level="OVERLAY">
+            <Layer level="OVERLAY" textureSubLevel="4">
                 <!--FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
                     <Size x="36" y="10"/>
                     <Anchors>
                         <Anchor point="BOTTOM" x="0" y="2"/>
                     </Anchors>
                 </FontString-->
+                <Texture parentKey="IconOverlay" hidden="true">
+                    <Size x="24" y="24"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="CENTER"/>
+                    </Anchors>
+                </Texture>
             </Layer>
         </Layers>
         <NormalTexture parentKey="NormalTexture">
@@ -544,7 +550,7 @@
             </Anchors>
         </CheckedTexture-->
         <Frames>
-            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawBling="false" useParentLevel="true">
+            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawBling="false" drawEdge="false" useParentLevel="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="0" y="0"/>
                     <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="0" y="0"/>
