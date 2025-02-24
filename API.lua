@@ -2740,7 +2740,10 @@ do  -- Macro Util
         GetItemCount = C_Item.GetItemCount,
         GetItemCraftedQualityByItemInfo = C_TradeSkillUI and C_TradeSkillUI.GetItemCraftedQualityByItemInfo or Nop,
         GetItemReagentQualityByItemInfo = C_TradeSkillUI and C_TradeSkillUI.GetItemReagentQualityByItemInfo or Nop,
-        IsConsumableItem = C_Item.IsConsumableItem or Nop,
+        --IsConsumableItem = C_Item.IsConsumableItem or Nop,    --This is not what we thought it is
+        GetItemInfoInstant = C_Item.GetItemInfoInstant,
+        FindPetIDByName = C_PetJournal and C_PetJournal.FindPetIDByName or Nop,
+        GetPetInfoBySpeciesID = C_PetJournal and C_PetJournal.GetPetInfoBySpeciesID or Nop,
     };
 
     function API.CanPlayerPerformAction(actionType, arg1, arg2)
@@ -2749,10 +2752,14 @@ do  -- Macro Util
         elseif actionType == "item" then
             if API.IsToyItem(arg1) then
                 return WoWAPI.PlayerHasToy(arg1)
-            elseif WoWAPI.IsConsumableItem(arg1) then
-                --always return true for conumable items in case player needs to restock
-                return true
             else
+                local _, _, _, _, _, classID, subClassID = WoWAPI.GetItemInfoInstant(arg1);
+
+                --always return true for conumable items in case player needs to restock
+                if classID == 0 then
+                    return true
+                end
+
                 local count = WoWAPI.GetItemCount(arg1, true, true, true, true);
                 return count > 0
             end
@@ -2767,6 +2774,16 @@ do  -- Macro Util
             quality = WoWAPI.GetItemReagentQualityByItemInfo(item);
         end
         return quality
+    end
+
+    function API.GetPetNameAndUsability(speciesID, checkUsability)
+        local name = WoWAPI.GetPetInfoBySpeciesID(speciesID);
+        if checkUsability then
+            local _, petGUID = WoWAPI.FindPetIDByName(name);
+            return name, petGUID ~= nil
+        else
+            return name
+        end
     end
 end
 

@@ -5,12 +5,13 @@ local CallbackRegistry = addon.CallbackRegistry;
 
 local tinsert = table.insert;
 local InCombatLockdown = InCombatLockdown;
-local IsPlayerSpell = IsPlayerSpell;
 local CreateFrame = CreateFrame;
 local GetCVarBool = C_CVar.GetCVarBool;
 local GetItemCount = C_Item.GetItemCount;
 local PlayerHasToy = PlayerHasToy or API.Nop;
+local C_PetJournal = C_PetJournal;
 local GetItemCraftingQuality = API.GetItemCraftingQuality;
+local CanPlayerPerformAction = API.CanPlayerPerformAction;
 local find = string.find;
 local gsub = string.gsub;
 local UIParent = UIParent;
@@ -275,7 +276,7 @@ do  --VisualButtonMixin
 
         if self.actionType == "spell" then
             self.tooltipMethod = "SetSpellByID";
-            if not IsPlayerSpell(self.id) then
+            if not CanPlayerPerformAction("spell", self.id) then
                 self:SetUsableVisual(false);
             end
 
@@ -646,6 +647,7 @@ do  --SecureControllerPool
             if not InCombatLockdown() then
                 ActionButtonPool:UpdateClicks();
             end
+            --Also triggered when clicking the handler to close the menu
         end);
 
         handler:SetAttribute("_onclick", HANDLER_ONCLICK);

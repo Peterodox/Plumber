@@ -39,7 +39,6 @@ local RequestLoadSpellData = C_Spell.RequestLoadSpellData;
 local GetSpellName = C_Spell.GetSpellName;
 local GetSpellTexture = C_Spell.GetSpellTexture;
 local GetSpellInfo = C_Spell.GetSpellInfo;
-local IsPlayerSpell = IsPlayerSpell;
 local CanPlayerPerformAction = API.CanPlayerPerformAction;
 local GetItemCraftingQuality = API.GetItemCraftingQuality;
 
@@ -136,6 +135,9 @@ EL.macroIndexMax = 138;
 
 function EL:CheckSupportedMacros()
     self:UnregisterAllEvents();
+    if not self.isInitialized then
+        self:RegisterEvent("PLAYER_ENTERING_WORLD");
+    end
 
     for command, commandData in pairs(PlumberMacros) do
         commandData.currentState = nil;
@@ -274,6 +276,18 @@ local DrawerUpdateFlag = {
     Success = 2,
 };
 
+function EL:InitializeDrawerInfo()
+    self:CheckSupportedMacros();
+    local drawers = self.activeCommands and self.activeCommands["drawer"];
+    if drawers and #drawers > 0 then
+        local name, icon, body;
+        for _, macroIndex in ipairs(drawers) do
+            name, icon, body = GetMacroInfo(macroIndex);
+            MacroInterpreter:GetDrawerInfo(body);
+        end
+    end
+end
+
 function EL:UpdateDrawers()
     if InCombatLockdown() then
         self.drawerUpdateFlag = DrawerUpdateFlag.Combat;
@@ -287,7 +301,7 @@ function EL:UpdateDrawers()
         local name, icon, body, drawerInfo;
         local handlerName;
         local checkUsability = true;
-        local ignoreUnsable = true;
+        local ignoreUnsable = false;
         for _, macroIndex in ipairs(drawers) do
             name, icon, body = GetMacroInfo(macroIndex);
             drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, ignoreUnsable);
@@ -339,15 +353,6 @@ function EL:LoadSpellAndItem()
         end
     end
 end
-
-function EL:ListenEvents(state)
-    if state then
-        self:RegisterEvent("PLAYER_ENTERING_WORLD");
-    else
-        self:UnregisterAllEvents();
-    end
-end
-EL:ListenEvents(true);
 
 
 do  --EditorUI  --MacroForge
@@ -595,17 +600,26 @@ end
 
 
 function EL:OnEvent(event, ...)
+    --print(event, GetTimePreciseSec())
     if event == "PLAYER_ENTERING_WORLD" then
+        self.isInitialized = true;
         self:UnregisterEvent(event);
         self:LoadSpellAndItem();
         self:RequestUpdateMacros(0.5);
     elseif event == "PLAYER_REGEN_ENABLED" then
         self:CheckQueue();
+    elseif event == "UPDATE_MACROS" then
+        --UPDATE_MACROS usually fires twice before PLAYER_ENTERING_WORLD
+        self:UnregisterEvent(event);
+        self:InitializeDrawerInfo();
     elseif self.macroEvents and self.macroEvents[event] then
         self:UpdateMacroByEvent(event);
     end
 end
 EL:SetScript("OnEvent", EL.OnEvent);
+EL:RegisterEvent("UPDATE_MACROS");
+EL:RegisterEvent("PLAYER_ENTERING_WORLD");
+
 
 
 do  --MacroInterpreter
@@ -648,25 +662,41 @@ do  --MacroInterpreter
         local tbl;
         local n = 0;
         local processed, usable;
-        local name, icon, actionType, id, macroText, craftingQuality;
+        local name, icon, actionType, id, macroText, craftingQuality, tempID;
 
         for line in string.gmatch(body, "#(/[^\n]+)") do
             processed = false;
             usable = false;
+            name = nil;
+            icon = nil;
             actionType = nil;
             id = nil;
-            icon = nil;
             macroText = nil;
+            tempID = nil;
 
             if not processed then
-                local mountID = match(line, "/use%s+mount:(%d+)");
-                if not mountID then
-                    mountID = match(line, "/cast%s+mount:(%d+)");
+                tempID = match(line, "/use%s+mount:(%d+)");
+                if not tempID then
+                    tempID = match(line, "/cast%s+mount:(%d+)");
                 end
-                if mountID then
+                if tempID then
                     processed = true;
                     actionType = "mount";
-                    id = tonumber(mountID);
+                    id = tonumber(tempID);
+                end
+            end
+
+            if not processed then
+                tempID = match(line, "/sp%s+pet:(%d+)");
+                if tempID then
+                    processed = true;
+                    actionType = "SetSummonPet";
+                    id = tonumber(tempID);
+                    name, usable = API.GetPetNameAndUsability(id, true);
+                    id = name;
+                    if name then
+                        macroText = "/sp "..name;
+                    end
                 end
             end
 
@@ -732,7 +762,7 @@ do  --MacroInterpreter
                     if id and (not icon) then
                         icon = GetSpellTexture(id) or 134400;
                     end
-                    if id and IsPlayerSpell(id) then
+                    if id and CanPlayerPerformAction(actionType, id) then
                         usable = true;
                     end
                     if name then
@@ -764,8 +794,8 @@ do  --MacroInterpreter
                     actionType = "spell";
                     id = _spellID;
                 else
-                    name = line;
-                    macroText = line;
+                    name = name or line;
+                    macroText = macroText or line;
                     usable = true;
                 end
 
@@ -901,6 +931,9 @@ do  --Editor Setup
                 self:SetSize(w, w);
                 self.Border:SetSize(w*72/64, w*72/64);
                 self.Icon:SetSize(w*60/64, w*60/64);
+                if self.IconOverlay then
+                    self.IconOverlay:SetSize(w * 36/64, w * 36/64);
+                end
             end
 
             IconButtonMixin.SetEffectiveSize(Placeholder, EditorSetup.itemButtonSize);
@@ -975,6 +1008,11 @@ do  --Editor Setup
                 f.Border:SetTexture(file);
                 f.Border:SetTexCoord(272/512, 344/512, 0, 72/512);
                 API.DisableSharpening(f.Border);
+
+                f.IconOverlay = f:CreateTexture(nil, "OVERLAY");
+                f.IconOverlay:SetPoint("BOTTOMRIGHT", f, "CENTER", 0 ,0);
+                f.IconOverlay:Hide();
+                f.IconOverlay:SetTexture("Interface/AddOns/Plumber/Art/Frame/SpellFlyout");
 
                 API.Mixin(f, IconButtonMixin);
                 f:OnLoad();
