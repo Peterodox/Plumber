@@ -331,8 +331,22 @@ L["QuickSlot Error 3"] = "快捷按钮：A controller with the same key \"%s\" a
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber赛车坐骑宏";
 L["PlumberMacro Drawer"] = "Plumber技能收纳宏";
+L["PlumberMacro DrawerFlag Combat"] = "技能收纳宏将在你离开战斗后更新。";
+L["PlumberMacro DrawerFlag Stuck"] = "更新技能收纳宏时遇到了错误。";
 L["PlumberMacro Error Combat"] = "战斗中不可用";
 L["PlumberMacro Error NoAction"] = "无可用技能";
+L["Dismiss Battle Pet"] = "解散小宠物";
+L["Drag And Drop Item Here"] = "拖拽一个东西放在这里";
+L["Drag To Reorder"] = "左键单击并拖拽以更改位置";
+L["Unsupported Action Type Format"] = "不支持的动作类别： %s";
+L["Drawer Add Action Format"] = "添加 |cffffffff%s|r";
+L["Drawer Option Global Tooltip"] = "所有的收纳宏共用此设置。";
+L["Drawer Option CloseAfterClick"] = "点击后关闭";
+L["Drawer Option CloseAfterClick Tooltip"] = "在你点击菜单中任何一个按钮后关闭菜单，无论动作是否成功。";
+L["Drawer Option SingleRow"] = "单行排布";
+L["Drawer Option SingleRow Tooltip"] = "勾选此选项后，所有按钮都在一排显示，而不是每排最多4个。";
+L["Drawer Option Hide Unusable"] = "隐藏不可用的动作";
+L["Drawer Option Hide Unusable Tooltip"] = "隐藏身上没有的物品和未学会的法术。\n\n消耗品例如药水不受此选项影响。";
 
 
 --Generic

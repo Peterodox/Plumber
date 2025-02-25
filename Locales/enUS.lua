@@ -340,6 +340,13 @@ L["Drag And Drop Item Here"] = "Drag and drop an item here.";
 L["Drag To Reorder"] = "Left click and drag to reorder";
 L["Unsupported Action Type Format"] = "Unsupported action type: %s";
 L["Drawer Add Action Format"] = "Add |cffffffff%s|r";
+L["Drawer Option Global Tooltip"] = "This setting is shared across all drawer macros.";
+L["Drawer Option CloseAfterClick"] = "Close After Clicks";
+L["Drawer Option CloseAfterClick Tooltip"] = "Close the drawer after clicking any button in it, regardless of successful or not.";
+L["Drawer Option SingleRow"] = "Single Row";
+L["Drawer Option SingleRow Tooltip"] = "If checked, align all buttons on the same row instead of 4 items per row.";
+L["Drawer Option Hide Unusable"] = "Hide Unusable Actions";
+L["Drawer Option Hide Unusable Tooltip"] = "Hide unowned items and unlearned spells.\n\nConsumable items like potions will always be shown.";
 
 
 --Generic

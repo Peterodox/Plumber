@@ -5,12 +5,17 @@
 -- 2. plumber:drive         Added to your regular mount macro. Summon G-99 Breakneck in Undermine. Change the icon.
 
 
+-- User Settings
+local HIDE_UNUSABLE = false;  --Hide unusable spells
+------------------
+
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
 local CallbackRegistry = addon.CallbackRegistry;
 --local SpellFlyout = addon.SpellFlyout;  --Unused, Insecure
 local SecureSpellFlyout = addon.SecureSpellFlyout;
+local GetDBValue = addon.GetDBValue;
 
 local find = string.find;
 local match = string.match;
@@ -59,9 +64,11 @@ local SlashCmd = {};
 
 local function AddExtraLineToMacroBody(extraLine, body)
     extraLine = "\n\n"..extraLine;
-    local numRequired = strlenutf8(extraLine) + 2;
+    local numRequired = strlenutf8(extraLine) + 3;
     local numTotal = strlenutf8(body);
+    local overflow;
     if numTotal + numRequired >= 255 then
+        overflow = true;
         local pattern = "$";
         local n = 0;
         while n < numRequired do
@@ -70,9 +77,10 @@ local function AddExtraLineToMacroBody(extraLine, body)
         end
         body = gsub(body, pattern, extraLine);
     else
+        overflow = false;
         body = body..extraLine;
     end
-    return body
+    return body, overflow
 end
 
 local PlumberMacros = {};
@@ -298,23 +306,31 @@ function EL:UpdateDrawers()
     SecureSpellFlyout:ReleaseClickHandlers();
     local drawers = self.activeCommands and self.activeCommands["drawer"];
     if drawers and #drawers > 0 then
-        local name, icon, body, drawerInfo;
+        local name, icon, body, drawerInfo, overflow, anyOverflow;
         local handlerName;
         local checkUsability = true;
-        local ignoreUnsable = false;
+        local hideUnusable = HIDE_UNUSABLE;
+
         for _, macroIndex in ipairs(drawers) do
             name, icon, body = GetMacroInfo(macroIndex);
-            drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, ignoreUnsable);
+            drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable);
             if drawerInfo then
                 handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
                 if handlerName then
                     body = gsub(body, "/plmr 1", "");   --Legacy. Remove it in future update
                     body = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
                     local extraLine = "/click "..handlerName;
-                    body = AddExtraLineToMacroBody(extraLine, body);
+                    body, overflow = AddExtraLineToMacroBody(extraLine, body);
                     EditMacro(macroIndex, name, icon, body);
+                    if overflow then
+                        anyOverflow = true;
+                    end
                 end
             end
+        end
+
+        if anyOverflow then
+            self:UpdateDrawers();
         end
     end
 
@@ -567,6 +583,9 @@ if MacroFrame_LoadUI then
                 ef:SetScript("OnHide", function()
                     ef:UnregisterAllEvents();
                 end);
+                ef:SetScript("OnShow", function()
+                    ef:UpdatePixel();
+                end);
                 local offsetY = -4;
                 ef:SetPoint("TOPLEFT", MacroFrame, "BOTTOMLEFT", 0, offsetY);
                 ef:SetPoint("TOPRIGHT", MacroFrame, "BOTTOMRIGHT", 0, offsetY);
@@ -658,7 +677,7 @@ do  --MacroInterpreter
         end
     end
 
-    function MacroInterpreter:GetDrawerInfo(body, checkUsability, ignoreUnsable)
+    function MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable)
         local tbl;
         local n = 0;
         local processed, usable;
@@ -806,7 +825,7 @@ do  --MacroInterpreter
                     end
                 end
 
-                if ignoreUnsable and not usable then
+                if hideUnusable and not usable then
                     id = nil;
                 end
 
@@ -871,8 +890,9 @@ end
 do  --Editor Setup
     EditorSetup.itemButtonSize = 32;
     EditorSetup.itemButtonGap = 4;
+    EditorSetup.iconButtonContainerHeight = 72;
 
-    function EditorSetup.CreateIconButtonPool()
+    function EditorSetup.AcquireIconButton()
         if not EditorUI.objectPools.iconButtonPool then
             EditorUI.objectPools.iconButtonPool = {};
 
@@ -880,7 +900,7 @@ do  --Editor Setup
 
             local IconButtonMixin = {};
 
-            local Placeholder = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
+            local Placeholder = CreateFrame("Frame", nil, EditorSetup.IconButtonContainer);
             Placeholder:Hide();
             Placeholder:SetSize(32, 32);
             Placeholder.Border = Placeholder:CreateTexture(nil, "OVERLAY");
@@ -891,7 +911,7 @@ do  --Editor Setup
             EditorUI:AddRemovableElements(Placeholder);
             API.DisableSharpening(Placeholder.Border);
 
-            local ReorderController = API.CreateDragReorderController(EditorUI.ExtraFrame);
+            local ReorderController = API.CreateDragReorderController(EditorSetup.IconButtonContainer);
             EditorUI.ReorderController = ReorderController;
 
             ReorderController:SetOnDragStartCallback(function()
@@ -903,7 +923,6 @@ do  --Editor Setup
 
             ReorderController:SetOnDragEndCallback(function(draggedObject, delete)
                 Placeholder:Hide();
-
                 local body = "#plumber:drawer";
                 for _, object in ipairs(ReorderController.objects) do
                     if delete and object == draggedObject then
@@ -1003,7 +1022,7 @@ do  --Editor Setup
             SecureSpellFlyout:PopulateButtonMixin(IconButtonMixin);
 
             local function CreateObject()
-                local f = CreateFrame("Button", nil, EditorSetup.IconButtonContainer, "PlumberSmallIconButtonTemplate");
+                local f = CreateFrame("Button", nil, EditorSetup.IconButtonFrame, "PlumberSmallIconButtonTemplate");
 
                 f.Border:SetTexture(file);
                 f.Border:SetTexCoord(272/512, 344/512, 0, 72/512);
@@ -1022,7 +1041,17 @@ do  --Editor Setup
             end
             EditorUI.objectPools.iconButtonPool = API.CreateObjectPool(CreateObject);
         end
-        return EditorUI.objectPools.iconButtonPool
+        return EditorUI.objectPools.iconButtonPool:Acquire();
+    end
+
+    function EditorSetup.AcquireCheckbox()
+        if not EditorUI.objectPools.checkboxPool then
+            local function CreateCheckbox()
+                return addon.CreateCheckbox(EditorUI.ExtraFrame);
+            end
+            EditorUI.objectPools.checkboxPool = API.CreateObjectPool(CreateCheckbox);
+        end
+        return EditorUI.objectPools.checkboxPool:Acquire();
     end
 
     local SupportedCursorInfo = {
@@ -1059,19 +1088,13 @@ do  --Editor Setup
         },
     };
 
-    local function Checkbox_CloseAfterClick_OnClick(self)
-        local state = self:GetChecked();
-        addon.SetDBValue("SpellFlyout_CloseAfterClick", state);
-        EL:RequestUpdateMacros(0.0);
-    end
-
     function EditorSetup.DrawerOnEvent(self, event, ...)
         if event == "CURSOR_CHANGED" then
             local infoType, arg1, arg2, arg3, arg4 = GetCursorInfo();
 
             if infoType then
                 EditorSetup.ReceptorFrame:Show();
-                EditorSetup.IconButtonContainer:Hide();
+                EditorSetup.IconButtonFrame:Hide();
                 EditorUI.Note:Hide();
                 local receptor = EditorSetup.ReceptorFrame;
                 local info = SupportedCursorInfo[infoType];
@@ -1137,49 +1160,63 @@ do  --Editor Setup
                 end
             else
                 EditorSetup.ReceptorFrame:Hide();
-                EditorSetup.IconButtonContainer:Show();
+                EditorSetup.IconButtonFrame:Show();
                 EditorUI.Note:Show();
             end
         end
     end
 
-    function EditorSetup.DrawerRecepetor()
-        --drag and drop an item/spell to add it to the drawer
+    function EditorSetup.DrawerInitFrames()
         if not EditorSetup.IconButtonContainer then
-            local f = CreateFrame("Frame", nil, EditorUI.ExtraFrame);
-            EditorSetup.IconButtonContainer = f;
-            f:SetHeight(72);
-            f:SetPoint("TOPLEFT", EditorUI.ExtraFrame, "TOPLEFT", 0, 0);
-            f:SetPoint("TOPRIGHT", EditorUI.ExtraFrame, "TOPRIGHT", 0, 0);
-        end
+            local MainFrame = EditorUI.ExtraFrame;
 
-        if not EditorSetup.ReceptorFrame then
-            local f = CreateFrame("Button", nil, EditorUI.ExtraFrame);
-            EditorSetup.ReceptorFrame = f;
-            f:SetAllPoints(true);
-            f:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+            local IconButtonContainer = CreateFrame("Frame", nil, MainFrame);
+            EditorSetup.IconButtonContainer = IconButtonContainer;
+            IconButtonContainer:SetPoint("TOPLEFT", MainFrame, "TOPLEFT", 0, 0);
+            IconButtonContainer:SetPoint("TOPRIGHT", MainFrame, "TOPRIGHT", 0, 0);
+            IconButtonContainer:SetHeight(EditorSetup.iconButtonContainerHeight);
 
-            local PlusSign = f:CreateTexture(nil, "OVERLAY");
-            f.PlusSign = PlusSign;
-            PlusSign:SetSize(32, 32);
-            PlusSign:SetPoint("CENTER", f, "CENTER", 0, 0);
-            PlusSign:SetTexture("Interface/AddOns/Plumber/Art/Frame/MacroForge.png");
-            PlusSign:SetTexCoord(0/512, 64/512, 72/512, 136/512)
+            if not EditorSetup.IconButtonFrame then
+                local f = CreateFrame("Frame", nil, IconButtonContainer);
+                EditorSetup.IconButtonFrame = f;
+                f:SetPoint("TOPLEFT", IconButtonContainer, "TOPLEFT", 0, 0);
+                f:SetPoint("BOTTOMRIGHT", IconButtonContainer, "BOTTOMRIGHT", 0, 0);
+            end
 
-            local Instruction = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            f.Instruction = Instruction;
-            Instruction:Hide();
-            Instruction:SetJustifyH("CENTER");
-            Instruction:SetPoint("LEFT", f, "LEFT", 16, 0);
-            Instruction:SetPoint("RIGHT", f, "RIGHT", -16, 0);
-            Instruction:SetSpacing(2);
+            if not EditorSetup.ReceptorFrame then
+                local f = CreateFrame("Button", nil, IconButtonContainer);
+                EditorSetup.ReceptorFrame = f;
+                f:SetAllPoints(true);
+                f:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+
+                local PlusSign = f:CreateTexture(nil, "OVERLAY");
+                f.PlusSign = PlusSign;
+                PlusSign:SetSize(32, 32);
+                PlusSign:SetPoint("CENTER", f, "CENTER", 0, 0);
+                PlusSign:SetTexture("Interface/AddOns/Plumber/Art/Frame/MacroForge.png");
+                PlusSign:SetTexCoord(0/512, 64/512, 72/512, 136/512)
+
+                local Instruction = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+                f.Instruction = Instruction;
+                Instruction:Hide();
+                Instruction:SetJustifyH("CENTER");
+                Instruction:SetPoint("LEFT", f, "LEFT", 16, 0);
+                Instruction:SetPoint("RIGHT", f, "RIGHT", -16, 0);
+                Instruction:SetSpacing(2);
+            end
         end
     end
 
+    EditorSetup.drawerOptions = {
+        {label = L["Drawer Option CloseAfterClick"], dbKey = "SpellFlyout_CloseAfterClick", tooltip = L["Drawer Option CloseAfterClick Tooltip"], tooltip2 = L["Drawer Option Global Tooltip"]},
+        {label = L["Drawer Option SingleRow"], dbKey = "SpellFlyout_SingleRow", tooltip = L["Drawer Option SingleRow Tooltip"], tooltip2 = L["Drawer Option Global Tooltip"]},
+        {label = L["Drawer Option Hide Unusable"], dbKey = "SpellFlyout_HideUnusable", tooltip = L["Drawer Option Hide Unusable Tooltip"], tooltip2 = L["Drawer Option Global Tooltip"]},
+    };
+
     function EditorSetup.Drawer(body)
-        EditorSetup.DrawerRecepetor();
+        EditorSetup.DrawerInitFrames();
         EditorSetup.ReceptorFrame:Hide();
-        EditorSetup.IconButtonContainer:Show();
+        EditorSetup.IconButtonFrame:Show();
 
         local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
         if drawerInfo and #drawerInfo > 0 then
@@ -1208,8 +1245,7 @@ do  --Editor Setup
             if refresh then
                 EditorUI:ReleaseElements();
                 local parent = MacroFrame;
-                local container = EditorSetup.IconButtonContainer;
-                local pool = EditorSetup.CreateIconButtonPool();
+                local container = EditorSetup.IconButtonFrame;
                 local size = EditorSetup.itemButtonSize;
                 local gap = EditorSetup.itemButtonGap;
                 local frameWidth = parent:GetWidth();
@@ -1223,7 +1259,7 @@ do  --Editor Setup
                 local baseFrameLevel = container:GetFrameLevel();
 
                 for i, info in ipairs(drawerInfo) do
-                    button = pool:Acquire();
+                    button = EditorSetup.AcquireIconButton();
                     button.index = i;
                     button:SetFrameLevel(baseFrameLevel + i);
                     button:Show();
@@ -1236,14 +1272,69 @@ do  --Editor Setup
                 EditorUI.ExtraFrame:SetWidth(frameWidth);
 
                 EditorUI.ReorderController:SetAnchorInfo(container, "LEFT", fromX, 0, EditorSetup.itemButtonGap, 0);
+
+                local visualOffsetY = 4;
+                local padding = 8;
+                local extraHeight = padding - visualOffsetY;
+                local checkbox;
+                for _, info in ipairs(EditorSetup.drawerOptions) do
+                    checkbox = EditorSetup.AcquireCheckbox();
+                    checkbox:SetData(info);
+                    checkbox:SetChecked(GetDBValue(checkbox.dbKey));
+                    checkbox:SetPoint("TOPLEFT", EditorSetup.IconButtonFrame, "BOTTOMLEFT", 24, -extraHeight);
+                    extraHeight = extraHeight + checkbox:GetHeight();
+                end
+                extraHeight = extraHeight + padding + visualOffsetY;
+                EditorUI.ExtraFrame:SetHeight(EditorSetup.iconButtonContainerHeight + extraHeight);
+
+                local Divider = EditorUI.Divider;
+                if not Divider then
+                    Divider = EditorUI.ExtraFrame:CreateTexture(nil, "OVERLAY");
+                    EditorUI.Divider = Divider;
+                    EditorUI:AddRemovableElements(Divider);
+                    Divider:SetHeight(2);
+                    Divider:SetVertexColor(1, 1, 1, 0.4);
+                    Divider:SetTexture("Interface/AddOns/Plumber/Art/Frame/MacroForge.png");
+                    Divider:SetTexCoord(64/512, 264/512, 72/512, 76/512)
+                end
+                Divider:SetPoint("CENTER", EditorUI.ExtraFrame, "TOP", 0, -EditorSetup.iconButtonContainerHeight + visualOffsetY);
+                Divider:SetWidth(frameWidth - 24);
+                Divider:Show();
             end
         else
             EditorUI:ReleaseElements();
             EditorUI:DisplayNote(L["Drag And Drop Item Here"]);
+            EditorUI.ExtraFrame:SetHeight(EditorSetup.iconButtonContainerHeight);
         end
         EditorUI.args.drawerInfo = drawerInfo;
         EditorUI.ExtraFrame:RegisterEvent("CURSOR_CHANGED");
         EditorUI.ExtraFrame:SetScript("OnEvent", EditorSetup.DrawerOnEvent);
     end
     PlumberMacros["drawer"].editorSetupFunc = EditorSetup.Drawer;
+end
+
+
+do  --Settings Registry
+    local function UpdateAfterSettingsChanged()
+        EL:RequestUpdateMacros(0.0);
+    end
+
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_CloseAfterClick", function(state, userInput)
+        if userInput then
+            UpdateAfterSettingsChanged();
+        end
+    end);
+
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_SingleRow", function(state, userInput)
+        if userInput then
+            UpdateAfterSettingsChanged();
+        end
+    end);
+
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_HideUnusable", function(state, userInput)
+        HIDE_UNUSABLE = state;
+        if userInput then
+            UpdateAfterSettingsChanged();
+        end
+    end);
 end

@@ -1,3 +1,9 @@
+-- User Settings
+local CLOSE_AFTER_CLICK = true;
+local GRID_LAYOUT = true;           --Multi-row, not single row
+local MAX_BUTTON_PER_ROW = 4;
+------------------
+
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
@@ -40,13 +46,6 @@ end
 
 --Flyout Cursor OffsetX = 24.0
 --Flyout Cursor OffsetY = 26.0
-
-
--- User Settings
-local CLOSE_AFTER_CLICK = true;
-local GRID_LAYOUT = true;           --Multi-row
-local MAX_BUTTON_PER_ROW = 4;
-------------------
 
 
 do --SpellFlyout Main
@@ -622,7 +621,12 @@ do  --SecureControllerPool
         end
     ]=];
 
-    local HANDLER_ONCLICK = HANDLER_ONCLICK_FORMAT:format(ACTION_BUTTON_SIZE, tostring(GRID_LAYOUT), MAX_BUTTON_PER_ROW);
+    local HANDLER_ONCLICK;
+
+    function SecureControllerPool:UpdateLayout()
+        HANDLER_ONCLICK = HANDLER_ONCLICK_FORMAT:format(ACTION_BUTTON_SIZE, tostring(GRID_LAYOUT), MAX_BUTTON_PER_ROW);
+    end
+    SecureControllerPool:UpdateLayout()
 
     function SecureControllerPool:AddActions(actions)
         local handler = self:AcquireClickHandler();
@@ -747,7 +751,24 @@ do  --SecureHandler
 end
 
 do  --Settings Registry
-    CallbackRegistry:RegisterSettingCallback("SpellFlyout_CloseAfterClick", function(state)
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_CloseAfterClick", function(state, userInput)
         CLOSE_AFTER_CLICK = state;
+        if userInput and not InCombatLockdown() then
+            SecureRootContainer:Hide();
+        end
+    end);
+
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_SingleRow", function(state, userInput)
+        GRID_LAYOUT = not state;
+        SecureControllerPool:UpdateLayout();
+        if userInput and not InCombatLockdown() then
+            SecureRootContainer:Hide();
+        end
+    end);
+
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_HideUnusable", function(state, userInput)
+        if userInput and not InCombatLockdown() then
+            SecureRootContainer:Hide();
+        end
     end);
 end

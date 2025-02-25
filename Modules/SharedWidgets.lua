@@ -5748,9 +5748,10 @@ do  --SliceFrame
         local scale = API.GetPixelForScale(self:GetEffectiveScale());
         self.Background:SetScale(scale);
 
-        local pixelOffset = self.pixelOffset;
-        local scale = self.Background:GetEffectiveScale()
-        local offset = API.GetPixelForScale(scale, pixelOffset);
+        local pixelOffset = self.Background.pixelOffset;
+        --local scale = self.Background:GetEffectiveScale()
+        --local offset = API.GetPixelForScale(scale, pixelOffset);
+        local offset = pixelOffset * scale;
         self.Background:ClearAllPoints();
         self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
         self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);

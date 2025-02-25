@@ -167,6 +167,8 @@ local DefaultValues = {
 
     --SpellFlyout DrawerMacro
         SpellFlyout_CloseAfterClick = true,
+        SpellFlyout_SingleRow = false,
+        SpellFlyout_HideUnusable = false,
 
 
     EnableNewByDefault = false,             --Always enable newly added features
