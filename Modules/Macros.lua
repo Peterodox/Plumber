@@ -22,6 +22,7 @@ local match = string.match;
 local gsub = string.gsub;
 local format = string.format;
 local tinsert = table.insert;
+local pairs = pairs;
 local ipairs = ipairs;
 local strlenutf8 = strlenutf8;
 local InCombatLockdown = InCombatLockdown;
@@ -127,6 +128,12 @@ do
     PlumberMacros["drawer"] = {
         name = L["PlumberMacro Drawer"],
         type = ModifyType.None,
+        alwaysUpdate = true,
+
+        events = {
+            "ACTIVE_TALENT_GROUP_CHANGED",
+            "NEW_TOY_ADDED",
+        },
 
         conditionFunc = function ()
             return true
@@ -136,9 +143,9 @@ end
 
 
 local EL = CreateFrame("Frame");
-
 EL.macroIndexMin = 1;
 EL.macroIndexMax = 138;
+EL.macroEvents = {};
 
 
 function EL:CheckSupportedMacros()
@@ -199,6 +206,40 @@ function EL:CheckSupportedMacros()
     end
 end
 
+function EL:RequestUpdateMacroByEvent(event)
+    if not self.eventQueue then
+        self.eventQueue = {};
+    end
+    self.t = -0.5;
+    self.eventQueue[event] = true;
+    if self:GetScript("OnUpdate") == nil then
+        self:SetScript("OnUpdate", self.OnUpdate_UpdateMacroByEvent);
+    end
+end
+
+function EL:OnUpdate_UpdateMacroByEvent(elapsed)
+    self.t = self.t + elapsed;
+    if self.t > 0 then
+        self.t = nil;
+        self:SetScript("OnUpdate", nil);
+        if self.eventQueue then
+            local events = {};
+            local n = 0;
+            for event in pairs(self.eventQueue) do
+                n = n + 1;
+                events[n] = event;
+            end
+            self.eventQueue = nil;
+
+            for _, event in ipairs(events) do
+                if self.macroEvents[event] then
+                    self:UpdateMacroByEvent(event);
+                end
+            end
+        end
+    end
+end
+
 function EL:UpdateMacroByEvent(event)
     local commands = {};
 
@@ -218,13 +259,13 @@ function EL:UpdateMacros(commands)
 
         local inCombat = InCombatLockdown();
         local anyChange, newState, returns;
-        local name, icon, body;
+        local name, icon, body, anyEdit;
         local commandData;
         local prefix;
 
         for command, list in pairs(commands) do
             newState = PlumberMacros[command].conditionFunc();
-            if newState ~= PlumberMacros[command].currentState then
+            if PlumberMacros[command].alwaysUpdate or newState ~= PlumberMacros[command].currentState then
                 anyChange = true;
                 if not inCombat then
                     PlumberMacros[command].currentState = newState;
@@ -238,7 +279,12 @@ function EL:UpdateMacros(commands)
 
                     for _, index in ipairs(list) do
                         name, icon, body = GetMacroInfo(index);
+                        anyEdit = false;
+
                         if returns and returns.icon then
+                            if returns.icon ~= icon then
+                                anyEdit = true;
+                            end
                             icon = returns.icon;
                             if icon == 0 then
                                 icon = 134400;
@@ -258,13 +304,22 @@ function EL:UpdateMacros(commands)
                             else
                                 body = prefix.."\n"..body;
                             end
+                            anyEdit = true;
                         end
 
                         if commandData.initFunc then
                             body = commandData.initFunc(body);
+                            anyEdit = true;
                         end
-                        EditMacro(index, name, icon, body);
+
+                        if anyEdit then
+                            EditMacro(index, name, icon, body);
+                        end
                     end
+                end
+
+                if command == "drawer" then
+                    self:UpdateDrawers();
                 end
             end
         end
@@ -272,8 +327,6 @@ function EL:UpdateMacros(commands)
         if anyChange and inCombat then
             self:RegisterEvent("PLAYER_REGEN_ENABLED");
         end
-
-        self:UpdateDrawers();
     end
 end
 
@@ -337,8 +390,11 @@ function EL:UpdateDrawers()
     self.drawerUpdateFlag = DrawerUpdateFlag.Success;
 end
 
-function EL:CheckQueue()
-    if InCombatLockdown() then return end;
+function EL:UpdateMacrosAndDrawers()
+    if InCombatLockdown() then
+        self:RegisterEvent("PLAYER_REGEN_ENABLED");
+        return
+    end
     self:UnregisterEvent("PLAYER_REGEN_ENABLED");
     self:UpdateMacros();
 end
@@ -626,13 +682,13 @@ function EL:OnEvent(event, ...)
         self:LoadSpellAndItem();
         self:RequestUpdateMacros(0.5);
     elseif event == "PLAYER_REGEN_ENABLED" then
-        self:CheckQueue();
+        self:UpdateMacrosAndDrawers();
     elseif event == "UPDATE_MACROS" then
         --UPDATE_MACROS usually fires twice before PLAYER_ENTERING_WORLD
         self:UnregisterEvent(event);
         self:InitializeDrawerInfo();
     elseif self.macroEvents and self.macroEvents[event] then
-        self:UpdateMacroByEvent(event);
+        self:RequestUpdateMacroByEvent(event);
     end
 end
 EL:SetScript("OnEvent", EL.OnEvent);
@@ -818,7 +874,7 @@ do  --MacroInterpreter
                     usable = true;
                 end
 
-                if checkUsability and id then
+                if checkUsability and id and not usable then
                     if not CanPlayerPerformAction(actionType, id) then
                         --id = nil;
                         usable = false;
@@ -1059,33 +1115,51 @@ do  --Editor Setup
             command = "/use",
             argGetter = function(itemID, itemLink)
                 local name = GetItemNameByID(itemID);
-                return name, "item:"..itemID
-            end
+                return name, (itemID and "item:"..itemID) or nil
+            end,
         },
 
         spell = {
             command = "/cast",
             argGetter = function(spellIndex, bookType, spellID, baseSpellID)
                 local name = GetSpellName(spellID);
-                return name, "spell:"..spellID
-            end
+                return name, (spellID and "spell:"..spellID) or nil
+            end,
         },
 
         battlepet = {
             command = "/sp",
             argGetter = function(petGUID)
-                local speciesID, customName, level, xp, maxXp, displayID, favorite, name = C_PetJournal.GetPetInfoByPetID(petGUID);
-                return name, "pet:"..speciesID
-            end
+                local speciesID, customName, level, xp, maxXp, displayID, favorite, speciesName = C_PetJournal.GetPetInfoByPetID(petGUID);
+                return speciesName, (speciesID and "pet:"..speciesID) or nil
+            end,
         },
 
         mount = {
             command = "/use",
             argGetter = function(mountID, mountIndex)
                 local name = GetMountInfoByID(mountID);
-                return name, "mount:"..mountID
-            end
+                return name, (mountID and "mount:"..mountID) or nil
+            end,
         },
+
+
+        --Classic
+        --GetCompanionInfo seems to be broken
+        --[[
+        companion = {
+            command = "/use",
+            argGetter = function(index, companionType)
+                if companionType == "MOUNT" then
+                    local name, spellID, icon, isActive, isUsable, sourceType, isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected, mountID = C_MountJournal.GetDisplayedMountInfo(index);
+                    return name, (mountID and "mount:"..mountID) or nil
+                elseif companionType == "CRITTER" then
+                    local petID, speciesID, owned, customName, level, favorite, isRevoked, speciesName = C_PetJournal.GetPetInfoByIndex(index);
+                    return speciesName, (speciesID and "pet:"..speciesID) or nil
+                end
+            end,
+        },
+        --]]
     };
 
     function EditorSetup.DrawerOnEvent(self, event, ...)
@@ -1102,7 +1176,8 @@ do  --Editor Setup
                     receptor.PlusSign:Show();
                     receptor.Instruction:Hide();
                     local name, commandArg = info.argGetter(arg1, arg2, arg3, arg4);
-                    local newCommand = format("#%s %s", info.command, commandArg);
+                    local newCommand = commandArg and format("#%s %s", info.command, commandArg) or nil;
+                    name = name or "Unknown";
 
                     local function Receptor_OnEnter(self)
                         receptor.PlusSign:Hide();
@@ -1126,9 +1201,12 @@ do  --Editor Setup
                             return
                         end
 
-                        local body = EditorUI.SourceEditBox:GetText();
-                        body = body.."\n"..newCommand;
-                        EditorUI:SaveMacroBody(body);
+                        if newCommand then
+                            local body = EditorUI.SourceEditBox:GetText();
+                            body = body.."\n"..newCommand;
+                            EditorUI:SaveMacroBody(body);
+                        end
+
                         if not InCombatLockdown() then
                             ClearCursor();
                         end

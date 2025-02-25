@@ -2735,7 +2735,8 @@ end
 
 do  -- Macro Util
     local WoWAPI = {
-        IsSpellKnown = IsSpellKnownOrOverridesKnown or IsSpellKnown or IsPlayerSpell,
+        IsSpellKnown = IsSpellKnownOrOverridesKnown or IsSpellKnown,
+        IsPlayerSpell = IsPlayerSpell,
         PlayerHasToy = PlayerHasToy or Nop,
         GetItemCount = C_Item.GetItemCount,
         GetItemCraftedQualityByItemInfo = C_TradeSkillUI and C_TradeSkillUI.GetItemCraftedQualityByItemInfo or Nop,
@@ -2748,7 +2749,7 @@ do  -- Macro Util
 
     function API.CanPlayerPerformAction(actionType, arg1, arg2)
         if actionType == "spell" then
-            return WoWAPI.IsSpellKnown(arg1);
+            return WoWAPI.IsSpellKnown(arg1) or WoWAPI.IsPlayerSpell(arg1)
         elseif actionType == "item" then
             if API.IsToyItem(arg1) then
                 return WoWAPI.PlayerHasToy(arg1)
