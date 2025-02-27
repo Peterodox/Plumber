@@ -623,61 +623,11 @@ end
 
 do
     --Item Upgrade System (Crests)
+    local IUC = addon.ItemUpgradeConstant;
     local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 
     local CURRENCY_QUANTITY_ICON_FORMAT = "%s |T%s:10:10:0:-2:64:64:4:60:4:60|t";
     local DBKEY_MORE_INFO_CREST = "TooltipShowExtraInfoCrest";
-
-    local BASE_CURRENCY_ID = 2245;      --Flightstones
-    local CATALYST_CURRENCY_ID = 2167;  --Item conversion   /dump ItemInteractionFrame.currencyTypeId
-
-    local RAID_DIFFICUTY_M = PLAYER_DIFFICULTY6 or "Mythic";
-    local RAID_DIFFICUTY_H = PLAYER_DIFFICULTY2 or "Heroic";
-    local RAID_DIFFICUTY_N = PLAYER_DIFFICULTY1 or "Normal";
-    local RAID_DIFFICUTY_LFR = PLAYER_DIFFICULTY3 or "Raid Finder";
-
-    local CrestSources = {
-        RAID_DIFFICUTY_M..", +6",
-        RAID_DIFFICUTY_H..", +5",
-        RAID_DIFFICUTY_N,
-        RAID_DIFFICUTY_LFR,
-    };
-
-    local UpgradeCurrencies = {
-        --Universal Upgrade System (Crests)
-        --convert to string for hybrid process
-        --CategoryID ~= 142
-        --From high tier to low
-
-        --S4 Awakened
-        2812,   --Aspect    (M, M6+)
-        2809,   --Wyrm      (H, M5)
-        2807,   --Drake     (N, M0)
-        2806,   --Whelpling (LFR, H)
-    };
-
-
-    if UnitLevel("player") > 70 then
-        BASE_CURRENCY_ID = 3008;        --Valorstones
-        CATALYST_CURRENCY_ID = 2813;    --Harmonized Silk
-
-        CrestSources = {
-            RAID_DIFFICUTY_M..", +8",
-            RAID_DIFFICUTY_H..", +4",
-            RAID_DIFFICUTY_N..", +3",
-            RAID_DIFFICUTY_LFR,
-        };
-
-        UpgradeCurrencies = {
-            --TWW S1
-            2917,   --Aspect    (M, M6+)
-            2916,   --Wyrm      (H, M5)
-            2915,   --Drake     (N, M0)
-            2914,   --Whelpling (LFR, H)
-        };
-    end
-
-    addon.UpgradeCurrencies = UpgradeCurrencies;
 
     --local SEASON_CAP_LABEL = string.gsub(CURRENCY_SEASON_TOTAL_MAXIMUM or "Season Maximum: %s%s/%s", "%%s/%%s", "");
 
@@ -714,7 +664,7 @@ do
 
         local showIcon = true;
 
-        for i, currencyID in ipairs(UpgradeCurrencies) do
+        for i, currencyID in ipairs(IUC.Crests) do
             info = GetCurrencyInfo(currencyID);
             if info and (info.discovered or anyDiscovered) then
                 if info.discovered then
@@ -757,7 +707,7 @@ do
                 self:SetGridLine(row, 3, toEarn, 0.8, 0.8, 0.8, nil, 3);
 
                 if showExtraInfo then
-                    self:SetGridLine(row, 4, CrestSources[i], 1, 0.82, 0, nil, 1);
+                    self:SetGridLine(row, 4, IUC.CrestSources[i], 1, 0.82, 0, nil, 1);
                 end
             end
         end
@@ -773,12 +723,12 @@ do
                 self:SetGridLine(1, 3, L["Numbers To Earn"], 0.5, 0.5, 0.5, 3, 3);
             end
 
-            --Show flightstone
-            self:AppendCurrency(BASE_CURRENCY_ID, true);
+            --Show Valorstone
+            self:AppendCurrency(IUC.BaseCurrencyID, true);
 
             --Catalyst Charges
-            if showExtraInfo and CATALYST_CURRENCY_ID then
-                self:AppendCurrency(CATALYST_CURRENCY_ID, false, L["Catalyst Charges"], true);
+            if showExtraInfo and IUC.CatalystCurrencyID then
+                self:AppendCurrency(IUC.CatalystCurrencyID, false, L["Catalyst Charges"], true);
             end
         else
             self:AddLeftLine(ERR_ITEM_NOT_FOUND, 1.000, 0.282, 0.000);

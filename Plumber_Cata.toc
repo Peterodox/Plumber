@@ -17,6 +17,7 @@ Initialization.lua
 Locales\Localization.xml
 API.lua
 
+Modules\SharedData.lua
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
 

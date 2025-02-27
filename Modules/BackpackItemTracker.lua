@@ -2,6 +2,7 @@ local _, addon = ...
 local API = addon.API;
 local L = addon.L;
 local TooltipFrame = addon.SharedTooltip;
+local UpgradeCurrencies = addon.ItemUpgradeConstant.Crests;
 
 local ENABLE_THIS_MODULE = true;        --DB.BackpackItemTracker
 local HIDE_ZERO_COUNT_ITEM = true;      --DB.HideZeroCountItem      Dock items inside a flyout menu
@@ -56,8 +57,6 @@ local HolidayItems = {
     hallowsendend = 33226,      --Tricky Treat
     --winterveil
 };
-
-local UpgradeCurrencies = addon.UpgradeCurrencies;  --Defined in SharedTooltip.lua
 
 
 local EL = CreateFrame("Frame");
