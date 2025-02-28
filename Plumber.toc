@@ -1,6 +1,6 @@
 ## X-Flavor: retail
-## Interface: 110007, 110100
-## Version: 1.6.2
+## Interface: 110100
+## Version: 1.6.3
 
 ## Title: Plumber
 
@@ -20,6 +20,7 @@ API.lua
 Modules\SharedData.lua
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
+#Modules\DevTool.lua
 #Modules\DirectionArrow.lua
 #Modules\SuperTrack.xml
 
@@ -60,6 +61,7 @@ Modules\BlizzardSuperTrack.lua
 Modules\AccountStore.lua
 Modules\EquipmentFlyout.xml
 Modules\Macros.lua
+Modules\ProfessionsBook.lua
 
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua

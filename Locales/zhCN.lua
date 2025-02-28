@@ -289,6 +289,12 @@ L["ModuleName BlizzardSuperTrack"] = "导航：事件倒计时";
 L["ModuleDescription BlizzardSuperTrack"] = "如果你正在追踪的地图标记的鼠标提示里包含时间信息，在屏幕导航下方显示此时间。";
 
 
+--ProfessionsBook
+L["ModuleName ProfessionsBook"] = "未使用的知识";
+L["ModuleDescription ProfessionsBook"] = "在专业技能书界面上显示你未使用的专精知识点数。";
+L["Unspent Knowledge Tooltip Format"] = "你有|cffffffff%s|r点未使用的专业专精知识。";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";

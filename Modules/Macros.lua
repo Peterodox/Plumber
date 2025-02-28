@@ -850,7 +850,6 @@ do  --MacroInterpreter
                     if id and DoesItemReallyExist(id) then
                         name = GetItemNameByID(id);
                         icon = GetItemIconByID(id);
-                        usable = true;
                         macroText = format("/use \"item:%d\"", id);
                         craftingQuality = GetItemCraftingQuality(id);
                         if name and craftingQuality then
@@ -875,9 +874,8 @@ do  --MacroInterpreter
                 end
 
                 if checkUsability and id and not usable then
-                    if not CanPlayerPerformAction(actionType, id) then
-                        --id = nil;
-                        usable = false;
+                    if CanPlayerPerformAction(actionType, id) then
+                        usable = true;
                     end
                 end
 

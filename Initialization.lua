@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.6.2";
-local VERSION_DATE = 1740600000;
+local VERSION_TEXT = "v1.6.3";
+local VERSION_DATE = 1740750000;
 
 
 local addonName, addon = ...
@@ -116,6 +116,7 @@ local DefaultValues = {
     Plunderstore = true,
         Plunderstore_HideCollected = true,
     BlizzardSuperTrack = false,         --Add timer to the SuperTrackedFrame when tracking a POI with time format
+    ProfessionsBook = true,             --Show unspent points on ProfessionsBookFrame
 
 
     --Custom Loot Window

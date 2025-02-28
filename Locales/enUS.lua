@@ -289,6 +289,12 @@ L["ModuleName BlizzardSuperTrack"] = "Waypoint: Event Timer";
 L["ModuleDescription BlizzardSuperTrack"] = "Add a timer to your active waypoint if its map pin tooltip has one.";
 
 
+--ProfessionsBook
+L["ModuleName ProfessionsBook"] = PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS or "Unspent Knowledge";
+L["ModuleDescription ProfessionsBook"] = "Display the number of your unspent Profession Specialization Knowledge on the Professions Book UI";
+L["Unspent Knowledge Tooltip Format"] = "You have |cffffffff%s|r unspent Profession Specialization Knowledge."  --see PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
