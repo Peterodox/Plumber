@@ -170,6 +170,7 @@ local DefaultValues = {
         SpellFlyout_CloseAfterClick = true,
         SpellFlyout_SingleRow = false,
         SpellFlyout_HideUnusable = false,
+        SpellFlyout_UpdateFrequently = false,
 
 
     EnableNewByDefault = false,             --Always enable newly added features

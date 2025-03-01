@@ -2757,12 +2757,13 @@ do  -- Macro Util
                 local _, _, _, _, _, classID, subClassID = WoWAPI.GetItemInfoInstant(arg1);
 
                 --always return true for conumable items in case player needs to restock
-                if classID == 0 then
-                    return true
-                end
+                --if classID == 0 then
+                --    return true
+                --end
+                local isConsumable = classID == 0;
 
                 local count = WoWAPI.GetItemCount(arg1, true, true, true, true);
-                return count > 0
+                return count > 0, isConsumable
             end
         end
 

@@ -6,7 +6,8 @@
 
 
 -- User Settings
-local HIDE_UNUSABLE = false;  --Hide unusable spells
+local HIDE_UNUSABLE = false;        --Hide unusable spells
+local UPDATE_FREQUENTLY = false;    --Update drawers when BAG_UPDATE_DELAYED, SPELLS_CHANGED
 ------------------
 
 local _, addon = ...
@@ -52,6 +53,8 @@ local GetItemCraftingQuality = API.GetItemCraftingQuality;
 local MacroInterpreter = {};    --Add info to tooltip
 local EditorUI = {};            --Attach to MacroFrame once it loaded
 local EditorSetup = {};         --Setup the editor when viewing supported Plumber Macro
+local DrawerUpdator = CreateFrame("Frame");     --Optional. Update button states when bag, spell change. (Flagged dirty after certain events, update all drawers unpon mouse over Action Button or entering combat)
+
 
 local ModifyType = {
     None = 0,
@@ -128,12 +131,7 @@ do
     PlumberMacros["drawer"] = {
         name = L["PlumberMacro Drawer"],
         type = ModifyType.None,
-        alwaysUpdate = true,
-
-        events = {
-            "ACTIVE_TALENT_GROUP_CHANGED",
-            "NEW_TOY_ADDED",
-        },
+        --alwaysUpdate = true,
 
         conditionFunc = function ()
             return true
@@ -204,6 +202,8 @@ function EL:CheckSupportedMacros()
             self:RegisterEvent(event);
         end
     end
+
+    DrawerUpdator:SetEnabled(self.activeCommands["drawer"] ~= nil);
 end
 
 function EL:RequestUpdateMacroByEvent(event)
@@ -317,10 +317,6 @@ function EL:UpdateMacros(commands)
                         end
                     end
                 end
-
-                if command == "drawer" then
-                    self:UpdateDrawers();
-                end
             end
         end
 
@@ -359,25 +355,24 @@ function EL:UpdateDrawers()
     SecureSpellFlyout:ReleaseClickHandlers();
     local drawers = self.activeCommands and self.activeCommands["drawer"];
     if drawers and #drawers > 0 then
-        local name, icon, body, drawerInfo, overflow, anyOverflow;
+        local name, icon, body, drawerInfo, overflow, anyOverflow, anyChange;
         local handlerName;
         local checkUsability = true;
         local hideUnusable = HIDE_UNUSABLE;
+        local alwaysShowConsumables = not UPDATE_FREQUENTLY;
 
         for _, macroIndex in ipairs(drawers) do
             name, icon, body = GetMacroInfo(macroIndex);
-            drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable);
-            if drawerInfo then
-                handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
-                if handlerName then
-                    body = gsub(body, "/plmr 1", "");   --Legacy. Remove it in future update
-                    body = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
-                    local extraLine = "/click "..handlerName;
-                    body, overflow = AddExtraLineToMacroBody(extraLine, body);
-                    EditMacro(macroIndex, name, icon, body);
-                    if overflow then
-                        anyOverflow = true;
-                    end
+            drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable, alwaysShowConsumables);
+            handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
+            if handlerName then
+                body = gsub(body, "/plmr 1", "");   --Legacy. Remove it in future update
+                body, anyChange = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
+                local extraLine = "/click "..handlerName;
+                body, overflow = AddExtraLineToMacroBody(extraLine, body);
+                EditMacro(macroIndex, name, icon, body);
+                if overflow then
+                    anyOverflow = true;
                 end
             end
         end
@@ -413,6 +408,7 @@ function EL:RequestUpdateMacros(delay)
     delay = delay and -delay or 0;
     self.t = delay;
     self:SetScript("OnUpdate", self.OnUpdate_UpdateMacros);
+    DrawerUpdator:RequestUpdate(delay);
 end
 
 function EL:LoadSpellAndItem()
@@ -513,7 +509,10 @@ do  --EditorUI  --MacroForge
         end
     end
 
-    function EditorUI:SearchInEditBoxForSupportedCommand()
+    function EditorUI:SearchInEditBoxForSupportedCommand(forceUpdate)
+        if forceUpdate then
+            self.args = {};
+        end
         local body = self.SourceEditBox:GetText();
         local command = match(body, "#plumber:(%w+)");
         if command and PlumberMacros[command] and self.ExtraFrame and PlumberMacros[command].editorSetupFunc then
@@ -599,14 +598,14 @@ do  --EditorUI  --MacroForge
     end
 
     function EditorUI:SaveMacroBody(body)
-        EditorUI.SourceEditBox:SetText(body);
         if not InCombatLockdown() then
+            EditorUI.SourceEditBox:SetText(body);
             --MacroFrame:SaveMacro();
             local selectedMacroIndex = MacroFrame:GetSelectedIndex();
             local actualIndex = MacroFrame:GetMacroDataIndex(selectedMacroIndex);
             EditMacro(actualIndex, nil, nil, body);
+            EL:RequestUpdateMacros(0.0);
         end
-        EL:RequestUpdateMacros(0.0);
     end
 end
 
@@ -637,6 +636,7 @@ if MacroFrame_LoadUI then
                 f.ExtraFrame = ef;
                 ef:Hide();
                 ef:SetScript("OnHide", function()
+                    ef:Hide();
                     ef:UnregisterAllEvents();
                 end);
                 ef:SetScript("OnShow", function()
@@ -665,6 +665,7 @@ if MacroFrame_LoadUI then
                 f.MouseBlocker:SetFrameLevel(128);
                 f.MouseBlocker:SetFixedFrameLevel(true);
                 f.MouseBlocker:EnableMouse(true);
+                f.MouseBlocker:Hide();
 
                 f:SetFrameHeight(72);
                 f:RequestSearchInEditBox();
@@ -681,6 +682,7 @@ function EL:OnEvent(event, ...)
         self:UnregisterEvent(event);
         self:LoadSpellAndItem();
         self:RequestUpdateMacros(0.5);
+        DrawerUpdator:RequestUpdate(0.7);
     elseif event == "PLAYER_REGEN_ENABLED" then
         self:UpdateMacrosAndDrawers();
     elseif event == "UPDATE_MACROS" then
@@ -733,11 +735,12 @@ do  --MacroInterpreter
         end
     end
 
-    function MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable)
+    function MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable, alwaysShowConsumables)
         local tbl;
         local n = 0;
         local processed, usable;
         local name, icon, actionType, id, macroText, craftingQuality, tempID;
+        local canPerform, isConsumable
 
         for line in string.gmatch(body, "#(/[^\n]+)") do
             processed = false;
@@ -874,7 +877,10 @@ do  --MacroInterpreter
                 end
 
                 if checkUsability and id and not usable then
-                    if CanPlayerPerformAction(actionType, id) then
+                    canPerform, isConsumable = CanPlayerPerformAction(actionType, id);
+                    if canPerform then
+                        usable = true;
+                    elseif isConsumable and alwaysShowConsumables then
                         usable = true;
                     end
                 end
@@ -1027,7 +1033,13 @@ do  --Editor Setup
                     if self.tooltipMethod then
                         tooltip:AddLine(" ");
                     end
-                    tooltip:AddLine("<"..L["Drag To Reorder"]..">", 0.1, 1, 0.1, true);
+
+                    if InCombatLockdown() then
+                        tooltip:AddLine(L["PlumberMacro Error EditMacroInCombat"], 1, 0.1, 0.1, true);
+                    else
+                        tooltip:AddLine("<"..L["Drag To Reorder"]..">", 0.1, 1, 0.1, true);
+                    end
+
                     tooltip:Show();
 
                     if self:IsDataCached() then
@@ -1048,6 +1060,7 @@ do  --Editor Setup
 
             function IconButtonMixin:OnMouseDown(mouseButton)
                 if mouseButton == "LeftButton" then
+                    if InCombatLockdown() then return end;
                     ReorderController:SetDraggedObject(self);
                     ReorderController:PreDragStart();
                     EditorUI:RaiseIconButtonLevel(self);
@@ -1170,7 +1183,9 @@ do  --Editor Setup
                 EditorUI.Note:Hide();
                 local receptor = EditorSetup.ReceptorFrame;
                 local info = SupportedCursorInfo[infoType];
-                if info and (arg1 ~= nil) then
+                local inCombat = InCombatLockdown();
+
+                if (not inCombat) and info and (arg1 ~= nil) then
                     receptor.PlusSign:Show();
                     receptor.Instruction:Hide();
                     local name, commandArg = info.argGetter(arg1, arg2, arg3, arg4);
@@ -1227,8 +1242,13 @@ do  --Editor Setup
                 else
                     receptor.PlusSign:Hide();
                     receptor.Instruction:Show();
-                    receptor.Instruction:SetText(format(L["Unsupported Action Type Format"], infoType));
-                    receptor.Instruction:SetTextColor(0.6, 0.6, 0.6);
+                    if inCombat then
+                        receptor.Instruction:SetText(L["PlumberMacro Error EditMacroInCombat"]);
+                        receptor.Instruction:SetTextColor(1, 0.1, 0.1);
+                    else
+                        receptor.Instruction:SetText(format(L["Unsupported Action Type Format"], infoType));
+                        receptor.Instruction:SetTextColor(0.6, 0.6, 0.6);
+                    end
                     receptor:SetScript("OnEnter", nil);
                     receptor:SetScript("OnLeave", nil);
                     receptor:SetScript("OnClick", nil);
@@ -1286,7 +1306,20 @@ do  --Editor Setup
     EditorSetup.drawerOptions = {
         {label = L["Drawer Option CloseAfterClick"], dbKey = "SpellFlyout_CloseAfterClick", tooltip = L["Drawer Option CloseAfterClick Tooltip"], tooltip2 = L["Drawer Option Global Tooltip"]},
         {label = L["Drawer Option SingleRow"], dbKey = "SpellFlyout_SingleRow", tooltip = L["Drawer Option SingleRow Tooltip"], tooltip2 = L["Drawer Option Global Tooltip"]},
-        {label = L["Drawer Option Hide Unusable"], dbKey = "SpellFlyout_HideUnusable", tooltip = L["Drawer Option Hide Unusable Tooltip"], tooltip2 = L["Drawer Option Global Tooltip"]},
+        {label = L["Drawer Option Hide Unusable"], dbKey = "SpellFlyout_HideUnusable", tooltip = L["Drawer Option Hide Unusable Tooltip"],
+            tooltip2 = function()
+                if GetDBValue("SpellFlyout_UpdateFrequently") then
+                    return L["Drawer Option Global Tooltip"]
+                else
+                    return L["Drawer Option Hide Unusable Tooltip 2"].."\n\n"..L["Drawer Option Global Tooltip"]
+                end
+            end,
+            onClickFunc = function()
+                local forceUpdate = true;
+                EditorUI:SearchInEditBoxForSupportedCommand(forceUpdate);
+            end,
+        },
+        {label = L["Drawer Option Update Frequently"], dbKey = "SpellFlyout_UpdateFrequently", tooltip = L["Drawer Option Update Frequently Tooltip"], tooltip2 = L["Drawer Option Global Tooltip"], requiredDBValues = { SpellFlyout_HideUnusable = true }},
     };
 
     function EditorSetup.Drawer(body)
@@ -1351,14 +1384,31 @@ do  --Editor Setup
 
                 local visualOffsetY = 4;
                 local padding = 8;
+                local checkboxBaseOffsetX = 24;
                 local extraHeight = padding - visualOffsetY;
                 local checkbox;
+                local valid;
                 for _, info in ipairs(EditorSetup.drawerOptions) do
-                    checkbox = EditorSetup.AcquireCheckbox();
-                    checkbox:SetData(info);
-                    checkbox:SetChecked(GetDBValue(checkbox.dbKey));
-                    checkbox:SetPoint("TOPLEFT", EditorSetup.IconButtonFrame, "BOTTOMLEFT", 24, -extraHeight);
-                    extraHeight = extraHeight + checkbox:GetHeight();
+                    valid = true;
+                    if info.requiredDBValues then
+                        for dbKey, value in pairs(info.requiredDBValues) do
+                            if GetDBValue(dbKey) ~= value then
+                                valid = false;
+                                break
+                            end
+                        end
+                        fromX = checkboxBaseOffsetX + 20;
+                    else
+                        fromX = checkboxBaseOffsetX;
+                    end
+
+                    if valid then
+                        checkbox = EditorSetup.AcquireCheckbox();
+                        checkbox:SetData(info);
+                        checkbox:SetChecked(GetDBValue(checkbox.dbKey));
+                        checkbox:SetPoint("TOPLEFT", EditorSetup.IconButtonFrame, "BOTTOMLEFT", fromX, -extraHeight);
+                        extraHeight = extraHeight + checkbox:GetHeight();
+                    end
                 end
                 extraHeight = extraHeight + padding + visualOffsetY;
                 EditorUI.ExtraFrame:SetHeight(EditorSetup.iconButtonContainerHeight + extraHeight);
@@ -1390,6 +1440,115 @@ do  --Editor Setup
 end
 
 
+do  --DrawerUpdator
+    local UpdateEvents_Constant = {
+        ["ACTIVE_TALENT_GROUP_CHANGED"] = true,
+        ["NEW_TOY_ADDED"] = true,
+        ["NEW_PET_ADDED"] = true,
+        ["NEW_MOUNT_ADDED"] = true,
+    };
+
+    local UpdateEvents_Lazy = {
+        ["SPELLS_CHANGED"] = true,
+        ["BAG_UPDATE_DELAYED"] = true,
+    };
+
+    function DrawerUpdator:SetEnabled(state)
+        self.enabled = state;
+        if state then
+            for event in pairs(UpdateEvents_Constant) do
+                self:RegisterEvent(event);
+            end
+            self:SetScript("OnEvent", self.OnEvent);
+
+            if UPDATE_FREQUENTLY then
+                self:EnableAdditionalChecks(true);
+            else
+                self:EnableAdditionalChecks(false);
+            end
+        else
+            for event in pairs(UpdateEvents_Constant) do
+                self:UnregisterEvent(event);
+            end
+            self:EnableAdditionalChecks(false);
+        end
+    end
+
+    function DrawerUpdator:EnableAdditionalChecks(state)
+        if not self.enabled then return end;
+
+        if state then
+            for event in pairs(UpdateEvents_Lazy) do
+                self:RegisterEvent(event);
+            end
+        else
+            for event in pairs(UpdateEvents_Lazy) do
+                self:UnregisterEvent(event);
+            end
+        end
+    end
+
+    function DrawerUpdator:OnEvent(event, ...)
+        if UpdateEvents_Constant[event] then
+            if not self.drawerDirty then
+                self.drawerDirty = true;
+                self:RequestUpdate();
+            end
+        elseif UpdateEvents_Lazy[event] then
+            if not self.drawerDirty then
+                self.drawerDirty = true;
+                self:RequestUpdate();
+            end
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            self:UnregisterEvent(event);
+            if self.drawerDirty then
+                self:UpdateDrawers();
+            end
+        end
+    end
+
+    function DrawerUpdator:RequestUpdate(delay)
+        self.drawerDirty = true;
+        delay = delay or 0.2;
+        self.t = -delay;
+        if InCombatLockdown() then
+            self:SetScript("OnUpdate", nil);
+            self:RegisterEvent("PLAYER_REGEN_ENABLED");
+        else
+            self:SetScript("OnUpdate", self.OnUpdate);
+        end
+    end
+
+    function DrawerUpdator:UpdateIfDirty()
+        if self.drawerDirty then
+            if not InCombatLockdown() then
+                self:UpdateDrawers();
+            end
+        end
+    end
+
+    function DrawerUpdator:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            if InCombatLockdown() then
+                self:RequestUpdate();
+            else
+                self:UpdateDrawers();
+            end
+        end
+    end
+
+    function DrawerUpdator:UpdateDrawers()
+        self.drawerDirty = false;
+        EL:UpdateDrawers();
+        SecureSpellFlyout:Close();
+        --print("DRAWER UPDATED")
+    end
+end
+
+
 do  --Settings Registry
     local function UpdateAfterSettingsChanged()
         EL:RequestUpdateMacros(0.0);
@@ -1409,6 +1568,14 @@ do  --Settings Registry
 
     CallbackRegistry:RegisterSettingCallback("SpellFlyout_HideUnusable", function(state, userInput)
         HIDE_UNUSABLE = state;
+        if userInput then
+            UpdateAfterSettingsChanged();
+        end
+    end);
+
+    CallbackRegistry:RegisterSettingCallback("SpellFlyout_UpdateFrequently", function(state, userInput)
+        UPDATE_FREQUENTLY = state;
+        DrawerUpdator:EnableAdditionalChecks(state);
         if userInput then
             UpdateAfterSettingsChanged();
         end

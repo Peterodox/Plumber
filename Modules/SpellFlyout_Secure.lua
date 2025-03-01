@@ -145,6 +145,12 @@ do --SpellFlyout Main
         self.FlyoutArrow:SetSize(24, 24);
         self.FlyoutArrow:Hide();
 
+        self.Note = self:CreateFontString(nil, "OVERLAY", "GameFontRed");
+        self.Note:SetPoint("CENTER", self, "CENTER", 0, 0);
+        self.Note:SetJustifyH("CENTER");
+        self.Note:SetJustifyH("CENTER");
+        self.Note:Hide();
+
         self:SetScript("OnShow", self.OnShow);
         self:SetScript("OnHide", self.OnHide);
         self:SetScript("OnEvent", self.OnEvent);
@@ -162,10 +168,12 @@ do --SpellFlyout Main
             self:Init();
         end
 
+        local buttonSize = ACTION_BUTTON_SIZE;
+        local gap = 2;
+        local h, v = 0, 0;
+
         if actions and #actions > 0 then
-            local buttonSize = ACTION_BUTTON_SIZE;
-            local gap = 2;
-            local h, v = 0, 0;
+            self.Note:Hide();
             local level = 9;
             local n = 0;
             local action;
@@ -204,16 +212,6 @@ do --SpellFlyout Main
                 h = MAX_BUTTON_PER_ROW;
             end
 
-            self:SetSize(h * (buttonSize + gap) + gap, (v + 1) * (buttonSize + gap) + gap);
-
-            local x, y = API.GetScaledCursorPositionForFrame(self);
-            self:ClearAllPoints();
-            self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 24.0, y + 26.0);
-            self:SetFrameStrata("FULLSCREEN_DIALOG");
-            self:SetFrameLevel(7);
-            self:EnableMouse(true);
-            self:Show();
-
             if anySpell then
                 self:UpdateSpellCooldowns();
             end
@@ -221,9 +219,28 @@ do --SpellFlyout Main
                 self:UpdateItemCooldowns();
                 self:UpdateItemCount();
             end
-        else
 
+            self:SetSize(h * (buttonSize + gap) + gap, (v + 1) * (buttonSize + gap) + gap);
+        else
+            self.Note:SetText(L["PlumberMacro Error NoAction"]);
+            self.Note:Show();
+            h = 4;
+            v = 0;
+
+            self.Note:SetWidth(3 * (buttonSize + gap) - gap);
+            local textWidth = API.Round(self.Note:GetWrappedWidth());
+            local textHeight = API.Round(self.Note:GetHeight());
+            self:SetSize(textWidth + 32, textHeight + 24);
+            --self:SetSize(h * (buttonSize + gap) + gap, (v + 1) * (buttonSize + gap) + gap);
         end
+
+        local x, y = API.GetScaledCursorPositionForFrame(self);
+        self:ClearAllPoints();
+        self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 24.0, y + 26.0);
+        self:SetFrameStrata("FULLSCREEN_DIALOG");
+        self:SetFrameLevel(7);
+        self:EnableMouse(true);
+        self:Show();
     end
 
     function SpellFlyout:SetOwner(owner)
@@ -313,9 +330,11 @@ do  --VisualButtonMixin
         if state then
             self.Icon:SetVertexColor(1, 1, 1);
             self.Icon:SetDesaturated(false);
+            self.IconOverlay:SetVertexColor(1, 1, 1);
         else
-            self.Icon:SetVertexColor(0.8, 0.8, 0.8);
+            self.Icon:SetVertexColor(0.5, 0.5, 0.5);
             self.Icon:SetDesaturated(true);
+            self.IconOverlay:SetVertexColor(0.8, 0.8, 0.8);
         end
     end
 
@@ -512,6 +531,7 @@ do  --SecureControllerPool
         end
 
         self.numIdleHandlers = #self.clickHandlers;
+        self.emptyActionHandlerName = nil;
 
         for _, handler in ipairs(self.clickHandlers) do
             handler:SetAttribute("_onclick", nil);
@@ -609,6 +629,10 @@ do  --SecureControllerPool
                 local x = uiWidth * xRatio;
                 local y = uiHeight * yRatio;
 
+                if numActions == 0 then
+                    h = 4;
+                end
+
                 ActionButtonContainer:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 24.0, y + 26.0);
                 ActionButtonContainer:SetWidth(h * (buttonSize + gap) + gap);
                 ActionButtonContainer:SetHeight((v + 1) * (buttonSize + gap) + gap);
@@ -629,22 +653,36 @@ do  --SecureControllerPool
     SecureControllerPool:UpdateLayout()
 
     function SecureControllerPool:AddActions(actions)
-        local handler = self:AcquireClickHandler();
-        local handlerName = handler:GetName();
-        handler:SetAttribute("numActions", #actions);
+        local numActions = actions and #actions or 0;
 
-        if CLOSE_AFTER_CLICK then
-            local closeFlyoutMacro = self:GetCloseFlyoutMacro();
-            closeFlyoutMacro = "\n"..closeFlyoutMacro;
-            for i, action in ipairs(actions) do
-                handler:SetAttribute("customMacroText"..i, (action.macroText or "")..closeFlyoutMacro);
-            end
-        else
-            for i, action in ipairs(actions) do
-                handler:SetAttribute("customMacroText"..i, action.macroText);
-            end
+        if numActions == 0 and self.emptyActionHandlerName then
+            return self.emptyActionHandlerName;
         end
 
+        local handler = self:AcquireClickHandler();
+        local handlerName = handler:GetName();
+
+        if numActions == 0 then
+            self.emptyActionHandlerName = handlerName;
+        end
+
+        handler:SetAttribute("numActions", numActions);
+
+        if numActions > 0 then
+            if CLOSE_AFTER_CLICK then
+                local closeFlyoutMacro = self:GetCloseFlyoutMacro();
+                closeFlyoutMacro = "\n"..closeFlyoutMacro;
+                for i, action in ipairs(actions) do
+                    handler:SetAttribute("customMacroText"..i, (action.macroText or "")..closeFlyoutMacro);
+                end
+            else
+                for i, action in ipairs(actions) do
+                    handler:SetAttribute("customMacroText"..i, action.macroText);
+                end
+            end
+        else
+
+        end
 
         handler:SetScript("PreClick", function()
             SpellFlyout:ShowActions(actions);
@@ -686,14 +724,26 @@ do  --SecureControllerPool
 
     function SpellFlyout:RemoveClickHandlerFromMacro(body)
         local pattern = "/click%s+"..VIRTUAL_BUTTON_NAME.."%d+";
+        local anyChange;
         if find(body, pattern) then
             body = gsub(body, pattern, "");
             while find(body, "\n\n") do
                 body = gsub(body, "\n\n", "\n");
             end
             body = gsub(body, "%s+$", "");
+            anyChange = true;
+        else
+            anyChange = false;
         end
-        return body
+        return body, anyChange
+    end
+
+    function SpellFlyout:Close()
+        if not InCombatLockdown() then
+            if SecureRootContainer:IsShown() then
+                SecureRootContainer:Hide();
+            end
+        end
     end
 end
 
