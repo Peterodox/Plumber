@@ -24,6 +24,7 @@ local DelvePOI = {
     --Ringing Deeps
     {2214, 7867, 7788},   --The Dread Pit
     {2214, 7866, 7782},   --The Waterworks
+    {2214, 8143, 8181},   --Excavation Site 9
 
     --Hallowfall
     {2215, 7869, 7780},   --Mycomancer Cavern
@@ -189,9 +190,9 @@ do
             end
         end
 
-        if positionToCache then
-            API.ConvertAndCacheMapPositions(positionToCache, onCoordReceivedFunc, onConvertFinishedFunc);
-        end
+        --if positionToCache then
+        --    API.ConvertAndCacheMapPositions(positionToCache, onCoordReceivedFunc, onConvertFinishedFunc);
+        --end
 
         return data
     end
@@ -312,6 +313,13 @@ POILocation = {
         ["y"] = 0.461,
         ["x"] = 0.47,
         ["poiID"] = 7780,
+        ["continent"] = 2274,
+    },
+    [8181] = {
+        ["uiMapID"] = 2214,
+        ["y"] = 0.744,
+        ["x"] = 0.64,
+        ["poiID"] = 8181,
         ["continent"] = 2274,
     },
 };

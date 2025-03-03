@@ -212,9 +212,9 @@ do
             end
         end
 
-        if positionToCache then
-            API.ConvertAndCacheMapPositions(positionToCache, onCoordReceivedFunc, onConvertFinishedFunc);
-        end
+        --if positionToCache then
+        --    API.ConvertAndCacheMapPositions(positionToCache, onCoordReceivedFunc, onConvertFinishedFunc);
+        --end
 
         return data
     end

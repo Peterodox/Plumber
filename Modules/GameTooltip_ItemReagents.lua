@@ -1,6 +1,6 @@
 local _, addon = ...
 local L = addon.L;
-local GameTooltipItemManager = addon.GameTooltipItemManager;
+local GameTooltipItemManager = addon.GameTooltipManager:GetItemManager();
 
 local floor = math.floor;
 local GetItemSpell = C_Item.GetItemSpell;
@@ -26,7 +26,7 @@ local TextureInfoTable = {
 
 local ItemSubModule = {};
 
-function ItemSubModule:ProcessItem(tooltip, itemID)
+function ItemSubModule:ProcessData(tooltip, itemID)
     if self.enabled then
         if ItemReagentCache[itemID] == nil then
             local _, _, _, _, _, classID = GetItemInfoInstant(itemID);

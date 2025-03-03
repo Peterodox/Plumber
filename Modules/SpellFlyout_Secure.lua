@@ -53,6 +53,7 @@ do --SpellFlyout Main
     SpellFlyout:SetFrameStrata("FULLSCREEN_DIALOG");
 
     function SpellFlyout:Clear()
+        self.actions = nil;
         self:Hide();
         self:ClearAllPoints();
     end
@@ -305,7 +306,8 @@ do  --VisualButtonMixin
             end
             local craftingQuality = GetItemCraftingQuality(self.id);
             self:SetCraftingQuality(craftingQuality);
-
+        elseif self.actionType == "profession" then
+            self:SetPrimaryProfession(action.id);
         elseif self[action.actionType] then
             self[action.actionType](self, action.id);
         end
@@ -466,6 +468,14 @@ do  --VisualButtonMixin
 
     function VisualButtonMixin:SetCustomEmote(customEmote)
         self.tooltipText = (EMOTE or "Emote")..": "..customEmote;
+    end
+
+    function VisualButtonMixin:SetPrimaryProfession(spellID)
+        if spellID and spellID > 0 then
+            self.tooltipMethod = "SetSpellByID";
+        else
+            self.tooltipText = self.tooltipLineText;
+        end
     end
 
 
@@ -685,7 +695,9 @@ do  --SecureControllerPool
         end
 
         handler:SetScript("PreClick", function()
-            SpellFlyout:ShowActions(actions);
+            if not(SpellFlyout:IsShown() and SpellFlyout.actions == actions) then
+                SpellFlyout:ShowActions(actions);
+            end
             if not InCombatLockdown() then
                 ActionButtonPool:UpdateClicks();
             end

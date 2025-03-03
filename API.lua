@@ -2789,6 +2789,75 @@ do  -- Macro Util
     end
 end
 
+do  --Professions
+    --/dump ProfessionsBook_GetSpellBookItemSlot(GetMouseFoci()[1]) --Used on ProfessionsBookFrame SpellButton
+
+    local GetProfessions = GetProfessions;
+    local GetProfessionInfo = GetProfessionInfo;
+    local GetSpellBookItemType = (C_SpellBook and C_SpellBook.GetSpellBookItemType) or GetSpellBookItemInfo;
+
+    function API.GetProfessionSpellInfo(professionOrderIndex)
+        local prof1, prof2, archaeology, fishing, cooking = GetProfessions();
+        local index;
+
+        if professionOrderIndex == 2 then
+            index = prof2;
+        else
+            index = prof1;
+        end
+
+        if not index then return end;
+
+        local name, texture, rank, maxRank, numSpells, spellOffset, skillLine, rankModifier, specializationIndex, specializationOffset, skillLineName = GetProfessionInfo(index);
+        if not spellOffset then return end;
+
+        local buttonID = 1;     --PrimaryProfessionSpellButtonBottom
+        local slotIndex = spellOffset + buttonID;
+        local activeSpellBank = 0;  --Enum.SpellBookSpellBank.Player
+        local itemType, actionID, spellID = GetSpellBookItemType(slotIndex, activeSpellBank);
+
+        --Classic
+        if not spellID then
+            spellID = actionID;
+        end
+
+        local tbl = {
+            spellID = spellID,
+            texture = texture,
+            name = name,
+            slotIndex = slotIndex,
+            activeSpellBank = activeSpellBank,
+            skillLine = skillLine,
+        };
+
+        return tbl
+    end
+
+    if C_TradeSkillUI and C_TradeSkillUI.OpenTradeSkill then
+        --Retail
+        function API.OpenProfessionFrame(professionOrderIndex)
+            local info = API.GetProfessionSpellInfo(professionOrderIndex);
+            if info then
+                local currBaseProfessionInfo = C_TradeSkillUI.GetBaseProfessionInfo();
+                if (not currBaseProfessionInfo) or (currBaseProfessionInfo.professionID ~= info.skillLine) then
+                    C_TradeSkillUI.OpenTradeSkill(info.skillLine);
+                    --C_SpellBook.CastSpellBookItem(info.slotIndex, info.activeSpellBank);
+                else
+                    C_TradeSkillUI.CloseTradeSkill();
+                end
+            end
+        end
+    else
+        --Classic
+        function API.OpenProfessionFrame(professionOrderIndex)
+            local info = API.GetProfessionSpellInfo(professionOrderIndex);
+            if info then
+                CastSpell(info.slotIndex, "professions");
+            end
+        end
+    end
+    PlumberGlobals.OpenProfessionFrame = API.OpenProfessionFrame;
+end
 
 --[[
 local DEBUG = CreateFrame("Frame");

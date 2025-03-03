@@ -1,25 +1,11 @@
 local _, addon = ...
-local GameTooltipItemManager = {};
-addon.GameTooltipItemManager = GameTooltipItemManager;
+local GameTooltipManager = {};
+addon.GameTooltipManager = GameTooltipManager;
 
+local After = C_Timer.After;
 local C_TooltipInfo = C_TooltipInfo;
-local TOOLTIP_DATA_TYPE = Enum.TooltipDataType and Enum.TooltipDataType.Item or 0;
+local GetItemIconByID = C_Item.GetItemIconByID;
 
-local NO_MODULE_ENABLED = true;
-local IS_HOOKED = false;
-
-
-local function TooltipUtil_GetDisplayedItem(tooltip)
-    if NO_MODULE_ENABLED then return end;
-
-    local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
-	if tooltipData and tooltipData.type == TOOLTIP_DATA_TYPE then
-		local itemID = tooltipData.id;
-        if itemID then
-            GameTooltipItemManager:CallSubModules(tooltip, itemID);
-        end
-	end
-end
 
 local ItemIconInfoTable = {
     width = 24,
@@ -29,12 +15,12 @@ local ItemIconInfoTable = {
     verticalOffset = 6;
 };
 
+
+local HandlerMixin = {};
 do
     local ipairs = ipairs;
 
-    GameTooltipItemManager.modules = {};
-
-    function GameTooltipItemManager:AddSubModule(module)
+    function HandlerMixin:AddSubModule(module)
         for _, m in ipairs(self.modules) do
             if m == module then
                 return
@@ -43,9 +29,9 @@ do
         table.insert(self.modules, module);
     end
 
-    function GameTooltipItemManager:CallSubModules(tooltip, itemID)
+    function HandlerMixin:CallSubModules(tooltip, itemID)
         for _, m in ipairs(self.modules) do
-            if m:ProcessItem(tooltip, itemID) then
+            if m:ProcessData(tooltip, itemID) then
                 self.anyChange = true;
             end
         end
@@ -54,20 +40,20 @@ do
         end
     end
 
-    function GameTooltipItemManager:InitSubModules()
-        NO_MODULE_ENABLED = true;
+    function HandlerMixin:InitSubModules()
+        self.noModuleEnabled = true;
 
         for _, m in ipairs(self.modules) do
             if m:IsEnabled() then
-                NO_MODULE_ENABLED = false;
+                self.noModuleEnabled = false;
             end
         end
 
-        if not NO_MODULE_ENABLED then
-            if not IS_HOOKED then
-                IS_HOOKED = true;
+        if not self.noModuleEnabled then
+            if not self.postCallAdded then
+                self.postCallAdded = true;
                 if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
-                    TooltipDataProcessor.AddTooltipPostCall(TOOLTIP_DATA_TYPE, TooltipUtil_GetDisplayedItem);
+                    TooltipDataProcessor.AddTooltipPostCall(self.tooltipDataType, self.ProcessDisplayedData);
                 else
                     print("Plumber AddOn Alert: WoW\'s TooltipDataProcessor methods changed.")
                 end
@@ -75,17 +61,17 @@ do
         end
     end
 
-    function GameTooltipItemManager:RequestUpdate()
+    function HandlerMixin:RequestUpdate()
         if not self.pauseUpdate then
             self.pauseUpdate = true;
-            C_Timer.After(0, function()
+            After(0, function()
                 self.pauseUpdate = nil;
                 self:InitSubModules();
             end);
         end
     end
 
-    function GameTooltipItemManager:AppendTooltipInfo(tooltip, method, arg1, arg2, arg3, arg4)
+    function HandlerMixin:AppendTooltipInfo(tooltip, method, arg1, arg2, arg3, arg4)
         if C_TooltipInfo[method] then
             local tooltipData = C_TooltipInfo[method](arg1, arg2, arg3, arg4);
             if tooltipData then
@@ -97,21 +83,21 @@ do
         end
     end
 
-    function GameTooltipItemManager:AppendItemInfo(tooltip, itemID)
+    function HandlerMixin:AppendItemInfo(tooltip, itemID)
         local tooltipData = C_TooltipInfo.GetItemByID(itemID);
         if tooltipData then
             tooltip:AddLine(" ");
             for i, lineData in ipairs(tooltipData.lines) do
                 tooltip:AddLineDataText(lineData);
                 if i == 1 then
-                    local icon = C_Item.GetItemIconByID(itemID);
+                    local icon = GetItemIconByID(itemID);
                     tooltip:AddTexture(icon, ItemIconInfoTable);
                 end
             end
         end
     end
 
-    function GameTooltipItemManager:DebugAddField(tooltip, tbl, field, label, enumLookup)
+    function HandlerMixin:DebugAddField(tooltip, tbl, field, label, enumLookup)
         local leftText, rightText;
         if label then
             leftText = string.format("- %s: %s", label, field);
@@ -144,7 +130,7 @@ do
 
     end
 
-    function GameTooltipItemManager:DebugPrintBool(tooltip, leftText, bool)
+    function HandlerMixin:DebugPrintBool(tooltip, leftText, bool)
         if bool then
             tooltip:AddDoubleLine(leftText, tostring(bool), 1, 0.82, 0, 0.098, 1.000, 0.098);
         else
@@ -154,11 +140,47 @@ do
 end
 
 
-do  --ItemSubModuleMixin
---[[
-    local ItemSubModule = {};
+do  --GameTooltipManager
+    GameTooltipManager.handlers = {};
 
-    function ItemSubModule:ProcessItem(tooltip, itemID)
+    function GameTooltipManager:GetHandler(tooltipDataType)
+        if not self.handlers[tooltipDataType] then
+            local handler = {};
+            self.handlers[tooltipDataType] = handler;
+            addon.API.Mixin(handler, HandlerMixin);
+
+            handler.modules = {};
+            handler.tooltipDataType = tooltipDataType;
+            handler.noModuleEnabled = true;
+
+            function handler.ProcessDisplayedData(tooltip)
+                local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
+                if tooltipData and tooltipData.type == tooltipDataType then
+                    local arg1 = tooltipData.id;
+                    if arg1 then
+                        handler:CallSubModules(tooltip, arg1);
+                    end
+                end
+            end
+        end
+        return self.handlers[tooltipDataType]
+    end
+
+    function GameTooltipManager:GetItemManager()
+        return self:GetHandler(0)   ----Enum.TooltipDataType.Item
+    end
+
+    function GameTooltipManager:GetSpellManager()
+        return self:GetHandler(1)   ----Enum.TooltipDataType.Spell
+    end
+end
+
+
+do  --SubModuleMixin
+--[[
+    local SubModule = {};
+
+    function SubModule:ProcessData(tooltip, itemID)
         if self.enabled then
 
         else
@@ -166,16 +188,16 @@ do  --ItemSubModuleMixin
         end
     end
 
-    function ItemSubModule:GetDBKey()
+    function SubModule:GetDBKey()
         return "dbkey"
     end
 
-    function ItemSubModule:SetEnabled(enabled)
+    function SubModule:SetEnabled(enabled)
         self.enabled = enabled == true
-        GameTooltipItemManager:RequestUpdate();
+        GameTooltipManager:RequestUpdate();
     end
 
-    function ItemSubModule:IsEnabled()
+    function SubModule:IsEnabled()
         return self.enabled == true
     end
 --]]

@@ -282,7 +282,8 @@ local function AttachFrameToCastingBar(bar, overlay)
         f:OnLoad();
     end
 
-    if bar.Icon then
+    if bar.Icon and false then
+        --We temporarily disable this because we might encounter negative area if the icon is on the right
         f:SetPoint("TOPLEFT", bar.Icon, "TOPLEFT", 0, 0);
     else
         f:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0);
@@ -419,8 +420,12 @@ end
 
 
 local AttachedBars = {
+    --[GlobalName] = {unit = unit},
     TargetFrameSpellBar = {unit = "target"},
     FocusFrameSpellBar = {unit = "focus"},
+
+    ElvUF_Target_CastBar = {unit = "target"},
+    ElvUF_Focus_CastBar = {unit = "focus"},
 };
 
 

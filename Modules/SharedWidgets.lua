@@ -5609,12 +5609,12 @@ do  --Displayed required items on nameplate widget set
     end
 
     function NameplateTokenMixin:OnEnter()
-        GameTooltip:Hide();
+        NamePlateTooltip:Hide();
         DelayedTooltip:OnObjectEnter(self);
     end
 
     function NameplateTokenMixin:OnLeave()
-        GameTooltip:Hide();
+        NamePlateTooltip:Hide();
         DelayedTooltip:OnObjectLeave(self);
     end
 
@@ -5625,16 +5625,16 @@ do  --Displayed required items on nameplate widget set
 
         if self.type == "item" then
             method = "SetItemByID";
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-
         elseif self.type == "currency" then
             method = "GetCurrencyByID";
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
         end
 
         if method then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-            GameTooltip[method](GameTooltip, self.id);
+            --Anchor the GameTooltip to nameplate nullify its "clampedToScreen"
+            --Blizzard_NamePlates use NamePlateTooltip, so we'll do that too.
+            local tooltip = NamePlateTooltip;
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            tooltip[method](tooltip, self.id);
         end
     end
 

@@ -1,5 +1,5 @@
 local _, addon = ...
-local GameTooltipItemManager = addon.GameTooltipItemManager;
+local GameTooltipItemManager = addon.GameTooltipManager:GetItemManager();
 local TOOLTIP_TEXT_1 = addon.L["Color Applied"];
 
 local GetMountInfoExtraByID = C_MountJournal.GetMountInfoExtraByID;
@@ -32,7 +32,7 @@ local TextureInfo_Snapdragon_Base = {
 
 local ItemSubModule = {};
 
-function ItemSubModule:ProcessItem(tooltip, itemID)
+function ItemSubModule:ProcessData(tooltip, itemID)
     if self.enabled then
         local info = ItemIDXInfo[itemID];
         if info then

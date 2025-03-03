@@ -1,12 +1,12 @@
 local _, addon = ...
-local GameTooltipItemManager = addon.GameTooltipItemManager;
+local GameTooltipItemManager = addon.GameTooltipManager:GetItemManager();
 
 local GetFactionStatusText = addon.API.GetFactionStatusText;
 local GetFactionGrantedByItem = addon.GetFactionGrantedByItem;
 
 local ItemSubModule = {};
 
-function ItemSubModule:ProcessItem(tooltip, itemID)
+function ItemSubModule:ProcessData(tooltip, itemID)
     if self.enabled then
         local factionID = GetFactionGrantedByItem(itemID);
         if factionID then

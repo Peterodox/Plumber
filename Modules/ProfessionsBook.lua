@@ -1,18 +1,28 @@
 -- Show unspent points on the ProfessionsBookFrame
+-- Show unspent points on Profession Tooltip
 
 local _, addon = ...
 local L = addon.L
 local API = addon.API;
+local GameTooltipManager = addon.GameTooltipManager:GetSpellManager();
 
 
 local GetProfessions = GetProfessions;
 local GetProfessionInfo = GetProfessionInfo;
-local C_TradeSkillUI = C_TradeSkillUI;
 local C_ProfSpecs = C_ProfSpecs;
 local C_Traits = C_Traits;
+local GetSpecTabIDsForSkillLine = C_ProfSpecs.GetSpecTabIDsForSkillLine;
+local GetConfigIDForSkillLine = C_ProfSpecs.GetConfigIDForSkillLine;
+local GetTabInfo = C_ProfSpecs.GetTabInfo;
+local GetSpendCurrencyForPath = C_ProfSpecs.GetSpendCurrencyForPath;
+local GetTreeCurrencyInfo = C_Traits.GetTreeCurrencyInfo;
+local GetAllProfessionTradeSkillLines = C_TradeSkillUI.GetAllProfessionTradeSkillLines;
+local GetProfessionInfoBySkillLineID = C_TradeSkillUI.GetProfessionInfoBySkillLineID;
 
 
 local EL = CreateFrame("Frame");
+
+local Debug = {};
 
 
 local function GetPrimaryProfessionID(index)
@@ -22,10 +32,10 @@ local function GetPrimaryProfessionID(index)
         if not subcateogryName or subcateogryName == "" then return end;
 
         local info;
-        local skillLines = C_TradeSkillUI.GetAllProfessionTradeSkillLines();
+        local skillLines = GetAllProfessionTradeSkillLines();
 
         for i, skillLine in ipairs(skillLines) do
-            info = C_TradeSkillUI.GetProfessionInfoBySkillLineID(skillLine)
+            info = GetProfessionInfoBySkillLineID(skillLine)
             if info and info.professionName == subcateogryName then
                 return skillLine, info.professionName
             end
@@ -36,31 +46,33 @@ end
 
 local function GetProfessionUnspentPoints(index)
     local professionID, progressionName = GetPrimaryProfessionID(index);
+    local total = 0;
+
     if professionID then
-        local configID = C_ProfSpecs.GetConfigIDForSkillLine(professionID);
-        local tabTreeIDs = C_ProfSpecs.GetSpecTabIDsForSkillLine(professionID);
+        local configID = GetConfigIDForSkillLine(professionID);
+        local tabTreeIDs = GetSpecTabIDsForSkillLine(professionID);
         local excludeStagedChangesForCurrencies = false;
         local tabCurrencyCount = {};
-        local total = 0;
+        local tabInfo, tabSpendCurrency, treeCurrencyInfo, treeCurrencyInfoMap, currencyInfo, currencyCount;
 
         for treeOrder, treeID in ipairs(tabTreeIDs) do
-            local tabInfo = C_ProfSpecs.GetTabInfo(treeID);
-            local tabSpendCurrency = C_ProfSpecs.GetSpendCurrencyForPath(tabInfo.rootNodeID);
+            tabInfo = GetTabInfo(treeID);
+            tabSpendCurrency = GetSpendCurrencyForPath(tabInfo.rootNodeID);
             if not (tabCurrencyCount[tabSpendCurrency]) then
-                local treeCurrencyInfo = C_Traits.GetTreeCurrencyInfo(configID, treeID, excludeStagedChangesForCurrencies);
-                local treeCurrencyInfoMap = {};
+                treeCurrencyInfo = GetTreeCurrencyInfo(configID, treeID, excludeStagedChangesForCurrencies);
+                treeCurrencyInfoMap = {};
                 for _, treeCurrency in ipairs(treeCurrencyInfo) do
                     treeCurrencyInfoMap[treeCurrency.traitCurrencyID] = treeCurrency;
                 end
-                local currencyInfo = treeCurrencyInfoMap[tabSpendCurrency];
-                local currencyCount = currencyInfo and currencyInfo.quantity or 0;
+                currencyInfo = treeCurrencyInfoMap[tabSpendCurrency];
+                currencyCount = currencyInfo and currencyInfo.quantity or 0;
                 tabCurrencyCount[tabSpendCurrency] = currencyCount;
                 total = total + currencyCount;
             end
         end
-
-        return total
     end
+
+    return total, professionID, progressionName
 end
 
 local PointsDisplayMixin = {};
@@ -69,7 +81,7 @@ do
         if points and points > 0 then
             self.points = points;
             if points > 99 then
-                points = 99;
+                points = "99+";
             end
             self.Text:SetText(points);
             self:Show();
@@ -156,6 +168,8 @@ function EL:HookProfessionBook()
         end);
 
         self.blizFrameFound = true;
+    else
+        Debug.ProfessionsBookFrame = false;
     end
 end
 
@@ -171,10 +185,13 @@ function EL:CreateWidgets()
                 API.Mixin(widget, PointsDisplayMixin);
                 widget:OnLoad();
                 widget:Hide();
-                local parent = _G[string.format("PrimaryProfession%dSpellButtonBottom", i )];
+                local buttonName = string.format("PrimaryProfession%dSpellButtonBottom", i);
+                local parent = _G[buttonName];
                 if parent then
                     widget:SetPoint("RIGHT", parent, "TOPLEFT", 5, -6);
                     widget:SetFrameLevel(parent:GetFrameLevel() + 2);
+                else
+                    Debug[buttonName] = false;
                 end
                 self.widgets[i] = widget;
             end
@@ -199,12 +216,16 @@ if ProfessionsBook_LoadUI then
         if EL.initialized then return end;
         EL.initialized = true;
         EL:HookProfessionBook();
-        if EL.enabled and EL.blizFrameFound and ProfessionsBookFrame:IsShown() then
-            EL:ListenEvents(true);
-            EL:CreateWidgets();
-            EL:UpdateCurrency();
+        if EL.enabled and EL.blizFrameFound then
+            if ProfessionsBookFrame:IsShown() then
+                EL:ListenEvents(true);
+                EL:CreateWidgets();
+                EL:UpdateCurrency();
+            end
         end
     end);
+else
+    Debug.ProfessionsBook_LoadUI = false;
 end
 
 function EL:EnableModule(state)
@@ -238,6 +259,155 @@ do
         categoryID = 1,
         uiOrder = 1170,
         moduleAddedTime = 1740755000,
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
+end
+
+
+do  --User-end Debugging    /run PlumberDebug()
+    function PlumberDebug()
+        local n = 0;
+
+        local function Print(...)
+            n = n + 1;
+            print("|cffa0a0a0"..n.."|r", ...)
+        end
+
+        for i = 1, 2 do
+            local points, id, name = GetProfessionUnspentPoints(i);
+            if id then
+                Print(string.format("%s (%s)  Unspent Knowledge: %s", name, id, points));
+            else
+                Print(string.format("|cffff2020Profession #%d not found|r", i));
+            end
+        end
+
+        if not ProfessionsBookFrame then
+            local hotkey = GetBindingKey("TOGGLEPROFESSIONBOOK") or NOT_BOUND or "Not Bound";
+            Print(string.format("|cffff2020ProfessionsBookFrame not found. Make sure you have opened Profession Book once. (Default hotkey: %s)|r", hotkey));
+        end
+
+        if not (EL.widgets and #EL.widgets == 2) then
+            Print("|cffff2020Widgets not found|r");
+        end
+
+        for k, v in pairs(Debug) do
+            if v then
+                Print("|cffff2020"..k.."|r", tostring(v));
+            else
+                Print(k, tostring(v));
+            end
+        end
+    end
+end
+
+
+
+
+do  --Tooltip Module
+    local SubModule = CreateFrame("Frame");
+
+    function SubModule:ProcessData(tooltip, spellID)
+        if self.enabled then
+            --tooltip:AddLine(spellID);
+            if self.isDirty then
+                self:UpdateProfessionInfo();
+            end
+
+            if spellID == self.profSpell1 then
+                if not self.unspentPoints1 then
+                    self.unspentPoints1 = GetProfessionUnspentPoints(1) or 0;
+                end
+                if self.unspentPoints1 > 0 then
+                    tooltip:AddLine(" ");
+                    tooltip:AddLine(L["Available Knowledge Format"]:format(self.unspentPoints1), 1, 0.82, 0, true);
+                end
+            elseif spellID == self.profSpell2 then
+                if not self.unspentPoints2 then
+                    self.unspentPoints2 = GetProfessionUnspentPoints(2) or 0;
+                end
+                if self.unspentPoints2 > 0 then
+                    tooltip:AddLine(" ");
+                    tooltip:AddLine(L["Available Knowledge Format"]:format(self.unspentPoints2), 1, 0.82, 0, true);
+                end
+            end
+
+            return false
+        else
+            return false
+        end
+    end
+
+    function SubModule:GetDBKey()
+        return "TooltipProfessionKnowledge"
+    end
+
+    function SubModule:SetEnabled(enabled)
+        self.enabled = enabled == true
+        GameTooltipManager:RequestUpdate();
+        if enabled then
+            self:SetScript("OnEvent", self.OnEvent);
+            self:UpdateProfessionInfo();
+        else
+            self:SetScript("OnEvent", nil);
+            self:UnregisterAllEvents();
+        end
+    end
+
+    function SubModule:IsEnabled()
+        return self.enabled == true
+    end
+
+
+    function SubModule:UpdateProfessionInfo()
+        self.profSpell1 = nil;
+        self.profSpell2 = nil;
+        self.unspentPoints1 = nil;
+        self.unspentPoints2 = nil;
+        self.isDirty = false;
+
+        for i = 1, 2 do
+            local info = API.GetProfessionSpellInfo(i);
+            if info and info.spellID then
+                self["profSpell"..i] = info.spellID;
+            end
+        end
+
+        self:RegisterEvent("SKILL_LINES_CHANGED");
+        self:RegisterEvent("TRAIT_CONFIG_UPDATED");
+        self:RegisterEvent("TRAIT_TREE_CURRENCY_INFO_UPDATED");
+    end
+
+    function SubModule:OnEvent(event, ...)
+        if event == "SKILL_LINES_CHANGED" then
+            self.isDirty = true;
+            self:UnregisterEvent(event);
+        else
+            self.isDirty = true;
+            self.unspentPoints1 = nil;
+            self.unspentPoints2 = nil;
+            self:UnregisterEvent(event);
+        end
+    end
+
+    local function EnableModule(state)
+        if state then
+            SubModule:SetEnabled(true);
+            GameTooltipManager:AddSubModule(SubModule);
+        else
+            SubModule:SetEnabled(false);
+        end
+    end
+
+    local moduleData = {
+        name = addon.L["ModuleName TooltipProfessionKnowledge"],
+        dbKey = SubModule:GetDBKey(),
+        description = addon.L["ModuleDescription TooltipProfessionKnowledge"],
+        toggleFunc = EnableModule,
+        categoryID = 3,
+        uiOrder = 1152,
+        moduleAddedTime = 1736940000,
     };
 
     addon.ControlCenter:AddModule(moduleData);

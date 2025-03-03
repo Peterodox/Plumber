@@ -20,6 +20,7 @@ local GetDBValue = addon.GetDBValue;
 
 local find = string.find;
 local match = string.match;
+local gmatch = string.gmatch;
 local gsub = string.gsub;
 local format = string.format;
 local tinsert = table.insert;
@@ -740,11 +741,11 @@ do  --MacroInterpreter
         local n = 0;
         local processed, usable;
         local name, icon, actionType, id, macroText, craftingQuality, tempID;
-        local canPerform, isConsumable
+        local canPerform, isConsumable;
 
-        for line in string.gmatch(body, "#(/[^\n]+)") do
+        for line in gmatch(body, "#(/[^\n]+)") do
             processed = false;
-            usable = false;
+            usable = nil;
             name = nil;
             icon = nil;
             actionType = nil;
@@ -813,6 +814,32 @@ do  --MacroInterpreter
                 end
             end
 
+            if not processed then
+                local professionIndex = match(line, "/prof(%d)");
+                if professionIndex then
+                    processed = true;
+                    professionIndex = tonumber(professionIndex);
+                    if professionIndex == 1 or professionIndex == 2 then
+                        local info = API.GetProfessionSpellInfo(professionIndex);
+                        if info then
+                            icon = info.texture;
+                            name = info.name;
+                            id = info.spellID;
+                            actionType = "profession";
+                            macroText = format("/run PlumberGlobals.OpenProfessionFrame(%s)", professionIndex);
+                            usable = true;
+                        else
+                            icon = 134400;
+                            name = professionIndex == 1 and L["Drawer Add Profession1"] or L["Drawer Add Profession2"];
+                            id = -1;
+                            actionType = "profession";
+                            macroText = "";
+                            usable = false;
+                        end
+                    end
+                end
+            end
+
             if not processed then   --generic macro command match
                 local arg;
                 for pattern, handler in pairs(MacroHandlers) do
@@ -870,13 +897,15 @@ do  --MacroInterpreter
                     macroText = _name and gsub(line, "mount:%d+", _name) or line;
                     actionType = "spell";
                     id = _spellID;
+                elseif actionType == "profession" then
+                    
                 else
                     name = name or line;
                     macroText = macroText or line;
                     usable = true;
                 end
 
-                if checkUsability and id and not usable then
+                if checkUsability and id and (usable == nil) then
                     canPerform, isConsumable = CanPlayerPerformAction(actionType, id);
                     if canPerform then
                         usable = true;
@@ -1134,6 +1163,17 @@ do  --Editor Setup
             command = "/cast",
             argGetter = function(spellIndex, bookType, spellID, baseSpellID)
                 local name = GetSpellName(spellID);
+                local info;
+                for i = 1, 2 do
+                    info = API.GetProfessionSpellInfo(i);
+                    if info and (spellID == info.spellID or baseSpellID == info.spellID) then
+                        if i == 1 then
+                            return L["Drawer Add Profession1"], nil, "/prof1"
+                        else
+                            return L["Drawer Add Profession2"], nil, "/prof2"
+                        end
+                    end
+                end
                 return name, (spellID and "spell:"..spellID) or nil
             end,
         },
@@ -1188,8 +1228,13 @@ do  --Editor Setup
                 if (not inCombat) and info and (arg1 ~= nil) then
                     receptor.PlusSign:Show();
                     receptor.Instruction:Hide();
-                    local name, commandArg = info.argGetter(arg1, arg2, arg3, arg4);
-                    local newCommand = commandArg and format("#%s %s", info.command, commandArg) or nil;
+                    local name, commandArg, overrideCommand = info.argGetter(arg1, arg2, arg3, arg4);
+                    local newCommand;
+                    if overrideCommand then
+                        newCommand = "#"..overrideCommand;
+                    else
+                        newCommand = commandArg and format("#%s %s", info.command, commandArg) or nil;
+                    end
                     name = name or "Unknown";
 
                     local function Receptor_OnEnter(self)
@@ -1446,6 +1491,7 @@ do  --DrawerUpdator
         ["NEW_TOY_ADDED"] = true,
         ["NEW_PET_ADDED"] = true,
         ["NEW_MOUNT_ADDED"] = true,
+        ["SKILL_LINES_CHANGED"] = true,
     };
 
     local UpdateEvents_Lazy = {

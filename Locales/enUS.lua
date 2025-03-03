@@ -295,6 +295,12 @@ L["ModuleDescription ProfessionsBook"] = "Display the number of your unspent Pro
 L["Unspent Knowledge Tooltip Format"] = "You have |cffffffff%s|r unspent Profession Specialization Knowledge."  --see PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
 
 
+--TooltipProfessionKnowledge
+L["ModuleName TooltipProfessionKnowledge"] = L["ModuleName ProfessionsBook"];
+L["ModuleDescription TooltipProfessionKnowledge"] = "Show the number of your unspent Profession Specialization Knowledge.";
+L["Available Knowledge Format"] = "Available Knowledge: |cffffffff%s|r";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
@@ -347,6 +353,8 @@ L["Drag And Drop Item Here"] = "Drag and drop an item here.";
 L["Drag To Reorder"] = "Left click and drag to reorder";
 L["Unsupported Action Type Format"] = "Unsupported action type: %s";
 L["Drawer Add Action Format"] = "Add |cffffffff%s|r";
+L["Drawer Add Profession1"] = "First Profession";
+L["Drawer Add Profession2"] = "Second Profession";
 L["Drawer Option Global Tooltip"] = "This setting is shared across all drawer macros.";
 L["Drawer Option CloseAfterClick"] = "Close After Clicks";
 L["Drawer Option CloseAfterClick Tooltip"] = "Close the drawer after clicking any button in it, regardless of successful or not.";
