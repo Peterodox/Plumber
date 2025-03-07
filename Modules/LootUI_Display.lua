@@ -1624,14 +1624,6 @@ end
 
 
 do
-    local EDITMODE_HOOKED = false;
-
-    local function EditMode_Enter()
-        if ENABLE_MODULE then
-            MainFrame:EnterEditMode();
-        end
-    end
-
     local STOCK_UI_MUTED = false;
 
     local function SettingChanged_UseStockUI(state, userInput)
@@ -1684,12 +1676,6 @@ do
 
             MainFrame:OnUIScaleChanged();
 
-            if not EDITMODE_HOOKED then
-                EDITMODE_HOOKED = true;
-                EventRegistry:RegisterCallback("EditMode.Enter", EditMode_Enter);
-                EventRegistry:RegisterCallback("EditMode.Exit", MainFrame.ExitEditMode, MainFrame);
-            end
-
             if addon.GetDBBool("LootUI_ReplaceDefaultAlert") and (not addon.GetDBBool("LootUI_UseStockUI")) then
                 EL:ListenAlertSystemEvent(true);
             else
@@ -1734,6 +1720,14 @@ do
         uiOrder = 1115,
         moduleAddedTime = 1727793830,
         optionToggleFunc = OptionToggle_OnClick,
+
+        visibleInEditMode = true,
+        enterEditMode = function()
+            MainFrame:EnterEditMode();
+        end,
+        exitEditMode = function()
+            MainFrame:ExitEditMode();
+        end,
     };
 
     addon.ControlCenter:AddModule(moduleData);

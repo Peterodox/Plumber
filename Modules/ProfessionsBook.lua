@@ -179,7 +179,6 @@ function EL:CreateWidgets()
     if not self.widgets then
         local BlizFrame = ProfessionsBookFrame;
         if BlizFrame then
-            self.widgets = {};
             for i = 1, 2 do
                 local widget = CreateFrame("Frame", nil, BlizFrame);
                 API.Mixin(widget, PointsDisplayMixin);
@@ -192,6 +191,9 @@ function EL:CreateWidgets()
                     widget:SetFrameLevel(parent:GetFrameLevel() + 2);
                 else
                     Debug[buttonName] = false;
+                end
+                if not self.widgets then
+                    self.widgets = {};
                 end
                 self.widgets[i] = widget;
             end

@@ -17,6 +17,9 @@ L["Quick Slot Layout Linear"] = "Linear";
 L["Quick Slot Layout Radial"] = "Radial";
 L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map - Map Filter - Plumber";
+L["Toggle Plumber UI"] = "Toggle Plumber UI";
+L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
+
 
 
 --Module Categories
@@ -348,6 +351,7 @@ L["PlumberMacro DrawerFlag Stuck"] = "Something went wrong when updating the dra
 L["PlumberMacro Error Combat"] = "Unavailable in combat";
 L["PlumberMacro Error NoAction"] = "No usable actions";
 L["PlumberMacro Error EditMacroInCombat"] = "Cannot edit macros while in combat";
+L["Random Favorite Mount"] = "Random Favorite Mount"; --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
 L["Dismiss Battle Pet"] = "Dismiss Battle Pet";
 L["Drag And Drop Item Here"] = "Drag and drop an item here.";
 L["Drag To Reorder"] = "Left click and drag to reorder";

@@ -20,6 +20,7 @@ API.lua
 Modules\SharedData.lua
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
+Modules\BlizzardEditMode.lua
 
 ControlCenter.lua
 

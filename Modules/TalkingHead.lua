@@ -319,12 +319,6 @@ function NewTalkingHead:EnableTalkingHead()
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
     self:SetScript("OnEvent", self.OnEvent);
-
-    if not self.editmodeHooked then
-        self.editmodeHooked = true;
-        EventRegistry:RegisterCallback("EditMode.Enter", self.EnterEditMode, self);
-        EventRegistry:RegisterCallback("EditMode.Exit", self.ExitEditMode, self);
-    end
 end
 
 function NewTalkingHead:DisableTalkingHead()
@@ -762,6 +756,14 @@ do
         uiOrder = 3,
         moduleAddedTime = 1704423300,
         optionToggleFunc = OptionToggle_OnClick,
+
+        visibleInEditMode = true,
+        enterEditMode = function()
+            NewTalkingHead:EnterEditMode();
+        end,
+        exitEditMode = function()
+            NewTalkingHead:ExitEditMode();
+        end,
     };
 
     addon.ControlCenter:AddModule(moduleData);

@@ -100,7 +100,8 @@ do
         },
 
         conditionFunc = function()
-            if API.GetPlayerMap() == 2346 then
+            local uiMapID = API.GetPlayerMap();
+            if uiMapID == 2346 or uiMapID == 2374 or uiMapID == 2406 or uiMapID == 2407 or uiMapID == 2408 or uiMapID == 2409 or uiMapID == 2411 or uiMapID == 2428 then
                 return true
             end
             local abilities = GetActiveAbilities();
@@ -890,13 +891,21 @@ do  --MacroInterpreter
                         end
                     end
                 elseif actionType == "mount" then
-                    local  _name, _spellID, _icon, _isActive, _isUsable, _sourceType, _isFavorite, _isFactionSpecific, _faction, _shouldHideOnChar, _isCollected = GetMountInfoByID(id);
-                    icon = _icon;
-                    usable = _isCollected;
-                    name = _name;
-                    macroText = _name and gsub(line, "mount:%d+", _name) or line;
-                    actionType = "spell";
-                    id = _spellID;
+                    if id == 0 then --RandomFavoriteMount
+                        local _spellID = 150544;
+                        name = L["Random Favorite Mount"];
+                        icon = GetSpellTexture(_spellID);
+                        macroText = "/run C_MountJournal.SummonByID(0)";
+                        id = _spellID;
+                    else
+                        local  _name, _spellID, _icon, _isActive, _isUsable, _sourceType, _isFavorite, _isFactionSpecific, _faction, _shouldHideOnChar, _isCollected = GetMountInfoByID(id);
+                        icon = _icon;
+                        usable = _isCollected;
+                        name = _name;
+                        macroText = _name and gsub(line, "mount:%d+", _name) or line;
+                        actionType = "spell";
+                        id = _spellID;
+                    end
                 elseif actionType == "profession" then
                     
                 else
@@ -1189,6 +1198,11 @@ do  --Editor Setup
         mount = {
             command = "/use",
             argGetter = function(mountID, mountIndex)
+                if mountID > 9999 then
+                    --the exact id for RandomFavoriteMount is (2^28 - 1)
+                    local name = GetSpellName(150544);
+                    return name, "mount:0"
+                end
                 local name = GetMountInfoByID(mountID);
                 return name, (mountID and "mount:"..mountID) or nil
             end,

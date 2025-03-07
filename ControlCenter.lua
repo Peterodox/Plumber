@@ -693,6 +693,10 @@ function ControlCenter:AddModule(moduleData)
     end
 
     table.insert(self.modules, moduleData);
+
+    if moduleData.visibleInEditMode then
+        addon.AddEditModeVisibleModule(moduleData);
+    end
 end
 
 

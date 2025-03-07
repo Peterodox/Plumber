@@ -120,6 +120,7 @@ local DefaultValues = {
     BlizzardSuperTrack = false,         --Add timer to the SuperTrackedFrame when tracking a POI with time format
     ProfessionsBook = true,             --Show unspent points on ProfessionsBookFrame
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
+    EditModeShowPlumberUI = true;
 
 
     --Custom Loot Window

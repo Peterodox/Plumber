@@ -16,6 +16,8 @@ local GetCVarBool = C_CVar.GetCVarBool;
 local GetItemCount = C_Item.GetItemCount;
 local PlayerHasToy = PlayerHasToy or API.Nop;
 local C_PetJournal = C_PetJournal;
+local GetSpellTexture = C_Spell.GetSpellTexture;
+local IsSpellDataCached = C_Spell.IsSpellDataCached;
 local GetItemCraftingQuality = API.GetItemCraftingQuality;
 local CanPlayerPerformAction = API.CanPlayerPerformAction;
 local find = string.find;
@@ -308,6 +310,10 @@ do  --VisualButtonMixin
             self:SetCraftingQuality(craftingQuality);
         elseif self.actionType == "profession" then
             self:SetPrimaryProfession(action.id);
+        elseif self.actionType == "mount" then
+            --Only RandomFavoriteMount use this method
+            --Regular mounts have been converted to spells 
+            self:SetMount(self.id);
         elseif self[action.actionType] then
             self[action.actionType](self, action.id);
         end
@@ -426,7 +432,7 @@ do  --VisualButtonMixin
 
     function VisualButtonMixin:IsDataCached()
         if self.actionType == "spell" then
-            return C_Spell.IsSpellDataCached(self.id);
+            return IsSpellDataCached(self.id);
         elseif self.actionType == "item" then
             return C_Item.IsItemDataCachedByID(self.id);
         end
@@ -437,7 +443,7 @@ do  --VisualButtonMixin
     function VisualButtonMixin:SetRandomFavoritePet()
         self.tooltipMethod = "SetSpellByID";
         self.id = 243819;
-        self.Icon:SetTexture(C_Spell.GetSpellTexture(self.id));
+        self.Icon:SetTexture(GetSpellTexture(self.id));
     end
 
     function VisualButtonMixin:SetRandomPet()
@@ -476,6 +482,11 @@ do  --VisualButtonMixin
         else
             self.tooltipText = self.tooltipLineText;
         end
+    end
+
+    function VisualButtonMixin:SetMount(spellID)
+        self.tooltipMethod = "SetMountBySpellID";
+        self.Icon:SetTexture(GetSpellTexture(spellID));
     end
 
 

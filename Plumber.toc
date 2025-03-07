@@ -1,5 +1,5 @@
 ## X-Flavor: retail
-## Interface: 110100
+## Interface: 110100, 110105
 ## Version: 1.6.4
 
 ## Title: Plumber
@@ -20,6 +20,7 @@ API.lua
 Modules\SharedData.lua
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
+Modules\BlizzardEditMode.lua
 #Modules\DevTool.lua
 #Modules\DirectionArrow.lua
 #Modules\SuperTrack.xml
@@ -58,7 +59,6 @@ Modules\NameplateResources.lua
 Modules\StaticPopupEnhancement.xml
 Modules\PlayerTitleUI.lua
 Modules\BlizzardSuperTrack.lua
-Modules\AccountStore.lua
 Modules\EquipmentFlyout.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
@@ -71,3 +71,4 @@ Modules\ProfessionsBook.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua
 #Modules\WoWAnniversary.lua
 #Modules\Navigator_Dreamseed.lua
+#Modules\AccountStore.lua

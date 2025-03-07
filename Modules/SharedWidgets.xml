@@ -585,4 +585,31 @@
             </OnHide>
         </Scripts>
     </Button>
+
+    <Button name="PlumberBlizzardCheckButtonTemplate" virtual="true">
+        <Size x="225" y="32"/>
+        <Frames>
+            <CheckButton parentKey="Button" motionScriptsWhileDisabled="true">
+                <Size x="32" y="32"/>
+                <Anchors>
+                    <Anchor point="LEFT"/>
+                </Anchors>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+        </Frames>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" wordwrap="false" justifyH="LEFT" inherits="GameFontHighlightMedium">
+                    <Size y="32"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.Button" relativePoint="RIGHT" x="5"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
 </Ui>
