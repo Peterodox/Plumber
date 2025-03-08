@@ -21,7 +21,6 @@ L["Toggle Plumber UI"] = "Toggle Plumber UI";
 L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
 
 
-
 --Module Categories
 --- order: 0
 L["Module Category Unknown"] = "Unknown"    --Don't need to translate

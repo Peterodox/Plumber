@@ -17,6 +17,8 @@ L["Quick Slot Layout Radial"] = "环形";
 L["Quick Slot High Contrast Mode"] = "切换高对比度模式";
 L["Restriction Combat"] = "战斗中不可用";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*如需更改标记大小，请打开 世界地图 - 地图筛选 - Plumber";
+L["Toggle Plumber UI"] = "Plumber界面可见性";
+L["Toggle Plumber UI Tooltip"] = "在编辑模式中显示以下Plumber界面：\n%s\n\n此选项仅控制它们在编辑模式下是否可见，并不会启用或禁用这些功能。";
 
 
 --Module Categories
@@ -220,6 +222,7 @@ L["Item Level Abbr"] = "装等";
 L["Delves Reputation Name"] = "地下堡赛季进度";
 L["ModuleName Delves_SeasonProgress"] = "地下堡: 赛季进度";
 L["ModuleDescription Delves_SeasonProgress"] = "在你提升“地下堡行者的旅程”时显示一个进度条。";
+L["Delve Crest Stash No Info"] = "你所在区域无法获取该信息。";
 
 
 --WoW Anniversary
@@ -348,6 +351,7 @@ L["PlumberMacro DrawerFlag Stuck"] = "更新技能收纳宏时遇到了错误。
 L["PlumberMacro Error Combat"] = "战斗中不可用";
 L["PlumberMacro Error NoAction"] = "无可用技能";
 L["PlumberMacro Error EditMacroInCombat"] = "战斗中不可编辑";
+L["Random Favorite Mount"] = "召唤随机偏好坐骑";
 L["Dismiss Battle Pet"] = "解散小宠物";
 L["Drag And Drop Item Here"] = "拖拽一个东西放在这里";
 L["Drag To Reorder"] = "左键单击并拖拽以更改位置";
@@ -378,6 +382,7 @@ L["Paragon Reputation"] = "巅峰";
 L["Level Maxed"] = "已满级";   --Reached max level
 L["Current Colon"] = "当前：";
 L["Unclaimed Reward Alert"] = "你有未领取的巅峰宝箱";
+L["Total Colon"] = "总计：";
 
 
 --Plumber AddOn Settings
@@ -399,7 +404,6 @@ L["currency-2914"] = "风化";
 L["currency-2915"] = "蚀刻";
 L["currency-2916"] = "符文";
 L["currency-2917"] = "鎏金";
-
 
 L["Scenario Delves"] = "地下堡";
 L["GameObject Door"] = "门";

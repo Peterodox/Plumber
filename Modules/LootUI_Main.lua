@@ -162,7 +162,10 @@ do
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             if self.object and self.object:IsMouseMotionFocus() then
+                self:RegisterEvent("MODIFIER_STATE_CHANGED");
                 self.object:OnFocused();
+            else
+                self:UnregisterEvent("MODIFIER_STATE_CHANGED");
             end
         end
     end
@@ -176,6 +179,7 @@ do
             self.t = 0;
         else
             self:SetScript("OnUpdate", nil);
+            self:UnregisterEvent("MODIFIER_STATE_CHANGED");
             self.t = nil;
         end
     end
@@ -183,6 +187,15 @@ do
     function FocusSolver:IsLastFocus(itemFrame)
         return self.object and self.object == itemFrame
     end
+
+    function FocusSolver:OnEvent(event, ...)
+        if event == "MODIFIER_STATE_CHANGED" then
+            if self.object and self.object:IsMouseMotionFocus() then
+                self.object:OnFocused();
+            end
+        end
+    end
+    FocusSolver:SetScript("OnEvent", FocusSolver.OnEvent);
 end
 
 
@@ -589,7 +602,7 @@ do  --UI ItemButton
         MainFrame:SetFocused(false);
     end
 
-    function ItemFrameMixin:OnFocused()
+    function ItemFrameMixin:ShowTooltip()
         --Effective during Manual Mode
         local tooltip = GameTooltip;
         if self.enableState == 1 then
@@ -619,6 +632,10 @@ do  --UI ItemButton
                 tooltip:SetHyperlink(self.data.link);
             end
         end
+    end
+
+    function ItemFrameMixin:OnFocused()
+        self:ShowTooltip();
     end
 
     function ItemFrameMixin:OnMouseDown(button)
