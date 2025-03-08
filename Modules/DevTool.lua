@@ -1,4 +1,4 @@
-if true then return end;
+if false then return end;
 
 local _, addon = ...
 local ipairs = ipairs;
@@ -94,12 +94,14 @@ do  --Aura Watcher
         end
     end);
 
-    EL:RegisterUnitEvent("UNIT_AURA", "player");
-    EL:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
-    EL:RegisterEvent("PLAYER_ENTERING_WORLD");
+    if false then
+        EL:RegisterUnitEvent("UNIT_AURA", "player");
+        EL:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+        EL:RegisterEvent("PLAYER_ENTERING_WORLD");
+    end
 end
 
-do
+do  --Profession Specialization
     local function GetPrimaryProfessionID(index)
         local prof = select(index, GetProfessions());
         if prof then
@@ -170,4 +172,29 @@ do
             end
         end
     end
+end
+
+do  --Currency Watcher
+    local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
+    local EL = CreateFrame("Frame");
+    local GainSourceName = {};
+    local DestroyReasonName = {};
+
+    for k, v in pairs(Enum.CurrencySource) do
+        GainSourceName[v] = k;
+    end
+
+    for k, v in pairs(Enum.CurrencyDestroyReason) do
+        DestroyReasonName[v] = k;
+    end
+
+    function EL:OnEvent(event, currencyID, quantity, quantityChange, quantityGainSource, destroyReason)
+        local info = currencyID and GetCurrencyInfo(currencyID);
+        if info then
+            print(info.currencyID, info.name, quantity, "("..quantityChange..")", quantityGainSource, quantityGainSource and GainSourceName[quantityGainSource], destroyReason and DestroyReasonName[destroyReason]);
+        end
+    end
+
+    EL:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+    EL:SetScript("OnEvent", EL.OnEvent);
 end

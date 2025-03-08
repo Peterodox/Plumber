@@ -15,7 +15,12 @@ local GetSpecTabIDsForSkillLine = C_ProfSpecs.GetSpecTabIDsForSkillLine;
 local GetConfigIDForSkillLine = C_ProfSpecs.GetConfigIDForSkillLine;
 local GetTabInfo = C_ProfSpecs.GetTabInfo;
 local GetSpendCurrencyForPath = C_ProfSpecs.GetSpendCurrencyForPath;
+local GetUnlockEntryForPath = C_ProfSpecs.GetUnlockEntryForPath;
 local GetTreeCurrencyInfo = C_Traits.GetTreeCurrencyInfo;
+local GetEntryInfo = C_Traits.GetEntryInfo;
+local GetNodeInfo = C_Traits.GetNodeInfo;
+local GetTreeNodes = C_Traits.GetTreeNodes;
+local CanPurchaseRank = C_Traits.CanPurchaseRank;
 local GetAllProfessionTradeSkillLines = C_TradeSkillUI.GetAllProfessionTradeSkillLines;
 local GetProfessionInfoBySkillLineID = C_TradeSkillUI.GetProfessionInfoBySkillLineID;
 
@@ -43,10 +48,21 @@ local function GetPrimaryProfessionID(index)
     end
 end
 
+local function GetNodeRanks(configID, nodeInfo, nodeID)
+    --First tier for the path node is the unlock entry, which we do not want to include in the count. It can have a max ranks of either 0 or 1
+    local unlockNodeEntry = GetUnlockEntryForPath(nodeID);
+    local nodeEntryInfo = GetEntryInfo(configID, unlockNodeEntry);
+    local numUnlockPoints = nodeEntryInfo and nodeEntryInfo.maxRanks or 0;
+    local currRank = (nodeInfo.currentRank > 0) and (nodeInfo.currentRank - numUnlockPoints) or nodeInfo.currentRank;
+    local maxRank = nodeInfo.maxRanks - numUnlockPoints;
+    return currRank, maxRank
+end
+
 
 local function GetProfessionUnspentPoints(index)
     local professionID, progressionName = GetPrimaryProfessionID(index);
     local total = 0;
+    local anyPurchasableNode = false;
 
     if professionID then
         local configID = GetConfigIDForSkillLine(professionID);
@@ -69,10 +85,52 @@ local function GetProfessionUnspentPoints(index)
                 tabCurrencyCount[tabSpendCurrency] = currencyCount;
                 total = total + currencyCount;
             end
+
+
+            local nodeIDs = GetTreeNodes(treeID);
+            local nodeInfo;
+            local ranksPurchased, maxRanks;
+            local activeEntryID, entryInfo, talentType;
+            local totalPurchased = 0;
+            local totalMaxRanks = 0;
+            local canPurchased = 0;
+
+            for _, nodeID in ipairs(nodeIDs) do
+                nodeInfo = GetNodeInfo(configID, nodeID);
+                if nodeInfo and nodeInfo.isVisible then
+                    activeEntryID = nodeInfo.activeEntry and nodeInfo.activeEntry.entryID or nil;
+                    if CanPurchaseRank(configID, nodeID, activeEntryID) then
+                        canPurchased = canPurchased + 1;
+                        anyPurchasableNode = true;
+                    end
+                    --[[
+                    entryInfo = (activeEntryID ~= nil) and GetEntryInfo(configID, activeEntryID) or nil;
+                    talentType = (entryInfo ~= nil) and entryInfo.type or nil;
+                    if talentType then
+                        ranksPurchased, maxRanks = GetNodeRanks(configID, nodeInfo, nodeID);
+                        if maxRanks > 1 then
+                            totalMaxRanks = totalMaxRanks + maxRanks;
+                            totalPurchased = totalPurchased + ranksPurchased;
+                        end
+                    end
+                    --]]
+                end
+            end
+
+            --[[
+            local diff = totalPurchased - totalMaxRanks;
+            if diff ~= 0 then
+                print(progressionName, totalPurchased.."/"..totalMaxRanks, "|cffff4800"..diff.."|r", canPurchased);
+            else
+                print(progressionName, totalPurchased.."/"..totalMaxRanks, canPurchased);
+            end
+            --]]
         end
     end
 
-    return total, professionID, progressionName
+    if anyPurchasableNode then
+        return total, professionID, progressionName
+    end
 end
 
 local PointsDisplayMixin = {};
@@ -137,7 +195,7 @@ end
 
 function EL:OnUpdate(elapse)
     self.t = self.t + elapse;
-    if self.t > 0.5 then
+    if self.t > 1.0 then
         self.t = 0;
         self:SetScript("OnUpdate", nil);
         EL:UpdateCurrency();

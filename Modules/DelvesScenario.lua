@@ -14,55 +14,7 @@ local GetStepInfo = C_Scenario.GetStepInfo;
 
 local UIParent = UIParent;
 
-local DELVES_SEASON_FACTION;    --2644
-
-local DelvePOI = {
-    --{mapID, normalPoi, bountifulPoi}
-
-    --Isle of Dorn
-    {2248, 7863, 7787},   --Earthcrawl Mines
-    {2248, 7864, 7779},   --Fungal Folly
-    {2248, 7865, 7781},   --Kriegval's Rest
-
-    --Ringing Deeps
-    {2214, 7867, 7788},   --The Dread Pit
-    {2214, 7866, 7782},   --The Waterworks
-
-    --Hallowfall
-    {2215, 7869, 7780},   --Mycomancer Cavern
-    {2215, 7868, 7785},   --Nightfall Sanctum
-    {2215, 7871, 7789},   --Skittering Breach
-    {2215, 7870, 7783},   --The Sinkhole
-
-    --Azj-Kahet
-    {2255, 7873, 7784},   --Tak-Rethan Abyss        
-    {2255, 7874, 7790},   --The Spiral Weave
-    {2255, 7872, 7786},   --The Underkeep
-
-
-    --{0, 7875, nil},    --Zekvir's Lair (Mystery 13th Delve)
-};
-
-local DelveMaps = {
-    2248, 2214, 2215, 2255,
-};
-
-local POIxDelveIndex = {};
-
-do  --Format Data
-    local poiID;
-
-    for delveIndex, data in ipairs(DelvePOI) do
-        poiID = data[2];
-        if poiID then
-            POIxDelveIndex[poiID] = delveIndex;
-        end
-        poiID = data[3];
-        if poiID then
-            POIxDelveIndex[poiID] = delveIndex;
-        end
-    end
-end
+local DELVES_SEASON_FACTION;
 
 
 local EL = CreateFrame("Frame");
@@ -105,126 +57,6 @@ function EL:ProcessOnNextCycle(func, delay)
     end
 
     table.insert(self.queuedFuncs, func);
-end
-
-local function Dev_GetDelveMapInfo()
-    --Bountfiul Delves have different poiID different from their regular modes
-    --C_AreaPoiInfo.GetAreaPOISecondsLeft returns nil
-
-    --/dump C_AreaPoiInfo.GetAreaPOIInfo(2215, 7783)
-
-    for delveIndex, data in ipairs(DelvePOI) do
-        data.isBountiful = true;
-    end
-
-    local areaPoiIDs, poiInfo;
-
-    local n = 0;
-    local poiData = {};
-    local delveIndex;
-
-    for _, mapID in ipairs(DelveMaps) do
-        areaPoiIDs = GetDelvesForMap(mapID);
-        for _, poiID in ipairs(areaPoiIDs) do
-            delveIndex = POIxDelveIndex[poiID];
-            if delveIndex then
-                DelvePOI[delveIndex].isBountiful = nil;
-            end
-        end
-    end
-
-    local tooltipWidgetSet;
-    local mapID, poiID;
-
-    for delveIndex, data in ipairs(DelvePOI) do
-        mapID = data[1];
-        if data.isBountiful then
-            poiID = data[3];
-        else
-            poiID = data[2];
-        end
-        poiInfo = GetAreaPOIInfo(mapID, poiID)
-
-        if poiInfo then
-            if not data.name then
-                data.name = poiInfo.name;
-            end
-
-            if data.isBountiful then
-                print(delveIndex, "|cnGREEN_FONT_COLOR:"..data.name.."|r");
-                if not tooltipWidgetSet then
-                    tooltipWidgetSet = poiInfo.tooltipWidgetSet;
-                end
-                local x, y = poiInfo.position:GetXY();
-                API.ConvertMapPositionToContinentPosition(mapID, x, y, poiID);
-            else
-                print(delveIndex, data.name);
-            end
-        end
-    end
-
-    if tooltipWidgetSet then
-        local widgets = C_UIWidgetManager.GetAllWidgetsBySetID(tooltipWidgetSet);
-        local widgetID = widgets and widgets[1] and widgets[1].widgetID;
-
-        if widgetID then
-            local widgetInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(widgetID);
-            if widgetInfo then
-                local seconds = TimeLeftTextToSeconds(widgetInfo.text);
-                print(seconds);
-                print(API.SecondsToTime(seconds))
-            end
-        end
-    end
-end
-
-local function GetEnemyGroupCount()
-    local widgetSetID = select(12, GetStepInfo());
-    if not widgetSetID then return end;
-
-    local widgets = C_UIWidgetManager.GetAllWidgetsBySetID(widgetSetID);
-    if not widgets then return end;
-
-    local TYPE_ID = Enum.UIWidgetVisualizationType.ScenarioHeaderDelves or 29;
-    local widgetID;
-
-    for _, widgetInfo in ipairs(widgets) do
-        if widgetInfo.widgetType == TYPE_ID then
-            widgetID = widgetInfo.widgetID;
-        end
-    end
-
-    if not widgetID then return end;
-
-    local SPELL_ID = 456037;    --Zekvir's Influence
-    local isSpellFound;
-
-    local widgetInfo = C_UIWidgetManager.GetScenarioHeaderDelvesWidgetVisualizationInfo(widgetID);
-
-    if widgetInfo and widgetInfo.shownState == 1 and widgetInfo.spells then
-		for _, spellInfo in ipairs(widgetInfo.spells) do
-            if spellInfo.spellID == SPELL_ID then
-                if spellInfo.shownState == 1 then
-                    isSpellFound = true;
-                end
-                break
-            end
-        end
-	end
-
-    if isSpellFound then
-        local isPet = false;
-        local showSubtext = true;
-        local tooltipData = C_TooltipInfo.GetSpellByID(SPELL_ID, isPet, showSubtext);
-
-        if tooltipData and tooltipData.lines then
-            local numLines = #tooltipData.lines;
-            local lineText = tooltipData.lines[numLines].leftText;
-            print(lineText);    --Zekvir, the Hand of the Harbinger...Enemy groups remaining: 3/3
-            local current, total = string.match(lineText, "(%d+)%s*/%s*(%d+)");
-            print(current, total)
-        end
-    end
 end
 
 
@@ -294,7 +126,7 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
 
         if not widgetID then return end;
 
-        local SPELL_ID = 456037;    --Zekvir's Influence
+        local SPELL_ID = 472952;    --Nemisis Strongbox    /dump GetMouseFoci()[1].spellID
         local spellIndex;
 
         local widgetInfo = C_UIWidgetManager.GetScenarioHeaderDelvesWidgetVisualizationInfo(widgetID);

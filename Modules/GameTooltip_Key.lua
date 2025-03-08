@@ -38,7 +38,7 @@ local ZONE_DOORS = {
 local SUPPORTED_MAPS = {};
 
 do
-    local DELVE_INSTANCE = {
+    local DELVE_INSTANCE = {    --/dump GetInstanceInfo()
         2664,
         2679,
         2680,
@@ -53,6 +53,7 @@ do
         2689,
         2690,
         2767,
+        2815,
     };
 
     for _, mapID in ipairs(DELVE_INSTANCE) do

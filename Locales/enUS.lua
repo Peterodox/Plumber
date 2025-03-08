@@ -223,6 +223,7 @@ L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
 L["Delves Reputation Name"] = "Delver's Journey";
 L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
 L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
+L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
 
 
 --WoW Anniversary

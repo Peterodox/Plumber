@@ -5844,9 +5844,9 @@ do  --Blizzard Check Button
             end
 
             if checked then
-                PlaySound(SFX_CHECKBOX_ON);
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
             else
-                PlaySound(SFX_CHECKBOX_OFF);
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
             end
         end
     end
