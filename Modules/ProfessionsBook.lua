@@ -326,7 +326,7 @@ end
 
 
 do  --User-end Debugging    /run PlumberDebug()
-    function PlumberDebug()
+    local function PlumberDebug()
         local n = 0;
 
         local function Print(...)
@@ -360,6 +360,8 @@ do  --User-end Debugging    /run PlumberDebug()
             end
         end
     end
+
+    --_G.PlumberDebug = PlumberDebug;
 end
 
 

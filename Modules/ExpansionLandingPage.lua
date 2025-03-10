@@ -220,14 +220,14 @@ MajorFactionButtonMod.Containers = {};
 do
     local SubFactionData = {
         --[MajorFactionID] = {SubFactionID, iconType (1:CreatureDisplayID, 2:TextureFileID)}
-        [2600] = {  --The Severed Threads
+        [2600] = {  --2600 The Severed Threads
             {2601, 1, 116208},     --Weaver
             {2605, 1, 114775},     --General Anub'azal
             {2607, 1, 114268},     --Vizier
         },
 
-        [2653] = {  --The Cartels of Undermine  --interface/icons/inv_1115_reputationcurrencies_
-            --{2669, 0},     --Darkfuse Solutions
+        [2653] = {  --2653 The Cartels of Undermine  --interface/icons/inv_1115_reputationcurrencies_
+            {2669, 2, 6439629, criteria = function() return C_QuestLog.IsQuestFlaggedCompletedOnAccount(8691) end}, --Darkfuse Solutions unlocked after completed "Diversified Investments"
             {2673, 2, 6439627},     --Bilgewater Cartel 6383479
             {2677, 2, 6439630},     --Steamwheedle Cartel 6383482
             {2675, 2, 6439628},     --Blackwater Cartel 6383480
@@ -277,39 +277,62 @@ do
                     container:SetSize(100, barSize);
                     container.widgets = {};
 
-                    for i, data in ipairs(subFactions) do
-                        local f = CreateFactionProgress(container);
-                        container.widgets[i] = f;
-                        f:SetFaction(data[1]);
-                        if data[2] == 1 then
-                            f:SetIconByCreatureDisplayID(data[3]);
-                        else
-                            f:SetIconByFileID(data[3]);
-                        end
-                        f:SetPoint("LEFT", container, "LEFT", (i - 1) * (barSize + barGap), 0);
-                        f:SetHitRectInsets(shrinkAll, shrinkAll, shrinkTop, 0);     --hopefully reduce our influence on the FactionButton
-                    end
-
-                    container:SetSize(-barGap + rightPadding + (barSize + barGap) * #subFactions, barSize);
-                    container:EnableMouse(true);
-                    container:SetHitRectInsets(shrinkAll, 0, shrinkTop, 0);
-
                     local scrollOverlay = ExpansionLandingPage.Overlay.WarWithinLandingOverlay.ScrollFadeOverlay;
                     container.scrollOverlay = scrollOverlay;
-                else
-                    for i, widget in ipairs(container.widgets) do
-                        widget:Update();
-                        if widget:IsMouseMotionFocus() then
-                            widget:OnEnter();
+                end
+
+                local n = 0;
+                local subFactionID;
+                local widget;
+
+                for i, data in ipairs(subFactions) do
+                    if (not data.criteria) or (data.criteria()) then
+                        n = n + 1;
+                        widget = container.widgets[n];
+                        if not widget then
+                            widget = CreateFactionProgress(container);
+                            container.widgets[n] = widget;
+                            widget:SetPoint("LEFT", container, "LEFT", (n - 1) * (barSize + barGap), 0);
+                            widget:SetHitRectInsets(shrinkAll, shrinkAll, shrinkTop, 0);     --hopefully reduce our influence on the FactionButton
                         end
+                        subFactionID = data[1];
+                        if widget.factionID ~= subFactionID then
+                            widget:SetFaction(subFactionID);
+                            if data[2] == 1 then
+                                widget:SetIconByCreatureDisplayID(data[3]);
+                            else
+                                widget:SetIconByFileID(data[3]);
+                            end
+                        else
+                            widget:Update();
+                        end
+                        widget:Show();
                     end
                 end
 
+                container:SetSize(-barGap + rightPadding + (barSize + barGap) * n, barSize);
+                container:EnableMouse(true);
+                container:SetHitRectInsets(shrinkAll, 0, shrinkTop, 0);
                 container:ClearAllPoints();
                 container:SetParent(button);
-                container:SetPoint("RIGHT", button, "RIGHT", 0, -32);
+                container:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 1, -5);
                 container.scrollOverlay:Hide();
                 container:Show();
+
+                if n > 4 then
+                    container:SetScale(0.8);
+                else
+                    container:SetScale(1);
+                end
+
+                for i, widget in ipairs(container.widgets) do
+                    if i > n then
+                        widget:Hide();
+                    end
+                    if widget:IsMouseMotionFocus() then
+                        widget:OnEnter();
+                    end
+                end
             else
                 self:HideFactionWidgets(factionID);
             end

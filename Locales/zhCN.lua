@@ -409,6 +409,8 @@ L["Scenario Delves"] = "地下堡";
 L["GameObject Door"] = "门";
 L["Delve Chest 1 Rare"] = "丰裕宝匣";
 
+L["Season Maximum Colon"] = "赛季上限："
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "丰裕地下堡";

@@ -275,9 +275,31 @@ do  --Gilded Stash: 3 per week, 7 Gilded Crests each
         local title = C_Spell.GetSpellName(CREST_SPELL);
         tooltip:SetText(title, 1, 1, 1);
         if tooltipText then
+            TP = tooltipText;
             tooltipText = string.gsub(tooltipText, title.."%c+", "");
+
+            tooltip:AddLine(L["Delve Crest Stash Requirement"], 1, 0.82, 0, true);
+            tooltip:AddLine(" ");
             tooltip:AddLine(tooltipText, 1, 0.82, 0, true);
-            --tooltip:SetSpellByID(CREST_SPELL);
+            --tooltip:SetSpellByID(CREST_SPELL);    --wrong progress number
+
+            local info = C_CurrencyInfo.GetCurrencyInfo(addon.ItemUpgradeConstant.DelveWeeklyStashCurrencyID);
+            if info then    --Add total and season max
+                tooltip:AddLine(" ");
+                local r, g, b = C_Item.GetItemQualityColor(info.quality);
+                tooltip:AddLine(info.name, r, g, b, true);
+                tooltip:AddLine(L["Total Colon"].." |cffffffff"..(info.quantity or 0).."|r", 1, 0.82, 0);
+                local maxQuantity = info.useTotalEarnedForMaxQty and info.maxQuantity or 0;
+                if maxQuantity > 0 then
+                    local totalEarned = info.totalEarned or 0;
+                    local quantityText = ("|cffffd100"..L["Season Maximum Colon"].."|r ")..(totalEarned.."/"..maxQuantity);
+                    if totalEarned >= maxQuantity then
+                        tooltip:AddLine(quantityText, 1, 0.282, 0, true);
+                    else
+                        tooltip:AddLine(quantityText, 1, 1, 1, true);
+                    end
+                end
+            end
         else
             tooltip:AddLine(L["Delve Crest Stash No Info"], 1, 0.1, 0.1, true);
         end

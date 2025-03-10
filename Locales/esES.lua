@@ -94,6 +94,8 @@ L["currency-2915"] = "tallado";
 L["currency-2916"] = "con runas";
 L["currency-2917"] = "dorado";
 
+L["Season Maximum Colon"] = "Máximo de la temporada:";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Profundidad pródiga";

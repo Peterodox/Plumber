@@ -24,8 +24,9 @@ L["currency-2915"] = "Geschnitztes";
 L["currency-2916"] = "Runenverziertes";
 L["currency-2917"] = "Vergoldetes";
 
-
 L["Delve Chest 1 Rare"] = "Großzügiger Kasten";
+
+L["Season Maximum Colon"] = "Saisonmaximum:";
 
 
 --Map Pin Filter Name (name should be plural)

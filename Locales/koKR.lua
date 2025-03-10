@@ -17,6 +17,8 @@ L["currency-2915"] = "각인된";
 L["currency-2916"] = "룬새김";
 L["currency-2917"] = "금빛";
 
+L["Season Maximum Colon"] = "시즌 상한선:";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "풍요로운 구렁";

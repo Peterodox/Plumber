@@ -5,6 +5,7 @@ do  --Item Upgrade Track
     local ItemUpgradeConstant = {
         BaseCurrencyID = 3008,      --Flightstones
         CatalystCurrencyID = 3116;  --Item conversion   /dump ItemInteractionFrame.currencyTypeId
+        DelveWeeklyStashCurrencyID = 3110,
 
         Crests = {
             --Universal Upgrade System (Crests)
@@ -13,10 +14,10 @@ do  --Item Upgrade Track
             --From high tier to low
 
             --11.1.0
-            3110,   --Aspect    (M, M7+)
-            3109,   --Wyrm      (H, M2)
-            3108,   --Drake     (N, M0)
-            3107,   --Whelpling (LFR, H)
+            3110,   --Gilded    (M, M7+)
+            3109,   --Runed     (H, M2)
+            3108,   --Carved    (N, M0)
+            3107,   --Weathered (LFR, H)
         },
 
         CrestSources = {

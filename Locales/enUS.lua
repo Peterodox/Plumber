@@ -205,7 +205,7 @@ L["Number Millions"] = "M";     --1.5M 1,500,000
 
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Khaz Algar Summary";
-L["ModuleDescription ExpansionLandingPage"] = "Display extra info on the landing page:\n\n- Severed Threads Pact Level";
+L["ModuleDescription ExpansionLandingPage"] = "Display extra info on the landing page:\n\n- Severed Threads Pact Level\n\n- Undermine Cartel Standings";
 L["Instruction Track Reputation"] = "<Shift click to track this reputation>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
 
@@ -223,6 +223,7 @@ L["Delves Reputation Name"] = "Delver's Journey";
 L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
 L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
 L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
+L["Delve Crest Stash Requirement"] = "Appears in Tier 11 Bountiful Delves.";
 
 
 --WoW Anniversary
@@ -408,6 +409,8 @@ L["currency-2917"] = "Gilded";
 L["Scenario Delves"] = "Delves";
 L["GameObject Door"] = "Door";
 L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
+
+L["Season Maximum Colon"] = "Season Maximum:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
 
 
 --Map Pin Filter Name (name should be plural)

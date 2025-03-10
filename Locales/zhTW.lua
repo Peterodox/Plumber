@@ -17,6 +17,8 @@ L["currency-2915"] = "雕刻";
 L["currency-2916"] = "符文";
 L["currency-2917"] = "鍍金";
 
+L["Season Maximum Colon"] = "賽季上限：";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "豐碩探究";
