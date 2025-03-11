@@ -21,6 +21,7 @@ local CanUpgradeItem = C_ItemUpgrade.CanUpgradeItem;
 local GetItemLink = C_Item.GetItemLink;
 local TooltipInfp_GetBagItem = C_TooltipInfo.GetBagItem;
 local TooltipInfp_GetInventoryItem = C_TooltipInfo.GetInventoryItem;
+--11.1.5: C_Item.GetItemUpgradeInfo
 
 
 local TierOrder = {

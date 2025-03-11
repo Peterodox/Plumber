@@ -1385,7 +1385,9 @@ do  --Edit Mode
         self:SetAlpha(0);
         self:Hide();
 
-        self.TakeAllButton:Enable();
+        if self.TakeAllButton then
+            self.TakeAllButton:Enable();
+        end
 
         if self.Selection then
             self.Selection:Hide();

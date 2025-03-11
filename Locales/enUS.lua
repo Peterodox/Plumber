@@ -356,6 +356,7 @@ L["Random Favorite Mount"] = "Random Favorite Mount"; --A shorter version of MOU
 L["Dismiss Battle Pet"] = "Dismiss Battle Pet";
 L["Drag And Drop Item Here"] = "Drag and drop an item here.";
 L["Drag To Reorder"] = "Left click and drag to reorder";
+L["Click To Set Macro Icon"] = "Ctrl click to set as macro icon";
 L["Unsupported Action Type Format"] = "Unsupported action type: %s";
 L["Drawer Add Action Format"] = "Add |cffffffff%s|r";
 L["Drawer Add Profession1"] = "First Profession";

@@ -205,7 +205,7 @@ L["Number Millions"] = "M";
 
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = "卡兹阿加概要";
-L["ModuleDescription ExpansionLandingPage"] = "在概要界面上显示额外信息：\n\n- 斩离之丝等级";
+L["ModuleDescription ExpansionLandingPage"] = "在概要界面上显示额外信息：\n\n- 斩离之丝等级\n\n- 安德麦财阀声望";
 L["Instruction Track Reputation"] = "<按住Shift点击追踪此声望>";
 L["Instruction Untrack Reputation"] = "<按住Shift点击停止追踪>";
 
@@ -223,6 +223,7 @@ L["Delves Reputation Name"] = "地下堡赛季进度";
 L["ModuleName Delves_SeasonProgress"] = "地下堡: 赛季进度";
 L["ModuleDescription Delves_SeasonProgress"] = "在你提升“地下堡行者的旅程”时显示一个进度条。";
 L["Delve Crest Stash No Info"] = "你所在区域无法获取该信息。";
+L["Delve Crest Stash Requirement"] = "仅在11层丰裕地下堡出现。";
 
 
 --WoW Anniversary
@@ -355,6 +356,7 @@ L["Random Favorite Mount"] = "召唤随机偏好坐骑";
 L["Dismiss Battle Pet"] = "解散小宠物";
 L["Drag And Drop Item Here"] = "拖拽一个东西放在这里";
 L["Drag To Reorder"] = "左键单击并拖拽以更改位置";
+L["Click To Set Macro Icon"] = "按住Ctrl点击来设为宏图标";
 L["Unsupported Action Type Format"] = "不支持的动作类别： %s";
 L["Drawer Add Action Format"] = "添加 |cffffffff%s|r";
 L["Drawer Add Profession1"] = "第一个专业技能";

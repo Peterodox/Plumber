@@ -599,13 +599,24 @@ do  --EditorUI  --MacroForge
         tinsert(self.otherElements, object);
     end
 
+    function EditorUI:GetCurrentMacroIndex()
+        local selectedMacroIndex = MacroFrame:GetSelectedIndex();
+        local actualIndex = MacroFrame:GetMacroDataIndex(selectedMacroIndex);
+        return actualIndex
+    end
+
     function EditorUI:SaveMacroBody(body)
         if not InCombatLockdown() then
             EditorUI.SourceEditBox:SetText(body);
             --MacroFrame:SaveMacro();
-            local selectedMacroIndex = MacroFrame:GetSelectedIndex();
-            local actualIndex = MacroFrame:GetMacroDataIndex(selectedMacroIndex);
-            EditMacro(actualIndex, nil, nil, body);
+            EditMacro(self:GetCurrentMacroIndex(), nil, nil, body);
+            EL:RequestUpdateMacros(0.0);
+        end
+    end
+
+    function EditorUI:SetMacroIcon(icon)
+        if not InCombatLockdown() then
+            EditMacro(self:GetCurrentMacroIndex(), nil, icon);
             EL:RequestUpdateMacros(0.0);
         end
     end
@@ -1075,6 +1086,7 @@ do  --Editor Setup
                     if InCombatLockdown() then
                         tooltip:AddLine(L["PlumberMacro Error EditMacroInCombat"], 1, 0.1, 0.1, true);
                     else
+                        tooltip:AddLine("<"..L["Click To Set Macro Icon"]..">", 0.1, 1, 0.1, true);
                         tooltip:AddLine("<"..L["Drag To Reorder"]..">", 0.1, 1, 0.1, true);
                     end
 
@@ -1099,10 +1111,17 @@ do  --Editor Setup
             function IconButtonMixin:OnMouseDown(mouseButton)
                 if mouseButton == "LeftButton" then
                     if InCombatLockdown() then return end;
+
+                    GameTooltip:Hide();
+
+                    if IsControlKeyDown() then
+                        EditorUI:SetMacroIcon(self.Icon:GetTexture());
+                        return
+                    end
+
                     ReorderController:SetDraggedObject(self);
                     ReorderController:PreDragStart();
                     EditorUI:RaiseIconButtonLevel(self);
-                    GameTooltip:Hide();
                 end
             end
 
