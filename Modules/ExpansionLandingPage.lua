@@ -227,7 +227,7 @@ do
         },
 
         [2653] = {  --2653 The Cartels of Undermine  --interface/icons/inv_1115_reputationcurrencies_
-            {2669, 2, 6439629, criteria = function() return C_QuestLog.IsQuestFlaggedCompletedOnAccount(8691) end}, --Darkfuse Solutions unlocked after completed "Diversified Investments"
+            {2669, 2, 6439629, criteria = function() return C_QuestLog.IsQuestFlaggedCompletedOnAccount(86961) end}, --Darkfuse Solutions unlocked after completed "Diversified Investments"
             {2673, 2, 6439627},     --Bilgewater Cartel 6383479
             {2677, 2, 6439630},     --Steamwheedle Cartel 6383482
             {2675, 2, 6439628},     --Blackwater Cartel 6383480
