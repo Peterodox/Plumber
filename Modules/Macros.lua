@@ -623,65 +623,133 @@ do  --EditorUI  --MacroForge
 end
 
 
+local function CreateEditorUI(parent)
+    if not parent then return end;
+
+    local f = CreateFrame("Frame", nil, parent);
+    API.Mixin(f, EditorUI);
+    EditorUI = f;
+    f:OnLoad();
+
+    local ef = API.CreateNewSliceFrame(f, "RoughWideFrame");
+    f.ExtraFrame = ef;
+    ef:Hide();
+    ef:SetScript("OnHide", function()
+        ef:Hide();
+        ef:UnregisterAllEvents();
+    end);
+    ef:SetScript("OnShow", function()
+        ef:UpdatePixel();
+    end);
+    local offsetY = -4;
+    ef:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, offsetY);
+    ef:SetPoint("TOPRIGHT", parent, "BOTTOMRIGHT", 0, offsetY);
+    ef:EnableMouse(true);
+    ef:SetFrameStrata("HIGH");
+
+    f.Note = ef:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    f.Note:SetJustifyH("CENTER");
+    f.Note:SetTextColor(0.8, 0.8, 0.8);
+    f.Note:SetPoint("LEFT", ef, "LEFT", 16, 0);
+    f.Note:SetPoint("RIGHT", ef, "RIGHT", -16, 0);
+    f.Note:SetSpacing(2);
+
+    f.HighlightFrame = CreateFrame("Frame", nil, ef);
+    f.HighlightFrame.Texture = f.HighlightFrame:CreateTexture(nil, "OVERLAY");
+    f.HighlightFrame.Texture:SetAllPoints(true);
+    f.HighlightFrame:Hide();
+
+    f.MouseBlocker = CreateFrame("Frame", nil, ef);
+    f.MouseBlocker:SetAllPoints(true);
+    f.MouseBlocker:SetFrameLevel(128);
+    f.MouseBlocker:SetFixedFrameLevel(true);
+    f.MouseBlocker:EnableMouse(true);
+    f.MouseBlocker:Hide();
+
+    f:SetFrameHeight(72);
+    f:RequestSearchInEditBox();
+end
+
+local function CreateEditorUI_Blizzard()
+    if MacroSaveButton then
+        MacroSaveButton:HookScript("OnClick", function()
+            EL:RequestUpdateMacros();
+        end);
+    end
+
+    if MacroFrameText and MacroFrameText:IsObjectType("EditBox") then
+        EditorUI.SourceEditBox = MacroFrameText;
+    end
+
+    CreateEditorUI(MacroFrame);
+end
+
+local function CreateEditorUI_MacroToolkit()
+    --Note: MacroToolkit causes a breif fps drop when formatting our drawer commands with or without Plumber enabled.
+
+    local SaveButton = MacroToolkitSave;
+    if SaveButton then
+        SaveButton:HookScript("OnClick", function()
+            EL:RequestUpdateMacros();
+        end);
+    end
+
+    if MacroToolkitText and MacroToolkitText:IsObjectType("EditBox") then
+        EditorUI.SourceEditBox = MacroToolkitText;
+    end
+
+    EditorUI.macroFrameHooked = true;
+
+    if MacroToolkitFrame then
+        CreateEditorUI(MacroToolkitFrame);
+
+        local pauseUpdate;
+
+        local function UpdateMacroTooltipFrame()
+            if not pauseUpdate then
+                pauseUpdate = true;
+                C_Timer.After(0.03, function()
+                    pauseUpdate = nil;
+                    if not InCombatLockdown() then
+                        securecall(MacroToolkit.MacroFrameUpdate, MacroToolkit);
+                    end
+                end);
+            end
+        end
+
+        function EditorUI:GetCurrentMacroIndex()
+            return MacroToolkitFrame.selectedMacro
+        end
+
+        function EditorUI:SaveMacroBody(body)
+            if not InCombatLockdown() then
+                EditorUI.SourceEditBox:SetText(body);
+                EditMacro(self:GetCurrentMacroIndex(), nil, nil, body);
+                SaveButton:Click("LeftButton");
+                EL:RequestUpdateMacros(0.0);
+                UpdateMacroTooltipFrame();
+            end
+        end
+
+        function EditorUI:SetMacroIcon(icon)
+            if not InCombatLockdown() then
+                EditMacro(self:GetCurrentMacroIndex(), nil, icon);
+                SaveButton:Click("LeftButton");
+                EL:RequestUpdateMacros(0.0);
+                UpdateMacroTooltipFrame();
+            end
+        end
+    end
+end
+
+
 if MacroFrame_LoadUI then
     --UPDATE_MACROS fires when selecting any macro, without changing its content, so we update our macro after MarcoFrame is closed
     hooksecurefunc("MacroFrame_LoadUI", function()
         if not EditorUI.macroFrameHooked then
             if MacroFrame then
                 EditorUI.macroFrameHooked = true;
-
-                if MacroSaveButton then
-                    MacroSaveButton:HookScript("OnClick", function()
-                        EL:RequestUpdateMacros();
-                    end);
-                end
-
-                if MacroFrameText and MacroFrameText:IsObjectType("EditBox") then
-                    EditorUI.SourceEditBox = MacroFrameText;
-                end
-
-                local f = CreateFrame("Frame", nil, MacroFrame);
-                API.Mixin(f, EditorUI);
-                EditorUI = f;
-                f:OnLoad();
-
-                local ef = API.CreateNewSliceFrame(f, "RoughWideFrame");
-                f.ExtraFrame = ef;
-                ef:Hide();
-                ef:SetScript("OnHide", function()
-                    ef:Hide();
-                    ef:UnregisterAllEvents();
-                end);
-                ef:SetScript("OnShow", function()
-                    ef:UpdatePixel();
-                end);
-                local offsetY = -4;
-                ef:SetPoint("TOPLEFT", MacroFrame, "BOTTOMLEFT", 0, offsetY);
-                ef:SetPoint("TOPRIGHT", MacroFrame, "BOTTOMRIGHT", 0, offsetY);
-                ef:EnableMouse(true);
-                ef:SetFrameStrata("HIGH");
-
-                f.Note = ef:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-                f.Note:SetJustifyH("CENTER");
-                f.Note:SetTextColor(0.8, 0.8, 0.8);
-                f.Note:SetPoint("LEFT", ef, "LEFT", 16, 0);
-                f.Note:SetPoint("RIGHT", ef, "RIGHT", -16, 0);
-                f.Note:SetSpacing(2);
-
-                f.HighlightFrame = CreateFrame("Frame", nil, ef);
-                f.HighlightFrame.Texture = f.HighlightFrame:CreateTexture(nil, "OVERLAY");
-                f.HighlightFrame.Texture:SetAllPoints(true);
-                f.HighlightFrame:Hide();
-
-                f.MouseBlocker = CreateFrame("Frame", nil, ef);
-                f.MouseBlocker:SetAllPoints(true);
-                f.MouseBlocker:SetFrameLevel(128);
-                f.MouseBlocker:SetFixedFrameLevel(true);
-                f.MouseBlocker:EnableMouse(true);
-                f.MouseBlocker:Hide();
-
-                f:SetFrameHeight(72);
-                f:RequestSearchInEditBox();
+                CreateEditorUI_Blizzard();
             end
         end
     end);
@@ -696,6 +764,10 @@ function EL:OnEvent(event, ...)
         self:LoadSpellAndItem();
         self:RequestUpdateMacros(0.5);
         DrawerUpdator:RequestUpdate(0.7);
+
+        if C_AddOns.IsAddOnLoaded("MacroToolkit") then
+            CreateEditorUI_MacroToolkit();
+        end
     elseif event == "PLAYER_REGEN_ENABLED" then
         self:UpdateMacrosAndDrawers();
     elseif event == "UPDATE_MACROS" then
@@ -1431,11 +1503,11 @@ do  --Editor Setup
 
             if refresh then
                 EditorUI:ReleaseElements();
-                local parent = MacroFrame;
+                local parent = EditorUI:GetParent();
                 local container = EditorSetup.IconButtonFrame;
                 local size = EditorSetup.itemButtonSize;
                 local gap = EditorSetup.itemButtonGap;
-                local frameWidth = parent:GetWidth();
+                local frameWidth = 338; --parent:GetWidth()
                 local span = #drawerInfo * (size + gap) - gap;
                 local requiredWidth = span + 48;
                 if requiredWidth > frameWidth then

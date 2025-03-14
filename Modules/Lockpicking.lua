@@ -18,7 +18,9 @@ local SpellIsTargeting = SpellIsTargeting;
 local GetMouseFocus = API.GetMouseFocus;
 local GetSpellInfo = API.GetSpellInfo;
 local GetCursorInfo = GetCursorInfo;
+local GetCVarBool = C_CVar.GetCVarBool;
 local match = string.match;
+local find = string.find;
 local IsInteractingWithNpcOfType = (C_PlayerInteractionManager and C_PlayerInteractionManager.IsInteractingWithNpcOfType) or function(type) return false end
 
 
@@ -303,14 +305,14 @@ end
 local function IsMouseoverItemLocked(lineIndex)
     local toIndex;
     if lineIndex then
-        toIndex = 2;
+        toIndex = GetCVarBool("colorblindMode") and 3 or 2;    --Colorblind Mode: Quality becomes the 2nd line
     else
         toIndex = TooltipFrame:NumLines();
     end
     local line;
     for i = 2, toIndex do
         line = _G["GameTooltipTextLeft"..i];
-        if line and line:GetText() == TEXT_LOCKED then
+        if line and find(line:GetText(), TEXT_LOCKED) then      --Colorblind Mode: [++]Locked(Yellow), [-]Locked(Red)
             local r, g, b = line:GetTextColor();
             if IsWarningColor(r, g, b) then
                 return false
