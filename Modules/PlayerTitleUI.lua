@@ -357,6 +357,14 @@ function Module:Init()
 
     API.Mixin(FilterButton, FilterButtonMixin);
     FilterButton:OnLoad();
+
+
+    --Addon Skin
+    if ElvUI then
+        local E = ElvUI[1];
+        local S = E:GetModule('Skins')
+        S:HandleEditBox(Searchbox);
+    end
 end
 
 function Module:SetSearchboxInstructions(text)

@@ -205,7 +205,7 @@ L["Number Millions"] = "M";     --1.5M 1,500,000
 
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Khaz Algar Summary";
-L["ModuleDescription ExpansionLandingPage"] = "Display extra info on the landing page:\n\n- Severed Threads Pact Level\n\n- Undermine Cartel Standings";
+L["ModuleDescription ExpansionLandingPage"] = "Display extra info on the landing page:\n\n- Paragon Progress\n\n- Severed Threads Pact Level\n\n- Undermine Cartel Standings";
 L["Instruction Track Reputation"] = "<Shift click to track this reputation>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
 L["Error Show UI In Combat"] = "You cannot toggle this UI while in combat.";
