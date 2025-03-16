@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.4
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.6
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -17,6 +17,8 @@ L["Quick Slot Layout Linear"] = "Линейный";
 L["Quick Slot Layout Radial"] = "Радиальный";
 L["Restriction Combat"] = "Не работает в бою";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*Вы можете изменить размер штифта на карте мира - Фильтр карты - Plumber";
+L["Toggle Plumber UI"] = "Переключить интерфейс Plumber";
+L["Toggle Plumber UI Tooltip"] = "Показать следующий интерфейс Plumber в режиме редактирования:\n%s\n\nЭтот флажок управляет только их видимостью в режиме редактирования. Он не включает и не отключает эти модули.";
 
 
 --Module Categories
@@ -220,6 +222,8 @@ L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
 L["Delves Reputation Name"] = "Путешествие в вылазки";
 L["ModuleName Delves_SeasonProgress"] = "Вылазки: Путешествие в вылазки";
 L["ModuleDescription Delves_SeasonProgress"] = "Отображение шкалы прогресса в верхней части экрана каждый раз, когда вы получаете опыт для вылазки";
+L["Delve Crest Stash No Info"] = "Эта информация недоступна в вашем текущем местоположении.";
+L["Delve Crest Stash Requirement"] = "Появляется на 11-м уровне многообещающих вылазок.";
 
 
 --WoW Anniversary
@@ -348,9 +352,11 @@ L["PlumberMacro DrawerFlag Stuck"] = "Что-то пошло не так при 
 L["PlumberMacro Error Combat"] = "Недоступно в бою";
 L["PlumberMacro Error NoAction"] = "Нет поддерживаемых действий";
 L["PlumberMacro Error EditMacroInCombat"] = "Невозможно редактировать макросы во время боя";
+L["Random Favorite Mount"] = "Случайное избранное средство передвижения"; --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
 L["Dismiss Battle Pet"] = "Отпустить боевого питомца";
 L["Drag And Drop Item Here"] = "Перетащите предмет сюда.";
 L["Drag To Reorder"] = "ЛКМ и перетащите, чтобы изменить порядок.";
+L["Click To Set Macro Icon"] = "Ctrl-клик, чтобы установить как значок макроса";
 L["Unsupported Action Type Format"] = "Неподдерживаемый тип действия: %s";
 L["Drawer Add Action Format"] = "Добавить |cffffffff%s|r";
 L["Drawer Add Profession1"] = "Первая профессия";
