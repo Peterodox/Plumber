@@ -54,6 +54,7 @@ do
         2690,
         2767,
         2815,
+        2826,
     };
 
     for _, mapID in ipairs(DELVE_INSTANCE) do

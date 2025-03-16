@@ -7,6 +7,7 @@ local GetParagonValuesAndLevel = API.GetParagonValuesAndLevel;
 
 local FACTION_FRAME_WIDTH = 60;
 
+local MajorFactionListOverride = {};
 local HiddenObjectUtil = {};
 do
     local ipairs = ipairs;
@@ -236,10 +237,10 @@ do
     };
 
     function MajorFactionButtonMod:GetFactionButton(factionID)
-        local parent = ExpansionLandingPage.Overlay.WarWithinLandingOverlay;
-        if not parent then return end;
+        local LandingOverlay = ExpansionLandingPage.Overlay.WarWithinLandingOverlay;
+        if not LandingOverlay then return end;
 
-        local ScrollBox = parent.MajorFactionList.ScrollBox;
+        local ScrollBox = LandingOverlay.MajorFactionList.ScrollBox;
         local dataProvider = ScrollBox:GetDataProvider();
 
         local dataIndex, foundElementData = dataProvider:FindByPredicate(function(elementData)
@@ -339,6 +340,92 @@ do
         end
     end
 
+    function MajorFactionButtonMod:SetupSubFaction(majorFactionButton)
+        if majorFactionButton.plumberLastFactionID then
+            self:HideFactionWidgets(majorFactionButton.plumberLastFactionID);
+            majorFactionButton.plumberLastFactionID = nil;
+        end
+
+        local factionID = majorFactionButton.factionID;
+        if not (factionID and SubFactionData[factionID]) then
+            return
+        end
+
+        majorFactionButton.plumberLastFactionID = factionID;
+
+        local UnlockedState = majorFactionButton.UnlockedState;
+        local subFactions = SubFactionData[factionID];
+        local barSize = FACTION_FRAME_WIDTH;
+        local barGap = 0;
+        local rightPadding = 8;
+        local shrinkTop = 8;
+        local shrinkAll = 4;
+
+        local container = self.Containers[factionID];
+        if not container then
+            container = CreateFrame("Frame", nil, UnlockedState);
+            self.Containers[factionID] = container;
+            container:SetSize(100, barSize);
+            container.widgets = {};
+
+            local scrollOverlay = ExpansionLandingPage.Overlay.WarWithinLandingOverlay.ScrollFadeOverlay;
+            container.scrollOverlay = scrollOverlay;
+        end
+
+        local n = 0;
+        local subFactionID;
+        local widget;
+
+        for i, data in ipairs(subFactions) do
+            if (not data.criteria) or (data.criteria()) then
+                n = n + 1;
+                widget = container.widgets[n];
+                if not widget then
+                    widget = CreateFactionProgress(container);
+                    container.widgets[n] = widget;
+                    widget:SetPoint("LEFT", container, "LEFT", (n - 1) * (barSize + barGap), 0);
+                    widget:SetHitRectInsets(shrinkAll, shrinkAll, shrinkTop, 0);     --hopefully reduce our influence on the FactionButton
+                end
+                subFactionID = data[1];
+                if widget.factionID ~= subFactionID then
+                    widget:SetFaction(subFactionID);
+                    if data[2] == 1 then
+                        widget:SetIconByCreatureDisplayID(data[3]);
+                    else
+                        widget:SetIconByFileID(data[3]);
+                    end
+                else
+                    widget:Update();
+                end
+                widget:Show();
+            end
+        end
+
+        container:SetSize(-barGap + rightPadding + (barSize + barGap) * n, barSize);
+        container:EnableMouse(true);
+        container:SetHitRectInsets(shrinkAll, 0, shrinkTop, 0);
+        container:ClearAllPoints();
+        container:SetParent(UnlockedState);
+        container:SetPoint("BOTTOMRIGHT", UnlockedState, "BOTTOMRIGHT", 1, -5);
+        container.scrollOverlay:Hide();
+        container:Show();
+
+        if n > 4 then
+            container:SetScale(0.8);
+        else
+            container:SetScale(1);
+        end
+
+        for i, widget in ipairs(container.widgets) do
+            if i > n then
+                widget:Hide();
+            end
+            if widget:IsMouseMotionFocus() then
+                widget:OnEnter();
+            end
+        end
+    end
+
     function MajorFactionButtonMod:HideFactionWidgets(factionID)
         local container = self.Containers[factionID];
         if container then
@@ -363,27 +450,25 @@ do
 
         if state then
             if not self.factionEventListener then
-                local factionEventListener = CreateFrame("Frame", nil, ExpansionLandingPage.Overlay.WarWithinLandingOverlay);
+                local LandingOverlay = ExpansionLandingPage.Overlay.WarWithinLandingOverlay;
+                local factionEventListener = CreateFrame("Frame", nil, LandingOverlay);
                 self.factionEventListener = factionEventListener;
 
                 factionEventListener:SetScript("OnShow", function()
-                    factionEventListener:RegisterEvent("UPDATE_FACTION");
-                    factionEventListener:RegisterEvent("MAJOR_FACTION_UNLOCKED");
-                    MajorFactionButtonMod:ModifyFactionButtons()
-                end);
+                    if not self.needChecked then
+                        self.needChecked = true;
+                        if MajorFactionListOverride:IsModificationNeeded() then
+                            self.listNeedModified = true;
+                        end
+                    end
 
-                factionEventListener:SetScript("OnHide", function()
-                    factionEventListener:UnregisterEvent("UPDATE_FACTION");
-                    factionEventListener:UnregisterEvent("MAJOR_FACTION_UNLOCKED");
-                end);
+                    if self.listNeedModified and (not self.refreshModified) and LandingOverlay.MajorFactionList then
+                        self.refreshModified = true;
 
-                factionEventListener:SetScript("OnEvent", function(_, event, ...)
-                    if not self.pauseUpdate then
-                        self.pauseUpdate = true;
-                        C_Timer.After(0.05, function()
-                            self.pauseUpdate = nil;
-                            MajorFactionButtonMod:ModifyFactionButtons()
-                        end);
+                        MajorFactionListOverride.OnLoad(LandingOverlay.MajorFactionList.ScrollBox);
+
+                        LandingOverlay.MajorFactionList.Refresh = MajorFactionListOverride.RefreshList;
+                        LandingOverlay.MajorFactionList:Refresh();
                     end
                 end);
             end
@@ -399,6 +484,132 @@ do
 end
 
 
+do  --Custom List Insert
+    --expansionFilter = LE_EXPANSION_WAR_WITHIN
+    local ForceShownFactions = {
+        --[majorFactionID] = true
+        [2685] = true,
+    };
+
+    local FactionDataOverride = {
+        [2685] = {
+            uiPriority = 15.5,      --Gallagio Loyalty Rewards Club (15 is Cartels of Undermine)
+        },
+    };
+
+    local FactionAtlasOverride = {
+        [2685] = "thewarwithin-landingpage-renownbutton-rocket",
+    };
+
+
+
+    local UnlockedStateMixinOverride = {};
+    function UnlockedStateMixinOverride:OnClick(button)
+        if InCombatLockdown() then
+            API.DisplayErrorMessage(L["Error Show UI In Combat"]);
+            return
+        end
+        MajorFactionButtonUnlockedStateMixin.OnClick(self, button);
+    end
+
+    function UnlockedStateMixinOverride:RefreshUnlockState(majorFactionData)
+        --Override ProgressBar to display Paragon
+
+        self.Title:SetText(majorFactionData.name or "");
+        self.Title:SetPoint("BOTTOMLEFT", self.RenownProgressBar, "RIGHT", 8, 0);
+
+        local factionID = majorFactionData.factionID;
+        C_Reputation.RequestFactionParagonPreloadRewardData(factionID);
+
+
+        local isCapped = C_MajorFactions.HasMaximumRenown(factionID);
+        local isParagon = C_Reputation.IsFactionParagon(factionID);
+        local currentValue = isCapped and majorFactionData.renownLevelThreshold or majorFactionData.renownReputationEarned or 0;
+        local maxValue = majorFactionData.renownLevelThreshold;
+
+        if isParagon then
+            local totalEarned, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID);
+            if totalEarned and threshold and threshold ~= 0 then
+                local paragonLevel = math.floor(totalEarned / threshold);
+                currentValue = totalEarned - paragonLevel * threshold;
+                maxValue = threshold;
+            end
+
+            if hasRewardPending then
+                currentValue = maxValue;
+            end
+
+            self.RenownLevel:SetText(L["Paragon Reputation"]);
+        else
+            self.RenownLevel:SetText(MAJOR_FACTION_BUTTON_RENOWN_LEVEL:format(majorFactionData.renownLevel or 0));
+        end
+
+        self.RenownProgressBar:UpdateBar(currentValue, maxValue);
+        self.RenownProgressBar:Show();
+
+        MajorFactionButtonMod:SetupSubFaction(self:GetParent());
+    end
+
+
+    function MajorFactionListOverride:IsModificationNeeded()
+        for majorFactionID in pairs(ForceShownFactions) do
+            if C_MajorFactions.IsMajorFactionHiddenFromExpansionPage(majorFactionID) then
+                return true
+            end
+        end
+        return false
+    end
+
+    function MajorFactionListOverride:RefreshList()
+        local factionList = {};
+
+        local majorFactionIDs = C_MajorFactions.GetMajorFactionIDs(self.expansionFilter);
+        for index, majorFactionID in ipairs(majorFactionIDs) do
+            if (not C_MajorFactions.IsMajorFactionHiddenFromExpansionPage(majorFactionID)) or ForceShownFactions[majorFactionID] then
+                local majorFactionData = C_MajorFactions.GetMajorFactionData(majorFactionID);
+                table.insert(factionList, majorFactionData);
+                if FactionDataOverride[majorFactionID] then
+                    for k, v in pairs(FactionDataOverride[majorFactionID]) do
+                        majorFactionData[k] = v;
+                    end
+                end
+            end
+        end
+
+        local function MajorFactionSort(faction1, faction2)
+            if faction1.uiPriority ~= faction2.uiPriority then
+                return faction1.uiPriority > faction2.uiPriority;
+            end
+
+            return strcmputf8i(faction1.name, faction2.name) < 0;
+        end
+        table.sort(factionList, MajorFactionSort);
+
+        MajorFactionButtonMod:HideAllWidgets();
+
+        local dataProvider = CreateDataProvider(factionList);
+        self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
+        self.ScrollBar:SetShown(self.ScrollBox:HasScrollableExtent());
+    end
+
+    function MajorFactionListOverride:OnLoad()
+        local view = self:GetView();
+        view:SetElementInitializer("MajorFactionButtonTemplate", function(button, majorFactionData)
+            button.UnlockedState:SetScript("OnClick", UnlockedStateMixinOverride.OnClick);
+            button.UnlockedState.Refresh = UnlockedStateMixinOverride.RefreshUnlockState;
+            button:Init(majorFactionData);
+
+            local factionID = button.factionID;
+            if button.isUnlocked then
+                button.UnlockedState:SetSelected(factionID == self.selectedFactionID);
+            end
+
+            if factionID and FactionAtlasOverride[factionID] then
+                button.UnlockedState.Background:SetAtlas(FactionAtlasOverride[factionID]);
+            end
+        end);
+    end
+end
 
 
 do

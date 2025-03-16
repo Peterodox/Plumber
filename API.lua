@@ -1728,7 +1728,7 @@ do  -- Reputation
                 factionStandingtext = L["Renown Level Label"] .. majorFactionData.renownLevel;
 
                 if isParagon then
-                    local totalEarned, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID);
+                    local totalEarned, threshold, rewardQuestID, hasRewardPending = GetFactionParagonInfo(factionID);
                     if totalEarned and threshold and threshold ~= 0 then
                         local paragonLevel = floor(totalEarned / threshold);
                         local currentValue = totalEarned - paragonLevel * threshold;
@@ -2530,6 +2530,12 @@ do  -- Chat Message
         print(ADDON_ICON.." |cffb8c8d1Plumber:|r "..msg);
     end
     API.PrintMessage = PrintMessage;
+
+    function API.DisplayErrorMessage(msg)
+        if not msg then return end;
+        local messageType = 0;
+        UIErrorsFrame:TryDisplayMessage(messageType, (ADDON_ICON.." |cffb8c8d1Plumber:|r ")..msg, RED_FONT_COLOR:GetRGB());
+    end
 end
 
 do  -- Custom Hyperlink ItemRef

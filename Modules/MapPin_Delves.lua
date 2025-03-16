@@ -45,7 +45,7 @@ local DelvePOI = {
     --8142 Demolition Dome  --Undermine Challenge
 };
 
-local DelveMaps = {
+local DelveMaps = { --Unused
     2248, 2214, 2215, 2255, 2346,
 };
 

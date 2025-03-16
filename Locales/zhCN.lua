@@ -208,6 +208,7 @@ L["ModuleName ExpansionLandingPage"] = "卡兹阿加概要";
 L["ModuleDescription ExpansionLandingPage"] = "在概要界面上显示额外信息：\n\n- 斩离之丝等级\n\n- 安德麦财阀声望";
 L["Instruction Track Reputation"] = "<按住Shift点击追踪此声望>";
 L["Instruction Untrack Reputation"] = "<按住Shift点击停止追踪>";
+L["Error Show UI In Combat"] = "无法在战斗中打开或关闭此界面。";
 
 
 --WorldMapPin_TWW (Show Pins On Continent Map)

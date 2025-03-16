@@ -208,6 +208,7 @@ L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Khaz Al
 L["ModuleDescription ExpansionLandingPage"] = "Display extra info on the landing page:\n\n- Severed Threads Pact Level\n\n- Undermine Cartel Standings";
 L["Instruction Track Reputation"] = "<Shift click to track this reputation>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
+L["Error Show UI In Combat"] = "You cannot toggle this UI while in combat.";
 
 
 --WorldMapPin_TWW (Show Pins On Continent Map)

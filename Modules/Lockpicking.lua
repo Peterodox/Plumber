@@ -309,10 +309,11 @@ local function IsMouseoverItemLocked(lineIndex)
     else
         toIndex = TooltipFrame:NumLines();
     end
-    local line;
+    local line, lineText;
     for i = 2, toIndex do
         line = _G["GameTooltipTextLeft"..i];
-        if line and find(line:GetText(), TEXT_LOCKED) then      --Colorblind Mode: [++]Locked(Yellow), [-]Locked(Red)
+        lineText = line and line:GetText();
+        if lineText and find(lineText, TEXT_LOCKED) then      --Colorblind Mode: [++]Locked(Yellow), [-]Locked(Red)
             local r, g, b = line:GetTextColor();
             if IsWarningColor(r, g, b) then
                 return false
