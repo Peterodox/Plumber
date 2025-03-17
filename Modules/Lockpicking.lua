@@ -361,6 +361,7 @@ local function SetupButtonAndTooltip(bag, slot, tradeItem)
         CursorProgressIndicator:SetParent(UIParent);
         CursorProgressIndicator:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
         CursorProgressIndicator:WatchSpell(SPELL_ID_PICK_LOCK);
+        CursorProgressIndicator:SetEdgeScale(1);
     end
 end
 

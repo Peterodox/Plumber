@@ -341,10 +341,12 @@ do
     end
 
     function MajorFactionButtonMod:SetupSubFaction(majorFactionButton)
-        if majorFactionButton.plumberLastFactionID then
+        local UnlockedState = majorFactionButton.UnlockedState;
+
+        if majorFactionButton.plumberLastFactionID and self.Containers[majorFactionButton.plumberLastFactionID]:GetParent() == UnlockedState then
             self:HideFactionWidgets(majorFactionButton.plumberLastFactionID);
-            majorFactionButton.plumberLastFactionID = nil;
         end
+        majorFactionButton.plumberLastFactionID = nil;
 
         local factionID = majorFactionButton.factionID;
         if not (factionID and SubFactionData[factionID]) then
@@ -353,7 +355,6 @@ do
 
         majorFactionButton.plumberLastFactionID = factionID;
 
-        local UnlockedState = majorFactionButton.UnlockedState;
         local subFactions = SubFactionData[factionID];
         local barSize = FACTION_FRAME_WIDTH;
         local barGap = 0;

@@ -2865,6 +2865,34 @@ do  --Professions
     PlumberGlobals.OpenProfessionFrame = API.OpenProfessionFrame;
 end
 
+do  --Addon Skin
+    local AddOnSkinHandler = {
+        ElvUI = {
+            global = "ElvUI",
+            root = function() local E = ElvUI[1]; return E:GetModule("Skins") end,
+            handlerKey = {
+                editbox = "HandleEditBox";
+            };
+        },
+    };
+
+    function API.SetupSkinExternal(object)
+        local objectType = object:GetObjectType();
+        objectType = string.lower(objectType);
+
+        for addOnName, v in pairs(AddOnSkinHandler) do
+            if _G[v.global] then
+                local root = v.root();
+                if v.handlerKey[objectType] then
+                    root[v.handlerKey[objectType]](root, object);
+                    return true, addOnName
+                end
+            end
+        end
+    end
+end
+
+
 --[[
 local DEBUG = CreateFrame("Frame");
 DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");

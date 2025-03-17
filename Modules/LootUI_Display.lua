@@ -45,6 +45,8 @@ local BG_OPACITY = 0.5;             --Base Alpha: 0.9 (This parameter doesn't af
 
 
 local EL = CreateFrame("Frame");
+local EventGenerator = CreateFrame("Frame");
+
 
 local ENABLE_MODULE = false;
 local IS_CLASSIC = not addon.IsToCVersionEqualOrNewerThan(110000);
@@ -1063,7 +1065,7 @@ do  --UI Manually Pickup Mode
         self:HighlightItemFrame(nil);
         if state then
             self.Header:Hide();
-            self.TakeAllButton:Show();
+            self.HeaderWidgetContainer:Show();
             self:SetBackgroundAlpha(1);
             self.isFocused = false;
             if LOOT_UNDER_MOUSE then
@@ -1071,13 +1073,15 @@ do  --UI Manually Pickup Mode
             end
 
             EL:ListenDynamicEvents(false);
+            EventGenerator:WatchLootCleared();
         else
             self.Header:Show();
-            self.TakeAllButton:Hide();
+            self.HeaderWidgetContainer:Hide();
             self:SetBackgroundAlpha(BG_OPACITY);
             if LOOT_UNDER_MOUSE then
                 self:LoadPosition();
             end
+            EventGenerator:Stop();
         end
         self:EnableMouseScript(state);
     end
@@ -1346,10 +1350,10 @@ do  --Edit Mode
 
         self.manualMode = nil;
         self.Header:Hide();
-        self.TakeAllButton:Show();
+        self.HeaderWidgetContainer:Show();
         self.TakeAllButton:Layout();
         self.TakeAllButton:SetScript("OnKeyDown", nil);
-        self.TakeAllButton:Disable();
+        self:EnableHeaderWidgets(false);
     end
 
     function MainFrame:EnterEditMode()
@@ -1371,6 +1375,8 @@ do  --Edit Mode
 
         self:LoadPosition();
         self:UnregisterEvent("GLOBAL_MOUSE_UP");
+
+        EventGenerator:Stop();
     end
 
     function MainFrame:ExitEditMode()
@@ -1385,9 +1391,7 @@ do  --Edit Mode
         self:SetAlpha(0);
         self:Hide();
 
-        if self.TakeAllButton then
-            self.TakeAllButton:Enable();
-        end
+        self:EnableHeaderWidgets(true);
 
         if self.Selection then
             self.Selection:Hide();
@@ -1622,6 +1626,30 @@ do  --Edit Mode
         end
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_LootUnderMouse", SettingChanged_LootUnderMouse);
+end
+
+
+do  --EventGenerator
+    function EventGenerator:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.5 then
+            self.t = 0;
+            if GetNumLootItems() <= 0 then
+                self:SetScript("OnUpdate", nil);
+                EL:OnEvent("LOOT_CLOSED");
+            end
+        end
+    end
+
+    function EventGenerator:WatchLootCleared()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function EventGenerator:Stop()
+        self.t = 0;
+        self:SetScript("OnUpdate", nil);
+    end
 end
 
 

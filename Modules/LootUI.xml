@@ -47,7 +47,6 @@
     <Button name="PlumberLootUIGenericButtonTemplate" propagateKeyboardInput="true" virtual="true">
 		<Size x="128" y="32"/>
 		<Layers>
-
 			<Layer level="BACKGROUND">
 				<Texture parentKey="Background" setAllPoints="true" ignoreParentScale="false" alpha="0.6">
                     <TexCoords left="0" right="0.125" top="0.140625" bottom="0.203125"/>
@@ -97,6 +96,27 @@
                 <Alpha childKey="Highlight" duration="0.8" fromAlpha="1" toAlpha="0" startDelay="0.1" order="2"/>
             </AnimationGroup>
 		</Animations>
+    </Button>
+
+    <Button name="PlumberLootUISquareIconButtonTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" setAllPoints="true" ignoreParentScale="false" alpha="0.6">
+                    <TexCoords left="0" right="0.03125" top="0.203125" bottom="0.265625"/>
+                    <TextureSliceMode mode="Stretched"/>
+                    <TextureSliceMargins left="8" right="8" top="8" bottom="8"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon">
+                    <Size x="14" y="14"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+                    </Anchors>
+				</Texture>
+			</Layer>
+        </Layers>
     </Button>
 
 	<Frame name="PlumberLootUIItemFrameTemplate" alpha="0" virtual="true">

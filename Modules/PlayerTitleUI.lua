@@ -359,12 +359,8 @@ function Module:Init()
     FilterButton:OnLoad();
 
 
-    --Addon Skin
-    if ElvUI then
-        local E = ElvUI[1];
-        local S = E:GetModule('Skins')
-        S:HandleEditBox(Searchbox);
-    end
+    --3rd Party Addon Skin
+    API.SetupSkinExternal(Searchbox);
 end
 
 function Module:SetSearchboxInstructions(text)
