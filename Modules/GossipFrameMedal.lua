@@ -183,18 +183,17 @@ local function ProcessLines(...)
     end
 
     if k == 1 then
-        --print("No Data")
         EL:QueryAuraTooltipInto();
     else
         UpdateGossipIcons(ranks);
         EL:QueryAuraTooltipInto();    --Sometimes the tooltip data is partial so we keep querying x times
-        --EL:PostDataFullyRetrieved();
     end
 end
 
 local function ProcessAuraByAuraInstanceID(auraInstanceID)
     local info = C_TooltipInfo.GetUnitBuffByAuraInstanceID("player", auraInstanceID);
     if info and info.lines and info.lines[2] then
+        EL:WatchDataInstanceID(info.dataInstanceID);
         ProcessLines( string.split("\r", info.lines[2].leftText) );
     else
         --Tooltip data not ready
@@ -240,6 +239,13 @@ function EL:PostDataFullyRetrieved()
     self:SetScript("OnUpdate", nil);
 end
 
+function EL:WatchDataInstanceID(dataInstanceID)
+    self.dataInstanceID = dataInstanceID;
+    if dataInstanceID then
+        self:RegisterUnitEvent("TOOLTIP_DATA_UPDATE");
+    end
+end
+
 
 
 local function ProcessFunc(auraInfo)
@@ -276,6 +282,12 @@ local function EL_OnEvent(self, event, ...)
 
     elseif event == "UNIT_AURA" then
         EL:UpdateRaceTimesFromAura();
+
+    elseif event == "TOOLTIP_DATA_UPDATE" then
+        local dataInstanceID = ...
+        if dataInstanceID == self.dataInstanceID then
+            EL:UpdateRaceTimesFromAura();
+        end
     end
 end
 
@@ -325,6 +337,8 @@ function EL:DisableModule()
     self:UnregisterEvent("GOSSIP_SHOW");
     self:UnregisterEvent("GOSSIP_CLOSED");
     self:UnregisterEvent("UNIT_AURA");
+    self:UnregisterEvent("TOOLTIP_DATA_UPDATE");
+    self.dataInstanceID = nil;
 end
 
 local function EnableModule(state)

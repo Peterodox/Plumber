@@ -1680,14 +1680,12 @@ end
 do  --Rare Items
     local RareItems = {
         --[210796] = true,    --debug
-        [210939] = true,    --Null Stone
         [224025] = true,    --Crackling Shard
-        [221758] = true,    --Profaned Tinderbox
     };
 
     function IsRareItem(data)
         if RareItems[data.id] then
-            return true;
+            return true
         elseif data.classID == 15 and data.subclassID == 5 then
             --Mount
             return true

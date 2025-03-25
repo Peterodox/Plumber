@@ -1,5 +1,5 @@
 local VERSION_TEXT = "v1.6.6";
-local VERSION_DATE = 1742200000;
+local VERSION_DATE = 1742900000;
 
 
 local addonName, addon = ...
@@ -125,7 +125,7 @@ local DefaultValues = {
 
     --Custom Loot Window
     LootUI = false,
-        LootUI_FontSize = 14,
+        LootUI_FontSize = 12,
         LootUI_FadeDelayPerItem = 0.25,
         LootUI_ItemsPerPage = 6,
         LootUI_BackgroundAlpha = 0.5,

@@ -30,6 +30,7 @@ local strlenutf8 = strlenutf8;
 local InCombatLockdown = InCombatLockdown;
 local GetMacroBody = GetMacroBody;
 local GetMacroInfo = GetMacroInfo;
+local GetMacroIndexByName = GetMacroIndexByName;
 local EditMacro = EditMacro;
 local GetActiveAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or API.Nop;
 local GetMountInfoByID = C_MountJournal and C_MountJournal.GetMountInfoByID or API.Nop;
@@ -117,8 +118,10 @@ do
 
         addFunc = function()
             local spellName = (GetSpellName(PlumberMacros["drive"].spellID)) or "G-99 Breakneck";
-            return "/cast spell:460013\n/cast [noswimming] "..spellName
+            --return "/cast spell:460013\n/cast [noswimming] "..spellName
+            return "/cast "..spellName
             --The first /cast doesn't get executed but it's necessary to make GetActionInfo() return the macroIndex instead of spellID
+            --when applying [noswimming], the game will think the ZoneAbility isn't on the ActionBar and display the ZoneAbilityFrame
         end,
 
         trueReturn = {
@@ -140,6 +143,8 @@ do
         end,
     };
 end
+
+local IsMacroSpell = {};
 
 
 local EL = CreateFrame("Frame");
@@ -417,6 +422,7 @@ function EL:LoadSpellAndItem()
     for _, commandData in pairs(PlumberMacros) do
         if commandData.spellID then
             RequestLoadSpellData(commandData.spellID);
+            IsMacroSpell[commandData.spellID] = true;
         end
         if commandData.itemID then
             RequestLoadItemDataByID(commandData.itemID);
@@ -808,8 +814,18 @@ do  --MacroInterpreter
                     local action = tooltip.infoList[1].getterArgs[1];
                     if action then
                         local actionType, id, subType = GetActionInfo(action);
-                        if actionType == "macro" and subType == "" then
-                            self:TooltipSetMacro(tooltip, id);
+                        --print(actionType, id, subType)
+                        if actionType == "macro" then
+                            if subType == "" then
+
+                            elseif subType == "spell" and IsMacroSpell[id] then
+                                local macroName = tooltipData.lines and tooltipData.lines[1]and tooltipData.lines[1].leftText;
+                                id = macroName and GetMacroIndexByName(macroName);
+                            end
+
+                            if id then
+                                self:TooltipSetMacro(tooltip, id);
+                            end
                         end
                     end
                 end

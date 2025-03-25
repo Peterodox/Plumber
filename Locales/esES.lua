@@ -75,6 +75,11 @@ L["ModuleName GossipFrameMedal"] = "Medalla de jinete de dragón";
 L["ModuleDescription GossipFrameMedal Format"] = "Reemplaza el ícono predeterminado %s con la medalla %s que ganes.\n\nEs posible que te lleve un breve momento adquirir tus registros cuando interactúas con el NPC.";
 
 
+--PlayerChoiceFrameToken (PlayerChoiceFrame)
+L["ModuleName PlayerChoiceFrameToken"] = "Elección UI: Coste de item";
+L["ModuleDescription PlayerChoiceFrameToken"] = "Muestra cuántos items se necesitan para completar una determinada acción.\n\nActualmente sólo se admiten eventos en The War Within.";
+
+
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
 L["ModuleName EmeraldBountySeedList"] = "Ranura rápida: semillas del sueño";
 L["ModuleDescription EmeraldBountySeedList"] = "Muestra una lista de semillas del sueño cuando te acerques a un Regalo esmeralda."..L["Quick Slot Generic Description"];
@@ -178,6 +183,14 @@ L["Delves Reputation Name"] = "Viaje de explorador de profundidades";
 L["ModuleName Delves_SeasonProgress"] = "Profundidades: Viaje de explorador de profundidades";
 L["ModuleDescription Delves_SeasonProgress"] = "Muestra una barra de progreso en la parte superior de la pantalla cada vez que ganes experiencia en el viaje de explorador de profundidades";
 L["Delve Crest Stash No Info"] = "Esta información no está disponible en tu ubicación actual.";
+L["Delve Crest Stash Requirement"] = "Aparece en las profundidades pródigas de nivel 11.";
+
+
+--WoW Anniversary
+L["ModuleName WoWAnniversary"] = "WoW Aniversario";
+L["ModuleDescription WoWAnniversary"] = "- Summon the corresponding mount easily during the Mount Maniac event.\n\n- Show voting results during the Fashion Frenzy event. ";
+L["Voting Result Header"] = "Resultados";
+L["Mount Not Collected"] = "No has obtenido esta montura.";
 
 
 --BlizzFixFishingArtifact
@@ -255,19 +268,82 @@ L["Available Knowledge Format"] = "Conocimiento disponible: |cffffffff%s|r";
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Ventana de botín";
 L["ModuleDescription LootUI"] = "Reemplaza la ventana de botín predeterminada y proporciona algunas funciones opcionales:\n\n- Saquea objetos rápidamente.\n\n- Corrige error de falla del botín automático.\n\n- Muestra un botón Coger todo al saquear manualmente.";
+L["Take All"] = "Take All";     --Take all items from a loot window
+L["You Received"] = YOU_RECEIVED_LABEL or "You recieved";
+L["Reach Currency Cap"] = "Reached currency caps";
+L["Sample Item 4"] = "Awesome Epic Item";
+L["Sample Item 3"] = "Awesome Rare Item";
+L["Sample Item 2"] = "Awesome Uncommon Item";
+L["Sample Item 1"] = "Common Item";
+L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
+L["Manual Loot Instruction Format"] = "To temporarily cancel auto loot on a specific pickup, press and hold |cffffffff%s|r key until the loot window appears.";
+L["LootUI Option Force Auto Loot"] = "Force Auto Loot";
+L["LootUI Option Force Auto Loot Tooltip"] = "Always enable Auto Loot to counter the occasional auto loot failure.";
+L["LootUI Option Owned Count"] = "Show Number Of Owned Items";
+L["LootUI Option New Transmog"] = "Mark Uncollected Appearance";
+L["LootUI Option New Transmog Tooltip"] = "Add a marker %s if you have not collected the item's appearance.";
+L["LootUI Option Use Hotkey"] = "Press Key To Take All Items";
+L["LootUI Option Use Hotkey Tooltip"] = "While in Manual Loot Mode, press the following hotkey to take all items.";
+L["LootUI Option Fade Delay"] = "Fade Out Delay Per Item";
+L["LootUI Option Items Per Page"] = "Items por página";
+L["LootUI Option Items Per Page Tooltip"] = "Adjust the amount of items that can be displayed on one page when receiving loots.\n\nThis option doesn't affect Manual Loot Mode or Edit Mode.";
+L["LootUI Option Replace Default"] = "Replace Default Loot Alert";
+L["LootUI Option Replace Default Tooltip"] = "Replace the default loot alerts that usually appear above the action bars.";
+L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Open Loot Window at Mouse";
+L["LootUI Option Loot Under Mouse Tooltip"] = "While in |cffffffffManual Loot|r Mode, the window will appear under the current mouse location";
+L["LootUI Option Use Default UI"] = "Use Default Loot Window";
+L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
+L["LootUI Option Background Opacity"] = "Opacidad";
+L["LootUI Option Background Opacity Tooltip"] = "Set the background's opacity in Loot Notification Mode.\n\nThis option doesn't affect Manual Loot Mode.";
+
+
+--Quick Slot For Third-party Dev
+L["Quickslot Module Info"] = "Module Info";
+L["QuickSlot Error 1"] = "Quick Slot: You have already added this controller.";
+L["QuickSlot Error 2"] = "Quick Slot: The controller is missing \"%s\"";
+L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" already exists.";
+
+
+--Plumber Macro
+L["PlumberMacro Drive"] = "Plumber C.A.R.R.O. Macro";
+L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
+L["PlumberMacro DrawerFlag Combat"] = "The drawer will be updated after leaving combat.";
+L["PlumberMacro DrawerFlag Stuck"] = "Algo salió mal al actualizar el cajón.";
+L["PlumberMacro Error Combat"] = "No disponible en combate";
+L["PlumberMacro Error NoAction"] = "No usable actions";
+L["PlumberMacro Error EditMacroInCombat"] = "No se pueden editar macros durante en combate";
+L["Random Favorite Mount"] = "Montura favorita aleatoria"; --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
+L["Dismiss Battle Pet"] = "Retirar mascota";
+L["Drag And Drop Item Here"] = "Drag and drop an item here.";
+L["Drag To Reorder"] = "Left click and drag to reorder";
+L["Click To Set Macro Icon"] = "Ctrl click to set as macro icon";
+L["Unsupported Action Type Format"] = "Unsupported action type: %s";
+L["Drawer Add Action Format"] = "Add |cffffffff%s|r";
+L["Drawer Add Profession1"] = "Primera profesión";
+L["Drawer Add Profession2"] = "Segunda profesión";
+L["Drawer Option Global Tooltip"] = "This setting is shared across all drawer macros.";
+L["Drawer Option CloseAfterClick"] = "Close After Clicks";
+L["Drawer Option CloseAfterClick Tooltip"] = "Close the drawer after clicking any button in it, regardless of successful or not.";
+L["Drawer Option SingleRow"] = "Single Row";
+L["Drawer Option SingleRow Tooltip"] = "If checked, align all buttons on the same row instead of 4 items per row.";
+L["Drawer Option Hide Unusable"] = "Hide Unusable Actions";
+L["Drawer Option Hide Unusable Tooltip"] = "Hide unowned items and unlearned spells.";
+L["Drawer Option Hide Unusable Tooltip 2"] = "Consumable items like potions will always be shown."
+L["Drawer Option Update Frequently"] = "Actualizar frecuentemente";
+L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
 
 
 --Generic
 L["Reposition Button Horizontal"] = "Mover horizontalmente";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Mover verticalmente";
 L["Reposition Button Tooltip"] = "Has click izquierdo y arrastra para mover la ventana";
-L["Font Size"] = FONT_SIZE or "Tamaño de la fuente";
+L["Font Size"] = "Tamaño de la fuente";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Restablecer a la posición predeterminada";
-L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renombre ";  --There is a space
+L["Renown Level Label"] = "Renombre ";  --There is a space
 L["Paragon Reputation"] = "Dechado";
 L["Level Maxed"] = "(Máximo)";   --Reached max level
-L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Actual:";
-L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Tienes recompensas sin reclamar";
+L["Current Colon"] = "Actual:";
+L["Unclaimed Reward Alert"] = "Tienes recompensas sin reclamar";
 L["Total Colon"] = FROM_TOTAL or "Total:";
 
 
