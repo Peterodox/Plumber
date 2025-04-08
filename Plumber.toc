@@ -1,6 +1,6 @@
 ## X-Flavor: retail
 ## Interface: 110100, 110105
-## Version: 1.6.6
+## Version: 1.6.7
 
 ## Title: Plumber
 
@@ -9,6 +9,7 @@
 
 ## Author: Peterodox
 ## SavedVariables: PlumberDB, PlumberDevData, PlumberStorage
+## SavedVariablesPerCharacter: PlumberDB_PC
 
 ## IconTexture: Interface\AddOns\Plumber\Art\Logo\PlumberLogo64
 
@@ -62,6 +63,7 @@ Modules\BlizzardSuperTrack.lua
 Modules\EquipmentFlyout.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
+Modules\MinimapMouseover.lua
 
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua

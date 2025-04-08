@@ -223,6 +223,8 @@ L["Item Level Abbr"] = "装等";
 L["Delves Reputation Name"] = "地下堡赛季进度";
 L["ModuleName Delves_SeasonProgress"] = "地下堡: 赛季进度";
 L["ModuleDescription Delves_SeasonProgress"] = "在你提升“地下堡行者的旅程”时显示一个进度条。";
+L["ModuleName Delves_Dashboard"] = "地下堡: 每周奖励";
+L["ModuleDescription Delves_Dashboard"] = "在地下堡赛季界面显示宏伟宝库和鎏金藏匿物的进度。";
 L["Delve Crest Stash No Info"] = "你所在区域无法获取该信息。";
 L["Delve Crest Stash Requirement"] = "仅在11层丰裕地下堡出现。";
 
@@ -304,6 +306,11 @@ L["Unspent Knowledge Tooltip Format"] = "你有|cffffffff%s|r点未使用的专�
 L["ModuleName TooltipProfessionKnowledge"] = "未使用的知识";
 L["ModuleDescription TooltipProfessionKnowledge"] = "在专业技能的鼠标提示上显示你未使用的知识总数。";
 L["Available Knowledge Format"] = "可用知识：|cffffffff%s|r";
+
+
+--MinimapMouseover (click to /tar creature on the minimap)
+L["ModuleName MinimapMouseover"] = "小地图目标";
+L["ModuleDescription MinimapMouseover"] = "按住Alt键并点击小地图上的一个生物来尝试将其设为你的目标。".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
 
 
 --Loot UI

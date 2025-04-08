@@ -647,13 +647,10 @@ do
     end
 
     function SharedTooltip:DisplayUpgradeCurrencies(showExtraInfo)
-        if PlumberDB then
-            --Save previous states
-            if showExtraInfo == nil then
-                showExtraInfo = PlumberDB and PlumberDB[DBKEY_MORE_INFO_CREST] or false;
-            end
-            PlumberDB[DBKEY_MORE_INFO_CREST] = showExtraInfo;
+        if showExtraInfo == nil then
+            showExtraInfo = addon.GetDBBool(DBKEY_MORE_INFO_CREST) or false;
         end
+        addon.SetDBValue(DBKEY_MORE_INFO_CREST, showExtraInfo);
 
         self:ClearLines();
 

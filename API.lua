@@ -1421,7 +1421,8 @@ do  -- Currency
         end
         local currencyInfo = GetCurrencyInfo(currencyID);
         local quantity = currencyInfo and (currencyInfo.useTotalEarnedForMaxQty and currencyInfo.totalEarned or currencyInfo.quantity);
-        return quantity and currencyInfo.maxQuantity > 0 and rewardQuantity + quantity > currencyInfo.maxQuantity, quantity
+        local overflow = quantity and currencyInfo.maxQuantity > 0 and rewardQuantity + quantity > currencyInfo.maxQuantity;
+        return overflow, quantity, currencyInfo.useTotalEarnedForMaxQty, currencyInfo.maxQuantity
     end
     API.WillCurrencyRewardOverflow = WillCurrencyRewardOverflow;
 

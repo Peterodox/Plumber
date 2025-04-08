@@ -5,6 +5,7 @@ addon.GameTooltipManager = GameTooltipManager;
 local After = C_Timer.After;
 local C_TooltipInfo = C_TooltipInfo;
 local GetItemIconByID = C_Item.GetItemIconByID;
+local gsub = string.gsub;
 
 
 local ItemIconInfoTable = {
@@ -143,7 +144,7 @@ end
 do  --GameTooltipManager
     GameTooltipManager.handlers = {};
 
-    function GameTooltipManager:GetHandler(tooltipDataType)
+    function GameTooltipManager:GetHandler(tooltipDataType, useLeftTextAsArgument)
         if not self.handlers[tooltipDataType] then
             local handler = {};
             self.handlers[tooltipDataType] = handler;
@@ -153,12 +154,28 @@ do  --GameTooltipManager
             handler.tooltipDataType = tooltipDataType;
             handler.noModuleEnabled = true;
 
-            function handler.ProcessDisplayedData(tooltip)
-                local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
-                if tooltipData and tooltipData.type == tooltipDataType then
-                    local arg1 = tooltipData.id;
-                    if arg1 then
-                        handler:CallSubModules(tooltip, arg1);
+            if useLeftTextAsArgument then
+                function handler.ProcessDisplayedData(tooltip)
+                    local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
+                    if tooltipData and tooltipData.type == tooltipDataType then
+                        local leftText = tooltipData.lines and tooltipData.lines[1] and tooltipData.lines[1].leftText;
+                        if leftText then
+                            leftText = gsub(leftText, "|T.+|t", "");
+                            leftText = gsub(leftText, "%\n.+", "");
+                            leftText = gsub(leftText, "|cff%w%w%w%w%w%w", "");
+                            leftText = gsub(leftText, "|r", "");
+                        end
+                        handler:CallSubModules(tooltip, leftText);
+                    end
+                end
+            else
+                function handler.ProcessDisplayedData(tooltip)
+                    local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
+                    if tooltipData and tooltipData.type == tooltipDataType then
+                        local arg1 = tooltipData.id;
+                        if arg1 then
+                            handler:CallSubModules(tooltip, arg1);
+                        end
                     end
                 end
             end
@@ -172,6 +189,11 @@ do  --GameTooltipManager
 
     function GameTooltipManager:GetSpellManager()
         return self:GetHandler(1)   ----Enum.TooltipDataType.Spell
+    end
+
+    function GameTooltipManager:GetMinimapManager()
+        local useLeftTextAsArgument = true;
+        return self:GetHandler(21, useLeftTextAsArgument)   ----Enum.TooltipDataType.MinimapMouseover
     end
 end
 

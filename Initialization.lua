@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.6.6";
-local VERSION_DATE = 1742900000;
+local VERSION_TEXT = "v1.6.7";
+local VERSION_DATE = 1744100000;
 
 
 local addonName, addon = ...
@@ -7,6 +7,7 @@ local addonName, addon = ...
 local L = {};       --Locale
 local API = {};     --Custom APIs used by this addon
 local DB;
+local DB_PC;        --Per Character
 
 PlumberGlobals = {};
 
@@ -83,6 +84,18 @@ end
 addon.GetDBBool = GetDBBool;
 
 
+local function GetPersonalData(dbKey)
+    --From SavedVariablesPerCharacter
+    return DB_PC[dbKey]
+end
+addon.GetPersonalData = GetPersonalData;
+
+local function SetPersonalData(dbKey, value, userInput)
+    DB_PC[dbKey] = value;
+end
+addon.SetPersonalData = SetPersonalData;
+
+
 local DefaultValues = {
     AutoJoinEvents = true,
     BackpackItemTracker = true,
@@ -103,6 +116,7 @@ local DefaultValues = {
     TooltipItemReagents = false,        --For items with "use to combine": show the reagent count
     PlayerChoiceFrameToken = true,      --Add owned token count to PlayerChoiceFrame
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
+    Delves_Dashboard = true,            --Show Great Vault Progress on DelvesDashboardFrame
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
     WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
         VotingResultsExpanded = true,
@@ -120,7 +134,8 @@ local DefaultValues = {
     BlizzardSuperTrack = false,         --Add timer to the SuperTrackedFrame when tracking a POI with time format
     ProfessionsBook = true,             --Show unspent points on ProfessionsBookFrame
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
-    EditModeShowPlumberUI = true;
+    EditModeShowPlumberUI = true,
+    MinimapMouseover = false,
 
 
     --Custom Loot Window
@@ -132,7 +147,7 @@ local DefaultValues = {
         LootUI_ShowItemCount = false,
         LootUI_NewTransmogIcon = true,
         LootUI_ForceAutoLoot = true,
-        LootUI_LootUnderMouse = false;
+        LootUI_LootUnderMouse = false,
         LootUI_UseHotkey = true,
         LootUI_HotkeyName = "E",
         LootUI_ReplaceDefaultAlert = false,
@@ -148,7 +163,7 @@ local DefaultValues = {
 
     --Modify default interface behavior:
     BlizzFixEventToast = true,          --Make Toast non-interactable
-    MerchantPrice = false;              --Merchant Price (Alt Currency) Overview, gray insufficient items
+    MerchantPrice = false,              --Merchant Price (Alt Currency) Overview, gray insufficient items
 
 
     --In-game Navigation: Use waypoint (Super Tracking) to navigate players. Generally default to false, since it will mute WoW's own SuperTrackedFrame
@@ -192,8 +207,10 @@ local DefaultValues = {
 local function LoadDatabase()
     PlumberDB = PlumberDB or {};
     PlumberStorage = PlumberStorage or {};  --Save large data (Spell)
+    PlumberDB_PC = PlumberDB_PC or {};
 
     DB = PlumberDB;
+    DB_PC = PlumberDB_PC;
 
     local alwaysEnableNew = DB.EnableNewByDefault or false;
     local newDBKeys = {};

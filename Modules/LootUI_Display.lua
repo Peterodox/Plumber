@@ -84,6 +84,8 @@ local CLASS_SORT_ORDER = {
     [19] = 19,  --Profession
 };
 
+local OverflowWarningShown = {};    --[currencyID] = true
+
 local function SortFunc_LootSlot(a, b)
     if a.looted ~= b.looted then
         return b.looted
@@ -321,9 +323,19 @@ do  --Event Handler
             elseif currencyID then
                 id = currencyID;
                 slotType = Defination.SLOT_TYPE_CURRENCY;
-                local overflow, numOwned = API.WillCurrencyRewardOverflow(currencyID, quantity);
+                local overflow, numOwned, useTotalEarnedForMaxQty, maxQuantity = API.WillCurrencyRewardOverflow(currencyID, quantity);
                 if overflow then    --debug
-                    itemOverflow = true;
+                    if useTotalEarnedForMaxQty then
+                        if not OverflowWarningShown[currencyID] then
+                            OverflowWarningShown[currencyID] = true;
+                            if maxQuantity and maxQuantity > 0 and addon.GetPersonalData("CurrencyCap:"..currencyID) ~= maxQuantity then
+                                itemOverflow = true;
+                                addon.SetPersonalData("CurrencyCap:"..currencyID, maxQuantity);
+                            end
+                        end
+                    else
+                        itemOverflow = true;
+                    end
                 end
             end
         end

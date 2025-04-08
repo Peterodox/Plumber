@@ -406,17 +406,21 @@ do
             return
         end
 
+        self.hiddenBlizzardFrames = {};
+
         if parent.GreatVaultButton then
             parent.GreatVaultButton:Hide();
-            self.BlizzardGreatVaultButton = parent.GreatVaultButton;
+            table.insert(self.hiddenBlizzardFrames, parent.GreatVaultButton);
         end
 
         if parent.PanelDescription then
             parent.PanelDescription:Hide();
+            table.insert(self.hiddenBlizzardFrames, parent.PanelDescription);
         end
 
         if parent.PanelTitle then
             parent.PanelTitle:Hide();
+            table.insert(self.hiddenBlizzardFrames, parent.PanelTitle);
         end
 
         local NewPanelTitle = self:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge");
@@ -651,8 +655,8 @@ local Module = {};
 do
     function Module:HookPVEFrame()
         if self.hookedPVEFrame then return end;
-
         self.hookedPVEFrame = true;
+
         hooksecurefunc("PVEFrame_ShowFrame", function(sidePanelName, selection)
             if self.isEnabled and (not self.blizzardDashboardLoaded) and sidePanelName == "DelvesDashboardFrame" then
                 self.blizzardDashboardLoaded = true;
@@ -664,23 +668,51 @@ do
     end
 
     function Module.EnableModule(state)
-        Module.isEnabled = state;
-
         if state then
-            Module:HookPVEFrame();
-            if not GreatVaultFrame.Init then
-                GreatVaultFrame:Show();
-                if GreatVaultFrame.BlizzardGreatVaultButton then
-                    GreatVaultFrame.BlizzardGreatVaultButton:Hide();
+            if not Module.isEnabled then
+                Module.isEnabled = true;
+                Module:HookPVEFrame();
+                if not GreatVaultFrame.Init then
+                    GreatVaultFrame:Show();
+                    if GreatVaultFrame.hiddenBlizzardFrames then
+                        for _, obj in ipairs(GreatVaultFrame.hiddenBlizzardFrames) do
+                            obj:Hide();
+                        end
+                    end
+                else
+                    local panel = DelvesDashboardFrame;
+                    if panel and panel:IsShown() then
+                        GreatVaultFrame:Init();
+                    end
                 end
             end
         else
-            GreatVaultFrame:Hide();
-            if GreatVaultFrame.BlizzardGreatVaultButton then
-                GreatVaultFrame.BlizzardGreatVaultButton:Show();
+            if Module.isEnabled then
+                Module.isEnabled = false;
+                GreatVaultFrame:Hide();
+                if GreatVaultFrame.hiddenBlizzardFrames then
+                    for _, obj in ipairs(GreatVaultFrame.hiddenBlizzardFrames) do
+                        obj:Show();
+                    end
+                end
             end
         end
     end
 end
 
-Module.EnableModule(true);  --debug
+
+
+
+do
+    local moduleData = {
+        name = addon.L["ModuleName Delves_Dashboard"],
+        dbKey = "Delves_Dashboard",
+        description = addon.L["ModuleDescription Delves_Dashboard"],
+        toggleFunc = Module.EnableModule,
+        categoryID = 1,
+        uiOrder = 1104,
+        moduleAddedTime = 1724100000,
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
+end

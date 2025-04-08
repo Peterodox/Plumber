@@ -371,15 +371,16 @@ function EL:UpdateDrawers()
         for _, macroIndex in ipairs(drawers) do
             name, icon, body = GetMacroInfo(macroIndex);
             drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable, alwaysShowConsumables);
-            handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
-            if handlerName then
-                body = gsub(body, "/plmr 1", "");   --Legacy. Remove it in future update
-                body, anyChange = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
-                local extraLine = "/click "..handlerName;
-                body, overflow = AddExtraLineToMacroBody(extraLine, body);
-                EditMacro(macroIndex, name, icon, body);
-                if overflow then
-                    anyOverflow = true;
+            if drawerInfo then
+                handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
+                if handlerName then
+                    body, anyChange = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
+                    local extraLine = "/click "..handlerName;
+                    body, overflow = AddExtraLineToMacroBody(extraLine, body);
+                    EditMacro(macroIndex, name, icon, body);
+                    if overflow then
+                        anyOverflow = true;
+                    end
                 end
             end
         end
@@ -676,15 +677,21 @@ local function CreateEditorUI(parent)
     f:RequestSearchInEditBox();
 end
 
+local function RequestUpdateMacros()
+    EL:RequestUpdateMacros();
+end
+
 local function CreateEditorUI_Blizzard()
     if MacroSaveButton then
-        MacroSaveButton:HookScript("OnClick", function()
-            EL:RequestUpdateMacros();
-        end);
+        MacroSaveButton:HookScript("OnClick", RequestUpdateMacros);
     end
 
     if MacroFrameText and MacroFrameText:IsObjectType("EditBox") then
         EditorUI.SourceEditBox = MacroFrameText;
+    end
+
+    if DeleteMacro then
+        hooksecurefunc("DeleteMacro", RequestUpdateMacros);
     end
 
     CreateEditorUI(MacroFrame);
@@ -821,6 +828,8 @@ do  --MacroInterpreter
                             elseif subType == "spell" and IsMacroSpell[id] then
                                 local macroName = tooltipData.lines and tooltipData.lines[1]and tooltipData.lines[1].leftText;
                                 id = macroName and GetMacroIndexByName(macroName);
+                            else
+                                return
                             end
 
                             if id then
@@ -837,6 +846,9 @@ do  --MacroInterpreter
     end
 
     function MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable, alwaysShowConsumables)
+        if not body then return end;
+        if not find(body, "#plumber:drawer") then return end;
+
         local tbl;
         local n = 0;
         local processed, usable;
