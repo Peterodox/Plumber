@@ -58,7 +58,7 @@ do
 
         HiddenObjectUtil:SetObjectsAlpha(self.alpha);
     end
-    
+
     function HiddenObjectUtil:SetObjectsAlpha(alpha)
         for _, object in ipairs(self.objects) do
             object:SetAlpha(alpha);
@@ -506,8 +506,7 @@ do  --Custom List Insert
 
     local UnlockedStateMixinOverride = {};
     function UnlockedStateMixinOverride:OnClick(button)
-        if InCombatLockdown() then
-            API.DisplayErrorMessage(L["Error Show UI In Combat"]);
+        if API.CheckAndDisplayErrorIfInCombat() then
             return
         end
         MajorFactionButtonUnlockedStateMixin.OnClick(self, button);

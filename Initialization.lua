@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.6.7";
-local VERSION_DATE = 1744100000;
+local VERSION_TEXT = "v1.6.8";
+local VERSION_DATE = 1744500000;
 
 
 local addonName, addon = ...
@@ -136,6 +136,7 @@ local DefaultValues = {
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
     EditModeShowPlumberUI = true,
     MinimapMouseover = false,
+    LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
 
 
     --Custom Loot Window

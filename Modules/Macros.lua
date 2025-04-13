@@ -130,6 +130,11 @@ do
 
         falseReturn = {
             icon = 0,
+            bestIconFunc = function(body)
+                if find(body, "C_MountJournal.SummonByID(0)", 1, true) then
+                    return 413588
+                end
+            end
         },
     };
 
@@ -260,6 +265,14 @@ function EL:UpdateMacroByEvent(event)
     self:UpdateMacros(commands);
 end
 
+local function GetBestDefaultIcon(body)
+    if body then
+        if find(body, "C_MountJournal.SummonByID(0)") then
+            return 413588
+        end
+    end
+end
+
 function EL:UpdateMacros(commands)
     if self.anySupported then
         commands = commands or self.activeCommands;
@@ -271,12 +284,12 @@ function EL:UpdateMacros(commands)
         local prefix;
 
         for command, list in pairs(commands) do
-            newState = PlumberMacros[command].conditionFunc();
-            if PlumberMacros[command].alwaysUpdate or newState ~= PlumberMacros[command].currentState then
+            commandData = PlumberMacros[command];
+            newState = commandData.conditionFunc();
+            if commandData.alwaysUpdate or newState ~= commandData.currentState then
                 anyChange = true;
                 if not inCombat then
-                    PlumberMacros[command].currentState = newState;
-                    commandData = PlumberMacros[command];
+                    commandData.currentState = newState;
                     returns = nil;
                     if newState then
                         returns = commandData.trueReturn;
@@ -294,7 +307,10 @@ function EL:UpdateMacros(commands)
                             end
                             icon = returns.icon;
                             if icon == 0 then
-                                icon = 134400;
+                                if returns.bestIconFunc then
+                                    icon = returns.bestIconFunc(body);
+                                end
+                                icon = icon or 134400;
                             end
                         end
 

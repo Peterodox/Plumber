@@ -211,6 +211,13 @@ L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or
 L["Error Show UI In Combat"] = "You cannot toggle this UI while in combat.";
 
 
+--Landing Page Switch
+L["ModuleName LandingPageSwitch"] = "Minimap Mission Report";
+L["ModuleDescription LandingPageSwitch"] = "Access Garrison and Class Hall mission reports by right-clicking on the Renown Summary button on the minimap.";
+L["Mission Complete Count Format"] = "%d Ready to complete";
+L["Open Mission Report Tooltip"] = "Right click to open mission reports.";
+
+
 --WorldMapPin_TWW (Show Pins On Continent Map)
 L["ModuleName WorldMapPin_TWW"] = "Map Pin: "..(EXPANSION_NAME10 or "The War Within");
 L["ModuleDescription WorldMapPin_TWW"] = "Show additional pins on Khaz Algar continent map:\n\n- %s\n\n- %s";  --Wwe'll replace %s with locales (See Map Pin Filter Name at the bottom)

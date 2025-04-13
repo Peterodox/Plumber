@@ -211,6 +211,13 @@ L["Instruction Untrack Reputation"] = "<按住Shift点击停止追踪>";
 L["Error Show UI In Combat"] = "无法在战斗中打开或关闭此界面。";
 
 
+--Landing Page Switch
+L["ModuleName LandingPageSwitch"] = "小地图要塞任务报告";
+L["ModuleDescription LandingPageSwitch"] = "右键单击小地图上的名望概要按钮来访问要塞和职业大厅任务报告。";
+L["Mission Complete Count Format"] = "已完成%d项任务";
+L["Open Mission Report Tooltip"] = "右键单击来打开任务报告。";
+
+
 --WorldMapPin_TWW (Show Pins On Continent Map)
 L["ModuleName WorldMapPin_TWW"] = "地图标记：地心之战";
 L["ModuleDescription WorldMapPin_TWW"] = "在卡兹阿加地图上显示额外标记：\n\n- %s\n\n- %s";  --Wwe'll replace %s with locales (See Map Pin Filter Name at the bottom)

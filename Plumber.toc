@@ -1,6 +1,6 @@
 ## X-Flavor: retail
 ## Interface: 110100, 110105
-## Version: 1.6.7
+## Version: 1.6.8
 
 ## Title: Plumber
 
@@ -51,6 +51,7 @@ Modules\MerchantPrice.lua
 Modules\DelvesScenario.lua
 Modules\DelvesDashboard.lua
 Modules\ExpansionLandingPage.xml
+Modules\LandingPageSwitch.lua
 Modules\GameTooltipExtension.xml
 Modules\LootUI.xml
 Modules\UnderlightAngler.lua
