@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.6
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.8
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -208,6 +208,14 @@ L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Рез�
 L["ModuleDescription ExpansionLandingPage"] = "Отображение дополнительной информации на странице:\n\n- Уровень пакта с Отрезанными нитями";
 L["Instruction Track Reputation"] = "<Нажмите Shift, чтобы отслеживать эту репутацию>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Нажмите Shift, чтобы остановить отслеживание>";
+L["Error Show UI In Combat"] = "Вы не можете переключать этот интерфейс во время боя.";
+
+
+--Landing Page Switch
+L["ModuleName LandingPageSwitch"] = "Отчет о миссии на мини-карте";
+L["ModuleDescription LandingPageSwitch"] = "Получите доступ к отчетам о миссиях гарнизона и оплоту класса, ПКМ на кнопке Сводка известности на мини-карте.";
+L["Mission Complete Count Format"] = "%d Готовность к завершению";
+L["Open Mission Report Tooltip"] = "ПКМ, чтобы открыть отчеты о миссиях.";
 
 
 --WorldMapPin_TWW (Show Pins On Continent Map)
@@ -222,6 +230,8 @@ L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
 L["Delves Reputation Name"] = "Путешествие в вылазки";
 L["ModuleName Delves_SeasonProgress"] = "Вылазки: Путешествие в вылазки";
 L["ModuleDescription Delves_SeasonProgress"] = "Отображение шкалы прогресса в верхней части экрана каждый раз, когда вы получаете опыт для вылазки";
+L["ModuleName Delves_Dashboard"] = "Вылазки: Еженедельная награда";
+L["ModuleDescription Delves_Dashboard"] = "Отображать прогресс Великого хранилища и Позолоченных тайников на панели Вылазок.";
 L["Delve Crest Stash No Info"] = "Эта информация недоступна в вашем текущем местоположении.";
 L["Delve Crest Stash Requirement"] = "Появляется на 11-м уровне многообещающих вылазок.";
 
@@ -303,6 +313,11 @@ L["Unspent Knowledge Tooltip Format"] = "У вас есть |cffffffff%s|r не�
 L["ModuleName TooltipProfessionKnowledge"] = L["ModuleName ProfessionsBook"];
 L["ModuleDescription TooltipProfessionKnowledge"] = "Покажите количество неизрасходованных знаний вашей специализации профессии.";
 L["Available Knowledge Format"] = "Доступные знания: |cffffffff%s|r";
+
+
+--MinimapMouseover (click to /tar creature on the minimap)
+L["ModuleName MinimapMouseover"] = "Цель на миникарте";
+L["ModuleDescription MinimapMouseover"] = "Alt Щелкните существо на мини-карте, чтобы установить его в качестве цели. ".."\n\n|cffd4641c- " ..L["Ограничение боя"].."|r";
 
 
 --Loot UI
