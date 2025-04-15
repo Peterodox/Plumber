@@ -317,7 +317,7 @@ L["Available Knowledge Format"] = "Доступные знания: |cffffffff%s
 
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "Цель на миникарте";
-L["ModuleDescription MinimapMouseover"] = "Alt Щелкните существо на мини-карте, чтобы установить его в качестве цели. ".."\n\n|cffd4641c- " ..L["Ограничение боя"].."|r";
+L["ModuleDescription MinimapMouseover"] = "Alt+Клик на существе на мини-карте, чтобы сделать его целью.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
 
 
 --Loot UI
