@@ -545,13 +545,14 @@ do  --SecureControllerPool
 
     SecureControllerPool.clickHandlers = {};
     SecureControllerPool.numHandlers = 0;
+    SecureControllerPool.usedHandlers = 0;
 
     function SecureControllerPool:ReleaseClickHandlers()
         if InCombatLockdown() then
             return
         end
 
-        self.numIdleHandlers = #self.clickHandlers;
+        self.usedHandlers = 0;
         self.emptyActionHandlerName = nil;
 
         for _, handler in ipairs(self.clickHandlers) do
@@ -572,14 +573,14 @@ do  --SecureControllerPool
 
     function SecureControllerPool:AcquireClickHandler()
         local handler;
-        if self.numIdleHandlers == 0 then
+        self.usedHandlers = self.usedHandlers + 1;
+        if self.usedHandlers > self.numHandlers then
             self.numHandlers = self.numHandlers + 1;
             local id = self.numHandlers;
             handler = self:CreateClickHandler(id);
             self.clickHandlers[id] = handler;
         else
-            handler = self.clickHandlers[self.numIdleHandlers];
-            self.numIdleHandlers = self.numIdleHandlers - 1;
+            handler = self.clickHandlers[self.usedHandlers];
         end
         return handler
     end

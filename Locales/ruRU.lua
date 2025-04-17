@@ -29,7 +29,7 @@ L["Module Category General"] = "Общие";
 --- order: 2
 L["Module Category NPC Interaction"] = "Взаимодействие с НПС";
 --- order: 3
---L["Module Category Tooltip"] = "Tooltip";   --Additional Info on Tooltips
+L["Module Category Tooltip"] = "Подсказка";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "Класс";   --Player Class (rogue, paladin...)
 

@@ -451,29 +451,34 @@ do
 
         if state then
             if not self.factionEventListener then
-                local LandingOverlay = ExpansionLandingPage.Overlay.WarWithinLandingOverlay;
-                local factionEventListener = CreateFrame("Frame", nil, LandingOverlay);
-                self.factionEventListener = factionEventListener;
+                local LandingOverlay = ExpansionLandingPage and ExpansionLandingPage.Overlay and ExpansionLandingPage.Overlay.WarWithinLandingOverlay;
+                if LandingOverlay then
+                    --LandingOverlay may not be loaded in some cases
+                    local factionEventListener = CreateFrame("Frame", nil, LandingOverlay);
+                    self.factionEventListener = factionEventListener;
 
-                factionEventListener:SetScript("OnShow", function()
-                    if not self.needChecked then
-                        self.needChecked = true;
-                        if MajorFactionListOverride:IsModificationNeeded() then
-                            self.listNeedModified = true;
+                    factionEventListener:SetScript("OnShow", function()
+                        if not self.needChecked then
+                            self.needChecked = true;
+                            if MajorFactionListOverride:IsModificationNeeded() then
+                                self.listNeedModified = true;
+                            end
                         end
-                    end
 
-                    if self.listNeedModified and (not self.refreshModified) and LandingOverlay.MajorFactionList then
-                        self.refreshModified = true;
+                        if self.listNeedModified and (not self.refreshModified) and LandingOverlay.MajorFactionList then
+                            self.refreshModified = true;
 
-                        MajorFactionListOverride.OnLoad(LandingOverlay.MajorFactionList.ScrollBox);
+                            MajorFactionListOverride.OnLoad(LandingOverlay.MajorFactionList.ScrollBox);
 
-                        LandingOverlay.MajorFactionList.Refresh = MajorFactionListOverride.RefreshList;
-                        LandingOverlay.MajorFactionList:Refresh();
-                    end
-                end);
+                            LandingOverlay.MajorFactionList.Refresh = MajorFactionListOverride.RefreshList;
+                            LandingOverlay.MajorFactionList:Refresh();
+                        end
+                    end);
+                end
             end
-            self.factionEventListener:Show();
+            if self.factionEventListener then
+                self.factionEventListener:Show();
+            end
         else
             if self.factionEventListener then
                 self.factionEventListener:Hide();

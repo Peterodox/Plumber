@@ -13,6 +13,19 @@ MinimapOverlay:SetPropagateMouseClicks(true);
 MinimapOverlay:RegisterForClicks("AnyDown");
 MinimapOverlay:RegisterForClicks("AnyUp");
 
+local function Dummy()
+end
+
+local Methods = {
+    "SetParent", "GetParent", "SetScale", "SetPoint", "GetPoint", "ClearAllPoints",
+    "Show", "Hide", "SetShown";
+};
+
+for _, method in ipairs(Methods) do
+    MinimapOverlay["_"..method] = MinimapOverlay[method];
+    MinimapOverlay[method] = Dummy;
+end
+
 
 local SubModule = {};
 
@@ -39,8 +52,14 @@ function SubModule:SetEnabled(enabled)
 
     if enabled then
         self:RequestSetupOverlay();
+        MinimapOverlay:SetScript("OnEvent", MinimapOverlay.OnEvent);
+        MinimapOverlay:RegisterEvent("PLAYER_REGEN_ENABLED");
+        MinimapOverlay:RegisterEvent("PLAYER_REGEN_DISABLED");
     else
         self:RequestRemoveOverlay();
+        MinimapOverlay:SetScript("OnEvent", nil);
+        MinimapOverlay:UnregisterEvent("PLAYER_REGEN_ENABLED");
+        MinimapOverlay:UnregisterEvent("PLAYER_REGEN_DISABLED");
     end
 end
 
@@ -52,10 +71,10 @@ function SubModule:SetupOverlay()
     if self.overlayAdded then return end;
     self.overlayAdded = true;
     local parent = Minimap;
-    MinimapOverlay:SetParent(parent);
-    MinimapOverlay:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0);
-    MinimapOverlay:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", 0, 0);
-    MinimapOverlay:Show();
+    MinimapOverlay:_SetParent(parent);
+    MinimapOverlay:_SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0);
+    MinimapOverlay:_SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", 0, 0);
+    MinimapOverlay:_Show();
 end
 
 function SubModule:RequestSetupOverlay()
@@ -68,21 +87,14 @@ function SubModule:RequestSetupOverlay()
     else
         self:SetupOverlay();
     end
-
-    MinimapOverlay:SetScript("OnEvent", MinimapOverlay.OnEvent);
-    MinimapOverlay:RegisterEvent("PLAYER_REGEN_ENABLED");
-    MinimapOverlay:RegisterEvent("PLAYER_REGEN_DISABLED");
 end
 
 function SubModule:RemoveOverlay()
     if not self.overlayAdded then return end;
     self.overlayAdded = false;
-    MinimapOverlay:SetParent(UIParent);
-    MinimapOverlay:ClearAllPoints();
-    MinimapOverlay:Hide();
-    MinimapOverlay:SetScript("OnEvent", nil);
-    MinimapOverlay:UnregisterEvent("PLAYER_REGEN_ENABLED");
-    MinimapOverlay:UnregisterEvent("PLAYER_REGEN_DISABLED");
+    MinimapOverlay:_SetParent(UIParent);
+    MinimapOverlay:_ClearAllPoints();
+    MinimapOverlay:_Hide();
 end
 
 function SubModule:RequestRemoveOverlay()
@@ -138,15 +150,7 @@ do  --Overlay
     function MinimapOverlay:OnEvent(event, ...)
         if event == "PLAYER_REGEN_ENABLED" then
             self.inCombat = false;
-
-            if self.needSetup then
-                SubModule:RequestSetupOverlay();
-            end
-
-            if self.needRemoval then
-                SubModule:RequestRemoveOverlay();
-            end
-
+            SubModule:RequestSetupOverlay();
             if self.pendingTargetName then
                 self:SetTargetName(self.pendingTargetName);
             end
@@ -156,6 +160,7 @@ do  --Overlay
                 self.targetName = nil;
                 self:SetAttribute("macrotext", nil);
             end
+            SubModule:RequestRemoveOverlay();
         end
     end
 end

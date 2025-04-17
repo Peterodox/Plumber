@@ -355,6 +355,7 @@ local DrawerUpdateFlag = {
     Started = 1,
     Success = 2,
 };
+EL.drawerUpdateFlag = DrawerUpdateFlag.Combat;
 
 function EL:InitializeDrawerInfo()
     self:CheckSupportedMacros();
@@ -423,16 +424,38 @@ function EL:OnUpdate_UpdateMacros(elapsed)
     if self.t > 0 then
         self.t = nil;
         self:SetScript("OnUpdate", nil);
-        self:CheckSupportedMacros();
-        self:UpdateMacros();
+
+        if self.macroCheckPending then
+            self.macroCheckPending = nil;
+            self:CheckSupportedMacros();
+        end
+
+        if self.macroUpdatePending then
+            self.macroUpdatePending = nil;
+            self:UpdateMacros();
+        end
+
+        if self.drawerUpdatePending then
+            self.drawerUpdatePending = nil;
+            DrawerUpdator:RequestUpdate(0);
+        end
     end
 end
 
 function EL:RequestUpdateMacros(delay)
     delay = delay and -delay or 0;
     self.t = delay;
+    self.macroCheckPending = true;
+    self.macroUpdatePending = true;
+    self.drawerUpdatePending = true;
     self:SetScript("OnUpdate", self.OnUpdate_UpdateMacros);
-    DrawerUpdator:RequestUpdate(delay);
+end
+
+function EL:RequestCheckMacros(delay)
+    delay = delay and -delay or 0;
+    self.t = delay;
+    self.macroCheckPending = true;
+    self:SetScript("OnUpdate", self.OnUpdate_UpdateMacros);
 end
 
 function EL:LoadSpellAndItem()
@@ -710,7 +733,24 @@ local function CreateEditorUI_Blizzard()
         hooksecurefunc("DeleteMacro", RequestUpdateMacros);
     end
 
-    CreateEditorUI(MacroFrame);
+    local frame = MacroFrame;
+    if frame then
+        CreateEditorUI(frame);
+
+        --We can't use this because of securecall("MacroFrame_SaveMacro") in SECURE_ACTIONS.action
+        --Interface/AddOns/Blizzard_FrameXML/Mainline/SecureTemplates.lua
+        --[[
+            if frame.SaveMacro then
+                hooksecurefunc(frame, "SaveMacro", RequestUpdateMacros);
+            end
+        --]]
+
+        if frame.SelectMacro then
+            hooksecurefunc(frame, "SelectMacro", function()
+                EL:RequestCheckMacros();
+            end);
+        end
+    end
 end
 
 local function CreateEditorUI_MacroToolkit()
@@ -1073,7 +1113,7 @@ do  --MacroInterpreter
             end
         end
 
-        return tbl
+        return tbl or {}
     end
 
     function MacroInterpreter.drawer(tooltip, body)
