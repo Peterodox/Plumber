@@ -275,7 +275,6 @@ do  --Gilded Stash: 3 per week, 7 Gilded Crests each
         local title = C_Spell.GetSpellName(CREST_SPELL);
         tooltip:SetText(title, 1, 1, 1);
         if tooltipText then
-            TP = tooltipText;
             tooltipText = string.gsub(tooltipText, title.."%c+", "");
 
             tooltip:AddLine(L["Delve Crest Stash Requirement"], 1, 0.82, 0, true);
@@ -424,6 +423,12 @@ do
         end
 
         local NewPanelTitle = self:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge");
+        if AutoScalingFontStringMixin then
+            API.Mixin(NewPanelTitle, AutoScalingFontStringMixin);
+            NewPanelTitle:SetWidth(ITEMBUTTON_WIDTH);
+            NewPanelTitle.minLineHeight = 10;
+            NewPanelTitle:SetMaxLines(1);
+        end
         NewPanelTitle:SetHeight(32);
         NewPanelTitle:SetPoint("TOP", self, "TOP", 0, 0);
         NewPanelTitle:SetText(PVP_WEEKLY_REWARD);

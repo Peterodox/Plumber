@@ -64,7 +64,6 @@ Modules\BlizzardSuperTrack.lua
 Modules\EquipmentFlyout.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
-Modules\MinimapMouseover.lua
 
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua
@@ -75,3 +74,4 @@ Modules\MinimapMouseover.lua
 #Modules\WoWAnniversary.lua
 #Modules\Navigator_Dreamseed.lua
 #Modules\AccountStore.lua
+#Modules\MinimapMouseover.lua

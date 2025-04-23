@@ -1,5 +1,5 @@
 local VERSION_TEXT = "v1.6.8";
-local VERSION_DATE = 1744850000;
+local VERSION_DATE = 1745400000;
 
 
 local addonName, addon = ...
@@ -135,7 +135,6 @@ local DefaultValues = {
     ProfessionsBook = true,             --Show unspent points on ProfessionsBookFrame
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
     EditModeShowPlumberUI = true,
-    MinimapMouseover = false,
     LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
 
 
@@ -201,8 +200,9 @@ local DefaultValues = {
 
 
     --Deprecated:
-    --DruidModelFix = true,               --Fixed by Blizzard in 10.2.0
-    --BlizzFixWardrobeTrackingTip = true, --Hide Wardrobe tip that cannot be disabled   --Tip removed by Blizzard
+    --DruidModelFix = true,                 --Fixed by Blizzard in 10.2.0
+    --BlizzFixWardrobeTrackingTip = true,   --Hide Wardrobe tip that cannot be disabled   --Tip removed by Blizzard
+    --MinimapMouseover = false,             --Ridden with compatibility issue
 };
 
 local function LoadDatabase()
