@@ -444,38 +444,57 @@ do
         end
     end
 
+    function MajorFactionButtonMod:OnOverlayChanged()
+        if not self.factionEventListener then
+            local LandingOverlay = ExpansionLandingPage and ExpansionLandingPage.Overlay and ExpansionLandingPage.Overlay.WarWithinLandingOverlay;
+            if LandingOverlay then
+                --LandingOverlay may not be loaded in some cases
+                --e.g. Player logged in pre-TWW area
+
+                local factionEventListener = CreateFrame("Frame", nil, LandingOverlay);
+                self.factionEventListener = factionEventListener;
+
+                factionEventListener:SetScript("OnShow", function()
+                    if not self.needChecked then
+                        self.needChecked = true;
+                        if MajorFactionListOverride:IsModificationNeeded() then
+                            self.listNeedModified = true;
+                        end
+                    end
+
+                    if self.listNeedModified and (not self.refreshModified) and LandingOverlay.MajorFactionList then
+                        self.refreshModified = true;
+
+                        MajorFactionListOverride.OnLoad(LandingOverlay.MajorFactionList.ScrollBox);
+
+                        LandingOverlay.MajorFactionList.Refresh = MajorFactionListOverride.RefreshList;
+                        LandingOverlay.MajorFactionList:Refresh();
+                    end
+                end);
+            end
+        end
+
+        if self.factionEventListener then
+            self:WatchOverlayChanged(false);
+        end
+    end
+
+    function MajorFactionButtonMod:WatchOverlayChanged(state)
+        if state and not self.factionEventListener then
+            EventRegistry:RegisterCallback("ExpansionLandingPage.OverlayChanged", self.OnOverlayChanged, self);
+        else
+            EventRegistry:UnregisterCallback("ExpansionLandingPage.OverlayChanged", self);
+        end
+    end
+
     function MajorFactionButtonMod.EnableModule(state)
         --ExpansionLandingPage is not loaded when this file is loaded
 
         local self = MajorFactionButtonMod;
+        self:WatchOverlayChanged(state);
 
         if state then
-            if not self.factionEventListener then
-                local LandingOverlay = ExpansionLandingPage and ExpansionLandingPage.Overlay and ExpansionLandingPage.Overlay.WarWithinLandingOverlay;
-                if LandingOverlay then
-                    --LandingOverlay may not be loaded in some cases
-                    local factionEventListener = CreateFrame("Frame", nil, LandingOverlay);
-                    self.factionEventListener = factionEventListener;
-
-                    factionEventListener:SetScript("OnShow", function()
-                        if not self.needChecked then
-                            self.needChecked = true;
-                            if MajorFactionListOverride:IsModificationNeeded() then
-                                self.listNeedModified = true;
-                            end
-                        end
-
-                        if self.listNeedModified and (not self.refreshModified) and LandingOverlay.MajorFactionList then
-                            self.refreshModified = true;
-
-                            MajorFactionListOverride.OnLoad(LandingOverlay.MajorFactionList.ScrollBox);
-
-                            LandingOverlay.MajorFactionList.Refresh = MajorFactionListOverride.RefreshList;
-                            LandingOverlay.MajorFactionList:Refresh();
-                        end
-                    end);
-                end
-            end
+            self:OnOverlayChanged();
             if self.factionEventListener then
                 self.factionEventListener:Show();
             end
@@ -483,7 +502,6 @@ do
             if self.factionEventListener then
                 self.factionEventListener:Hide();
             end
-
             self:HideAllWidgets();
         end
     end
