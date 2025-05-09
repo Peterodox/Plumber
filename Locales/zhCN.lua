@@ -399,6 +399,7 @@ L["Paragon Reputation"] = "巅峰";
 L["Level Maxed"] = "已满级";   --Reached max level
 L["Current Colon"] = "当前：";
 L["Unclaimed Reward Alert"] = "你有未领取的巅峰宝箱";
+L["Reward Available"] = "奖励待领取";
 L["Total Colon"] = "总计：";
 
 

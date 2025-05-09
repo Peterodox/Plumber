@@ -225,6 +225,10 @@ end
 do  --QuantityOverride
     --[recipeID] = {[itemID] = quantityRequired}
 
+    QuantityOverride[404592] = {
+        [204340] = 30,   --Torn Recipe Scrap
+    };
+
     QuantityOverride[428667] = {
         [211297] = 2,   --Fractured Spark TWW S1
     };

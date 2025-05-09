@@ -3,6 +3,7 @@ local API = addon.API;
 local L = addon.L;
 
 local C_Reputation = C_Reputation;
+local C_MajorFactions = C_MajorFactions;
 local GetParagonValuesAndLevel = API.GetParagonValuesAndLevel;
 
 local FACTION_FRAME_WIDTH = 60;
@@ -519,6 +520,9 @@ do  --Custom List Insert
         [2685] = {
             uiPriority = 15.5,      --Gallagio Loyalty Rewards Club (15 is Cartels of Undermine)
         },
+        [2688] = {
+            uiPriority = 16.5,      --Flame's Radiance (0 by default, intentional?)
+        },
     };
 
     local FactionAtlasOverride = {
@@ -549,9 +553,11 @@ do  --Custom List Insert
         local isParagon = C_Reputation.IsFactionParagon(factionID);
         local currentValue = isCapped and majorFactionData.renownLevelThreshold or majorFactionData.renownReputationEarned or 0;
         local maxValue = majorFactionData.renownLevelThreshold;
+        local hasRewardPending;
 
         if isParagon then
-            local totalEarned, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID);
+            local totalEarned, threshold, rewardQuestID;
+            totalEarned, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID);
             if totalEarned and threshold and threshold ~= 0 then
                 local paragonLevel = math.floor(totalEarned / threshold);
                 currentValue = totalEarned - paragonLevel * threshold;
@@ -560,11 +566,18 @@ do  --Custom List Insert
 
             if hasRewardPending then
                 currentValue = maxValue;
+                self.RenownLevel:SetText(L["Reward Available"]);
+            else
+                self.RenownLevel:SetText(L["Paragon Reputation"]);
             end
-
-            self.RenownLevel:SetText(L["Paragon Reputation"]);
         else
             self.RenownLevel:SetText(MAJOR_FACTION_BUTTON_RENOWN_LEVEL:format(majorFactionData.renownLevel or 0));
+        end
+
+        if hasRewardPending then
+            self.RenownLevel:SetTextColor(0.098, 1.000, 0.098);
+        else
+            self.RenownLevel:SetTextColor(1, 0.82, 0);
         end
 
         self.RenownProgressBar:UpdateBar(currentValue, maxValue);

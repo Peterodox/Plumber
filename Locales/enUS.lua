@@ -399,6 +399,7 @@ L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
+L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Total Colon"] = FROM_TOTAL or "Total:";
 
 

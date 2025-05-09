@@ -1,5 +1,5 @@
 ## X-Flavor: retail
-## Interface: 110100, 110105
+## Interface: 110105, 110107
 ## Version: 1.6.8
 
 ## Title: Plumber
@@ -75,3 +75,4 @@ Modules\ProfessionsBook.lua
 #Modules\Navigator_Dreamseed.lua
 #Modules\AccountStore.lua
 #Modules\MinimapMouseover.lua
+#Modules\ObjectiveTrackerModule.xml

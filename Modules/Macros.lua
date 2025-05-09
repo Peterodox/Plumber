@@ -283,6 +283,8 @@ function EL:UpdateMacros(commands)
         local commandData;
         local prefix;
 
+        local updateList = false;
+
         for command, list in pairs(commands) do
             commandData = PlumberMacros[command];
             newState = commandData.conditionFunc();
@@ -299,44 +301,51 @@ function EL:UpdateMacros(commands)
 
                     for _, index in ipairs(list) do
                         name, icon, body = GetMacroInfo(index);
-                        anyEdit = false;
 
-                        if returns and returns.icon then
-                            if returns.icon ~= icon then
+                        if command == match(body, "#plumber:(%w+)") then
+                            anyEdit = false;
+
+                            if returns and returns.icon then
+                                if returns.icon ~= icon then
+                                    anyEdit = true;
+                                end
+                                icon = returns.icon;
+                                if icon == 0 then
+                                    if returns.bestIconFunc then
+                                        icon = returns.bestIconFunc(body);
+                                    end
+                                    icon = icon or 134400;
+                                end
+                            end
+
+                            if commandData.type == ModifyType.Add and commandData.addFunc then
+                                prefix = "#plumber:"..command;
+                                body = gsub(body, ".+##", "");
+                                body = gsub(body, prefix, "");
+                                while find(body, "^\n") do
+                                    body = gsub(body, "^\n", "");
+                                end
+                                if newState then
+                                    local extraLine = commandData.addFunc();
+                                    body = prefix.."\n"..extraLine.."\n##\n"..body;
+                                else
+                                    body = prefix.."\n"..body;
+                                end
                                 anyEdit = true;
                             end
-                            icon = returns.icon;
-                            if icon == 0 then
-                                if returns.bestIconFunc then
-                                    icon = returns.bestIconFunc(body);
-                                end
-                                icon = icon or 134400;
-                            end
-                        end
 
-                        if commandData.type == ModifyType.Add and commandData.addFunc then
-                            prefix = "#plumber:"..command;
-                            body = gsub(body, ".+##", "");
-                            body = gsub(body, prefix, "");
-                            while find(body, "^\n") do
-                                body = gsub(body, "^\n", "");
+                            if commandData.initFunc then
+                                body = commandData.initFunc(body);
+                                anyEdit = true;
                             end
-                            if newState then
-                                local extraLine = commandData.addFunc();
-                                body = prefix.."\n"..extraLine.."\n##\n"..body;
-                            else
-                                body = prefix.."\n"..body;
+
+                            if anyEdit then
+                                EditMacro(index, name, icon, body);
                             end
-                            anyEdit = true;
-                        end
-
-                        if commandData.initFunc then
-                            body = commandData.initFunc(body);
-                            anyEdit = true;
-                        end
-
-                        if anyEdit then
-                            EditMacro(index, name, icon, body);
+                        else
+                            --This is when the body doesn't match our last cache
+                            --Possibly due to macros update without using MacroFrame (using other macro addons)
+                            updateList = true;
                         end
                     end
                 end
@@ -345,6 +354,10 @@ function EL:UpdateMacros(commands)
 
         if anyChange and inCombat then
             self:RegisterEvent("PLAYER_REGEN_ENABLED");
+        end
+
+        if updateList then
+            self:CheckSupportedMacros();
         end
     end
 end
