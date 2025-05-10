@@ -9,6 +9,8 @@ local PinController = addon.MapPinController;
 
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo;
 local GetDelvesForMap = C_AreaPoiInfo.GetDelvesForMap;
+local C_UIWidgetManager = C_UIWidgetManager;
+
 
 local MAPID_KHAZALGAR = 2274;
 
@@ -45,11 +47,26 @@ local DelvePOI = {
     --8142 Demolition Dome  --Undermine Challenge
 };
 
-local DelveMaps = { --Unused
-    2248, 2214, 2215, 2255, 2346,
-};
-
 local POILocation = {}; --See the bottom of this file
+
+
+local function IsOverchargedDelve(poiInfo)
+    --11.1.7 Overcharge Delve
+    if poiInfo.iconWidgetSet then
+        local widgets = C_UIWidgetManager.GetAllWidgetsBySetID(poiInfo.iconWidgetSet);
+        if widgets then
+            local widgetInfo;
+            for _, widget in ipairs(widgets) do
+                if widget.widgetType == 22 then     --Enum.UIWidgetVisualizationType.Spacer
+                    widgetInfo = C_UIWidgetManager.GetSpacerVisualizationInfo(widget.widgetID);
+                    if widgetInfo.shownState == 1 and widgetInfo.scriptedAnimationEffectID == 183 then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+end
 
 
 local DelvesPinMixin = {};
@@ -66,11 +83,16 @@ do
                 tooltip:SetText(poiInfo.name, 1, 1, 1);
 
                 if poiInfo.description then
-                    tooltip:AddLine(poiInfo.description, 1, 1, 1, true);
-                    tooltip:AddLine(" ", 1, 1, 1, true);
+                    if self.data.bountiful then
+                        tooltip:AddLine(poiInfo.description, 1, 0.82, 0, true);
+                    end
+                    if self.data.overcharged then
+                        tooltip:AddLine(L["Overcharged Delve"], 0.000, 0.800, 1.000, true);
+                    end
                 end
 
                 if poiInfo.tooltipWidgetSet then
+                    tooltip:AddLine(" ");
                     self:AttachWidgetSetToTooltip(tooltip, poiInfo.tooltipWidgetSet);
                 end
 
@@ -88,13 +110,25 @@ do
     end
 
     function DelvesPinMixin:Update()
-        self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/Delve-Bountiful", "LINEAR");
+        if self.data.overcharged then
+            if self.data.bountiful then
+                self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/Delve-OverchargedBountiful", "LINEAR");
+            else
+                self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/Delve-OverchargedOnly", "LINEAR");
+            end
+            self.sizeMultiplier = 2;
+        else
+            self:SetTexture("Interface/AddOns/Plumber/Art/MapPin/Delve-Bountiful", "LINEAR");
+            self.sizeMultiplier = 1;
+        end
         self:SetTexCoord(0, 1, 0, 1);
-        self:SetSizeScale(1);
     end
 
     function DelvesPinMixin:SetSizeScale(scale)
-        self.Texture:SetSize(ICON_WIDTH * scale, ICON_HEIGHT * scale);
+        if not self.sizeMultiplier then
+            self.sizeMultiplier = 1;
+        end
+        self.Texture:SetSize(ICON_WIDTH * scale * self.sizeMultiplier, ICON_HEIGHT * scale * self.sizeMultiplier);
     end
 end
 
@@ -137,58 +171,66 @@ do
             end
         end
 
-        local isBountiful = {};
-
-        for delveIndex, info in ipairs(DelvePOI) do
-            isBountiful[delveIndex] = true;
-        end
-
         local uiMapID, poiInfo;
         local positionToCache, p;
+        local bountiful, overcharged;
 
         for delveIndex, info in ipairs(DelvePOI) do
             uiMapID = info[1];
-            if isBountiful[delveIndex] then
-                poiID = info[3];
-                poiInfo = GetAreaPOIInfo(uiMapID, poiID)
+            poiID = info[3];    --bountifulPoi
+            poiInfo = GetAreaPOIInfo(uiMapID, poiID);
+            overcharged = false;
 
-                if poiInfo then
-                    if isBountiful[delveIndex] then
-                        if POILocation[poiID] then
-                            n = n + 1;
+            if poiInfo then
+                bountiful = true;
+            else
+                bountiful = false;
+                poiID = info[2];
+                poiInfo = GetAreaPOIInfo(uiMapID, poiID);
+            end
 
-                            if not data then
-                                data = {};
-                            end
+            if poiInfo then
+                overcharged = IsOverchargedDelve(poiInfo);
+            end
 
-                            data[n] = {
-                                mixin = DelvesPinMixin,
-                                x = POILocation[poiID].x,
-                                y = POILocation[poiID].y,
-                                clickable = false,
-                                uiMapID = uiMapID,
-                                poiID = poiID,
-                            };
+            if poiInfo and (bountiful or overcharged) then
+                overcharged = IsOverchargedDelve(poiInfo);
 
-                        else
-                            if poiInfo then
-                                if not positionToCache then
-                                    positionToCache = {};
-                                    p = 0;
-                                end
+                if POILocation[poiID] then
+                    n = n + 1;
 
-                                p = p + 1;
-                                local x, y = poiInfo.position:GetXY();
-                                local position = {
-                                    uiMapID = uiMapID,
-                                    poiID = poiID,
-                                    x = x,
-                                    y = y,
-                                };
+                    if not data then
+                        data = {};
+                    end
 
-                                positionToCache[p] = position;
-                            end
+                    data[n] = {
+                        mixin = DelvesPinMixin,
+                        x = POILocation[poiID].x,
+                        y = POILocation[poiID].y,
+                        clickable = false,
+                        uiMapID = uiMapID,
+                        poiID = poiID,
+                        bountiful = bountiful,
+                        overcharged = overcharged,
+                    };
+
+                else
+                    if poiInfo then
+                        if not positionToCache then
+                            positionToCache = {};
+                            p = 0;
                         end
+
+                        p = p + 1;
+                        local x, y = poiInfo.position:GetXY();
+                        local position = {
+                            uiMapID = uiMapID,
+                            poiID = poiID,
+                            x = x,
+                            y = y,
+                        };
+
+                        positionToCache[p] = position;
                     end
                 end
             end

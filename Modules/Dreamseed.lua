@@ -1074,17 +1074,6 @@ do
         end
     end
 
-    function YeetPOI()
-        local uiMapID = C_Map.GetBestMapForUnit("player");
-        local areaPoiIDs = C_AreaPoiInfo.GetAreaPOIForMap(uiMapID);
-        local info;
-
-        for i, areaPoiID in ipairs(areaPoiIDs) do
-            info = C_AreaPoiInfo.GetAreaPOIInfo(uiMapID, areaPoiID);
-            print(i, info.name);
-        end
-    end
-
     function YeetVignette()
         local vignetteGUIDs = C_VignetteInfo.GetVignettes();
         local info, position;

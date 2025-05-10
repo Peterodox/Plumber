@@ -234,6 +234,7 @@ L["ModuleName Delves_Dashboard"] = "Delves: Weekly Reward";
 L["ModuleDescription Delves_Dashboard"] = "Show your Great Vault and Gilded Stash progress on the Delves Dashboard.";
 L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
 L["Delve Crest Stash Requirement"] = "Appears in Tier 11 Bountiful Delves.";
+L["Overcharged Delve"] = "Overcharged Delve";
 
 
 --WoW Anniversary

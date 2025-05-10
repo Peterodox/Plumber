@@ -198,3 +198,39 @@ do  --Currency Watcher
     EL:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
     EL:SetScript("OnEvent", EL.OnEvent);
 end
+
+do  --AreaPOI
+    function YeetPOI(uiMapID)
+        if not uiMapID then
+            uiMapID = C_Map.GetBestMapForUnit("player");
+        end
+
+        local areaPOIs = C_AreaPoiInfo.GetAreaPOIForMap(uiMapID);
+        local delvePOIs = C_AreaPoiInfo.GetDelvesForMap(uiMapID);
+        if delvePOIs and #delvePOIs > 0 then
+            for _, areaPoiID in ipairs(delvePOIs) do
+                table.insert(areaPOIs, areaPoiID);
+            end
+        end
+        local info;
+
+        for i, areaPoiID in ipairs(areaPOIs) do
+            info = C_AreaPoiInfo.GetAreaPOIInfo(uiMapID, areaPoiID);
+            print(i, areaPoiID, info.name);
+            if info.iconWidgetSet then
+                print("iconWidgetSet:", info.iconWidgetSet);
+            end
+        end
+    end
+
+    function YeetScriptedAnimationEffectInfo(effectID)
+        local effects = {};
+        local effectDescriptions = C_ScriptedAnimations.GetAllScriptedAnimationEffects();
+        local count = #effectDescriptions;
+        for i = 1, count do
+            if effectID == effectDescriptions[i].id then
+               return effectDescriptions[i]
+            end
+        end
+    end
+end
