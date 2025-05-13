@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.8
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.8 f
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -234,6 +234,7 @@ L["ModuleName Delves_Dashboard"] = "Вылазки: Еженедельная н�
 L["ModuleDescription Delves_Dashboard"] = "Отображать прогресс Великого хранилища и Позолоченных тайников на панели Вылазок.";
 L["Delve Crest Stash No Info"] = "Эта информация недоступна в вашем текущем местоположении.";
 L["Delve Crest Stash Requirement"] = "Появляется на 11-м уровне многообещающих вылазок.";
+L["Overcharged Delve"] = "Перегруженная Вылазка";
 
 
 --WoW Anniversary
@@ -399,6 +400,7 @@ L["Paragon Reputation"] = "Парагон";
 L["Level Maxed"] = "(Максимально)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Текущий:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "У вас есть невостребованные награды";
+L["Reward Available"] = "Доступна награда";  --As brief as possible
 L["Total Colon"] = FROM_TOTAL or "Всего:";
 
 
