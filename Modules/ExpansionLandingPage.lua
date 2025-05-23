@@ -214,6 +214,7 @@ do
 
         return f
     end
+    addon.CreateFactionProgress = CreateFactionProgress;
 end
 
 

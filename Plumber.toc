@@ -19,6 +19,7 @@ Locales\Localization.xml
 API.lua
 
 Modules\SharedData.lua
+Modules\SharedFonts.xml
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
 Modules\BlizzardEditMode.lua
@@ -64,6 +65,7 @@ Modules\BlizzardSuperTrack.lua
 Modules\EquipmentFlyout.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
+#Modules\ExpansionLandingPage\ExpansionLandingPage.xml
 
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua

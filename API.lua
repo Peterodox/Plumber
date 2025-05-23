@@ -1613,12 +1613,15 @@ do  -- Reputation
     local function GetReputationProgress(factionID)
         if not factionID then return end;
 
-        local level, isFull, currentValue, maxValue, name, reputationType;
+        local level, isFull, currentValue, maxValue, name, reputationType, isUnlocked;
 
         local repInfo = GetFriendshipReputation(factionID);
+        local paragonRepEarned, paragonThreshold, rewardQuestID, hasRewardPending = GetFactionParagonInfo(factionID);
+
         if repInfo and repInfo.friendshipFactionID and repInfo.friendshipFactionID > 0 then
             reputationType = 2;
             name = repInfo.name;
+            isUnlocked = true;
             if repInfo.nextThreshold then
                 currentValue = repInfo.standing - repInfo.reactionThreshold;
                 maxValue = repInfo.nextThreshold - repInfo.reactionThreshold;
@@ -1636,11 +1639,34 @@ do  -- Reputation
             isFull = level >= rankInfo.maxLevel;
         end
 
+        if C_Reputation.IsMajorFaction(factionID) then
+            local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID);
+            if majorFactionData then
+                reputationType = 3;
+                maxValue = majorFactionData.renownLevelThreshold;
+                local isCapped = C_MajorFactions.HasMaximumRenown(factionID);
+                currentValue = isCapped and majorFactionData.renownLevelThreshold or majorFactionData.renownReputationEarned or 0;
+                level = majorFactionData.renownLevel;
+                name = majorFactionData.name;
+                isUnlocked = majorFactionData.isUnlocked;
+                if C_Reputation.IsFactionParagon(factionID) then
+                    isFull = true;
+                    if paragonRepEarned and paragonThreshold and paragonThreshold ~= 0 then
+                        local paragonLevel = floor(paragonRepEarned / paragonThreshold);
+                        currentValue = paragonRepEarned - paragonLevel * paragonThreshold;
+                        maxValue = paragonThreshold;
+                        level = paragonLevel;
+                    end
+                end
+            end
+        end
+
         if not reputationType then
             repInfo = GetFactionInfoByID(factionID);
             if repInfo then
                 reputationType = 1;
                 name = repInfo.name;
+                isUnlocked = true;
                 if repInfo.currentReactionThreshold then
                     currentValue = repInfo.currentStanding - repInfo.currentReactionThreshold;
                     maxValue = repInfo.nextReactionThreshold - repInfo.currentReactionThreshold;
@@ -1668,7 +1694,10 @@ do  -- Reputation
                 isFull = isFull,
                 name = name,
                 reputationType = reputationType,    --1:Standard, 2:Friendship
+                rewardPending = hasRewardPending,
+                isUnlocked = isUnlocked,
             };
+
             return tbl
         end
     end
@@ -1800,6 +1829,14 @@ do  -- Reputation
         end
     end
     API.GetReputationChangeFromText = GetReputationChangeFromText;
+
+
+    function API.GetMaxRenownLevel(factionID)
+        local renownLevelsInfo = C_MajorFactions.GetRenownLevels(factionID);
+        if renownLevelsInfo then
+            return renownLevelsInfo[#renownLevelsInfo].level
+        end
+    end
 end
 
 do  -- Spell
@@ -2066,6 +2103,26 @@ do  -- Quest
         return questName
     end
     API.GetQuestName = GetQuestName;
+
+    function API.IsQuestRewardCached(questID)
+        --We use this to query Faction Paragon rewards, so numQuestRewards should always > 0
+        --May be 0 during the first query
+
+        local numQuestRewards = GetNumQuestLogRewards(questID);
+        if numQuestRewards > 0 then
+            local getterFunc = GetQuestLogRewardInfo;
+            local itemName, itemTexture, quantity, quality, isUsable, itemID;
+            for i = 1, numQuestRewards do
+                itemName, itemTexture, quantity, quality, isUsable, itemID = getterFunc(i, questID);
+                if not itemName then
+                    return false
+                end
+            end
+            return true
+        else
+            return false
+        end
+    end
 end
 
 do  -- Tooltip
@@ -2917,6 +2974,19 @@ do  --Addon Skin
     end
 end
 
+do  --FrameUtil
+    function API.RegisterFrameForEvents(frame, events)
+        for i, event in ipairs(events) do
+            frame:RegisterEvent(event);
+        end
+    end
+
+    function API.UnregisterFrameForEvents(frame, events)
+        for i, event in ipairs(events) do
+            frame:UnregisterEvent(event);
+        end
+    end
+end
 
 --[[
 local DEBUG = CreateFrame("Frame");

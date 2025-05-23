@@ -402,6 +402,7 @@ L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
 L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Total Colon"] = FROM_TOTAL or "Total:";
+L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
 
 
 --Plumber AddOn Settings

@@ -1,0 +1,148 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="Basic.lua"/>
+	<Script file="GreatVault.lua"/>
+	<Script file="ItemUpgrade.lua"/>
+	<Script file="Currency.lua"/>
+	<Script file="FactionTab.lua"/>
+	<Script file="ActivityTab.lua"/>
+	<Script file="MajorFactionRenown.lua"/>
+	<Script file="ExpansionLandingPage.lua"/>
+	<Script file="MinimapButton.lua"/>
+
+	<Button name="PlumberLandingPageMajorFactionButtonTemplate" virtual="true">
+		<Size x="80" y="80"/>
+		<Layers>
+			<Layer level="OVERLAY" textureSubLevel="3">
+				<Texture parentKey="Border">
+					<Size x="100" y="108"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent" relativePoint="TOP" y="10"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="BorderHighlight" alphaMode="ADD" alpha="0.5">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Border" relativePoint="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="5">
+				<FontString parentKey="Level" inherits="GameFontNormal" justifyH="CENTER" text="1">
+					<Size x="0" y="0"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER" x="0" y="-33"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="Glow" hidden="true">
+					<Size x="100" y="100"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+					</Anchors>
+					<Animations>
+						<AnimationGroup parentKey="AnimGlow" looping="BOUNCE">
+							<Alpha fromAlpha="0" toAlpha="1" duration="1" order="1"/>
+						</AnimationGroup>
+					</Animations>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="6">
+				<Texture parentKey="AlertIcon" hidden="true">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Level" relativePoint="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="FactionIcon">
+					<Size x="44" y="44"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BACKGROUND" textureSubLevel="2">
+				<Texture parentKey="Background">
+					<Size x="80" y="80"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Cooldown parentKey="ProgressBar" reverse="true" hideCountdownNumbers="true" useCircularEdge="true" rotation="180" useParentLevel="true">
+				<Size x="80" y="80"/>
+				<Anchors>
+					<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+				</Anchors>
+				<SwipeTexture file="Interface\PVPFrame\pvpqueue-sidebar-honorbar-fill"/>
+				<EdgeTexture file="Interface\AddOns\Plumber\Art\Frame\ExpansionLandingPage-ProgressBarEdge"/>
+				<KeyValues>
+					<KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+				</KeyValues>
+			</Cooldown>
+		</Frames>
+	</Button>
+
+	<Frame name="PlumberExpansionLandingPage" parent="UIParent" mixin="PlumberExpansionLandingPageMixin" topLevel="true" hidden="true">
+		<Size x="1012" y="550"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT" x="64" y="-150"/>
+		</Anchors>
+		<Frames>
+			<Frame parentKey="LeftSection">
+				<Size x="274" y="550"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Frames>
+					<Frame parentKey="DefaultFrame"/>
+				</Frames>
+			</Frame>
+			<Frame parentKey="RightSection">
+				<Size x="732" y="550"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.LeftSection" relativePoint="TOPRIGHT" x="6"/>
+				</Anchors>
+				<Frames>
+					<Frame parentKey="Header">
+						<Size y="68"/>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+							<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<Texture parentKey="DividerLeft">
+									<Size x="64" y="24"/>
+									<Anchors>
+										<Anchor point="LEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="32"/>
+									</Anchors>
+								</Texture>
+								<Texture parentKey="DividerRight">
+									<Size x="64" y="24"/>
+									<Anchors>
+										<Anchor point="LEFT" relativeKey="$parent.DividerLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-32"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame parentKey="TabContainer">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.Header" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+</Ui>

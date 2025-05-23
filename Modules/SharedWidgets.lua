@@ -46,6 +46,7 @@ do  -- Slice Frame
         NineSlice_GenericBox_Border = true,     --used by BackpackItemTracker
         NineSlice_GenericBox_Black = true,
         NineSlice_GenericBox_Black_Shadowed = true,
+        ExpansionBorder_TWW = true,
     };
 
     local ThreeSliceLayouts = {
@@ -135,7 +136,7 @@ do  -- Slice Frame
             self.pieces[6]:SetPoint("BOTTOMRIGHT", self.pieces[9], "TOPRIGHT", 0, 0);
             self.pieces[8]:SetPoint("TOPLEFT", self.pieces[7], "TOPRIGHT", 0, 0);
             self.pieces[8]:SetPoint("BOTTOMRIGHT", self.pieces[9], "BOTTOMLEFT", 0, 0);
-    
+
             self.pieces[1]:SetTexCoord(0, 0.25, 0, 0.25);
             self.pieces[2]:SetTexCoord(0.25, 0.75, 0, 0.25);
             self.pieces[3]:SetTexCoord(0.75, 1, 0, 0.25);
@@ -175,6 +176,12 @@ do  -- Slice Frame
         --end
         for i = 1, #self.pieces do
             self.pieces[i]:SetTexture(tex);
+        end
+    end
+
+    function SliceFrameMixin:SetDisableSharpening(state)
+        for i = 1, #self.pieces do
+            self.pieces[i]:SetSnapToPixelGrid(not state);
         end
     end
 
@@ -5019,13 +5026,13 @@ do  --Radial Progress Bar
     function RadialProgressBarMixin:SetPercentage(percentage)
         local seconds = 100;
 
-        if percentage > 1 then
+        if percentage >= 1 then
             percentage = 1;
-        elseif percentage < 0 then
+        elseif percentage <= 0 then
             percentage = 0;
+        else
+            percentage = self.visualOffset * (1- percentage) + (1 - self.visualOffset) * percentage;    --Additional shrinking due to level background   --Remap 0-100 to 7-93
         end
-
-        percentage = self.visualOffset * (1- percentage) + (1 - self.visualOffset) * percentage;    --Additional shrinking due to level background   --Remap 0-100 to 7-93
 
         self:Pause();
         self:SetCooldown(GetTime() - (seconds * percentage), seconds);
@@ -5104,6 +5111,8 @@ do  --Radial Progress Bar
         return f
     end
     addon.CreateRadialProgressBar = CreateRadialProgressBar;
+
+    addon.RadialProgressBarMixin = RadialProgressBarMixin;
 end
 
 do  --Progress Bar With Level
