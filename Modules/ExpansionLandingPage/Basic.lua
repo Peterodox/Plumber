@@ -8,6 +8,10 @@ addon.LandingPageUtil = LandingPageUtil;
 local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW";
 
 local CreateFrame = CreateFrame;
+local ipairs = ipairs;
+local tinsert = table.insert;
+local tremove = table.remove;
+
 
 local ExpansionThemeFrameMixin = {};
 do
@@ -187,4 +191,302 @@ do  --TabUtil
     function LandingPageUtil.GetSelectedTabKey()
         return SelectedTabKay
     end
+end
+
+
+local AtlasUtil = {};
+addon.AtlasUtil = AtlasUtil;
+do  --Atlas
+    local FACTION_ICONS = "Interface/AddOns/Plumber/Art/Frame/MajorFactionIcons.png";
+    local FACTION_ICONS_COORDS = {
+        --[factionID] = {icon l, r, t, b, highlight l, r, t, b}
+        [2590] = {0  , 128, 0, 128},      --Council of Dornogal
+        [2594] = {128, 256, 0, 128},      --The Assembly of the Deeps
+        [2570] = {256, 384, 0, 128},      --Hallowfall Arathi
+        [2600] = {384, 512, 0, 128},      --Severed Threads
+        [2653] = {512, 640, 0, 128},      --Cartels of Undermine
+        [2685] = {640, 768, 0, 128},      --Gallagio Loyalty Rewards Club
+        [2688] = {768, 896, 0, 128},      --Flame's Radiance
+
+    };
+
+    local function SetTextureDimension(textureObject, file, width, height, l, r, t, b, useTrilinearFilter)
+        if useTrilinearFilter then
+            textureObject:SetTexture(file, nil, nil, true);
+        else
+            textureObject:SetTexture(file);
+        end
+        textureObject:SetTexCoord(l/width, r/width, t/height, b/height);
+    end
+
+    function AtlasUtil.SetFactionIcon(textureObject, factionID)
+        --SetAtlas(string.format("majorfactions_icons_%s512", factionData.textureKit))
+        local v = FACTION_ICONS_COORDS[factionID];
+        if v then
+            SetTextureDimension(textureObject, FACTION_ICONS, 1024, 1024, v[1], v[2], v[3], v[4]);
+            return true
+        end
+        return false
+    end
+
+    function AtlasUtil.SetFactionIconHighlight(textureObject, factionID)
+        local v = FACTION_ICONS_COORDS[factionID];
+        if v then
+            SetTextureDimension(textureObject, FACTION_ICONS, 1024, 1024, v[1], v[2], v[3] + 128, v[4] + 128, true);
+            return true
+        end
+        return false
+    end
+end
+
+
+do  --ScrollFrame
+    local ObjectPoolMixin = {};
+
+    function ObjectPoolMixin:ReleaseAll()
+        for _, obj in ipairs(self.activeObjects) do
+            obj:Hide();
+            obj:ClearAllPoints();
+            if self.onRemoved then
+                self.onRemoved(obj);
+            end
+        end
+
+        local tbl = {};
+        for k, object in ipairs(self.objects) do
+            tbl[k] = object;
+        end
+        self.unusedObjects = tbl;
+        self.activeObjects = {};
+    end
+
+    function ObjectPoolMixin:ReleaseObject(object)
+        object:Hide();
+        object:ClearAllPoints();
+
+        if self.onRemoved then
+            self.onRemoved(object);
+        end
+
+        local found;
+        for k, obj in ipairs(self.activeObjects) do
+            if obj == object then
+                found = true;
+                tremove(self.activeObjects, k);
+                break
+            end
+        end
+
+        if found then
+            tinsert(self.unusedObjects, object);
+        end
+    end
+
+    function ObjectPoolMixin:Acquire()
+        local object = tremove(self.unusedObjects);
+        if not object then
+            object = self.create();
+            object.Release = self.Object_Release;
+            tinsert(self.objects, object);
+        end
+        tinsert(self.activeObjects, object);
+        if self.onAcquired then
+            self.onAcquired(object);
+        end
+        object:Show();
+        return object
+    end
+
+    local function CraeteObjectPool(create, onAcquired, onRemoved)
+        local pool = {};
+        API.Mixin(pool, ObjectPoolMixin);
+
+        pool.objects = {};
+        pool.activeObjects = {};
+        pool.unusedObjects = {};
+
+        pool.create = create;
+        pool.onAcquired = onAcquired;
+        pool.onRemoved = onRemoved;
+
+        function pool.Object_Release(obj)
+            pool:ReleaseObject(obj);
+        end
+
+        return pool
+    end
+
+
+    local ScrollViewMixin = {};
+
+    function ScrollViewMixin:SetOffset(offset)
+        self.offset = offset;
+        self.toOffset = offset;
+        self.ScrollRef:SetPoint("TOP", self, "TOP", 0, offset);
+        self:UpdateView();
+    end
+
+    function ScrollViewMixin:ScrollToTop()
+        self:SetOffset(0);
+    end
+
+    function ScrollViewMixin:ScrollToBottom()
+        self:SetOffset(self.range);
+    end
+
+    function ScrollViewMixin:AddTemplate(templateKey, create, onAcquired, onRemoved)
+        self.pools[templateKey] = CraeteObjectPool(create, onAcquired, onRemoved);
+    end
+
+    function ScrollViewMixin:ReleaseAllObjects()
+        self.indexedObjects = {};
+        for templateKey, pool in pairs(self.pools) do
+            pool:ReleaseAll();
+        end
+    end
+
+    function ScrollViewMixin:GetDebugCount()
+        local total = 0;
+        local active = 0;
+        local unused = 0;
+        for templateKey, pool in pairs(self.pools) do
+            total = total + #pool.objects;
+            active = active + #pool.activeObjects;
+            unused = unused + #pool.unusedObjects;
+        end
+        print(total, active, unused);
+    end
+
+    function ScrollViewMixin:OnSizeChanged()
+        self.viewportSize = API.Round(self:GetHeight());
+    end
+
+    function ScrollViewMixin:AcquireObject(templateKey)
+        return self.pools[templateKey]:Acquire();
+    end
+
+    function ScrollViewMixin:UpdateView()
+        local top = self.offset;
+        local bottom = self.offset + self.viewportSize;
+        local fromDataIndex;
+        local toDataIndex;
+
+        for dataIndex, v in ipairs(self.content) do
+            if not fromDataIndex then
+                if v.top >= top or v.bottom >= top then
+                    fromDataIndex = dataIndex;
+                end
+            end
+
+            if not toDataIndex then
+                if (v.top <= bottom and v.bottom >= bottom) or (v.top >= bottom) then
+                    toDataIndex = dataIndex;
+                    break
+                end
+            end
+        end
+        toDataIndex = toDataIndex or #self.content;
+
+        for dataIndex, obj in pairs(self.indexedObjects) do
+            if dataIndex < fromDataIndex or dataIndex > toDataIndex then
+                obj:Release();
+                self.indexedObjects[dataIndex] = nil;
+            end
+        end
+
+        local obj;
+        local contentData;
+
+        if fromDataIndex then
+            for dataIndex = fromDataIndex, toDataIndex do
+                if self.indexedObjects[dataIndex] then
+
+                else
+                    contentData = self.content[dataIndex];
+                    obj = self:AcquireObject(contentData.templateKey);
+                    if obj then
+                        if contentData.setupFunc then
+                            contentData.setupFunc(obj);
+                        end
+                        obj:SetPoint(contentData.point or "TOP", self.ScrollRef, "TOP", contentData.offsetX or 0, -contentData.top);
+                        self.indexedObjects[dataIndex] = obj;
+                    end
+                end
+            end
+        end
+    end
+
+    function ScrollViewMixin:OnMouseWheel(delta)
+        if (delta > 0 and self.toOffset <= 0) or (delta < 0 and self.toOffset >= self.range) then
+            return
+        end
+
+        self.toOffset = self.toOffset - self.stepSize * delta;
+        if self.toOffset < 0 then
+            self.toOffset = 0;
+        elseif self.toOffset > self.range then
+            self.toOffset = self.range;
+        end
+
+        self:SetOffset(self.toOffset);
+    end
+
+    function ScrollViewMixin:SetStepSize(stepSize)
+        self.stepSize = stepSize;
+    end
+
+    function ScrollViewMixin:SetScrollRange(range)
+        self.range = range;
+    end
+
+    function ScrollViewMixin:SetContent(content, retainPosition)
+        self.content = content or {};
+    
+        if #self.content > 0 then
+            local range = content[#self.content].bottom - self.viewportSize + self.bottomOvershoot;
+            self:SetScrollRange(range);
+        else
+            self:SetScrollRange(0);
+        end
+        self:ReleaseAllObjects();
+
+        if retainPosition then
+            local offset = self.toOffset;
+            if offset > self.range then
+                offset = self.range;
+            end
+            self:SetOffset(offset);
+        else
+            self:ScrollToTop();
+        end
+    end
+
+    function ScrollViewMixin:SetBottomOvershoot(bottomOvershoot)
+        self.bottomOvershoot = bottomOvershoot;
+    end
+
+    local function CreateScrollView(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        API.Mixin(f, ScrollViewMixin);
+        f:SetClipsChildren(true);
+
+        f.ScrollRef = CreateFrame("Frame", nil, f);
+        f.ScrollRef:SetSize(4, 4);
+        f.ScrollRef:SetPoint("TOP", f, "TOP", 0, 0);
+
+        f.pools = {};
+        f.content = {};
+        f.indexedObjects = {};
+        f.offset = 0;
+        f.toOffset = 0;
+        f.range = 0;
+        f.viewportSize = 0;
+        f:SetStepSize(32);
+        f:SetBottomOvershoot(0);
+
+        f:SetScript("OnMouseWheel", f.OnMouseWheel);
+
+        return f
+    end
+    API.CreateScrollView = CreateScrollView;
 end

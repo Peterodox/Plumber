@@ -57,7 +57,7 @@
 			</Layer>
 			<Layer level="OVERLAY">
 				<Texture parentKey="FactionIcon">
-					<Size x="44" y="44"/>
+					<Size x="56" y="56"/>
 					<Anchors>
 						<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
 					</Anchors>
@@ -87,7 +87,7 @@
 		</Frames>
 	</Button>
 
-	<Frame name="PlumberExpansionLandingPage" parent="UIParent" mixin="PlumberExpansionLandingPageMixin" topLevel="true" hidden="true">
+	<Frame name="PlumberExpansionLandingPage" parent="UIParent" mixin="PlumberExpansionLandingPageMixin" topLevel="true" hidden="true" enableMouse="true">
 		<Size x="1012" y="550"/>
 		<Anchors>
 			<Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT" x="64" y="-150"/>

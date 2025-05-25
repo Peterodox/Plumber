@@ -5036,6 +5036,7 @@ do  --Radial Progress Bar
 
         self:Pause();
         self:SetCooldown(GetTime() - (seconds * percentage), seconds);
+        self:SetDrawEdge(percentage > 0);
     end
 
     function RadialProgressBarMixin:SetValue(currentValue, maxValue)

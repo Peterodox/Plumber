@@ -2,7 +2,9 @@ local _, addon = ...
 local API = addon.API;
 local L = addon.L;
 local LandingPageUtil = addon.LandingPageUtil;
+local AtlasUtil = addon.AtlasUtil;
 
+local CreateFrame = CreateFrame;
 local C_Reputation = C_Reputation;
 local C_MajorFactions = C_MajorFactions;
 local GetParagonValuesAndLevel = API.GetParagonValuesAndLevel;
@@ -49,7 +51,7 @@ local MajorFactionLayout = {
 
     [2] = {
         {factionID = 2685},     --Gallagio Loyalty Rewards Club
-        {factionID = 2653,
+        {factionID = 2653,      --Cartels of Undermine
             subFactions = {
                 {factionID = 2669, iconFileID = 6439629, criteria = function() return C_QuestLog.IsQuestFlaggedCompletedOnAccount(86961) end}, --Darkfuse Solutions unlocked after completed "Diversified Investments"
                 {factionID = 2673, iconFileID = 6439627},     --Bilgewater Cartel
@@ -64,7 +66,7 @@ local MajorFactionLayout = {
         {factionID = 2590},     --Council of Dornogal
         {factionID = 2594},     --The Assembly of the Deeps
         {factionID = 2570},     --Hallowfall Arathi
-        {factionID = 2600,
+        {factionID = 2600,      --Severed Threads
             subFactions = {
                 {factionID = 2601, creatureDisplayID = 116208},     --Weaver
                 {factionID = 2605, creatureDisplayID = 114775},     --General Anub'azal
@@ -206,6 +208,79 @@ local function NotificationCheck()
 end
 
 
+local CreateFactionIconButton;
+do
+    local FactionIconButtonMixin = {};
+
+    function FactionIconButtonMixin:OnEnter()
+
+    end
+
+    function FactionIconButtonMixin:OnLeave()
+        if not self.selected then
+
+        end
+    end
+
+    function FactionIconButtonMixin:OnClick()
+        if not self.selected then
+            FactionTab:DisplayMajorFactionDetail(self.factionID);
+        end
+    end
+
+    function FactionIconButtonMixin:OnMouseDown()
+        if not self.selected then
+            self.FactionIcon:SetPoint("CENTER", self, "CENTER", 0, -1);
+        end
+    end
+
+    function FactionIconButtonMixin:OnMouseUp()
+        self.FactionIcon:SetPoint("CENTER", self, "CENTER", 0, 0);
+    end
+
+    function FactionIconButtonMixin:SetFaction(factionID)
+        self.factionID = factionID;
+        local data = C_MajorFactions.GetMajorFactionData(factionID);
+        if data then
+            AtlasUtil.SetFactionIcon(self.FactionIcon, factionID);
+            AtlasUtil.SetFactionIconHighlight(self.Highlight, factionID);
+            self.Highlight:SetAlpha(1);
+            self.Highlight:SetVertexColor(1, 0.82, 0);
+        end
+    end
+
+    function FactionIconButtonMixin:SetSelected(state)
+        self.selected = state;
+        if state then
+            self.FactionIcon:SetVertexColor(1, 1, 1);
+        else
+            self.FactionIcon:SetVertexColor(0.5, 0.5, 0.5);
+        end
+    end
+
+    function CreateFactionIconButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        f:SetSize(32, 32);
+        f.FactionIcon = f:CreateTexture(nil, "OVERLAY");
+        f.FactionIcon:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.FactionIcon:SetSize(44, 44);
+
+        f.Highlight = f:CreateTexture(nil, "HIGHLIGHT");
+        f.Highlight:SetPoint("TOPLEFT", f.FactionIcon, "TOPLEFT", 0, 0);
+        f.Highlight:SetPoint("BOTTOMRIGHT", f.FactionIcon, "BOTTOMRIGHT", 0, 0);
+
+        API.Mixin(f, FactionIconButtonMixin);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnClick", f.OnClick);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
+
+        return f
+    end
+end
+
+
 local LandingPageMajorFactionButtonMixin = {};
 do
     function LandingPageMajorFactionButtonMixin:OnLoad()
@@ -332,7 +407,7 @@ do
         local r, g, b = 1, 1, 1;
 
         if data then
-            self.FactionIcon:SetAtlas(string.format("majorfactions_icons_%s512", data.textureKit));
+            AtlasUtil.SetFactionIcon(self.FactionIcon, factionID);
         end
 
         if factionID or self.parentFactionID then
@@ -422,7 +497,7 @@ do
             self.AlertIcon:SetSize(32, 32);
             self.Level:SetPoint("CENTER", self, "CENTER", 0, -33);
             self.Level:SetFontObject("GameFontNormal");
-            self.FactionIcon:SetSize(44, 44);
+            self.FactionIcon:SetSize(56, 56);
             self.Background:SetSize(80, 80);
             self.Background:SetTexCoord(200/1024, 360/1024, 20/1024, 180/1024);
             self.ProgressBar:SetSize(80, 80);
@@ -463,6 +538,83 @@ local function CreateFactionButton(parent, clickable)
     return f
 end
 
+
+local CreateRenownItemButton;
+do
+    local RenownItemButtonMixin = {};
+
+    function RenownItemButtonMixin:SetRewardInfo(info)
+        self.RewardIcon:SetTexture(info.icon);
+        self.Name:SetText(info.name);
+        self.name = info.name;
+        self.description = info.description;
+        self.isAccountUnlock = info.isAccountUnlock;
+
+        if info.itemID then
+            
+        elseif info.spellID then
+
+        elseif info.mountID then
+
+        elseif info.transmogID then
+
+        elseif info.transmogSetID then
+
+        elseif info.transmogIllusionSourceID then
+
+        elseif info.titleMaskID then
+
+        end
+    end
+
+    function RenownItemButtonMixin:OnEnter()
+        local tooltip = GameTooltip;
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+        tooltip:SetText(self.name, 1, 1, 1);
+        if self.isAccountUnlock then
+            tooltip:AddLine(RENOWN_REWARD_ACCOUNT_UNLOCK_LABEL, 0.000, 0.800, 1.000, true);  --ACCOUNT_WIDE_FONT_COLOR
+            tooltip:AddLine(" ");
+        end
+        tooltip:AddLine(self.description, 1, 0.82, 0, true);
+        tooltip:Show();
+    end
+
+    function RenownItemButtonMixin:OnLeave()
+        GameTooltip:Hide();
+    end
+
+    function CreateRenownItemButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        f:SetSize(256, 32);
+        f.RewardIcon = f:CreateTexture(nil, "ARTWORK");
+        f.RewardIcon:SetSize(30, 30);
+        f.RewardIcon:SetPoint("LEFT", f, "LEFT", 2, 0);
+        f.RewardIcon:SetTexCoord(0.0625, 0.9375, 0.0625, 0.9375);
+
+        local mask = f:CreateMaskTexture(nil, "ARTWORK");
+        mask:SetSize(32, 32);
+        mask:SetPoint("CENTER", f.RewardIcon, "CENTER", 0, 0);
+        mask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Chamfer.tga", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+        f.RewardIcon:AddMaskTexture(mask);
+
+        f.ItemBorder = f:CreateTexture(nil, "OVERLAY");
+        f.ItemBorder:SetSize(40, 40);
+        f.ItemBorder:SetPoint("CENTER", f.RewardIcon, "CENTER", 0, 0);
+        f.ItemBorder:SetTexture("Interface/AddOns/Plumber/Art/Frame/ItemBorder");
+        f.ItemBorder:SetTexCoord(80/512, 160/512, 0/512, 80/512);
+
+        f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Name:SetPoint("LEFT", f, "LEFT", 40, 0);
+        f.Name:SetJustifyH("LEFT");
+        f.Name:SetTextColor(0.92, 0.92, 0.92);
+
+        API.Mixin(f, RenownItemButtonMixin);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+
+        return f
+    end
+end
 
 local FactionTabMixin = {};
 do
@@ -553,6 +705,7 @@ do
         self:InitDetailFrame();
         self.DetailFrame:Show();
         self:UpdateLeftWidgets();
+        self:UpdateRightSection();
     end
 
     function FactionTabMixin:InitDetailFrame()
@@ -560,57 +713,149 @@ do
 
         local DetailFrame = CreateFrame("Frame", nil, self);
         self.DetailFrame = DetailFrame;
-        DetailFrame:SetAllPoints(true);
-
-        local LeftFrame = PlumberExpansionLandingPage.LeftSection;
-        local LeftHeader = LandingPageUtil.CreateListCategoryButton(DetailFrame, MAJOR_FACTION_LIST_TITLE);
-        LeftHeader:SetPoint("TOP", LeftFrame, "TOP", 0, -16);
-
-        local ProgressDisplay = CreateFactionButton(DetailFrame);
-        self.LeftProgressDisplay = ProgressDisplay;
-        ProgressDisplay.alwaysHideRenownLevel = true;
-        ProgressDisplay:SetShowRenownLevel(false);
-        ProgressDisplay:SetPoint("TOP", LeftFrame, "TOP", 0, -72);
-        ProgressDisplay:SetScale(1.25);
-        ProgressDisplay:EnableMouse(false);
-        ProgressDisplay:EnableMouse(false);
-
-        local BackgroundGlow = DetailFrame:CreateTexture(nil, "BACKGROUND");
-        BackgroundGlow:SetSize(256, 256);
-        BackgroundGlow:SetPoint("CENTER", ProgressDisplay, "CENTER", 0, 0);
-        BackgroundGlow:SetTexture("Interface/AddOns/Plumber/Art/Frame/ExpansionLandingPage-BackgroundGlow");
-        BackgroundGlow:SetBlendMode("ADD");
-        local shrink = 48;
-        BackgroundGlow:SetTexCoord(shrink/256, 1-shrink/256, shrink/256, 1-shrink/256);
-        BackgroundGlow:SetVertexColor(51/255, 29/255, 17/255);
+        DetailFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 8, -8);
+        DetailFrame:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -8, 8);
 
 
-        --Create texts below LeftProgressDisplay (FactionName, Level, Rep until next level)
-        local textWidth = 224;
-        local textFonts = {
-            "PlumberFont_16", "GameFontNormal", "GameFontNormal";
-        };
+        do  --LeftSection
+            local LeftFrame = PlumberExpansionLandingPage.LeftSection;
+            local LeftHeader = LandingPageUtil.CreateListCategoryButton(DetailFrame, MAJOR_FACTION_LIST_TITLE);
+            LeftHeader:SetPoint("TOP", LeftFrame, "TOP", 0, -16);
 
-        local fs, r, g, b;
-        for i = 1, 3 do
-            fs = DetailFrame:CreateFontString(nil, "OVERLAY", textFonts[i]);
-            ProgressDisplay["Text"..i] = fs;
-            fs:SetWidth(textWidth);
-            fs:SetJustifyH("CENTER");
-            fs:SetJustifyV("TOP");
-            if i == 1 then
-                fs:SetPoint("TOP", ProgressDisplay, "BOTTOM", 0, -24);
-                fs:SetSpacing(2);
-                r, g, b = 0.906, 0.737, 0.576;
-            else
-                fs:SetPoint("TOP", ProgressDisplay["Text"..(i - 1)], "BOTTOM", 0, -6);
-                if i == 2 then
-                    r, g, b = 0.8, 0.8, 0.8;
+            local ProgressDisplay = CreateFactionButton(DetailFrame);
+            self.LeftProgressDisplay = ProgressDisplay;
+            ProgressDisplay.alwaysHideRenownLevel = true;
+            ProgressDisplay:SetShowRenownLevel(false);
+            ProgressDisplay:SetPoint("TOP", LeftFrame, "TOP", 0, -72);
+            ProgressDisplay:SetScale(1.25);
+            ProgressDisplay:EnableMouse(false);
+            ProgressDisplay:EnableMouse(false);
+
+            local BackgroundGlow = DetailFrame:CreateTexture(nil, "BACKGROUND");
+            BackgroundGlow:SetSize(256, 256);
+            BackgroundGlow:SetPoint("CENTER", ProgressDisplay, "CENTER", 0, 0);
+            BackgroundGlow:SetTexture("Interface/AddOns/Plumber/Art/Frame/ExpansionLandingPage-BackgroundGlow");
+            BackgroundGlow:SetBlendMode("ADD");
+            local shrink = 48;
+            BackgroundGlow:SetTexCoord(shrink/256, 1-shrink/256, shrink/256, 1-shrink/256);
+            BackgroundGlow:SetVertexColor(51/255, 29/255, 17/255);
+
+
+            --Create texts below LeftProgressDisplay (FactionName, Level, Rep until next level)
+            local textWidth = 224;
+            local textFonts = {
+                "PlumberFont_16", "GameFontNormal", "GameFontNormal";
+            };
+
+            local fs, r, g, b;
+            for i = 1, 3 do
+                fs = DetailFrame:CreateFontString(nil, "OVERLAY", textFonts[i]);
+                ProgressDisplay["Text"..i] = fs;
+                fs:SetWidth(textWidth);
+                fs:SetJustifyH("CENTER");
+                fs:SetJustifyV("TOP");
+                if i == 1 then
+                    fs:SetPoint("TOP", ProgressDisplay, "BOTTOM", 0, -24);
+                    fs:SetSpacing(2);
+                    r, g, b = 0.906, 0.737, 0.576;
                 else
-                    r, g, b = 0.5, 0.5, 0.5;
+                    fs:SetPoint("TOP", ProgressDisplay["Text"..(i - 1)], "BOTTOM", 0, -6);
+                    if i == 2 then
+                        r, g, b = 0.8, 0.8, 0.8;
+                    else
+                        r, g, b = 0.5, 0.5, 0.5;
+                    end
+                end
+                fs:SetTextColor(r, g, b);
+            end
+
+
+            --Create a List of FactionIconButtons
+            local button;
+            local buttons = {};
+            self.FactionIconButtons = buttons;
+            local gap = 0;
+            local iconButtonSize = 42;
+            local iconsPerRow = 5;
+            local factionList = {};
+            for row, rowInfo in ipairs(MajorFactionLayout) do
+                for _, factionInfo in ipairs(rowInfo) do
+                    table.insert(factionList, factionInfo.factionID);
                 end
             end
-            fs:SetTextColor(r, g, b);
+
+            local numFactions = #factionList;
+            local numRows = math.ceil(numFactions / iconsPerRow);
+            local iconsLastRow = numFactions + (1 - numRows) * iconsPerRow;
+            local spanLastRow = iconsLastRow * (iconButtonSize + gap) - gap;
+            local spanFullRow = iconsPerRow * (iconButtonSize + gap) - gap;
+            local row, col = 1, 0;
+            local fromY = 416;  --432
+            local offsetX, spanX;
+
+            for i, factionID in ipairs(factionList) do
+                button = CreateFactionIconButton(DetailFrame);
+                button:SetSize(iconButtonSize, iconButtonSize);
+                table.insert(buttons, button);
+                col = col + 1;
+                if col > iconsPerRow then
+                    col = 1;
+                    row = row + 1;
+                    fromY = fromY + iconButtonSize + gap;
+                end
+                if row >= numRows then
+                    spanX = spanLastRow;
+                else
+                    spanX = spanFullRow;
+                end
+                offsetX = -0.5 * spanX + (col - 1) * (iconButtonSize + gap);
+                button:SetPoint("TOPLEFT", LeftFrame, "TOP", offsetX, -fromY);
+                button:SetFaction(factionID);
+            end
+        end
+
+
+        do  --RightSection
+            local RenownItemScrollView = API.CreateScrollView(DetailFrame);
+            self.RenownItemScrollView = RenownItemScrollView;
+            RenownItemScrollView:SetAllPoints(true);
+            RenownItemScrollView:OnSizeChanged();
+            RenownItemScrollView:SetStepSize(48);
+            RenownItemScrollView:SetBottomOvershoot(48);
+
+
+            local function RenownItemButton_Create()
+                return CreateRenownItemButton(RenownItemScrollView)
+            end
+
+            local function RenownItemButton_OnRemove(button)
+                button.name = nil;
+                button.description = nil;
+                button.isAccountUnlock = nil;
+            end
+
+            RenownItemScrollView:AddTemplate("Item", RenownItemButton_Create, nil, RenownItemButton_OnRemove);
+
+
+            local function Divider_Create()
+                local divider = RenownItemScrollView:CreateTexture(nil, "ARTWORK");
+                divider:SetSize(512, 16);
+                divider:SetTexture("Interface/AddOns/Plumber/Art/Frame/Divider-H-Shadow");
+                divider:SetAlpha(0.1);
+                return divider
+            end
+
+            RenownItemScrollView:AddTemplate("Divider", Divider_Create);
+
+
+            local function LevelText_Create()
+               local fs = RenownItemScrollView:CreateFontString(nil, "OVERLAY", "PlumberFont_16");
+               fs:SetTextColor(1, 1, 1, 0.2);
+               fs:SetJustifyH("RIGHT");
+               return fs
+            end
+
+            RenownItemScrollView:AddTemplate("LevelText", LevelText_Create);
         end
     end
 
@@ -648,6 +893,93 @@ do
                 ProgressDisplay.Text3:SetTextColor(0.5, 0.5, 0.5);
             end
         end
+
+        if self.FactionIconButtons then
+            for _, button in ipairs(self.FactionIconButtons) do
+                button:SetSelected(button.factionID == factionID);
+            end
+        end
+    end
+
+    function FactionTabMixin:UpdateRightSection()
+        local factionID = self.selectedFactionID;
+        local renownLevelsInfo = C_MajorFactions.GetRenownLevels(factionID);
+        local rewards;
+
+        local function SortFunc_UIOrder(a, b)
+            if a.uiOrder and b.uiOrder and (a.uiOrder ~= b.uiOrder) then
+                return a.uiOrder < b.uiOrder
+            else
+                return a.name < b.name
+            end
+        end
+
+        local content = {};
+        local n = 0;
+        local gapSameTie = 8;
+        local offsetY = 16;
+        local buttonHeight = 32;
+        local numLevels = #renownLevelsInfo;
+        local top, bottom;
+
+        if renownLevelsInfo then
+            for k, v in ipairs(renownLevelsInfo) do
+                rewards = C_MajorFactions.GetRenownRewardsForLevel(factionID, v.level)
+                table.sort(rewards, SortFunc_UIOrder);
+                for index, rewardInfo in ipairs(rewards) do
+                    n = n + 1;
+                    top = offsetY;
+                    bottom = offsetY + buttonHeight + gapSameTie;
+                    content[n] = {
+                        dataIndex = n,
+                        templateKey = "Item",
+                        setupFunc = function(obj)
+                            obj:SetRewardInfo(rewardInfo);
+                        end,
+                        top = top,
+                        bottom = bottom,
+                    };
+
+                    if index == 1 then
+                        n = n + 1;
+                        top = offsetY + 0.5*(#rewards*(buttonHeight + gapSameTie) - gapSameTie);
+                        content[n] = {
+                            dataIndex = n,
+                            templateKey = "LevelText",
+                            setupFunc = function(obj)
+                                obj:SetText(v.level);
+                                if v.locked then
+                                    obj:SetAlpha(0.2);
+                                else
+                                    obj:SetAlpha(0.6);
+                                end
+                            end,
+                            top = top,
+                            bottom = top + 16,
+                            offsetX = -164,
+                            point = "CENTER",
+                        };
+                    end
+
+                    offsetY = bottom;
+                end
+
+                if k ~= numLevels then
+                    n = n + 1;
+                    top = offsetY;
+                    bottom = offsetY + 16 + 1*gapSameTie;
+                    content[n] = {
+                        dataIndex = n,
+                        templateKey = "Divider",
+                        top = top,
+                        bottom = bottom,
+                    };
+                    offsetY = bottom;
+                end
+            end
+        end
+
+        self.RenownItemScrollView:SetContent(content);
     end
 end
 
