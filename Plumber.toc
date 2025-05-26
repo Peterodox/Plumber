@@ -65,7 +65,7 @@ Modules\BlizzardSuperTrack.lua
 Modules\EquipmentFlyout.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
-#Modules\ExpansionLandingPage\ExpansionLandingPage.xml
+Modules\ExpansionLandingPage\ExpansionLandingPage.xml
 
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua

@@ -83,6 +83,11 @@ local FACTION_BUTTON_GAP_V = 20 + 8;
 local SUBFACTION_BUTTON_SIZE = 40;
 
 
+local function HideTooltip()
+    GameTooltip:Hide();
+end
+
+
 local ReputationTooltipScripts = {};
 do
     --Derivative of Blizzard ReputationUtil.lua
@@ -580,7 +585,7 @@ do
     end
 
     function RenownItemButtonMixin:OnLeave()
-        GameTooltip:Hide();
+        HideTooltip();
     end
 
     function CreateRenownItemButton(parent)
@@ -602,6 +607,7 @@ do
         f.ItemBorder:SetPoint("CENTER", f.RewardIcon, "CENTER", 0, 0);
         f.ItemBorder:SetTexture("Interface/AddOns/Plumber/Art/Frame/ItemBorder");
         f.ItemBorder:SetTexCoord(80/512, 160/512, 0/512, 80/512);
+        API.DisableSharpening(f.ItemBorder)
 
         f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         f.Name:SetPoint("LEFT", f, "LEFT", 40, 0);
@@ -822,6 +828,12 @@ do
             RenownItemScrollView:OnSizeChanged();
             RenownItemScrollView:SetStepSize(48);
             RenownItemScrollView:SetBottomOvershoot(48);
+            RenownItemScrollView:EnableMouseBlocker(true);
+
+            local function ShowFocusedButtonTooltip()
+
+            end
+            RenownItemScrollView:SetOnScrollStopCallback(ShowFocusedButtonTooltip);
 
 
             local function RenownItemButton_Create()
@@ -921,6 +933,7 @@ do
         local buttonHeight = 32;
         local numLevels = #renownLevelsInfo;
         local top, bottom;
+        local firstLockedIndex;
 
         if renownLevelsInfo then
             for k, v in ipairs(renownLevelsInfo) do
@@ -939,6 +952,10 @@ do
                         top = top,
                         bottom = bottom,
                     };
+
+                    if v.locked and (not firstLockedIndex) then
+                        firstLockedIndex = n;
+                    end
 
                     if index == 1 then
                         n = n + 1;
@@ -980,6 +997,10 @@ do
         end
 
         self.RenownItemScrollView:SetContent(content);
+
+        print(firstLockedIndex)
+        firstLockedIndex = firstLockedIndex or n;
+        self.RenownItemScrollView:ScrollToContent(firstLockedIndex);
     end
 end
 

@@ -11,6 +11,7 @@ local CreateFrame = CreateFrame;
 local ipairs = ipairs;
 local tinsert = table.insert;
 local tremove = table.remove;
+local IsShiftKeyDown = IsShiftKeyDown;
 
 
 local ExpansionThemeFrameMixin = {};
@@ -421,7 +422,9 @@ do  --ScrollFrame
             return
         end
 
-        self.toOffset = self.toOffset - self.stepSize * delta;
+        local a = IsShiftKeyDown() and 2 or 1;
+        self.toOffset = self.toOffset - self.stepSize * a * delta;
+
         if self.toOffset < 0 then
             self.toOffset = 0;
         elseif self.toOffset > self.range then
@@ -436,7 +439,18 @@ do  --ScrollFrame
     end
 
     function ScrollViewMixin:SetScrollRange(range)
+        if range < 0 then
+            range = 0;
+        end
         self.range = range;
+
+        if range > 0 then
+            self:SetClipsChildren(true);
+            self:SetScript("OnMouseWheel", self.OnMouseWheel);
+        else
+            self:SetClipsChildren(false);
+            self:SetScript("OnMouseWheel", nil);
+        end
     end
 
     function ScrollViewMixin:SetContent(content, retainPosition)
@@ -490,3 +504,53 @@ do  --ScrollFrame
     end
     API.CreateScrollView = CreateScrollView;
 end
+
+
+--[[
+do  --SoftTargetName
+    local EL = CreateFrame("Frame");
+
+    function EL:OnEvent(event, ...)
+        if event == "NAME_PLATE_UNIT_ADDED" then
+            local unit = ...
+            local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+            if nameplate then
+                local f = nameplate.UnitFrame.SoftTargetFrame;
+                if f:IsShown() then
+                    if not f.SoftTargetFontString then
+                        f.SoftTargetFontString = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+                        f.SoftTargetFontString:SetPoint("TOP", f.Icon, "BOTTOM", 0, -4);
+                    end
+                    f.SoftTargetFontString:SetText(UnitName(unit));
+                    f.SoftTargetFontString:Show();
+
+                    local textureFile = f.Icon:GetTexture();
+                    --To determine if the interaction is in range:
+                    if string.find(string.lower(textureFile), "unable") then
+                        f.SoftTargetFontString:SetTextColor(0.5, 0.5, 0.5);
+                    else
+                        f.SoftTargetFontString:SetTextColor(1, 0.82, 0);
+                    end
+                    self.softTargetUnit = unit;
+                else
+                    if f.SoftTargetFontString then
+                        f.SoftTargetFontString:Hide();
+                    end
+                end
+            end
+        elseif event == "PLAYER_SOFT_INTERACT_CHANGED" then
+            local oldTarget, newTarget = ...
+            if not newTarget then
+                self.softTargetUnit = nil;
+            end
+            if self.softTargetUnit then
+                self:OnEvent("NAME_PLATE_UNIT_ADDED", self.softTargetUnit);
+            end
+        end
+    end
+
+    EL:SetScript("OnEvent", EL.OnEvent);
+    EL:RegisterEvent("NAME_PLATE_UNIT_ADDED");
+    EL:RegisterEvent("PLAYER_SOFT_INTERACT_CHANGED");
+end
+--]]
