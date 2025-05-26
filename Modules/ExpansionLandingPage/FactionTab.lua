@@ -83,14 +83,33 @@ local FACTION_BUTTON_GAP_V = 20 + 8;
 local SUBFACTION_BUTTON_SIZE = 40;
 
 
+local function IsFactionWatched(factionID)
+    local factionData = C_Reputation.GetFactionDataByID(factionID);
+    return factionData and factionData.isWatched
+end
+
 local function HideTooltip()
     GameTooltip:Hide();
+    EmbeddedItemTooltip:Hide();
 end
 
 
 local ReputationTooltipScripts = {};
 do
     --Derivative of Blizzard ReputationUtil.lua
+
+    function ReputationTooltipScripts.AppendClickInstruction(tooltip, factionID, asBottomLine)
+        local text = (IsFactionWatched(factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"];
+        if C_Reputation.IsMajorFaction(factionID) then
+            text = L["Instruction Click To View Renown"].."\n"..text;
+        end
+
+        if asBottomLine then
+            GameTooltip_SetBottomText(tooltip, text, GREEN_FONT_COLOR);
+        else
+            GameTooltip_AddColoredLine(tooltip, text, GREEN_FONT_COLOR, true);
+        end
+    end
 
     function ReputationTooltipScripts.TryAppendAccountReputationLineToTooltip(tooltip, factionID)
         if not tooltip or not factionID or not C_Reputation.IsAccountWideReputation(factionID) then
@@ -100,10 +119,14 @@ do
         tooltip:AddLine(REPUTATION_TOOLTIP_ACCOUNT_WIDE_LABEL, 0.000, 0.800, 1.000, wrapText);  --ACCOUNT_WIDE_FONT_COLOR
     end
 
+    function ReputationTooltipScripts.AppendProgressBar(tooltip, min, max, value)
+        GameTooltip_ShowProgressBar(tooltip, min, max, value, REPUTATION_PROGRESS_FORMAT:format(value, max));
+    end
+
     function ReputationTooltipScripts.ShowMajorFactionRenownTooltip(self)
         --Before reaching Paragon
-
-        local data = C_MajorFactions.GetMajorFactionData(self.factionID);
+        local factionID = self.factionID;
+        local data = C_MajorFactions.GetMajorFactionData(factionID);
         if not data then
             return;
         end
@@ -114,15 +137,15 @@ do
         tooltip:SetOwner(self, "ANCHOR_RIGHT");
         tooltip:SetText(data.name, 1, 1, 1);
 
-        ReputationTooltipScripts.TryAppendAccountReputationLineToTooltip(tooltip, data.factionID);
+        ReputationTooltipScripts.TryAppendAccountReputationLineToTooltip(tooltip, factionID);
 
         --GameTooltip_AddHighlightLine(tooltip, RENOWN_LEVEL_LABEL:format(data.renownLevel));
-        local maxLevel = API.GetMaxRenownLevel(self.factionID);
+        local maxLevel = API.GetMaxRenownLevel(factionID);
 
         tooltip:AddLine(string.format("%s %d/%d", LANDING_PAGE_RENOWN_LABEL, data.renownLevel, maxLevel), 1, 1, 1);
         local value = data.renownReputationEarned;
         local threshold = data.renownLevelThreshold;
-        GameTooltip_ShowProgressBar(tooltip, 0, threshold, value, REPUTATION_PROGRESS_FORMAT:format(value, threshold));
+        ReputationTooltipScripts.AppendProgressBar(tooltip, 0, threshold, value);
 
         tooltip:AddLine(" ");
         --[[
@@ -130,13 +153,13 @@ do
         tooltip:AddLine(" ");
         --]]
 
-        local nextRenownRewards = C_MajorFactions.GetRenownRewardsForLevel(data.factionID, C_MajorFactions.GetCurrentRenownLevel(data.factionID) + 1);
+        local nextRenownRewards = C_MajorFactions.GetRenownRewardsForLevel(factionID, C_MajorFactions.GetCurrentRenownLevel(factionID) + 1);
         if #nextRenownRewards > 0 then
             RenownRewardUtil.AddRenownRewardsToTooltip(tooltip, nextRenownRewards, callback);
         end
 
         tooltip:AddLine(" ");
-        GameTooltip_AddInstructionLine(tooltip, REPUTATION_BUTTON_TOOLTIP_CLICK_INSTRUCTION);
+        ReputationTooltipScripts.AppendClickInstruction(tooltip, factionID);
 
         tooltip:Show();
     end
@@ -175,7 +198,7 @@ do
                 if hasRewardPending then
                     value = value + threshold;
                 end
-                GameTooltip_ShowProgressBar(tooltip, 0, threshold, value, REPUTATION_PROGRESS_FORMAT:format(value, threshold));
+                ReputationTooltipScripts.AppendProgressBar(tooltip, 0, threshold, value);
             end
 
             local description = PARAGON_REPUTATION_TOOLTIP_TEXT:format(factionData.name);
@@ -192,7 +215,8 @@ do
             GameTooltip_AddQuestRewardsToTooltip(tooltip, rewardQuestID);
         end
 
-        GameTooltip_SetBottomText(tooltip, REPUTATION_BUTTON_TOOLTIP_CLICK_INSTRUCTION, GREEN_FONT_COLOR);
+        ReputationTooltipScripts.AppendClickInstruction(tooltip, factionID, true);
+
         --tooltip:Show();
         GameTooltip_OnShow(tooltip);    --Recalculating padding
 
@@ -201,9 +225,69 @@ do
         else
             self.UpdateTooltip = nil;
         end
+    end
 
-        --debug
-        print(factionID)
+    function ReputationTooltipScripts.ShowFriendshipReputationTooltip(self)
+        local factionID = self.factionID;
+        local friendshipData = C_GossipInfo.GetFriendshipReputation(factionID);
+        if not friendshipData or friendshipData.friendshipFactionID < 0 then
+            return
+        end
+
+        local tooltip = GameTooltip;
+
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+
+        local rankInfo = C_GossipInfo.GetFriendshipReputationRanks(friendshipData.friendshipFactionID);
+        if rankInfo.maxLevel > 0 then
+            GameTooltip_SetTitle(tooltip, friendshipData.name.." ("..rankInfo.currentLevel.." / "..rankInfo.maxLevel..")", HIGHLIGHT_FONT_COLOR);
+        else
+            GameTooltip_SetTitle(tooltip, friendshipData.name, HIGHLIGHT_FONT_COLOR);
+        end
+
+        ReputationTooltipScripts.TryAppendAccountReputationLineToTooltip(tooltip, factionID);
+
+        tooltip:AddLine(" ");
+        tooltip:AddLine(friendshipData.text, nil, nil, nil, true);
+
+        if friendshipData.nextThreshold then
+            local current = friendshipData.standing - friendshipData.reactionThreshold;
+            local max = friendshipData.nextThreshold - friendshipData.reactionThreshold;
+            local wrapText = true;
+            GameTooltip_AddHighlightLine(tooltip, friendshipData.reaction.." ("..current.." / "..max..")", wrapText);
+        else
+            local wrapText = true;
+            GameTooltip_AddHighlightLine(tooltip, friendshipData.reaction, wrapText);
+        end
+
+        tooltip:AddLine(" ");
+        ReputationTooltipScripts.AppendClickInstruction(tooltip, factionID);
+
+        tooltip:Show();
+    end
+
+    function ReputationTooltipScripts.ShowStandardTooltip(self)
+        local factionID = self.factionID;
+        local factionData = factionID and API.GetReputationProgress(factionID);
+        if not factionData then return end;
+
+        local tooltip = GameTooltip;
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+
+        tooltip:SetText(factionData.name, 1, 1, 1);
+
+        ReputationTooltipScripts.TryAppendAccountReputationLineToTooltip(tooltip, factionID);
+
+        tooltip:AddLine(API.GetReputationStandingText(factionData.reaction), 1, 1, 1, true);
+
+        if not factionData.isFull then
+            ReputationTooltipScripts.AppendProgressBar(tooltip, 0, factionData.maxValue, factionData.currentValue);
+        end
+
+        tooltip:AddLine(" ");
+        ReputationTooltipScripts.AppendClickInstruction(tooltip, factionID);
+
+        tooltip:Show();
     end
 end
 
@@ -442,12 +526,12 @@ do
     end
 
     function LandingPageMajorFactionButtonMixin:OnLeave()
-        self:HideTooltip();
+        HideTooltip();
     end
 
-    function LandingPageMajorFactionButtonMixin:OnClick()
+    function LandingPageMajorFactionButtonMixin:OnClick(button)
         if self.onClickFunc then
-            self.onClickFunc(self);
+            self.onClickFunc(self, button);
         end
     end
 
@@ -458,18 +542,12 @@ do
         if C_Reputation.IsFactionParagon(self.factionID) then
             ReputationTooltipScripts.ShowParagonRewardsTooltip(self);
         elseif self.reputationType == 2 then    --Friendship
-            local canClickForOptions = true;
-            ReputationEntryMixin.ShowFriendshipReputationTooltip(self, self.factionID, "ANCHOR_RIGHT", canClickForOptions);
+            ReputationTooltipScripts.ShowFriendshipReputationTooltip(self);
         elseif self.reputationType == 3 then    --MajorFaction
             ReputationTooltipScripts.ShowMajorFactionRenownTooltip(self);
         elseif self.reputationType == 1 then    --Standard
-            ReputationEntryMixin.ShowStandardTooltip(self);
+            ReputationTooltipScripts.ShowStandardTooltip(self);
         end
-    end
-
-    function LandingPageMajorFactionButtonMixin:HideTooltip()
-        GameTooltip:Hide();
-        EmbeddedItemTooltip:Hide();
     end
 
     function LandingPageMajorFactionButtonMixin:SetMinimized(state)
@@ -523,7 +601,14 @@ do
 end
 
 
-local function FactionButton_OnClickFunc(self)
+local function FactionButton_OnClickFunc(self, button)
+    if button == "LeftButton" and IsShiftKeyDown() then
+        local watchedFactionID = (IsFactionWatched(self.factionID) and 0) or self.factionID;
+        C_Reputation.SetWatchedFactionByID(watchedFactionID);       --Trigger UPDATE_FACTION
+        HideTooltip();
+        return
+    end
+
     if FactionTab then
         FactionTab:DisplayMajorFactionDetail(self.factionID);
     end
@@ -548,31 +633,55 @@ local CreateRenownItemButton;
 do
     local RenownItemButtonMixin = {};
 
+    function RenownItemButtonMixin:GreyOut(state)
+        if state then
+            self.RewardIcon:SetDesaturated(true);
+            self.RewardIcon:SetVertexColor(0.8, 0.8, 0.8);
+            self.Name:SetTextColor(0.6, 0.6, 0.6);
+        else
+            self.RewardIcon:SetDesaturated(false);
+            self.RewardIcon:SetVertexColor(1, 1, 1);
+            self.Name:SetTextColor(0.92, 0.92, 0.92);
+        end
+    end
+
     function RenownItemButtonMixin:SetRewardInfo(info)
         self.RewardIcon:SetTexture(info.icon);
         self.Name:SetText(info.name);
         self.name = info.name;
         self.description = info.description;
         self.isAccountUnlock = info.isAccountUnlock;
+        self:GreyOut(self.locked);
 
+        --The following fields always seem to be nil
+        self.type, self.id = nil, nil;
         if info.itemID then
-            
+            self.type = "item";
+            self.id = info.itemID;
         elseif info.spellID then
-
+            self.type = "spell";
+            self.id = info.spellID;
         elseif info.mountID then
-
+            self.type = "mount";
+            self.id = info.mountID;
         elseif info.transmogID then
-
+            self.type = "transmog";
+            self.id = info.transmogID;
         elseif info.transmogSetID then
-
+            self.type = "transmogSet";
+            self.id = info.transmogSetID;
         elseif info.transmogIllusionSourceID then
-
+            self.type = "illusion";
+            self.id = info.transmogIllusionSourceID;
         elseif info.titleMaskID then
-
+            self.type = "title";
+            self.id = info.titleMaskID;
         end
     end
 
     function RenownItemButtonMixin:OnEnter()
+        self.Highlight:Show();
+
         local tooltip = GameTooltip;
         tooltip:SetOwner(self, "ANCHOR_RIGHT");
         tooltip:SetText(self.name, 1, 1, 1);
@@ -585,12 +694,14 @@ do
     end
 
     function RenownItemButtonMixin:OnLeave()
+        self.Highlight:Hide();
         HideTooltip();
     end
 
     function CreateRenownItemButton(parent)
         local f = CreateFrame("Button", nil, parent);
         f:SetSize(256, 32);
+
         f.RewardIcon = f:CreateTexture(nil, "ARTWORK");
         f.RewardIcon:SetSize(30, 30);
         f.RewardIcon:SetPoint("LEFT", f, "LEFT", 2, 0);
@@ -607,12 +718,22 @@ do
         f.ItemBorder:SetPoint("CENTER", f.RewardIcon, "CENTER", 0, 0);
         f.ItemBorder:SetTexture("Interface/AddOns/Plumber/Art/Frame/ItemBorder");
         f.ItemBorder:SetTexCoord(80/512, 160/512, 0/512, 80/512);
-        API.DisableSharpening(f.ItemBorder)
+        API.DisableSharpening(f.ItemBorder);
+
+        f.Highlight = f:CreateTexture(nil, "BACKGROUND");
+        f.Highlight:Hide();
+        f.Highlight:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.Highlight:SetSize(288, 36);
+        f.Highlight:SetTexture("Interface/AddOns/Plumber/Art/Frame/HorizontalButtonHighlight");
+        f.Highlight:SetBlendMode("ADD");
+        f.Highlight:SetVertexColor(51/255, 29/255, 17/255);
 
         f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         f.Name:SetPoint("LEFT", f, "LEFT", 40, 0);
         f.Name:SetJustifyH("LEFT");
         f.Name:SetTextColor(0.92, 0.92, 0.92);
+        f.Name:SetMaxLines(2);
+        f.Name:SetWidth(216);
 
         API.Mixin(f, RenownItemButtonMixin);
         f:SetScript("OnEnter", f.OnEnter);
@@ -633,9 +754,16 @@ do
     };
 
     function FactionTabMixin:Refresh()
+        local focus = self:IsMouseOver() and API.GetMouseFocus();
+
         self.factionDirty = nil;
         for _, button in ipairs(FactionButtons) do
             button:Refresh();
+            if button == focus then
+                if button:IsMouseMotionFocus() and button.onClickFunc then
+                    button:OnEnter();
+                end
+            end
         end
 
         self:UpdateLeftWidgets();
@@ -664,7 +792,8 @@ do
 
     function FactionTabMixin:OnEvent(event, ...)
         if event == "UPDATE_FACTION" or event == "QUEST_TURNED_IN" or event == "MAJOR_FACTION_RENOWN_LEVEL_CHANGED" or event == "MAJOR_FACTION_UNLOCKED" then
-            self:RequestFullUpdate();
+            local updateRewards = event == "MAJOR_FACTION_RENOWN_LEVEL_CHANGED" or event == "MAJOR_FACTION_UNLOCKED";
+            self:RequestFullUpdate(updateRewards);
         elseif event == "GLOBAL_MOUSE_UP" then
             local button = ...
             if button == "RightButton" and self:IsMouseOver() and not self.isOverview then
@@ -678,15 +807,27 @@ do
         if self.t >= 0.2 then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
+
             if self.factionDirty then
                 self.factionDirty = nil;
                 self:Refresh();
             end
+
+            if self.rewardsDirty then
+                self.rewardsDirty = nil;
+                if self:IsViewingFactionDetail() then
+                    local retainPosition = true;
+                    self:UpdateRewardsList(retainPosition);
+                end
+            end
         end
     end
 
-    function FactionTabMixin:RequestFullUpdate()
+    function FactionTabMixin:RequestFullUpdate(updateRewards)
         self.factionDirty = true;
+        if updateRewards then
+            self.rewardsDirty = true;
+        end
         self.t = 0;
         self:SetScript("OnUpdate", self.OnUpdate);
     end
@@ -714,6 +855,10 @@ do
         self:UpdateRightSection();
     end
 
+    function FactionTabMixin:IsViewingFactionDetail()
+        return not self.isOverview
+    end
+
     function FactionTabMixin:InitDetailFrame()
         if self.DetailFrame then return end;
 
@@ -721,6 +866,7 @@ do
         self.DetailFrame = DetailFrame;
         DetailFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 8, -8);
         DetailFrame:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -8, 8);
+        --DetailFrame:SetHyperlinksEnabled(true);
 
 
         do  --LeftSection
@@ -761,9 +907,30 @@ do
                 fs:SetJustifyH("CENTER");
                 fs:SetJustifyV("TOP");
                 if i == 1 then
+                    --Faction Name
                     fs:SetPoint("TOP", ProgressDisplay, "BOTTOM", 0, -24);
                     fs:SetSpacing(2);
                     r, g, b = 0.906, 0.737, 0.576;
+
+                    --Mouseover faction name to show faction description
+                    local LeftNameArea = CreateFrame("Frame", nil, DetailFrame);
+                    self.LeftNameArea = LeftNameArea;
+                    LeftNameArea:SetPoint("TOPLEFT", fs, "TOPLEFT", 0, 4);
+                    LeftNameArea:SetPoint("BOTTOMRIGHT", fs, "BOTTOMRIGHT", 0, -4);
+                    LeftNameArea:SetScript("OnEnter", function()
+                        local factionID = self.selectedFactionID;
+                        local factionData = factionID and C_Reputation.GetFactionDataByID(factionID);
+                        if factionData and factionData.description then
+                            local tooltip = GameTooltip;
+                            tooltip:SetOwner(LeftNameArea, "ANCHOR_RIGHT");
+                            tooltip:SetText(factionData.name, 1, 1, 1);
+                            tooltip:AddLine(factionData.description, 1, 0.82, 0, true);
+                            tooltip:Show();
+                        end
+                    end);
+                    LeftNameArea:SetScript("OnLeave", function()
+                        HideTooltip();
+                    end);
                 else
                     fs:SetPoint("TOP", ProgressDisplay["Text"..(i - 1)], "BOTTOM", 0, -6);
                     if i == 2 then
@@ -844,6 +1011,8 @@ do
                 button.name = nil;
                 button.description = nil;
                 button.isAccountUnlock = nil;
+                button.type = nil;
+                button.id = nil;
             end
 
             RenownItemScrollView:AddTemplate("Item", RenownItemButton_Create, nil, RenownItemButton_OnRemove);
@@ -913,7 +1082,7 @@ do
         end
     end
 
-    function FactionTabMixin:UpdateRightSection()
+    function FactionTabMixin:UpdateRewardsList(retainPosition, scrollToFirstLockedReward)
         local factionID = self.selectedFactionID;
         local renownLevelsInfo = C_MajorFactions.GetRenownLevels(factionID);
         local rewards;
@@ -947,6 +1116,7 @@ do
                         dataIndex = n,
                         templateKey = "Item",
                         setupFunc = function(obj)
+                            obj.locked = v.locked;
                             obj:SetRewardInfo(rewardInfo);
                         end,
                         top = top,
@@ -954,7 +1124,7 @@ do
                     };
 
                     if v.locked and (not firstLockedIndex) then
-                        firstLockedIndex = n;
+                        firstLockedIndex = n - 1;
                     end
 
                     if index == 1 then
@@ -996,11 +1166,16 @@ do
             end
         end
 
-        self.RenownItemScrollView:SetContent(content);
+        self.RenownItemScrollView:SetContent(content, retainPosition);
 
-        print(firstLockedIndex)
-        firstLockedIndex = firstLockedIndex or n;
-        self.RenownItemScrollView:ScrollToContent(firstLockedIndex);
+        if scrollToFirstLockedReward then
+            firstLockedIndex = firstLockedIndex or n;
+            self.RenownItemScrollView:SnapToContent(firstLockedIndex);
+        end
+    end
+
+    function FactionTabMixin:UpdateRightSection()
+        self:UpdateRewardsList(false, true);
     end
 end
 
@@ -1035,7 +1210,7 @@ local function CreateFactionTab(factionTab)
                 offsetX = offsetX + FACTION_BUTTON_SIZE + 0.5 * FACTION_BUTTON_GAP_H;
                 local childOffsetY = offsetY - 0.5 * (FACTION_BUTTON_SIZE - SUBFACTION_BUTTON_SIZE);
                 for _, v in ipairs(factionInfo.subFactions) do
-                    local widget = CreateFactionButton(OverviewFrame);
+                    local widget = CreateFactionButton(OverviewFrame, true);
                     widget:SetMinimized(true);
                     widget:SetPoint("TOPLEFT", OverviewFrame, "TOPLEFT", offsetX, childOffsetY);
                     offsetX = offsetX + 0.5 * (FACTION_BUTTON_SIZE + FACTION_BUTTON_GAP_H);

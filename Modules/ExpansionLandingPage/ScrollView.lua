@@ -151,6 +151,13 @@ do  --ScrollView Basic Content Render
             if not toDataIndex then
                 if (v.top <= bottom and v.bottom >= bottom) or (v.top >= bottom) then
                     toDataIndex = dataIndex;
+                    local nextIndex = dataIndex + 1;
+                    v = self.content[nextIndex];
+                    if v then
+                        if v.top <= bottom then
+                            toDataIndex = nextIndex;
+                        end
+                    end
                     break
                 end
             end
@@ -366,6 +373,7 @@ do  --ScrollView Smooth Scroll
 
     function ScrollViewMixin:SnapTo(value)
         --No Easing
+        value = Clamp(value, 0, self.range);
         self:SetOffset(value);
         self.scrollTarget = value;
         self.isScrolling = true;
@@ -407,8 +415,18 @@ do  --ScrollView Scroll Behavior
     end
 
     function ScrollViewMixin:ScrollToContent(contentIndex)
+        if contentIndex < 1 then contentIndex = 1 end;
+
         if self.content[contentIndex] then
             self:ScrollTo(self.content[contentIndex].top);
+        end
+    end
+
+    function ScrollViewMixin:SnapToContent(contentIndex)
+        if contentIndex < 1 then contentIndex = 1 end;
+
+        if self.content[contentIndex] then
+            self:SnapTo(self.content[contentIndex].top);
         end
     end
 

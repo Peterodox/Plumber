@@ -1613,7 +1613,7 @@ do  -- Reputation
     local function GetReputationProgress(factionID)
         if not factionID then return end;
 
-        local level, isFull, currentValue, maxValue, name, reputationType, isUnlocked;
+        local level, isFull, currentValue, maxValue, name, reputationType, isUnlocked, reaction;
 
         local repInfo = GetFriendshipReputation(factionID);
         local paragonRepEarned, paragonThreshold, rewardQuestID, hasRewardPending = GetFactionParagonInfo(factionID);
@@ -1621,6 +1621,7 @@ do  -- Reputation
         if repInfo and repInfo.friendshipFactionID and repInfo.friendshipFactionID > 0 then
             reputationType = 2;
             name = repInfo.name;
+            reaction = repInfo.reaction;
             isUnlocked = true;
             if repInfo.nextThreshold then
                 currentValue = repInfo.standing - repInfo.reactionThreshold;
@@ -1680,8 +1681,8 @@ do  -- Reputation
                 end
 
                 local zeroLevel = 4;    --Neutral
-                level = repInfo.reaction;
-                level = level - zeroLevel;
+                reaction = repInfo.reaction;
+                level = reaction - zeroLevel;
                 isFull = level >= 8; --TEMP DEBUG
             end
         end
@@ -1696,6 +1697,7 @@ do  -- Reputation
                 reputationType = reputationType,    --1:Standard, 2:Friendship
                 rewardPending = hasRewardPending,
                 isUnlocked = isUnlocked,
+                reaction = reaction,
             };
 
             return tbl
@@ -1714,6 +1716,14 @@ do  -- Reputation
         return 0, 1, 0
     end
     API.GetParagonValuesAndLevel = GetParagonValuesAndLevel;
+
+
+    local function GetReputationStandingText(reaction)
+        local gender = UnitSex("player");
+        local reputationStandingtext = GetText("FACTION_STANDING_LABEL"..reaction, gender);    --GetText: Game API that returns localized texts
+        return reputationStandingtext
+    end
+    API.GetReputationStandingText = GetReputationStandingText;
 
 
     local function GetFactionStatusText(factionID)
@@ -1778,8 +1788,7 @@ do  -- Reputation
             end
         elseif (standingID and standingID > 0) then
             isCapped = standingID == 8;  --MAX_REPUTATION_REACTION
-            local gender = UnitSex("player");
-		    factionStandingtext = GetText("FACTION_STANDING_LABEL"..standingID, gender);    --GetText: Game API that returns localized texts
+		    factionStandingtext = GetReputationStandingText(standingID);
         end
 
         local rolloverText; --(0/24000)

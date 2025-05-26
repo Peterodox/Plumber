@@ -403,6 +403,7 @@ L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclai
 L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
+L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Click to view Renown>";
 
 
 --Plumber AddOn Settings
