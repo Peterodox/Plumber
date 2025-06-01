@@ -1,5 +1,7 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="Basic.lua"/>
+	<Script file="DataCache.lua"/>
+	<Script file="ActivityData.lua"/>
 	<Script file="ScrollView.lua"/>
 	<Script file="GreatVault.lua"/>
 	<Script file="ItemUpgrade.lua"/>

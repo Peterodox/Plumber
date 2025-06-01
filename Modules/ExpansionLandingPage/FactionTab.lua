@@ -292,11 +292,6 @@ do
 end
 
 
-local function NotificationCheck()
-    return false
-end
-
-
 local CreateFactionIconButton;
 do
     local FactionIconButtonMixin = {};
@@ -614,7 +609,6 @@ local function FactionButton_OnClickFunc(self, button)
     end
 end
 
-
 local function CreateFactionButton(parent, clickable)
     local f = CreateFrame("Button", nil, parent, "PlumberLandingPageMajorFactionButtonTemplate");
     API.Mixin(f, LandingPageMajorFactionButtonMixin);
@@ -743,6 +737,7 @@ do
     end
 end
 
+
 local FactionTabMixin = {};
 do
     local DynamicEvents = {
@@ -833,6 +828,8 @@ do
     end
 
     function FactionTabMixin:DisplayOverview()
+        if self.isOverview then return end;
+
         self.isOverview = true;
         self.selectedFactionID = nil;
         LandingPageUtil.ShowLeftFrame(true);
@@ -1007,7 +1004,7 @@ do
                 return CreateRenownItemButton(RenownItemScrollView)
             end
 
-            local function RenownItemButton_OnRemove(button)
+            local function RenownItemButton_OnRemoved(button)
                 button.name = nil;
                 button.description = nil;
                 button.isAccountUnlock = nil;
@@ -1015,7 +1012,7 @@ do
                 button.id = nil;
             end
 
-            RenownItemScrollView:AddTemplate("Item", RenownItemButton_Create, nil, RenownItemButton_OnRemove);
+            RenownItemScrollView:AddTemplate("Item", RenownItemButton_Create, nil, RenownItemButton_OnRemoved);
 
 
             local function Divider_Create()
@@ -1179,6 +1176,7 @@ do
     end
 end
 
+
 local function CreateFactionTab(factionTab)
     --local majorFactionIDs = C_MajorFactions.GetMajorFactionIDs(10);
 
@@ -1241,6 +1239,15 @@ local function CreateFactionTab(factionTab)
     OverviewFrame:SetPoint("TOPLEFT", TabContainer, "TOPLEFT", 0.5*(TabContainer:GetWidth() - maxSpanX), -0.5*(TabContainer:GetHeight() - maxSpanY));
 end
 
+local function NotificationCheck()
+    return false
+end
+
+local function FactionTab_OnSelected()
+    if FactionTab then
+        FactionTab:DisplayOverview();
+    end
+end
 
 LandingPageUtil.AddTab(
     {
@@ -1250,5 +1257,6 @@ LandingPageUtil.AddTab(
         initFunc = CreateFactionTab,
         notificationGetter = NotificationCheck,
         useCustomLeftFrame = true,
+        onTabSelected = FactionTab_OnSelected,
     }
 );

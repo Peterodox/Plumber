@@ -2132,6 +2132,77 @@ do  -- Quest
             return false
         end
     end
+
+    function API.GetQuestProgressPercent(questID, asText)
+        --Unify progression text and bar
+        --C_QuestLog.GetNumQuestObjectives
+
+        local value, max = 0, 0;
+        local questLogIndex = questID and C_QuestLog.GetLogIndexForQuestID(questID);
+
+        if questLogIndex then
+            local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
+            local text, objectiveType, finished, fulfilled, required;
+            for objectiveIndex = 1, numObjectives do
+                text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
+                --print(questID, GetQuestName(questID), numObjectives, finished, fulfilled, required)
+                if objectiveType == "progressbar" then
+                    fulfilled = 0.01 * GetQuestProgressBarPercent(questID);
+                    required = 1;
+                else
+                    if not finished then
+                        if fulfilled == required then
+                            --"Complete the scenario Nightfall" fulfilled = required = 1 when accepting the quest
+                            fulfilled = 0;
+                        end
+                    end
+                end
+                value = value + fulfilled;
+                max = max + required;
+            end
+        else
+            return
+        end
+
+        if max == 0 then
+            value = 0;
+            max = 1;
+        end
+
+        if asText then
+            return floor(100 * value / max).."%"
+        else
+            return value / max
+        end
+    end
+
+
+    function YeetQuestForMap(uiMapID)
+        --Only contains quests with visible marker on the map
+        if not uiMapID then
+            uiMapID = C_Map.GetBestMapForUnit("player");
+        end
+
+        local function PrintQuests(quests)
+            if not quests then return end;
+            local questID, name;
+            for k, v in ipairs(quests) do
+                questID = v.questID;
+                name = GetQuestName(questID);
+                if name then
+                    print(questID, name);
+                else
+                    CallbackRegistry:LoadQuest(questID, function(_questID)
+                        print(questID, GetQuestName(questID));
+                    end);
+                end
+            end
+        end
+
+        PrintQuests(C_TaskQuest.GetQuestsOnMap(uiMapID));
+        print(" ");
+        PrintQuests(C_QuestLog.GetQuestsOnMap(uiMapID));
+    end
 end
 
 do  -- Tooltip

@@ -217,12 +217,12 @@ do  --ScrollView Basic Content Render
         end
         self.range = range;
 
-        if range > 0 then
-            self:SetClipsChildren(true);
-            self:SetScript("OnMouseWheel", self.OnMouseWheel);
-        else
+        if range <= 0 and self.smartClipsChildren then
             self:SetClipsChildren(false);
             self:SetScript("OnMouseWheel", nil);
+        else
+            self:SetClipsChildren(true);
+            self:SetScript("OnMouseWheel", self.OnMouseWheel);
         end
     end
 
@@ -239,7 +239,7 @@ do  --ScrollView Basic Content Render
 
         if retainPosition then
             local offset = self.scrollTarget;
-            if offset > self.range then
+            if (not self.allowOvershoot) and offset > self.range then
                 offset = self.range;
             end
             self.scrollTarget = offset;
@@ -452,6 +452,18 @@ do  --ScrollView Scroll Behavior
             end
         end
     end
+
+    function ScrollViewMixin:SetSmartClipsChildren(state)
+        --If true, SetClipsChildren(false)
+        --This affects texture rendering
+        self.smartClipsChildren = state;
+    end
+
+    function ScrollViewMixin:SetAllowOvershootAfterRangeChange(state)
+        --If the entries are collapsible, the header button's position may change with scroll range
+        --If true, the button will retain its position until scroll
+        self.allowOvershoot = state;
+    end
 end
 
 do  --ScrollView Callback
@@ -495,6 +507,15 @@ do  --ScrollView Callback
         self.onScrollStopCallback = onScrollStopCallback;
     end
 end
+
+do  --ScrollView Content Update
+    function ScrollViewMixin:CallObjectMethod(templateKey, method, ...)
+        for _, object in ipairs(self.pools[templateKey].activeObjects) do
+            object[method](object, ...)
+        end
+    end
+end
+
 
 --[[
 do  --SoftTargetName

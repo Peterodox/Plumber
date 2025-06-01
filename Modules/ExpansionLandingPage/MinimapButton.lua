@@ -15,3 +15,6 @@ local function ToggleExpansionLandingPage_New()
     PlumberExpansionLandingPage:ToggleUI();
 end
 ToggleExpansionLandingPage = ToggleExpansionLandingPage_New;
+
+
+_G.Plumber_ToggleLandingPage = ToggleExpansionLandingPage_New;

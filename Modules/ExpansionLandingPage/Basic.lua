@@ -14,6 +14,29 @@ local tremove = table.remove;
 local IsShiftKeyDown = IsShiftKeyDown;
 
 
+local function SetupThreeSliceBackground(frame, textureFile, leftOffset, rightOffset)
+    if not frame.Left then
+        frame.Left = frame:CreateTexture(nil, "BACKGROUND");
+    end
+    frame.Left:SetPoint("LEFT", frame, "LEFT", leftOffset or 0, 0);
+    frame.Left:SetTexture(textureFile);
+
+    if not frame.Right then
+        frame.Right = frame:CreateTexture(nil, "BACKGROUND");
+    end
+    frame.Right:SetPoint("RIGHT", frame, "RIGHT", rightOffset or 0, 0);
+    frame.Right:SetTexture(textureFile);
+
+    if not frame.Center then
+        frame.Center = frame:CreateTexture(nil, "BACKGROUND");
+        frame.Center:SetPoint("TOPLEFT", frame.Left, "TOPRIGHT", 0, 0);
+        frame.Center:SetPoint("BOTTOMRIGHT", frame.Right, "BOTTOMLEFT", 0, 0);
+    end
+    frame.Center:SetTexture(textureFile);
+end
+API.SetupThreeSliceBackground = SetupThreeSliceBackground;
+
+
 local ExpansionThemeFrameMixin = {};
 do
     function ExpansionThemeFrameMixin:ShowCloseButton(state)
@@ -110,23 +133,12 @@ do
         f.Name:SetJustifyH("CENTER");
         f.Name:SetTextColor(0.804, 0.667, 0.498);
 
-        f.Left = f:CreateTexture(nil, "BACKGROUND");
-        f.Left:SetPoint("LEFT", f, "LEFT", -3, 0);
+        SetupThreeSliceBackground(f, TEXTURE_FILE, -3, 3);
         f.Left:SetSize(20, 32);
         f.Left:SetTexCoord(694/1024, 734/1024, 48/512, 112/512);
-        f.Right = f:CreateTexture(nil, "BACKGROUND");
-        f.Right:SetPoint("RIGHT", f, "RIGHT", 3, 0);
         f.Right:SetSize(20, 32);
         f.Right:SetTexCoord(910/1024, 950/1024, 48/512, 112/512);
-        f.Center = f:CreateTexture(nil, "BACKGROUND");
-        f.Center:SetPoint("TOPLEFT", f.Left, "TOPRIGHT", 0, 0);
-        f.Center:SetPoint("BOTTOMRIGHT", f.Right, "BOTTOMLEFT", 0, 0);
         f.Center:SetTexCoord(734/1024, 910/1024, 48/512, 112/512);
-
-        local tex = TEXTURE_FILE;
-        f.Left:SetTexture(tex);
-        f.Right:SetTexture(tex);
-        f.Center:SetTexture(tex);
 
         if name then
             f:SetName(name);
@@ -177,6 +189,10 @@ do  --TabUtil
             if tabInfo.key == tabKey then
                 if not tabInfo.useCustomLeftFrame then
                     LandingPageUtil.ShowLeftFrame(true);
+                end
+
+                if tabInfo.onTabSelected then
+                    tabInfo.onTabSelected();
                 end
             end
         end
@@ -241,269 +257,6 @@ do  --Atlas
 end
 
 
-do  --ScrollFrame
-    local ObjectPoolMixin = {};
-
-    function ObjectPoolMixin:ReleaseAll()
-        for _, obj in ipairs(self.activeObjects) do
-            obj:Hide();
-            obj:ClearAllPoints();
-            if self.onRemoved then
-                self.onRemoved(obj);
-            end
-        end
-
-        local tbl = {};
-        for k, object in ipairs(self.objects) do
-            tbl[k] = object;
-        end
-        self.unusedObjects = tbl;
-        self.activeObjects = {};
-    end
-
-    function ObjectPoolMixin:ReleaseObject(object)
-        object:Hide();
-        object:ClearAllPoints();
-
-        if self.onRemoved then
-            self.onRemoved(object);
-        end
-
-        local found;
-        for k, obj in ipairs(self.activeObjects) do
-            if obj == object then
-                found = true;
-                tremove(self.activeObjects, k);
-                break
-            end
-        end
-
-        if found then
-            tinsert(self.unusedObjects, object);
-        end
-    end
-
-    function ObjectPoolMixin:Acquire()
-        local object = tremove(self.unusedObjects);
-        if not object then
-            object = self.create();
-            object.Release = self.Object_Release;
-            tinsert(self.objects, object);
-        end
-        tinsert(self.activeObjects, object);
-        if self.onAcquired then
-            self.onAcquired(object);
-        end
-        object:Show();
-        return object
-    end
-
-    local function CraeteObjectPool(create, onAcquired, onRemoved)
-        local pool = {};
-        API.Mixin(pool, ObjectPoolMixin);
-
-        pool.objects = {};
-        pool.activeObjects = {};
-        pool.unusedObjects = {};
-
-        pool.create = create;
-        pool.onAcquired = onAcquired;
-        pool.onRemoved = onRemoved;
-
-        function pool.Object_Release(obj)
-            pool:ReleaseObject(obj);
-        end
-
-        return pool
-    end
-
-
-    local ScrollViewMixin = {};
-
-    function ScrollViewMixin:SetOffset(offset)
-        self.offset = offset;
-        self.toOffset = offset;
-        self.ScrollRef:SetPoint("TOP", self, "TOP", 0, offset);
-        self:UpdateView();
-    end
-
-    function ScrollViewMixin:ScrollToTop()
-        self:SetOffset(0);
-    end
-
-    function ScrollViewMixin:ScrollToBottom()
-        self:SetOffset(self.range);
-    end
-
-    function ScrollViewMixin:AddTemplate(templateKey, create, onAcquired, onRemoved)
-        self.pools[templateKey] = CraeteObjectPool(create, onAcquired, onRemoved);
-    end
-
-    function ScrollViewMixin:ReleaseAllObjects()
-        self.indexedObjects = {};
-        for templateKey, pool in pairs(self.pools) do
-            pool:ReleaseAll();
-        end
-    end
-
-    function ScrollViewMixin:GetDebugCount()
-        local total = 0;
-        local active = 0;
-        local unused = 0;
-        for templateKey, pool in pairs(self.pools) do
-            total = total + #pool.objects;
-            active = active + #pool.activeObjects;
-            unused = unused + #pool.unusedObjects;
-        end
-        print(total, active, unused);
-    end
-
-    function ScrollViewMixin:OnSizeChanged()
-        self.viewportSize = API.Round(self:GetHeight());
-    end
-
-    function ScrollViewMixin:AcquireObject(templateKey)
-        return self.pools[templateKey]:Acquire();
-    end
-
-    function ScrollViewMixin:UpdateView()
-        local top = self.offset;
-        local bottom = self.offset + self.viewportSize;
-        local fromDataIndex;
-        local toDataIndex;
-
-        for dataIndex, v in ipairs(self.content) do
-            if not fromDataIndex then
-                if v.top >= top or v.bottom >= top then
-                    fromDataIndex = dataIndex;
-                end
-            end
-
-            if not toDataIndex then
-                if (v.top <= bottom and v.bottom >= bottom) or (v.top >= bottom) then
-                    toDataIndex = dataIndex;
-                    break
-                end
-            end
-        end
-        toDataIndex = toDataIndex or #self.content;
-
-        for dataIndex, obj in pairs(self.indexedObjects) do
-            if dataIndex < fromDataIndex or dataIndex > toDataIndex then
-                obj:Release();
-                self.indexedObjects[dataIndex] = nil;
-            end
-        end
-
-        local obj;
-        local contentData;
-
-        if fromDataIndex then
-            for dataIndex = fromDataIndex, toDataIndex do
-                if self.indexedObjects[dataIndex] then
-
-                else
-                    contentData = self.content[dataIndex];
-                    obj = self:AcquireObject(contentData.templateKey);
-                    if obj then
-                        if contentData.setupFunc then
-                            contentData.setupFunc(obj);
-                        end
-                        obj:SetPoint(contentData.point or "TOP", self.ScrollRef, "TOP", contentData.offsetX or 0, -contentData.top);
-                        self.indexedObjects[dataIndex] = obj;
-                    end
-                end
-            end
-        end
-    end
-
-    function ScrollViewMixin:OnMouseWheel(delta)
-        if (delta > 0 and self.toOffset <= 0) or (delta < 0 and self.toOffset >= self.range) then
-            return
-        end
-
-        local a = IsShiftKeyDown() and 2 or 1;
-        self.toOffset = self.toOffset - self.stepSize * a * delta;
-
-        if self.toOffset < 0 then
-            self.toOffset = 0;
-        elseif self.toOffset > self.range then
-            self.toOffset = self.range;
-        end
-
-        self:SetOffset(self.toOffset);
-    end
-
-    function ScrollViewMixin:SetStepSize(stepSize)
-        self.stepSize = stepSize;
-    end
-
-    function ScrollViewMixin:SetScrollRange(range)
-        if range < 0 then
-            range = 0;
-        end
-        self.range = range;
-
-        if range > 0 then
-            self:SetClipsChildren(true);
-            self:SetScript("OnMouseWheel", self.OnMouseWheel);
-        else
-            self:SetClipsChildren(false);
-            self:SetScript("OnMouseWheel", nil);
-        end
-    end
-
-    function ScrollViewMixin:SetContent(content, retainPosition)
-        self.content = content or {};
-    
-        if #self.content > 0 then
-            local range = content[#self.content].bottom - self.viewportSize + self.bottomOvershoot;
-            self:SetScrollRange(range);
-        else
-            self:SetScrollRange(0);
-        end
-        self:ReleaseAllObjects();
-
-        if retainPosition then
-            local offset = self.toOffset;
-            if offset > self.range then
-                offset = self.range;
-            end
-            self:SetOffset(offset);
-        else
-            self:ScrollToTop();
-        end
-    end
-
-    function ScrollViewMixin:SetBottomOvershoot(bottomOvershoot)
-        self.bottomOvershoot = bottomOvershoot;
-    end
-
-    local function CreateScrollView(parent)
-        local f = CreateFrame("Frame", nil, parent);
-        API.Mixin(f, ScrollViewMixin);
-        f:SetClipsChildren(true);
-
-        f.ScrollRef = CreateFrame("Frame", nil, f);
-        f.ScrollRef:SetSize(4, 4);
-        f.ScrollRef:SetPoint("TOP", f, "TOP", 0, 0);
-
-        f.pools = {};
-        f.content = {};
-        f.indexedObjects = {};
-        f.offset = 0;
-        f.toOffset = 0;
-        f.range = 0;
-        f.viewportSize = 0;
-        f:SetStepSize(32);
-        f:SetBottomOvershoot(0);
-
-        f:SetScript("OnMouseWheel", f.OnMouseWheel);
-
-        return f
-    end
-    API.CreateScrollView = CreateScrollView;
-end
 
 
 --[[
