@@ -406,6 +406,8 @@ L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to r
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Click to view Renown>";
 L["Not On Quest"] = "You are not on this quest";
 L["Raids"] = RAIDS or "Raids";
+L["Instruction Track Achievement"] = "<Shift click to track this item>";
+L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
 
 
 --Plumber AddOn Settings
