@@ -19,7 +19,7 @@ local GreatVaultButtonMixin = {};
 do
     function GreatVaultButtonMixin:SetUnlockedState()
         self.unlocked = true;
-        self.Background:SetTexCoord(700/1024, 828/1024, 112/512, 176/512);
+        self.Background:SetTexCoord(700/1024, 828/1024, 112/1024, 176/1024);
 
         if self:IsRewardAtHighestTier() then
             self.Text:SetTextColor(1, 1, 1);
@@ -32,7 +32,7 @@ do
 
     function GreatVaultButtonMixin:SetLockedState()
         self.unlocked = false;
-        self.Background:SetTexCoord(828/1024, 956/1024, 112/512, 176/512);
+        self.Background:SetTexCoord(828/1024, 956/1024, 112/1024, 176/1024);
         self.Text:SetTextColor(0.5, 0.5, 0.5);
         self.Text:SetText("0/0");
     end
@@ -98,7 +98,7 @@ local function CreateButton(parent)
     f.Background = f:CreateTexture(nil, "BACKGROUND");
     f.Background:SetAllPoints(true);
     f.Background:SetTexture("Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW");
-    f.Background:SetTexCoord(700/1024, 828/1024, 112/512, 176/512);
+    f.Background:SetTexCoord(700/1024, 828/1024, 112/1024, 176/1024);
 
     f:SetScript("OnEnter", f.OnEnter);
     f:SetScript("OnLeave", f.OnLeave);
@@ -318,7 +318,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
     Highlight.Texture = Highlight:CreateTexture(nil, "OVERLAY");
     Highlight.Texture:SetAllPoints(true);
     Highlight.Texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW");
-    Highlight.Texture:SetTexCoord(700/1024, 828/1024, 176/512, 240/512);
+    Highlight.Texture:SetTexCoord(700/1024, 828/1024, 176/1024, 240/1024);
     Highlight.Texture:SetBlendMode("ADD");
 
 
@@ -348,7 +348,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
 
     local AlertText = ClaimChestAlert:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     ClaimChestAlert.AlertText = AlertText;
-    AlertText:SetWidth(5 * BUTTON_WIDTH);
+    AlertText:SetWidth(208);
     AlertText:SetJustifyH("CENTER");
     AlertText:SetJustifyV("BOTTOM")
     AlertText:SetPoint("BOTTOM", f, "BOTTOM", 0, 16);

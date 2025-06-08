@@ -91,6 +91,314 @@ do
 end
 
 
+local CreateScrollBar;
+do
+    local GetCursorPosition = GetCursorPosition;
+    local ScrollBarMixin = {};
+    local ArrowButtonMixin = {};
+    do
+        function ArrowButtonMixin:OnLoad()
+            self:SetScript("OnEnter", self.OnEnter);
+            self:SetScript("OnLeave", self.OnLeave);
+            self:SetScript("OnMouseDown", self.OnMouseDown);
+            self:SetScript("OnMouseUp", self.OnMouseUp);
+            self:SetScript("OnEnable", self.OnEnable);
+            self:SetScript("OnDisable", self.OnDisable);
+        end
+
+        function ArrowButtonMixin:OnEnter()
+
+        end
+
+        function ArrowButtonMixin:OnLeave()
+
+        end
+
+        function ArrowButtonMixin:OnMouseDown(button)
+            if not self:IsEnabled() then return end;
+            if button == "LeftButton" then
+                self:SharedOnMouseDown(button);
+                self:GetParent():GetScrollView():OnMouseWheel(self.delta);
+                self:GetParent():StartPushingArrow(self.delta);
+            end
+        end
+
+        function ArrowButtonMixin:OnMouseUp(button)
+            self:SharedOnMouseUp(button);
+            self:GetParent():StopUpdating();
+            self:GetParent():GetScrollView():StopSteadyScroll();
+        end
+
+        function ArrowButtonMixin:OnEnable()
+            self.Texture:SetVertexColor(1, 1, 1);
+            self.Texture:SetDesaturated(false);
+        end
+
+        function ArrowButtonMixin:OnDisable()
+            self.Texture:SetVertexColor(0.5, 0.5, 0.5);
+            self.Texture:SetDesaturated(true);
+        end
+    end
+
+
+    function ScrollBarMixin:SetValueByRatio(ratio)
+        if ratio < 0.001 then
+            ratio = 0;
+            self.isTop = true;
+            self.isBottom = false;
+        elseif ratio > 0.999 then
+            ratio = 1;
+            self.isTop = false;
+            self.isBottom = true;
+        else
+            self.isTop = false;
+            self.isBottom = false;
+        end
+
+        if self.isTop then
+            self.UpArrow:Disable();
+        else
+            self.UpArrow:Enable();
+        end
+        if self.isBottom then
+            self.DownArrow:Disable();
+        else
+            self.DownArrow:Enable();
+        end
+
+        self.ratio = ratio;
+        self.Thumb:SetPoint("TOP", self.Rail, "TOP", 0, -ratio * self.thumbRange);
+    end
+
+    function ScrollBarMixin:UpdateThumbRange()
+        local railLength = self.Rail:GetHeight();
+        local range = API.Round(railLength - self.Thumb:GetHeight());
+        self.thumbRange = range;
+        self.ratioPerUnit = 1 / range;
+    end
+
+    function ScrollBarMixin:SetScrollable(scrollable)
+        if scrollable then
+            self.Thumb:Show();
+            self.UpArrow:Show();
+            self.DownArrow:Show();
+            self.isTop = self:GetScrollView():IsAtTop();
+            self.isBottom = self:GetScrollView():IsAtBottom();
+        else
+            self.Thumb:Hide();
+            self.UpArrow:Hide();
+            self.DownArrow:Hide();
+            self.isTop = true;
+            self.isBottom = true;
+        end
+        self.scrollable = scrollable;
+        self.UpArrow:SetEnabled(not self.isTop);
+        self.DownArrow:SetEnabled(not self.isBottom);
+        self:UpdateThumbRange();
+    end
+
+    function ScrollBarMixin:StartDraggingThumb()
+        self:Snapshot();
+        self:UpdateThumbRange();
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate_ThumbDragged);
+    end
+
+    function ScrollBarMixin:OnUpdate_ThumbDragged(elapsed)
+        self.x, self.y = GetCursorPosition();
+        self.x = self.x / self.scale;
+        self.y = self.y / self.scale;
+        self.dx = self.x - self.x0;
+        self.dy = self.y - self.y0;
+        self:SetValueByRatio(self.fromRatio - self.dy * self.ratioPerUnit);
+        self.ScrollView:SnapToRatio(self.ratio);
+    end
+
+    function ScrollBarMixin:Snapshot()
+        self.x0, self.y0 = GetCursorPosition();
+        self.scale = self:GetEffectiveScale();
+        self.x0 = self.x0 / self.scale;
+        self.y0 = self.y0 / self.scale;
+        self.fromRatio = self.ratio;
+    end
+
+    function ScrollBarMixin:StartPushingArrow(delta)
+        self:Snapshot();
+        self:UpdateThumbRange();
+        self.t = 0;
+        self.delta = delta or -1;
+        self:SetScript("OnUpdate", self.OnUpdate_ArrowPushed);
+    end
+
+    function ScrollBarMixin:OnUpdate_ArrowPushed(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.5 then
+            self.t = 0;
+            self:GetScrollView():SteadyScroll(-self.delta);
+        end
+    end
+
+    function ScrollBarMixin:StopUpdating()
+        self:SetScript("OnUpdate", nil);
+        self.t = nil;
+        self.x, self.y = nil, nil;
+        self.x0, self.y0 = nil, nil;
+        self.dx, self.dy = nil, nil;
+        self.scale = nil;
+    end
+
+    function ScrollBarMixin:ScrollToMouseDownPosition()
+        local x, y = GetCursorPosition();
+        local scale = self:GetEffectiveScale();
+        x, y = x/scale, y/scale;
+
+        local top = self.Rail:GetTop();
+        local bottom = self.Rail:GetBottom();
+
+        local ratio;
+        if (top - y) < 4 then
+            ratio = 0;
+        elseif (y - bottom) < 4 then
+            ratio = 1;
+        else
+            ratio = (y - top)/(bottom - top);
+        end
+
+        self:GetScrollView():ScrollToRatio(ratio);
+    end
+
+    function ScrollBarMixin:GetScrollView()
+        return self.ScrollView
+    end
+
+
+
+    local function TextureButton_SharedOnMouseDown(self, button)
+        if self:IsEnabled() and button == "LeftButton" then
+            self.Highlight:SetAlpha(0.5);
+        end
+    end
+
+    local function TextureButton_SharedOnMouseUp(self, button)
+        self.Highlight:SetAlpha(0.2);
+    end
+
+    local function TextureButton_SetupTexture(self, file, l, r, t, b)
+        self.Texture:SetTexture(file);
+        self.Highlight:SetTexture(file);
+        self.Texture:SetTexCoord(l, r, t, b);
+        self.Highlight:SetTexCoord(l, r, t, b);
+    end
+
+    local function CreateTextureButton(parent)
+        local b = CreateFrame("Button", nil, parent);
+        b.Texture = b:CreateTexture(nil, "ARTWORK");
+        b.Texture:SetPoint("CENTER", b, "CENTER", 0, 0);
+        b.Highlight = b:CreateTexture(nil, "HIGHLIGHT");
+        b.Highlight:SetPoint("TOPLEFT", b.Texture, "TOPLEFT", 0, 0);
+        b.Highlight:SetPoint("BOTTOMRIGHT", b.Texture, "BOTTOMRIGHT", 0, 0);
+        b.Highlight:SetBlendMode("ADD");
+        TextureButton_SharedOnMouseUp(b);
+        b.SetupTexture = TextureButton_SetupTexture;
+        b.SharedOnMouseDown = TextureButton_SharedOnMouseDown;
+        b.SharedOnMouseUp = TextureButton_SharedOnMouseUp;
+        return b
+    end
+
+    function CreateScrollBar(parent)
+        local textureFile = "Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW";
+
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -2, -16);
+        f:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -2, 16);
+        f:SetSize(16, 256);
+        f.ScrollView = parent;
+
+        local function CreateArrowButton(delta)
+            local b = CreateTextureButton(f);
+            b:SetSize(16, 20);
+            b.Texture:SetSize(16, 20);
+            API.Mixin(b, ArrowButtonMixin);
+            b:OnLoad();
+            b.delta = delta;
+
+            if delta > 0 then
+                b:SetupTexture(textureFile, 64/1024, 96/1024, 616/1024, 656/1024);
+            else
+                b:SetupTexture(textureFile, 64/1024, 96/1024, 656/1024, 616/1024);
+            end
+
+            return b
+        end
+
+        f.UpArrow = CreateArrowButton(1);
+        f.UpArrow:SetPoint("TOP", f, "TOP", 0, -5);
+
+        f.DownArrow = CreateArrowButton(-1);
+        f.DownArrow:SetPoint("BOTTOM", f, "BOTTOM", 0, 5);
+
+        local Rail = CreateFrame("Frame", nil, f);
+        f.Rail = Rail;
+        Rail:SetPoint("TOP", f, "TOP", 0, -22);
+        Rail:SetPoint("BOTTOM", f, "BOTTOM", 0, 22);
+        Rail:SetSize(16, 208);
+        Rail:SetUsingParentLevel(true);
+
+        Rail.Top = f:CreateTexture(nil, "ARTWORK");
+        Rail.Top:SetPoint("TOP", f, "TOP", 0, 6);
+        Rail.Top:SetSize(32, 64);
+        Rail.Top:SetTexture(textureFile);
+        Rail.Top:SetTexCoord(0/1024, 64/1024, 512/1024, 640/1024);
+
+        Rail.Bottom = f:CreateTexture(nil, "ARTWORK");
+        Rail.Bottom:SetPoint("BOTTOM", f, "BOTTOM", 0, -6);
+        Rail.Bottom:SetSize(32, 64);
+        Rail.Bottom:SetTexture(textureFile);
+        Rail.Bottom:SetTexCoord(0/1024, 64/1024, 896/1024, 1024/1024);
+
+        Rail.Middle = f:CreateTexture(nil, "ARTWORK");
+        Rail.Middle:SetPoint("TOPLEFT", Rail.Top, "BOTTOMLEFT", 0, 0);
+        Rail.Middle:SetPoint("BOTTOMRIGHT", Rail.Bottom, "TOPRIGHT", 0, 0);
+        Rail.Middle:SetTexture(textureFile);
+        Rail.Middle:SetTexCoord(0/1024, 64/1024, 640/1024, 896/1024);
+
+        Rail:SetScript("OnMouseDown", function(_, button)
+            if button == "LeftButton" then
+                f:ScrollToMouseDownPosition();
+            end
+        end);
+
+        local Thumb = CreateTextureButton(f);
+        f.Thumb = Thumb;
+        Thumb:SetSize(16, 64);
+        Thumb:SetPoint("TOP", Rail, "TOP", 0, 0);
+        Thumb:SetupTexture(textureFile, 64/1024, 96/1024, 512/1024, 616/1024);
+        Thumb.Texture:SetSize(16, 52);
+
+        API.Mixin(f, ScrollBarMixin);
+
+        f:UpdateThumbRange();
+        f:SetValueByRatio(0);
+
+        Thumb:SetScript("OnMouseDown", function(_, button)
+            if button == "LeftButton" then
+                f:StartDraggingThumb();
+                Thumb:LockHighlight();
+                Thumb:SharedOnMouseDown(button);
+            end
+        end);
+
+        Thumb:SetScript("OnMouseUp", function(_, button)
+            f:StopUpdating();
+            Thumb:UnlockHighlight();
+            Thumb:SharedOnMouseUp(button);
+        end);
+
+        return f
+    end
+end
+
+
 local ScrollViewMixin = {};
 
 local function CreateScrollView(parent)
@@ -117,9 +425,14 @@ local function CreateScrollView(parent)
     f:SetScript("OnMouseWheel", f.OnMouseWheel);
     f:SetScript("OnHide", f.OnHide);
 
+    f.ScrollBar = CreateScrollBar(f);
+    f.ScrollBar:SetFrameLevel(f:GetFrameLevel() + 10);
+    f.ScrollBar:UpdateThumbRange();
+
     return f
 end
 API.CreateScrollView = CreateScrollView;
+
 
 do  --ScrollView Basic Content Render
     function ScrollViewMixin:GetScrollTarget()
@@ -133,6 +446,12 @@ do  --ScrollView Basic Content Render
     function ScrollViewMixin:SetOffset(offset)
         self.offset = offset;
         self.ScrollRef:SetPoint("TOP", self, "TOP", 0, offset);
+
+        if self.scrollable then
+            self.ScrollBar:SetValueByRatio(offset/self.range);
+        else
+            self.ScrollBar:SetValueByRatio(0);
+        end
     end
 
     function ScrollViewMixin:UpdateView(useScrollTarget)
@@ -215,15 +534,25 @@ do  --ScrollView Basic Content Render
         if range < 0 then
             range = 0;
         end
+
         self.range = range;
 
-        if range <= 0 and self.smartClipsChildren then
+        local scrollable = range > 0;
+
+        if (not scrollable) and self.smartClipsChildren then
             self:SetClipsChildren(false);
             self:SetScript("OnMouseWheel", nil);
         else
             self:SetClipsChildren(true);
             self:SetScript("OnMouseWheel", self.OnMouseWheel);
         end
+
+        if (not scrollable) and self.scrollable then
+            self:ScrollToTop();
+        end
+
+        self.scrollable = scrollable;
+        self.ScrollBar:SetScrollable(self.scrollable);
     end
 
     function ScrollViewMixin:SetContent(content, retainPosition)
@@ -308,7 +637,7 @@ do  --ScrollView Smooth Scroll
 
         if (self.offset - self.scrollTarget) > -0.4 and (self.offset - self.scrollTarget) < 0.4 then
             self.offset = self.scrollTarget;
-            self:StopScrolling();
+            self:SnapToScrollTarget();
             return
         end
 
@@ -370,6 +699,12 @@ do  --ScrollView Smooth Scroll
         end
     end
 
+    function ScrollViewMixin:StopSteadyScroll()
+        if self.isSteadyScrolling then
+            self:StopScrolling();
+        end
+    end
+
 
     function ScrollViewMixin:SnapTo(value)
         --No Easing
@@ -406,12 +741,22 @@ do  --ScrollView Scroll Behavior
         self:ScrollTo(self.range);
     end
 
+    function ScrollViewMixin:ScrollToRatio(ratio)
+        ratio = Clamp(ratio, 0, 1);
+        self:ScrollTo(self.range * ratio);
+    end
+
     function ScrollViewMixin:ResetScroll()
         self:SnapTo(0);
     end
 
     function ScrollViewMixin:SnapToBottom()
         self:SnapTo(self.range);
+    end
+
+    function ScrollViewMixin:SnapToRatio(ratio)
+        ratio = Clamp(ratio, 0, 1);
+        self:SnapTo(self.range * ratio);
     end
 
     function ScrollViewMixin:ScrollToContent(contentIndex)
@@ -442,7 +787,6 @@ do  --ScrollView Scroll Behavior
                 self.MouseBlocker = f;
                 f:Hide();
                 f:SetAllPoints(true);
-                f:SetFrameStrata("FULLSCREEN_DIALOG");
                 f:EnableMouse(true);
                 f:EnableMouseMotion(true);
             end
@@ -464,6 +808,22 @@ do  --ScrollView Scroll Behavior
         --If true, the button will retain its position until scroll
         self.allowOvershoot = state;
     end
+
+    function ScrollViewMixin:IsAtTop()
+        if self.scrollable then
+            return self.offset < 0.1
+        else
+            return true
+        end
+    end
+
+    function ScrollViewMixin:IsAtBottom()
+        if self.scrollable then
+            return self.offset > self.range - 0.1;
+        else
+            return true
+        end
+    end
 end
 
 do  --ScrollView Callback
@@ -472,6 +832,10 @@ do  --ScrollView Callback
 
         if self.onHideCallback then
             self.onHideCallback();
+        end
+
+        if self.ScrollBar then
+            self.ScrollBar:StopUpdating();
         end
     end
 
@@ -482,6 +846,7 @@ do  --ScrollView Callback
     function ScrollViewMixin:OnScrollStart()
         if self.useMouseBlocker then
             self.MouseBlocker:Show();
+            self.MouseBlocker:SetFrameLevel(self:GetFrameLevel() + 4);
         end
 
         if self.onScrollStartCallback then
@@ -516,52 +881,21 @@ do  --ScrollView Content Update
     end
 end
 
+do  --Create ScrollView in Tab
+    local function CreateScrollViewForTab(tab)
+        if tab.ScrollView then return end;
 
---[[
-do  --SoftTargetName
-    local EL = CreateFrame("Frame");
+        local ScrollView = API.CreateScrollView(tab);
+        tab.ScrollView = ScrollView;
+        ScrollView:SetPoint("TOPLEFT", tab, "TOPLEFT", 8, -8);
+        ScrollView:SetPoint("BOTTOMRIGHT", tab, "BOTTOMRIGHT", -8, 8);
+        ScrollView:OnSizeChanged();
+        ScrollView:SetStepSize(56);
+        ScrollView:SetBottomOvershoot(28);
+        ScrollView:EnableMouseBlocker(true);
+        ScrollView:SetAllowOvershootAfterRangeChange(true);
 
-    function EL:OnEvent(event, ...)
-        if event == "NAME_PLATE_UNIT_ADDED" then
-            local unit = ...
-            local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
-            if nameplate then
-                local f = nameplate.UnitFrame.SoftTargetFrame;
-                if f:IsShown() then
-                    if not f.SoftTargetFontString then
-                        f.SoftTargetFontString = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-                        f.SoftTargetFontString:SetPoint("TOP", f.Icon, "BOTTOM", 0, -4);
-                    end
-                    f.SoftTargetFontString:SetText(UnitName(unit));
-                    f.SoftTargetFontString:Show();
-
-                    local textureFile = f.Icon:GetTexture();
-                    --To determine if the interaction is in range:
-                    if string.find(string.lower(textureFile), "unable") then
-                        f.SoftTargetFontString:SetTextColor(0.5, 0.5, 0.5);
-                    else
-                        f.SoftTargetFontString:SetTextColor(1, 0.82, 0);
-                    end
-                    self.softTargetUnit = unit;
-                else
-                    if f.SoftTargetFontString then
-                        f.SoftTargetFontString:Hide();
-                    end
-                end
-            end
-        elseif event == "PLAYER_SOFT_INTERACT_CHANGED" then
-            local oldTarget, newTarget = ...
-            if not newTarget then
-                self.softTargetUnit = nil;
-            end
-            if self.softTargetUnit then
-                self:OnEvent("NAME_PLATE_UNIT_ADDED", self.softTargetUnit);
-            end
-        end
+        return ScrollView
     end
-
-    EL:SetScript("OnEvent", EL.OnEvent);
-    EL:RegisterEvent("NAME_PLATE_UNIT_ADDED");
-    EL:RegisterEvent("PLAYER_SOFT_INTERACT_CHANGED");
+    LandingPageUtil.CreateScrollViewForTab = CreateScrollViewForTab;
 end
---]]

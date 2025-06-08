@@ -11,7 +11,6 @@ local CreateFrame = CreateFrame;
 local ipairs = ipairs;
 local tinsert = table.insert;
 local tremove = table.remove;
-local IsShiftKeyDown = IsShiftKeyDown;
 
 
 local function SetupThreeSliceBackground(frame, textureFile, leftOffset, rightOffset)
@@ -41,9 +40,9 @@ local ExpansionThemeFrameMixin = {};
 do
     function ExpansionThemeFrameMixin:ShowCloseButton(state)
         if state then
-            self.pieces[3]:SetTexCoord(518/1024, 646/1024, 48/512, 176/512);
+            self.pieces[3]:SetTexCoord(518/1024, 646/1024, 48/1024, 176/1024);
         else
-            self.pieces[3]:SetTexCoord(384/1024, 512/1024, 0/512, 128/512);
+            self.pieces[3]:SetTexCoord(384/1024, 512/1024, 0/1024, 128/1024);
         end
         self.CloseButton:SetShown(state);
     end
@@ -67,15 +66,15 @@ do
         Background:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, -4);
         Background:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 4);
 
-        f.pieces[1]:SetTexCoord(0/1024, 128/1024, 0/512, 128/512);
-        f.pieces[2]:SetTexCoord(128/1024, 384/1024, 0/512, 128/512);
-        f.pieces[3]:SetTexCoord(384/1024, 512/1024, 0/512, 128/512);
-        f.pieces[4]:SetTexCoord(0/1024, 128/1024, 128/512, 384/512);
-        f.pieces[5]:SetTexCoord(128/1024, 384/1024, 128/512, 384/512);
-        f.pieces[6]:SetTexCoord(384/1024, 512/1024, 128/512, 384/512);
-        f.pieces[7]:SetTexCoord(0/1024, 128/1024, 384/512, 512/512);
-        f.pieces[8]:SetTexCoord(128/1024, 384/1024, 384/512, 512/512);
-        f.pieces[9]:SetTexCoord(384/1024, 512/1024, 384/512, 512/512);
+        f.pieces[1]:SetTexCoord(0/1024, 128/1024, 0/1024, 128/1024);
+        f.pieces[2]:SetTexCoord(128/1024, 384/1024, 0/1024, 128/1024);
+        f.pieces[3]:SetTexCoord(384/1024, 512/1024, 0/1024, 128/1024);
+        f.pieces[4]:SetTexCoord(0/1024, 128/1024, 128/1024, 384/1024);
+        f.pieces[5]:SetTexCoord(128/1024, 384/1024, 128/1024, 384/1024);
+        f.pieces[6]:SetTexCoord(384/1024, 512/1024, 128/1024, 384/1024);
+        f.pieces[7]:SetTexCoord(0/1024, 128/1024, 384/1024, 512/1024);
+        f.pieces[8]:SetTexCoord(128/1024, 384/1024, 384/1024, 512/1024);
+        f.pieces[9]:SetTexCoord(384/1024, 512/1024, 384/1024, 512/1024);
 
         local CloseButton = CreateFrame("Button", nil, f);
         f.CloseButton = CloseButton;
@@ -86,12 +85,12 @@ do
         CloseButton.Texture:SetPoint("CENTER", CloseButton, "CENTER", 0, 0);
         CloseButton.Texture:SetSize(24, 24);
         CloseButton.Texture:SetTexture(tex)
-        CloseButton.Texture:SetTexCoord(646/1024, 694/1024, 48/512, 96/512);
+        CloseButton.Texture:SetTexCoord(646/1024, 694/1024, 48/1024, 96/1024);
         CloseButton.Highlight = CloseButton:CreateTexture(nil, "HIGHLIGHT");
         CloseButton.Highlight:SetPoint("CENTER", CloseButton, "CENTER", 0, 0);
         CloseButton.Highlight:SetSize(24, 24);
         CloseButton.Highlight:SetTexture(tex)
-        CloseButton.Highlight:SetTexCoord(646/1024, 694/1024, 48/512, 96/512);
+        CloseButton.Highlight:SetTexCoord(646/1024, 694/1024, 48/1024, 96/1024);
         CloseButton.Highlight:SetBlendMode("ADD");
         CloseButton.Highlight:SetAlpha(0.5);
 
@@ -135,10 +134,10 @@ do
 
         SetupThreeSliceBackground(f, TEXTURE_FILE, -3, 3);
         f.Left:SetSize(20, 32);
-        f.Left:SetTexCoord(694/1024, 734/1024, 48/512, 112/512);
+        f.Left:SetTexCoord(694/1024, 734/1024, 48/1024, 112/1024);
         f.Right:SetSize(20, 32);
-        f.Right:SetTexCoord(910/1024, 950/1024, 48/512, 112/512);
-        f.Center:SetTexCoord(734/1024, 910/1024, 48/512, 112/512);
+        f.Right:SetTexCoord(910/1024, 950/1024, 48/1024, 112/1024);
+        f.Center:SetTexCoord(734/1024, 910/1024, 48/1024, 112/1024);
 
         if name then
             f:SetName(name);
@@ -256,6 +255,111 @@ do  --Atlas
     end
 end
 
+
+do  --ScrollViewListButton
+    local TEXTURE = "Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga";
+
+    local ListButtonMixin = {};
+
+    function ListButtonMixin:SetBackgroundColor(r, g, b)
+        self.Left:SetVertexColor(r, g, b);
+        self.Right:SetVertexColor(r, g, b);
+        self.Center:SetVertexColor(r, g, b);
+    end
+
+    function ListButtonMixin:UpdateBackground()
+        if self:IsMouseMotionFocus() then
+            self.Left:SetTexCoord(0/512, 64/512, 128/512, 192/512);
+            self.Right:SetTexCoord(448/512, 512/512, 128/512, 192/512);
+            self.Center:SetTexCoord(64/512, 448/512, 128/512, 192/512);
+            self.Name:SetTextColor(1, 1, 1);
+        else
+            if self.isOdd then
+                self.Left:SetTexCoord(0/512, 64/512, 64/512, 128/512);
+                self.Right:SetTexCoord(448/512, 512/512, 64/512, 128/512);
+                self.Center:SetTexCoord(64/512, 448/512, 64/512, 128/512);
+            else
+                self.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
+                self.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
+                self.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
+            end
+            if self.isHeader or self.completed then
+                self.Name:SetTextColor(0.6, 0.6, 0.6);
+                --self.Name:SetTextColor(0.8, 0.8, 0.8);
+            elseif self.readyForTurnIn then
+                self.Name:SetTextColor(0.098, 1.000, 0.098);
+            else
+                self.Name:SetTextColor(0.88, 0.88, 0.88);
+                --self.Name:SetTextColor(0.922, 0.871, 0.761);
+            end
+        end
+    end
+
+    function ListButtonMixin:SetHeader()
+        self.id = nil;
+        self.type = "Header";
+
+        self.isHeader = true;
+        self.readyForTurnIn = nil;
+        self.flagQuest = nil;
+        self.Icon:SetTexture(TEXTURE);
+        self.Icon:SetSize(18, 18);
+        self.Icon:SetPoint("CENTER", self, "LEFT", 16, 0);
+        self.Name:SetTextColor(0.6, 0.6, 0.6);
+        self.Name:SetWidth(0);
+        self.Name:SetMaxLines(1);
+        self.Name:SetPoint("LEFT", self, "LEFT", 32, 0);
+        self.Text1:SetText(nil);
+
+        if self.isCollapsed then
+            self.Icon:SetTexCoord(0, 48/512, 208/512, 256/512);
+        else
+            self.Icon:SetTexCoord(0, 48/512, 256/512, 208/512);
+        end
+    end
+
+    function ListButtonMixin:SetEntry()
+        --Clear Atlas
+        self.isHeader = nil;
+        self.Icon:SetSize(18, 18);
+        self.Icon:SetTexture(nil);
+        self.Icon:SetPoint("CENTER", self, "LEFT", 16, 0);
+        self.Icon:SetTexCoord(0, 1, 0, 1);
+        self.Name:SetTextColor(0.88, 0.88, 0.88);
+        self.Name:SetWidth(240);
+        self.Name:SetMaxLines(2);
+    end
+
+    function LandingPageUtil.CreateScrollViewListButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        f:SetSize(248, 24);
+
+        SetupThreeSliceBackground(f, TEXTURE, -4, 4);
+        f.Left:SetSize(32, 32);
+        f.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
+        f.Right:SetSize(32, 32);
+        f.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
+        f.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
+
+        f.Icon = f:CreateTexture(nil, "OVERLAY");
+        f.Icon:SetSize(18, 18);
+        f.Icon:SetPoint("CENTER", f, "LEFT", 16, 0);
+
+        f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Name:SetPoint("LEFT", f, "LEFT", 32, 0);
+        f.Name:SetTextColor(0.88, 0.88, 0.88);
+        f.Name:SetJustifyH("LEFT");
+
+        f.Text1 = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Text1:SetPoint("RIGHT", f, "RIGHT", -96, 0);
+        f.Text1:SetTextColor(0.88, 0.88, 0.88);
+        f.Text1:SetJustifyH("CENTER");
+
+        API.Mixin(f, ListButtonMixin);
+
+        return f
+    end
+end
 
 
 

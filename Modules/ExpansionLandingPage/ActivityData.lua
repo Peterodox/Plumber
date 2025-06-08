@@ -28,13 +28,14 @@ local ActivityData = {
         entries = {
             {name = "Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83317, accountwide = true},
+            {name = "Debug Quest", questID = 49738, atlas = DAILY_QUEST},
         }
     },
 
     {isHeader = true, name = "The Assembly of the Deeps", factionID = 2594,
         entries = {
             {name = "Rollin\' Down in the Deeps", questID = 82946, atlas = WEEKLY_QUEST},
-            {name = "Awakening the Machine", atlas = WEEKLY_QUEST},
+            {name = "Gearing Up for Trouble", questID = 83333, atlas = WEEKLY_QUEST}, --Awakening the Machine
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83318, accountwide = true},
         }
     },

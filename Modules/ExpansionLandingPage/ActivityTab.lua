@@ -5,6 +5,7 @@ local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil;
 local GetActivityName = LandingPageUtil.GetActivityName;
 local ShouldShowActivity = LandingPageUtil.ShouldShowActivity;
+local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 
 
 local ReadyForTurnIn = C_QuestLog.ReadyForTurnIn;
@@ -22,79 +23,19 @@ do  --Checklist Button
 
     function ChecklistButtonMixin:OnEnter()
         self:UpdateBackground();
+        self:DisplayQuestInfo();
     end
 
     function ChecklistButtonMixin:OnLeave()
         self:UpdateBackground();
+        TooltipUpdator:StopUpdating();
+        GameTooltip:Hide();
     end
 
     function ChecklistButtonMixin:OnClick()
         if self.isHeader then
             self:ToggleCollapsed();
         end
-    end
-
-    function ChecklistButtonMixin:SetBackgroundColor(r, g, b)
-        self.Left:SetVertexColor(r, g, b);
-        self.Right:SetVertexColor(r, g, b);
-        self.Center:SetVertexColor(r, g, b);
-    end
-
-
-    function ChecklistButtonMixin:UpdateBackground()
-        if self:IsMouseMotionFocus() then
-            self.Left:SetTexCoord(0/512, 64/512, 128/512, 192/512);
-            self.Right:SetTexCoord(448/512, 512/512, 128/512, 192/512);
-            self.Center:SetTexCoord(64/512, 448/512, 128/512, 192/512);
-            self.Name:SetTextColor(1, 1, 1);
-        else
-            if self.isOdd then
-                self.Left:SetTexCoord(0/512, 64/512, 64/512, 128/512);
-                self.Right:SetTexCoord(448/512, 512/512, 64/512, 128/512);
-                self.Center:SetTexCoord(64/512, 448/512, 64/512, 128/512);
-            else
-                self.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
-                self.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
-                self.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
-            end
-            if self.isHeader or self.completed then
-                self.Name:SetTextColor(0.6, 0.6, 0.6);
-            elseif self.readyForTurnIn then
-                self.Name:SetTextColor(0.098, 1.000, 0.098);
-            else
-                self.Name:SetTextColor(0.92, 0.92, 0.92);
-            end
-        end
-    end
-
-    function ChecklistButtonMixin:SetHeader()
-        self.id = nil;
-        self.type = "Header";
-
-        self.isHeader = true;
-        self.readyForTurnIn = nil;
-        self.flagQuest = nil;
-        self.Icon:SetTexture(TEXTURE);
-        self.Name:SetTextColor(0.6, 0.6, 0.6);
-        self.Name:SetWidth(0);
-        self.Name:SetMaxLines(1);
-        self.Text1:SetText(nil);
-
-        if self.isCollapsed then
-            self.Icon:SetTexCoord(0, 48/512, 208/512, 256/512);
-        else
-            self.Icon:SetTexCoord(0, 48/512, 256/512, 208/512);
-        end
-    end
-
-    function ChecklistButtonMixin:SetEntry()
-        --Clear Atlas
-        self.isHeader = nil;
-        self.Icon:SetTexture(nil);
-        self.Icon:SetTexCoord(0, 1, 0, 1);
-        self.Name:SetTextColor(0.92, 0.92, 0.92);
-        self.Name:SetWidth(240);
-        self.Name:SetMaxLines(2);
     end
 
     function ChecklistButtonMixin:SetActivity(dataIndex, data)
@@ -172,6 +113,9 @@ do  --Checklist Button
                     LandingPageUtil.StoreQuestActivityName(self.dataIndex, _questID, name);
                     self.Name:SetText(name);
                     self:UpdateProgress();
+                    if self:IsMouseMotionFocus() then
+                        self:OnEnter();
+                    end
                 end
             end);
         end
@@ -205,30 +149,19 @@ do  --Checklist Button
         end
     end
 
+    function ChecklistButtonMixin:DisplayQuestInfo()
+        if not ((self.type == "Quest") and self.id) then return end;
+
+        TooltipUpdator:SetFocusedObject(self);
+        TooltipUpdator:SetHeaderText(self.Name:GetText());
+        TooltipUpdator:SetQuestID(self.id);
+        TooltipUpdator:RequestQuestProgress();
+        TooltipUpdator:RequestQuestReward();
+    end
+
     function CreateChecklistButton(parent)
-        local f = CreateFrame("Button", nil, parent);
+        local f = LandingPageUtil.CreateScrollViewListButton(parent);
         f:SetSize(248, 24);
-
-        API.SetupThreeSliceBackground(f, TEXTURE, -4, 4);
-        f.Left:SetSize(32, 32);
-        f.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
-        f.Right:SetSize(32, 32);
-        f.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
-        f.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
-
-        f.Icon = f:CreateTexture(nil, "OVERLAY");
-        f.Icon:SetSize(18, 18);
-        f.Icon:SetPoint("CENTER", f, "LEFT", 16, 0);
-
-        f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        f.Name:SetPoint("LEFT", f, "LEFT", 32, 0);
-        f.Name:SetTextColor(0.92, 0.92, 0.92);
-        f.Name:SetJustifyH("LEFT");
-
-        f.Text1 = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        f.Text1:SetPoint("RIGHT", f, "RIGHT", -96, 0);
-        f.Text1:SetTextColor(0.92, 0.92, 0.92);
-        f.Text1:SetJustifyH("CENTER");
 
         API.Mixin(f, ChecklistButtonMixin);
         f:SetScript("OnEnter", f.OnEnter);
@@ -302,7 +235,7 @@ do
         end
 
         local retainPosition = true;
-        self.ScrollView:SetContent(content, retainPosition)
+        self.ScrollView:SetContent(content, retainPosition);
     end
 
     function ActivityTabMixin:OnShow()
@@ -328,16 +261,7 @@ do
     end
 
     function ActivityTabMixin:InitChecklist()
-        local ScrollView = API.CreateScrollView(self);
-        self.ScrollView = ScrollView;
-        ScrollView:SetPoint("TOPLEFT", self, "TOPLEFT", 8, -8);
-        ScrollView:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -8, 8);
-        ScrollView:OnSizeChanged();
-        ScrollView:SetStepSize(56);
-        ScrollView:SetBottomOvershoot(28);
-        ScrollView:EnableMouseBlocker(true);
-        ScrollView:SetAllowOvershootAfterRangeChange(true);
-
+        local ScrollView = LandingPageUtil.CreateScrollViewForTab(self);
 
         local function ChecklistButton_Create()
             return CreateChecklistButton(ScrollView)
@@ -381,6 +305,7 @@ do
     end
 end
 
+
 local function CreateActivityTab(f)
     ActivityTab = f;
     API.Mixin(f, ActivityTabMixin);
@@ -390,7 +315,6 @@ local function CreateActivityTab(f)
     f:SetScript("OnHide", f.OnHide);
     f:SetScript("OnEvent", f.OnEvent);
 end
-
 
 LandingPageUtil.AddTab(
     {

@@ -2176,7 +2176,169 @@ do  -- Quest
         end
     end
 
+    function API.GetQuestProgressTexts(questID)
+        local questLogIndex = questID and C_QuestLog.GetLogIndexForQuestID(questID);
 
+        if questLogIndex then
+            local texts = {};
+            if C_QuestLog.ReadyForTurnIn(questID) then
+                texts[1] = QUEST_PROGRESS_TOOLTIP_QUEST_READY_FOR_TURN_IN;
+                return texts
+            end
+
+            local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
+            local text, objectiveType, finished, fulfilled, required;
+
+            for objectiveIndex = 1, numObjectives do
+                text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
+                text = text or "";
+                if not finished then
+                    if objectiveType == "progressbar" then
+                        fulfilled = GetQuestProgressBarPercent(questID);
+                        fulfilled = floor(fulfilled);
+                        tinsert(texts, format("- %s%% %s", fulfilled, text));
+                    else
+                        tinsert(texts, format("- %s", text));
+                    end
+                end
+            end
+
+            return texts
+        else
+            if not C_QuestLog.IsOnQuest(questID) then
+                local texts = {};
+                if C_QuestLog.IsQuestFlaggedCompleted(questID) then
+                    texts[1] = format("|cff808080%s|r", QUEST_COMPLETE);
+                else
+                    texts[1] = format("|cff808080%s|r", L["Not On Quest"]);
+                end
+                return texts;
+            end
+        end
+    end
+
+    function API.GetQuestRewards(questID)
+        --Ignore XP, Money     --GetQuestLogRewardXP()
+
+        local rewards;
+        local missingData = false;
+
+        local function SortFunc_QualityID(a, b)
+            if a.quality ~= b.quality then
+                return a.quality > b.quality
+            end
+
+            if a.id ~= b.id then
+                return a.id > b.id
+            end
+
+            if a.quantity ~= b.quantity then
+                return a.quantity > b.quantity
+            end
+
+            return true
+        end
+
+        if C_QuestInfoSystem.HasQuestRewardCurrencies(questID) then
+            local currencies = {};
+            local currencyRewards = C_QuestLog.GetQuestRewardCurrencies(questID);
+            local currencyID, quality;
+            local info;
+
+            for index, currencyReward in ipairs(currencyRewards) do
+                currencyID = currencyReward.currencyID;
+                quality = C_CurrencyInfo.GetCurrencyInfo(currencyID).quality;
+                info = {
+                    name = currencyReward.name,
+                    texture = currencyReward.texture,
+                    quantity = currencyReward.totalRewardAmount,
+                    id = currencyID,
+                    questRewardContextFlags = currencyReward.questRewardContextFlags,
+                    quality = quality,
+                };
+                tinsert(currencies, info);
+            end
+
+            table.sort(currencies, SortFunc_QualityID);
+
+            if not rewards then
+                rewards = {};
+            end
+            rewards.currencies = currencies;
+
+            if #currencyRewards == 0 then
+                missingData = true;
+            end
+        end
+
+        if C_QuestInfoSystem.HasQuestRewardSpells(questID) then
+            local spells = {};
+            local spellRewards = C_QuestInfoSystem.GetQuestRewardSpells(questID);
+            local info;
+            for index, spellID in ipairs(spellRewards) do
+                info = C_QuestInfoSystem.GetQuestRewardSpellInfo(questID, spellID);
+                info.id = spellID;
+                tinsert(spells, info);
+            end
+
+            table.sort(spells,
+                function(a, b)
+                    if a.id ~= b.id then
+                        return a.id > b.id
+                    end
+
+                    return true
+                end
+            );
+
+            if not rewards then
+                rewards = {};
+            end
+            rewards.spells = spells;
+        end
+
+        local numItems = GetNumQuestLogRewards(questID);
+
+        if numItems > 0 then
+            local items = {};
+            local name, texture, quantity, quality, isUsable, itemID, itemLevel;
+            local info;
+            for index = 1, numItems do
+                name, texture, quantity, quality, isUsable, itemID, itemLevel = GetQuestLogRewardInfo(index, questID);
+                if name and itemID then
+                    info = {
+                        name = name,
+                        texture = texture,
+                        quantity = quantity,
+                        quality = quality,
+                        id = itemID,
+                    };
+                    tinsert(items, info);
+                else
+                    missingData = true;
+                end
+            end
+
+            table.sort(items, SortFunc_QualityID);
+
+            if not rewards then
+                rewards = {};
+            end
+            rewards.items = items;
+        end
+
+        local honor = GetQuestLogRewardHonor(questID);
+        if honor > 0 then
+            if not rewards then
+                rewards = {};
+            end
+            rewards.honor = honor;
+        end
+
+        return rewards, missingData
+    end
+
+    --[[
     function YeetQuestForMap(uiMapID)
         --Only contains quests with visible marker on the map
         if not uiMapID then
@@ -2203,6 +2365,7 @@ do  -- Quest
         print(" ");
         PrintQuests(C_QuestLog.GetQuestsOnMap(uiMapID));
     end
+    --]]
 end
 
 do  -- Tooltip

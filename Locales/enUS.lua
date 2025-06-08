@@ -404,6 +404,8 @@ L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Click to view Renown>";
+L["Not On Quest"] = "You are not on this quest";
+L["Raids"] = RAIDS or "Raids";
 
 
 --Plumber AddOn Settings

@@ -3,12 +3,15 @@
 	<Script file="DataCache.lua"/>
 	<Script file="ActivityData.lua"/>
 	<Script file="ScrollView.lua"/>
+	<Script file="TooltipUpdator.lua"/>
 	<Script file="GreatVault.lua"/>
 	<Script file="ItemUpgrade.lua"/>
 	<Script file="Currency.lua"/>
 	<Script file="FactionTab.lua"/>
 	<Script file="ActivityTab.lua"/>
 	<Script file="MajorFactionRenown.lua"/>
+	<Script file="EncounterData.lua"/>
+	<Script file="EncounterJournal.lua"/>
 	<Script file="ExpansionLandingPage.lua"/>
 	<Script file="MinimapButton.lua"/>
 

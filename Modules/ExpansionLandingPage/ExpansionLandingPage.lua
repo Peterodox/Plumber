@@ -103,9 +103,9 @@ do
         local tex = "Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW";
 
         self.RightSection.Header.DividerLeft:SetTexture(tex);
-        self.RightSection.Header.DividerLeft:SetTexCoord(0.5, 634/1024, 0, 48/512);
+        self.RightSection.Header.DividerLeft:SetTexCoord(0.5, 634/1024, 0, 48/1024);
         self.RightSection.Header.DividerRight:SetTexture(tex);
-        self.RightSection.Header.DividerRight:SetTexCoord(634/1024, 1, 0, 48/512);
+        self.RightSection.Header.DividerRight:SetTexCoord(634/1024, 1, 0, 48/1024);
 
         self:InitTabButtons();
         self:InitLeftSection();
