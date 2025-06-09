@@ -824,6 +824,12 @@ do  --ScrollView Scroll Behavior
             return true
         end
     end
+
+    function ScrollViewMixin:ResetScrollBarPosition()
+        self.ScrollBar:ClearAllPoints();
+        self.ScrollBar:SetPoint("TOPRIGHT", self, "TOPRIGHT", -1, -1);
+        self.ScrollBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 1, 1);
+    end
 end
 
 do  --ScrollView Callback

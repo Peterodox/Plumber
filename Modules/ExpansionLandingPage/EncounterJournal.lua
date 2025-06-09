@@ -6,6 +6,7 @@ local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 local GetEncounterProgress = LandingPageUtil.GetEncounterProgress;
 
 
+local tinsert = table.insert;
 local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
 
 
@@ -36,6 +37,7 @@ do
             self:ToggleCollapsed();
         else
             RaidTab.AchievementContainer:SetAchievements(LandingPageUtil.GetEncounterAchievements(self.journalEncounterID));
+            RaidTab.LootContainer:ShowLoot(self.journalInstanceID, self.journalEncounterID);
         end
     end
 
@@ -54,8 +56,9 @@ do
         self:HideProgress();
     end
 
-    function ListButtonMixin:SetEncounter(uiMapID, journalEncounterID, name)
+    function ListButtonMixin:SetEncounter(uiMapID, journalInstanceID, journalEncounterID, name)
         self.uiMapID = uiMapID;
+        self.journalInstanceID = journalInstanceID;
         self.journalEncounterID = journalEncounterID;
         self:SetEntry();
 
@@ -349,10 +352,328 @@ do
         local AlertText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         f.AlertText = AlertText;
         AlertText:SetWidth(208);
+        AlertText:SetPoint("CENTER", f, "CENTER", 0, 0);
+        AlertText:SetText(L["No Data"]);
+        AlertText:SetTextColor(0.5, 0.5, 0.5);
 
         return f
     end
 end
+
+
+local CreateLootContainer;
+do
+    local LootButtonMixin = {};
+
+    function LootButtonMixin:SetItemInfo(itemInfo)
+        self.itemID = itemInfo.itemID;
+        self.itemLink = itemInfo.link;
+
+        self.Icon:SetTexture(itemInfo.icon);
+        self.Name:SetText(itemInfo.name);
+
+        --local hexColor = itemInfo.itemQuality or "ffffffff";
+        local quality = C_Item.GetItemQualityByID(itemInfo.link) or 1;
+        local color = ColorManager.GetColorDataForItemQuality(quality);
+        local r, g, b = color.r, color.g, color.b;
+        self.Name:SetTextColor(r, g, b);
+        self.Border:SetVertexColor(r, g, b);
+
+        local slot = itemInfo.slot;
+        if itemInfo.handError then
+            if slot then
+                slot = INVALID_EQUIPMENT_COLOR:WrapTextInColorCode(slot);
+            end
+		end
+        if slot == "" then
+            slot = nil;
+        end
+
+        local armorType = itemInfo.armorType;
+        if itemInfo.weaponTypeError then
+            if armorType then
+                armorType = INVALID_EQUIPMENT_COLOR:WrapTextInColorCode(armorType);
+            end
+        end
+        if armorType == "" then
+            armorType = nil;
+        end
+
+        local subtext;
+        if slot then
+            subtext = slot;
+        end
+        if armorType then
+            if subtext then
+                subtext = subtext.."  "..armorType;
+            else
+                subtext = armorType;
+            end
+        end
+
+        if not subtext then
+            local _, itemType, itemSubType, itemEquipLoc, icon, classID, subClassID = C_Item.GetItemInfoInstant(self.itemID);
+            if classID == 15 and subClassID == 0 then
+                --Tier Tokens
+            else
+                subtext = itemSubType;
+            end
+        end
+
+        self.LeftText:SetText(subtext);
+    end
+
+    function LootButtonMixin:OnEnter()
+        local tooltip = GameTooltip;
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+        tooltip:SetHyperlink(self.itemLink);
+        RaidTab.LootContainer:HighlightButton(self);
+    end
+
+    function LootButtonMixin:OnLeave()
+        GameTooltip:Hide();
+        RaidTab.LootContainer:HighlightButton(nil);
+    end
+    
+    function LootButtonMixin:OnClick()
+
+    end
+
+    local function CreateLootButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        f:SetSize(208, 32);
+        API.Mixin(f, LootButtonMixin);
+
+        f.Border = f:CreateTexture(nil, "OVERLAY");
+        f.Border:SetPoint("CENTER", f, "LEFT", 16, 0);
+        f.Border:SetSize(40, 40);
+        f.Border:SetTexture("Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga");
+        f.Border:SetTexCoord(192/512, 272/512, 264/512, 344/512);
+
+        f.Icon = f:CreateTexture(nil, "ARTWORK");
+        f.Icon:SetPoint("CENTER", f, "LEFT", 16, 0);
+        f.Icon:SetSize(30, 30);
+        f.Icon:SetTexCoord(4/64, 60/64, 4/64, 60/64)
+
+        f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Name:SetPoint("TOPLEFT", f, "TOPLEFT", 40, -2);
+        f.Name:SetMaxLines(1);
+        f.Name:SetWidth(176);
+        f.Name:SetTextColor(0.88, 0.88, 0.88);
+        f.Name:SetJustifyH("LEFT");
+
+        f.LeftText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.LeftText:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 40, 2);
+        f.LeftText:SetMaxLines(1);
+        f.LeftText:SetWidth(176);
+        f.LeftText:SetTextColor(0.6, 0.6, 0.6);
+        f.LeftText:SetJustifyH("LEFT");
+
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnClick", f.OnClick);
+
+        return f
+    end
+
+
+    local function NullifyEJEvents()
+        --Pause default EncounterJounral updating
+        local f = EncounterJournal;
+        if f then
+            f:UnregisterEvent("EJ_LOOT_DATA_RECIEVED");
+            f:UnregisterEvent("EJ_DIFFICULTY_UPDATE");
+            C_Timer.After(0, function()
+                f:RegisterEvent("EJ_LOOT_DATA_RECIEVED");
+                f:RegisterEvent("EJ_DIFFICULTY_UPDATE");
+            end);
+        end
+    end
+
+    local LootContainerMixin = {};
+
+    function LootContainerMixin:ShowLoot(JournalInstanceID, journalEncounterID)
+        for _, button in ipairs(self.buttons) do
+            button:Hide();
+            button:ClearAllPoints();
+        end
+
+        NullifyEJEvents();
+        EJ_SelectInstance(JournalInstanceID);
+        EJ_SelectEncounter(journalEncounterID);
+
+
+        local difficultyID = DifficultyUtil.ID.PrimaryRaidNormal;
+        EJ_SetDifficulty(difficultyID);
+
+        local numLoots = EJ_GetNumLoot();
+
+        if numLoots > 0 then
+            self.AlertText:Hide();
+
+            local items = {};
+            local veryRareLoot = {};
+            local extremelyRareLoot = {};
+            local perPlayerLoot = {};
+
+            for i = 1, numLoots do
+                local itemInfo = C_EncounterJournal.GetLootInfoByIndex(i);
+                if itemInfo then
+                    itemInfo.uiOrder = i;
+                    if itemInfo.displayAsPerPlayerLoot then
+                        tinsert(perPlayerLoot, itemInfo);
+                    elseif itemInfo.displayAsExtremelyRare then
+                        tinsert(extremelyRareLoot, itemInfo);
+                    elseif itemInfo.displayAsVeryRare then
+                        tinsert(veryRareLoot, itemInfo);
+                    else
+                        tinsert(items, itemInfo);
+                    end
+                end
+            end
+
+            local function TryInsertItems(headerTitle, tbl)
+                if #tbl > 0 then
+                    tinsert(items, {
+                        isHeader = true,
+                        text = headerTitle,
+                    });
+
+                    for _, itemInfo in ipairs(tbl) do
+                        tinsert(items, itemInfo);
+                    end
+                end
+            end
+
+            TryInsertItems(EJ_ITEM_CATEGORY_VERY_RARE, veryRareLoot);
+            TryInsertItems(EJ_ITEM_CATEGORY_EXTREMELY_RARE, extremelyRareLoot);
+            TryInsertItems(BONUS_LOOT_TOOLTIP_TITLE, perPlayerLoot);
+
+            local n = 0;
+            local content = {};
+            local offsetY = 4;
+            local buttonHeight = 32;
+            local gap = 8;
+            local top, bottom;
+            local objectHeight;
+
+            for k, itemInfo in ipairs(items) do
+                n = n + 1;
+                top = offsetY;
+                if itemInfo.isHeader then
+                    objectHeight = 16;
+                    bottom = offsetY + objectHeight + gap;
+                    content[n] = {
+                        templateKey = "HeaderTitle",
+                        setupFunc = function(obj)
+                            obj:SetText(itemInfo.text);
+                        end,
+                        top = top,
+                        bottom = bottom,
+                        offsetX = -8,
+                    };
+                else
+                    objectHeight = buttonHeight;
+                    bottom = offsetY + objectHeight + gap;
+                    content[n] = {
+                        templateKey = "LootButton",
+                        setupFunc = function(obj)
+                            obj:SetItemInfo(itemInfo);
+                        end,
+                        top = top,
+                        bottom = bottom,
+                        offsetX = -8,
+                    };
+                end
+                offsetY = bottom;
+            end
+
+            local retainPosition = false;
+            self.ScrollView:Show();
+            self.ScrollView:SetContent(content, retainPosition);
+        else
+            self.AlertText:Show();
+            self.ScrollView:Hide();
+            self.ScrollView:SetContent(nil);
+        end
+    end
+
+    function LootContainerMixin:HighlightButton(button)
+        self.Highlight:Hide();
+        self.Highlight:ClearAllPoints();
+        if button then
+            self.Highlight:SetParent(button);
+            self.Highlight:SetPoint("CENTER", button, "CENTER", 0, 0);
+            self.Highlight:Show();
+        end
+    end
+
+
+    function CreateLootContainer(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f.buttons = {};
+        API.Mixin(f, LootContainerMixin);
+
+        local AlertText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.AlertText = AlertText;
+        AlertText:SetPoint("CENTER", f, "CENTER", 0, 0);
+        AlertText:SetWidth(208);
+        AlertText:SetText(L["No Data"]);
+        AlertText:SetTextColor(0.5, 0.5, 0.5);
+
+        f.Highlight = CreateFrame("Frame", nil, f);
+        f.Highlight:Hide();
+        f.Highlight:SetUsingParentLevel(true);
+        f.Highlight:SetSize(232, 40);
+        local tex = f.Highlight:CreateTexture(nil, "BACKGROUND");
+        tex:SetAllPoints(true);
+        tex:SetTexture("Interface/AddOns/Plumber/Art/Frame/HorizontalButtonHighlight");
+        tex:SetBlendMode("ADD");
+        tex:SetVertexColor(51/255, 29/255, 17/255);
+
+
+        local ScrollView = LandingPageUtil.CreateScrollViewForTab(f);
+        ScrollView:Hide();
+
+        local function LootButton_Create()
+            return CreateLootButton(ScrollView)
+        end
+
+        local function LootButton_OnAcquired(button)
+
+        end
+        local function LootButton_OnRemoved(button)
+
+        end
+
+        ScrollView:AddTemplate("LootButton", LootButton_Create, LootButton_OnAcquired, LootButton_OnRemoved);
+
+
+        local function HeaderTitle_Create()
+            local fs = ScrollView:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            fs:SetSize(208, 16);
+            fs:SetTextColor(0.8, 0.8, 0.8);
+            return fs
+        end
+
+        ScrollView:AddTemplate("HeaderTitle", HeaderTitle_Create);
+
+
+        local BottomGradient = CreateFrame("Frame", nil, f);
+        BottomGradient:SetSize(224, 40);
+        BottomGradient:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 6, 0);
+        local tex = BottomGradient:CreateTexture(nil, "OVERLAY");
+        tex:SetAllPoints(true);
+        local topColor = CreateColor(0.082, 0.047, 0.027, 0);
+        local bottomColor = CreateColor(0.082, 0.047, 0.027, 1)
+        tex:SetColorTexture(1, 1, 1);
+        tex:SetGradient("VERTICAL", bottomColor, topColor);
+        BottomGradient:SetFrameLevel(ScrollView:GetFrameLevel() + 2);
+
+        return f
+    end
+end
+
 
 local RaidTabMixin = {};
 do
@@ -429,10 +750,10 @@ do
             if data then
                 local uiMapID = data.uiMapID;
                 n = n + 1;
-                EncounterList[n] = {dataIndex = n, name = data.name, isCollapsed = false, isHeader = true};
+                EncounterList[n] = {dataIndex = n, name = data.name, isCollapsed = false, isHeader = true, journalInstanceID = journalInstanceID};
                 for _, encounterInfo in ipairs(data.encounters) do
                     n = n + 1;
-                    EncounterList[n] = {dataIndex = n, name = encounterInfo.name, journalEncounterID = encounterInfo.id, uiMapID = uiMapID};
+                    EncounterList[n] = {dataIndex = n, name = encounterInfo.name, journalEncounterID = encounterInfo.id, uiMapID = uiMapID, journalInstanceID = journalInstanceID};
                 end
             end
         end
@@ -477,7 +798,7 @@ do
                             obj:SetInstance(v.uiMapID, v.journalInstanceID, v.name);
                         else
                             obj:SetWidth(entryWidth);
-                            obj:SetEncounter(v.uiMapID, v.journalEncounterID, v.name);
+                            obj:SetEncounter(v.uiMapID, v.journalInstanceID, v.journalEncounterID, v.name);
                         end
                         obj:UpdateBackground();
                     end,
@@ -500,7 +821,6 @@ do
 
     function RaidTabMixin:UpdateAchievements()
         self.AchievementContainer:Update();
-        print("UpdateAchievements")
     end
 
     function RaidTabMixin:Init()
@@ -539,6 +859,16 @@ do
 
         local Header2 = LandingPageUtil.CreateListCategoryButton(self, LOOT_NOUN);
         Header2:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY);
+        offsetY = offsetY + categoryButtonHeight + lineGap;
+
+        local LootContainer = CreateLootContainer(self);
+        self.LootContainer = LootContainer;
+        LootContainer:SetWidth(260);
+        LootContainer:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY + 8);
+        LootContainer:SetPoint("BOTTOM", LeftFrame, "BOTTOM", 0, 12);
+        LootContainer.ScrollView:ResetScrollBarPosition();
+        LootContainer.ScrollView:OnSizeChanged();
+        LootContainer.ScrollView:SetBottomOvershoot(40);
     end
 end
 

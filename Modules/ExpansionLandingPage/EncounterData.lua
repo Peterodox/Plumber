@@ -59,6 +59,11 @@ function LandingPageUtil.GetEncounterProgress(dungeonAreaMapID, journalEncounter
 
     for i, difficultyID in ipairs(Difficulties) do
         progress[i] = IsEncounterComplete(dungeonAreaMapID, journalEncounterID, difficultyID);
+        if i == 1 then
+            if journalEncounterID >= 2639 then    --debug
+                progress[i] = true;
+            end
+        end
     end
 
     return progress
