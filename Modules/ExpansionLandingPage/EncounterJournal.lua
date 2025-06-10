@@ -6,18 +6,32 @@ local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 local GetEncounterProgress = LandingPageUtil.GetEncounterProgress;
 
 
+local ipairs = ipairs;
 local tinsert = table.insert;
 local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
 
 
-local JournalInstanceIDs = {
+local journalInstanceIDs = {
     1296,   --Liberation of Undermine
     1273,   --Nerub-ar Palace
 };
 
 
-local RaidTab;
+local RaidTab, LootContainer;
 local EncounterList = {};
+
+
+local function SelectEncounter(dataIndex)
+    for i, v in ipairs(EncounterList) do
+        v.selected = nil;
+    end
+
+    if dataIndex and EncounterList[dataIndex] then
+        EncounterList[dataIndex].selected = true;
+    end
+
+    RaidTab:UpdateScrollViewSelection();
+end
 
 
 local CreateListButton;
@@ -25,11 +39,11 @@ do
     local ListButtonMixin = {};
 
     function ListButtonMixin:OnEnter()
-        self:UpdateBackground();
+        self:UpdateVisual();
     end
 
     function ListButtonMixin:OnLeave()
-        self:UpdateBackground();
+        self:UpdateVisual();
     end
 
     function ListButtonMixin:OnClick(button)
@@ -38,6 +52,7 @@ do
         else
             RaidTab.AchievementContainer:SetAchievements(LandingPageUtil.GetEncounterAchievements(self.journalEncounterID));
             RaidTab.LootContainer:ShowLoot(self.journalInstanceID, self.journalEncounterID);
+            SelectEncounter(self.dataIndex);
         end
     end
 
@@ -84,14 +99,24 @@ do
                 texture = self["Light"..i];
                 if texture then
                     texture:Show();
+                    texture:SetTexture(nil);
+                    local filter;
                     if completed then
                         texture:SetTexCoord(48/512, 96/512, 208/512, 256/512);
+                        filter = "LINEAR";
                     else
                         texture:SetTexCoord(96/512, 144/512, 208/512, 256/512);
+                        filter = "TRILINEAR";
                     end
+                    texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga", nil, nil, filter);
                 end
             end
         end
+    end
+
+    function ListButtonMixin:UpdateSelection()
+        self.selected = EncounterList[self.dataIndex] and EncounterList[self.dataIndex].selected;
+        self:UpdateVisual();
     end
 
 
@@ -369,6 +394,14 @@ do
         self.itemID = itemInfo.itemID;
         self.itemLink = itemInfo.link;
 
+        if not (itemInfo.link and itemInfo.name) then
+            self.Icon:SetTexture(134400);
+            self.Name:SetText(nil);
+            self.Border:SetVertexColor(0.5, 0.5, 0.5);
+            RaidTab:RequestLootData();
+            return
+        end
+
         self.Icon:SetTexture(itemInfo.icon);
         self.Name:SetText(itemInfo.name);
 
@@ -462,7 +495,7 @@ do
         f.Name:SetTextColor(0.88, 0.88, 0.88);
         f.Name:SetJustifyH("LEFT");
 
-        f.LeftText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.LeftText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
         f.LeftText:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 40, 2);
         f.LeftText:SetMaxLines(1);
         f.LeftText:SetWidth(176);
@@ -478,7 +511,7 @@ do
 
 
     local function NullifyEJEvents()
-        --Pause default EncounterJounral updating
+        --Pause default EncounterJournal updating
         local f = EncounterJournal;
         if f then
             f:UnregisterEvent("EJ_LOOT_DATA_RECIEVED");
@@ -492,23 +525,32 @@ do
 
     local LootContainerMixin = {};
 
-    function LootContainerMixin:ShowLoot(JournalInstanceID, journalEncounterID)
+
+    function LootContainerMixin:ShowLoot(journalInstanceID, journalEncounterID)
+        self.journalInstanceID = journalInstanceID;
+        self.journalEncounterID = journalEncounterID;
+
+        RaidTab.lootDirty = nil;
+
         for _, button in ipairs(self.buttons) do
             button:Hide();
             button:ClearAllPoints();
         end
 
         NullifyEJEvents();
-        EJ_SelectInstance(JournalInstanceID);
+        EJ_SelectInstance(journalInstanceID);
         EJ_SelectEncounter(journalEncounterID);
 
 
-        local difficultyID = DifficultyUtil.ID.PrimaryRaidNormal;
+        local difficultyID = self.difficultyID or LandingPageUtil.RaidDifficulties[2];
         EJ_SetDifficulty(difficultyID);
+
+        self.DifficultyDropdown:SetText(DifficultyUtil.GetDifficultyName(difficultyID));
 
         local numLoots = EJ_GetNumLoot();
 
         if numLoots > 0 then
+            self.DifficultyDropdown:Show();
             self.AlertText:Hide();
 
             local items = {};
@@ -592,9 +634,22 @@ do
             self.ScrollView:Show();
             self.ScrollView:SetContent(content, retainPosition);
         else
+            self.DifficultyDropdown:Hide();
             self.AlertText:Show();
             self.ScrollView:Hide();
             self.ScrollView:SetContent(nil);
+        end
+    end
+
+    function LootContainerMixin:SetDifficulty(difficultyID)
+        difficultyID = difficultyID or self.difficultyID or LandingPageUtil.RaidDifficulties[2];
+        self.difficultyID = difficultyID;
+        self:Refresh();
+    end
+
+    function LootContainerMixin:Refresh()
+        if self.journalInstanceID and self.journalEncounterID then
+            self:ShowLoot(self.journalInstanceID, self.journalEncounterID);
         end
     end
 
@@ -608,9 +663,33 @@ do
         end
     end
 
+    local function DropdownMenuInfoGetter_Difficulty()
+        local tbl = {
+            key = "EncounterJournalDifficultyDropdownMenu",
+            widgets = {},
+        };
+
+        for i, difficultyID in ipairs(LandingPageUtil.RaidDifficulties) do
+            tbl.widgets[i] = {
+                type = "Radio",
+                text = DifficultyUtil.GetDifficultyName(difficultyID),
+                selected = difficultyID == LootContainer.difficultyID,
+                closeAfterClick = true,
+                onClickFunc = function()
+                    LootContainer:SetDifficulty(difficultyID);
+                end,
+            };
+        end
+
+        return tbl
+    end
 
     function CreateLootContainer(parent)
         local f = CreateFrame("Frame", nil, parent);
+        LootContainer = f;
+        f.difficultyID = LandingPageUtil.RaidDifficulties[2];   --Normal
+        f:SetWidth(260);
+
         f.buttons = {};
         API.Mixin(f, LootContainerMixin);
 
@@ -634,6 +713,9 @@ do
 
         local ScrollView = LandingPageUtil.CreateScrollViewForTab(f);
         ScrollView:Hide();
+        ScrollView:SetPoint("TOPLEFT", f, "TOPLEFT", 8, -40);
+        ScrollView:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -8, 8);
+        ScrollView:OnSizeChanged();
 
         local function LootButton_Create()
             return CreateLootButton(ScrollView)
@@ -670,6 +752,15 @@ do
         tex:SetGradient("VERTICAL", bottomColor, topColor);
         BottomGradient:SetFrameLevel(ScrollView:GetFrameLevel() + 2);
 
+
+        --Dropdowns
+        local DifficultyDropdown = LandingPageUtil.CreateDropdownButton(f);
+        f.DifficultyDropdown = DifficultyDropdown;
+        DifficultyDropdown:SetWidth(160);
+        DifficultyDropdown:SetPoint("TOPRIGHT", f, "TOPRIGHT", -12, -6);
+        DifficultyDropdown.menuInfoGetter = DropdownMenuInfoGetter_Difficulty;
+        DifficultyDropdown:Hide();
+
         return f
     end
 end
@@ -681,6 +772,7 @@ do
         "UPDATE_INSTANCE_INFO",
         "ACHIEVEMENT_EARNED",
         "CONTENT_TRACKING_UPDATE",
+        "EJ_LOOT_DATA_RECIEVED",
     };
 
     function RaidTabMixin:OnShow()
@@ -700,6 +792,8 @@ do
             self:UpdateAchievements();
         elseif event == "CONTENT_TRACKING_UPDATE" then
             self.AchievementContainer:UpdateTooltip();
+        elseif event == "EJ_LOOT_DATA_RECIEVED" then
+
         end
     end
 
@@ -745,7 +839,7 @@ do
 
         local n = 0;
 
-        for _, journalInstanceID in ipairs(JournalInstanceIDs) do
+        for _, journalInstanceID in ipairs(journalInstanceIDs) do
             local data = self:GetInstanceData(journalInstanceID);
             if data then
                 local uiMapID = data.uiMapID;
@@ -800,7 +894,7 @@ do
                             obj:SetWidth(entryWidth);
                             obj:SetEncounter(v.uiMapID, v.journalInstanceID, v.journalEncounterID, v.name);
                         end
-                        obj:UpdateBackground();
+                        obj:UpdateVisual();
                     end,
                     top = top,
                     bottom = bottom,
@@ -816,6 +910,12 @@ do
     function RaidTabMixin:UpdateScrollViewContent()
         if self.ScrollView then
             self.ScrollView:CallObjectMethod("ListButton", "UpdateProgress");
+        end
+    end
+
+    function RaidTabMixin:UpdateScrollViewSelection()
+        if self.ScrollView then
+            self.ScrollView:CallObjectMethod("ListButton", "UpdateSelection");
         end
     end
 
@@ -863,12 +963,34 @@ do
 
         local LootContainer = CreateLootContainer(self);
         self.LootContainer = LootContainer;
-        LootContainer:SetWidth(260);
         LootContainer:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY + 8);
         LootContainer:SetPoint("BOTTOM", LeftFrame, "BOTTOM", 0, 12);
         LootContainer.ScrollView:ResetScrollBarPosition();
         LootContainer.ScrollView:OnSizeChanged();
         LootContainer.ScrollView:SetBottomOvershoot(40);
+    end
+
+    --Frame Update
+    function RaidTabMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= 0.2 then
+            self.t = nil;
+            self:SetScript("OnUpdate", nil);
+
+            if self.lootDirty then
+                self.LootContainer:Refresh();
+            end
+        end
+    end
+
+    function RaidTabMixin:StartUpdating()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function RaidTabMixin:RequestLootData()
+        self.lootDirty = true;
+        self:StartUpdating();
     end
 end
 

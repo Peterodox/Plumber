@@ -635,7 +635,7 @@ do
         else
             self.RewardIcon:SetDesaturated(false);
             self.RewardIcon:SetVertexColor(1, 1, 1);
-            self.Name:SetTextColor(0.92, 0.92, 0.92);
+            self.Name:SetTextColor(0.922, 0.871, 0.761);
         end
     end
 
@@ -674,7 +674,7 @@ do
     end
 
     function RenownItemButtonMixin:OnEnter()
-        self.Highlight:Show();
+        FactionTab:HighlightButton(self);
 
         local tooltip = GameTooltip;
         tooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -685,11 +685,16 @@ do
         end
         tooltip:AddLine(self.description, 1, 0.82, 0, true);
         tooltip:Show();
+
+        if not self.locked then
+            self.Name:SetTextColor(1, 1, 1);
+        end
     end
 
     function RenownItemButtonMixin:OnLeave()
-        self.Highlight:Hide();
+        FactionTab:HighlightButton(nil);
         HideTooltip();
+        self:GreyOut(self.locked);
     end
 
     function CreateRenownItemButton(parent)
@@ -713,14 +718,6 @@ do
         f.ItemBorder:SetTexture("Interface/AddOns/Plumber/Art/Frame/ItemBorder");
         f.ItemBorder:SetTexCoord(80/512, 160/512, 0/512, 80/512);
         API.DisableSharpening(f.ItemBorder);
-
-        f.Highlight = f:CreateTexture(nil, "BACKGROUND");
-        f.Highlight:Hide();
-        f.Highlight:SetPoint("CENTER", f, "CENTER", 0, 0);
-        f.Highlight:SetSize(288, 36);
-        f.Highlight:SetTexture("Interface/AddOns/Plumber/Art/Frame/HorizontalButtonHighlight");
-        f.Highlight:SetBlendMode("ADD");
-        f.Highlight:SetVertexColor(51/255, 29/255, 17/255);
 
         f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         f.Name:SetPoint("LEFT", f, "LEFT", 40, 0);
@@ -993,6 +990,19 @@ do
             RenownItemScrollView:SetStepSize(48);
             RenownItemScrollView:SetBottomOvershoot(48);
             RenownItemScrollView:EnableMouseBlocker(true);
+
+            local ButtonHighlight = LandingPageUtil.CreateButtonHighlight(RenownItemScrollView);
+            ButtonHighlight:SetSize(288, 36);
+
+            function self:HighlightButton(renownItemButton)
+                ButtonHighlight:Hide();
+                ButtonHighlight:ClearAllPoints();
+                if renownItemButton then
+                    ButtonHighlight:SetParent(renownItemButton);
+                    ButtonHighlight:SetPoint("CENTER", renownItemButton, "CENTER", 0, 0);
+                    ButtonHighlight:Show();
+                end
+            end
 
             local function ShowFocusedButtonTooltip()
 

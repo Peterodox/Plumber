@@ -22,12 +22,12 @@ do  --Checklist Button
     local ChecklistButtonMixin = {};
 
     function ChecklistButtonMixin:OnEnter()
-        self:UpdateBackground();
+        self:UpdateVisual();
         self:DisplayQuestInfo();
     end
 
     function ChecklistButtonMixin:OnLeave()
-        self:UpdateBackground();
+        self:UpdateVisual();
         TooltipUpdator:StopUpdating();
         GameTooltip:Hide();
     end
@@ -95,7 +95,7 @@ do  --Checklist Button
             self.Text1:SetText(nil);
         end
 
-        self:UpdateBackground();
+        self:UpdateVisual();
     end
 
     function ChecklistButtonMixin:SetQuest(questID)

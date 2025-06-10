@@ -1,94 +1,14 @@
 local _, addon = ...
 local API = addon.API;
 local LandingPageUtil = addon.LandingPageUtil;
+local CreateObjectPool = LandingPageUtil.CreateObjectPool;
 
 
 local Clamp = API.Clamp;
 local DeltaLerp = API.DeltaLerp;
 local CreateFrame = CreateFrame;
 local ipairs = ipairs;
-local tinsert = table.insert;
-local tremove = table.remove;
 local IsShiftKeyDown = IsShiftKeyDown;
-
-
-local CraeteObjectPool;
-do
-    local ObjectPoolMixin = {};
-
-    function ObjectPoolMixin:ReleaseAll()
-        for _, obj in ipairs(self.activeObjects) do
-            obj:Hide();
-            obj:ClearAllPoints();
-            if self.onRemoved then
-                self.onRemoved(obj);
-            end
-        end
-
-        local tbl = {};
-        for k, object in ipairs(self.objects) do
-            tbl[k] = object;
-        end
-        self.unusedObjects = tbl;
-        self.activeObjects = {};
-    end
-
-    function ObjectPoolMixin:ReleaseObject(object)
-        object:Hide();
-        object:ClearAllPoints();
-
-        if self.onRemoved then
-            self.onRemoved(object);
-        end
-
-        local found;
-        for k, obj in ipairs(self.activeObjects) do
-            if obj == object then
-                found = true;
-                tremove(self.activeObjects, k);
-                break
-            end
-        end
-
-        if found then
-            tinsert(self.unusedObjects, object);
-        end
-    end
-
-    function ObjectPoolMixin:Acquire()
-        local object = tremove(self.unusedObjects);
-        if not object then
-            object = self.create();
-            object.Release = self.Object_Release;
-            tinsert(self.objects, object);
-        end
-        tinsert(self.activeObjects, object);
-        if self.onAcquired then
-            self.onAcquired(object);
-        end
-        object:Show();
-        return object
-    end
-
-    function CraeteObjectPool(create, onAcquired, onRemoved)
-        local pool = {};
-        API.Mixin(pool, ObjectPoolMixin);
-
-        pool.objects = {};
-        pool.activeObjects = {};
-        pool.unusedObjects = {};
-
-        pool.create = create;
-        pool.onAcquired = onAcquired;
-        pool.onRemoved = onRemoved;
-
-        function pool.Object_Release(obj)
-            pool:ReleaseObject(obj);
-        end
-
-        return pool
-    end
-end
 
 
 local CreateScrollBar;
@@ -309,8 +229,8 @@ do
         local textureFile = "Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW";
 
         local f = CreateFrame("Frame", nil, parent);
-        f:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -2, -16);
-        f:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -2, 16);
+        f:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -4, -16);
+        f:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 16);
         f:SetSize(16, 256);
         f.ScrollView = parent;
 
@@ -581,7 +501,7 @@ end
 
 do  --ScrollView ObjectPool
     function ScrollViewMixin:AddTemplate(templateKey, create, onAcquired, onRemoved)
-        self.pools[templateKey] = CraeteObjectPool(create, onAcquired, onRemoved);
+        self.pools[templateKey] = CreateObjectPool(create, onAcquired, onRemoved);
     end
 
     function ScrollViewMixin:AcquireObject(templateKey)
@@ -828,7 +748,7 @@ do  --ScrollView Scroll Behavior
     function ScrollViewMixin:ResetScrollBarPosition()
         self.ScrollBar:ClearAllPoints();
         self.ScrollBar:SetPoint("TOPRIGHT", self, "TOPRIGHT", -1, -1);
-        self.ScrollBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 1, 1);
+        self.ScrollBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 1);
     end
 end
 
