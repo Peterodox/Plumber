@@ -94,27 +94,48 @@ do  --Object Pool
 end
 
 
+local function CreateThreeSliceTextures(frame, layer, leftKey, centerKey, rightKey, textureFile, leftOffset, rightOffset)
+    local Left = frame[leftKey];
+    if not Left then
+        Left = frame:CreateTexture(nil, layer);
+        frame[leftKey] = Left;
+    end
+    Left:SetPoint("LEFT", frame, "LEFT", leftOffset or 0, 0);
+    Left:SetTexture(textureFile);
+
+    local Right = frame[rightKey];
+    if not Right then
+        Right = frame:CreateTexture(nil, layer);
+        frame[rightKey] = Right;
+    end
+    Right:SetPoint("RIGHT", frame, "RIGHT", rightOffset or 0, 0);
+    Right:SetTexture(textureFile);
+
+    local Center = frame[centerKey];
+    if not Center then
+        Center = frame:CreateTexture(nil, layer);
+        frame[centerKey] = Center;
+        Center:SetPoint("TOPLEFT", Left, "TOPRIGHT", 0, 0);
+        Center:SetPoint("BOTTOMRIGHT", Right, "BOTTOMLEFT", 0, 0);
+    end
+    Center:SetTexture(textureFile);
+end
+
 local function SetupThreeSliceBackground(frame, textureFile, leftOffset, rightOffset)
-    if not frame.Left then
-        frame.Left = frame:CreateTexture(nil, "BACKGROUND");
-    end
-    frame.Left:SetPoint("LEFT", frame, "LEFT", leftOffset or 0, 0);
-    frame.Left:SetTexture(textureFile);
-
-    if not frame.Right then
-        frame.Right = frame:CreateTexture(nil, "BACKGROUND");
-    end
-    frame.Right:SetPoint("RIGHT", frame, "RIGHT", rightOffset or 0, 0);
-    frame.Right:SetTexture(textureFile);
-
-    if not frame.Center then
-        frame.Center = frame:CreateTexture(nil, "BACKGROUND");
-        frame.Center:SetPoint("TOPLEFT", frame.Left, "TOPRIGHT", 0, 0);
-        frame.Center:SetPoint("BOTTOMRIGHT", frame.Right, "BOTTOMLEFT", 0, 0);
-    end
-    frame.Center:SetTexture(textureFile);
+    CreateThreeSliceTextures(frame, "BACKGROUND", "Left", "Center", "Right", textureFile, leftOffset, rightOffset);
 end
 API.SetupThreeSliceBackground = SetupThreeSliceBackground;
+
+local function SetupThressSliceHighlight(frame, textureFile, leftOffset, rightOffset)
+    CreateThreeSliceTextures(frame, "HIGHLIGHT", "HighlightLeft", "HighlightCenter", "HighlightRight", textureFile, leftOffset, rightOffset);
+    local alpha = 0.25;
+    frame.HighlightLeft:SetBlendMode("ADD");
+    frame.HighlightLeft:SetAlpha(alpha);
+    frame.HighlightCenter:SetBlendMode("ADD");
+    frame.HighlightCenter:SetAlpha(alpha);
+    frame.HighlightRight:SetBlendMode("ADD");
+    frame.HighlightRight:SetAlpha(alpha);
+end
 
 
 local ExpansionThemeFrameMixin = {};
@@ -487,7 +508,7 @@ do  --Dropdown Menu
 
     function MenuButtonMixin:SetRadio(selected)
         self.leftOffset = 20;
-        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/DropdownMenu", nil, nil, "TRILINEAR");
+        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/DropdownMenu", nil, nil, "LINEAR");
         self.selected = selected;
         if selected then
             self.LeftTexture:SetTexCoord(32/512, 64/512, 0/512, 32/512);
@@ -498,12 +519,25 @@ do  --Dropdown Menu
         self:Layout();
     end
 
+    function MenuButtonMixin:SetCheckbox(selected)
+        self.leftOffset = 20;
+        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/DropdownMenu", nil, nil, "LINEAR");
+        self.selected = selected;
+        if selected then
+            self.LeftTexture:SetTexCoord(96/512, 128/512, 0/512, 32/512);
+        else
+            self.LeftTexture:SetTexCoord(64/512, 96/512, 0/512, 32/512);
+        end
+        self.LeftTexture:Show();
+        self:Layout();
+    end
+
     function MenuButtonMixin:Layout()
         self.Text:SetPoint("LEFT", self, "LEFT", self.paddingH + self.leftOffset, 0);
     end
 
     function MenuButtonMixin:GetContentWidth()
-        return self.Text:GetWrappedWidth() + self.leftOffset + 2 * self.paddingH
+        return self.Text:GetWrappedWidth() + self.leftOffset + 3 * self.paddingH
     end
 
     local function CreateMenuButton(parent)
@@ -602,6 +636,8 @@ do  --Dropdown Menu
                     widget:SetLeftText(v.text);
                     if v.type == "Radio" then
                         widget:SetRadio(v.selected);
+                    elseif v.type == "Checkbox" then
+                        widget:SetCheckbox(v.selected);
                     else
                         widget:SetRegular();
                     end
@@ -644,9 +680,11 @@ do  --Dropdown Menu
         Frame:SetSize(112, 112);
         Frame:Hide();
         Frame:SetFrameStrata("FULLSCREEN_DIALOG");
+        Frame:SetFixedFrameStrata(true);
         Frame:EnableMouse(true);
         Frame:EnableMouseMotion(true);
-        self:SetPaddingV(4);
+        Frame:SetClampedToScreen(true);
+        self:SetPaddingV(6);
 
         local f = addon.CreateNineSliceFrame(Frame, "ExpansionBorder_TWW");
         Frame.Background = f;
@@ -673,7 +711,10 @@ do  --Dropdown Menu
 
 
         self.Highlight = LandingPageUtil.CreateButtonHighlight(Frame);
-        self.Highlight.Texture:SetVertexColor(80/255, 40/255, 20/255);
+        self.Highlight.Texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/DropdownMenu");
+        self.Highlight.Texture:SetTexCoord(368/512, 512/512, 0/512, 48/512);
+        self.Highlight.Texture:SetVertexColor(119/255, 96/255, 74/255);
+        self.Highlight.Texture:SetBlendMode("ADD");
 
 
 
@@ -776,14 +817,25 @@ do  --Dropdown Button
         local f = CreateFrame("Button", nil, parent);
         API.Mixin(f, DropdownButtonMixin);
         f:SetSize(240, 24);
-        f:SetHitRectInsets(-1, -1, -2, -2);
+        f:SetHitRectInsets(-2, -2, -4, -4);
 
-        SetupThreeSliceBackground(f, TEXTURE_FILE, -2.5, 2.5);
-        f.Left:SetSize(20, 32);
-        f.Left:SetTexCoord(518/1024, 558/1024, 256/1024, 320/1024);
-        f.Right:SetSize(32, 32);
-        f.Right:SetTexCoord(690/1024, 754/1024, 256/1024, 320/1024);
-        f.Center:SetTexCoord(558/1024, 690/1024, 256/1024, 320/1024);
+        for i = 1, 2 do
+            local setupFunc;
+            local prefix;
+            if i == 1 then
+                setupFunc = SetupThreeSliceBackground;
+                prefix = "";
+            else
+                setupFunc = SetupThressSliceHighlight;
+                prefix = "Highlight";
+            end
+            setupFunc(f, TEXTURE_FILE, -2.5, 2.5);
+            f[prefix.."Left"]:SetSize(20, 32);
+            f[prefix.."Left"]:SetTexCoord(518/1024, 558/1024, 256/1024, 320/1024);
+            f[prefix.."Right"]:SetSize(32, 32);
+            f[prefix.."Right"]:SetTexCoord(690/1024, 754/1024, 256/1024, 320/1024);
+            f[prefix.."Center"]:SetTexCoord(558/1024, 690/1024, 256/1024, 320/1024);
+        end
 
         f.Text = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         f.Text:SetTextColor(1, 1, 1);

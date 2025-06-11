@@ -473,13 +473,17 @@ do  --ScrollView Basic Content Render
 
         self.scrollable = scrollable;
         self.ScrollBar:SetScrollable(self.scrollable);
+        self.ScrollBar:SetShown(scrollable or self.alwaysShowScrollBar);
     end
 
     function ScrollViewMixin:SetContent(content, retainPosition)
         self.content = content or {};
 
         if #self.content > 0 then
-            local range = content[#self.content].bottom - self.viewportSize + self.bottomOvershoot;
+            local range = content[#self.content].bottom - self.viewportSize;
+            if range > 0 then
+                range = range + self.bottomOvershoot;
+            end
             self:SetScrollRange(range);
         else
             self:SetScrollRange(0);
@@ -729,6 +733,11 @@ do  --ScrollView Scroll Behavior
         self.allowOvershoot = state;
     end
 
+    function ScrollViewMixin:SetAlwaysShowScrollBar(state)
+        --If false, hide the scroll bar when it's not scrollable
+        self.alwaysShowScrollBar = state;
+    end
+
     function ScrollViewMixin:IsAtTop()
         if self.scrollable then
             return self.offset < 0.1
@@ -820,6 +829,7 @@ do  --Create ScrollView in Tab
         ScrollView:SetBottomOvershoot(28);
         ScrollView:EnableMouseBlocker(true);
         ScrollView:SetAllowOvershootAfterRangeChange(true);
+        ScrollView:SetAlwaysShowScrollBar(true);
 
         return ScrollView
     end

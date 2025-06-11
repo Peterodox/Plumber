@@ -1933,9 +1933,30 @@ do  -- System
     ModifierKeyName.RCTRL = ModifierKeyName.LCTRL;
     ModifierKeyName.RALT = ModifierKeyName.LALT;
 
-    API.GetModifierKeyName = function(key)
+    function API.GetModifierKeyName(key)
         if key and ModifierKeyName[key] then
             return ModifierKeyName[key]
+        end
+    end
+
+
+    function API.HandleModifiedItemClick(link, itemLocation)
+        if InCombatLockdown() then return false end;
+
+        if IsModifiedClick("CHATLINK") then
+            if ( ChatEdit_InsertLink(link) ) then
+                return true
+            elseif SocialPostFrame and Social_IsShown() then
+                Social_InsertLink(link);
+                return true
+            end
+        end
+
+        if IsModifiedClick("DRESSUP") then
+            if itemLocation then
+                return DressUpItemLocation(itemLocation)
+            end
+            return DressUpLink(link)
         end
     end
 end

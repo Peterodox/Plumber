@@ -42,6 +42,25 @@ local Difficulties = {
 LandingPageUtil.RaidDifficulties = Difficulties;
 
 
+local PlayerClassList_Modern = {
+    1,  --WARRIOR 	
+    2,  --PALADIN 	
+    3,  --HUNTER 	
+    4,  --ROGUE 	
+    5,  --PRIEST 	
+    6,  --DEATHKNIGHT
+    7,  --SHAMAN 	
+    8,  --MAGE 	
+    9,  --WARLOCK 	
+    10, --MONK
+    11, --DRUID 	
+    12, --DEMONHUNTER
+    13, --EVOKER
+};
+LandingPageUtil.PlayerClassList = PlayerClassList_Modern;
+
+
+
 function LandingPageUtil.GetEncounterIcon(journalEncounterID)
     if EncounterData[journalEncounterID] then
         return EncounterData[journalEncounterID].icon
@@ -53,7 +72,6 @@ function LandingPageUtil.GetEncounterAchievements(journalEncounterID)
         return EncounterData[journalEncounterID].achv
     end
 end
-
 
 function LandingPageUtil.GetEncounterProgress(dungeonAreaMapID, journalEncounterID)
     local progress = {};
@@ -70,4 +88,13 @@ function LandingPageUtil.GetEncounterProgress(dungeonAreaMapID, journalEncounter
     end
 
     return progress
+end
+
+function LandingPageUtil.GetDefaultRaidDifficulty()
+    return Difficulties[2]
+end
+
+function LandingPageUtil.GetDefaultPlayerClassID()
+    local _, _, classID = UnitClass("player");
+    return classID
 end

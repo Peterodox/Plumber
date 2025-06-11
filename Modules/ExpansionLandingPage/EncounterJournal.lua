@@ -34,6 +34,16 @@ local function SelectEncounter(dataIndex)
 end
 
 
+local function GetPlayerClassName(playerClassID)
+    if playerClassID == 0 then
+        return ALL_CLASSES
+    end
+
+   local info = C_CreatureInfo.GetClassInfo(playerClassID);
+   return info and info.className or ""
+end
+
+
 local CreateListButton;
 do
     local ListButtonMixin = {};
@@ -467,9 +477,11 @@ do
         GameTooltip:Hide();
         RaidTab.LootContainer:HighlightButton(nil);
     end
-    
-    function LootButtonMixin:OnClick()
 
+    function LootButtonMixin:OnClick()
+        if API.HandleModifiedItemClick(self.itemLink) then
+            return
+        end
     end
 
     local function CreateLootButton(parent)
@@ -542,15 +554,21 @@ do
         EJ_SelectEncounter(journalEncounterID);
 
 
-        local difficultyID = self.difficultyID or LandingPageUtil.RaidDifficulties[2];
+        local difficultyID = self.difficultyID or LandingPageUtil:GetDefaultRaidDifficulty();
+        self.difficultyID = difficultyID;
         EJ_SetDifficulty(difficultyID);
-
         self.DifficultyDropdown:SetText(DifficultyUtil.GetDifficultyName(difficultyID));
+
+        local playerClassID = self.playerClassID or LandingPageUtil:GetDefaultPlayerClassID();
+        self.playerClassID = playerClassID;
+        EJ_SetLootFilter(playerClassID, 0);
+        self.ClassDropdown:SetText(GetPlayerClassName(playerClassID));
 
         local numLoots = EJ_GetNumLoot();
 
         if numLoots > 0 then
             self.DifficultyDropdown:Show();
+            self.ClassDropdown:Show();
             self.AlertText:Hide();
 
             local items = {};
@@ -635,6 +653,7 @@ do
             self.ScrollView:SetContent(content, retainPosition);
         else
             self.DifficultyDropdown:Hide();
+            self.ClassDropdown:Hide();
             self.AlertText:Show();
             self.ScrollView:Hide();
             self.ScrollView:SetContent(nil);
@@ -642,8 +661,14 @@ do
     end
 
     function LootContainerMixin:SetDifficulty(difficultyID)
-        difficultyID = difficultyID or self.difficultyID or LandingPageUtil.RaidDifficulties[2];
+        difficultyID = difficultyID or self.difficultyID or LandingPageUtil.GetDefaultRaidDifficulty();
         self.difficultyID = difficultyID;
+        self:Refresh();
+    end
+
+    function LootContainerMixin:SetPlayerClass(playerClassID)
+        playerClassID = playerClassID or self.playerClassID or LandingPageUtil.GetDefaultPlayerClassID();
+        self.playerClassID = playerClassID;
         self:Refresh();
     end
 
@@ -666,11 +691,12 @@ do
     local function DropdownMenuInfoGetter_Difficulty()
         local tbl = {
             key = "EncounterJournalDifficultyDropdownMenu",
-            widgets = {},
         };
+        local widgets = {};
+        tbl.widgets = widgets;
 
         for i, difficultyID in ipairs(LandingPageUtil.RaidDifficulties) do
-            tbl.widgets[i] = {
+            widgets[i] = {
                 type = "Radio",
                 text = DifficultyUtil.GetDifficultyName(difficultyID),
                 selected = difficultyID == LootContainer.difficultyID,
@@ -684,11 +710,48 @@ do
         return tbl
     end
 
+    local function DropdownMenuInfoGetter_PlayerClass()
+        local tbl = {
+            key = "EncounterJournalClassDropdownMenu",
+        };
+        local widgets = {};
+        tbl.widgets = widgets;
+
+        local playerClassList = LandingPageUtil.PlayerClassList;
+        local n = 0;
+
+        for i = 0, #playerClassList do
+            local playerClassID;
+            if i == 0 then
+                playerClassID = 0;
+            else
+                playerClassID = playerClassList[i];
+            end
+
+            n = n + 1;
+            widgets[n] = {
+                type = "Radio",
+                text = GetPlayerClassName(playerClassID),
+                selected = playerClassID == LootContainer.playerClassID,
+                closeAfterClick = true,
+                onClickFunc = function()
+                    LootContainer:SetPlayerClass(playerClassID);
+                end,
+            };
+        end
+
+        return tbl
+    end
+
     function CreateLootContainer(parent)
         local f = CreateFrame("Frame", nil, parent);
         LootContainer = f;
-        f.difficultyID = LandingPageUtil.RaidDifficulties[2];   --Normal
-        f:SetWidth(260);
+
+        f.difficultyID = LandingPageUtil.GetDefaultRaidDifficulty();
+        f.playerClassID = LandingPageUtil.GetDefaultPlayerClassID();
+
+        local frameWidth = 260;
+        f:SetWidth(frameWidth);
 
         f.buttons = {};
         API.Mixin(f, LootContainerMixin);
@@ -716,6 +779,8 @@ do
         ScrollView:SetPoint("TOPLEFT", f, "TOPLEFT", 8, -40);
         ScrollView:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -8, 8);
         ScrollView:OnSizeChanged();
+        ScrollView:SetAlwaysShowScrollBar(false);
+        ScrollView:SetStepSize(60);
 
         local function LootButton_Create()
             return CreateLootButton(ScrollView)
@@ -754,12 +819,20 @@ do
 
 
         --Dropdowns
+        local buttonWidth = math.floor(frameWidth * 0.5 - 16);
         local DifficultyDropdown = LandingPageUtil.CreateDropdownButton(f);
         f.DifficultyDropdown = DifficultyDropdown;
-        DifficultyDropdown:SetWidth(160);
+        DifficultyDropdown:SetWidth(buttonWidth);
         DifficultyDropdown:SetPoint("TOPRIGHT", f, "TOPRIGHT", -12, -6);
         DifficultyDropdown.menuInfoGetter = DropdownMenuInfoGetter_Difficulty;
         DifficultyDropdown:Hide();
+
+        local ClassDropdown = LandingPageUtil.CreateDropdownButton(f);
+        f.ClassDropdown = ClassDropdown;
+        ClassDropdown:SetWidth(buttonWidth);
+        ClassDropdown:SetPoint("TOPLEFT", f, "TOPLEFT", 12, -6);
+        ClassDropdown.menuInfoGetter = DropdownMenuInfoGetter_PlayerClass;
+        ClassDropdown:Hide();
 
         return f
     end
