@@ -2,7 +2,6 @@ local _, addon = ...
 local API = addon.API;
 local L = addon.L;
 local LandingPageUtil = addon.LandingPageUtil;
-local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 local GetEncounterProgress = LandingPageUtil.GetEncounterProgress;
 
 
@@ -14,6 +13,7 @@ local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
 local journalInstanceIDs = {
     1296,   --Liberation of Undermine
     1273,   --Nerub-ar Palace
+    --1190,   --Debug Castle Nathria
 };
 
 
@@ -34,13 +34,19 @@ local function SelectEncounter(dataIndex)
 end
 
 
-local function GetPlayerClassName(playerClassID)
+local function GetPlayerClassName(playerClassID, markYourClass)
     if playerClassID == 0 then
         return ALL_CLASSES
     end
 
    local info = C_CreatureInfo.GetClassInfo(playerClassID);
-   return info and info.className or ""
+   local name = info and info.className or "";
+
+    if markYourClass and playerClassID == LandingPageUtil.GetDefaultPlayerClassID() then
+        name = name .."  "..L["Your Class"];
+    end
+
+   return name
 end
 
 
@@ -73,18 +79,19 @@ do
         end
     end
 
-    function ListButtonMixin:SetInstance(uiMapID, journalInstanceID, name)
-        self.uiMapID = uiMapID;
+    function ListButtonMixin:SetInstance(mapID, journalInstanceID, name)
+        self.mapID = mapID;
         self.journalInstanceID = journalInstanceID;
         self:SetHeader();
         self.Name:SetText(name);
         self:HideProgress();
     end
 
-    function ListButtonMixin:SetEncounter(uiMapID, journalInstanceID, journalEncounterID, name)
-        self.uiMapID = uiMapID;
+    function ListButtonMixin:SetEncounter(mapID, journalInstanceID, journalEncounterID, dungeonEncounterID, name)
+        self.mapID = mapID;
         self.journalInstanceID = journalInstanceID;
         self.journalEncounterID = journalEncounterID;
+        self.dungeonEncounterID = dungeonEncounterID;
         self:SetEntry();
 
         self.Name:SetPoint("LEFT", self, "LEFT", 10, 0);
@@ -102,8 +109,8 @@ do
 
     function ListButtonMixin:UpdateProgress()
         self:HideProgress();
-        if (not self.isHeader) and self.uiMapID and self.journalEncounterID then
-            local progress = GetEncounterProgress(self.uiMapID, self.journalEncounterID);
+        if (not self.isHeader) and self.mapID and self.dungeonEncounterID then
+            local progress = GetEncounterProgress(self.mapID, self.dungeonEncounterID);
             local texture;
             for i, completed in ipairs(progress) do
                 texture = self["Light"..i];
@@ -564,6 +571,9 @@ do
         EJ_SetLootFilter(playerClassID, 0);
         self.ClassDropdown:SetText(GetPlayerClassName(playerClassID));
 
+        C_EncounterJournal.SetSlotFilter(Enum.ItemSlotFilterType.NoFilter);
+
+
         local numLoots = EJ_GetNumLoot();
 
         if numLoots > 0 then
@@ -655,6 +665,7 @@ do
             self.DifficultyDropdown:Hide();
             self.ClassDropdown:Hide();
             self.AlertText:Show();
+            self.AlertText:SetText(L["No Data"]);
             self.ScrollView:Hide();
             self.ScrollView:SetContent(nil);
         end
@@ -731,7 +742,7 @@ do
             n = n + 1;
             widgets[n] = {
                 type = "Radio",
-                text = GetPlayerClassName(playerClassID),
+                text = GetPlayerClassName(playerClassID, true),
                 selected = playerClassID == LootContainer.playerClassID,
                 closeAfterClick = true,
                 onClickFunc = function()
@@ -760,7 +771,7 @@ do
         f.AlertText = AlertText;
         AlertText:SetPoint("CENTER", f, "CENTER", 0, 0);
         AlertText:SetWidth(208);
-        AlertText:SetText(L["No Data"]);
+        AlertText:SetText(L["No Raid Boss Selected"]);
         AlertText:SetTextColor(0.5, 0.5, 0.5);
 
         f.Highlight = CreateFrame("Frame", nil, f);
@@ -843,9 +854,10 @@ local RaidTabMixin = {};
 do
     local DynamicEvents = {
         "UPDATE_INSTANCE_INFO",
+        "BOSS_KILL",
         "ACHIEVEMENT_EARNED",
         "CONTENT_TRACKING_UPDATE",
-        "EJ_LOOT_DATA_RECIEVED",
+        --"EJ_LOOT_DATA_RECIEVED",
     };
 
     function RaidTabMixin:OnShow()
@@ -861,12 +873,12 @@ do
     function RaidTabMixin:OnEvent(event, ...)
         if event == "UPDATE_INSTANCE_INFO" then
             self:UpdateScrollViewContent();
+        elseif event == "BOSS_KILL" then
+            RequestRaidInfo();
         elseif event == "ACHIEVEMENT_EARNED" then
             self:UpdateAchievements();
         elseif event == "CONTENT_TRACKING_UPDATE" then
             self.AchievementContainer:UpdateTooltip();
-        elseif event == "EJ_LOOT_DATA_RECIEVED" then
-
         end
     end
 
@@ -874,7 +886,7 @@ do
         --journalInstanceID
         --EJ_DIFFICULTIES
 
-        local name, _, _, _, _, _, dungeonAreaMapID = EJ_GetInstanceInfo(instanceID);
+        local name, _, _, _, _, _, _, _, _, mapID = EJ_GetInstanceInfo(instanceID);
         if not name then return end;
 
         local difficultyID = DifficultyUtil.ID.PrimaryRaidNormal;
@@ -882,23 +894,23 @@ do
 
         local encounters = {};
         local i = 1;
-        local bossName, description, journalEncounterID = EJ_GetEncounterInfoByIndex(i, instanceID);
-        local isComplete;
+        local bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, instanceID);
 
         while journalEncounterID do
             encounters[i] = {
                 name = bossName,
                 id = journalEncounterID,
-                uiMapID = dungeonAreaMapID,
+                mapID = mapID,
+                dungeonEncounterID = dungeonEncounterID,
             };
             i = i + 1;
-            bossName, description, journalEncounterID = EJ_GetEncounterInfoByIndex(i, instanceID);
+            bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, instanceID);
         end
 
         local data = {
             name = name,
             instanceID = instanceID,
-            uiMapID = dungeonAreaMapID,
+            mapID = mapID,
             encounters = encounters,
         };
 
@@ -915,12 +927,12 @@ do
         for _, journalInstanceID in ipairs(journalInstanceIDs) do
             local data = self:GetInstanceData(journalInstanceID);
             if data then
-                local uiMapID = data.uiMapID;
+                local mapID = data.mapID;
                 n = n + 1;
                 EncounterList[n] = {dataIndex = n, name = data.name, isCollapsed = false, isHeader = true, journalInstanceID = journalInstanceID};
                 for _, encounterInfo in ipairs(data.encounters) do
                     n = n + 1;
-                    EncounterList[n] = {dataIndex = n, name = encounterInfo.name, journalEncounterID = encounterInfo.id, uiMapID = uiMapID, journalInstanceID = journalInstanceID};
+                    EncounterList[n] = {dataIndex = n, name = encounterInfo.name, journalEncounterID = encounterInfo.id, dungeonEncounterID = encounterInfo.dungeonEncounterID, mapID = mapID, journalInstanceID = journalInstanceID, };
                 end
             end
         end
@@ -962,10 +974,10 @@ do
                         if v.isHeader then
                             obj:SetWidth(headerWidth);
                             obj.isCollapsed = v.isCollapsed;
-                            obj:SetInstance(v.uiMapID, v.journalInstanceID, v.name);
+                            obj:SetInstance(v.mapID, v.journalInstanceID, v.name);
                         else
                             obj:SetWidth(entryWidth);
-                            obj:SetEncounter(v.uiMapID, v.journalInstanceID, v.journalEncounterID, v.name);
+                            obj:SetEncounter(v.mapID, v.journalInstanceID, v.journalEncounterID, v.dungeonEncounterID, v.name);
                         end
                         obj:UpdateVisual();
                     end,

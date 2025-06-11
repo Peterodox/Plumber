@@ -409,6 +409,8 @@ L["Raids"] = RAIDS or "Raids";
 L["Instruction Track Achievement"] = "<Shift click to track this achievement>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
 L["No Data"] = "No data";
+L["No Raid Boss Selected"] = "No boss selected";
+L["Your Class"] = "(Your Class)";
 
 
 --Plumber AddOn Settings

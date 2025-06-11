@@ -7,6 +7,8 @@ local LandingPageUtil = addon.LandingPageUtil;
 local ipairs = ipairs;
 local IsEncounterComplete = C_RaidLocks.IsEncounterComplete;
 
+local PLAYER_CLASS_ID;
+
 
 local EncounterData = {
     --[journalEncounterID] = {}
@@ -73,18 +75,11 @@ function LandingPageUtil.GetEncounterAchievements(journalEncounterID)
     end
 end
 
-function LandingPageUtil.GetEncounterProgress(dungeonAreaMapID, journalEncounterID)
+function LandingPageUtil.GetEncounterProgress(mapID, dungeonEncounterID)
     local progress = {};
 
     for i, difficultyID in ipairs(Difficulties) do
-        progress[i] = IsEncounterComplete(dungeonAreaMapID, journalEncounterID, difficultyID);
-        --[[
-        if i == 1 then
-            if journalEncounterID >= 2639 then    --debug
-                progress[i] = true;
-            end
-        end
-        --]]
+        progress[i] = IsEncounterComplete(mapID, dungeonEncounterID, difficultyID);
     end
 
     return progress
@@ -95,6 +90,8 @@ function LandingPageUtil.GetDefaultRaidDifficulty()
 end
 
 function LandingPageUtil.GetDefaultPlayerClassID()
-    local _, _, classID = UnitClass("player");
-    return classID
+    if not PLAYER_CLASS_ID then
+        _, _, PLAYER_CLASS_ID = UnitClass("player");
+    end
+    return PLAYER_CLASS_ID
 end
