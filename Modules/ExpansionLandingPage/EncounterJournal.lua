@@ -21,18 +21,6 @@ local RaidTab, LootContainer;
 local EncounterList = {};
 
 
-local function SelectEncounter(dataIndex)
-    for i, v in ipairs(EncounterList) do
-        v.selected = nil;
-    end
-
-    if dataIndex and EncounterList[dataIndex] then
-        EncounterList[dataIndex].selected = true;
-    end
-
-    RaidTab:UpdateScrollViewSelection();
-end
-
 
 local function GetPlayerClassName(playerClassID, markYourClass)
     if playerClassID == 0 then
@@ -66,9 +54,9 @@ do
         if self.isHeader then
             self:ToggleCollapsed();
         else
+            RaidTab:SelectEncounterByDataIndex(self.dataIndex);
             RaidTab.AchievementContainer:SetAchievements(LandingPageUtil.GetEncounterAchievements(self.journalEncounterID));
             RaidTab.LootContainer:ShowLoot(self.journalInstanceID, self.journalEncounterID);
-            SelectEncounter(self.dataIndex);
         end
     end
 
@@ -589,6 +577,11 @@ do
             for i = 1, numLoots do
                 local itemInfo = C_EncounterJournal.GetLootInfoByIndex(i);
                 if itemInfo then
+                    if not (itemInfo.link and itemInfo.name) then
+                        self.ScrollView:Hide();
+                        RaidTab:RequestLootData();
+                        return
+                    end
                     itemInfo.uiOrder = i;
                     if itemInfo.displayAsPerPlayerLoot then
                         tinsert(perPlayerLoot, itemInfo);
@@ -791,6 +784,7 @@ do
         ScrollView:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -8, 8);
         ScrollView:OnSizeChanged();
         ScrollView:SetAlwaysShowScrollBar(false);
+        ScrollView:SetSmartClipsChildren(true);
         ScrollView:SetStepSize(60);
 
         local function LootButton_Create()
@@ -923,6 +917,7 @@ do
         EncounterList = {};
 
         local n = 0;
+        local selectedJournalEncounterID = self.selectedJournalEncounterID or -1;
 
         for _, journalInstanceID in ipairs(journalInstanceIDs) do
             local data = self:GetInstanceData(journalInstanceID);
@@ -933,6 +928,9 @@ do
                 for _, encounterInfo in ipairs(data.encounters) do
                     n = n + 1;
                     EncounterList[n] = {dataIndex = n, name = encounterInfo.name, journalEncounterID = encounterInfo.id, dungeonEncounterID = encounterInfo.dungeonEncounterID, mapID = mapID, journalInstanceID = journalInstanceID, };
+                    if encounterInfo.id == selectedJournalEncounterID then
+                        EncounterList[n].selected = true;
+                    end
                 end
             end
         end
@@ -979,7 +977,7 @@ do
                             obj:SetWidth(entryWidth);
                             obj:SetEncounter(v.mapID, v.journalInstanceID, v.journalEncounterID, v.dungeonEncounterID, v.name);
                         end
-                        obj:UpdateVisual();
+                        obj:UpdateSelection();
                     end,
                     top = top,
                     bottom = bottom,
@@ -1006,6 +1004,23 @@ do
 
     function RaidTabMixin:UpdateAchievements()
         self.AchievementContainer:Update();
+    end
+
+    function RaidTabMixin:SelectEncounterByDataIndex(dataIndex)
+        for i, v in ipairs(EncounterList) do
+            v.selected = nil;
+        end
+
+        if dataIndex and EncounterList[dataIndex] then
+            EncounterList[dataIndex].selected = true;
+            self.selectedDataIndex = dataIndex;
+            self.selectedJournalEncounterID = EncounterList[dataIndex].journalEncounterID;
+        else
+            self.selectedDataIndex = nil;
+            self.selectedJournalEncounterID = nil;
+        end
+
+        RaidTab:UpdateScrollViewSelection();
     end
 
     function RaidTabMixin:Init()
@@ -1054,6 +1069,7 @@ do
         LootContainer.ScrollView:OnSizeChanged();
         LootContainer.ScrollView:SetBottomOvershoot(40);
     end
+    
 
     --Frame Update
     function RaidTabMixin:OnUpdate(elapsed)

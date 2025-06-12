@@ -3,8 +3,7 @@ local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil;
-local GetActivityName = LandingPageUtil.GetActivityName;
-local ShouldShowActivity = LandingPageUtil.ShouldShowActivity;
+local ActivityUtil = addon.ActivityUtil;
 local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 
 
@@ -67,7 +66,7 @@ do  --Checklist Button
             else
                 self.type = nil;
                 self.id = nil;
-                self.Name:SetText(GetActivityName(dataIndex));
+                self.Name:SetText(ActivityUtil.GetActivityName(dataIndex));
             end
 
             self:UpdateProgress();
@@ -104,13 +103,13 @@ do  --Checklist Button
 
         self.Text1:SetText(nil);
 
-        local name, isLocalized = GetActivityName(self.dataIndex);
+        local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex);
         self.Name:SetText(name);
         if not isLocalized then
             CallbackRegistry:LoadQuest(questID, function(_questID)
                 if questID == self.id then
                     local name = API.GetQuestName(_questID);
-                    LandingPageUtil.StoreQuestActivityName(self.dataIndex, _questID, name);
+                    ActivityUtil.StoreQuestActivityName(self.dataIndex, _questID, name);
                     self.Name:SetText(name);
                     self:UpdateProgress();
                     if self:IsMouseMotionFocus() then
@@ -127,13 +126,13 @@ do  --Checklist Button
 
         self.Text1:SetText(nil);
 
-        local name, isLocalized = GetActivityName(self.dataIndex);
+        local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex);
         self.Name:SetText(name);
         if not isLocalized then
             CallbackRegistry:LoadItem(itemID, function(_itemID)
                 if _itemID == self.itemID then
                     local name = C_Item.GetItemNameByID(_itemID);
-                    LandingPageUtil.StoreItemActivityName(self.dataIndex, _itemID, name);
+                    ActivityUtil.StoreItemActivityName(self.dataIndex, _itemID, name);
                     self.Name:SetText(name);
                     self:UpdateProgress();
                 end
@@ -142,9 +141,9 @@ do  --Checklist Button
     end
 
     function ChecklistButtonMixin:ToggleCollapsed()
-        local v = self.dataIndex and SortedActivityData[self.dataIndex]
+        local v = self.dataIndex;
         if v then
-            v.isCollapsed = not v.isCollapsed;
+            ActivityUtil.ToggleCollapsed(v);
             ActivityTab:FullUpdate();
         end
     end
@@ -180,6 +179,7 @@ do
         "QUEST_REMOVED",
         "QUEST_ACCEPTED",
         "QUEST_TURNED_IN",
+        "QUESTLINE_UPDATE",
     };
 
     function ActivityTabMixin:FullUpdate()
@@ -197,14 +197,14 @@ do
         local top, bottom;
         local showActivity, showGroup;
 
-        SortedActivityData = LandingPageUtil.GetSortedActivity();
+        SortedActivityData = ActivityUtil.GetSortedActivity();
 
         for k, v in ipairs(SortedActivityData) do
             if v.isHeader then
                 showActivity = true;
                 showGroup = not v.isCollapsed;
             else
-                showActivity = showGroup and ShouldShowActivity(v);
+                showActivity = showGroup and ActivityUtil.ShouldShowActivity(v);
             end
 
             if showActivity then
@@ -255,7 +255,7 @@ do
     function ActivityTabMixin:OnEvent(event, ...)
         if event == "QUEST_LOG_UPDATE" then
             self:RequestUpdate();
-        elseif event == "QUEST_REMOVED" or event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" then
+        elseif event == "QUEST_REMOVED" or event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" or event == "QUESTLINE_UPDATE" then
             self:RequestUpdate(true);
         end
     end

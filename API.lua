@@ -2197,7 +2197,7 @@ do  -- Quest
         end
     end
 
-    function API.GetQuestProgressTexts(questID)
+    function API.GetQuestProgressTexts(questID, hideFinishedObjectives)
         local questLogIndex = questID and C_QuestLog.GetLogIndexForQuestID(questID);
 
         if questLogIndex then
@@ -2213,13 +2213,21 @@ do  -- Quest
             for objectiveIndex = 1, numObjectives do
                 text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
                 text = text or "";
-                if not finished then
+                if (not finished) or not hideFinishedObjectives then
                     if objectiveType == "progressbar" then
                         fulfilled = GetQuestProgressBarPercent(questID);
                         fulfilled = floor(fulfilled);
-                        tinsert(texts, format("- %s%% %s", fulfilled, text));
+                        if finished then
+                            tinsert(texts, format("|cff808080- %s%% %s|r", fulfilled, text));
+                        else
+                            tinsert(texts, format("- %s%% %s", fulfilled, text));
+                        end
                     else
-                        tinsert(texts, format("- %s", text));
+                        if finished then
+                            tinsert(texts, format("|cff808080- %s|r", text));
+                        else
+                            tinsert(texts, format("- %s", text));
+                        end
                     end
                 end
             end

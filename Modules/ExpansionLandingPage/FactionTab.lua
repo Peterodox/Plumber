@@ -1077,7 +1077,8 @@ do
                 ProgressDisplay.Text3:SetTextColor(0.098, 1.000, 0.098);
             else
                 ProgressDisplay.ProgressBar:SetValue(currentValue, maxValue);
-                ProgressDisplay.Text3:SetText(L["Until Next Level Format"]:format(maxValue - currentValue));
+                local nextLevelFormat = progress.isFull and L["Until Paragon Reward Format"] or L["Until Next Level Format"];
+                ProgressDisplay.Text3:SetText(nextLevelFormat:format(maxValue - currentValue));
                 ProgressDisplay.Text3:SetTextColor(0.5, 0.5, 0.5);
             end
         end
