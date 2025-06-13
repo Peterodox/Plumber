@@ -31,7 +31,7 @@ do
                     --Full
                     self.Text:SetTextColor(0.098, 1.000, 0.098);
                 else
-                    self.Text:SetTextColor(0.92, 0.92, 0.92);
+                    self.Text:SetTextColor(0.88, 0.88, 0.88);
                 end
             else
                 self.Text:SetTextColor(0.5, 0.5, 0.5);

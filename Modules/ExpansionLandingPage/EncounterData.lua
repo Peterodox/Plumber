@@ -86,6 +86,14 @@ function LandingPageUtil.GetEncounterProgress(mapID, dungeonEncounterID)
 end
 
 function LandingPageUtil.GetDefaultRaidDifficulty()
+    local difficultyID = addon.GetDBValue("EncounterJournalDifficulty");
+    if difficultyID then
+        for _, id in ipairs(Difficulties) do
+            if id == difficultyID then
+                return difficultyID
+            end
+        end
+    end
     return Difficulties[2]
 end
 

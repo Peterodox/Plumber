@@ -431,6 +431,7 @@ function ActivityUtil.ToggleCollapsed(dataIndex)
 end
 
 
+--[[
 function Debug_YeetQuests(uiMapID)
     uiMapID = uiMapID or C_Map.GetBestMapForUnit("player");
 
@@ -458,3 +459,25 @@ function Debug_YeetActiveQuestLineQuests()
         end
     end
 end
+--]]
+
+--Debug Event Listener
+--[[
+do
+    local EL = CreateFrame("Frame");
+
+    local DynamicEvents = {
+        "QUEST_LOG_UPDATE",
+        "QUEST_REMOVED",
+        "QUEST_ACCEPTED",
+        "QUEST_TURNED_IN",
+        "QUESTLINE_UPDATE",
+        "TASK_PROGRESS_UPDATE",
+    };
+    API.RegisterFrameForEvents(EL, DynamicEvents);
+
+    EL:SetScript("OnEvent", function(self, event, ...)
+        print(event, ...)
+    end)
+end
+--]]

@@ -667,6 +667,7 @@ do
     function LootContainerMixin:SetDifficulty(difficultyID)
         difficultyID = difficultyID or self.difficultyID or LandingPageUtil.GetDefaultRaidDifficulty();
         self.difficultyID = difficultyID;
+        addon.SetDBValue("EncounterJournalDifficulty", difficultyID);
         self:Refresh();
     end
 

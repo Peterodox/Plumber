@@ -21,6 +21,7 @@ local DefaultResources = {
     {currencyID = 3028},    --Restored Coffer Key
     {itemID = 236096, isMinor = false},   --Coffer Key Shard
     {itemID = 235897},      --Radiant Echo
+    {currencyID = 3218},    --Empty Kaja'Cola Can
     {currencyID = 3226},    --Market Research
     {currencyID = 2815},    --Resonance Crystals
     {currencyID = 3056},    --Kej
@@ -53,11 +54,15 @@ do
 
     function CurrencyButtonMixin:Refresh()
         local quantity;
+        local isOverflow;
 
         if self.currencyID then
             local info = GetCurrencyInfo(self.currencyID);
             if info then
                 quantity = info.quantity;
+                local totalEarned = info.totalEarned or 0;
+                local maxQuantity = info.maxQuantity or 0;
+                isOverflow = quantity > 0 and maxQuantity > 0 and (((maxQuantity - totalEarned) == 0) or (quantity >= maxQuantity))
                 if self.buttonDitry then
                     self.buttonDitry = nil;
                     self.Name:SetText(info.name);
@@ -91,8 +96,12 @@ do
             if quantity > 0 then
                 self.anyOwned = true;
                 self.Name:SetTextColor(0.922, 0.871, 0.761);
-                self.Count:SetTextColor(0.8, 0.8, 0.8);
                 self.Count:SetText(BreakUpLargeNumbers(quantity));
+                if isOverflow then
+                    self.Count:SetTextColor(0.098, 1.000, 0.098);
+                else
+                    self.Count:SetTextColor(0.88, 0.88, 0.88);
+                end
             else
                 self.anyOwned = false;
                 self.Name:SetTextColor(0.5, 0.5, 0.5);
@@ -124,6 +133,10 @@ do
     function CurrencyButtonMixin:OnLeave()
         self:UpdateVisual();
         GameTooltip:Hide();
+    end
+
+    function CurrencyButtonMixin:OnClick()
+        API.ToggleBlizzardTokenUIIfWarbandCurrency(self.currencyID);
     end
 
     function CurrencyButtonMixin:UpdateVisual()
@@ -167,6 +180,7 @@ local function CreateButton(parent)
 
     f:SetScript("OnEnter", f.OnEnter);
     f:SetScript("OnLeave", f.OnLeave);
+    f:SetScript("OnClick", f.OnClick);
 
     return f
 end
@@ -285,6 +299,18 @@ do
                 self.currencyXButton[button.currencyID] = button;
                 button:Refresh();
             end
+        end
+
+        if self.anyCurrency then
+            self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+        else
+            self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+        end
+
+        if self.anyItem then
+            self:RegisterEvent("BAG_UPDATE_DELAYED");
+        else
+            self:UnregisterEvent("BAG_UPDATE_DELAYED");
         end
     end
 

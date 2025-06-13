@@ -1959,6 +1959,53 @@ do  -- System
             return DressUpLink(link)
         end
     end
+
+
+    function API.ToggleBlizzardTokenUIIfWarbandCurrency(currencyID)
+        if InCombatLockdown() then return end;
+
+        local info = currencyID and C_CurrencyInfo.GetCurrencyInfo(currencyID);
+        if not (info and info.isAccountTransferable) then return end;
+
+        local onlyShow = false;      --If true, don't hide the frame when shown
+        ToggleCharacter("TokenFrame", onlyShow);
+    end
+
+
+    function API.AddButtonToAddonCompartment(identifier, name, icon, onClickFunc, onEnterFunc, onLeaveFunc)
+        local f = AddonCompartmentFrame;
+        if not f then return end;
+
+        for index, addonData in ipairs(f.registeredAddons) do
+            if addonData.identifier == identifier then
+                return
+            end
+        end
+
+        local addonData = {
+            identifier = identifier,
+            text = name,
+            icon = icon,
+            func = onClickFunc,
+            funcOnEnter = onEnterFunc,
+            funcOnLeave = onLeaveFunc,
+        };
+
+        f:RegisterAddon(addonData)
+    end
+
+    function API.RemoveButtonFromAddonCompartment(identifier)
+        local f = AddonCompartmentFrame;
+        if not f then return end;
+
+        for index, addonData in ipairs(f.registeredAddons) do
+            if addonData.identifier == identifier then
+                table.remove(f.registeredAddons, index);
+                f:UpdateDisplay();
+                return
+            end
+        end
+    end
 end
 
 do  -- Player
@@ -2167,6 +2214,10 @@ do  -- Quest
             for objectiveIndex = 1, numObjectives do
                 text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
                 --print(questID, GetQuestName(questID), numObjectives, finished, fulfilled, required)
+                if fulfilled > required then
+                    fulfilled = required;
+                end
+
                 if objectiveType == "progressbar" then
                     fulfilled = 0.01 * GetQuestProgressBarPercent(questID);
                     required = 1;
@@ -2220,7 +2271,7 @@ do  -- Quest
                         if finished then
                             tinsert(texts, format("|cff808080- %s%% %s|r", fulfilled, text));
                         else
-                            tinsert(texts, format("- %s%% %s", fulfilled, text));
+                            tinsert(texts, format("- %s", text));
                         end
                     else
                         if finished then
@@ -2236,11 +2287,18 @@ do  -- Quest
         else
             if not C_QuestLog.IsOnQuest(questID) then
                 local texts = {};
+
                 if C_QuestLog.IsQuestFlaggedCompleted(questID) then
                     texts[1] = format("|cff808080%s|r", QUEST_COMPLETE);
                 else
-                    texts[1] = format("|cff808080%s|r", L["Not On Quest"]);
+                    texts[1] = format("|cffff2020%s|r", L["Not On Quest"]);
+                    local description = API.GetDescriptionFromTooltip(questID);
+                    if description and description ~= QUEST_TOOLTIP_REQUIREMENTS then
+                        tinsert(texts, " ");
+                        tinsert(texts, description);
+                    end
                 end
+
                 return texts;
             end
         end
@@ -2560,6 +2618,17 @@ do  -- Tooltip
         tooltip:ProcessInfo(tooltipInfo);
     end
     API.SetTooltipWithPostCall = SetTooltipWithPostCall;
+
+
+    function API.GetDescriptionFromTooltip(questID)
+        if questID then
+            local hyperlink = "|Hquest:"..questID.."|h";
+            local data = addon.TooltipAPI.GetHyperlink(hyperlink);
+            if data then
+                return data.lines[3] and data.lines[3].leftText or nil
+            end
+        end
+    end
 end
 
 do  -- AsyncCallback

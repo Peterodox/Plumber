@@ -1144,13 +1144,7 @@ do  -- TokenFrame   -- Money   -- Coin
         end
 
         if self.tokenType == 0 and self.currencyID then
-            local info = C_CurrencyInfo.GetCurrencyInfo(self.currencyID);
-            if not info then return end;
-
-            if not(info.discovered or info.isAccountWide or info.isAccountTransferable) then return end;
-
-            local onlyShow = false;      --If true, don't hide the frame when shown
-            ToggleCharacter("TokenFrame", onlyShow);
+            API.ToggleBlizzardTokenUIIfWarbandCurrency(self.currencyID);
 
             --[[    --Taint!!
             C_Timer.After(0, function()

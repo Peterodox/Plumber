@@ -293,7 +293,7 @@ do
 
     function ActivityTabMixin:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        if self.t >= 0.2 then
+        if self.t >= 0.5 then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             if self.fullUpdate then
