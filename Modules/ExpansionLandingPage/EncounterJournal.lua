@@ -786,6 +786,8 @@ do
         ScrollView:SetAlwaysShowScrollBar(false);
         ScrollView:SetSmartClipsChildren(true);
         ScrollView:SetStepSize(60);
+        ScrollView:UseBoundaryGradient(true);
+        ScrollView:SetBoundaryGradientSize(40);
 
         local function LootButton_Create()
             return CreateLootButton(ScrollView)
@@ -809,18 +811,6 @@ do
         end
 
         ScrollView:AddTemplate("HeaderTitle", HeaderTitle_Create);
-
-
-        local BottomGradient = CreateFrame("Frame", nil, f);
-        BottomGradient:SetSize(224, 40);
-        BottomGradient:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 6, 0);
-        local tex = BottomGradient:CreateTexture(nil, "OVERLAY");
-        tex:SetAllPoints(true);
-        local topColor = CreateColor(0.082, 0.047, 0.027, 0);
-        local bottomColor = CreateColor(0.082, 0.047, 0.027, 1)
-        tex:SetColorTexture(1, 1, 1);
-        tex:SetGradient("VERTICAL", bottomColor, topColor);
-        BottomGradient:SetFrameLevel(ScrollView:GetFrameLevel() + 2);
 
 
         --Dropdowns

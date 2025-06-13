@@ -182,10 +182,12 @@ do
 
     function PlumberExpansionLandingPageMixin:InitLeftSection()
         local categories = {
-            {name = "Great Vault", frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsPlayerAtMaxLevel},
-            {name = "Item Upgrade", frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
-            {name = "Resources", frameGetter = LandingPageUtil.CreateCurrencyList},
+            {name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsPlayerAtMaxLevel},
+            {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
+            {name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
         };
+
+        local numCategories = #categories;
 
         local offsetY = 16;
         local relativeTo = self.LeftSection;
@@ -204,6 +206,9 @@ do
                     local frame, height = v.frameGetter(container);
                     frame:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
                     offsetY = offsetY + height;
+                    if k == numCategories then
+                        frame:SetPoint("BOTTOM", relativeTo, "BOTTOM", 0, 16);
+                    end
                     frame:Refresh();
                 end
                 offsetY = offsetY + paragraphGap;

@@ -76,15 +76,15 @@ end
 
 
 
-local GreatVaultFrameMixin = {};
+local ItemUpgradeFrameMixin = {};
 do
-    function GreatVaultFrameMixin:Refresh()
+    function ItemUpgradeFrameMixin:Refresh()
         for _, button in ipairs(self.buttons) do
             button:Refresh();
         end
     end
 
-    function GreatVaultFrameMixin:GetActiveWidgets()
+    function ItemUpgradeFrameMixin:GetActiveWidgets()
         return self.buttons
     end
 end
@@ -120,7 +120,7 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
 
     f:SetSize(width, height);
 
-    API.Mixin(f, GreatVaultFrameMixin);
+    API.Mixin(f, ItemUpgradeFrameMixin);
     f.buttons = buttons;
 
     return f, height

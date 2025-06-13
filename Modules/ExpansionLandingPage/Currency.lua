@@ -26,6 +26,11 @@ local DefaultResources = {
     {currencyID = 3056},    --Kej
     --{currencyID = 3055},      --Mereldar Derby Mark
     {currencyID = 2803},    --Undercoin
+
+    {currencyID = 2123},    --Bloody Tokens
+    {currencyID = 1602},    --Conquest
+    {currencyID = 1792},    --Honor
+    {currencyID = 2797},    --Trophy of Strife
 };
 
 local CurrencyButtonMixin = {};
@@ -84,16 +89,19 @@ do
 
         if quantity then
             if quantity > 0 then
-                self.Name:SetTextColor(0.92, 0.92, 0.92);
-                self.Count:SetTextColor(0.92, 0.92, 0.92);
+                self.anyOwned = true;
+                self.Name:SetTextColor(0.922, 0.871, 0.761);
+                self.Count:SetTextColor(0.8, 0.8, 0.8);
                 self.Count:SetText(BreakUpLargeNumbers(quantity));
             else
+                self.anyOwned = false;
                 self.Name:SetTextColor(0.5, 0.5, 0.5);
                 self.Count:SetTextColor(0.5, 0.5, 0.5);
                 self.Count:SetText(0);
             end
             return true
         else
+            self.anyOwned = false;
             return false
         end
     end
@@ -103,16 +111,31 @@ do
     end
 
     function CurrencyButtonMixin:OnEnter()
-        GameTooltip:SetOwner(self.Icon, "ANCHOR_RIGHT", 0, 0);
+        self:UpdateVisual();
+        local tooltip = GameTooltip;
+        tooltip:SetOwner(self.Icon, "ANCHOR_RIGHT", 0, 0);
         if self.currencyID then
-            GameTooltip:SetCurrencyByID(self.currencyID);
+            tooltip:SetCurrencyByID(self.currencyID);
         elseif self.itemID then
-            GameTooltip:SetItemByID(self.itemID);
+            tooltip:SetItemByID(self.itemID);
         end
     end
 
     function CurrencyButtonMixin:OnLeave()
+        self:UpdateVisual();
         GameTooltip:Hide();
+    end
+
+    function CurrencyButtonMixin:UpdateVisual()
+        if self:IsMouseMotionFocus() then
+            self.Name:SetTextColor(1, 1, 1);
+        else
+            if self.anyOwned then
+                self.Name:SetTextColor(0.922, 0.871, 0.761);
+            else
+                self.Name:SetTextColor(0.5, 0.5, 0.5);
+            end
+        end
     end
 end
 
@@ -152,89 +175,128 @@ end
 local CurrencyListMixin = {};
 do
     function CurrencyListMixin:Refresh()
-        --This refresh everything
-        --Individual currency update is driven by events
-
-        local currencyXButton;
-        local itemXButton;
-
-        for _, button in ipairs(self.buttons) do
-            button:Refresh();
-            if button.currencyID then
-                if not currencyXButton then
-                    currencyXButton = {};
-                end
-                currencyXButton[button.currencyID] = button;
-            elseif button.itemID then
-                if not itemXButton then
-                    itemXButton = {};
-                end
-                itemXButton[button.itemID] = button;
-            end
-        end
-
-        local itemUpgradeButtons = LandingPageUtil.GetItemUpgradeButtons();
-        if itemUpgradeButtons then
-            for _, button in ipairs(itemUpgradeButtons) do
-                button:Refresh();
-                if not currencyXButton then
-                    currencyXButton = {};
-                end
-                currencyXButton[button.currencyID] = button;
-            end
-        end
-
-        self.currencyXButton = currencyXButton;
-        self.itemXButton = itemXButton;
-
-        if self:IsVisible() then
-            if currencyXButton then
-                self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
-            end
-
-            if itemXButton then
-                self:RegisterEvent("BAG_UPDATE_DELAYED");
-            end
-        end
-    end
-
-    function CurrencyListMixin:GetActiveWidgets()
-        local tbl = {};
-        local n = 0;
-        for _, button in ipairs(self.buttons) do
-            if button.currencyID or button.itemID then
-                n = n + 1;
-                tbl[n] = button;
-            end
-        end
-        return tbl
+        --Called once when frame is created
+        self:OnSizeChanged();
+        self:FullUpdate();
     end
 
     function CurrencyListMixin:OnShow()
-        self:Refresh();
+        self:FullUpdate();
     end
 
     function CurrencyListMixin:OnHide()
         self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
         self:UnregisterEvent("BAG_UPDATE_DELAYED");
-        self.currencyXButton = nil;
-        self.itemXButton = nil;
+        self.anyCurrency = nil;
+        self.anyItem = nil;
     end
 
     function CurrencyListMixin:OnEvent(event, ...)
         if event == "CURRENCY_DISPLAY_UPDATE" then
+            if not self.anyCurrency then return end;
             local currencyID = ...
-            if self.currencyXButton then
-                if self.currencyXButton[currencyID] then
-                    self.currencyXButton[currencyID]:Refresh();
+
+            if self.currencyXButton[currencyID] then
+                self.currencyXButton[currencyID]:Refresh();
+                return
+            end
+
+            local processFunc = function(obj)
+                if obj.currencyID == currencyID then
+                    obj:Refresh();
+                    return true
                 end
             end
+            self.ScrollView:ProcessActiveObjects("CurrencyButton", processFunc);
         elseif event == "BAG_UPDATE_DELAYED" then
-            if self.itemXButton then
-                for itemID, button in pairs(self.itemXButton) do
-                    button:Refresh();
+            if not self.anyItem then return end;
+            local processFunc = function(obj)
+                if obj.itemID then
+                    obj:Refresh();
                 end
             end
+            self.ScrollView:ProcessActiveObjects("CurrencyButton", processFunc);
+        end
+    end
+
+    function CurrencyListMixin:FullUpdate()
+        self.anyCurrency = nil;
+        self.anyItem = nil;
+
+        local n = 0;
+        local content = {};
+        local offsetY = 0;
+        local offsetX = -0.5 * BUTTON_WIDTH;
+        local gap = 0;
+        local top, bottom;
+        local objectHeight;
+
+        for _, v in ipairs(DefaultResources) do
+            n = n + 1;
+            top = offsetY;
+            if v.isHeader then
+                objectHeight = 16;
+                bottom = offsetY + objectHeight + gap;
+                content[n] = {
+                    templateKey = "HeaderTitle",
+                    setupFunc = function(obj)
+                        obj:SetText(v.name);
+                    end,
+                    top = top,
+                    bottom = bottom,
+                    point = "TOPLEFT",
+                    offsetX = offsetX,
+                };
+            else
+                objectHeight = BUTTON_HEIGHT;
+                bottom = offsetY + objectHeight + gap;
+                content[n] = {
+                    templateKey = "CurrencyButton",
+                    top = top,
+                    bottom = bottom,
+                    point = "TOPLEFT",
+                    offsetX = offsetX,
+                };
+                if v.currencyID then
+                    self.anyCurrency = true;
+                    content[n].setupFunc = function(obj)
+                        obj:SetCurrency(v.currencyID, v.isMinor);
+                    end;
+                elseif v.itemID then
+                    self.anyItem = true;
+                    content[n].setupFunc = function(obj)
+                        obj:SetItem(v.itemID, v.isMinor);
+                    end;
+                end
+            end
+            offsetY = bottom;
+        end
+
+        local retainPosition = true;
+        self.ScrollView:Show();
+        self.ScrollView:SetContent(content, retainPosition);
+
+
+        self.currencyXButton = {};
+        local itemUpgradeButtons = LandingPageUtil.GetItemUpgradeButtons();
+        if itemUpgradeButtons then
+            self.anyCurrency = true;
+            for _, button in ipairs(itemUpgradeButtons) do
+                self.currencyXButton[button.currencyID] = button;
+                button:Refresh();
+            end
+        end
+    end
+
+    function CurrencyListMixin:UpdateScrollViewContent()
+        if self.ScrollView then
+            self.ScrollView:CallObjectMethod("CurrencyButton", "Refresh");
+        end
+    end
+
+    function CurrencyListMixin:OnSizeChanged()
+        if self.ScrollView then
+            self.ScrollView:OnSizeChanged();
         end
     end
 end
@@ -243,31 +305,44 @@ end
 function LandingPageUtil.CreateCurrencyList(parent)
     local f = CreateFrame("Frame", nil, parent);
     API.Mixin(f, CurrencyListMixin);
-    f:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 
-    local buttons = {};
-    local n = 0;
-    local button;
-    local visualOffsetY = 4;
+    local height = 7 * BUTTON_HEIGHT;
+    f:SetSize(BUTTON_WIDTH, height);
 
-    for _, v in ipairs(DefaultResources) do
-        n = n + 1;
-        button = CreateButton(f);
-        buttons[n] = button;
-        if v.currencyID then
-            button:SetCurrency(v.currencyID, v.isMinor);
-        elseif v.itemID then
-            button:SetItem(v.itemID, v.isMinor);
+
+    local ScrollView = LandingPageUtil.CreateScrollViewForTab(f);
+    f.ScrollView = ScrollView;
+    ScrollView:Hide();
+    ScrollView:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+    ScrollView:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
+    ScrollView:OnSizeChanged();
+    ScrollView:SetAlwaysShowScrollBar(false);
+    ScrollView:SetSmartClipsChildren(true);
+    ScrollView:SetStepSize(2.5 * BUTTON_HEIGHT);
+    ScrollView:SetBottomOvershoot(BUTTON_HEIGHT);
+    ScrollView:ResetScrollBarPosition();
+    ScrollView:UseBoundaryGradient(true);
+    ScrollView:SetBoundaryGradientSize(BUTTON_HEIGHT);
+
+    local function CurrencyButton_Create()
+        return CreateButton(ScrollView)
+    end
+
+    local function CurrencyButton_OnAcquired(button)
+        if ScrollView:IsScrollable() then
+            button:SetWidth(BUTTON_WIDTH - 20);
+        else
+            button:SetWidth(BUTTON_WIDTH);
         end
-        button:SetPoint("TOP", f, "TOP", 0, visualOffsetY + (1 - n) * BUTTON_HEIGHT);
     end
 
-    f.buttons = buttons;
-
-    local height = n * BUTTON_HEIGHT;
-    if n > 0 then
-        f:SetHeight(height);
+    local function CurrencyButton_OnRemoved(button)
+        button.currencyID = nil;
+        button.itemID = nil;
     end
+
+    ScrollView:AddTemplate("CurrencyButton", CurrencyButton_Create, CurrencyButton_OnAcquired, CurrencyButton_OnRemoved);
+
 
     f:SetScript("OnShow", f.OnShow);
     f:SetScript("OnHide", f.OnHide);

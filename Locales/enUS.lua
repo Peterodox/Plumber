@@ -412,6 +412,9 @@ L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT o
 L["No Data"] = "No data";
 L["No Raid Boss Selected"] = "No boss selected";
 L["Your Class"] = "(Your Class)";
+L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Great Vault";
+L["Item Upgrade"] = ITEM_UPGRADE or "Item Upgrade";
+L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Resources";
 
 
 --Plumber AddOn Settings

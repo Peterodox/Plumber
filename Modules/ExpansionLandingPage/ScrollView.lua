@@ -476,6 +476,10 @@ do  --ScrollView Basic Content Render
         self.ScrollBar:SetShown(scrollable or self.alwaysShowScrollBar);
     end
 
+    function ScrollViewMixin:IsScrollable()
+        return self.scrollable
+    end
+
     function ScrollViewMixin:SetContent(content, retainPosition)
         self.content = content or {};
 
@@ -759,6 +763,37 @@ do  --ScrollView Scroll Behavior
         self.ScrollBar:SetPoint("TOPRIGHT", self, "TOPRIGHT", -1, -1);
         self.ScrollBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 1);
     end
+
+    function ScrollViewMixin:UseBoundaryGradient(state)
+        self.useBoundaryGradient = state;
+
+        if state and not self.BottomGradient then
+            local BottomGradient = CreateFrame("Frame", nil, self);
+            self.BottomGradient = BottomGradient;
+            BottomGradient:SetSize(224, self.boundaryGradientSize or 40);
+            BottomGradient:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 6, -1);
+            BottomGradient:SetPoint("BOTTOMRIGHT", self.ScrollBar, "BOTTOMLEFT", -1, -1);
+            local tex = BottomGradient:CreateTexture(nil, "OVERLAY");
+            tex:SetAllPoints(true);
+            local topColor = CreateColor(0.082, 0.047, 0.027, 0);
+            local bottomColor = CreateColor(0.082, 0.047, 0.027, 1)
+            tex:SetColorTexture(1, 1, 1);
+            tex:SetGradient("VERTICAL", bottomColor, topColor);
+            BottomGradient:SetFrameLevel(self:GetFrameLevel() + 2);
+        end
+
+        if self.BottomGradient then
+            self.BottomGradient:SetShown(state);
+        end
+    end
+
+    function ScrollViewMixin:SetBoundaryGradientSize(size)
+        --size(height) is usually (buttonHeight + gap)
+        self.boundaryGradientSize = size;
+        if self.BottomGradient then
+            self.BottomGradient:SetHeight(size);
+        end
+    end
 end
 
 do  --ScrollView Callback
@@ -810,9 +845,15 @@ end
 
 do  --ScrollView Content Update
     function ScrollViewMixin:CallObjectMethod(templateKey, method, ...)
-        for _, object in ipairs(self.pools[templateKey].activeObjects) do
-            object[method](object, ...)
-        end
+        self.pools[templateKey]:CallMethod(method, ...);
+    end
+
+    function ScrollViewMixin:CallObjectMethodByPredicate(templateKey, predicate, method, ...)
+        self.pools[templateKey]:CallMethodByPredicate(predicate, method, ...);
+    end
+
+    function ScrollViewMixin:ProcessActiveObjects(templateKey, processFunc)
+        self.pools[templateKey]:ProcessActiveObjects(processFunc)
     end
 end
 

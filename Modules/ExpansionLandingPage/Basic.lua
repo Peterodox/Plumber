@@ -72,6 +72,28 @@ do  --Object Pool
         return object
     end
 
+    function ObjectPoolMixin:CallMethod(method, ...)
+        for _, object in ipairs(self.activeObjects) do
+            object[method](object, ...);
+        end
+    end
+
+    function ObjectPoolMixin:CallMethodByPredicate(predicate, method, ...)
+        for _, object in ipairs(self.activeObjects) do
+            if predicate(object) then
+                object[method](object, ...);
+            end
+        end
+    end
+
+    function ObjectPoolMixin:ProcessActiveObjects(processFunc)
+        for _, object in ipairs(self.activeObjects) do
+            if processFunc(object) then
+                return
+            end
+        end
+    end
+
     function CreateObjectPool(create, onAcquired, onRemoved)
         local pool = {};
         API.Mixin(pool, ObjectPoolMixin);
