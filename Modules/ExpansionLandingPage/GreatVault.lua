@@ -97,7 +97,7 @@ local function CreateButton(parent)
 
     f.Background = f:CreateTexture(nil, "BACKGROUND");
     f.Background:SetAllPoints(true);
-    f.Background:SetTexture("Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW");
+    f.Background:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW");
     f.Background:SetTexCoord(700/1024, 828/1024, 112/1024, 176/1024);
 
     f:SetScript("OnEnter", f.OnEnter);
@@ -317,7 +317,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
     Highlight:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT);
     Highlight.Texture = Highlight:CreateTexture(nil, "OVERLAY");
     Highlight.Texture:SetAllPoints(true);
-    Highlight.Texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW");
+    Highlight.Texture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW");
     Highlight.Texture:SetTexCoord(700/1024, 828/1024, 176/1024, 240/1024);
     Highlight.Texture:SetBlendMode("ADD");
 
@@ -328,7 +328,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
     ClaimChestAlert:Hide();
     ClaimChestAlert:SetAllPoints(true);
 
-    local chestTex = "Interface/AddOns/Plumber/Art/Frame/GreatVault";
+    local chestTex = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/GreatVault";
     local ChestIcon = ClaimChestAlert:CreateTexture(nil, "OVERLAY");
     ChestIcon:SetSize(64, 64);
     ChestIcon:SetPoint("TOP", f, "TOP", 0, -9);

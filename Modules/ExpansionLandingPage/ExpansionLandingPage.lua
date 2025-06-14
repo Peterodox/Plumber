@@ -9,7 +9,7 @@ local MainFrame;
 
 local CreateTabButton;
 do  --TabButtonMixin
-    local TEXT_OFFSET = 8;
+    local TEXT_OFFSET = 10;
     local BUTTON_HEIGHT = 32;
     local TabButtonMixin = {};
 
@@ -23,11 +23,28 @@ do  --TabButtonMixin
         if not self.selected then
             self.Name:SetTextColor(1, 1, 1);
         end
+
+        if self.notificationGetter then
+            local tooltipLines = self.notificationGetter(true);
+            if tooltipLines and type(tooltipLines) == "table" then
+                local tooltip = GameTooltip;
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", -8, -4);
+                for i, line in ipairs(tooltipLines) do
+                    if i == 1 then
+                        tooltip:SetText(line, 1, 1, 1, true);
+                    else
+                        tooltip:AddLine(line, 1, 0.82, 0, true);
+                    end
+                end
+                tooltip:Show();
+            end
+        end
     end
 
     function TabButtonMixin:OnLeave()
         self.Name:SetAlpha(0.9);
         self:SetSelected(self.selected);
+        GameTooltip:Hide();
     end
 
     function TabButtonMixin:SetSelected(state)
@@ -61,6 +78,20 @@ do  --TabButtonMixin
         return width
     end
 
+    function TabButtonMixin:ShowGreenDot(state)
+        self.GreenDot:SetShown(state);
+    end
+
+    function TabButtonMixin:UpdateNotification()
+        if self.notificationGetter then
+            if self.notificationGetter() then
+                self:ShowGreenDot(true);
+                return
+            end
+        end
+        self:ShowGreenDot(false);
+    end
+
     function CreateTabButton(parent)
         local button = CreateFrame("Button", nil, parent);
         API.Mixin(button, TabButtonMixin);
@@ -70,9 +101,18 @@ do  --TabButtonMixin
         button:SetScript("OnMouseDown", button.OnMouseDown);
         button:SetScript("OnMouseUp", button.OnMouseUp);
         button:SetSize(BUTTON_HEIGHT, BUTTON_HEIGHT);
+
         button.Name = button:CreateFontString(nil, "OVERLAY", "PlumberFont_16");
         button.Name:SetPoint("LEFT", button, "LEFT", TEXT_OFFSET, 0);
         button.Name:SetAlpha(0.9);
+
+        button.GreenDot = button:CreateTexture(nil, "OVERLAY");
+        button.GreenDot:SetSize(16, 16);
+        button.GreenDot:SetPoint("CENTER", button.Name, "TOPRIGHT", 4, 2);
+        button.GreenDot:Hide();
+        button.GreenDot:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/AlertFrame", nil, nil, "TRILINEAR");
+        button.GreenDot:SetTexCoord(0/512, 32/512, 0/512, 32/512);
+
         return button
     end
 end
@@ -100,7 +140,7 @@ do
         local a = 0.4;
         NineSlice.Background:SetVertexColor(a, a, a);
 
-        local tex = "Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW";
+        local tex = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW";
 
         self.RightSection.Header.DividerLeft:SetTexture(tex);
         self.RightSection.Header.DividerLeft:SetTexCoord(0.5, 634/1024, 0, 48/1024);
@@ -135,7 +175,7 @@ do
 
         local button;
         local buttonWidth;
-        local totalWidth = 48;
+        local totalWidth = 46;
         local buttonContainer = self.RightSection.Header;
 
         for i, tabInfo in LandingPageUtil.EnumerateTabInfo() do
@@ -145,6 +185,7 @@ do
                 self.TabButtons[i] = button;
             end
             button.tabKey = tabInfo.key;
+            button.notificationGetter = tabInfo.notificationGetter;
             buttonWidth = API.Round(button:SetName(tabInfo.name));
             button:ClearAllPoints();
             button:SetPoint("LEFT", buttonContainer, "LEFT", totalWidth, -12);
@@ -158,6 +199,7 @@ do
         local selectedTabKey = LandingPageUtil.GetSelectedTabKey();
         for _, button in ipairs(self.TabButtons) do
             button:SetSelected(button.tabKey == selectedTabKey);
+            button:UpdateNotification();
         end
     end
 

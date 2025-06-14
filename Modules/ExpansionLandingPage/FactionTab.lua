@@ -3,78 +3,18 @@ local API = addon.API;
 local L = addon.L;
 local LandingPageUtil = addon.LandingPageUtil;
 local AtlasUtil = addon.AtlasUtil;
+local FactionUtil = addon.FactionUtil;
+local MajorFactionLayout = FactionUtil.MajorFactionLayout;
 
+
+local ipairs = ipairs;
 local CreateFrame = CreateFrame;
 local C_Reputation = C_Reputation;
 local C_MajorFactions = C_MajorFactions;
-local GetParagonValuesAndLevel = API.GetParagonValuesAndLevel;
 
 
 local FactionTab;
 local FactionButtons = {};
-
-local OverrideFactionInfo = {
-    [2570] = {  --Hallowfall Arathi
-        barColor = {244/255, 186/255, 130/255},
-    },
-
-    [2590] = {  --Council of Dornogal
-        barColor = {56/255, 184/255, 255/255},
-    },
-
-    [2594] = {  --The Assembly of the Deeps
-        barColor = {254/255, 137/255, 97/255},
-    },
-
-    [2600] = {  --The Severed Threads
-        barColor = {251/255, 137/255, 119/255},
-    },
-
-    [2653] = {  --The Cartels of Undermine
-        barColor = {252/255, 138/255, 103/255},
-    },
-
-    [2685] = {  --Gallagio Loyalty Rewards Club
-        barColor = {163/255, 178/255, 104/255},
-    },
-
-    [2688] = {  --Flame's Radiance
-        barColor = {178/255, 171/255, 135/255},
-    },
-};
-
-local MajorFactionLayout = {
-    --[row] = {},
-    [1] = {
-        {factionID = 2688},     --Flame's Radiance
-    },
-
-    [2] = {
-        {factionID = 2685},     --Gallagio Loyalty Rewards Club
-        {factionID = 2653,      --Cartels of Undermine
-            subFactions = {
-                {factionID = 2669, iconFileID = 6439629, criteria = function() return C_QuestLog.IsQuestFlaggedCompletedOnAccount(86961) end}, --Darkfuse Solutions unlocked after completed "Diversified Investments"
-                {factionID = 2673, iconFileID = 6439627},     --Bilgewater Cartel
-                {factionID = 2677, iconFileID = 6439630},     --Steamwheedle Cartel
-                {factionID = 2675, iconFileID = 6439628},     --Blackwater Cartel
-                {factionID = 2671, iconFileID = 6439631},     --Venture Co.
-            },
-        },
-    },
-
-    [3] = {
-        {factionID = 2590},     --Council of Dornogal
-        {factionID = 2594},     --The Assembly of the Deeps
-        {factionID = 2570},     --Hallowfall Arathi
-        {factionID = 2600,      --Severed Threads
-            subFactions = {
-                {factionID = 2601, creatureDisplayID = 116208},     --Weaver
-                {factionID = 2605, creatureDisplayID = 114775},     --General Anub'azal
-                {factionID = 2607, creatureDisplayID = 114268},     --Vizier
-            },
-        },
-    },
-};
 
 
 local FACTION_BUTTON_SIZE = 80;
@@ -82,11 +22,6 @@ local FACTION_BUTTON_GAP_H = 20;
 local FACTION_BUTTON_GAP_V = 20 + 8;
 local SUBFACTION_BUTTON_SIZE = 40;
 
-
-local function IsFactionWatched(factionID)
-    local factionData = C_Reputation.GetFactionDataByID(factionID);
-    return factionData and factionData.isWatched
-end
 
 local function HideTooltip()
     GameTooltip:Hide();
@@ -99,7 +34,7 @@ do
     --Derivative of Blizzard ReputationUtil.lua
 
     function ReputationTooltipScripts.AppendClickInstruction(tooltip, factionID, asBottomLine)
-        local text = (IsFactionWatched(factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"];
+        local text = (FactionUtil:IsFactionWatched(factionID) and L["Instruction Untrack Reputation"]) or L["Instruction Track Reputation"];
         if C_Reputation.IsMajorFaction(factionID) then
             text = L["Instruction Click To View Renown"].."\n"..text;
         end
@@ -368,7 +303,7 @@ end
 local LandingPageMajorFactionButtonMixin = {};
 do
     function LandingPageMajorFactionButtonMixin:OnLoad()
-        local tex = "Interface/AddOns/Plumber/Art/Frame/ExpansionLandingPage";
+        local tex = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionLandingPage";
 
         self.Border:SetTexture(tex);
         self.Border:SetTexCoord(0/1024, 200/1024, 0/1024, 216/1024);
@@ -407,7 +342,7 @@ do
         self:SetScript("OnLeave", self.OnLeave);
         self:SetScript("OnClick", self.OnClick);
 
-        --self.AlertIcon:SetTexture("Interface/AddOns/Plumber/Art/Frame/AlertIcon-Green");
+        --self.AlertIcon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/AlertIcon-Green");
     end
 
     function LandingPageMajorFactionButtonMixin:SetShowRenownLevel(state)
@@ -495,12 +430,7 @@ do
         end
 
         if factionID or self.parentFactionID then
-            local v = OverrideFactionInfo[factionID] or OverrideFactionInfo[self.parentFactionID];
-            if v then
-                if v.barColor then
-                    r, g, b = v.barColor[1], v.barColor[2], v.barColor[3];
-                end
-            end
+            r, g, b = FactionUtil:GetProgressBarColor(factionID, self.parentFactionID);
         end
 
         self.ProgressBar:SetSwipeColor(r, g, b);
@@ -598,7 +528,7 @@ end
 
 local function FactionButton_OnClickFunc(self, button)
     if button == "LeftButton" and IsShiftKeyDown() then
-        local watchedFactionID = (IsFactionWatched(self.factionID) and 0) or self.factionID;
+        local watchedFactionID = (FactionUtil:IsFactionWatched(self.factionID) and 0) or self.factionID;
         C_Reputation.SetWatchedFactionByID(watchedFactionID);       --Trigger UPDATE_FACTION
         HideTooltip();
         return
@@ -715,7 +645,7 @@ do
         f.ItemBorder = f:CreateTexture(nil, "OVERLAY");
         f.ItemBorder:SetSize(40, 40);
         f.ItemBorder:SetPoint("CENTER", f.RewardIcon, "CENTER", 0, 0);
-        f.ItemBorder:SetTexture("Interface/AddOns/Plumber/Art/Frame/ItemBorder");
+        f.ItemBorder:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ItemBorder");
         f.ItemBorder:SetTexCoord(80/512, 160/512, 0/512, 80/512);
         API.DisableSharpening(f.ItemBorder);
 
@@ -880,7 +810,7 @@ do
             local BackgroundGlow = DetailFrame:CreateTexture(nil, "BACKGROUND");
             BackgroundGlow:SetSize(256, 256);
             BackgroundGlow:SetPoint("CENTER", ProgressDisplay, "CENTER", 0, 0);
-            BackgroundGlow:SetTexture("Interface/AddOns/Plumber/Art/Frame/ExpansionLandingPage-BackgroundGlow");
+            BackgroundGlow:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionLandingPage-BackgroundGlow");
             BackgroundGlow:SetBlendMode("ADD");
             local shrink = 48;
             BackgroundGlow:SetTexCoord(shrink/256, 1-shrink/256, shrink/256, 1-shrink/256);
@@ -1028,7 +958,7 @@ do
             local function Divider_Create()
                 local divider = RenownItemScrollView:CreateTexture(nil, "ARTWORK");
                 divider:SetSize(512, 16);
-                divider:SetTexture("Interface/AddOns/Plumber/Art/Frame/Divider-H-Shadow");
+                divider:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Divider-H-Shadow");
                 divider:SetAlpha(0.1);
                 return divider
             end
@@ -1250,8 +1180,22 @@ local function CreateFactionTab(factionTab)
     OverviewFrame:SetPoint("TOPLEFT", TabContainer, "TOPLEFT", 0.5*(TabContainer:GetWidth() - maxSpanX), -0.5*(TabContainer:GetHeight() - maxSpanY));
 end
 
-local function NotificationCheck()
-    return false
+local function NotificationCheck(asTooltip)
+    if asTooltip then
+        local factionIDs = FactionUtil:GetFactionsWithRewardPending();
+        if factionIDs then
+            local tooltipLines = {};
+            local n = 1;
+            tooltipLines[n] = L["Paragon Reward Available"];
+            for _, factionID in ipairs(factionIDs) do
+                n = n + 1;
+                tooltipLines[n] = "- "..(FactionUtil:GetFactionName(factionID) or "");
+            end
+            return tooltipLines
+        end
+    else
+        return FactionUtil:IsAnyParagonRewardPending()
+    end
 end
 
 local function FactionTab_OnSelected()

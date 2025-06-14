@@ -5,7 +5,7 @@ local LandingPageUtil = {};
 addon.LandingPageUtil = LandingPageUtil;
 
 
-local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW";
+local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW";
 
 local CreateFrame = CreateFrame;
 local ipairs = ipairs;
@@ -190,6 +190,7 @@ do
         Background:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, -4);
         Background:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 4);
 
+        f:SetTexture(tex);
         f.pieces[1]:SetTexCoord(0/1024, 128/1024, 0/1024, 128/1024);
         f.pieces[2]:SetTexCoord(128/1024, 384/1024, 0/1024, 128/1024);
         f.pieces[3]:SetTexCoord(384/1024, 512/1024, 0/1024, 128/1024);
@@ -337,7 +338,7 @@ end
 local AtlasUtil = {};
 addon.AtlasUtil = AtlasUtil;
 do  --Atlas
-    local FACTION_ICONS = "Interface/AddOns/Plumber/Art/Frame/MajorFactionIcons.png";
+    local FACTION_ICONS = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/MajorFactionIcons.png";
     local FACTION_ICONS_COORDS = {
         --[factionID] = {icon l, r, t, b, highlight l, r, t, b}
         [2590] = {0  , 128, 0, 128},      --Council of Dornogal
@@ -381,7 +382,7 @@ end
 
 
 do  --ScrollViewListButton
-    local TEXTURE = "Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga";
+    local TEXTURE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga";
 
     local ListButtonMixin = {};
 
@@ -530,7 +531,7 @@ do  --Dropdown Menu
 
     function MenuButtonMixin:SetRadio(selected)
         self.leftOffset = 20;
-        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/DropdownMenu", nil, nil, "LINEAR");
+        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         self.selected = selected;
         if selected then
             self.LeftTexture:SetTexCoord(32/512, 64/512, 0/512, 32/512);
@@ -543,7 +544,7 @@ do  --Dropdown Menu
 
     function MenuButtonMixin:SetCheckbox(selected)
         self.leftOffset = 20;
-        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/DropdownMenu", nil, nil, "LINEAR");
+        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         self.selected = selected;
         if selected then
             self.LeftTexture:SetTexCoord(96/512, 128/512, 0/512, 32/512);
@@ -714,7 +715,7 @@ do  --Dropdown Menu
         f:SetCornerSize(16, 16);
         f:SetDisableSharpening(false);
         f:CoverParent(0);
-
+        f:SetTexture(TEXTURE_FILE);
         f.pieces[1]:SetTexCoord(512/1024, 544/1024, 320/1024, 352/1024);
         f.pieces[2]:SetTexCoord(544/1024, 736/1024, 320/1024, 352/1024);
         f.pieces[3]:SetTexCoord(736/1024, 768/1024, 320/1024, 352/1024);
@@ -733,7 +734,7 @@ do  --Dropdown Menu
 
 
         self.Highlight = LandingPageUtil.CreateButtonHighlight(Frame);
-        self.Highlight.Texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/DropdownMenu");
+        self.Highlight.Texture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu");
         self.Highlight.Texture:SetTexCoord(368/512, 512/512, 0/512, 48/512);
         self.Highlight.Texture:SetVertexColor(119/255, 96/255, 74/255);
         self.Highlight.Texture:SetBlendMode("ADD");
@@ -902,7 +903,7 @@ do  --Button Highlight
         local tex = f:CreateTexture(nil, "BACKGROUND");
         f.Texture = tex;
         tex:SetAllPoints(true);
-        tex:SetTexture("Interface/AddOns/Plumber/Art/Frame/HorizontalButtonHighlight");
+        tex:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/HorizontalButtonHighlight");
         tex:SetBlendMode("ADD");
         tex:SetVertexColor(51/255, 29/255, 17/255);
         return f

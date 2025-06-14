@@ -7,6 +7,7 @@
 	<Script file="GreatVault.lua"/>
 	<Script file="ItemUpgrade.lua"/>
 	<Script file="Currency.lua"/>
+	<Script file="FactionUtil.lua"/>
 	<Script file="FactionTab.lua"/>
 	<Script file="ActivityTab.lua"/>
 	<Script file="MajorFactionRenown.lua"/>
@@ -85,7 +86,7 @@
 					<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
 				</Anchors>
 				<SwipeTexture file="Interface\PVPFrame\pvpqueue-sidebar-honorbar-fill"/>
-				<EdgeTexture file="Interface\AddOns\Plumber\Art\Frame\ExpansionLandingPage-ProgressBarEdge"/>
+				<EdgeTexture file="Interface\AddOns\Plumber\Art\ExpansionLandingPage\ExpansionLandingPage-ProgressBarEdge"/>
 				<KeyValues>
 					<KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
 				</KeyValues>

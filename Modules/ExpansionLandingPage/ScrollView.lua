@@ -226,7 +226,7 @@ do
     end
 
     function CreateScrollBar(parent)
-        local textureFile = "Interface/AddOns/Plumber/Art/Frame/ExpansionBorder_TWW";
+        local textureFile = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW";
 
         local f = CreateFrame("Frame", nil, parent);
         f:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -4, -16);

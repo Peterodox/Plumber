@@ -113,7 +113,7 @@ do
                         texture:SetTexCoord(96/512, 144/512, 208/512, 256/512);
                         filter = "TRILINEAR";
                     end
-                    texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga", nil, nil, filter);
+                    texture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga", nil, nil, filter);
                 end
             end
         end
@@ -137,7 +137,7 @@ do
             local texture = f:CreateTexture(nil, "OVERLAY");
             f["Light"..i] = texture;
             texture:SetSize(24, 24);
-            texture:SetTexture("Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga", nil, nil, "TRILINEAR");
+            texture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga", nil, nil, "TRILINEAR");
             texture:SetTexCoord(96/512, 144/512, 208/512, 256/512);
             texture:SetPoint("LEFT", f, "RIGHT", -184 + (i - 1) * 24, 0);
             texture:Hide();
@@ -340,13 +340,13 @@ do
                     button.Border = button:CreateTexture(nil, "OVERLAY");
                     button.Border:SetPoint("CENTER", button, "CENTER", 0, 0);
                     button.Border:SetSize(48, 48);
-                    button.Border:SetTexture("Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga");
+                    button.Border:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga");
                     button.Border:SetTexCoord(0/512, 96/512, 256/512, 352/512);
 
                     button.Highlight = button:CreateTexture(nil, "HIGHLIGHT");
                     button.Highlight:SetPoint("CENTER", button, "CENTER", 0, 0);
                     button.Highlight:SetSize(48, 48);
-                    button.Highlight:SetTexture("Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga");
+                    button.Highlight:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga");
                     button.Highlight:SetTexCoord(96/512, 192/512, 256/512, 352/512);
                     button.Highlight:SetBlendMode("ADD");
                 end
@@ -487,7 +487,7 @@ do
         f.Border = f:CreateTexture(nil, "OVERLAY");
         f.Border:SetPoint("CENTER", f, "LEFT", 16, 0);
         f.Border:SetSize(40, 40);
-        f.Border:SetTexture("Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga");
+        f.Border:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga");
         f.Border:SetTexCoord(192/512, 272/512, 264/512, 344/512);
 
         f.Icon = f:CreateTexture(nil, "ARTWORK");
@@ -774,7 +774,7 @@ do
         f.Highlight:SetSize(232, 40);
         local tex = f.Highlight:CreateTexture(nil, "BACKGROUND");
         tex:SetAllPoints(true);
-        tex:SetTexture("Interface/AddOns/Plumber/Art/Frame/HorizontalButtonHighlight");
+        tex:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/HorizontalButtonHighlight");
         tex:SetBlendMode("ADD");
         tex:SetVertexColor(51/255, 29/255, 17/255);
 

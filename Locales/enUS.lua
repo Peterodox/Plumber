@@ -389,19 +389,9 @@ L["Drawer Option Update Frequently"] = "Update Frequently";
 L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
 
 
---Generic
-L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
-L["Reposition Button Vertical"] = "Move Vertically";
-L["Reposition Button Tooltip"] = "Left click and drag to move the window";
-L["Font Size"] = FONT_SIZE or "Font Size";
-L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Reset To Default Position";
-L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renown ";  --There is a space
-L["Paragon Reputation"] = "Paragon";
-L["Level Maxed"] = "(Maxed)";   --Reached max level
-L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
-L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
+--New Expansion Landing Page
 L["Reward Available"] = "Reward Available";  --As brief as possible
-L["Total Colon"] = FROM_TOTAL or "Total:";
+L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d until Paragon reward";
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Click to view Renown>";
@@ -416,6 +406,21 @@ L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Great Vault";
 L["Item Upgrade"] = ITEM_UPGRADE or "Item Upgrade";
 L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Resources";
 L["Plumber Experimental Feature Tooltip"] = "An experimental feature in Plumber addon.";
+
+
+--Generic
+L["Total Colon"] = FROM_TOTAL or "Total:";
+L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
+L["Reposition Button Vertical"] = "Move Vertically";
+L["Reposition Button Tooltip"] = "Left click and drag to move the window";
+L["Font Size"] = FONT_SIZE or "Font Size";
+L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Reset To Default Position";
+L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renown ";  --There is a space
+L["Paragon Reputation"] = "Paragon";
+L["Level Maxed"] = "(Maxed)";   --Reached max level
+L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
+L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
+
 
 
 --Plumber AddOn Settings

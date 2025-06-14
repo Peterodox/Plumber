@@ -1,6 +1,6 @@
 ## X-Flavor: retail
 ## Interface: 110105, 110107
-## Version: 1.6.8
+## Version: 1.7.0
 
 ## Title: Plumber
 
