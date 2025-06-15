@@ -6,6 +6,9 @@ local L = addon.L;
 local ActivityUtil = {};
 addon.ActivityUtil = ActivityUtil;
 
+ActivityUtil.hideCompleted = false;
+ActivityUtil.collapsedHeader = {};
+
 
 local ipairs = ipairs;
 local tsort = table.sort;
@@ -31,12 +34,14 @@ end
 local SortedActivity;
 local MapQuestData;     --Show quests available on certain maps. The quest markers need to be visible on the world map
 
+local DELVES_REP_TOOLTIP = L["Bountiful Delves Rep Tooltip"];
+
 local ActivityData = {  --Constant
 
     {isHeader = true, name = "Council of Dornogal", factionID = 2590,
         entries = {
             {name = "Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83317, accountwide = true},
+            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83317, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
             --{name = "Debug Quest", questID = 49738, atlas = DAILY_QUEST},
         }
     },
@@ -45,14 +50,14 @@ local ActivityData = {  --Constant
         entries = {
             {name = "Rollin\' Down in the Deeps", questID = 82946, atlas = WEEKLY_QUEST},
             {name = "Gearing Up for Trouble", questID = 83333, atlas = WEEKLY_QUEST}, --Awakening the Machine
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83318, accountwide = true},
+            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83318, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
     {isHeader = true, name = "Hallowfall Arathi", factionID = 2570,
         entries = {
             {name = "Speading the Light", questID = 76586, atlas = WEEKLY_QUEST},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83320, accountwide = true},
+            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83320, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
@@ -62,7 +67,7 @@ local ActivityData = {  --Constant
             {name = "Blade of the General", questID = 80671, atlas = WEEKLY_QUEST, factionID = 2605, shownIfOnQuest = true},
             {name = "Hand of the Vizier", questID = 80672, atlas = WEEKLY_QUEST, factionID = 2607, shownIfOnQuest = true},
             {name = "Eyes of the Weaver", questID = 80670, atlas = WEEKLY_QUEST, factionID = 2601, shownIfOnQuest = true},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83319, accountwide = true},
+            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83319, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
@@ -71,7 +76,7 @@ local ActivityData = {  --Constant
             {name = "Many Jobs, Handle It!", questID = 85869, atlas = WEEKLY_QUEST},
             {name = "Urge to Surge", questID = 86775, atlas = WEEKLY_QUEST},
             {name = "Reduce, Reuse, Resell", questID = 85879, atlas = WEEKLY_QUEST},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 87407, accountwide = true},
+            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 87407, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
@@ -97,27 +102,19 @@ local ActivityData = {  --Constant
 
 addon.ActivityData = ActivityData;
 
-
-
-local DataList = {};
-
-local function IndexData(n, data)
-    for _, category in ipairs(data) do
-        n = n + 1;
-        category.dataIndex = n;
-        DataList[n] = category;
-        for _, entry in ipairs(category.entries) do
-            n = n + 1;
-            entry.dataIndex = n;
-            DataList[n] = entry;
-        end
+do  --Assign ID
+    for k, v in ipairs(ActivityData) do
+        v.headerIndex = k;
     end
-    return n
 end
 
 
 local SortFuncs = {};
 do
+    function SortFuncs.DataIndex(a, b)
+        return a.dataIndex < b.dataIndex
+    end
+
     function SortFuncs.IncompleteFirst(a, b)
         if a.completed ~= b.completed then
             return b.completed
@@ -158,9 +155,24 @@ local QuestIconAtlas =
 	[Enum.QuestClassification.Important] =	"importantavailablequesticon",
 };
 
+local QuestIconFile = {
+	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+};
+
 local function InitQuestData(info)
     local questClassification = info.questClassification or GetQuestClassification(info.questID);
     info.questClassification = questClassification;
+
+    if info.isOnQuest == nil then
+        info.isOnQuest = IsOnQuest(info.questID);
+    end
+
+    if info.isOnQuest then
+        info.icon = questClassification and QuestIconFile[questClassification];
+    end
 
     if not info.atlas then
         info.atlas = questClassification and QuestIconAtlas[questClassification] or "QuestNormal";
@@ -176,7 +188,17 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
         [2339] = {  --Dornogal
             5572,   --Worldsoul: Weekly Meata
         },
-    }
+    };
+
+    local MapQuests = {
+        [2339] = {  --Dornogal
+            {name = "Sparks of War: Azj-Khahet", questID = 81796, shownIfOnQuest = true},
+            {name = "Sparks of War: Isle of Dorn", questID = 81793, shownIfOnQuest = true},
+            {name = "Sparks of War: The Ringing Deeps", questID = 81794, shownIfOnQuest = true},
+            {name = "Sparks of War: Hallowfall", questID = 81795, shownIfOnQuest = true},
+            {name = "Sparks of War: Undermine", questID = 86853, shownIfOnQuest = true},
+        },
+    };
 
     function DynamicQuestDataProvider:Reset()
         self.addedQuests = {};
@@ -227,6 +249,35 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
             end
         end
 
+        if MapQuests[uiMapID] then
+            local n;
+            local valid;
+
+            if self.questsByMap[uiMapID] then
+                n = #self.questsByMap[uiMapID];
+            else
+                self.questsByMap[uiMapID] = {};
+                n = 0;
+            end
+
+            for _, entry in ipairs(MapQuests[uiMapID]) do
+                valid = false;
+                if entry.shownIfOnQuest then
+                    if ShownIfOnQuest(entry.questID) then
+                        valid = true;
+                    end
+                else
+                    valid = true;
+                end
+
+                if valid then
+                    n = n + 1;
+                    InitQuestData(entry);
+                    self.questsByMap[uiMapID][n] = entry;
+                end
+            end
+        end
+
         if self.questsByMap[uiMapID] then
             table.sort(self.questsByMap[uiMapID], SortFuncs.ClassificationThenQuestID);
             local mapName = C_Map.GetMapInfo(uiMapID).name;
@@ -272,38 +323,27 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
 end
 
 
-local function BuildDataList()
-    DataList = {};
-    local n = 0;
-
-    MapQuestData = nil;
-
-    DynamicQuestDataProvider:Reset();
-    DynamicQuestDataProvider:AddQuestsFromMap(2339);     --Dornogal
-
-    if MapQuestData then
-        n = IndexData(n, MapQuestData);
-    end
-
-    n = IndexData(n, ActivityData);
-end
-BuildDataList();
-
-
 function ActivityUtil.GetActivityData(dataIndex)
-    return DataList[dataIndex]
+    if SortedActivity then
+        return SortedActivity[dataIndex]
+    end
 end
+
+
+local QuestNames = {};
+local ItemNames = {};
+
 
 function ActivityUtil.GetActivityName(dataIndex)
     --2nd arg: isLocalized
-    local v = DataList[dataIndex];
+    local v = SortedActivity[dataIndex];
     if v then
         if v.localizedName then
             return v.localizedName, true
         end
 
         if v.questID then
-            local name = API.GetQuestName(v.questID);
+            local name = QuestNames[v.questID] or API.GetQuestName(v.questID);
             if name and name ~= "" then
                 v.localizedName = name;
                 return name, true
@@ -319,7 +359,7 @@ function ActivityUtil.GetActivityName(dataIndex)
         end
 
         if v.itemID then
-            local name = C_Item.GetItemNameByID(v.itemID);
+            local name = ItemNames[v.itemID] or C_Item.GetItemNameByID(v.itemID);
             if name then
                 v.localizedName = name;
                 return name, true
@@ -331,19 +371,16 @@ function ActivityUtil.GetActivityName(dataIndex)
 end
 
 
-local function StoreLocalizedName(dataIndex, key, id, localizedName)
-    local v = DataList[dataIndex];
-    if v and id and v[key] == id and localizedName and localizedName ~= "" then
-        v.localizedName = localizedName;
+function ActivityUtil.StoreQuestActivityName(questID, localizedName)
+    if questID and localizedName and localizedName ~= "" then
+        QuestNames[questID] = localizedName;
     end
 end
 
-function ActivityUtil.StoreQuestActivityName(dataIndex, questID, localizedName)
-    StoreLocalizedName(dataIndex, "questID", questID, localizedName);
-end
-
-function ActivityUtil.StoreItemActivityName(dataIndex, itemID, localizedName)
-    StoreLocalizedName(dataIndex, "itemID", itemID, localizedName);
+function ActivityUtil.StoreItemActivityName(itemID, localizedName)
+    if itemID and localizedName and localizedName ~= "" then
+        ItemNames[itemID] = localizedName;
+    end
 end
 
 function ActivityUtil.ShouldShowActivity(data)
@@ -355,46 +392,39 @@ function ActivityUtil.ShouldShowActivity(data)
 end
 
 
-function ActivityUtil.GetSortedActivity()
-    BuildDataList();
-
-    local tbl = {};
+local function IndexData(activityData)
     local n = 0;
-    local flagQuest;
-
-    if MapQuestData then
-        for _, category in ipairs(MapQuestData) do
+    for _, category in ipairs(activityData) do
+        n = n + 1;
+        category.dataIndex = n;
+        for _, entry in ipairs(category.entries) do
             n = n + 1;
-            tbl[n] = category;
-
-            for _, entry in ipairs(category.entries) do
-                flagQuest = entry.questID;
-                if flagQuest then
-                    if entry.accountwide then
-                        entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
-                    else
-                        entry.completed = IsQuestFlaggedCompleted(flagQuest);
-                    end
-                else
-                    entry.completed = false;
-                end
-            end
-
-            tsort(category.entries, SortFuncs.IncompleteFirst);
-
-            for _, entry in ipairs(category.entries) do
-                n = n + 1;
-                tbl[n] = entry;
-            end
+            entry.dataIndex = n;
         end
     end
+end
 
-    for _, category in ipairs(ActivityData) do
-        n = n + 1;
-        tbl[n] = category;
+local function FlattenData(activityData, n, outputTbl, numCompleted)
+    if not activityData then return n, 0 end;
+
+    IndexData(activityData);
+
+    local hideCompleted = ActivityUtil.hideCompleted;
+    numCompleted = numCompleted or 0
+
+    for _, category in ipairs(activityData) do
+        local anyIncomplted;
+        local numEntries = 0;
+        local entries = {};
+        local flagQuest;
 
         for _, entry in ipairs(category.entries) do
             flagQuest = entry.flagQuest or entry.questID;
+
+            if entry.questID then
+                InitQuestData(entry);
+            end
+
             if flagQuest then
                 if entry.accountwide then
                     entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
@@ -404,31 +434,95 @@ function ActivityUtil.GetSortedActivity()
             else
                 entry.completed = false;
             end
+
+            if entry.completed then
+                numCompleted = numCompleted + 1;
+            else
+                anyIncomplted = true;
+            end
+
+            if hideCompleted then
+                if entry.isHeader or (not entry.completed) then
+                    numEntries = numEntries + 1;
+                    entries[numEntries] = entry;
+                end
+            end
         end
 
-        tsort(category.entries, SortFuncs.IncompleteFirst);
-
-        for _, entry in ipairs(category.entries) do
+        if hideCompleted then
+            if anyIncomplted then
+                n = n + 1;
+                outputTbl[n] = category;
+                if numEntries > 0 then
+                    tsort(entries, SortFuncs.DataIndex);
+                    for _, entry in ipairs(entries) do
+                        n = n + 1;
+                        outputTbl[n] = entry;
+                    end
+                end
+            end
+        else
             n = n + 1;
-            tbl[n] = entry;
+            outputTbl[n] = category;
+            tsort(category.entries, SortFuncs.IncompleteFirst);
+            for _, entry in ipairs(category.entries) do
+                n = n + 1;
+                outputTbl[n] = entry;
+            end
         end
+    end
+
+    return n, numCompleted
+end
+
+function ActivityUtil.GetSortedActivity()
+    --Wipe old data
+    MapQuestData = nil;
+    DynamicQuestDataProvider:Reset();
+    DynamicQuestDataProvider:AddQuestsFromMap(2339);     --Dornogal
+
+
+    local tbl = {};
+    local n = 0;
+    local numCompleted = 0;
+
+    for _, category in ipairs(ActivityData) do
+        category.isCollapsed = ActivityUtil.collapsedHeader[category.headerIndex];
+    end
+
+    n, numCompleted = FlattenData(MapQuestData, n, tbl, numCompleted);
+    n, numCompleted = FlattenData(ActivityData, n, tbl, numCompleted);
+
+    for k, v in ipairs(tbl) do
+        v.dataIndex = k;
     end
 
     SortedActivity = tbl
 
-    return tbl
+    return tbl, numCompleted
 end
 
 function ActivityUtil.ToggleCollapsed(dataIndex)
     local v = SortedActivity and SortedActivity[dataIndex];
     if v and v.isHeader then
         v.isCollapsed = not v.isCollapsed;
+
+        if v.headerIndex then
+            ActivityUtil.collapsedHeader[v.headerIndex] = not ActivityUtil.collapsedHeader[v.headerIndex];
+        end
+
         if v.isDynamicQuest and v.questMapID then
-            --print(dataIndex, v.localizedName or v.name, v.questMapID, v.isCollapsed);
             DynamicQuestDataProvider:SetMapCollapsed(v.questMapID, v.isCollapsed);
         end
+
+        --print(dataIndex, v.localizedName or v.name, v.isDynamicQuest, v.questMapID, v.isCollapsed);
     end
 end
+
+function ActivityUtil.SetHideCompleted(state)
+    ActivityUtil.hideCompleted = state;
+end
+addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", ActivityUtil.SetHideCompleted);
 
 
 --[[

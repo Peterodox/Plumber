@@ -1994,6 +1994,7 @@ do  -- System
         f:RegisterAddon(addonData)
     end
 
+
     function API.RemoveButtonFromAddonCompartment(identifier)
         local f = AddonCompartmentFrame;
         if not f then return end;
@@ -2004,6 +2005,12 @@ do  -- System
                 f:UpdateDisplay();
                 return
             end
+        end
+    end
+
+    function API.TriggerExpansionMinimapButtonAlert(text)
+        if ExpansionLandingPageMinimapButton then
+            ExpansionLandingPageMinimapButton:TriggerAlert(text);
         end
     end
 end

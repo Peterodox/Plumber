@@ -116,6 +116,14 @@ local MajorFactionLayout = {
 FactionUtil.MajorFactionLayout = MajorFactionLayout;
 
 
+local RewardQuestIDs = {};
+for factionID, v in pairs(OverrideFactionInfo) do
+    if v.rewardQuestID then
+        RewardQuestIDs[v.rewardQuestID] = factionID;
+    end
+end
+
+
 function FactionUtil:GetProgressBarColor(factionID, subFactionID)
     local color;
 
@@ -141,8 +149,8 @@ function FactionUtil:GetFactionsWithRewardPending()
     local tbl;
     local IsOnQuest = C_QuestLog.IsOnQuest;
 
-    for factionID, v in pairs(OverrideFactionInfo) do
-        if v.rewardQuestID and IsOnQuest(v.rewardQuestID) then
+    for questID, factionID in pairs(RewardQuestIDs) do
+        if IsOnQuest(questID) then
             if not tbl then
                 tbl = {};
             end
@@ -155,6 +163,10 @@ end
 
 function FactionUtil:IsAnyParagonRewardPending()
     return self:GetFactionsWithRewardPending() ~= nil
+end
+
+function FactionUtil:IsParagonRewardQuest(questID)
+    return questID and RewardQuestIDs[questID] ~= nil
 end
 
 function FactionUtil:GetFactionName(factionID)

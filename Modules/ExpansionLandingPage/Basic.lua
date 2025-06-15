@@ -304,7 +304,22 @@ do  --TabUtil
     end
 
     function LandingPageUtil.SelectTab(tabKey)
+        local valid;
+        if tabKey then
+            for _, tabInfo in ipairs(Tabs) do
+                if tabInfo.key == tabKey then
+                    valid = true;
+                    break
+                end
+            end
+        end
+
+        if not valid then
+            tabKey = Tabs[1].key;
+        end
+
         SelectedTabKay = tabKey;
+
         for _, tabInfo in ipairs(Tabs) do
             if tabInfo.frame then
                 tabInfo.frame:SetShown(tabInfo.key == tabKey);
@@ -320,6 +335,8 @@ do  --TabUtil
                 end
             end
         end
+
+        addon.SetDBValue("LandingPage_DefaultTab", tabKey);
     end
 
     function LandingPageUtil.SelectTabByIndex(index)
@@ -909,6 +926,120 @@ do  --Button Highlight
         return f
     end
     LandingPageUtil.CreateButtonHighlight = CreateButtonHighlight;
+end
+
+
+do  --Checkbox Button
+    local CheckboxButtonMixin = {};
+
+    function CheckboxButtonMixin:OnEnter()
+        self:UpdateVisual();
+    end
+
+    function CheckboxButtonMixin:OnLeave()
+        self:UpdateVisual();
+    end
+
+    function CheckboxButtonMixin:UpdateVisual()
+        if self:IsEnabled() then
+            if self:IsMouseMotionFocus() then
+                self.Label:SetTextColor(1, 1, 1);
+            else
+                self.Label:SetTextColor(1, 0.82, 0);
+            end
+        else
+            self.Label:SetTextColor(0.5, 0.5, 0.5);
+        end
+    end
+
+    function CheckboxButtonMixin:OnClick()
+        if self.dbKey then
+            local checked = not addon.GetDBBool(self.dbKey);
+            addon.SetDBValue(self.dbKey, checked, true);
+            self:SetChecked(checked);
+            if self.checked then
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+            else
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
+            end
+        end
+    end
+
+    function CheckboxButtonMixin:SetChecked(state)
+        self.checked = state;
+        if state then
+            self.Texture:SetTexCoord(828/1024, 892/1024, 320/1024, 384/1024);
+        else
+            self.Texture:SetTexCoord(764/1024, 828/1024, 320/1024, 384/1024);
+        end
+    end
+
+    function CheckboxButtonMixin:UpdateChecked()
+        if self.dbKey then
+            local checked = addon.GetDBBool(self.dbKey);
+            self:SetChecked(checked);
+        end
+    end
+
+    function CheckboxButtonMixin:SetText(text, changeWidth)
+        self.Label:SetText(text);
+        if changeWidth then
+            local width = API.Round(26 + self.Label:GetWrappedWidth());
+            self:SetWidth(width);
+        end
+    end
+
+    function CheckboxButtonMixin:OnEnable()
+        self.Texture:SetDesaturated(false);
+        self.Texture:SetVertexColor(1, 1, 1);
+        self:UpdateVisual();
+    end
+
+    function CheckboxButtonMixin:OnDisable()
+        self.Texture:SetDesaturated(true);
+        self.Texture:SetVertexColor(0.6, 0.6, 0.6);
+        self:UpdateVisual();
+    end
+
+    function CheckboxButtonMixin:SetFormattedText(text)
+        if self.textFormat then
+            self:SetText(string.format(self.textFormat, text));
+        else
+            self:SetText(text);
+        end
+    end
+
+    function LandingPageUtil.CreateCheckboxButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        f:SetSize(24, 24);
+        API.Mixin(f, CheckboxButtonMixin);
+
+        f.Texture = f:CreateTexture(nil, "OVERLAY");
+        f.Texture:SetSize(32, 32);
+        f.Texture:SetPoint("CENTER", f, "LEFT", 10, 0);
+        f.Texture:SetTexture(TEXTURE_FILE);
+        f:SetChecked(false);
+
+        f.Highlight = f:CreateTexture(nil, "HIGHLIGHT");
+        f.Highlight:SetSize(32, 32);
+        f.Highlight:SetPoint("CENTER", f.Texture, "CENTER", 0, 0);
+        f.Highlight:SetTexture(TEXTURE_FILE);
+        f.Highlight:SetTexCoord(892/1024, 956/1024, 320/1024, 384/1024);
+        f.Highlight:SetBlendMode("ADD");
+        f.Highlight:SetAlpha(0.5);
+
+        f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Label:SetJustifyH("LEFT");
+        f.Label:SetPoint("LEFT", f, "LEFT", 26, 0);
+
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnClick", f.OnClick);
+        f:SetScript("OnEnable", f.OnEnable);
+        f:SetScript("OnDisable", f.OnDisable);
+
+        return f
+    end
 end
 
 

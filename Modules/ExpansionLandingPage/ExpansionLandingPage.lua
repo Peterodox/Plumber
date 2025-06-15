@@ -15,7 +15,7 @@ do  --TabButtonMixin
 
     function TabButtonMixin:OnClick()
         LandingPageUtil.SelectTab(self.tabKey);
-        MainFrame:InitTabs();
+        MainFrame:UpdateTabs();
     end
 
     function TabButtonMixin:OnEnter()
@@ -157,11 +157,14 @@ do
         self:SetScript("OnShow", self.OnShow);
     end
 
-
+    addon.CallbackRegistry:Register("DBLoaded", function(db)
+        local tabKey = addon.GetDBValue("LandingPage_DefaultTab");
+        LandingPageUtil.SelectTab(tabKey);
+    end);
 
 
     function PlumberExpansionLandingPageMixin:OnShow()
-        self:InitTabs();    --The selected tab will be created here
+        self:UpdateTabs();    --The selected tab will be created here
     end
 
     function PlumberExpansionLandingPageMixin:InitTabButtons()
@@ -203,7 +206,7 @@ do
         end
     end
 
-    function PlumberExpansionLandingPageMixin:InitTabs()
+    function PlumberExpansionLandingPageMixin:UpdateTabs()
         self:UpdateTabButtons();
 
         local selectedTabKey = LandingPageUtil.GetSelectedTabKey();

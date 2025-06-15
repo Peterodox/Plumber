@@ -16,13 +16,11 @@ local SortedActivityData;
 
 local CreateChecklistButton;
 do  --Checklist Button
-    local TEXTURE = "Interface/AddOns/Plumber/Art/Frame/ChecklistButton.tga";
-
     local ChecklistButtonMixin = {};
 
     function ChecklistButtonMixin:OnEnter()
         self:UpdateVisual();
-        self:DisplayQuestInfo();
+        self:DisplayTooltip();
     end
 
     function ChecklistButtonMixin:OnLeave()
@@ -39,7 +37,7 @@ do  --Checklist Button
 
     function ChecklistButtonMixin:SetActivity(dataIndex, data)
         if not data then
-            data = LandingPageUtil.GetActivityData(dataIndex);
+            data = ActivityUtil.GetActivityData(dataIndex);
         end
 
         if data then
@@ -48,11 +46,15 @@ do  --Checklist Button
 
             if self.completed then
                 self.Icon:SetAtlas("checkmark-minimal-disabled");
+            elseif data.icon then
+                if data.itemID then
+                    self.Icon:SetTexCoord(6/64, 58/64, 6/64, 58/64);
+                else
+                    self.Icon:SetTexCoord(0, 1, 0, 1);
+                end
+                self.Icon:SetTexture(data.icon);
             elseif data.atlas then
                 self.Icon:SetAtlas(data.atlas);
-            elseif data.icon then
-                self.Icon:SetTexCoord(6/64, 58/64, 6/64, 58/64);
-                self.Icon:SetTexture(data.icon);
             else
                 if not self.isHeader then
                     self.Icon:SetAtlas("questlog-questtypeicon-quest"); --debug
@@ -109,7 +111,7 @@ do  --Checklist Button
             CallbackRegistry:LoadQuest(questID, function(_questID)
                 if questID == self.id then
                     local name = API.GetQuestName(_questID);
-                    ActivityUtil.StoreQuestActivityName(self.dataIndex, _questID, name);
+                    ActivityUtil.StoreQuestActivityName( _questID, name);
                     self.Name:SetText(name);
                     self:UpdateProgress();
                     if self:IsMouseMotionFocus() then
@@ -132,7 +134,7 @@ do  --Checklist Button
             CallbackRegistry:LoadItem(itemID, function(_itemID)
                 if _itemID == self.itemID then
                     local name = C_Item.GetItemNameByID(_itemID);
-                    ActivityUtil.StoreItemActivityName(self.dataIndex, _itemID, name);
+                    ActivityUtil.StoreItemActivityName(_itemID, name);
                     self.Name:SetText(name);
                     self:UpdateProgress();
                 end
@@ -148,14 +150,35 @@ do  --Checklist Button
         end
     end
 
-    function ChecklistButtonMixin:DisplayQuestInfo()
-        if not ((self.type == "Quest") and self.id) then return end;
+    function ChecklistButtonMixin:DisplayTooltip()
+        if self.type == "Quest" and self.id then
+            TooltipUpdator:SetFocusedObject(self);
+            TooltipUpdator:SetHeaderText(self.Name:GetText());
+            TooltipUpdator:SetQuestID(self.id);
+            TooltipUpdator:RequestQuestProgress();
+            TooltipUpdator:RequestQuestReward();
+        else
+            local data = ActivityUtil.GetActivityData(self.dataIndex);
+            if data and data.tooltip then
+                TooltipUpdator:SetFocusedObject(self);
+                TooltipUpdator:SetHeaderText(self.Name:GetText());
+                local tooltipLines = {};
 
-        TooltipUpdator:SetFocusedObject(self);
-        TooltipUpdator:SetHeaderText(self.Name:GetText());
-        TooltipUpdator:SetQuestID(self.id);
-        TooltipUpdator:RequestQuestProgress();
-        TooltipUpdator:RequestQuestReward();
+                if data.completed then
+                    table.insert(tooltipLines, string.format("|cff808080%s|r", L["Completed"]));
+                    table.insert(tooltipLines, " ");
+                end
+
+                table.insert(tooltipLines, data.tooltip);
+
+                if data.accountwide then
+                    table.insert(tooltipLines, " ");
+                    table.insert(tooltipLines, string.format("|cff00ccff%s|r", L["Warband Weekly Reward Tooltip"]));
+                end
+
+                TooltipUpdator:RequestTooltipLines(tooltipLines);
+            end
+        end
     end
 
     function CreateChecklistButton(parent)
@@ -180,6 +203,7 @@ do
         "QUEST_ACCEPTED",
         "QUEST_TURNED_IN",
         "QUESTLINE_UPDATE",
+        "BAG_UPDATE_DELAYED",       --Looting some items triggers hidden quest flag, but the quest events don't fire
     };
 
     function ActivityTabMixin:FullUpdate()
@@ -189,15 +213,16 @@ do
         local n = 0;
         local buttonHeight = 24;
         local gap = 4;
-        local offsetY = 16;
+        local offsetY = 2;
 
         local entryWidth = 544;
         local headerWidth = entryWidth + 62;
 
         local top, bottom;
         local showActivity, showGroup;
+        local numCompleted;
 
-        SortedActivityData = ActivityUtil.GetSortedActivity();
+        SortedActivityData, numCompleted = ActivityUtil.GetSortedActivity();
 
         for k, v in ipairs(SortedActivityData) do
             if v.isHeader then
@@ -236,6 +261,8 @@ do
 
         local retainPosition = true;
         self.ScrollView:SetContent(content, retainPosition);
+
+        self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
     end
 
     function ActivityTabMixin:OnShow()
@@ -253,15 +280,27 @@ do
     end
 
     function ActivityTabMixin:OnEvent(event, ...)
-        if event == "QUEST_LOG_UPDATE" then
+        if event == "QUEST_LOG_UPDATE" or event == "BAG_UPDATE_DELAYED" then
             self:RequestUpdate();
-        elseif event == "QUEST_REMOVED" or event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" or event == "QUESTLINE_UPDATE" then
+        elseif event == "QUEST_REMOVED" or event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" or event == "QUESTLINE_UPDATE" or event == "UPDATE_FACTION" then
             self:RequestUpdate(true);
         end
     end
 
     function ActivityTabMixin:InitChecklist()
-        local ScrollView = LandingPageUtil.CreateScrollViewForTab(self);
+        local Checkbox_HideCompleted = LandingPageUtil.CreateCheckboxButton(self);
+        self.Checkbox_HideCompleted = Checkbox_HideCompleted;
+        Checkbox_HideCompleted:SetPoint("TOPRIGHT", self, "TOPRIGHT", -52, -10);
+        Checkbox_HideCompleted:SetText(L["Filter Hide Completed Format"], true);
+        Checkbox_HideCompleted.dbKey = "LandingPage_Activity_HideCompleted";
+        Checkbox_HideCompleted.textFormat = L["Filter Hide Completed Format"];
+        Checkbox_HideCompleted:UpdateChecked();
+
+        addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", self.SetHideCompleted, self);
+
+        
+        local ScrollView = LandingPageUtil.CreateScrollViewForTab(self, -32);
+        ScrollView:SetScrollBarOffsetY(-4);
 
         local function ChecklistButton_Create()
             return CreateChecklistButton(ScrollView)
@@ -302,6 +341,11 @@ do
                 self:UpdateScrollViewContent();
             end
         end
+    end
+
+    function ActivityTabMixin:SetHideCompleted(state)
+        ActivityUtil.SetHideCompleted(state);
+        self:FullUpdate();
     end
 end
 

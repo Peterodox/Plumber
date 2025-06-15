@@ -3,6 +3,9 @@ local API = addon.API;
 local LandingPageUtil = addon.LandingPageUtil;
 
 
+local iparis = ipairs;
+
+
 local TooltipUpdator = CreateFrame("Frame");
 TooltipUpdator:Hide();
 LandingPageUtil.TooltipUpdator = TooltipUpdator;
@@ -20,11 +23,13 @@ function TooltipUpdator:StopUpdating()
         self:SetScript("OnUpdate", nil);
     end
 
+    self.keepUpdating = nil;
     self.questID = nil;
     self.headerText = nil;
     self.showProgress = nil;
     self.showRewards = nil;
     self.poiID = nil;
+    self.tooltipLines = nil;
 end
 
 function TooltipUpdator:SetFocusedObject(obj)
@@ -58,18 +63,27 @@ function TooltipUpdator:RequestEventTimer(poiID)
     self.poiID = poiID;
 end
 
+function TooltipUpdator:RequestTooltipLines(tooltipLines)
+    self.tooltipLines = tooltipLines;
+end
+
 function TooltipUpdator:OnUpdate(elapsed)
     self.t = self.t + elapsed;
     if self.t >= 0.5 then
         self.t = 0;
         self:SetScript("OnUpdate", nil);
+        self.keepUpdating = nil;
 
-        if self.obj and self.obj:IsMouseMotionFocus() and self.questID then
+        if self.obj and self.obj:IsMouseMotionFocus() and (self.questID or self.tooltipLines) then
             local anyContent;
             local questRewards = {};
             local isRetrievingData;
             local tooltipLines = {};
             local hasLineAbove = false;
+
+            if self.questID then
+                self.keepUpdating = true;
+            end
 
             if self.showProgress then
                 local texts = API.GetQuestProgressTexts(self.questID);
@@ -77,6 +91,7 @@ function TooltipUpdator:OnUpdate(elapsed)
                     anyContent = true;
                     tooltipLines = texts;
                 end
+                self.keepUpdating = true;
             end
 
             if self.showRewards then
@@ -93,6 +108,16 @@ function TooltipUpdator:OnUpdate(elapsed)
 
                 if missingData then
                     isRetrievingData = true;
+                end
+
+                self.keepUpdating = true;
+            end
+
+            if self.tooltipLines then
+                anyContent = true;
+                local n = #tooltipLines;
+                for i, text in ipairs(self.tooltipLines) do
+                    tooltipLines[n + i] = text;
                 end
             end
 
@@ -131,7 +156,9 @@ function TooltipUpdator:OnUpdate(elapsed)
                 tooltip:Show();
             end
 
-            self:SetScript("OnUpdate", self.OnUpdate);
+            if self.keepUpdating then
+                self:SetScript("OnUpdate", self.OnUpdate);
+            end
         end
     end
 end

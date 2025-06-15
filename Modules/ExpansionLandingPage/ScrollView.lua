@@ -764,6 +764,14 @@ do  --ScrollView Scroll Behavior
         self.ScrollBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 1);
     end
 
+    function ScrollViewMixin:SetScrollBarOffsetY(top, bottom)
+        top = top or -16;
+        bottom = bottom or 16;
+        self.ScrollBar:ClearAllPoints();
+        self.ScrollBar:SetPoint("TOPRIGHT", self, "TOPRIGHT", -4, top);
+        self.ScrollBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -4, bottom);
+    end
+
     function ScrollViewMixin:UseBoundaryGradient(state)
         self.useBoundaryGradient = state;
 
@@ -858,12 +866,14 @@ do  --ScrollView Content Update
 end
 
 do  --Create ScrollView in Tab
-    local function CreateScrollViewForTab(tab)
+    local function CreateScrollViewForTab(tab, offsetY)
         if tab.ScrollView then return end;
+
+        offsetY = offsetY or 0;
 
         local ScrollView = API.CreateScrollView(tab);
         tab.ScrollView = ScrollView;
-        ScrollView:SetPoint("TOPLEFT", tab, "TOPLEFT", 8, -8);
+        ScrollView:SetPoint("TOPLEFT", tab, "TOPLEFT", 8, -8 + offsetY);
         ScrollView:SetPoint("BOTTOMRIGHT", tab, "BOTTOMRIGHT", -8, 8);
         ScrollView:OnSizeChanged();
         ScrollView:SetStepSize(56);

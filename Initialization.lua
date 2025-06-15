@@ -73,8 +73,10 @@ end
 addon.GetDBValue = GetDBValue;
 
 local function SetDBValue(dbKey, value, userInput)
-    DB[dbKey] = value;
-    addon.CallbackRegistry:Trigger("SettingChanged."..dbKey, value, userInput);
+    if DB then
+        DB[dbKey] = value;
+        addon.CallbackRegistry:Trigger("SettingChanged."..dbKey, value, userInput);
+    end
 end
 addon.SetDBValue = SetDBValue;
 
@@ -239,16 +241,24 @@ local function LoadDatabase()
     DefaultValues = nil;
 
     CallbackRegistry:Trigger("NewDBKeysAdded", newDBKeys);
+    CallbackRegistry:Trigger("DBLoaded", DB);
 end
 
 local EL = CreateFrame("Frame");
 EL:RegisterEvent("ADDON_LOADED");
 
 EL:SetScript("OnEvent", function(self, event, ...)
-    local name = ...
-    if name == addonName then
+    if event == "ADDON_LOADED"  then
+        local name = ...
+        if name == addonName then
+            self:UnregisterEvent(event);
+            LoadDatabase();
+        end
+    elseif event == "LOADING_SCREEN_DISABLED" then
         self:UnregisterEvent(event);
-        LoadDatabase();
+        C_Timer.After(3, function()
+            CallbackRegistry:Trigger("LOADING_SCREEN_DISABLED");
+        end);
     end
 end);
 

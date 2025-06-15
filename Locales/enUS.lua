@@ -406,6 +406,10 @@ L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Great Vault";
 L["Item Upgrade"] = ITEM_UPGRADE or "Item Upgrade";
 L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Resources";
 L["Plumber Experimental Feature Tooltip"] = "An experimental feature in Plumber addon.";
+L["Bountiful Delves Rep Tooltip"] = "Opening a Bountiful Coffer has a chance to increase your reputation with this faction.";
+L["Warband Weekly Reward Tooltip"] = "You Warband can only receive this reward once per week.";
+L["Completed"] = CRITERIA_COMPLETED or "Completed";
+L["Filter Hide Completed Format"] = "Hide Completed (%d)";
 
 
 --Generic
