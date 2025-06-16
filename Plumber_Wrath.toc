@@ -1,6 +1,6 @@
 ## X-Flavor: wrath
 ## Interface: 30404
-## Version: 1.6.8
+## Version: 1.7.0
 
 ## Title: Plumber
 

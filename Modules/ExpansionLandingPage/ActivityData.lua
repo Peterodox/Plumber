@@ -502,6 +502,23 @@ function ActivityUtil.GetSortedActivity()
     return tbl, numCompleted
 end
 
+function ActivityUtil.UpdateAndGetProgress(dataIndex)
+    local entry = SortedActivity and SortedActivity[dataIndex];
+    if entry then
+        local flagQuest = entry.flagQuest or entry.questID;
+        if flagQuest then
+            if entry.accountwide then
+                entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
+            else
+                entry.completed = IsQuestFlaggedCompleted(flagQuest);
+            end
+        else
+            entry.completed = false;
+        end
+        return entry.completed
+    end
+end
+
 function ActivityUtil.ToggleCollapsed(dataIndex)
     local v = SortedActivity and SortedActivity[dataIndex];
     if v and v.isHeader then

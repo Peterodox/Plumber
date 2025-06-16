@@ -80,11 +80,20 @@ do  --Checklist Button
         end
     end
 
-    function ChecklistButtonMixin:UpdateProgress()
+    function ChecklistButtonMixin:UpdateProgress(updateCompletion)
         if self.flagQuest then
             self.readyForTurnIn = ReadyForTurnIn(self.flagQuest);
             if self.readyForTurnIn then
                 self.Icon:SetAtlas("QuestTurnin");
+            else
+                if updateCompletion then
+                    local completed = ActivityUtil.UpdateAndGetProgress(self.dataIndex);
+                    if completed ~= self.completed then
+                        self.completed = true;
+                        self.Icon:SetAtlas("checkmark-minimal-disabled");
+                        ActivityTab:RequestUpdate(true);
+                    end
+                end
             end
         else
             self.readyForTurnIn = nil;
@@ -211,7 +220,7 @@ do
         "QUEST_ACCEPTED",
         "QUEST_TURNED_IN",
         "QUESTLINE_UPDATE",
-        "BAG_UPDATE_DELAYED",       --Looting some items triggers hidden quest flag, but the quest events don't fire
+        --"LOOT_CLOSED",       --Looting some items triggers hidden quest flag, but the quest events don't fire
     };
 
     function ActivityTabMixin:FullUpdate()
@@ -288,7 +297,7 @@ do
     end
 
     function ActivityTabMixin:OnEvent(event, ...)
-        if event == "QUEST_LOG_UPDATE" or event == "BAG_UPDATE_DELAYED" then
+        if event == "QUEST_LOG_UPDATE" then
             self:RequestUpdate();
         elseif event == "QUEST_REMOVED" or event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" or event == "QUESTLINE_UPDATE" or event == "UPDATE_FACTION" then
             self:RequestUpdate(true);
@@ -326,7 +335,7 @@ do
 
     function ActivityTabMixin:UpdateScrollViewContent()
         if self.ScrollView then
-            self.ScrollView:CallObjectMethod("ChecklistButton", "UpdateProgress");
+            self.ScrollView:CallObjectMethod("ChecklistButton", "UpdateProgress", true);
         end
     end
 

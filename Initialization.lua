@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.6.8";
-local VERSION_DATE = 1746800000;
+local VERSION_TEXT = "v1.7.0";
+local VERSION_DATE = 1750100000;
 
 
 local addonName, addon = ...
@@ -245,6 +245,7 @@ local function LoadDatabase()
     CallbackRegistry:Trigger("DBLoaded", DB);
 end
 
+
 local EL = CreateFrame("Frame");
 EL:RegisterEvent("ADDON_LOADED");
 
@@ -257,9 +258,7 @@ EL:SetScript("OnEvent", function(self, event, ...)
         end
     elseif event == "LOADING_SCREEN_DISABLED" then
         self:UnregisterEvent(event);
-        C_Timer.After(3, function()
-            CallbackRegistry:Trigger("LOADING_SCREEN_DISABLED");
-        end);
+        CallbackRegistry:Trigger("LOADING_SCREEN_DISABLED");
     end
 end);
 
