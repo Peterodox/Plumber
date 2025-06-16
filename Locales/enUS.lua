@@ -395,6 +395,8 @@ L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button sta
 
 
 --New Expansion Landing Page
+L["ModuleName NewExpansionLandingPage"] = "Expansion Summary";
+L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Clicking Khaz Algar Summary button on the minimap.\n\n- Set a hotkey in Game Settings - Keybindings.";
 L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
@@ -429,7 +431,6 @@ L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
-
 
 
 --Plumber AddOn Settings

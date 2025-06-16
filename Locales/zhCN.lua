@@ -1,9 +1,14 @@
-﻿if not (GetLocale() == "zhCN") then return end;
+﻿--
 
-
+if not (GetLocale() == "zhCN") then return end;
 
 local _, addon = ...
 local L = addon.L;
+
+
+--Globals
+BINDING_HEADER_PLUMBER = "Plumber插件";
+BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "打开/关闭资料片概要";   --Show/hide Expansion Summary UI
 
 
 --Module Control Panel
@@ -234,6 +239,7 @@ L["ModuleName Delves_Dashboard"] = "地下堡: 每周奖励";
 L["ModuleDescription Delves_Dashboard"] = "在地下堡赛季界面显示宏伟宝库和鎏金藏匿物的进度。";
 L["Delve Crest Stash No Info"] = "你所在区域无法获取该信息。";
 L["Delve Crest Stash Requirement"] = "仅在11层丰裕地下堡出现。";
+L["Overcharged Delve"] = "超载地下堡";
 
 
 --WoW Anniversary
@@ -388,7 +394,33 @@ L["Drawer Option Update Frequently"] = "频繁更新";
 L["Drawer Option Update Frequently Tooltip"] = "在你背包或法术书发生变化时更新所有收纳宏。启用此选项可能会略微增加运算量。";
 
 
+--New Expansion Landing Page
+L["ModuleName NewExpansionLandingPage"] = "资料片概要";
+L["ModuleDescription NewExpansionLandingPage"] = "一个显示声望、每周事件和团本进度的界面。你可从以下方式访问：\n\n- 点击小地图上的卡兹阿加概要按钮。\n\n- 在游戏设置-快捷键中设置一个快捷键。";
+L["Reward Available"] = "奖励待领取";  --As brief as possible
+L["Paragon Reward Available"] = "巅峰奖励待领取";
+L["Until Next Level Format"] = "离下一级还有 %d";   --Earn x reputation to reach the next level
+L["Until Paragon Reward Format"] = "离巅峰宝箱还有 %d";
+L["Instruction Click To View Renown"] = "<点击查看名望>";
+L["Not On Quest"] = "你没有接到该任务";
+L["Raids"] = "团队副本";
+L["Instruction Track Achievement"] = "<按住Shift点击追踪此成就>";
+L["Instruction Untrack Achievement"] = "<按住Shift点击取消追踪>";
+L["No Data"] = "没有数据";
+L["No Raid Boss Selected"] = "未选择首领战";
+L["Your Class"] = "(你的职业)";
+L["Great Vault"] = "宏伟宝库";
+L["Item Upgrade"] = "物品升级";
+L["Resources"] = "资源";
+L["Plumber Experimental Feature Tooltip"] = "Plumber插件中的实验性功能。";
+L["Bountiful Delves Rep Tooltip"] = "打开丰裕宝匣有几率奖励此阵营的声望。";
+L["Warband Weekly Reward Tooltip"] = "你的战团每周只能获取一次此奖励。";
+L["Completed"] = "已完成";
+L["Filter Hide Completed Format"] = "隐藏已完成的条目 (%d)";
+
+
 --Generic
+L["Total Colon"] = "总计：";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally
 L["Reposition Button Vertical"] = "竖直方向移动";
 L["Reposition Button Tooltip"] = "左键点击并拖拉来移动这个窗口。";
@@ -399,8 +431,6 @@ L["Paragon Reputation"] = "巅峰";
 L["Level Maxed"] = "已满级";   --Reached max level
 L["Current Colon"] = "当前：";
 L["Unclaimed Reward Alert"] = "你有未领取的巅峰宝箱";
-L["Reward Available"] = "奖励待领取";
-L["Total Colon"] = "总计：";
 
 
 --Plumber AddOn Settings

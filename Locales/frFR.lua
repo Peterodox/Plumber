@@ -6,6 +6,11 @@ local _, addon = ...
 local L = addon.L;
 
 
+--Globals
+BINDING_HEADER_PLUMBER = "Plumber Addon";
+BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Feuille de Résumé de l'expansion";   --Show/hide Expansion Summary UI
+
+
 --Module Control Panel
 L["Module Control"] = "Contrôle du module";
 L["Quick Slot Generic Description"] = "\n\n*L'emplacement rapide est un ensemble de boutons cliquables qui apparaissent sous certaines conditions.";
@@ -231,6 +236,29 @@ L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Ouvrir la fenêt
 L["LootUI Option Loot Under Mouse Tooltip"] = "En mode |cffffffffButin manuel|r, la fenêtre apparaîtra sous la position actuelle de la souris";
 L["LootUI Option Use Default UI"] = "Utiliser la fenêtre de butin par défaut";
 L["LootUI Option Use Default UI Tooltip"] = "Utiliser la fenêtre de butin par défaut de WoW.\n\n|cffff4800Activer cette option annule tous les réglage";
+
+
+--New Expansion Landing Page
+L["Reward Available"] = "Récompense disponible";
+L["Paragon Reward Available"] = "Récompense Parangon disponible";
+L["Until Next Level Format"] = "%d jusqu'au niveau suivant";
+L["Until Paragon Reward Format"] = "%d jusqu'à la récompense Parangon";
+L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Cliquez pour voir la Renommée>";
+L["Not On Quest"] = "Vous n'êtes pas sur cette quête";
+L["Raids"] = RAIDS or "Raids";
+L["Instruction Track Achievement"] = "<Maj + clic pour suivre ce haut-fait>";
+L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Maj + clic pour arrêter le suivi>";
+L["No Data"] = "Aucune donnée";
+L["No Raid Boss Selected"] = "Aucun boss sélectionné";
+L["Your Class"] = "(Votre classe)";
+L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Grand Caveau";
+L["Item Upgrade"] = ITEM_UPGRADE or "Amélioration d'objet";
+L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Ressources";
+L["Plumber Experimental Feature Tooltip"] = "Une fonction expérimentale de l'addon Plumber.";
+L["Bountiful Delves Rep Tooltip"] = "Ouvrir un Coffre généreux a une chance d'augmenter votre réputation avec cette faction.";
+L["Warband Weekly Reward Tooltip"] = "Votre Bande de guerre ne peut recevoir cette récompense qu'une fois par semaine.";
+L["Completed"] = CRITERIA_COMPLETED or "Terminé";
+L["Filter Hide Completed Format"] = "Masquer les terminés (%d)";
 
 
 --Generic

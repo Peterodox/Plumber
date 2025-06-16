@@ -14,7 +14,7 @@
 	<Script file="EncounterData.lua"/>
 	<Script file="EncounterJournal.lua"/>
 	<Script file="ExpansionLandingPage.lua"/>
-	<Script file="MinimapButton.lua"/>
+	<Script file="ModuleRegistry.lua"/>
 
 	<Button name="PlumberLandingPageMajorFactionButtonTemplate" virtual="true">
 		<Size x="80" y="80"/>

@@ -6,6 +6,11 @@ local _, addon = ...
 local L = addon.L;
 
 
+--Globals
+BINDING_HEADER_PLUMBER = "Plumber Addon";
+BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Mostrar/ocultar resumen de expansión";   --Show/hide Expansion Summary UI
+
+
 --Module Control Panel
 L["Module Control"] = "Módulo de control";
 L["Quick Slot Generic Description"] = "\n\n*Ranura rápida es un conjunto de botones en los que se puede hacer click y que aparecen bajo ciertas condiciones.";
@@ -333,6 +338,30 @@ L["Drawer Option Update Frequently"] = "Actualizar frecuentemente";
 L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
 
 
+
+--New Expansion Landing Page
+L["Reward Available"] = "Recompensa disponible";  --As brief as possible
+L["Paragon Reward Available"] = "Recompensa de Paragón disponible";
+L["Until Next Level Format"] = "%d hasta el siguiente nivel";   --Earn x reputation to reach the next level
+L["Until Paragon Reward Format"] = "%d hasta la recompensa de Paragón";
+L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Haz clic para ver Renombre>";
+L["Not On Quest"] = "No estás en esta misión";
+L["Raids"] = RAIDS or "Bandas";
+L["Instruction Track Achievement"] = "<Mayús + clic para seguir este logro>";
+L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Mayús + clic para dejar de seguir>";
+L["No Data"] = "Sin datos";
+L["No Raid Boss Selected"] = "No se ha seleccionado un jefe";
+L["Your Class"] = "(Tu clase)";
+L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Gran Cámara";
+L["Item Upgrade"] = ITEM_UPGRADE or "Mejora de objeto";
+L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Recursos";
+L["Plumber Experimental Feature Tooltip"] = "Una función experimental en el addon Plumber.";
+L["Bountiful Delves Rep Tooltip"] = "Abrir un Arca Abundante tiene la posibilidad de aumentar tu reputación con esta facción.";
+L["Warband Weekly Reward Tooltip"] = "Tu Banda de Guerra solo puede recibir esta recompensa una vez por semana.";
+L["Completed"] = CRITERIA_COMPLETED or "Completado";
+L["Filter Hide Completed Format"] = "Ocultar completados (%d)";
+
+
 --Generic
 L["Reposition Button Horizontal"] = "Mover horizontalmente";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Mover verticalmente";
@@ -344,7 +373,6 @@ L["Paragon Reputation"] = "Dechado";
 L["Level Maxed"] = "(Máximo)";   --Reached max level
 L["Current Colon"] = "Actual:";
 L["Unclaimed Reward Alert"] = "Tienes recompensas sin reclamar";
-L["Total Colon"] = FROM_TOTAL or "Total:";
 
 
 --Plumber AddOn Settings

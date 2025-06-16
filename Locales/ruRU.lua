@@ -6,6 +6,11 @@ local _, addon = ...
 local L = addon.L;
 
 
+--Globals
+BINDING_HEADER_PLUMBER = "Plumber";
+BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Окно Резюме расширения";   --Show/hide Expansion Summary UI
+
+
 --Module Control Panel
 L["Module Control"] = "Управление модулем";
 L["Quick Slot Generic Description"] = "\n\n*Быстрый слот - это набор интерактивных кнопок, которые появляются при определенных условиях.";
@@ -389,7 +394,31 @@ L["Drawer Option Update Frequently"] = "Часто обновляйте";
 L["Drawer Option Update Frequently Tooltip"] = "Попробуйте обновить состояние кнопок всякий раз, когда в ваших сумках или книгах заклинаний происходят изменения. Включение этой опции может немного увеличить использование ресурсов.";
 
 
+--New Expansion Landing Page
+L["Reward Available"] = "Доступная награда";
+L["Paragon Reward Available"] = "Доступна награда Парагона";
+L["Until Next Level Format"] = "%d до следующего уровня";
+L["Until Paragon Reward Format"] = "%d до награды Парагона";
+L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Нажмите, чтобы посмотреть репутацию>";
+L["Not On Quest"] = "Вы не выполняете это задание";
+L["Raids"] = RAIDS or "Рейды";
+L["Instruction Track Achievement"] = "<Shift + клик, чтобы отслеживать это достижение>";
+L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift + клик, чтобы прекратить отслеживание>";
+L["No Data"] = "Нет данных";
+L["No Raid Boss Selected"] = "Босс не выбран";
+L["Your Class"] = "(Ваш класс)";
+L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Великое Хранилище";
+L["Item Upgrade"] = ITEM_UPGRADE or "Улучшение предмета";
+L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Ресурсы";
+L["Plumber Experimental Feature Tooltip"] = "Экспериментальная функция аддона Plumber.";
+L["Bountiful Delves Rep Tooltip"] = "Открытие Щедрого ларца дает шанс увеличить репутацию с этой фракцией.";
+L["Warband Weekly Reward Tooltip"] = "Ваш Боевой Отряд может получить эту награду только раз в неделю.";
+L["Completed"] = CRITERIA_COMPLETED or "Завершено";
+L["Filter Hide Completed Format"] = "Скрыть завершенные (%d)";
+
+
 --Generic
+L["Total Colon"] = FROM_TOTAL or "Всего:";
 L["Reposition Button Horizontal"] = "Перемещение по горизонтали";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Перемещение по вертикали";
 L["Reposition Button Tooltip"] = "Щелкните ЛКМ и перетащите, чтобы переместить окно.";
@@ -401,7 +430,6 @@ L["Level Maxed"] = "(Максимально)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Текущий:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "У вас есть невостребованные награды";
 L["Reward Available"] = "Доступна награда";  --As brief as possible
-L["Total Colon"] = FROM_TOTAL or "Всего:";
 
 
 --Plumber AddOn Settings
