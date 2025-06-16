@@ -16,6 +16,7 @@ do  --TabButtonMixin
     function TabButtonMixin:OnClick()
         LandingPageUtil.SelectTab(self.tabKey);
         MainFrame:UpdateTabs();
+        LandingPageUtil.PlayUISound("SwitchTab");
     end
 
     function TabButtonMixin:OnEnter()
@@ -126,7 +127,6 @@ do
         MainFrame = self;
 
         local NineSlice;
-        local borderOffset = -30;
 
         NineSlice = LandingPageUtil.CreateExpansionThemeFrame(self.LeftSection, 10);
         self.LeftSection.NineSlice = NineSlice;
@@ -155,6 +155,7 @@ do
         LandingPageUtil.SelectTabByIndex(1);
 
         self:SetScript("OnShow", self.OnShow);
+        self:SetScript("OnHide", self.OnHide);
     end
 
     addon.CallbackRegistry:Register("DBLoaded", function(db)
@@ -165,6 +166,11 @@ do
 
     function PlumberExpansionLandingPageMixin:OnShow()
         self:UpdateTabs();    --The selected tab will be created here
+        LandingPageUtil.PlayUISound("LandingPageOpen");
+    end
+
+    function PlumberExpansionLandingPageMixin:OnHide()
+        LandingPageUtil.PlayUISound("LandingPageClose");
     end
 
     function PlumberExpansionLandingPageMixin:InitTabButtons()
@@ -270,5 +276,10 @@ do
 
     function PlumberExpansionLandingPageMixin:ToggleUI()
         self:SetShown(not self:IsShown());
+    end
+
+    function PlumberExpansionLandingPageMixin:ResetPosition()
+        self:ClearAllPoints();
+        self:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 64, -150);
     end
 end

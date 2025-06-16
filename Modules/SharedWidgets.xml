@@ -612,4 +612,32 @@
             </Layer>
         </Layers>
     </Button>
+
+    <Frame name="PlumberRepositionFrameTemplate" registerForDrag="LeftButton" virtual="true">
+        <Size x="8" y="8"/>
+        <Scripts>
+            <OnDragStart>
+                self.isMoving = true;
+                self:GetParent():StartMoving(true);
+            </OnDragStart>
+            <OnDragStop>
+                self.isMoving = false;
+                self:GetParent():StopMovingOrSizing();
+            </OnDragStop>
+            <OnHide>
+                if self.isMoving then
+                    self.isMoving = false;
+                    self:GetParent():StopMovingOrSizing();
+                end
+            </OnHide>
+            <OnMouseDown>
+                if button == "RightButton" then
+                    local parent = self:GetParent();
+                    if parent.ResetPosition then
+                        parent:ResetPosition();
+                    end
+                end
+            </OnMouseDown>
+        </Scripts>
+    </Frame>
 </Ui>

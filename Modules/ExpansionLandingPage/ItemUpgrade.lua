@@ -49,6 +49,10 @@ do
     function CurrencyButtonMixin:OnLeave()
         GameTooltip:Hide();
     end
+
+    function CurrencyButtonMixin:OnClick()
+        API.ToggleBlizzardTokenUIIfWarbandCurrency(self.currencyID);
+    end
 end
 
 
@@ -69,6 +73,7 @@ local function CreateButton(parent)
 
     f:SetScript("OnEnter", f.OnEnter);
     f:SetScript("OnLeave", f.OnLeave);
+    f:SetScript("OnClick", f.OnClick);
 
     return f
 end

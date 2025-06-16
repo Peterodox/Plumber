@@ -1650,15 +1650,6 @@ do  -- Reputation
                 level = majorFactionData.renownLevel;
                 name = majorFactionData.name;
                 isUnlocked = majorFactionData.isUnlocked;
-                if C_Reputation.IsFactionParagon(factionID) then
-                    isFull = true;
-                    if paragonRepEarned and paragonThreshold and paragonThreshold ~= 0 then
-                        local paragonLevel = floor(paragonRepEarned / paragonThreshold);
-                        currentValue = paragonRepEarned - paragonLevel * paragonThreshold;
-                        maxValue = paragonThreshold;
-                        level = paragonLevel;
-                    end
-                end
             end
         end
 
@@ -1684,6 +1675,16 @@ do  -- Reputation
                 reaction = repInfo.reaction;
                 level = reaction - zeroLevel;
                 isFull = level >= 8; --TEMP DEBUG
+            end
+        end
+
+        if C_Reputation.IsFactionParagon(factionID) then
+            isFull = true;
+            if paragonRepEarned and paragonThreshold and paragonThreshold ~= 0 then
+                local paragonLevel = floor(paragonRepEarned / paragonThreshold);
+                currentValue = paragonRepEarned - paragonLevel * paragonThreshold;
+                maxValue = paragonThreshold;
+                level = paragonLevel;
             end
         end
 
@@ -2007,6 +2008,7 @@ do  -- System
             end
         end
     end
+
 
     function API.TriggerExpansionMinimapButtonAlert(text)
         if ExpansionLandingPageMinimapButton then

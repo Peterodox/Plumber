@@ -6,28 +6,39 @@ local L = addon.L;
 local FactionUtil = addon.FactionUtil;
 
 
-local function SetupMinimapButton()
-    local MinimapButton = ExpansionLandingPageMinimapButton;
-    if not MinimapButton then return end;
+local function ShouldShowWarWithinLandingPage()
+    return C_PlayerInfo.IsExpansionLandingPageUnlockedForPlayer(10)
 end
 
 
 local ToggleExpansionLandingPage_Old = ToggleExpansionLandingPage;
 
-local function ToggleExpansionLandingPage_New()
+local function Plumber_ToggleLandingPage()
     PlumberExpansionLandingPage:ToggleUI();
 end
-ToggleExpansionLandingPage = ToggleExpansionLandingPage_New;
+
+local function ToggleExpansionLandingPage_New()
+    if ShouldShowWarWithinLandingPage() then
+        Plumber_ToggleLandingPage();
+    else
+        ToggleExpansionLandingPage_Old();
+    end
+end
 
 
-_G.Plumber_ToggleLandingPage = ToggleExpansionLandingPage_New;
+--Override Default API
+_G.ToggleExpansionLandingPage = ToggleExpansionLandingPage_New;
+
+
+--Global Declares
+_G.Plumber_ToggleLandingPage = Plumber_ToggleLandingPage;
 
 
 --Addon Compartment
 local IDENTIFIER = "PlumberLandingPage";
 
 local function AddonCompartment_OnClick()
-    ToggleExpansionLandingPage_New();
+    Plumber_ToggleLandingPage();
 end
 
 local function AddonCompartment_OnEnter(menuButton, data)
@@ -55,7 +66,7 @@ EL:SetScript("OnEvent", function(self, event, ...)
         self:UnregisterEvent(event);
         API.AddButtonToAddonCompartment(IDENTIFIER, L["ModuleName ExpansionLandingPage"], nil, AddonCompartment_OnClick, AddonCompartment_OnEnter, AddonCompartment_OnLeave);
         C_Timer.After(3, function()
-            if FactionUtil:IsAnyParagonRewardPending() then
+            if ShouldShowWarWithinLandingPage() and FactionUtil:IsAnyParagonRewardPending() then
                 API.TriggerExpansionMinimapButtonAlert(L["Paragon Reward Available"]);
             end
         end);

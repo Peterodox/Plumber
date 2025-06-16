@@ -128,7 +128,7 @@ do
             tooltip:AddLine(factionStandingtext, 1, 1, 1, true);
 
             if not hasRewardPending and currentValue and threshold then
-                local value = mod(currentValue, threshold);
+                local value = math.fmod(currentValue, threshold);
                 -- show overflow if reward is pending
                 if hasRewardPending then
                     value = value + threshold;

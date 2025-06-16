@@ -1,0 +1,7 @@
+<Bindings>
+    <Binding name="TOGGLE_PLUMBER_LANDINGPAGE" category="BINDING_HEADER_PLUMBER"> <!--runOnUp="true"-->
+        if Plumber_ToggleLandingPage then
+            Plumber_ToggleLandingPage();
+        end
+    </Binding>
+</Bindings>

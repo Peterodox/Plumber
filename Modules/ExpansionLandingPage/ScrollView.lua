@@ -40,6 +40,7 @@ do
                 self:SharedOnMouseDown(button);
                 self:GetParent():GetScrollView():OnMouseWheel(self.delta);
                 self:GetParent():StartPushingArrow(self.delta);
+                LandingPageUtil.PlayUISound("ScrollBarStep");
             end
         end
 
@@ -285,6 +286,7 @@ do
         Rail:SetScript("OnMouseDown", function(_, button)
             if button == "LeftButton" then
                 f:ScrollToMouseDownPosition();
+                LandingPageUtil.PlayUISound("ScrollBarThumbDown");
             end
         end);
 
@@ -305,6 +307,7 @@ do
                 f:StartDraggingThumb();
                 Thumb:LockHighlight();
                 Thumb:SharedOnMouseDown(button);
+                LandingPageUtil.PlayUISound("ScrollBarThumbDown");
             end
         end);
 
@@ -776,7 +779,7 @@ do  --ScrollView Scroll Behavior
         self.useBoundaryGradient = state;
 
         if state and not self.BottomGradient then
-            local BottomGradient = CreateFrame("Frame", nil, self);
+            local BottomGradient = CreateFrame("Frame", nil, self:GetParent());
             self.BottomGradient = BottomGradient;
             BottomGradient:SetSize(224, self.boundaryGradientSize or 40);
             BottomGradient:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 6, -1);

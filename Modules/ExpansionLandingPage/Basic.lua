@@ -13,7 +13,6 @@ local tinsert = table.insert;
 local tremove = table.remove;
 
 
-
 local CreateObjectPool;
 do  --Object Pool
     local ObjectPoolMixin = {};
@@ -270,6 +269,36 @@ do
 
         return f
     end
+end
+
+
+
+local PlayUISound;
+do
+    local PlaySound = PlaySound;
+
+    local SoundEffects = {
+        LandingPageOpen = SOUNDKIT.UI_EXPANSION_LANDING_PAGE_OPEN,
+        LandingPageClose = SOUNDKIT.UI_EXPANSION_LANDING_PAGE_CLOSE,
+
+        SwitchTab = SOUNDKIT.IG_CHARACTER_INFO_TAB,
+
+        ScrollBarThumbDown = SOUNDKIT.U_CHAT_SCROLL_BUTTON,
+        ScrollBarStep = SOUNDKIT.SCROLLBAR_STEP,
+
+        CheckboxOn = SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON,
+        CheckboxOff = SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF,
+
+        DropdownOpen = SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON,
+        DropdownClose = SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF,
+    };
+
+    function PlayUISound(key)
+        if SoundEffects[key] then
+            PlaySound(SoundEffects[key])
+        end
+    end
+    LandingPageUtil.PlayUISound = PlayUISound;
 end
 
 
@@ -760,11 +789,13 @@ do  --Dropdown Menu
 
         Frame:SetScript("OnShow", function()
             Frame:RegisterEvent("GLOBAL_MOUSE_DOWN");
+            PlayUISound("DropdownOpen");
         end);
 
         Frame:SetScript("OnHide", function()
             DropdownMenu:Hide();
             Frame:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+            PlayUISound("DropdownClose");
         end);
 
         Frame:SetScript("OnEvent", function()
@@ -958,9 +989,9 @@ do  --Checkbox Button
             addon.SetDBValue(self.dbKey, checked, true);
             self:SetChecked(checked);
             if self.checked then
-                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+                PlayUISound("CheckboxOn");
             else
-                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
+                PlayUISound("CheckboxOff");
             end
         end
     end

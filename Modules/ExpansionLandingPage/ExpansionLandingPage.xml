@@ -94,7 +94,7 @@
 		</Frames>
 	</Button>
 
-	<Frame name="PlumberExpansionLandingPage" parent="UIParent" mixin="PlumberExpansionLandingPageMixin" topLevel="true" hidden="true" enableMouse="true">
+	<Frame name="PlumberExpansionLandingPage" parent="UIParent" mixin="PlumberExpansionLandingPageMixin" topLevel="true" hidden="true" enableMouse="true" clampedToScreen="true" movable="true">
 		<Size x="1012" y="550"/>
 		<Anchors>
 			<Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT" x="64" y="-150"/>
@@ -146,6 +146,13 @@
 						</Anchors>
 					</Frame>
 				</Frames>
+			</Frame>
+			<Frame parentKey="RepositionFrame" inherits="PlumberRepositionFrameTemplate">
+				<Size y="20"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x="-48"/>
+				</Anchors>
 			</Frame>
 		</Frames>
 		<Scripts>

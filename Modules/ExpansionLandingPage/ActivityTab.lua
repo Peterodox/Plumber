@@ -31,7 +31,12 @@ do  --Checklist Button
 
     function ChecklistButtonMixin:OnClick()
         if self.isHeader then
-            self:ToggleCollapsed();
+            local isCollapsed = self:ToggleCollapsed();
+            if isCollapsed then
+                LandingPageUtil.PlayUISound("CheckboxOff");
+            else
+                LandingPageUtil.PlayUISound("CheckboxOn");
+            end
         end
     end
 
@@ -145,8 +150,9 @@ do  --Checklist Button
     function ChecklistButtonMixin:ToggleCollapsed()
         local v = self.dataIndex;
         if v then
-            ActivityUtil.ToggleCollapsed(v);
+            local isCollapsed = ActivityUtil.ToggleCollapsed(v);
             ActivityTab:FullUpdate();
+            return isCollapsed
         end
     end
 
@@ -156,7 +162,9 @@ do  --Checklist Button
             TooltipUpdator:SetHeaderText(self.Name:GetText());
             TooltipUpdator:SetQuestID(self.id);
             TooltipUpdator:RequestQuestProgress();
-            TooltipUpdator:RequestQuestReward();
+            if not self.completed then
+                TooltipUpdator:RequestQuestReward();
+            end
         else
             local data = ActivityUtil.GetActivityData(self.dataIndex);
             if data and data.tooltip then

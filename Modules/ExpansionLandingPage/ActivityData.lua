@@ -516,6 +516,8 @@ function ActivityUtil.ToggleCollapsed(dataIndex)
         end
 
         --print(dataIndex, v.localizedName or v.name, v.isDynamicQuest, v.questMapID, v.isCollapsed);
+
+        return v.isCollapsed
     end
 end
 

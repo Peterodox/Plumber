@@ -52,7 +52,12 @@ do
 
     function ListButtonMixin:OnClick(button)
         if self.isHeader then
-            self:ToggleCollapsed();
+            local isCollapsed = self:ToggleCollapsed();
+            if isCollapsed then
+                LandingPageUtil.PlayUISound("CheckboxOff");
+            else
+                LandingPageUtil.PlayUISound("CheckboxOn");
+            end
         else
             RaidTab:SelectEncounterByDataIndex(self.dataIndex);
             RaidTab.AchievementContainer:SetAchievements(LandingPageUtil.GetEncounterAchievements(self.journalEncounterID));
@@ -62,8 +67,10 @@ do
 
     function ListButtonMixin:ToggleCollapsed()
         if self.dataIndex and EncounterList[self.dataIndex] then
-            EncounterList[self.dataIndex].isCollapsed = not EncounterList[self.dataIndex].isCollapsed;
+            local isCollapsed = not EncounterList[self.dataIndex].isCollapsed;
+            EncounterList[self.dataIndex].isCollapsed = isCollapsed;
             RaidTab:RefreshList();
+            return isCollapsed
         end
     end
 
@@ -179,7 +186,11 @@ do
 		end
 
         if IsModifiedClick("QUESTWATCHTOGGLE") then
-            self:ToggleTracking();
+            if self:ToggleTracking() then
+                LandingPageUtil.PlayUISound("CheckboxOn");
+            else
+                LandingPageUtil.PlayUISound("CheckboxOff");
+            end
         end
     end
 
@@ -279,7 +290,7 @@ do
         for _, _id in ipairs(trackedIDs) do
             if id == _id then
                 C_ContentTracking.StopTracking(trackType, id, Enum.ContentTrackingStopType.Manual);
-                return
+                return false
             end
         end
 
@@ -297,6 +308,8 @@ do
         local trackingError = C_ContentTracking.StartTracking(trackType, id);
         if trackingError then
             ContentTrackingUtil.DisplayTrackingError(trackingError);
+        else
+            return true
         end
     end
 

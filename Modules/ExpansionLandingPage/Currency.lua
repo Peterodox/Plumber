@@ -21,13 +21,16 @@ local DefaultResources = {
     {currencyID = 3028},    --Restored Coffer Key
     {itemID = 236096, isMinor = false},   --Coffer Key Shard
     {itemID = 235897},      --Radiant Echo
+    {currencyID = 3149},    --Displaced Corrupted Mementos
     {currencyID = 3218},    --Empty Kaja'Cola Can
     {currencyID = 3226},    --Market Research
+    {currencyID = 3090},    --Flame-Blessed Iron
     {currencyID = 2815},    --Resonance Crystals
     {currencyID = 3056},    --Kej
     --{currencyID = 3055},      --Mereldar Derby Mark
     {currencyID = 2803},    --Undercoin
 
+    {isHeader = true, name = PVP},
     {currencyID = 2123},    --Bloody Tokens
     {currencyID = 1602},    --Conquest
     {currencyID = 1792},    --Honor
@@ -369,6 +372,15 @@ function LandingPageUtil.CreateCurrencyList(parent)
 
     ScrollView:AddTemplate("CurrencyButton", CurrencyButton_Create, CurrencyButton_OnAcquired, CurrencyButton_OnRemoved);
 
+
+    local function HeaderTitle_Create()
+        local fs = ScrollView:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        fs:SetSize(208, 16);
+        fs:SetTextColor(0.8, 0.8, 0.8);
+        return fs
+    end
+
+    ScrollView:AddTemplate("HeaderTitle", HeaderTitle_Create);
 
     f:SetScript("OnShow", f.OnShow);
     f:SetScript("OnHide", f.OnHide);
