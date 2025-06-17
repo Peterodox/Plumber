@@ -1222,7 +1222,7 @@ end
 LandingPageUtil.AddTab(
     {
         key = "faction",
-        name = "Factions",
+        name = L["Factions"],
         uiOrder = 1,
         initFunc = CreateFactionTab,
         notificationGetter = NotificationCheck,

@@ -204,14 +204,9 @@ do  --Checklist Button
         end
     end
 
-    function ChecklistButtonMixin:UpdateLocationMarker()
+    function ChecklistButtonMixin:UpdateLocationHighlight()
         local data = self.dataIndex and ActivityUtil.GetActivityData(self.dataIndex);
         self.Glow:SetShown(data.showGlow);
-        --[[
-        local state = data and data.showLocationMarker;
-        self.Icon2:SetShown(state);
-        self:Layout();
-        --]]
     end
 
     function CreateChecklistButton(parent)
@@ -274,6 +269,13 @@ do
                 local isOdd = n % 2 == 0;
                 top = offsetY;
                 bottom = offsetY + buttonHeight + gap;
+
+                if v.uiMapID then
+                    v.showGlow = (not v.isHeader) and (not v.completed) and (v.uiMapID == uiMapID);
+                else
+                    v.showGlow = false;
+                end
+
                 content[n] = {
                     templateKey = "ChecklistButton",
                     setupFunc = function(obj)
@@ -286,11 +288,6 @@ do
                         else
                             obj:SetWidth(entryWidth);
                             obj:SetEntry();
-                        end
-                        if v.uiMapID then
-                            v.showGlow = (not v.isHeader) and (not v.completed) and (v.uiMapID == uiMapID);
-                        else
-                            v.showGlow = false;
                         end
                         obj:SetActivity(v.dataIndex, v);
                     end,
@@ -394,14 +391,14 @@ do
             self.uiMapID = uiMapID;
             if SortedActivityData then
                 for k, v in ipairs(SortedActivityData) do
-                    if v.uiMapID and v.uiMapID == uiMapID then
-                        v.showGlow = true;  --debug
+                    if v.uiMapID and v.uiMapID == uiMapID and (not v.isHeader) then
+                        v.showGlow = true;
                     else
                         v.showGlow = nil;
                     end
                 end
                 if updateScrollView then
-                    self.ScrollView:CallObjectMethod("ChecklistButton", "UpdateLocationMarker");
+                    self.ScrollView:CallObjectMethod("ChecklistButton", "UpdateLocationHighlight");
                 end
             end
         end
@@ -440,7 +437,7 @@ end
 LandingPageUtil.AddTab(
     {
         key = "activity",
-        name = "Activities",
+        name = L["Activities"],
         uiOrder = 2,
         initFunc = CreateActivityTab,
         dimBackground = true,

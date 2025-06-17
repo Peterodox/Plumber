@@ -395,12 +395,16 @@ L["Drawer Option Update Frequently Tooltip"] = "在你背包或法術書發生�
 
 
 --New Expansion Landing Page
+L["ModuleName NewExpansionLandingPage"] = "資料片總覽";
+L["ModuleDescription NewExpansionLandingPage"] = "一個顯示聲望、每週事件和團隊副本進度的介面。你可從以下方式打開：\n\n- 點擊小地圖上的卡茲阿加概要按鈕。\n\n- 在遊戲設定-快捷鍵中設定一個快捷鍵。";
 L["Reward Available"] = "獎勵待領取";  --As brief as possible
 L["Paragon Reward Available"] = "巔峰獎勵待領取";
 L["Until Next Level Format"] = "離下一級還有 %d";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "離巔峰寶箱還有 %d";
 L["Instruction Click To View Renown"] = "<點擊查看名望>";
 L["Not On Quest"] = "你沒有接到該任務";
+L["Factions"] = "陣營";
+L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "活動";
 L["Raids"] = "團隊副本";
 L["Instruction Track Achievement"] = "<按住Shift點擊追蹤此成就>";
 L["Instruction Untrack Achievement"] = "<按住Shift點擊取消追蹤>";

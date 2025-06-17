@@ -272,6 +272,9 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
         "AddRaidCompletionInfoToGameTooltip",
         "GetRaidName",
         "HandlePreviewWorldRewardTooltip",
+        "HandlePreviewRaidRewardTooltip",
+        "HandlePreviewMythicRewardTooltip",
+        "HandlePreviewPvPRewardTooltip",
     };
 
     local function ShowTooltip(self)
