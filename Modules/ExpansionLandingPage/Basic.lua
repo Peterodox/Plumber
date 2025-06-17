@@ -292,6 +292,9 @@ do
 
         DropdownOpen = SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON,
         DropdownClose = SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF,
+
+        PageOpen = SOUNDKIT.IG_QUEST_LOG_OPEN,
+        PageClose = SOUNDKIT.IG_QUEST_LOG_CLOSE,
     };
 
     function PlayUISound(key)

@@ -21,19 +21,21 @@ local DefaultResources = {
     {currencyID = 3028},    --Restored Coffer Key
     {itemID = 236096, isMinor = false},   --Coffer Key Shard
     {itemID = 235897},      --Radiant Echo
+
+    {currencyID = 1602},    --Conquest
+    {currencyID = 1792},    --Honor
+
     {currencyID = 3149},    --Displaced Corrupted Mementos
+    {currencyID = 2815},    --Resonance Crystals
     {currencyID = 3218},    --Empty Kaja'Cola Can
     {currencyID = 3226},    --Market Research
     {currencyID = 3090},    --Flame-Blessed Iron
-    {currencyID = 2815},    --Resonance Crystals
     {currencyID = 3056},    --Kej
     --{currencyID = 3055},      --Mereldar Derby Mark
     {currencyID = 2803},    --Undercoin
 
-    {isHeader = true, name = PVP},
+    ---{isHeader = true, name = PVP},
     {currencyID = 2123},    --Bloody Tokens
-    {currencyID = 1602},    --Conquest
-    {currencyID = 1792},    --Honor
     {currencyID = 2797},    --Trophy of Strife
 };
 

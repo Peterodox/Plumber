@@ -243,7 +243,9 @@ do
 
     function FactionIconButtonMixin:OnClick()
         if not self.selected then
-            FactionTab:DisplayMajorFactionDetail(self.factionID);
+            if FactionTab:DisplayMajorFactionDetail(self.factionID) then
+                LandingPageUtil.PlayUISound("CheckboxOn");
+            end
         end
     end
 
@@ -528,14 +530,24 @@ end
 
 local function FactionButton_OnClickFunc(self, button)
     if button == "LeftButton" and IsShiftKeyDown() then
-        local watchedFactionID = (FactionUtil:IsFactionWatched(self.factionID) and 0) or self.factionID;
+        local newState = not FactionUtil:IsFactionWatched(self.factionID);
+        local watchedFactionID = (newState and self.factionID) or 0;
         C_Reputation.SetWatchedFactionByID(watchedFactionID);       --Trigger UPDATE_FACTION
         HideTooltip();
+
+        if newState then
+            LandingPageUtil.PlayUISound("CheckboxOn");
+        else
+            LandingPageUtil.PlayUISound("CheckboxOff");
+        end
+
         return
     end
 
     if FactionTab then
-        FactionTab:DisplayMajorFactionDetail(self.factionID);
+        if FactionTab:DisplayMajorFactionDetail(self.factionID) then
+            LandingPageUtil.PlayUISound("PageOpen");
+        end
     end
 end
 
@@ -720,6 +732,7 @@ do
             local button = ...
             if button == "RightButton" and self:IsMouseOver() and not self.isOverview then
                 self:DisplayOverview();
+                LandingPageUtil.PlayUISound("PageClose");
             end
         end
     end
@@ -767,7 +780,7 @@ do
     end
 
     function FactionTabMixin:DisplayMajorFactionDetail(factionID)
-        if not C_Reputation.IsMajorFaction(factionID) then return end;
+        if not C_Reputation.IsMajorFaction(factionID) then return false end;
 
         self.isOverview = false;
         self.selectedFactionID = factionID;
@@ -777,6 +790,8 @@ do
         self.DetailFrame:Show();
         self:UpdateLeftWidgets();
         self:UpdateRightSection();
+
+        return true
     end
 
     function FactionTabMixin:IsViewingFactionDetail()

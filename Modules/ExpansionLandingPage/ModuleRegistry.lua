@@ -116,6 +116,7 @@ do
         toggleFunc = EL.EnableModule,
         categoryID = 1,
         uiOrder = 0,
+        moduleAddedTime = 1750160000,
     };
 
     addon.ControlCenter:AddModule(moduleData);

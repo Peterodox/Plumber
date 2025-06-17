@@ -449,13 +449,13 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 end
             end
 
-            if showActivity then
-                if entry.completed then
-                    numCompleted = numCompleted + 1;
-                else
-                    anyIncomplted = true;
-                end
+            if entry.completed then
+                numCompleted = numCompleted + 1;
+            elseif showActivity then
+                anyIncomplted = true;
+            end
 
+            if showActivity then
                 if hideCompleted then
                     if entry.isHeader or (not entry.completed) then
                         numEntries = numEntries + 1;

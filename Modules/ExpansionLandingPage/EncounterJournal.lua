@@ -62,6 +62,7 @@ do
             RaidTab:SelectEncounterByDataIndex(self.dataIndex);
             RaidTab.AchievementContainer:SetAchievements(LandingPageUtil.GetEncounterAchievements(self.journalEncounterID));
             RaidTab.LootContainer:ShowLoot(self.journalInstanceID, self.journalEncounterID);
+            LandingPageUtil.PlayUISound("CheckboxOn");
         end
     end
 

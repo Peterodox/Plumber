@@ -396,7 +396,7 @@ L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button sta
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Expansion Summary";
-L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Clicking Khaz Algar Summary button on the minimap.\n\n- Set a hotkey in Game Settings - Keybindings.";
+L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Click Khaz Algar Summary button on the minimap.\n\n- Set a hotkey in Game Settings - Keybindings.";
 L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
