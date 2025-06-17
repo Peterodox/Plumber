@@ -22,8 +22,8 @@ local GetQuestLineInfo = C_QuestLine.GetQuestLineInfo;
 
 
 local DELVES_BOUNTIFUL = "delves-bountiful";
-local DAILY_QUEST = "quest-recurring-available";   --"questlog-questtypeicon-daily";
-local WEEKLY_QUEST = "questlog-questtypeicon-weekly";
+local DAILY_QUEST = "quest-recurring-available";    --questlog-questtypeicon-daily;
+local WEEKLY_QUEST = "quest-wrapper-available";     --questlog-questtypeicon-weekly";
 
 
 local function ShownIfOnQuest(questID)
@@ -138,6 +138,7 @@ end
 
 
 local ShownQuestClassification = {
+    --Show these types of quests
     [Enum.QuestClassification.Recurring] = true,
     [Enum.QuestClassification.Meta] = true,
     [Enum.QuestClassification.Calling] = true,
@@ -155,8 +156,8 @@ local QuestIconAtlas =
 	[Enum.QuestClassification.Important] =	"importantavailablequesticon",
 };
 
-local QuestIconFile = {
-	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+local InProgressQuestIconFile = {
+	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
 	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
 	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
 	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
@@ -166,12 +167,11 @@ local function InitQuestData(info)
     local questClassification = info.questClassification or GetQuestClassification(info.questID);
     info.questClassification = questClassification;
 
-    if info.isOnQuest == nil then
-        info.isOnQuest = IsOnQuest(info.questID);
-    end
+    info.isOnQuest = IsOnQuest(info.questID);
 
     if info.isOnQuest then
-        info.icon = questClassification and QuestIconFile[questClassification];
+        --print(API.GetQuestName(info.questID), info.questID, questClassification);
+        info.icon = questClassification and InProgressQuestIconFile[questClassification];
     end
 
     if not info.atlas then

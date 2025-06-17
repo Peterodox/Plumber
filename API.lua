@@ -295,7 +295,7 @@ do  -- Time
     local SHOW_HOUR_BELOW_DAYS = 3;
     local SHOW_MINUTE_BELOW_HOURS = 12;
     local SHOW_SECOND_BELOW_MINUTES = 10;
-    local COLOR_RED_BELOW_SECONDS = 172800;
+    local COLOR_RED_BELOW_SECONDS = 43200;
 
     local function BakePlural(number, singularPlural)
         singularPlural = gsub(singularPlural, ";", "");
@@ -317,7 +317,7 @@ do  -- Time
         end
     end
 
-    local function SecondsToTime(seconds, abbreviated, partialTime, bakePluralEscapeSequence)
+    local function SecondsToTime(seconds, abbreviated, partialTime, bakePluralEscapeSequence, colorized)
         --partialTime: Stop processing if the remaining units don't really matter. e.g. to display the remaining time of an event when there are still days left
         --bakePluralEscapeSequence: Convert EcsapeSequence like "|4Sec:Sec;" to its result so it can be sent to chat
         local intialSeconds = seconds;
@@ -376,7 +376,7 @@ do  -- Time
                 else
                     timeString = timeString.." "..minuteText;
                 end
-                if partialTime and minutes >= SHOW_SECOND_BELOW_MINUTES then
+                if partialTime and (minutes >= SHOW_SECOND_BELOW_MINUTES or hours > 0) then
                     isComplete = true;
                 end
             else
@@ -396,7 +396,7 @@ do  -- Time
             end
         end
 
-        if partialTime and intialSeconds < COLOR_RED_BELOW_SECONDS and not bakePluralEscapeSequence then
+        if colorized and partialTime and intialSeconds < COLOR_RED_BELOW_SECONDS and not bakePluralEscapeSequence then
             --WARNING_FONT_COLOR
             timeString = "|cffff4800"..timeString.."|r";
         end

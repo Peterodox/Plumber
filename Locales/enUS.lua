@@ -417,6 +417,7 @@ L["Bountiful Delves Rep Tooltip"] = "Opening a Bountiful Coffer has a chance to 
 L["Warband Weekly Reward Tooltip"] = "You Warband can only receive this reward once per week.";
 L["Completed"] = CRITERIA_COMPLETED or "Completed";
 L["Filter Hide Completed Format"] = "Hide Completed (%d)";
+L["Weeky Reset Format"] = "Weekly Reset: %s";
 
 
 --Generic

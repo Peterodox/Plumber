@@ -1,6 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil;
 
 
@@ -156,6 +157,11 @@ do
 
         self:SetScript("OnShow", self.OnShow);
         self:SetScript("OnHide", self.OnHide);
+
+
+        --Events triggerd in ModuleRegistry.lua
+        CallbackRegistry:Register("ParagonRewardReady", self.RequestUpdateTabButtons, self);
+        CallbackRegistry:Register("ParagonRewardQuestTurnedIn", self.RequestUpdateTabButtons, self);
     end
 
     addon.CallbackRegistry:Register("DBLoaded", function(db)
@@ -209,6 +215,12 @@ do
         for _, button in ipairs(self.TabButtons) do
             button:SetSelected(button.tabKey == selectedTabKey);
             button:UpdateNotification();
+        end
+    end
+
+    function PlumberExpansionLandingPageMixin:RequestUpdateTabButtons()
+        if self.TabButtons and self:IsVisible() then
+            self:UpdateTabButtons();
         end
     end
 

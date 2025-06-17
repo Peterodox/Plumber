@@ -105,12 +105,14 @@ do
             self.DownArrow:Show();
             self.isTop = self:GetScrollView():IsAtTop();
             self.isBottom = self:GetScrollView():IsAtBottom();
+            self:SetAlpha(1);
         else
             self.Thumb:Hide();
             self.UpArrow:Hide();
             self.DownArrow:Hide();
             self.isTop = true;
             self.isBottom = true;
+            self:SetAlpha(0.5);
         end
         self.scrollable = scrollable;
         self.UpArrow:SetEnabled(not self.isTop);

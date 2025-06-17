@@ -116,10 +116,10 @@ local MajorFactionLayout = {
 FactionUtil.MajorFactionLayout = MajorFactionLayout;
 
 
-local RewardQuestIDs = {};
+local RewardQuestXFaction = {};
 for factionID, v in pairs(OverrideFactionInfo) do
     if v.rewardQuestID then
-        RewardQuestIDs[v.rewardQuestID] = factionID;
+        RewardQuestXFaction[v.rewardQuestID] = factionID;
     end
 end
 
@@ -149,7 +149,7 @@ function FactionUtil:GetFactionsWithRewardPending()
     local tbl;
     local IsOnQuest = C_QuestLog.IsOnQuest;
 
-    for questID, factionID in pairs(RewardQuestIDs) do
+    for questID, factionID in pairs(RewardQuestXFaction) do
         if IsOnQuest(questID) then
             if not tbl then
                 tbl = {};
@@ -165,8 +165,12 @@ function FactionUtil:IsAnyParagonRewardPending()
     return self:GetFactionsWithRewardPending() ~= nil
 end
 
+function FactionUtil:GetParagonRewardQuestFaction(questID)
+    return questID and RewardQuestXFaction[questID] or nil
+end
+
 function FactionUtil:IsParagonRewardQuest(questID)
-    return questID and RewardQuestIDs[questID] ~= nil
+    return self:GetParagonRewardQuestFaction(questID) ~= nil
 end
 
 function FactionUtil:GetFactionName(factionID)

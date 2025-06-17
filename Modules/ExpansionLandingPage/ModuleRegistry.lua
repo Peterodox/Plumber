@@ -3,6 +3,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local CallbackRegistry = addon.CallbackRegistry;
 local FactionUtil = addon.FactionUtil;
 
 
@@ -73,8 +74,15 @@ EL:SetScript("OnEvent", function(self, event, ...)
         end
     elseif event == "QUEST_ACCEPTED" then
         local questID = ...
-        if FactionUtil:IsParagonRewardQuest(questID) then
+        local factionID = FactionUtil:GetParagonRewardQuestFaction(questID);
+        if factionID then
             API.TriggerExpansionMinimapButtonAlert(L["Paragon Reward Available"]);
+            CallbackRegistry:Trigger("ParagonRewardReady", factionID);
+        end
+    elseif event == "QUEST_TURNED_IN" then
+        local questID = ...
+        if FactionUtil:IsParagonRewardQuest(questID) then
+            CallbackRegistry:Trigger("ParagonRewardQuestTurnedIn", questID);
         end
     end
 end);
@@ -85,6 +93,7 @@ function EL.EnableModule(state)
             EL.enabled = true;
             _G.ToggleExpansionLandingPage = ToggleExpansionLandingPage_New;     --Override Default API
             EL:RegisterEvent("QUEST_ACCEPTED");
+            EL:RegisterEvent("QUEST_TURNED_IN");
             API.AddButtonToAddonCompartment(IDENTIFIER, L["ModuleName NewExpansionLandingPage"], nil, AddonCompartment_OnClick, AddonCompartment_OnEnter, AddonCompartment_OnLeave);
         end
     else
@@ -92,6 +101,7 @@ function EL.EnableModule(state)
             EL.enabled = false;
             _G.ToggleExpansionLandingPage = ToggleExpansionLandingPage_Old;
             EL:UnregisterEvent("QUEST_ACCEPTED");
+            EL:UnregisterEvent("QUEST_TURNED_IN");
             API.RemoveButtonFromAddonCompartment(IDENTIFIER);
         end
     end

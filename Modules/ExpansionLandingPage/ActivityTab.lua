@@ -305,17 +305,31 @@ do
     end
 
     function ActivityTabMixin:InitChecklist()
+        local headerWidgetOffsetY = -10;
+
+
         local Checkbox_HideCompleted = LandingPageUtil.CreateCheckboxButton(self);
         self.Checkbox_HideCompleted = Checkbox_HideCompleted;
-        Checkbox_HideCompleted:SetPoint("TOPRIGHT", self, "TOPRIGHT", -52, -10);
+        Checkbox_HideCompleted:SetPoint("TOPRIGHT", self, "TOPRIGHT", -52, headerWidgetOffsetY);
         Checkbox_HideCompleted:SetText(L["Filter Hide Completed Format"], true);
         Checkbox_HideCompleted.dbKey = "LandingPage_Activity_HideCompleted";
         Checkbox_HideCompleted.textFormat = L["Filter Hide Completed Format"];
         Checkbox_HideCompleted:UpdateChecked();
-
         addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", self.SetHideCompleted, self);
 
-        
+
+        local WeeklyResetTimer = LandingPageUtil.CreateTimerFrame(self);
+        self.WeeklyResetTimer = WeeklyResetTimer;
+        WeeklyResetTimer:SetPoint("TOPLEFT", self, "TOPLEFT", 58, headerWidgetOffsetY);
+        WeeklyResetTimer:SetTimeGetter(C_DateAndTime.GetSecondsUntilWeeklyReset);
+        WeeklyResetTimer:SetTimeTextFormat(L["Weeky Reset Format"]);
+        WeeklyResetTimer:SetDisplayStyle("FormattedText");
+        WeeklyResetTimer:SetLowThresholdAndColor(6*3600, "ffe24c45");
+        WeeklyResetTimer:SetAutoStart(true);
+        WeeklyResetTimer:SetShownThreshold(86400);
+        WeeklyResetTimer:OnShow();
+
+
         local ScrollView = LandingPageUtil.CreateScrollViewForTab(self, -32);
         ScrollView:SetScrollBarOffsetY(-4);
 
