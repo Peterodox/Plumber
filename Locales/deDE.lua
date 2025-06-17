@@ -415,6 +415,7 @@ L["Bountiful Delves Rep Tooltip"] = "Das Öffnen einer üppigen Truhe kann deine
 L["Warband Weekly Reward Tooltip"] = "Deine Kriegsschar kann diese Belohnung nur einmal pro Woche erhalten.";
 L["Completed"] = CRITERIA_COMPLETED or "Abgeschlossen";
 L["Filter Hide Completed Format"] = "Abgeschlossene ausblenden (%d)";
+L["Weeky Reset Format"] = "Reset: %s";
 
 
 --Generic

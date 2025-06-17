@@ -138,7 +138,11 @@ local DefaultValues = {
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
     EditModeShowPlumberUI = true,
     LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
+
+
+    --New Expansion Landing Page
     NewExpansionLandingPage = true,
+        LandingPage_Activity_HideCompleted = true,
 
 
     --Custom Loot Window

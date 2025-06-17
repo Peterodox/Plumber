@@ -188,6 +188,7 @@ do
         f.Background = Background;
         Background:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, -4);
         Background:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 4);
+        Background:SetColorTexture(0.067, 0.040, 0.024);    --0.082, 0.047, 0.027
 
         f:SetTexture(tex);
         f.pieces[1]:SetTexCoord(0/1024, 128/1024, 0/1024, 128/1024);
@@ -359,6 +360,8 @@ do  --TabUtil
                     LandingPageUtil.ShowLeftFrame(true);
                 end
 
+                LandingPageUtil.DimBackground(tabInfo.dimBackground);
+
                 if tabInfo.onTabSelected then
                     tabInfo.onTabSelected();
                 end
@@ -479,10 +482,10 @@ do  --ScrollViewListButton
         self.Icon:SetTexture(TEXTURE);
         self.Icon:SetSize(18, 18);
         self.Icon:SetPoint("CENTER", self, "LEFT", 16, 0);
+        self.Icon:Show();
         self.Name:SetTextColor(0.6, 0.6, 0.6);
         self.Name:SetWidth(0);
         self.Name:SetMaxLines(1);
-        self.Name:SetPoint("LEFT", self, "LEFT", 32, 0);
         self.Text1:SetText(nil);
 
         if self.isCollapsed then
@@ -490,6 +493,8 @@ do  --ScrollViewListButton
         else
             self.Icon:SetTexCoord(0, 48/512, 256/512, 208/512);
         end
+
+        self:Layout();
     end
 
     function ListButtonMixin:SetEntry()
@@ -502,6 +507,20 @@ do  --ScrollViewListButton
         self.Name:SetTextColor(0.88, 0.88, 0.88);
         self.Name:SetWidth(240);
         self.Name:SetMaxLines(2);
+    end
+
+    function ListButtonMixin:Layout()
+        local textOffset = 10;
+
+        if self.Icon:IsShown() then
+            textOffset = textOffset + 22;
+        end
+
+        if self.Icon2:IsShown() then
+            textOffset = textOffset + 18;
+        end
+
+        self.Name:SetPoint("LEFT", self, "LEFT", textOffset, 0);
     end
 
     function LandingPageUtil.CreateScrollViewListButton(parent)
@@ -519,6 +538,13 @@ do  --ScrollViewListButton
         f.Icon:SetSize(18, 18);
         f.Icon:SetPoint("CENTER", f, "LEFT", 16, 0);
 
+        f.Icon2 = f:CreateTexture(nil, "OVERLAY");
+        f.Icon2:SetSize(16, 16);
+        f.Icon2:SetPoint("LEFT", f, "LEFT", 30, 0);
+        f.Icon2:Hide();
+        f.Icon2:SetTexture(TEXTURE);
+        f.Icon2:SetTexCoord(152/512, 184/512, 216/512, 248/512);
+
         f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         f.Name:SetPoint("LEFT", f, "LEFT", 32, 0);
         f.Name:SetTextColor(0.88, 0.88, 0.88);
@@ -528,6 +554,16 @@ do  --ScrollViewListButton
         f.Text1:SetPoint("RIGHT", f, "RIGHT", -96, 0);
         f.Text1:SetTextColor(0.88, 0.88, 0.88);
         f.Text1:SetJustifyH("CENTER");
+
+        f.Glow = f:CreateTexture(nil, "BORDER");
+        f.Glow:Hide();
+        f.Glow:SetTexture(TEXTURE);
+        f.Glow:SetTexCoord(0/512, 512/512, 352/512, 416/512);
+        f.Glow:SetPoint("LEFT", f.Left, "LEFT", 0, 0);
+        f.Glow:SetSize(256, 32);
+        f.Glow:SetBlendMode("ADD");
+        f.Glow:SetVertexColor(0.4, 0.4, 0.4);
+        --f.Glow:SetVertexColor(1, 0.82, 0);
 
         API.Mixin(f, ListButtonMixin);
 

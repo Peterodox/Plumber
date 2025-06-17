@@ -89,8 +89,9 @@ do
         self.dungeonEncounterID = dungeonEncounterID;
         self:SetEntry();
 
-        self.Name:SetPoint("LEFT", self, "LEFT", 10, 0);
+        self.Icon:Hide();
         self.Name:SetText(name);
+        self:Layout();
 
         self:UpdateProgress();
     end
@@ -1116,5 +1117,6 @@ LandingPageUtil.AddTab(
         uiOrder = 3,
         initFunc = CreateRaidTab,
         useCustomLeftFrame = true,
+        dimBackground = true,
     }
 );

@@ -7,6 +7,7 @@ local ActivityUtil = addon.ActivityUtil;
 local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 
 
+local ipairs = ipairs;
 local ReadyForTurnIn = C_QuestLog.ReadyForTurnIn;
 
 
@@ -77,6 +78,11 @@ do  --Checklist Button
             end
 
             self:UpdateProgress();
+
+            self.Glow:SetShown(data.showGlow);
+            self.Icon2:SetShown(data.showLocationMarker);
+
+            self:Layout();
         end
     end
 
@@ -198,6 +204,16 @@ do  --Checklist Button
         end
     end
 
+    function ChecklistButtonMixin:UpdateLocationMarker()
+        local data = self.dataIndex and ActivityUtil.GetActivityData(self.dataIndex);
+        self.Glow:SetShown(data.showGlow);
+        --[[
+        local state = data and data.showLocationMarker;
+        self.Icon2:SetShown(state);
+        self:Layout();
+        --]]
+    end
+
     function CreateChecklistButton(parent)
         local f = LandingPageUtil.CreateScrollViewListButton(parent);
         f:SetSize(248, 24);
@@ -221,10 +237,14 @@ do
         "QUEST_TURNED_IN",
         "QUESTLINE_UPDATE",
         --"LOOT_CLOSED",       --Looting some items triggers hidden quest flag, but the quest events don't fire
+        "ZONE_CHANGED_NEW_AREA",
     };
 
     function ActivityTabMixin:FullUpdate()
         self.fullUpdate = nil;
+
+        local uiMapID = API.GetPlayerMap();
+        self.uiMapID = uiMapID;
 
         local content = {};
         local n = 0;
@@ -246,7 +266,7 @@ do
                 showActivity = true;
                 showGroup = not v.isCollapsed;
             else
-                showActivity = showGroup and ActivityUtil.ShouldShowActivity(v);
+                showActivity = showGroup;
             end
 
             if showActivity then
@@ -266,6 +286,11 @@ do
                         else
                             obj:SetWidth(entryWidth);
                             obj:SetEntry();
+                        end
+                        if v.uiMapID then
+                            v.showGlow = (not v.isHeader) and (not v.completed) and (v.uiMapID == uiMapID);
+                        else
+                            v.showGlow = false;
                         end
                         obj:SetActivity(v.dataIndex, v);
                     end,
@@ -301,6 +326,8 @@ do
             self:RequestUpdate();
         elseif event == "QUEST_REMOVED" or event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" or event == "QUESTLINE_UPDATE" or event == "UPDATE_FACTION" then
             self:RequestUpdate(true);
+        elseif event == "ZONE_CHANGED_NEW_AREA" then
+            self:UpdateMap(true);
         end
     end
 
@@ -361,6 +388,25 @@ do
         end
     end
 
+    function ActivityTabMixin:UpdateMap(updateScrollView)
+        local uiMapID = API.GetPlayerMap();
+        if uiMapID ~= self.uiMapID then
+            self.uiMapID = uiMapID;
+            if SortedActivityData then
+                for k, v in ipairs(SortedActivityData) do
+                    if v.uiMapID and v.uiMapID == uiMapID then
+                        v.showGlow = true;  --debug
+                    else
+                        v.showGlow = nil;
+                    end
+                end
+                if updateScrollView then
+                    self.ScrollView:CallObjectMethod("ChecklistButton", "UpdateLocationMarker");
+                end
+            end
+        end
+    end
+
     function ActivityTabMixin:OnUpdate(elapsed)
         self.t = self.t + elapsed;
         if self.t >= 0.5 then
@@ -397,5 +443,6 @@ LandingPageUtil.AddTab(
         name = "Activities",
         uiOrder = 2,
         initFunc = CreateActivityTab,
+        dimBackground = true,
     }
 );

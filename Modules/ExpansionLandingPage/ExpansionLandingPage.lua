@@ -131,14 +131,13 @@ do
 
         NineSlice = LandingPageUtil.CreateExpansionThemeFrame(self.LeftSection, 10);
         self.LeftSection.NineSlice = NineSlice;
-        NineSlice.Background:SetColorTexture(0.082, 0.047, 0.027);
 
         NineSlice = LandingPageUtil.CreateExpansionThemeFrame(self.RightSection, 10);
         self.RightSection.NineSlice = NineSlice;
         NineSlice.Background:SetAtlas("thewarwithin-landingpage-background", false);
         NineSlice:ShowCloseButton(true);
         NineSlice:SetCloseButtonOwner(self);
-        local a = 0.4;
+        local a = 0.25;
         NineSlice.Background:SetVertexColor(a, a, a);
 
         local tex = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW";
@@ -284,6 +283,14 @@ do
     end
     function LandingPageUtil.ShowLeftFrame(state)
         MainFrame:ShowLeftFrame(state);
+    end
+
+    function PlumberExpansionLandingPageMixin:DimBackground(state)
+        local a = state and 0.25 or 0.4;
+        self.RightSection.NineSlice.Background:SetVertexColor(a, a, a);
+    end
+    function LandingPageUtil.DimBackground(state)
+        MainFrame:DimBackground(state);
     end
 
     function PlumberExpansionLandingPageMixin:ToggleUI()

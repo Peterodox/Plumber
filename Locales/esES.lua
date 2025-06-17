@@ -360,6 +360,7 @@ L["Bountiful Delves Rep Tooltip"] = "Abrir un Arca Abundante tiene la posibilida
 L["Warband Weekly Reward Tooltip"] = "Tu Banda de Guerra solo puede recibir esta recompensa una vez por semana.";
 L["Completed"] = CRITERIA_COMPLETED or "Completado";
 L["Filter Hide Completed Format"] = "Ocultar completados (%d)";
+L["Weeky Reset Format"] = "Reinicio semanal: %s";
 
 
 --Generic

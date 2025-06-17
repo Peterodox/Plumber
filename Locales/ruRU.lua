@@ -415,6 +415,7 @@ L["Bountiful Delves Rep Tooltip"] = "Открытие Щедрого ларца 
 L["Warband Weekly Reward Tooltip"] = "Ваш Боевой Отряд может получить эту награду только раз в неделю.";
 L["Completed"] = CRITERIA_COMPLETED or "Завершено";
 L["Filter Hide Completed Format"] = "Скрыть завершенные (%d)";
+L["Weeky Reset Format"] = "Сброс: %s";
 
 
 --Generic

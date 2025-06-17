@@ -259,6 +259,7 @@ L["Bountiful Delves Rep Tooltip"] = "Ouvrir un Coffre généreux a une chance d'
 L["Warband Weekly Reward Tooltip"] = "Votre Bande de guerre ne peut recevoir cette récompense qu'une fois par semaine.";
 L["Completed"] = CRITERIA_COMPLETED or "Terminé";
 L["Filter Hide Completed Format"] = "Masquer les terminés (%d)";
+L["Weeky Reset Format"] = "Reset hebdo: %s";
 
 
 --Generic

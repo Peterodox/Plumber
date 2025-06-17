@@ -38,57 +38,57 @@ local DELVES_REP_TOOLTIP = L["Bountiful Delves Rep Tooltip"];
 
 local ActivityData = {  --Constant
 
-    {isHeader = true, name = "Council of Dornogal", factionID = 2590,
+    {isHeader = true, name = "Council of Dornogal", factionID = 2590, uiMapID = 2248,
         entries = {
-            {name = "Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST},
+            {name = "Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST, uiMapID = 2248},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83317, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
             --{name = "Debug Quest", questID = 49738, atlas = DAILY_QUEST},
         }
     },
 
-    {isHeader = true, name = "The Assembly of the Deeps", factionID = 2594,
+    {isHeader = true, name = "The Assembly of the Deeps", factionID = 2594, uiMapID = 2214,
         entries = {
-            {name = "Rollin\' Down in the Deeps", questID = 82946, atlas = WEEKLY_QUEST},
-            {name = "Gearing Up for Trouble", questID = 83333, atlas = WEEKLY_QUEST}, --Awakening the Machine
+            {name = "Rollin\' Down in the Deeps", questID = 82946, atlas = WEEKLY_QUEST, uiMapID = 2214},
+            {name = "Gearing Up for Trouble", questID = 83333, atlas = WEEKLY_QUEST, uiMapID = 2214}, --Awakening the Machine
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83318, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
-    {isHeader = true, name = "Hallowfall Arathi", factionID = 2570,
+    {isHeader = true, name = "Hallowfall Arathi", factionID = 2570, uiMapID = 2215,
         entries = {
-            {name = "Speading the Light", questID = 76586, atlas = WEEKLY_QUEST},
+            {name = "Speading the Light", questID = 76586, atlas = WEEKLY_QUEST, uiMapID = 2215},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83320, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
-    {isHeader = true, name = "The Severed Threads", factionID = 2600,
+    {isHeader = true, name = "The Severed Threads", factionID = 2600, uiMapID = 2255,
         entries = {
-            {name = "Forge a Pact", questID = 80592, atlas = WEEKLY_QUEST},
-            {name = "Blade of the General", questID = 80671, atlas = WEEKLY_QUEST, factionID = 2605, shownIfOnQuest = true},
-            {name = "Hand of the Vizier", questID = 80672, atlas = WEEKLY_QUEST, factionID = 2607, shownIfOnQuest = true},
-            {name = "Eyes of the Weaver", questID = 80670, atlas = WEEKLY_QUEST, factionID = 2601, shownIfOnQuest = true},
+            {name = "Forge a Pact", questID = 80592, atlas = WEEKLY_QUEST, uiMapID = 2255},
+            {name = "Blade of the General", questID = 80671, atlas = WEEKLY_QUEST, factionID = 2605, shownIfOnQuest = true, uiMapID = 2255},
+            {name = "Hand of the Vizier", questID = 80672, atlas = WEEKLY_QUEST, factionID = 2607, shownIfOnQuest = true, uiMapID = 2255},
+            {name = "Eyes of the Weaver", questID = 80670, atlas = WEEKLY_QUEST, factionID = 2601, shownIfOnQuest = true, uiMapID = 2255},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83319, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
-    {isHeader = true, name = "The Cartels of Undermine", factionID = 2653,
+    {isHeader = true, name = "The Cartels of Undermine", factionID = 2653, uiMapID = 2346,
         entries = {
-            {name = "Many Jobs, Handle It!", questID = 85869, atlas = WEEKLY_QUEST},
-            {name = "Urge to Surge", questID = 86775, atlas = WEEKLY_QUEST},
-            {name = "Reduce, Reuse, Resell", questID = 85879, atlas = WEEKLY_QUEST},
+            {name = "Many Jobs, Handle It!", questID = 85869, atlas = WEEKLY_QUEST, uiMapID = 2346},
+            {name = "Urge to Surge", questID = 86775, atlas = WEEKLY_QUEST, uiMapID = 2346},
+            {name = "Reduce, Reuse, Resell", questID = 85879, atlas = WEEKLY_QUEST, uiMapID = 2346},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 87407, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
-    {isHeader = true, name = "Flame\'s Radiance", factionID = 2688,
+    {isHeader = true, name = "Flame\'s Radiance", factionID = 2688, uiMapID = 2215,
         entries = {
             {name = "The Flame Burns Eternal", questID = 91173, atlas = WEEKLY_QUEST},
-            {name = "Sureki Incursion: The Eastern Assault", questID = 87480, atlas = DAILY_QUEST, shownIfOnQuest = true},
-            {name = "Sureki Incursion: Southern Swarm", questID = 87477, atlas = DAILY_QUEST, shownIfOnQuest = true},
-            {name = "Sureki Incursion: Hold the Wall", questID = 87475, atlas = DAILY_QUEST, shownIfOnQuest = true},
-            {name = "Radiant Incursion: Rak-Zakaz", questID = 88945, atlas = DAILY_QUEST, shownIfOnQuest = true},
-            {name = "Radiant Incursion: Sureki\'s End", questID = 88916, atlas = DAILY_QUEST, shownIfOnQuest = true},
-            {name = "Radiant Incursion: Toxins and Pheromones", questID = 88711, atlas = DAILY_QUEST, shownIfOnQuest = true},
+            {name = "Sureki Incursion: The Eastern Assault", questID = 87480, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
+            {name = "Sureki Incursion: Southern Swarm", questID = 87477, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
+            {name = "Sureki Incursion: Hold the Wall", questID = 87475, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
+            {name = "Radiant Incursion: Rak-Zakaz", questID = 88945, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
+            {name = "Radiant Incursion: Sureki\'s End", questID = 88916, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2255},
+            {name = "Radiant Incursion: Toxins and Pheromones", questID = 88711, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2255},
         }
     },
 
@@ -417,9 +417,11 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
         local numEntries = 0;
         local entries = {};
         local flagQuest;
+        local showActivity;
 
         for _, entry in ipairs(category.entries) do
             flagQuest = entry.flagQuest or entry.questID;
+            showActivity = true;
 
             if entry.questID then
                 InitQuestData(entry);
@@ -435,14 +437,31 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 entry.completed = false;
             end
 
-            if entry.completed then
-                numCompleted = numCompleted + 1;
-            else
-                anyIncomplted = true;
+            if entry.shownIfOnQuest then
+                if hideCompleted then
+                    if not entry.isOnQuest then
+                        showActivity = false;
+                    end
+                else
+                    if not (entry.completed or entry.isOnQuest) then
+                        showActivity = false
+                    end
+                end
             end
 
-            if hideCompleted then
-                if entry.isHeader or (not entry.completed) then
+            if showActivity then
+                if entry.completed then
+                    numCompleted = numCompleted + 1;
+                else
+                    anyIncomplted = true;
+                end
+
+                if hideCompleted then
+                    if entry.isHeader or (not entry.completed) then
+                        numEntries = numEntries + 1;
+                        entries[numEntries] = entry;
+                    end
+                else
                     numEntries = numEntries + 1;
                     entries[numEntries] = entry;
                 end
@@ -462,12 +481,16 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 end
             end
         else
-            n = n + 1;
-            outputTbl[n] = category;
-            tsort(category.entries, SortFuncs.IncompleteFirst);
-            for _, entry in ipairs(category.entries) do
+            if true then
                 n = n + 1;
-                outputTbl[n] = entry;
+                outputTbl[n] = category;
+                if numEntries > 0 then
+                    tsort(entries, SortFuncs.DataIndex);
+                    for _, entry in ipairs(entries) do
+                        n = n + 1;
+                        outputTbl[n] = entry;
+                    end
+                end
             end
         end
     end
