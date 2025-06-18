@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.6.8 f
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.0 b
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -395,6 +395,8 @@ L["Drawer Option Update Frequently Tooltip"] = "Попробуйте обнов�
 
 
 --New Expansion Landing Page
+L["ModuleName NewExpansionLandingPage"] = "Резюме расширения";
+L["ModuleDescription NewExpansionLandingPage"] = "Интерфейс, который отображает фракции, еженедельные мероприятия и рейдовые кд. Вы можете открыть его:\n\n- Нажав на кнопку Обзор Каз Алгара на мини-карте..\n\n- Установить горячую клавишу в настройках игры - Сочетания клавиш.";
 L["Reward Available"] = "Доступная награда";
 L["Paragon Reward Available"] = "Доступна награда Парагона";
 L["Until Next Level Format"] = "%d до следующего уровня";
@@ -432,7 +434,6 @@ L["Paragon Reputation"] = "Парагон";
 L["Level Maxed"] = "(Максимально)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Текущий:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "У вас есть невостребованные награды";
-L["Reward Available"] = "Доступна награда";  --As brief as possible
 
 
 --Plumber AddOn Settings
