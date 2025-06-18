@@ -7,8 +7,8 @@ local L = addon.L;
 
 
 --Globals
-BINDING_HEADER_PLUMBER = "Plumber Addon";
-BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Feuille de Résumé de l'expansion";   --Show/hide Expansion Summary UI
+BINDING_HEADER_PLUMBER = "Plumber";
+BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Activer/Désactiver le résumé de l'extension";   --Show/hide Expansion Summary UI
 
 
 --Module Control Panel
