@@ -268,6 +268,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
     local inheritMethods = {
         "ShowPreviewItemTooltip",
         "ShowIncompleteTooltip",
+        "IsCompletedAtHeroicLevel",
         "AddTopRunsToTooltip",
         "AddRaidCompletionInfoToGameTooltip",
         "GetRaidName",
@@ -279,9 +280,16 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
 
     local function ShowTooltip(self)
         BlizzardMixin.OnEnter(self);
-        if GameTooltip:IsShown() then
-            GameTooltip:ClearAllPoints();
-            GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPRIGHT", -4, -4);
+        local tooltip = GameTooltip;
+        if tooltip:IsShown() and tooltip:GetOwner() == self then
+            tooltip:ClearAllPoints();
+            tooltip:SetPoint("BOTTOMLEFT", self, "TOPRIGHT", -4, -4);
+
+            if self.info.type == Enum.WeeklyRewardChestThresholdType.World then
+                if API.AddRecentDelvesRecordsToTooltip(tooltip, self.info.threshold) then
+                    tooltip:Show();
+                end
+            end
         end
     end
 

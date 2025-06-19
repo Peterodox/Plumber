@@ -1,5 +1,5 @@
 local VERSION_TEXT = "v1.7.0";
-local VERSION_DATE = 1750200000;
+local VERSION_DATE = 1750300000;
 
 
 local addonName, addon = ...
@@ -96,6 +96,7 @@ local function SetPersonalData(dbKey, value, userInput)
     DB_PC[dbKey] = value;
 end
 addon.SetPersonalData = SetPersonalData;
+
 
 
 local DefaultValues = {
@@ -254,7 +255,7 @@ local EL = CreateFrame("Frame");
 EL:RegisterEvent("ADDON_LOADED");
 
 EL:SetScript("OnEvent", function(self, event, ...)
-    if event == "ADDON_LOADED"  then
+    if event == "ADDON_LOADED" then
         local name = ...
         if name == addonName then
             self:UnregisterEvent(event);

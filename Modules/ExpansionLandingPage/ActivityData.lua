@@ -19,6 +19,7 @@ local IsQuestFlaggedCompletedOnAccount = C_QuestLog.IsQuestFlaggedCompletedOnAcc
 local GetQuestClassification = C_QuestInfoSystem.GetQuestClassification;
 local IsOnQuest = C_QuestLog.IsOnQuest;
 local GetQuestLineInfo = C_QuestLine.GetQuestLineInfo;
+local GetItemCount = C_Item.GetItemCount;
 
 
 local DELVES_BOUNTIFUL = "delves-bountiful";
@@ -35,6 +36,27 @@ local SortedActivity;
 local MapQuestData;     --Show quests available on certain maps. The quest markers need to be visible on the world map
 
 local DELVES_REP_TOOLTIP = L["Bountiful Delves Rep Tooltip"];
+
+
+local ConditionFuncs = {};
+do
+    function ConditionFuncs.OwnItem(itemID)
+        if itemID then
+            return GetItemCount(itemID) > 0
+        end
+        return 0
+    end
+end
+
+
+local Conditions = {};
+do
+    Conditions.ItemReadyToTurnInWhenLooted = {
+        ShouldShowActivity = ConditionFuncs.OwnItem,
+        IsReadyForTurnIn = ConditionFuncs.OwnItem,
+    };
+end
+
 
 local ActivityData = {  --Constant
 
@@ -76,6 +98,7 @@ local ActivityData = {  --Constant
             {name = "Many Jobs, Handle It!", questID = 85869, atlas = WEEKLY_QUEST, uiMapID = 2346},
             {name = "Urge to Surge", questID = 86775, atlas = WEEKLY_QUEST, uiMapID = 2346},
             {name = "Reduce, Reuse, Resell", questID = 85879, atlas = WEEKLY_QUEST, uiMapID = 2346},
+            {name = "Completed C.H.E.T.T. List", itemID = 235053, conditions = Conditions.ItemReadyToTurnInWhenLooted, icon = 134391, tooltip = L["Ready To Turn In Tooltip"], uiMapID = 2346},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 87407, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
@@ -433,6 +456,13 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 else
                     entry.completed = IsQuestFlaggedCompleted(flagQuest);
                 end
+            elseif entry.conditions then
+                if entry.conditions.ShouldShowActivity then
+                    showActivity = entry.conditions.ShouldShowActivity();
+                end
+                if entry.conditions.IsActivityCompleted then
+                    entry.completed = entry.conditions.IsActivityCompleted();
+                end
             else
                 entry.completed = false;
             end
@@ -485,7 +515,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 n = n + 1;
                 outputTbl[n] = category;
                 if numEntries > 0 then
-                    tsort(entries, SortFuncs.DataIndex);
+                    tsort(entries, SortFuncs.IncompleteFirst);
                     for _, entry in ipairs(entries) do
                         n = n + 1;
                         outputTbl[n] = entry;

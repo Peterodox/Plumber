@@ -240,6 +240,7 @@ L["ModuleDescription Delves_Dashboard"] = "Zeigt Ihren Fortschritt für die Gro�
 L["Delve Crest Stash No Info"] = "Diese Informationen sind an Ihrem aktuellen Standort nicht verfügbar.";
 L["Delve Crest Stash Requirement"] = "Erscheint in Großzügigen Tiefen der Stufe 11.";
 L["Overcharged Delve"] = "Überladene Tiefe";
+L["Delves History Requires AddOn"] = "Delves history is stored locally by the Plumber AddOn.";
 
 
 --WoW Anniversary

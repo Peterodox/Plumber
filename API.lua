@@ -1295,6 +1295,7 @@ do  -- Map
     end
     API.GetZoneName = GetZoneName;
 
+
     local HasActiveDelve = C_DelvesUI and C_DelvesUI.HasActiveDelve or Nop;
     local function IsInDelves()
         --See Blizzard InstanceDifficulty.lua
@@ -1302,6 +1303,14 @@ do  -- Map
         return HasActiveDelve(mapID);
     end
     API.IsInDelves = IsInDelves;
+
+
+    function API.GetMapName(uiMapID)
+        local info = GetMapInfo(uiMapID);
+        if info then
+            return info.name
+        end
+    end
 end
 
 do  -- Instance -- Map
@@ -2782,7 +2791,7 @@ do  -- AsyncCallback
 end
 
 do  -- Container Item Processor
-    local GetItemCount = C_Item.GetItemCount
+    local GetItemCount = C_Item.GetItemCount;
     local GetContainerNumSlots = C_Container.GetContainerNumSlots;
     local GetContainerItemID = C_Container.GetContainerItemID;
     local GetItemInfoInstant = C_Item.GetItemInfoInstant;

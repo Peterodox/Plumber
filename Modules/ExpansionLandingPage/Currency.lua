@@ -18,26 +18,39 @@ local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
 
 
 local DefaultResources = {
+    {itemID = 244465, shownInDelves = true},
+
     {currencyID = 3028},    --Restored Coffer Key
     {itemID = 236096, isMinor = false},   --Coffer Key Shard
     {itemID = 235897},      --Radiant Echo
 
-    {currencyID = 1602},    --Conquest
-    {currencyID = 1792},    --Honor
+    {currencyID = 1602, shownIfOwned = true},    --Conquest
+    {currencyID = 1792, shownIfOwned = true},    --Honor
 
-    {currencyID = 3149},    --Displaced Corrupted Mementos
+    {currencyID = 3149, shownIfOwned = true},    --Displaced Corrupted Mementos
     {currencyID = 2815},    --Resonance Crystals
     {currencyID = 3218},    --Empty Kaja'Cola Can
-    {currencyID = 3226},    --Market Research
-    {currencyID = 3090},    --Flame-Blessed Iron
+    {currencyID = 3226, shownIfOwned = true},    --Market Research
+    {currencyID = 3090, shownIfOwned = true},    --Flame-Blessed Iron
     {currencyID = 3056},    --Kej
     --{currencyID = 3055},      --Mereldar Derby Mark
     {currencyID = 2803},    --Undercoin
 
     ---{isHeader = true, name = PVP},
-    {currencyID = 2123},    --Bloody Tokens
-    {currencyID = 2797},    --Trophy of Strife
+    {currencyID = 2123, shownIfOwned = true},    --Bloody Tokens
+    {currencyID = 2797, shownIfOwned = true},    --Trophy of Strife
 };
+
+local function GetResourcesQuantity(data)
+    if data.currencyID then
+        local info = GetCurrencyInfo(data.currencyID);
+        return info and info.quantity or 0
+    elseif data.itemID then
+        return GetItemCount(data.itemID, true, false, true, true);
+    end
+
+    return 0
+end
 
 local CurrencyButtonMixin = {};
 do
@@ -249,46 +262,56 @@ do
         local gap = 0;
         local top, bottom;
         local objectHeight;
+        local valid;
 
         for _, v in ipairs(DefaultResources) do
-            n = n + 1;
-            top = offsetY;
-            if v.isHeader then
-                objectHeight = 16;
-                bottom = offsetY + objectHeight + gap;
-                content[n] = {
-                    templateKey = "HeaderTitle",
-                    setupFunc = function(obj)
-                        obj:SetText(v.name);
-                    end,
-                    top = top,
-                    bottom = bottom,
-                    point = "TOPLEFT",
-                    offsetX = offsetX,
-                };
-            else
-                objectHeight = BUTTON_HEIGHT;
-                bottom = offsetY + objectHeight + gap;
-                content[n] = {
-                    templateKey = "CurrencyButton",
-                    top = top,
-                    bottom = bottom,
-                    point = "TOPLEFT",
-                    offsetX = offsetX,
-                };
-                if v.currencyID then
-                    self.anyCurrency = true;
-                    content[n].setupFunc = function(obj)
-                        obj:SetCurrency(v.currencyID, v.isMinor);
-                    end;
-                elseif v.itemID then
-                    self.anyItem = true;
-                    content[n].setupFunc = function(obj)
-                        obj:SetItem(v.itemID, v.isMinor);
-                    end;
-                end
+            valid = true;
+            if v.shownInDelves then
+                valid = API.IsInDelves();
+            elseif v.shownIfOwned then
+                valid = GetResourcesQuantity(v) > 0;
             end
-            offsetY = bottom;
+
+            if valid then
+                n = n + 1;
+                top = offsetY;
+                if v.isHeader then
+                    objectHeight = 16;
+                    bottom = offsetY + objectHeight + gap;
+                    content[n] = {
+                        templateKey = "HeaderTitle",
+                        setupFunc = function(obj)
+                            obj:SetText(v.name);
+                        end,
+                        top = top,
+                        bottom = bottom,
+                        point = "TOPLEFT",
+                        offsetX = offsetX,
+                    };
+                else
+                    objectHeight = BUTTON_HEIGHT;
+                    bottom = offsetY + objectHeight + gap;
+                    content[n] = {
+                        templateKey = "CurrencyButton",
+                        top = top,
+                        bottom = bottom,
+                        point = "TOPLEFT",
+                        offsetX = offsetX,
+                    };
+                    if v.currencyID then
+                        self.anyCurrency = true;
+                        content[n].setupFunc = function(obj)
+                            obj:SetCurrency(v.currencyID, v.isMinor);
+                        end;
+                    elseif v.itemID then
+                        self.anyItem = true;
+                        content[n].setupFunc = function(obj)
+                            obj:SetItem(v.itemID, v.isMinor);
+                        end;
+                    end
+                end
+                offsetY = bottom;
+            end
         end
 
         local retainPosition = true;

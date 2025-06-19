@@ -49,6 +49,7 @@ do  --Checklist Button
         if data then
             self.completed = data.completed;
             self.flagQuest = data.flagQuest or data.questID;
+            self.conditions = data.conditions;
 
             if self.completed then
                 self.Icon:SetAtlas("checkmark-minimal-disabled");
@@ -87,6 +88,7 @@ do  --Checklist Button
     end
 
     function ChecklistButtonMixin:UpdateProgress(updateCompletion)
+        self.readyForTurnIn = nil;
         if self.flagQuest then
             self.readyForTurnIn = ReadyForTurnIn(self.flagQuest);
             if self.readyForTurnIn then
@@ -101,8 +103,10 @@ do  --Checklist Button
                     end
                 end
             end
-        else
-            self.readyForTurnIn = nil;
+        elseif self.conditions then
+            if self.conditions.IsReadyForTurnIn then
+                self.readyForTurnIn = self.conditions.IsReadyForTurnIn();
+            end
         end
 
         if self.type == "Quest" then

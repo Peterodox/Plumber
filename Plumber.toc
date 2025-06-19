@@ -23,6 +23,7 @@ Modules\SharedFonts.xml
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
 Modules\BlizzardEditMode.lua
+Modules\ScenarioTracker.lua
 #Modules\DevTool.lua
 #Modules\DirectionArrow.lua
 #Modules\SuperTrack.xml

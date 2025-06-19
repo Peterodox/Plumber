@@ -91,8 +91,6 @@ do
             end
         end
 
-        self:AppendOpenGVInstruction(tooltip);
-
         tooltip:Show();
     end
 
@@ -119,8 +117,6 @@ do
             GameTooltip_AddNormalLine(tooltip, description);
         end
 
-        self:AppendOpenGVInstruction(tooltip);
-
         tooltip:Show();
     end
 
@@ -131,12 +127,17 @@ do
     end
 
     function GreatVaultItemButtonMixin:OnEnter()
+        GreatVaultFrame:HighlightButton(self);
+
         if self.unlocked then
             self:ShowPreviewItemTooltip();
         else
             self:ShowIncompleteTooltip();
         end
-        GreatVaultFrame:HighlightButton(self);
+
+        API.AddRecentDelvesRecordsToTooltip(GameTooltip, self.threshold);
+        --self:AppendOpenGVInstruction(GameTooltip);
+        GameTooltip:Show();
     end
 
     function GreatVaultItemButtonMixin:OnLeave()
@@ -607,6 +608,7 @@ do
                 frame.level = activityInfo.level;
                 frame.id = activityInfo.id;
                 frame.index = activityInfo.index;
+                frame.threshold = activityInfo.threshold;
 
                 if progressDelta <= 0 then
                     frame:SetVisualUnlocked();

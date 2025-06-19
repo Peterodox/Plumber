@@ -565,7 +565,7 @@ do  --ScrollViewListButton
         f.Glow:SetPoint("LEFT", f.Left, "LEFT", 0, 0);
         f.Glow:SetSize(256, 32);
         f.Glow:SetBlendMode("ADD");
-        f.Glow:SetVertexColor(0.4, 0.4, 0.4);
+        f.Glow:SetVertexColor(0.5, 0.5, 0.5);
         --f.Glow:SetVertexColor(1, 0.82, 0);
 
         API.Mixin(f, ListButtonMixin);

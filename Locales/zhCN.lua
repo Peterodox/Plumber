@@ -240,6 +240,7 @@ L["ModuleDescription Delves_Dashboard"] = "在地下堡赛季界面显示宏伟�
 L["Delve Crest Stash No Info"] = "你所在区域无法获取该信息。";
 L["Delve Crest Stash Requirement"] = "仅在11层丰裕地下堡出现。";
 L["Overcharged Delve"] = "超载地下堡";
+L["Delves History Requires AddOn"] = "地下堡记录由Plumber插件在本地保存。";
 
 
 --WoW Anniversary
@@ -420,6 +421,7 @@ L["Warband Weekly Reward Tooltip"] = "你的战团每周只能获取一次此奖
 L["Completed"] = "已完成";
 L["Filter Hide Completed Format"] = "隐藏已完成的条目 (%d)";
 L["Weeky Reset Format"] = "周常重置：%s";
+L["Ready To Turn In Tooltip"] = "可以上交任务。";
 
 
 --Generic
