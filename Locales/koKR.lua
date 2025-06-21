@@ -366,32 +366,32 @@ L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" alre
 
 
 --Plumber Macro
-L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. Macro";
-L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
-L["PlumberMacro DrawerFlag Combat"] = "The drawer will be updated after leaving combat.";
-L["PlumberMacro DrawerFlag Stuck"] = "Something went wrong when updating the drawer.";
-L["PlumberMacro Error Combat"] = "Unavailable in combat";
-L["PlumberMacro Error NoAction"] = "No usable actions";
-L["PlumberMacro Error EditMacroInCombat"] = "Cannot edit macros while in combat";
-L["Random Favorite Mount"] = "Random Favorite Mount"; --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
-L["Dismiss Battle Pet"] = "Dismiss Battle Pet";
-L["Drag And Drop Item Here"] = "Drag and drop an item here.";
-L["Drag To Reorder"] = "Left click and drag to reorder";
-L["Click To Set Macro Icon"] = "Ctrl click to set as macro icon";
-L["Unsupported Action Type Format"] = "Unsupported action type: %s";
-L["Drawer Add Action Format"] = "Add |cffffffff%s|r";
-L["Drawer Add Profession1"] = "First Profession";
-L["Drawer Add Profession2"] = "Second Profession";
-L["Drawer Option Global Tooltip"] = "This setting is shared across all drawer macros.";
-L["Drawer Option CloseAfterClick"] = "Close After Clicks";
-L["Drawer Option CloseAfterClick Tooltip"] = "Close the drawer after clicking any button in it, regardless of successful or not.";
-L["Drawer Option SingleRow"] = "Single Row";
-L["Drawer Option SingleRow Tooltip"] = "If checked, align all buttons on the same row instead of 4 items per row.";
-L["Drawer Option Hide Unusable"] = "Hide Unusable Actions";
-L["Drawer Option Hide Unusable Tooltip"] = "Hide unowned items and unlearned spells.";
-L["Drawer Option Hide Unusable Tooltip 2"] = "Consumable items like potions will always be shown."
-L["Drawer Option Update Frequently"] = "Update Frequently";
-L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
+L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. 매크로";
+L["PlumberMacro Drawer"] = "Plumber 패널 매크로";
+L["PlumberMacro DrawerFlag Combat"] = "전투 종료 시 서랍이 갱신됩니다.";
+L["PlumberMacro DrawerFlag Stuck"] = "패널 갱신에 실패했습니다.";
+L["PlumberMacro Error Combat"] = "전투 중 제한됨";
+L["PlumberMacro Error NoAction"] = "사용 가능한 행동 없음";
+L["PlumberMacro Error EditMacroInCombat"] = "전투 중에는 매크로를 편집할 수 없습니다";
+L["Random Favorite Mount"] = "무작위 즐겨찾기 탈것"; --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
+L["Dismiss Battle Pet"] = "전투 애완동물 해제";
+L["Drag And Drop Item Here"] = "아이템을 이 영역으로 드래그 하세요.";
+L["Drag To Reorder"] = "왼쪽 클릭 후 드래그로 순서 변경";
+L["Click To Set Macro Icon"] = "Ctrl 클릭으로 매크로 아이콘 설정";
+L["Unsupported Action Type Format"] = "지원되지 않는 행동 유형: %s";
+L["Drawer Add Action Format"] = "추가 |cffffffff%s|r";
+L["Drawer Add Profession1"] = "첫 번째 전문 기술";
+L["Drawer Add Profession2"] = "두 번째 전문 기술";
+L["Drawer Option Global Tooltip"] = "이 설정은 모든 패널 매크로에 공통 적용됩니다.";
+L["Drawer Option CloseAfterClick"] = "클릭 후 닫기";
+L["Drawer Option CloseAfterClick Tooltip"] = "버튼이 성공적으로 작동했는지 여부와 관계없이, 클릭하면 패널을 닫습니다.";
+L["Drawer Option SingleRow"] = "단일 행";
+L["Drawer Option SingleRow Tooltip"] = "선택 시 버튼이 4개씩 나뉘는 대신 한 줄에 모두 정렬됩니다.";
+L["Drawer Option Hide Unusable"] = "사용 불가 행동 숨김";
+L["Drawer Option Hide Unusable Tooltip"] = "미보유 아이템 및 미습득 주문 숨기기.";
+L["Drawer Option Hide Unusable Tooltip 2"] = "포션과 같은 소비 아이템은 항상 표시됩니다."
+L["Drawer Option Update Frequently"] = "“항상 최신 상태 유지";
+L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경이 있을 때마다 버튼 상태를 갱신합니다. 이 옵션을 켜면 시스템 자원을 약간 더 사용할 수 있습니다";
 
 
 --New Expansion Landing Page
