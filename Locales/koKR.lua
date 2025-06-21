@@ -218,8 +218,8 @@ L["Error Show UI In Combat"] = "전투 중에는 이 UI를 전환할 수 없습�
 --Landing Page Switch
 L["ModuleName LandingPageSwitch"] = "미니맵 임무 보고서";
 L["ModuleDescription LandingPageSwitch"] = "미니맵의 명성 요약 버튼을 우클릭하여 주둔지 및 직업 전당 임무 보고서를 확인하세요.";
-L["Mission Complete Count Format"] = "%d Ready to complete";
-L["Open Mission Report Tooltip"] = "Right click to open mission reports.";
+L["Mission Complete Count Format"] = "%d 완료 가능";
+L["Open Mission Report Tooltip"] = "우클릭하여 임무 보고서를 열기.";
 
 
 --WorldMapPin_TWW (Show Pins On Continent Map)
