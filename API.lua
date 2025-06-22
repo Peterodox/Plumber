@@ -155,6 +155,17 @@ do  -- String
         end
     end
     API.JoinText = JoinText;
+
+
+    function API.StringTrim(text)
+        if text then
+            text = gsub(text, "^(%s+)", "");
+            text = gsub(text, "(%s+)$", "");
+            if text ~= "" then
+                return text
+            end
+        end
+    end
 end
 
 do  -- DEBUG

@@ -75,11 +75,13 @@ function LandingPageUtil.GetEncounterAchievements(journalEncounterID)
     end
 end
 
-function LandingPageUtil.GetEncounterProgress(mapID, dungeonEncounterID)
+function LandingPageUtil.GetEncounterProgress(instanceID, dungeonEncounterID)
+    --instanceID = mapID
+
     local progress = {};
 
     for i, difficultyID in ipairs(Difficulties) do
-        progress[i] = IsEncounterComplete(mapID, dungeonEncounterID, difficultyID);
+        progress[i] = IsEncounterComplete(instanceID, dungeonEncounterID, difficultyID);
     end
 
     return progress

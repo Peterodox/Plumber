@@ -157,6 +157,7 @@ local function SetupThressSliceHighlight(frame, textureFile, leftOffset, rightOf
     frame.HighlightRight:SetBlendMode("ADD");
     frame.HighlightRight:SetAlpha(alpha);
 end
+API.SetupThressSliceHighlight = SetupThressSliceHighlight;
 
 
 local ExpansionThemeFrameMixin = {};
@@ -271,7 +272,6 @@ do
         return f
     end
 end
-
 
 
 local PlayUISound;
@@ -575,14 +575,14 @@ do  --ScrollViewListButton
 end
 
 
-local DropdownMenu = {};
-LandingPageUtil.DropdownMenu = DropdownMenu;
+local MainDropdownMenu;
 do  --Dropdown Menu
+    local SharedMenuMixin = {};
     local MenuButtonMixin = {};
 
     function MenuButtonMixin:OnEnter()
         self.Text:SetTextColor(1, 1, 1);
-        DropdownMenu:HighlightButton(self);
+        self.parent:HighlightButton(self);
     end
 
     function MenuButtonMixin:OnLeave()
@@ -591,7 +591,7 @@ do  --Dropdown Menu
         else
             self.Text:SetTextColor(0.5, 0.5, 0.5);
         end
-        DropdownMenu:HighlightButton(nil);
+        self.parent:HighlightButton(nil);
     end
 
     function MenuButtonMixin:OnClick(button)
@@ -600,7 +600,7 @@ do  --Dropdown Menu
         end
 
         if self.closeAfterClick then
-            DropdownMenu:Hide();
+            self.parent:HideMenu();
         end
     end
 
@@ -609,8 +609,9 @@ do  --Dropdown Menu
     end
 
     function MenuButtonMixin:SetRegular()
-        self.leftOffset = 0;
+        self.leftOffset = 4;
         self.selected = nil;
+        self.LeftTexture:Hide();
         self:Layout();
     end
 
@@ -673,7 +674,7 @@ do  --Dropdown Menu
     end
 
 
-    function DropdownMenu:SetSize(width, height)
+    function SharedMenuMixin:SetSize(width, height)
         if width < 40 then
             width = 40;
         end
@@ -687,40 +688,59 @@ do  --Dropdown Menu
         end
     end
 
-    function DropdownMenu:SetPaddingV(paddingV)
+    function SharedMenuMixin:SetPaddingV(paddingV)
         self.paddingV = paddingV;
     end
 
-    function DropdownMenu:SetContentSize(width, height)
+    function SharedMenuMixin:SetContentSize(width, height)
         local padding = 2 * self.paddingV;
         self:SetSize(width, height + padding);
     end
 
-    function DropdownMenu:Show()
+    function SharedMenuMixin:Show()
         if self.Frame then
             self.Frame:Show();
         end
     end
 
-    function DropdownMenu:Hide()
+    function SharedMenuMixin:HideMenu()
         if self.Frame then
             self.Frame:Hide();
             self.Frame:ClearAllPoints();
-            self.buttonPool:ReleaseAll();
+            if not self.keepContentOnHide then
+                self.buttonPool:ReleaseAll();
+            end
         end
     end
 
-    function DropdownMenu:ShowMenu(owner, menuInfo)
+    function SharedMenuMixin:SetKeepContentOnHide(keepContentOnHide)
+        self.keepContentOnHide = keepContentOnHide;
+    end
+
+    function SharedMenuMixin:SetNoAutoHide(noAutoHide)
+        self.noAutoHide = noAutoHide;
+    end
+
+    function SharedMenuMixin:AnchorToObject(object)
+        local f = self.Frame;
+        if f then
+            f:ClearAllPoints();
+            f:SetParent(object);
+            f:SetPoint("TOPLEFT", object, "BOTTOMLEFT", 0, -6);
+        end
+    end
+
+    function SharedMenuMixin:ShowMenu(owner, menuInfo)
         if self.Init then
             self:Init();
         end
 
-        self:Hide();
+        self.buttonPool:ReleaseAll();
         self.owner = owner;
+
         if owner and menuInfo and menuInfo.widgets then
             local f = self.Frame;
-            f:SetParent(owner);
-            f:SetPoint("TOPLEFT", owner, "BOTTOMLEFT", 0, -6);
+            self:AnchorToObject(owner);
 
             local buttonHeight = 24;
             local n = 0;
@@ -731,12 +751,17 @@ do  --Dropdown Menu
             local contentHeight = 0;
             local widgetWidth;
             local widgets = {};
+            local numWidgets = #menuInfo.widgets;
 
             for _, v in ipairs(menuInfo.widgets) do
                 n = n + 1;
                 if v.type == "Checkbox" or v.type == "Radio" or v.type == "Button" then
                     widget = self.buttonPool:Acquire();
-                    widget:SetPoint("TOPLEFT", f, "TOPLEFT", offsetX, -offsetY);
+                    if numWidgets == 1 then
+                        widget:SetPoint("CENTER", f, "CENTER", 0, 0);
+                    else
+                        widget:SetPoint("TOPLEFT", f, "TOPLEFT", offsetX, -offsetY);
+                    end
                     offsetY = offsetY + buttonHeight;
                     contentHeight = contentHeight + buttonHeight;
                     widget.onClickFunc = v.onClickFunc;
@@ -750,6 +775,7 @@ do  --Dropdown Menu
                         widget:SetRegular();
                     end
                 end
+                widget.parent = self;
                 widgets[n] = widget;
                 widgetWidth = widget:GetContentWidth();
                 if widgetWidth > contentWidth then
@@ -767,26 +793,26 @@ do  --Dropdown Menu
             self:SetContentSize(contentWidth, contentHeight);
 
             f:Show();
+            self.visible = true;
         end
     end
 
-    function DropdownMenu:ToggleMenu(owner)
+    function SharedMenuMixin:ToggleMenu(owner)
         if self.owner == owner and (self.Frame and self.Frame:IsShown()) then
-            self:Hide();
+            self:HideMenu();
         else
-            local menuInfo = owner.menuInfoGetter();
+            local menuInfo = owner.menuInfoGetter and owner.menuInfoGetter() or nil;
             self:ShowMenu(owner, menuInfo);
         end
     end
 
-    function DropdownMenu:Init()
+    function SharedMenuMixin:Init()
         self.Init = nil;
 
-        local Frame = CreateFrame("Frame", nil, UIParent);
-        Frame:Hide();
+        local Frame = CreateFrame("Frame", nil, self.parent or UIParent);
         self.Frame = Frame;
-        Frame:SetSize(112, 112);
         Frame:Hide();
+        Frame:SetSize(112, 112);
         Frame:SetFrameStrata("FULLSCREEN_DIALOG");
         Frame:SetFixedFrameStrata(true);
         Frame:EnableMouse(true);
@@ -825,26 +851,35 @@ do  --Dropdown Menu
         self.Highlight.Texture:SetBlendMode("ADD");
 
 
+        if self.noAutoHide then
+            Frame:SetScript("OnShow", function()
+                PlayUISound("DropdownOpen");
+            end);
 
-        Frame:SetScript("OnShow", function()
-            Frame:RegisterEvent("GLOBAL_MOUSE_DOWN");
-            PlayUISound("DropdownOpen");
-        end);
+            Frame:SetScript("OnHide", function()
+                PlayUISound("DropdownClose");
+            end);
+        else
+            Frame:SetScript("OnShow", function()
+                Frame:RegisterEvent("GLOBAL_MOUSE_DOWN");
+                PlayUISound("DropdownOpen");
+            end);
 
-        Frame:SetScript("OnHide", function()
-            DropdownMenu:Hide();
-            Frame:UnregisterEvent("GLOBAL_MOUSE_DOWN");
-            PlayUISound("DropdownClose");
-        end);
+            Frame:SetScript("OnHide", function()
+                self:HideMenu();
+                Frame:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+                PlayUISound("DropdownClose");
+            end);
 
-        Frame:SetScript("OnEvent", function()
-            if not (Frame:IsMouseOver() or (self.owner and self.owner:IsMouseMotionFocus())) then
-                Frame:Hide();
-            end
-        end);
+            Frame:SetScript("OnEvent", function()
+                if not (Frame:IsMouseOver() or (self.owner and self.owner:IsMouseMotionFocus())) then
+                    Frame:Hide();
+                end
+            end);
+        end
     end
 
-    function DropdownMenu:HighlightButton(button)
+    function SharedMenuMixin:HighlightButton(button)
         self.Highlight:Hide();
         self.Highlight:ClearAllPoints();
         if button then
@@ -854,6 +889,19 @@ do  --Dropdown Menu
             self.Highlight:Show();
         end
     end
+
+
+    local function CreateMenuFrame(parent, obj)
+        obj = obj or {};
+        API.Mixin(obj, SharedMenuMixin);
+        obj.parent = parent;
+        return obj
+    end
+    LandingPageUtil.CreateMenuFrame = CreateMenuFrame;
+
+
+    MainDropdownMenu = CreateMenuFrame(UIParent, {name = "MainDropdownMenu"});
+    LandingPageUtil.DropdownMenu = MainDropdownMenu;
 end
 
 
@@ -880,7 +928,7 @@ do  --Dropdown Button
     end
 
     function DropdownButtonMixin:OnClick()
-        DropdownMenu:ToggleMenu(self, self.menuInfo);
+        MainDropdownMenu:ToggleMenu(self, self.menuInfo);
     end
 
     function DropdownButtonMixin:OnMouseDown(button)
@@ -1112,6 +1160,122 @@ do  --Checkbox Button
     end
 end
 
+
+do  --Encounter Journal
+    local After = C_Timer.After;
+    local EJ_SelectInstance = EJ_SelectInstance;
+    local EJ_SelectEncounter = EJ_SelectEncounter;
+    local EJ_IsValidInstanceDifficulty = EJ_IsValidInstanceDifficulty;
+
+    local function NullifyEJEvents()
+        --Pause default EncounterJournal updating
+        local f = EncounterJournal;
+        if f then
+            f:UnregisterEvent("EJ_LOOT_DATA_RECIEVED");
+            f:UnregisterEvent("EJ_DIFFICULTY_UPDATE");
+            After(0, function()
+                f:RegisterEvent("EJ_LOOT_DATA_RECIEVED");
+                f:RegisterEvent("EJ_DIFFICULTY_UPDATE");
+            end);
+        end
+    end
+
+    local function SelectInstanceAndEncounter(journalInstanceID, journalEncounterID)
+        NullifyEJEvents();
+        EJ_SelectInstance(journalInstanceID);
+        EJ_SelectEncounter(journalEncounterID);
+    end
+    API.SelectInstanceAndEncounter = SelectInstanceAndEncounter;
+
+
+    do  --This is a copy of Blizzard_EncounterJournal.lua
+        local DifficultyUtil = DifficultyUtil;
+
+        local EJ_DIFFICULTIES = {
+            DifficultyUtil.ID.DungeonNormal,
+            DifficultyUtil.ID.DungeonHeroic,
+            DifficultyUtil.ID.DungeonMythic,
+            DifficultyUtil.ID.DungeonChallenge,
+            DifficultyUtil.ID.DungeonTimewalker,
+            DifficultyUtil.ID.RaidLFR,
+            DifficultyUtil.ID.Raid10Normal,
+            DifficultyUtil.ID.Raid10Heroic,
+            DifficultyUtil.ID.Raid25Normal,
+            DifficultyUtil.ID.Raid25Heroic,
+            DifficultyUtil.ID.PrimaryRaidLFR,
+            DifficultyUtil.ID.PrimaryRaidNormal,
+            DifficultyUtil.ID.PrimaryRaidHeroic,
+            DifficultyUtil.ID.PrimaryRaidMythic,
+            DifficultyUtil.ID.RaidTimewalker,
+            DifficultyUtil.ID.Raid40,
+        };
+
+        local function GetEJDifficultySize(difficultyID)
+            if difficultyID ~= DifficultyUtil.ID.RaidTimewalker and not DifficultyUtil.IsPrimaryRaid(difficultyID) then
+                return DifficultyUtil.GetMaxPlayers(difficultyID);
+            end
+            return nil;
+        end
+
+        local function GetEJDifficultyString(difficultyID)
+            local name = DifficultyUtil.GetDifficultyName(difficultyID);
+            local size = GetEJDifficultySize(difficultyID);
+            if size then
+                return string.format(ENCOUNTER_JOURNAL_DIFF_TEXT, size, name);
+            else
+                return name;
+            end
+        end
+        API.GetRaidDifficultyString = GetEJDifficultyString;
+
+
+        local function GetValidDifficultiesForEncounter(instanceID, encounterID)
+            local n = 0;
+            local tbl = {};
+            SelectInstanceAndEncounter(instanceID, encounterID);
+
+            for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
+                if EJ_IsValidInstanceDifficulty(difficultyID) then
+                    local text = GetEJDifficultyString(difficultyID);
+                    n = n + 1;
+                    tbl[n] = {
+                        difficultyID = difficultyID,
+                        text = text,
+                    };
+                end
+            end
+
+            if n > 0 then
+                return tbl
+            end
+        end
+        API.GetValidDifficultiesForEncounter = GetValidDifficultiesForEncounter;
+    end
+end
+
+
+do  --MajorDivider
+    function LandingPageUtil.CreateMajorDivider(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        f:SetSize(128, 4);
+        f.Left = f:CreateTexture(nil, "OVERLAY");
+        f.Left:SetSize(64, 24);
+        f.Left:SetPoint("LEFT", f, "LEFT", 0, 0);
+        f.Right = f:CreateTexture(nil, "OVERLAY");
+        f.Right:SetSize(64, 24);
+        f.Right:SetPoint("LEFT", f.Left, "RIGHT", 0, 0);
+        f.Right:SetPoint("RIGHT", f, "RIGHT", 0, 0);
+
+        local tex = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW";
+
+        f.Left:SetTexture(tex);
+        f.Left:SetTexCoord(0.5, 634/1024, 0, 48/1024);
+        f.Right:SetTexture(tex);
+        f.Right:SetTexCoord(634/1024, 1, 0, 48/1024);
+
+        return f
+    end
+end
 
 --[[
 do  --SoftTargetName

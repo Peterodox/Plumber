@@ -140,12 +140,9 @@ do
         local a = 0.25;
         NineSlice.Background:SetVertexColor(a, a, a);
 
-        local tex = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_TWW";
-
-        self.RightSection.Header.DividerLeft:SetTexture(tex);
-        self.RightSection.Header.DividerLeft:SetTexCoord(0.5, 634/1024, 0, 48/1024);
-        self.RightSection.Header.DividerRight:SetTexture(tex);
-        self.RightSection.Header.DividerRight:SetTexCoord(634/1024, 1, 0, 48/1024);
+        local Divider = LandingPageUtil.CreateMajorDivider(self.RightSection.Header);
+        Divider:SetPoint("LEFT", self.RightSection.Header, "BOTTOMLEFT", 32, 0);
+        Divider:SetPoint("RIGHT", self.RightSection.Header, "BOTTOMRIGHT", -32, 0);
 
         self:InitTabButtons();
         self:InitLeftSection();

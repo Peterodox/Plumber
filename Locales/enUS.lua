@@ -422,6 +422,21 @@ L["Completed"] = CRITERIA_COMPLETED or "Completed";
 L["Filter Hide Completed Format"] = "Hide Completed (%d)";
 L["Weeky Reset Format"] = "Weekly Reset: %s";
 L["Ready To Turn In Tooltip"] = "Ready to turn in.";
+L["Trackers"] = "Trackers";
+L["New Tracker Title"] = "New Tracker";     --Create a new Tracker
+L["Type"] = "Type";
+L["Select Instruction"] = LFG_LIST_SELECT or "Select";
+L["Name"] = "Name";
+L["Difficulty"] = LFG_LIST_DIFFICULTY or "Difficulty";
+L["TrackerType Boss"] = "Boss";
+L["TrackerType Instance"] = "Instance";
+L["TrackerType Quest"] = "Quest";
+L["TrackerType Rare"] = "Rare Creature";
+L["Accountwide"] = "Account-wide";
+L["Quest Flag"] = "Quest Flag";
+L["Boss Or Instance Name"] = "Boss or instance name";
+L["Instance Or Boss Name"] = "Instance or boss name";
+L["Name EditBox Disabled Reason Format"] = "This box will be filled automatically when you enter a valid %s.";
 
 
 --Generic

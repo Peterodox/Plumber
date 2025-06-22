@@ -7,6 +7,7 @@ local GetEncounterProgress = LandingPageUtil.GetEncounterProgress;
 
 local ipairs = ipairs;
 local tinsert = table.insert;
+local EJ_GetInstanceInfo = EJ_GetInstanceInfo;
 local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
 
 
@@ -532,18 +533,6 @@ do
     end
 
 
-    local function NullifyEJEvents()
-        --Pause default EncounterJournal updating
-        local f = EncounterJournal;
-        if f then
-            f:UnregisterEvent("EJ_LOOT_DATA_RECIEVED");
-            f:UnregisterEvent("EJ_DIFFICULTY_UPDATE");
-            C_Timer.After(0, function()
-                f:RegisterEvent("EJ_LOOT_DATA_RECIEVED");
-                f:RegisterEvent("EJ_DIFFICULTY_UPDATE");
-            end);
-        end
-    end
 
     local LootContainerMixin = {};
 
@@ -559,10 +548,7 @@ do
             button:ClearAllPoints();
         end
 
-        NullifyEJEvents();
-        EJ_SelectInstance(journalInstanceID);
-        EJ_SelectEncounter(journalEncounterID);
-
+        API.SelectInstanceAndEncounter(journalInstanceID, journalEncounterID);
 
         local difficultyID = self.difficultyID or LandingPageUtil:GetDefaultRaidDifficulty();
         self.difficultyID = difficultyID;
