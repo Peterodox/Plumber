@@ -88,7 +88,7 @@ do
     end
 
     function EditBoxMixin:OnEditFocusLost()
-        self.Maginifier:SetVertexColor(0.5, 0.5, 0.5);
+        self.Magnifier:SetVertexColor(0.5, 0.5, 0.5);
         self:UpdateText();
         self:UnlockHighlight();
         self:UpdateVisual();
@@ -104,7 +104,7 @@ do
         end
 
         self.Instruction:Hide();
-        self.Maginifier:SetVertexColor(1, 1, 1);
+        self.Magnifier:SetVertexColor(1, 1, 1);
         self:LockHighlight();
         self:UpdateVisual();
         if self.onEditFocusGainedCallback then
@@ -128,10 +128,10 @@ do
         self.isSearchbox = state;
         local leftOffset;
         if state then
-            self.Maginifier:Show();
+            self.Magnifier:Show();
             leftOffset = 28;
         else
-            self.Maginifier:Hide();
+            self.Magnifier:Hide();
             leftOffset = 8;
         end
         --self:SetTextInsets(leftOffset, 8, 0, 0);    --May not function until next update
@@ -148,8 +148,21 @@ do
         self:ClearFocus();
     end
 
+    function EditBoxMixin:SetSearchResultMenu(searchResultMenu)
+        self.searchResultMenu = searchResultMenu;
+    end
+
+    function EditBoxMixin:OnEnterPressed()
+        self:ClearFocus();
+        if self.isSearchbox then
+            if self.searchResultMenu then
+                return self.searchResultMenu:SelectFirstResult();
+            end
+        end
+    end
+
     function EditBoxMixin:OnTextChanged(userInput)
-        if userInput and self.isSearchbox then
+        if userInput and self.hasOnTextChangeCallback then
             self.t = 0;
             self:SetScript("OnUpdate", self.OnUpdate);
         end
@@ -161,7 +174,11 @@ do
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             if self.searchFunc then
-                self.searchFunc(StringTrim(self:GetText()));
+                if self:IsNumeric() then
+                    self.searchFunc(self, self:GetNumber());
+                else
+                    self.searchFunc(self, StringTrim(self:GetText()));
+                end
             end
         end
     end
@@ -172,6 +189,7 @@ do
 
     function EditBoxMixin:SetSearchFunc(searchFunc)
         self.searchFunc = searchFunc;
+        self.hasOnTextChangeCallback = searchFunc ~= nil;
     end
 
     function EditBoxMixin:SetOnEditFocusGainedCallback(onEditFocusGainedCallback)
@@ -184,8 +202,10 @@ do
 
     function EditBoxMixin:ClearCallbacks()
         self.searchFunc = nil;
+        self.hasOnTextChangeCallback = nil;
         self.onEditFocusGainedCallback = nil;
         self.onEditFocusLostCallback = nil;
+        self.searchResultMenu = nil;
     end
 
     function LandingPageUtil.CreateEditBox(parent)
@@ -224,18 +244,20 @@ do
         f.Instruction:SetPoint("RIGHT", f, "RIGHT", -8, 0);
         f.Instruction:SetMaxLines(1);
 
-        f.Maginifier = f:CreateTexture(nil, "OVERLAY");
-        f.Maginifier:SetSize(24, 24);
-        f.Maginifier:SetPoint("LEFT", f, "LEFT", 2, 0);
-        f.Maginifier:SetTexture(TEXTURE_FILE);
-        f.Maginifier:SetTexCoord(956/1024, 1004/1024, 328/1024, 376/1024);
-        f.Maginifier:Hide();
+        f.Magnifier = f:CreateTexture(nil, "OVERLAY");
+        f.Magnifier:SetSize(24, 24);
+        f.Magnifier:SetPoint("LEFT", f, "LEFT", 2, 0);
+        f.Magnifier:SetTexture(TEXTURE_FILE);
+        f.Magnifier:SetTexCoord(956/1024, 1004/1024, 328/1024, 376/1024);
+        f.Magnifier:SetVertexColor(0.5, 0.5, 0.5);
+        f.Magnifier:Hide();
 
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
         f:SetScript("OnEditFocusGained", f.OnEditFocusGained);
         f:SetScript("OnEditFocusLost", f.OnEditFocusLost);
         f:SetScript("OnEscapePressed", f.OnEscapePressed);
+        f:SetScript("OnEnterPressed", f.OnEnterPressed);
         f:SetScript("OnEnable", f.OnEnable);
         f:SetScript("OnDisable", f.OnDisable);
         f:SetScript("OnHide", f.OnHide);

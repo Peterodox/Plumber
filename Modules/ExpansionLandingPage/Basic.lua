@@ -608,6 +608,15 @@ do  --Dropdown Menu
         self.Text:SetText(text);
     end
 
+    function MenuButtonMixin:SetRightTexture(icon)
+        self.RightTexture:SetTexture(icon);
+        if icon then
+            self.rightOffset = 20;
+        else
+            self.rightOffset = 0;
+        end
+    end
+
     function MenuButtonMixin:SetRegular()
         self.leftOffset = 4;
         self.selected = nil;
@@ -646,7 +655,7 @@ do  --Dropdown Menu
     end
 
     function MenuButtonMixin:GetContentWidth()
-        return self.Text:GetWrappedWidth() + self.leftOffset + 3 * self.paddingH
+        return self.Text:GetWrappedWidth() + self.leftOffset + self.rightOffset + 3 * self.paddingH;
     end
 
     local function CreateMenuButton(parent)
@@ -654,6 +663,7 @@ do  --Dropdown Menu
         f:SetSize(240, 24);
         API.Mixin(f, MenuButtonMixin);
         f.leftOffset = 0;
+        f.rightOffset = 0;
         f.paddingH = 8;
 
         f.Text = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -665,6 +675,10 @@ do  --Dropdown Menu
         f.LeftTexture:SetSize(16, 16);
         f.LeftTexture:SetPoint("LEFT", f, "LEFT", f.paddingH, 0);
         f.LeftTexture:Hide();
+
+        f.RightTexture = f:CreateTexture(nil, "OVERLAY");
+        f.RightTexture:SetSize(18, 18);
+        f.RightTexture:SetPoint("RIGHT", f, "RIGHT", -f.paddingH, 0);
 
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
@@ -721,6 +735,15 @@ do  --Dropdown Menu
         self.noAutoHide = noAutoHide;
     end
 
+    function SharedMenuMixin:SetNoContentAlert(text)
+        self.useNoContentAlert = text ~= nil;
+        if self.NoContentAlert then
+            self.NoContentAlert:SetText(text);
+        else
+            self.noContentAlertText = text;
+        end
+    end
+
     function SharedMenuMixin:AnchorToObject(object)
         local f = self.Frame;
         if f then
@@ -738,7 +761,11 @@ do  --Dropdown Menu
         self.buttonPool:ReleaseAll();
         self.owner = owner;
 
-        if owner and menuInfo and menuInfo.widgets then
+        if not owner then return end;
+
+        if menuInfo and menuInfo.widgets then
+            self.NoContentAlert:Hide();
+
             local f = self.Frame;
             self:AnchorToObject(owner);
 
@@ -757,6 +784,7 @@ do  --Dropdown Menu
                 n = n + 1;
                 if v.type == "Checkbox" or v.type == "Radio" or v.type == "Button" then
                     widget = self.buttonPool:Acquire();
+                    widget:SetRightTexture(v.rightTexture);
                     if numWidgets == 1 then
                         widget:SetPoint("CENTER", f, "CENTER", 0, 0);
                     else
@@ -794,6 +822,18 @@ do  --Dropdown Menu
 
             f:Show();
             self.visible = true;
+        else
+            if self.useNoContentAlert then
+                self.NoContentAlert:Show();
+                local contentWidth = owner:GetWidth();
+                local contentHeight = 24;
+                contentWidth = API.Round(contentWidth);
+                contentHeight = API.Round(contentHeight);
+                self:SetContentSize(contentWidth, contentHeight);
+                self:AnchorToObject(owner);
+                self.Frame:Show();
+                self.visible = true;
+            end
         end
     end
 
@@ -820,6 +860,7 @@ do  --Dropdown Menu
         Frame:SetClampedToScreen(true);
         self:SetPaddingV(6);
 
+
         local f = addon.CreateNineSliceFrame(Frame, "ExpansionBorder_TWW");
         Frame.Background = f;
         f:SetUsingParentLevel(true);
@@ -836,6 +877,18 @@ do  --Dropdown Menu
         f.pieces[7]:SetTexCoord(512/1024, 544/1024, 544/1024, 576/1024);
         f.pieces[8]:SetTexCoord(544/1024, 736/1024, 544/1024, 576/1024);
         f.pieces[9]:SetTexCoord(736/1024, 768/1024, 544/1024, 576/1024);
+
+
+        local NoContentAlert = Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        self.NoContentAlert = NoContentAlert;
+        NoContentAlert:Hide();
+        NoContentAlert:SetPoint("LEFT", Frame, "LEFT", 16, 0);
+        NoContentAlert:SetPoint("RIGHT", Frame, "RIGHT", -16, 0);
+        NoContentAlert:SetTextColor(0.5, 0.5, 0.5);
+        NoContentAlert:SetJustifyH("CENTER");
+        if self.noContentAlertText then
+            NoContentAlert:SetText(self.noContentAlertText);
+        end
 
 
         local function MenuButton_Create()
@@ -945,10 +998,23 @@ do  --Dropdown Button
 
     function DropdownButtonMixin:OnEnable()
         self:UpdateVisual();
+        self.Left:SetDesaturated(false);
+        self.Center:SetDesaturated(false);
+        self.Right:SetDesaturated(false);
+        self.Left:SetVertexColor(1, 1, 1);
+        self.Center:SetVertexColor(1, 1, 1);
+        self.Right:SetVertexColor(1, 1, 1);
     end
 
     function DropdownButtonMixin:OnDisable()
         self:UpdateVisual();
+        self.Text:SetTextColor(0.5, 0.5, 0.5);
+        self.Left:SetDesaturated(true);
+        self.Center:SetDesaturated(true);
+        self.Right:SetDesaturated(true);
+        self.Left:SetVertexColor(0.5, 0.5, 0.5);
+        self.Center:SetVertexColor(0.5, 0.5, 0.5);
+        self.Right:SetVertexColor(0.5, 0.5, 0.5);
     end
 
     function DropdownButtonMixin:UpdateVisual()
@@ -1021,11 +1087,109 @@ do  --Dropdown Button
         f:SetScript("OnClick", f.OnClick);
         f:SetScript("OnMouseDown", f.OnMouseDown);
         f:SetScript("OnMouseUp", f.OnMouseUp);
+        f:SetScript("OnEnable", f.OnEnable);
+        f:SetScript("OnDisable", f.OnDisable);
 
         f:UpdateVisual();
 
         return f
     end
+end
+
+
+do  --Red Button
+    local RedButtonMixin = {};
+
+    function RedButtonMixin:SetButtonText(text)
+        self.ButtonText:SetText(text);
+    end
+
+    function RedButtonMixin:UpdateVisual()
+        if self.buttonState == 1 then
+            self.Left:SetTexCoord(768/1024, 800/1024, 448/1024, 512/1024);
+            self.Right:SetTexCoord(972/1024, 1004/1024, 448/1024, 512/1024);
+            self.Center:SetTexCoord(800/1024, 972/1024, 448/1024, 512/1024);
+        elseif self.buttonState == 2 then
+
+        elseif self.buttonState == 3 then
+            self.Left:SetTexCoord(768/1024, 800/1024, 512/1024, 576/1024);
+            self.Right:SetTexCoord(972/1024, 1004/1024, 512/1024, 576/1024);
+            self.Center:SetTexCoord(800/1024, 972/1024, 512/1024, 576/1024);
+        end
+
+        if self.buttonState == 3 then
+            self.ButtonText:SetTextColor(0.5, 0.5, 0.5);
+        else
+            if self:IsMouseMotionFocus() then
+                self.ButtonText:SetTextColor(1, 1, 1);
+            else
+                self.ButtonText:SetTextColor(0.922, 0.871, 0.761);
+            end
+        end
+
+    end
+
+    function RedButtonMixin:OnMouseDown()
+        if self:IsEnabled() then
+            
+        end
+    end
+
+    function RedButtonMixin:OnMouseUp()
+
+    end
+
+    function RedButtonMixin:OnEnter()
+        self.ButtonText:SetTextColor(1, 1, 1);
+    end
+
+    function RedButtonMixin:OnLeave()
+        self.ButtonText:SetTextColor(0.922, 0.871, 0.761);
+    end
+
+    function RedButtonMixin:OnEnable()
+        self.buttonState = 1;
+        self:UpdateVisual();
+    end
+
+    function RedButtonMixin:OnDisable()
+        self.buttonState = 3;
+        self:UpdateVisual();
+    end
+
+    function RedButtonMixin:OnClick(button)
+
+    end
+
+    local function CreateRedButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        API.Mixin(f, RedButtonMixin);
+
+        f:SetSize(240, 24);
+
+        f.ButtonText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.ButtonText:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.ButtonText:SetJustifyH("CENTER");
+        f.ButtonText:SetTextColor(0.922, 0.871, 0.761);
+
+        SetupThreeSliceBackground(f, TEXTURE_FILE, -2.5, 2.5);
+        f.Left:SetSize(16, 32);
+        f.Left:SetTexCoord(768/1024, 800/1024, 448/1024, 512/1024);
+        f.Right:SetSize(16, 32);
+        f.Right:SetTexCoord(972/1024, 1004/1024, 448/1024, 512/1024);
+        f.Center:SetTexCoord(800/1024, 972/1024, 448/1024, 512/1024);
+
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
+        f:SetScript("OnEnable", f.OnEnable);
+        f:SetScript("OnDisable", f.OnDisable);
+        f:SetScript("OnClick", f.OnClick);
+
+        return f
+    end
+    LandingPageUtil.CreateRedButton = CreateRedButton;
 end
 
 
@@ -1250,6 +1414,28 @@ do  --Encounter Journal
             end
         end
         API.GetValidDifficultiesForEncounter = GetValidDifficultiesForEncounter;
+
+
+        local function IsDifficultyValidForEncounter(instanceID, encounterID, difficultyID)
+            local difficulties = instanceID and encounterID and GetValidDifficultiesForEncounter(instanceID, encounterID);
+            local valid, bestDifficultyID;
+            if difficulties then
+                if difficultyID then
+                    for k, v in ipairs(difficulties) do
+                        if v.difficultyID == difficultyID then
+                            valid = true;
+                            bestDifficultyID = difficultyID;
+                            break;
+                        end
+                    end
+                end
+                if not bestDifficultyID then
+                    bestDifficultyID = difficulties[#difficulties].difficultyID;
+                end
+            end
+            return valid, bestDifficultyID
+        end
+        API.IsDifficultyValidForEncounter = IsDifficultyValidForEncounter;
     end
 end
 

@@ -97,7 +97,7 @@ do  --Encounter Search
         if total > 0 then
             local name, icon;
             local id, stype, difficultyID, instanceID, encounterID;
-            local numShown = math.min(total, 50);
+            local numShown = math.min(total, 100);
             results = {};
 
             local uniqueEncounters = {};
@@ -148,13 +148,81 @@ do  --Encounter Search
         end
     end
 
-    function EL:SearchEncounter(rawText)
+    local function OnSearchFinished_Instance()
+        local total = EJ_GetNumSearchResults();
+        local n = 0;
+        local results;
+
+        if total > 0 then
+            local name, icon, bossName;
+            local _, id, stype, difficultyID, instanceID, encounterID, journalInstanceID, isBoss;
+            local numShown = math.min(total, 100);
+            results = {};
+
+            local uniqueInstances = {};
+
+            for i = 1, numShown do
+                name = nil;
+                isBoss = nil;
+                bossName = nil;
+                id, stype, difficultyID, journalInstanceID, encounterID = EJ_GetSearchResult(i);
+
+                if stype == 4 then  --EJ_STYPE_INSTANCE
+                    journalInstanceID = id;
+                    name, _, _, icon = EJ_GetInstanceInfo(journalInstanceID);
+                elseif stype == 1 then   --EJ_STYPE_ENCOUNTER
+                    name, _, _, _, _, journalInstanceID, _, instanceID = EJ_GetEncounterInfo(id);
+                    bossName = name;
+                    isBoss = true;
+                elseif stype == 2 then   --EJ_STYPE_CREATURE
+                    local cId, cName, _, cDisplayInfo;
+                    for j = 1, 9 do     --MAX_CREATURES_PER_ENCOUNTER
+                        cId, cName, _, cDisplayInfo = EJ_GetCreatureInfo(j, encounterID);
+                        if cId == id then
+                            bossName = cName;
+                            _, _, _, _, _, journalInstanceID, _, instanceID = EJ_GetEncounterInfo(encounterID);
+                            isBoss = true;
+                            break
+                        end
+                    end
+                end
+
+                if isBoss then
+                    local instanceName = EJ_GetInstanceInfo(journalInstanceID);
+                    if instanceName then   --Show which instance the boss belongs
+                        name = instanceName;
+                    end
+                end
+
+                if name then
+                    if journalInstanceID and not uniqueInstances[journalInstanceID] then
+                        uniqueInstances[journalInstanceID] = true;
+                        n = n + 1;
+                        results[n] = {
+                            name = name,
+                            stype = stype,
+                            instanceID = journalInstanceID,
+                            encounterID = encounterID,
+                            isInstance = true,
+                            bossName = bossName,
+                        };
+                    end
+                end
+            end
+        end
+
+        if EL.searchResultReceiver then
+            EL.searchResultReceiver:OnSearchComplete(results);
+        end
+    end
+
+    function EL:SearchEJ(rawText, callback)
         self.isSearchFinished = EJ_IsSearchFinished;
         self:ClearOnSearchFinishedCallbacks();
         local valid, text = self:GetValidTextForSearch(rawText);
 
         if valid then
-            self:AddOnSearchFinishedCallbacks(OnSearchFinished_Encounter);
+            self:AddOnSearchFinishedCallbacks(callback);
             EJ_SetSearch(text);
             self:OnSearchStart();
         else
@@ -207,13 +275,13 @@ do  --Encounter Search
         EL.searchResultReceiver = ReceiverDummy;
         ReceiverDummy.OnSearchComplete = ReceiverDummy.GetBosses;
         ReceiverDummy.searchResultReceiver = searchResultReceiver;
-        EL:SearchEncounter(rawText);
+        EL:SearchEJ(rawText, OnSearchFinished_Encounter);
     end
 
     function LandingPageUtil.SearchInstance(rawText, searchResultReceiver)
         EL.searchResultReceiver = ReceiverDummy;
         ReceiverDummy.OnSearchComplete = ReceiverDummy.GetInstances;
         ReceiverDummy.searchResultReceiver = searchResultReceiver;
-        EL:SearchEncounter(rawText);
+        EL:SearchEJ(rawText, OnSearchFinished_Instance);
     end
 end

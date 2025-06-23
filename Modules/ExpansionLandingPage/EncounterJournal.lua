@@ -11,7 +11,7 @@ local EJ_GetInstanceInfo = EJ_GetInstanceInfo;
 local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
 
 
-local journalInstanceIDs = {
+local JournalInstanceIDs = {
     1296,   --Liberation of Undermine
     1273,   --Nerub-ar Palace
     --1190,   --Debug Castle Nathria
@@ -911,7 +911,7 @@ do
         local n = 0;
         local selectedJournalEncounterID = self.selectedJournalEncounterID or -1;
 
-        for _, journalInstanceID in ipairs(journalInstanceIDs) do
+        for _, journalInstanceID in ipairs(JournalInstanceIDs) do
             local data = self:GetInstanceData(journalInstanceID);
             if data then
                 local mapID = data.mapID;

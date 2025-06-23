@@ -434,9 +434,10 @@ L["TrackerType Quest"] = "Quest";
 L["TrackerType Rare"] = "Rare Creature";
 L["Accountwide"] = "Account-wide";
 L["Quest Flag"] = "Quest Flag";
-L["Boss Or Instance Name"] = "Boss or instance name";
+L["Boss Name"] = "Boss name";
 L["Instance Or Boss Name"] = "Instance or boss name";
 L["Name EditBox Disabled Reason Format"] = "This box will be filled automatically when you enter a valid %s.";
+L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "No Matches";
 
 
 --Generic
