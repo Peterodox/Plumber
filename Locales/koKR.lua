@@ -397,12 +397,12 @@ L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "확장팩 개요";
 L["ModuleDescription NewExpansionLandingPage"] = "세력, 주간 활동, 공격대 귀속 정보를 표시하는 UI입니다. 다음 방법으로 열 수 있습니다:\n\n- 미니맵에 있는 ‘카즈 알가르 요약’ 버튼을 클릭하세요.\n\n- 게임 설정의 키 바인딩 메뉴에서 단축키를 설정할 수 있습니다.";
-L["Reward Available"] = "Reward Available";  --As brief as possible
+L["Reward Available"] = "보상 가능";  --As brief as possible
 L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d 다음 레벨까지";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d 영예 레벨 보상까지";
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Click to view Renown>";
-L["Not On Quest"] = "You are not on this quest";
+L["Not On Quest"] = "이 퀘스트를 진행 중이지 않음";
 L["Factions"] = "평판";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Activities";
 L["Raids"] = RAIDS or "Raids";
@@ -421,6 +421,22 @@ L["Completed"] = CRITERIA_COMPLETED or "Completed";
 L["Filter Hide Completed Format"] = "완료한 항목 숨기기 (%d)";
 L["Weeky Reset Format"] = "주간 초기화: %s";
 L["Ready To Turn In Tooltip"] = "“퀘스트 완료 상태.";
+L["Trackers"] = "추적기";
+L["New Tracker Title"] = "추적기 추가 [ + ]";     --새 추적기 만들기
+L["Type"] = "유형";
+L["Select Instruction"] = LFG_LIST_SELECT or "Select";
+L["Name"] = "이름";
+L["Difficulty"] = LFG_LIST_DIFFICULTY or "Difficulty";
+L["TrackerType Boss"] = "보스";
+L["TrackerType Instance"] = "인스턴스";
+L["TrackerType Quest"] = "퀘스트";
+L["TrackerType Rare"] = "희귀 몬스터";
+L["Accountwide"] = "계정 전체 적용";
+L["Quest Flag"] = "퀘스트 속성";
+L["Boss Name"] = "보스 이름";
+L["Instance Or Boss Name"] = "인스턴스/보스 이름";
+L["Name EditBox Disabled Reason Format"] = "%s를 입력하면 자동으로 완성됩니다";
+L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "No Matches";
 
 
 --Generic
