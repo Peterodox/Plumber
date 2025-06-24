@@ -428,16 +428,23 @@ L["Type"] = "Type";
 L["Select Instruction"] = LFG_LIST_SELECT or "Select";
 L["Name"] = "Name";
 L["Difficulty"] = LFG_LIST_DIFFICULTY or "Difficulty";
+L["All Difficulties"] = "All Difficulties";
 L["TrackerType Boss"] = "Boss";
 L["TrackerType Instance"] = "Instance";
 L["TrackerType Quest"] = "Quest";
 L["TrackerType Rare"] = "Rare Creature";
+L["TrackerTypePlural Boss"] = "Bosses";
+L["TrackerTypePlural Instance"] = "Instances";
+L["TrackerTypePlural Quest"] = "Quests";
+L["TrackerTypePlural Rare"] = "Rare Creatures";
 L["Accountwide"] = "Account-wide";
-L["Quest Flag"] = "Quest Flag";
+L["Flag Quest"] = "Flag Quest";
 L["Boss Name"] = "Boss name";
 L["Instance Or Boss Name"] = "Instance or boss name";
 L["Name EditBox Disabled Reason Format"] = "This box will be filled automatically when you enter a valid %s.";
 L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "No Matches";
+L["Creater New Tracker"] = "New Tracker";
+L["FailureReason Already Exist"] = "This entry already exists.";
 
 
 --Generic

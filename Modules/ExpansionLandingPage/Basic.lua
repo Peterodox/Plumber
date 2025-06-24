@@ -1,5 +1,7 @@
 local _, addon = ...
+local L = addon.L;
 local API = addon.API;
+
 
 local LandingPageUtil = {};
 addon.LandingPageUtil = LandingPageUtil;
@@ -243,9 +245,55 @@ do
         self.Name:SetText(name);
     end
 
+    function ListCategoryButtonMixin:SetCollapsible(collapsible)
+        self.collapsible = collapsible;
+        if collapsible then
+            self.Left:SetSize(32, 32);
+            self.Left:SetTexCoord(828/1024, 892/1024, 176/1024, 240/1024);
+            self.Center:SetTexCoord(758/1024, 910/1024, 48/1024, 112/1024);
+        else
+            self.Left:SetSize(20, 32);
+            self.Left:SetTexCoord(694/1024, 734/1024, 48/1024, 112/1024);
+            self.Center:SetTexCoord(734/1024, 910/1024, 48/1024, 112/1024);
+        end
+        self.MinimizeButton:SetShown(collapsible);
+    end
+
+    function ListCategoryButtonMixin:SetCollapsed(isCollapsed, userInput)
+        self.isCollapsed = isCollapsed;
+        self.MinimizeButton.isCollapsed = isCollapsed;
+        self.MinimizeButton:OnMouseUp();
+        if userInput then
+            if self.onCollapsed then
+                self.onCollapsed(isCollapsed);
+            end
+        end
+    end
+
+    local MinimizeButtonMixin = {};
+
+    function MinimizeButtonMixin:OnMouseDown()
+        if self.isCollapsed then    --"+"
+            self.Texture:SetTexCoord(964/1024, 1012/1024, 184/1024, 232/1024);
+        else
+            self.Texture:SetTexCoord(964/1024, 1012/1024, 264/1024, 312/1024);
+        end
+    end
+
+    function MinimizeButtonMixin:OnMouseUp()
+        if self.isCollapsed then    --"+"
+            self.Texture:SetTexCoord(900/1024, 948/1024, 184/1024, 232/1024);
+        else
+            self.Texture:SetTexCoord(964/1024, 1012/1024, 120/1024, 168/1024);
+        end
+    end
+
+    function MinimizeButtonMixin:OnClick()
+        self:GetParent():SetCollapsed(not self.isCollapsed, true);
+    end
 
     function LandingPageUtil.CreateListCategoryButton(parent, name)
-        local f = CreateFrame("Button", nil, parent);
+        local f = CreateFrame("Frame", nil, parent);
         API.Mixin(f, ListCategoryButtonMixin);
         f:SetSize(240, 32); --debug
 
@@ -268,6 +316,28 @@ do
         if name then
             f:SetName(name);
         end
+
+        local MinimizeButton = CreateFrame("Button", nil, f);
+        f.MinimizeButton = MinimizeButton;
+        MinimizeButton:Hide();
+        API.Mixin(MinimizeButton, MinimizeButtonMixin);
+        MinimizeButton:SetSize(24, 24);
+        MinimizeButton:SetPoint("CENTER", f.Left, "CENTER", 0, 0);
+        MinimizeButton.Texture = MinimizeButton:CreateTexture(nil, "OVERLAY");
+        MinimizeButton.Texture:SetSize(24, 24);
+        MinimizeButton.Texture:SetPoint("CENTER", MinimizeButton, "CENTER", 0, 0);
+        MinimizeButton.Texture:SetTexture(TEXTURE_FILE);
+        MinimizeButton.Highlight = MinimizeButton:CreateTexture(nil, "HIGHLIGHT");
+        MinimizeButton.Highlight:SetPoint("CENTER", MinimizeButton, "CENTER", 0, 0);
+        MinimizeButton.Highlight:SetSize(48, 48);
+        MinimizeButton.Highlight:SetTexture(TEXTURE_FILE);
+        MinimizeButton.Highlight:SetTexCoord(892/1024, 956/1024, 256/1024, 320/1024);
+        MinimizeButton.Highlight:SetBlendMode("ADD");
+        MinimizeButton.Highlight:SetVertexColor(0.4, 0.2, 0.1);
+        MinimizeButton:OnMouseUp();
+        MinimizeButton:SetScript("OnMouseDown", MinimizeButton.OnMouseDown);
+        MinimizeButton:SetScript("OnMouseUp", MinimizeButton.OnMouseUp);
+        MinimizeButton:SetScript("OnClick", MinimizeButton.OnClick);
 
         return f
     end
@@ -429,148 +499,6 @@ do  --Atlas
             return true
         end
         return false
-    end
-end
-
-
-do  --ScrollViewListButton
-    local TEXTURE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga";
-
-    local ListButtonMixin = {};
-
-    function ListButtonMixin:SetBackgroundColor(r, g, b)
-        self.Left:SetVertexColor(r, g, b);
-        self.Right:SetVertexColor(r, g, b);
-        self.Center:SetVertexColor(r, g, b);
-    end
-
-    function ListButtonMixin:UpdateVisual()
-        if self:IsMouseMotionFocus() then
-            self.Left:SetTexCoord(0/512, 64/512, 128/512, 192/512);
-            self.Right:SetTexCoord(448/512, 512/512, 128/512, 192/512);
-            self.Center:SetTexCoord(64/512, 448/512, 128/512, 192/512);
-            self.Name:SetTextColor(1, 1, 1);
-        else
-            if self.isOdd then
-                self.Left:SetTexCoord(0/512, 64/512, 64/512, 128/512);
-                self.Right:SetTexCoord(448/512, 512/512, 64/512, 128/512);
-                self.Center:SetTexCoord(64/512, 448/512, 64/512, 128/512);
-            else
-                self.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
-                self.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
-                self.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
-            end
-            if self.isHeader or self.completed then
-                self.Name:SetTextColor(0.6, 0.6, 0.6);
-                --self.Name:SetTextColor(0.8, 0.8, 0.8);
-            elseif self.readyForTurnIn then
-                self.Name:SetTextColor(0.098, 1.000, 0.098);
-            else
-                if self.selected then
-                    self.Name:SetTextColor(1, 1, 1);
-                else
-                    self.Name:SetTextColor(0.922, 0.871, 0.761);
-                end
-            end
-        end
-    end
-
-    function ListButtonMixin:SetHeader()
-        self.id = nil;
-        self.type = "Header";
-
-        self.isHeader = true;
-        self.readyForTurnIn = nil;
-        self.flagQuest = nil;
-        self.Icon:SetTexture(TEXTURE);
-        self.Icon:SetSize(18, 18);
-        self.Icon:SetPoint("CENTER", self, "LEFT", 16, 0);
-        self.Icon:Show();
-        self.Name:SetTextColor(0.6, 0.6, 0.6);
-        self.Name:SetWidth(0);
-        self.Name:SetMaxLines(1);
-        self.Text1:SetText(nil);
-
-        if self.isCollapsed then
-            self.Icon:SetTexCoord(0, 48/512, 208/512, 256/512);
-        else
-            self.Icon:SetTexCoord(0, 48/512, 256/512, 208/512);
-        end
-
-        self:Layout();
-    end
-
-    function ListButtonMixin:SetEntry()
-        --Clear Atlas
-        self.isHeader = nil;
-        self.Icon:SetSize(18, 18);
-        self.Icon:SetTexture(nil);
-        self.Icon:SetPoint("CENTER", self, "LEFT", 16, 0);
-        self.Icon:SetTexCoord(0, 1, 0, 1);
-        self.Name:SetTextColor(0.88, 0.88, 0.88);
-        self.Name:SetWidth(240);
-        self.Name:SetMaxLines(2);
-    end
-
-    function ListButtonMixin:Layout()
-        local textOffset = 10;
-
-        if self.Icon:IsShown() then
-            textOffset = textOffset + 22;
-        end
-
-        if self.Icon2:IsShown() then
-            textOffset = textOffset + 18;
-        end
-
-        self.Name:SetPoint("LEFT", self, "LEFT", textOffset, 0);
-    end
-
-    function LandingPageUtil.CreateScrollViewListButton(parent)
-        local f = CreateFrame("Button", nil, parent);
-        f:SetSize(248, 24);
-
-        SetupThreeSliceBackground(f, TEXTURE, -4, 4);
-        f.Left:SetSize(32, 32);
-        f.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
-        f.Right:SetSize(32, 32);
-        f.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
-        f.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
-
-        f.Icon = f:CreateTexture(nil, "OVERLAY");
-        f.Icon:SetSize(18, 18);
-        f.Icon:SetPoint("CENTER", f, "LEFT", 16, 0);
-
-        f.Icon2 = f:CreateTexture(nil, "OVERLAY");
-        f.Icon2:SetSize(16, 16);
-        f.Icon2:SetPoint("LEFT", f, "LEFT", 30, 0);
-        f.Icon2:Hide();
-        f.Icon2:SetTexture(TEXTURE);
-        f.Icon2:SetTexCoord(152/512, 184/512, 216/512, 248/512);
-
-        f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        f.Name:SetPoint("LEFT", f, "LEFT", 32, 0);
-        f.Name:SetTextColor(0.88, 0.88, 0.88);
-        f.Name:SetJustifyH("LEFT");
-
-        f.Text1 = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        f.Text1:SetPoint("RIGHT", f, "RIGHT", -96, 0);
-        f.Text1:SetTextColor(0.88, 0.88, 0.88);
-        f.Text1:SetJustifyH("CENTER");
-
-        f.Glow = f:CreateTexture(nil, "BORDER");
-        f.Glow:Hide();
-        f.Glow:SetTexture(TEXTURE);
-        f.Glow:SetTexCoord(0/512, 512/512, 352/512, 416/512);
-        f.Glow:SetPoint("LEFT", f.Left, "LEFT", 0, 0);
-        f.Glow:SetSize(256, 32);
-        f.Glow:SetBlendMode("ADD");
-        f.Glow:SetVertexColor(0.5, 0.5, 0.5);
-        --f.Glow:SetVertexColor(1, 0.82, 0);
-
-        API.Mixin(f, ListButtonMixin);
-
-        return f
     end
 end
 
@@ -1105,46 +1033,63 @@ do  --Red Button
     end
 
     function RedButtonMixin:UpdateVisual()
+        local isFocused = self:IsMouseMotionFocus();
+        local top;
         if self.buttonState == 1 then
-            self.Left:SetTexCoord(768/1024, 800/1024, 448/1024, 512/1024);
-            self.Right:SetTexCoord(972/1024, 1004/1024, 448/1024, 512/1024);
-            self.Center:SetTexCoord(800/1024, 972/1024, 448/1024, 512/1024);
+            if isFocused then
+                top = 576;
+            else
+                top = 448;
+            end
         elseif self.buttonState == 2 then
-
+            if isFocused then
+                top = 704;
+            else
+                top = 640;
+            end
         elseif self.buttonState == 3 then
-            self.Left:SetTexCoord(768/1024, 800/1024, 512/1024, 576/1024);
-            self.Right:SetTexCoord(972/1024, 1004/1024, 512/1024, 576/1024);
-            self.Center:SetTexCoord(800/1024, 972/1024, 512/1024, 576/1024);
+            top = 512;
         end
+        local bottom = top + 64;
+        self.Left:SetTexCoord(768/1024, 800/1024, top/1024, bottom/1024);
+        self.Right:SetTexCoord(972/1024, 1004/1024, top/1024, bottom/1024);
+        self.Center:SetTexCoord(800/1024, 972/1024, top/1024, bottom/1024);
 
         if self.buttonState == 3 then
             self.ButtonText:SetTextColor(0.5, 0.5, 0.5);
         else
-            if self:IsMouseMotionFocus() then
+            if isFocused then
                 self.ButtonText:SetTextColor(1, 1, 1);
             else
                 self.ButtonText:SetTextColor(0.922, 0.871, 0.761);
             end
         end
 
+        if self.buttonState == 2 then
+            self.ButtonText:SetPoint("CENTER", 2, -2);
+        else
+            self.ButtonText:SetPoint("CENTER", 0, 0);
+        end
     end
 
     function RedButtonMixin:OnMouseDown()
         if self:IsEnabled() then
-            
+            self.buttonState = 2;
+            self:UpdateVisual();
         end
     end
 
     function RedButtonMixin:OnMouseUp()
-
+        self.buttonState = self:IsEnabled() and 1 or 3;
+        self:UpdateVisual();
     end
 
     function RedButtonMixin:OnEnter()
-        self.ButtonText:SetTextColor(1, 1, 1);
+        self:UpdateVisual();
     end
 
     function RedButtonMixin:OnLeave()
-        self.ButtonText:SetTextColor(0.922, 0.871, 0.761);
+        self:UpdateVisual();
     end
 
     function RedButtonMixin:OnEnable()
@@ -1165,6 +1110,7 @@ do  --Red Button
         local f = CreateFrame("Button", nil, parent);
         API.Mixin(f, RedButtonMixin);
 
+        f.buttonState = 1;
         f:SetSize(240, 24);
 
         f.ButtonText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -1227,7 +1173,11 @@ do  --Checkbox Button
             if self:IsMouseMotionFocus() then
                 self.Label:SetTextColor(1, 1, 1);
             else
-                self.Label:SetTextColor(1, 0.82, 0);
+                if self.useDarkYellowLabel then
+                    self.Label:SetTextColor(1, 0.82, 0);
+                else
+                    self.Label:SetTextColor(0.922, 0.871, 0.761);
+                end
             end
         else
             self.Label:SetTextColor(0.5, 0.5, 0.5);
@@ -1238,28 +1188,38 @@ do  --Checkbox Button
         if self.dbKey then
             local checked = not addon.GetDBBool(self.dbKey);
             addon.SetDBValue(self.dbKey, checked, true);
-            self:SetChecked(checked);
-            if self.checked then
+            self:SetChecked(checked, true);
+        end
+
+        if self.onClickFunc then
+            self.checked = not self.checked;
+            self.onClickFunc(self, self.checked);
+            self:UpdateChecked(true);
+        end
+    end
+
+    function CheckboxButtonMixin:SetChecked(state, userInput)
+        self.checked = state;
+        if state then
+            self.Texture:SetTexCoord(828/1024, 892/1024, 320/1024, 384/1024);
+            if userInput then
                 PlayUISound("CheckboxOn");
-            else
+            end
+        else
+            self.Texture:SetTexCoord(764/1024, 828/1024, 320/1024, 384/1024);
+            if userInput then
                 PlayUISound("CheckboxOff");
             end
         end
     end
 
-    function CheckboxButtonMixin:SetChecked(state)
-        self.checked = state;
-        if state then
-            self.Texture:SetTexCoord(828/1024, 892/1024, 320/1024, 384/1024);
-        else
-            self.Texture:SetTexCoord(764/1024, 828/1024, 320/1024, 384/1024);
-        end
-    end
-
-    function CheckboxButtonMixin:UpdateChecked()
+    function CheckboxButtonMixin:UpdateChecked(userInput)
         if self.dbKey then
             local checked = addon.GetDBBool(self.dbKey);
-            self:SetChecked(checked);
+            self:SetChecked(checked, userInput);
+        elseif self.getCheckedFunc then
+            local checked = self.getCheckedFunc(self);
+            self:SetChecked(checked, userInput);
         end
     end
 
@@ -1289,6 +1249,22 @@ do  --Checkbox Button
         else
             self:SetText(text);
         end
+    end
+
+    function CheckboxButtonMixin:ClearCallbacks()
+        self.dbKey = nil;
+        self.getCheckedFunc = nil;
+    end
+
+    function CheckboxButtonMixin:SetGetCheckedFunc(getCheckedFunc)
+        self.getCheckedFunc = getCheckedFunc;
+        if getCheckedFunc then
+            self:UpdateChecked();
+        end
+    end
+
+    function CheckboxButtonMixin:SetOnClickFunc(onClickFunc)
+        self.onClickFunc = onClickFunc;
     end
 
     function LandingPageUtil.CreateCheckboxButton(parent)
@@ -1321,121 +1297,6 @@ do  --Checkbox Button
         f:SetScript("OnDisable", f.OnDisable);
 
         return f
-    end
-end
-
-
-do  --Encounter Journal
-    local After = C_Timer.After;
-    local EJ_SelectInstance = EJ_SelectInstance;
-    local EJ_SelectEncounter = EJ_SelectEncounter;
-    local EJ_IsValidInstanceDifficulty = EJ_IsValidInstanceDifficulty;
-
-    local function NullifyEJEvents()
-        --Pause default EncounterJournal updating
-        local f = EncounterJournal;
-        if f then
-            f:UnregisterEvent("EJ_LOOT_DATA_RECIEVED");
-            f:UnregisterEvent("EJ_DIFFICULTY_UPDATE");
-            After(0, function()
-                f:RegisterEvent("EJ_LOOT_DATA_RECIEVED");
-                f:RegisterEvent("EJ_DIFFICULTY_UPDATE");
-            end);
-        end
-    end
-
-    local function SelectInstanceAndEncounter(journalInstanceID, journalEncounterID)
-        NullifyEJEvents();
-        EJ_SelectInstance(journalInstanceID);
-        EJ_SelectEncounter(journalEncounterID);
-    end
-    API.SelectInstanceAndEncounter = SelectInstanceAndEncounter;
-
-
-    do  --This is a copy of Blizzard_EncounterJournal.lua
-        local DifficultyUtil = DifficultyUtil;
-
-        local EJ_DIFFICULTIES = {
-            DifficultyUtil.ID.DungeonNormal,
-            DifficultyUtil.ID.DungeonHeroic,
-            DifficultyUtil.ID.DungeonMythic,
-            DifficultyUtil.ID.DungeonChallenge,
-            DifficultyUtil.ID.DungeonTimewalker,
-            DifficultyUtil.ID.RaidLFR,
-            DifficultyUtil.ID.Raid10Normal,
-            DifficultyUtil.ID.Raid10Heroic,
-            DifficultyUtil.ID.Raid25Normal,
-            DifficultyUtil.ID.Raid25Heroic,
-            DifficultyUtil.ID.PrimaryRaidLFR,
-            DifficultyUtil.ID.PrimaryRaidNormal,
-            DifficultyUtil.ID.PrimaryRaidHeroic,
-            DifficultyUtil.ID.PrimaryRaidMythic,
-            DifficultyUtil.ID.RaidTimewalker,
-            DifficultyUtil.ID.Raid40,
-        };
-
-        local function GetEJDifficultySize(difficultyID)
-            if difficultyID ~= DifficultyUtil.ID.RaidTimewalker and not DifficultyUtil.IsPrimaryRaid(difficultyID) then
-                return DifficultyUtil.GetMaxPlayers(difficultyID);
-            end
-            return nil;
-        end
-
-        local function GetEJDifficultyString(difficultyID)
-            local name = DifficultyUtil.GetDifficultyName(difficultyID);
-            local size = GetEJDifficultySize(difficultyID);
-            if size then
-                return string.format(ENCOUNTER_JOURNAL_DIFF_TEXT, size, name);
-            else
-                return name;
-            end
-        end
-        API.GetRaidDifficultyString = GetEJDifficultyString;
-
-
-        local function GetValidDifficultiesForEncounter(instanceID, encounterID)
-            local n = 0;
-            local tbl = {};
-            SelectInstanceAndEncounter(instanceID, encounterID);
-
-            for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
-                if EJ_IsValidInstanceDifficulty(difficultyID) then
-                    local text = GetEJDifficultyString(difficultyID);
-                    n = n + 1;
-                    tbl[n] = {
-                        difficultyID = difficultyID,
-                        text = text,
-                    };
-                end
-            end
-
-            if n > 0 then
-                return tbl
-            end
-        end
-        API.GetValidDifficultiesForEncounter = GetValidDifficultiesForEncounter;
-
-
-        local function IsDifficultyValidForEncounter(instanceID, encounterID, difficultyID)
-            local difficulties = instanceID and encounterID and GetValidDifficultiesForEncounter(instanceID, encounterID);
-            local valid, bestDifficultyID;
-            if difficulties then
-                if difficultyID then
-                    for k, v in ipairs(difficulties) do
-                        if v.difficultyID == difficultyID then
-                            valid = true;
-                            bestDifficultyID = difficultyID;
-                            break;
-                        end
-                    end
-                end
-                if not bestDifficultyID then
-                    bestDifficultyID = difficulties[#difficulties].difficultyID;
-                end
-            end
-            return valid, bestDifficultyID
-        end
-        API.IsDifficultyValidForEncounter = IsDifficultyValidForEncounter;
     end
 end
 

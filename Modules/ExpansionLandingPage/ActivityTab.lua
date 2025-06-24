@@ -81,7 +81,6 @@ do  --Checklist Button
             self:UpdateProgress();
 
             self.Glow:SetShown(data.showGlow);
-            self.Icon2:SetShown(data.showLocationMarker);
 
             self:Layout();
         end
@@ -214,8 +213,7 @@ do  --Checklist Button
     end
 
     function CreateChecklistButton(parent)
-        local f = LandingPageUtil.CreateScrollViewListButton(parent);
-        f:SetSize(248, 24);
+        local f = LandingPageUtil.CreateSharedListButton(parent);
 
         API.Mixin(f, ChecklistButtonMixin);
         f:SetScript("OnEnter", f.OnEnter);
@@ -342,6 +340,7 @@ do
         Checkbox_HideCompleted:SetText(L["Filter Hide Completed Format"], true);
         Checkbox_HideCompleted.dbKey = "LandingPage_Activity_HideCompleted";
         Checkbox_HideCompleted.textFormat = L["Filter Hide Completed Format"];
+        Checkbox_HideCompleted.useDarkYellowLabel = true;
         Checkbox_HideCompleted:UpdateChecked();
         addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", self.SetHideCompleted, self);
 

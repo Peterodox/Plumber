@@ -437,9 +437,14 @@ do  --ScrollView Basic Content Render
         end
     end
 
-    function ScrollViewMixin:OnSizeChanged()
+    function ScrollViewMixin:OnSizeChanged(forceUpdate)
         --We call this manually
         self.viewportSize = API.Round(self:GetHeight());
+        if forceUpdate then
+            self.ScrollBar:UpdateThumbRange();
+            self:SetContent(self.content);
+            --self:SnapTo(self.offset or 0);
+        end
     end
 
     function ScrollViewMixin:OnMouseWheel(delta)
@@ -479,6 +484,14 @@ do  --ScrollView Basic Content Render
         self.scrollable = scrollable;
         self.ScrollBar:SetScrollable(self.scrollable);
         self.ScrollBar:SetShown(scrollable or self.alwaysShowScrollBar);
+
+        if self.useBoundaryGradient then
+            if scrollable then
+                self.BottomGradient:Show();
+            else
+                self.BottomGradient:Hide();
+            end
+        end
     end
 
     function ScrollViewMixin:IsScrollable()

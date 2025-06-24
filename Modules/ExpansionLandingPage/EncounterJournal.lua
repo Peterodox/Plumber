@@ -136,7 +136,7 @@ do
 
 
     function CreateListButton(parent)
-        local f = LandingPageUtil.CreateScrollViewListButton(parent);
+        local f = LandingPageUtil.CreateSharedListButton(parent);
         API.Mixin(f, ListButtonMixin);
 
         f:SetScript("OnEnter", f.OnEnter);
@@ -750,6 +750,8 @@ do
     end
 
     function CreateLootContainer(parent)
+        if LootContainer then return LootContainer end;
+
         local f = CreateFrame("Frame", nil, parent);
         LootContainer = f;
 
@@ -1042,26 +1044,46 @@ do
         local Header1 = LandingPageUtil.CreateListCategoryButton(self, ACHIEVEMENTS);
         Header1:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY);
         offsetY = offsetY + categoryButtonHeight + lineGap;
+        Header1:SetCollapsible(true);
+
+        local header1Bottom = offsetY;
+        local achvContainerHeight = 48;
 
         local AchievementContainer = CreateAchievementContainer(self);
         self.AchievementContainer = AchievementContainer;
-        AchievementContainer:SetSize(192, 48);
+        AchievementContainer:SetSize(192, achvContainerHeight);
         AchievementContainer:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY);
-        offsetY = offsetY + 48 + paragraphGap;
+        offsetY = offsetY + achvContainerHeight + paragraphGap;
+
+        local header2Top = offsetY;
 
         local Header2 = LandingPageUtil.CreateListCategoryButton(self, LOOT_NOUN);
-        Header2:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY);
+        Header2:SetPoint("TOP", LeftFrame, "TOP", 0, -header2Top);
         offsetY = offsetY + categoryButtonHeight + lineGap;
 
-        local LootContainer = CreateLootContainer(self);
+        LootContainer = CreateLootContainer(self);
         self.LootContainer = LootContainer;
-        LootContainer:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY + 8);
+        LootContainer:SetPoint("TOP", Header2, "BOTTOM", 0, - lineGap + 8);
         LootContainer:SetPoint("BOTTOM", LeftFrame, "BOTTOM", 0, 12);
         LootContainer.ScrollView:ResetScrollBarPosition();
         LootContainer.ScrollView:OnSizeChanged();
         LootContainer.ScrollView:SetBottomOvershoot(40);
+
+        Header1.onCollapsed = function(isCollapsed)
+            if isCollapsed then
+                AchievementContainer:Hide();
+                Header2:SetPoint("TOP", LeftFrame, "TOP", 0, -header1Bottom);
+            else
+                AchievementContainer:Show();
+                Header2:SetPoint("TOP", LeftFrame, "TOP", 0, -header2Top);
+            end
+            LootContainer.ScrollView:OnSizeChanged(true);
+            addon.SetDBValue("LandingPage_Raid_CollapsedAchievement", isCollapsed);
+        end
+
+        local isAchievementCollapsed = addon.GetDBBool("LandingPage_Raid_CollapsedAchievement");
+        Header1:SetCollapsed(isAchievementCollapsed, true)
     end
-    
 
     --Frame Update
     function RaidTabMixin:OnUpdate(elapsed)

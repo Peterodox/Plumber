@@ -22,11 +22,143 @@ local Enum_TrackerTypes = {
     "Rare",
 };
 
+local TrackerTypeXID = {};
+for k, v in ipairs(Enum_TrackerTypes) do
+    TrackerTypeXID[v] = k;
+end
+
+
+local TrackingList = {};
+do
+    function TrackingList:Init()
+        if not PlumberDB then
+            self.rawList = {};
+            return
+        end
+
+        if not PlumberDB.LadningPageTrackingList then
+            PlumberDB.LadningPageTrackingList = {};
+        end
+
+        if not PlumberDB.LadningPageTrackingListCollapsedTypes then
+            PlumberDB.LadningPageTrackingListCollapsedTypes = {};
+        end
+
+        self.rawList = PlumberDB.LadningPageTrackingList;
+        self.collapsedTypes = PlumberDB.LadningPageTrackingListCollapsedTypes;
+
+        self.uniqueQuestIDs = {};
+        self.uniqueCreatureIDs = {};
+    end
+
+    local function SortFunc_TypeThenID(a, b)
+        if a.type ~= b.type then
+            return a.type < b.type
+        end
+
+        return a.id < b.id
+    end
+
+    function TrackingList:IsTrackerTypeCollapsed(trackerTypeID)
+        return self.collapsedTypes[trackerTypeID]
+    end
+
+    function TrackingList:SetTrackerTypeCollapsed(trackerTypeID, isCollapsed)
+        self.collapsedTypes[trackerTypeID] = isCollapsed;
+    end
+
+    function TrackingList:GetSortedList(forceUpdate)
+        if self.sortedList and not forceUpdate then
+            return self.sortedList
+        end
+
+        table.sort(self.rawList, SortFunc_TypeThenID);
+
+        self.uniqueQuestIDs = {};
+        self.uniqueCreatureIDs = {};
+
+        local tbl = {};
+        local n = 0;
+        local lastType;
+        local trackerType;
+        local numCompleted = 0;
+        local data;
+
+        for k, v in ipairs(self.rawList) do
+            trackerType = Enum_TrackerTypes[v.type];
+            if v.type ~= lastType then
+                lastType = v.type;
+                n = n + 1;
+                data = {
+                    isHeader = true,
+                    localizedName = L["TrackerTypePlural "..trackerType],
+                    isCollapsed = self:IsTrackerTypeCollapsed(lastType);
+                    typeID = lastType,
+                };
+                tbl[n] = data;
+            end
+
+            n = n + 1;
+            data = {
+                type = trackerType,
+                id = v.id;
+            };
+            tbl[n] = data;
+
+            if trackerType == TrackerTypeXID.Quest then
+                self.uniqueQuestIDs[v.id] = true;
+            elseif trackerType == TrackerTypeXID.Creature then
+                self.uniqueCreatureIDs[v.id] = true;
+            end
+        end
+
+        self.sortedList = tbl;
+
+        return tbl, numCompleted
+    end
+
+    function TrackingList:IsQuestAdded(questID)
+        return self.uniqueQuestIDs[questID]
+    end
+
+    function TrackingList:AddQuest(questID)
+        if self:IsQuestAdded(questID) then
+            return false
+        end
+
+        table.insert(self.rawList, {
+            type = TrackerTypeXID.Quest,
+            id = questID,
+        });
+
+        return true
+    end
+
+    function TrackingList:IsCreatureAdded(creatureID)
+        return self.uniqueCreatureIDs[creatureID]
+    end
+
+    function TrackingList:AddRareCreature(creatureID, flagQuest)
+        if (self:IsQuestAdded(creatureID)) or (not flagQuest) then
+            return false
+        end
+
+        table.insert(self.rawList, {
+            type = TrackerTypeXID.Rare,
+            id = creatureID,
+            flagQuest = flagQuest,
+        });
+
+        return true
+    end
+end
+
+
 do  --DropdownInfoGetters
     local function GetSelectedTrackerTypeText()
-        local trackerType = EditorPopup and EditorPopup.trackerType;
-        if trackerType and Enum_TrackerTypes[trackerType] then
-            return L["TrackerType "..Enum_TrackerTypes[trackerType]];
+        local trackerTypeID = EditorPopup and EditorPopup.trackerTypeID;
+        if trackerTypeID and Enum_TrackerTypes[trackerTypeID] then
+            return L["TrackerType "..Enum_TrackerTypes[trackerTypeID]];
         else
             return L["Select Instruction"]
         end
@@ -38,7 +170,7 @@ do  --DropdownInfoGetters
             key = "TrackerEditor.TrackerType",
         };
 
-        local selectedTrackerType = EditorPopup.trackerType
+        local selectedTrackerType = EditorPopup.trackerTypeID
         local widgets = {};
 
         for k, v in ipairs(Enum_TrackerTypes) do
@@ -60,10 +192,12 @@ do  --DropdownInfoGetters
     end
 
 
-    function DropdownInfoGetters.GetValidDifficulties()
+    local function GetValidDifficulties(getterFunc, ...)
         local instanceID, encounterID = EditorPopup.instanceID, EditorPopup.encounterID;
         local selectedDifficultyID = EditorPopup.difficultyID;
-        local difficulties = instanceID and encounterID and API.GetValidDifficultiesForEncounter(instanceID, encounterID);
+        local showAllDifficulties = true;
+        local difficulties = getterFunc(instanceID, encounterID, showAllDifficulties);
+
         if difficulties then
             local tbl = {
                 key = "TrackerEditor.ValidDifficulties",
@@ -81,10 +215,19 @@ do  --DropdownInfoGetters
                     selected = v.difficultyID == selectedDifficultyID,
                 };
             end
+
             tbl.widgets = widgets;
 
             return tbl
         end
+    end
+
+    function DropdownInfoGetters.GetValidDifficultiesForEncounter(instanceID, encounterID)
+        return GetValidDifficulties(API.GetValidDifficultiesForEncounter, instanceID, encounterID, true)
+    end
+
+    function DropdownInfoGetters.GetValidDifficultiesForInstance(instanceID)
+        return GetValidDifficulties(API.GetValidDifficultiesForEncounter, instanceID, nil, true)
     end
 
     function DropdownInfoGetters.GetSelectedDifficultyText()
@@ -129,7 +272,7 @@ do  --EditorPopupMixin
     function EditorPopupMixin:SetLayoutByID(trackerTypeID)
         local layoutKey = Enum_TrackerTypes[trackerTypeID];
         if layoutKey then
-            self.trackerType = trackerTypeID;
+            self.trackerTypeID = trackerTypeID;
             if layoutKey ~= self.layoutKey then
                 self:ClearArguments();
                 self:SetLayout(layoutKey);
@@ -143,6 +286,7 @@ do  --EditorPopupMixin
         self.difficultyID = nil;
         self.creatureID = nil;
         self.questID = nil;
+        self.flagQuestID = nil;
     end
 
     function EditorPopupMixin:SetLayout(layoutKey)
@@ -200,6 +344,9 @@ do  --EditorPopupMixin
                 obj:SetParent(f);
                 obj:SetPoint("LEFT", f, "LEFT", 0, 0);
                 obj:SetText(v.label);
+                obj:SetGetCheckedFunc(v.getCheckedFunc);
+                obj:SetOnClickFunc(v.onClickFunc);
+                obj:UpdateVisual();
                 f.Label:SetText(nil);
 
             end
@@ -238,6 +385,7 @@ do  --EditorPopupMixin
         self.encounterID = encounterID;
 
         local valid, bestDifficultyID = API.IsDifficultyValidForEncounter(instanceID, encounterID, self.difficultyID);
+
         if bestDifficultyID then
             self:SetDifficultyID(bestDifficultyID);
             self:UpdateSaveButton(true);
@@ -264,6 +412,7 @@ do  --EditorPopupMixin
 
         local self = CreateFrame("Frame", nil, TrackerTab);
         EditorPopup = self;
+        EditorPopup:Hide();
         API.Mixin(self, EditorPopupMixin);
         self:SetSize(POPUP_WIDTH, 480);
         self:SetFrameStrata("DIALOG");
@@ -329,7 +478,11 @@ do  --EditorPopupMixin
             return f
         end
 
-        local CheckboxPool = LandingPageUtil.CreateObjectPool(Checkbox_Create);
+        local function Checkbox_Remove(obj)
+            obj:ClearCallbacks();
+        end
+
+        local CheckboxPool = LandingPageUtil.CreateObjectPool(Checkbox_Create, Checkbox_Remove);
         self.CheckboxPool = CheckboxPool;
 
 
@@ -355,6 +508,9 @@ do  --EditorPopupMixin
         self.SaveButton:SetWidth(redbuttonWidth);
         self.SaveButton:SetButtonText(SAVE);
         self.SaveButton:SetPoint("BOTTOMRIGHT", self, "BOTTOM", -0.5*redButtonGap, redButtonOffsetY);
+        self.SaveButton:SetScript("OnClick", function()
+            EditorPopup:TrySave();
+        end);
 
         self.CancelButton = LandingPageUtil.CreateRedButton(self);
         self.CancelButton:SetWidth(redbuttonWidth);
@@ -370,12 +526,12 @@ end
 do  --EditorPopupMixin:CanSaveOptions
     function EditorPopupMixin:UpdateSaveButton(forceEnabled)
         local enabled;
-        local disabledReason;
+        local failureReason;
 
         if forceEnabled then
             enabled = true;
         else
-            enabled = self:CanSaveOptions();
+            enabled, failureReason = self:CanSaveOptions();
         end
 
         self.SaveButton:SetEnabled(enabled);
@@ -397,12 +553,15 @@ do  --EditorPopupMixin:CanSaveOptions
     end
 
     function EditorPopupMixin:CanSaveOptions_Instance()
-
+        if self.instanceID and self.difficultyID then
+            local valid = API.IsDifficultyValidForEncounter(self.instanceID, nil, self.difficultyID);
+            return valid
+        end
     end
 
     function EditorPopupMixin:CanSaveOptions_Quest()
         --We also update some widgets here
-        local valid;
+        local valid, failureReason;
         local questID = self.questID;
         local editBoxText;
 
@@ -414,7 +573,7 @@ do  --EditorPopupMixin:CanSaveOptions
             else
                 editBoxText = "";
                 CallbackRegistry:LoadQuest(questID, function(_questID)
-                    if self.layoutKey == "Quest" and self.questID == _questID then
+                    if self.trackerTypeID == TrackerTypeXID.Quest and self.questID == _questID then
                         self:UpdateSaveButton();
                     end
                 end);
@@ -429,7 +588,12 @@ do  --EditorPopupMixin:CanSaveOptions
             nameEditBox:UpdateTextInsets();
         end
 
-        return valid
+        if TrackingList:IsQuestAdded(questID) then
+            valid = false;
+            failureReason = L["FailureReason Already Exist"];
+        end
+
+        return valid, failureReason
     end
 
     function EditorPopupMixin:CanSaveOptions_Rare()
@@ -461,7 +625,47 @@ do  --EditorPopupMixin:CanSaveOptions
             nameEditBox:UpdateTextInsets();
         end
 
+        local flagQuestID = creatureID and API.GetKnownRareFlagQuest(creatureID);
+        if flagQuestID then
+            self.flagQuestID = flagQuestID;
+            local flagQuestEditBox = self:GetWidgetByKey("CreatureFlagQuestEditBox");
+            if flagQuestEditBox then
+                flagQuestEditBox:SetText(flagQuestID);
+                flagQuestEditBox:UpdateTextInsets();
+                flagQuestEditBox:Disable();
+                flagQuestEditBox:GetParent():SetOptionEnabled(false);
+            end
+        else
+            local flagQuestEditBox = self:GetWidgetByKey("CreatureFlagQuestEditBox");
+            if flagQuestEditBox then
+                flagQuestEditBox:UpdateTextInsets();
+                flagQuestEditBox:Enable();
+                flagQuestEditBox:GetParent():SetOptionEnabled(true);
+            end
+        end
+
+        if not self.flagQuestID then
+            valid = false;
+        end
+
         return valid
+    end
+
+
+    function EditorPopupMixin:TrySave()
+        local success;
+        if self.trackerTypeID == TrackerTypeXID.Quest then
+            if self:CanSaveOptions_Quest() then
+                success = TrackingList:AddQuest(self.questID);
+            end
+        elseif self.trackerTypeID == TrackerTypeXID.Rare then
+            if self:CanSaveOptions_Rare() then
+                success = TrackingList:AddRareCreature(self.creatureID, self.flagQuestID);
+            end
+        end
+
+        EditorPopup:Hide();
+        TrackerTab:FullUpdate();
     end
 end
 
@@ -491,6 +695,27 @@ local function SearchBox_CreatureID(searchBox, creatureID)
     --API.GetCreatureName
     EditorPopup.creatureID = creatureID;
     EditorPopup:UpdateSaveButton();
+end
+
+local function SearchBox_FlagQuest(searchBox, flagQuestID)
+    EditorPopup.flagQuestID = flagQuestID;
+    EditorPopup:UpdateSaveButton();
+end
+
+local function Checkbox_Accountwide_Quest_GetChecked()
+    return EditorPopup.questAccountwide == true
+end
+
+local function Checkbox_Accountwide_Quest_OnClick(checkbox, state)
+    EditorPopup.questAccountwide = state;
+end
+
+local function Checkbox_Accountwide_Rare_GetChecked()
+    return EditorPopup.rareAccountwide == true
+end
+
+local function Checkbox_Accountwide_Rare_OnClick(checkbox, state)
+    EditorPopup.rareAccountwide = state;
 end
 
 
@@ -567,7 +792,7 @@ do  --SearchResultMenu
                     onClickFunc = function(mouseButton)
                         self.owner:SetText(v.name);
                         self.owner:ClearFocus();
-                        EditorPopup:SetInstanceAndEncounter(v.instanceID, v.encounterID or 0);
+                        EditorPopup:SetInstanceAndEncounter(v.instanceID, v.encounterID);
                     end,
                 };
             end
@@ -605,7 +830,7 @@ do  --PopupLayouts
             onEditFocusGainedCallback = SearchBox_OnEditFocusGainedCallback,
             onEditFocusLostCallback = SearchBox_OnEditFocusLostCallback,
         },
-        {type = "Dropdown", label = L["Difficulty"], widgetKey = "DifficultyDropdown", disabled = true, menuInfoGetter = DropdownInfoGetters.GetValidDifficulties, valueGetter = DropdownInfoGetters.GetSelectedDifficultyText},
+        {type = "Dropdown", label = L["Difficulty"], widgetKey = "DifficultyDropdown", disabled = true, menuInfoGetter = DropdownInfoGetters.GetValidDifficultiesForEncounter, valueGetter = DropdownInfoGetters.GetSelectedDifficultyText},
     };
 
     PopupLayouts.Instance = {
@@ -615,43 +840,195 @@ do  --PopupLayouts
             onEditFocusGainedCallback = SearchBox_OnEditFocusGainedCallback,
             onEditFocusLostCallback = SearchBox_OnEditFocusLostCallback,
         },
-        {type = "Dropdown", label = L["Difficulty"], widgetKey = "DifficultyDropdown", disabled = true, menuInfoGetter = DropdownInfoGetters.GetValidDifficulties, valueGetter = DropdownInfoGetters.GetSelectedDifficultyText},
+        {type = "Dropdown", label = L["Difficulty"], widgetKey = "DifficultyDropdown", disabled = true, menuInfoGetter = DropdownInfoGetters.GetValidDifficultiesForInstance, valueGetter = DropdownInfoGetters.GetSelectedDifficultyText},
     };
 
     PopupLayouts.Quest = {
         SharedHeader,
         {type = "EditBox", label = "Quest ID", numeric = true, maxLetters = 6, searchFunc = SearchBox_QusetID},
         {type = "EditBox", label = L["Name"], widgetKey = "QuestNameEditBox", disabled = true, disabledTooltipText = L["Name EditBox Disabled Reason Format"]:format("Quest ID")},
-        {type = "Checkbox", label = L["Accountwide"]},
+        {type = "Checkbox", label = L["Accountwide"], getCheckedFunc = Checkbox_Accountwide_Quest_GetChecked, onClickFunc = Checkbox_Accountwide_Quest_OnClick},
     };
 
     PopupLayouts.Rare = {
         SharedHeader,
         {type = "EditBox", label = "Creature ID", numeric = true, maxLetters = 6, searchFunc = SearchBox_CreatureID},
         {type = "EditBox", label = L["Name"], widgetKey = "CreatureNameEditBox", disabled = true, disabledTooltipText = L["Name EditBox Disabled Reason Format"]:format("Creature ID")},
-        {type = "EditBox", label = L["Quest Flag"], numeric = true, maxLetters = 6},
-        {type = "Checkbox", label = L["Accountwide"]},
+        {type = "EditBox", label = L["Flag Quest"], widgetKey = "CreatureFlagQuestEditBox", numeric = true, maxLetters = 6, searchFunc = SearchBox_FlagQuest},
+        {type = "Checkbox", label = L["Accountwide"], getCheckedFunc = Checkbox_Accountwide_Rare_GetChecked, onClickFunc = Checkbox_Accountwide_Rare_OnClick},
     };
+end
+
+
+local GenericEntryButtonMixin = {};
+do
+    function GenericEntryButtonMixin:OnClick(button)
+        if button == "LeftButton" then
+            if self.isHeader then
+                self:ToggleCollapsed();
+            end
+        end
+    end
+
+    function GenericEntryButtonMixin:ToggleCollapsed()
+        local trackerTypeID = self.data and self.data.typeID;
+        if trackerTypeID then
+            TrackerTab:SetTrackerTypeCollapsed(trackerTypeID, not TrackingList:IsTrackerTypeCollapsed(trackerTypeID));
+        end
+    end
 end
 
 
 local TrackerTabMixin = {};
 do
+    local DynamicEvents = {
+        "QUEST_TURNED_IN",
+    };
+
     function TrackerTabMixin:OnShow()
-        EditorPopup:ShowHomePage();
+        self:FullUpdate();
+        API.RegisterFrameForEvents(self, DynamicEvents);
     end
 
     function TrackerTabMixin:OnHide()
-
+        API.UnregisterFrameForEvents(self, DynamicEvents);
     end
 
-    function TrackerTabMixin:OnEvent()
+    function TrackerTabMixin:OnEvent(event, ...)
+        if event == "QUEST_TURNED_IN" then
+            self:FullUpdate();
+        end
+    end
 
+    function TrackerTabMixin:OpenEditorPopup()
+        if not EditorPopup then
+            EditorPopup_Init();
+        end
+        EditorPopup:ShowHomePage();
     end
 
     function TrackerTabMixin:Init()
         self.Init = nil;
         EditorPopup_Init();
+
+
+        --Right List
+        local headerWidgetOffsetY = -10;
+        local Checkbox_HideCompleted = LandingPageUtil.CreateCheckboxButton(self);
+        self.Checkbox_HideCompleted = Checkbox_HideCompleted;
+        Checkbox_HideCompleted:SetPoint("TOPRIGHT", self, "TOPRIGHT", -52, headerWidgetOffsetY);
+        Checkbox_HideCompleted:SetText(L["Filter Hide Completed Format"], true);
+        Checkbox_HideCompleted.dbKey = "LandingPage_Tracker_HideCompleted";
+        Checkbox_HideCompleted.textFormat = L["Filter Hide Completed Format"];
+        Checkbox_HideCompleted.useDarkYellowLabel = true;
+        Checkbox_HideCompleted:UpdateChecked();
+        Checkbox_HideCompleted:SetFormattedText(0);
+
+        local CreateNewTrackerButton = LandingPageUtil.CreateCheckboxButton(self);
+        self.CreateNewTrackerButton = CreateNewTrackerButton;
+        CreateNewTrackerButton:SetPoint("TOPLEFT", self, "TOPLEFT", 56, headerWidgetOffsetY);
+        CreateNewTrackerButton:SetText(L["Creater New Tracker"], true);
+        CreateNewTrackerButton.useDarkYellowLabel = true;
+        CreateNewTrackerButton:UpdateChecked();
+        CreateNewTrackerButton:SetOnClickFunc(function()
+            TrackerTab:OpenEditorPopup();
+        end);
+
+
+        --ScrollView
+        local ScrollView = LandingPageUtil.CreateScrollViewForTab(self, -32);
+        ScrollView:SetScrollBarOffsetY(-4);
+
+        local function GenericEntryButton_Create()
+            local button = LandingPageUtil.CreateChecklistButton(ScrollView);
+            API.Mixin(button, GenericEntryButtonMixin);
+            button:SetScript("OnClick", button.OnClick);
+            return button
+        end
+
+        local function GenericEntryButton_OnAcquired(button)
+
+        end
+        local function GenericEntryButton_OnRemoved(button)
+
+        end
+
+        ScrollView:AddTemplate("GenericEntryButton", GenericEntryButton_Create, GenericEntryButton_OnAcquired, GenericEntryButton_OnRemoved);
+
+
+        TrackingList:Init();
+    end
+
+    function TrackerTabMixin:FullUpdate()
+        self.fullUpdate = nil;
+
+        local uiMapID = API.GetPlayerMap();
+        self.uiMapID = uiMapID;
+
+        local content = {};
+        local n = 0;
+        local buttonHeight = 24;
+        local gap = 4;
+        local offsetY = 2;
+
+        local entryWidth = 544;
+        local headerWidth = entryWidth + 62;
+
+        local top, bottom;
+        local showActivity, showGroup;
+
+        local sortedList, numCompleted = TrackingList:GetSortedList(true);
+
+        for k, v in ipairs(sortedList) do
+            if v.isHeader then
+                showActivity = true;
+                showGroup = not v.isCollapsed;
+            else
+                showActivity = showGroup;
+            end
+
+            if showActivity then
+                n = n + 1;
+                local isOdd = n % 2 == 0;
+                top = offsetY;
+                bottom = offsetY + buttonHeight + gap;
+
+                if v.uiMapID then
+                    v.showGlow = (not v.isHeader) and (not v.completed) and (v.uiMapID == uiMapID);
+                else
+                    v.showGlow = false;
+                end
+
+                content[n] = {
+                    templateKey = "GenericEntryButton",
+                    setupFunc = function(obj)
+                        obj.isOdd = isOdd;
+                        if v.isHeader then
+                            obj:SetWidth(headerWidth);
+                            obj.isCollapsed = v.isCollapsed;
+                            obj:SetHeader();
+                        else
+                            obj:SetWidth(entryWidth);
+                            obj:SetEntry();
+                        end
+                        obj:SetData(v);
+                    end,
+                    top = top,
+                    bottom = bottom,
+                };
+                offsetY = bottom;
+            end
+        end
+
+        local retainPosition = true;
+        self.ScrollView:SetContent(content, retainPosition);
+
+        self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
+    end
+
+    function TrackerTabMixin:SetTrackerTypeCollapsed(trackerTypeID, isCollapsed)
+        TrackingList:SetTrackerTypeCollapsed(trackerTypeID, isCollapsed);
+        self:FullUpdate();
     end
 end
 

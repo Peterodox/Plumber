@@ -167,8 +167,7 @@ local ShownQuestClassification = {
     [Enum.QuestClassification.Calling] = true,
 };
 
-local QuestIconAtlas =
-{
+local QuestIconAtlas = {
 	[Enum.QuestClassification.Normal] = 	"QuestNormal",
 	[Enum.QuestClassification.Questline] = 	"QuestNormal",
 	[Enum.QuestClassification.Recurring] =	DAILY_QUEST,
