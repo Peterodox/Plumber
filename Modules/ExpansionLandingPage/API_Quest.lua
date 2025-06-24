@@ -52,7 +52,7 @@ local function GetQuestData(questID)
     data.questClassification = qc;
     data.isOnQuest = IsOnQuest(questID);
     data.readyForTurnIn = ReadyForTurnIn(questID);
-
+    data.completed = IsQuestFlaggedCompleted(questID);
 
     if data.readyForTurnIn then
         data.iconAtlas = "QuestTurnin";

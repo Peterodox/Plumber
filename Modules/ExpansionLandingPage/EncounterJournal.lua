@@ -17,6 +17,10 @@ local JournalInstanceIDs = {
     --1190,   --Debug Castle Nathria
 };
 
+if addon.IsToCVersionEqualOrNewerThan(110200) then
+    tinsert(JournalInstanceIDs, 1, 1302);   --Manaforge Omega   --debug
+end
+
 
 local RaidTab, LootContainer;
 local EncounterList = {};

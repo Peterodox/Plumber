@@ -470,7 +470,8 @@ do  --Atlas
         [2653] = {512, 640, 0, 128},      --Cartels of Undermine
         [2685] = {640, 768, 0, 128},      --Gallagio Loyalty Rewards Club
         [2688] = {768, 896, 0, 128},      --Flame's Radiance
-
+        [2658] = {896, 1024, 0, 128},     --The K'aresh Trust
+        --[2736] = {896, 1024, 0, 128},     --Manaforge Vandals Debug
     };
 
     local function SetTextureDimension(textureObject, file, width, height, l, r, t, b, useTrilinearFilter)

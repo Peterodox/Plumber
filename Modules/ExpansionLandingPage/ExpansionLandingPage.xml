@@ -18,7 +18,7 @@
 	<Script file="MajorFactionRenown.lua"/>
 	<Script file="EncounterData.lua"/>
 	<Script file="EncounterJournal.lua"/>
-	<Script file="TrackerTab.lua"/>
+	<!--Script file="TrackerTab.lua"/-->
 	<Script file="ExpansionLandingPage.lua"/>
 	<Script file="ModuleRegistry.lua"/>
 

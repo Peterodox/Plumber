@@ -79,6 +79,16 @@ local OverrideFactionInfo = {
         barColor = {178/255, 171/255, 135/255},
         rewardQuestID = 89515,
     },
+
+    [2658] = {  --The K'aresh Trust
+        barColor = {197/255, 142/255, 255/255},
+        rewardQuestID = 85109,
+    },
+
+    [2736] = {  --Manaforge Vandals
+        barColor = {197/255, 142/255, 255/255},
+        --rewardQuestID = 85109,
+    },
 };
 
 local MajorFactionLayout = {
@@ -114,6 +124,12 @@ local MajorFactionLayout = {
     },
 };
 FactionUtil.MajorFactionLayout = MajorFactionLayout;
+
+
+if addon.IsToCVersionEqualOrNewerThan(110200) then  --debug
+    table.insert(MajorFactionLayout[1], 1, {factionID = 2658});     --The K'aresh Trust
+    table.insert(MajorFactionLayout[1], 1, {factionID = 2736});     --Manaforge Vandals
+end
 
 
 local RewardQuestXFaction = {};

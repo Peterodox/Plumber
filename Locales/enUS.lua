@@ -445,6 +445,8 @@ L["Name EditBox Disabled Reason Format"] = "This box will be filled automaticall
 L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "No Matches";
 L["Creater New Tracker"] = "New Tracker";
 L["FailureReason Already Exist"] = "This entry already exists.";
+L["Quest ID"] = "Quest ID";
+L["Creature ID"] = "Creature ID";
 
 
 --Generic

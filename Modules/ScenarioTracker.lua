@@ -38,6 +38,7 @@ do
     function DBManager:SaveRecord(record)
         if not self.records then
             self:Init();
+            self:ClearDatedRecords();
         end
 
         local timeDiff;
@@ -62,6 +63,30 @@ do
             self:Init();
         end
         return self.records
+    end
+
+    function DBManager:ClearDatedRecords()
+        if not self.records then return end;
+
+        local lastResetTime = C_DateAndTime.GetWeeklyResetStartTime();
+        if lastResetTime and lastResetTime > 0 then
+            local timeThreshold = lastResetTime - 7*86400;
+            local records = DBManager:GetRecords();
+            local startIndex;
+
+            for i, v in ipairs(records) do
+                if v.time < timeThreshold then
+                    startIndex = i;
+                    break
+                end
+            end
+
+            if startIndex then
+                for i = startIndex, #records do
+                    records[i] = nil;
+                end
+            end
+        end
     end
 end
 

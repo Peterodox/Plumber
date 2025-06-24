@@ -845,14 +845,14 @@ do  --PopupLayouts
 
     PopupLayouts.Quest = {
         SharedHeader,
-        {type = "EditBox", label = "Quest ID", numeric = true, maxLetters = 6, searchFunc = SearchBox_QusetID},
+        {type = "EditBox", label = L["Quest ID"], numeric = true, maxLetters = 6, searchFunc = SearchBox_QusetID},
         {type = "EditBox", label = L["Name"], widgetKey = "QuestNameEditBox", disabled = true, disabledTooltipText = L["Name EditBox Disabled Reason Format"]:format("Quest ID")},
         {type = "Checkbox", label = L["Accountwide"], getCheckedFunc = Checkbox_Accountwide_Quest_GetChecked, onClickFunc = Checkbox_Accountwide_Quest_OnClick},
     };
 
     PopupLayouts.Rare = {
         SharedHeader,
-        {type = "EditBox", label = "Creature ID", numeric = true, maxLetters = 6, searchFunc = SearchBox_CreatureID},
+        {type = "EditBox", label = L["Creature ID"], numeric = true, maxLetters = 6, searchFunc = SearchBox_CreatureID},
         {type = "EditBox", label = L["Name"], widgetKey = "CreatureNameEditBox", disabled = true, disabledTooltipText = L["Name EditBox Disabled Reason Format"]:format("Creature ID")},
         {type = "EditBox", label = L["Flag Quest"], widgetKey = "CreatureFlagQuestEditBox", numeric = true, maxLetters = 6, searchFunc = SearchBox_FlagQuest},
         {type = "Checkbox", label = L["Accountwide"], getCheckedFunc = Checkbox_Accountwide_Rare_GetChecked, onClickFunc = Checkbox_Accountwide_Rare_OnClick},
@@ -882,7 +882,8 @@ end
 local TrackerTabMixin = {};
 do
     local DynamicEvents = {
-        "QUEST_TURNED_IN",
+        "QUEST_LOG_UPDATE",
+        "QUEST_REMOVED", "QUEST_ACCEPTED", "QUEST_TURNED_IN", "QUESTLINE_UPDATE",
     };
 
     function TrackerTabMixin:OnShow()
@@ -895,8 +896,10 @@ do
     end
 
     function TrackerTabMixin:OnEvent(event, ...)
-        if event == "QUEST_TURNED_IN" then
-            self:FullUpdate();
+        if event == "QUEST_LOG_UPDATE" then
+            self:RequestUpdate();
+        elseif event == "QUEST_REMOVED" or event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" or event == "QUESTLINE_UPDATE" then
+            self:RequestUpdate(true);
         end
     end
 
@@ -1024,6 +1027,33 @@ do
         self.ScrollView:SetContent(content, retainPosition);
 
         self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
+    end
+
+    function TrackerTabMixin:RequestUpdate(fullUpdate)
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+        if fullUpdate then
+            self.fullUpdate = true;
+        end
+    end
+
+    function TrackerTabMixin:UpdateScrollViewContent()
+        if self.ScrollView then
+            self.ScrollView:CallObjectMethod("GenericEntryButton", "UpdateProgress", true);
+        end
+    end
+
+    function TrackerTabMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.5 then
+            self.t = nil;
+            self:SetScript("OnUpdate", nil);
+            if self.fullUpdate then
+                self:FullUpdate();
+            else
+                self:UpdateScrollViewContent();
+            end
+        end
     end
 
     function TrackerTabMixin:SetTrackerTypeCollapsed(trackerTypeID, isCollapsed)

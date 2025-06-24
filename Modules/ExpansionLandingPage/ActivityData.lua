@@ -105,7 +105,7 @@ local ActivityData = {  --Constant
 
     {isHeader = true, name = "Flame\'s Radiance", factionID = 2688, uiMapID = 2215,
         entries = {
-            {name = "The Flame Burns Eternal", questID = 91173, atlas = WEEKLY_QUEST},
+            {name = "The Flame Burns Eternal", questID = 91173, atlas = WEEKLY_QUEST, uiMapID = 2215},
             {name = "Sureki Incursion: The Eastern Assault", questID = 87480, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
             {name = "Sureki Incursion: Southern Swarm", questID = 87477, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
             {name = "Sureki Incursion: Hold the Wall", questID = 87475, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},

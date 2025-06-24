@@ -716,6 +716,11 @@ do  --ScrollView Scroll Behavior
     function ScrollViewMixin:SnapToContent(contentIndex)
         if contentIndex < 1 then contentIndex = 1 end;
 
+        if contentIndex == 1 then
+            self:ResetScroll();
+            return
+        end
+
         if self.content[contentIndex] then
             self:SnapTo(self.content[contentIndex].top);
         end
