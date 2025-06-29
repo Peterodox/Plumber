@@ -170,7 +170,7 @@ do  --Generic Checklist Button
     function ChecklistButtonMixin:UpdateProgress_Quest()
         local data = API.GetQuestData(self.id);
         if data then
-            if data.completed then
+            if  data.completed or (self.data.warband and data.warbandCompleted) then
                 self.Icon:SetAtlas("checkmark-minimal-disabled");
                 self.completed = true;
             else
@@ -198,7 +198,7 @@ do  --Generic Checklist Button
     end
 
     function ChecklistButtonMixin:UpdateProgress_Rare()
-        if API.IsRareCreatureKilled(self.id, self.data.flagQuest) then
+        if API.IsRareCreatureKilled(self.id, self.data.flagQuest, self.data.warband) then
             self.completed = true;
             self.Icon:SetAtlas("checkmark-minimal-disabled");
         else

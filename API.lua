@@ -535,6 +535,7 @@ do  -- Item
     local C_Item = C_Item;
     local GetItemSpell = GetItemSpell;
 
+
     local function ColorizeTextByQuality(text, quality, allowColorBlind)
         if not (text and quality) then
             return text
@@ -550,6 +551,7 @@ do  -- Item
     end
     API.ColorizeTextByQuality = ColorizeTextByQuality;
 
+
     local function GetColorizedItemName(itemID)
         local name = C_Item.GetItemNameByID(itemID);
         local quality = C_Item.GetItemQualityByID(itemID);
@@ -558,14 +560,26 @@ do  -- Item
     end
     API.GetColorizedItemName = GetColorizedItemName;
 
+
     local function GetItemSpellID(item)
         local spellName, spellID = GetItemSpell(item);
         return spellID
     end
     API.GetItemSpellID = GetItemSpellID;
 
+
     function API.IsToyItem(item)
        return C_ToyBox.GetToyInfo(item) ~= nil
+    end
+
+
+    function API.GetItemSellPrice(item)
+        if item then
+            local sellPrice = select(11, C_Item.GetItemInfo(item));
+            if sellPrice and sellPrice > 0 then
+                return sellPrice
+            end
+        end
     end
 end
 
@@ -2044,12 +2058,18 @@ do  -- Player
     end
     API.GetPlayerMaxLevel = GetPlayerMaxLevel;
 
+
     local function IsPlayerAtMaxLevel()
         local maxLevel = GetPlayerMaxLevel();
         local playerLevel = UnitLevel("player");
         return playerLevel >= maxLevel
     end
     API.IsPlayerAtMaxLevel = IsPlayerAtMaxLevel;
+
+
+    function API.IsGreatVaultFeatureAvailable()
+        return IsPlayerAtMaxLevel() and C_WeeklyRewards ~= nil;
+    end
 end
 
 do  -- Scenario
@@ -2195,15 +2215,19 @@ do  -- Transmog
 end
 
 do  -- Quest
+    local GetRegularQuestTitle = C_QuestLog.GetTitleForQuestID or C_QuestLog.GetQuestInfo;
+    local RequestLoadQuest = C_QuestLog.RequestLoadQuestByID or Nop;
+    local GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID or Nop;
+
     local function GetQuestName(questID)
         local questName = C_TaskQuest.GetQuestInfoByQuestID(questID);
         if not questName then
-            questName = C_QuestLog.GetTitleForQuestID(questID);
+            questName = GetRegularQuestTitle(questID);
         end
         if questName and questName ~= "" then
             return questName
         else
-            C_QuestLog.RequestLoadQuestByID(questID);
+            RequestLoadQuest(questID);
         end
     end
     API.GetQuestName = GetQuestName;
@@ -2233,7 +2257,7 @@ do  -- Quest
         --C_QuestLog.GetNumQuestObjectives
 
         local value, max = 0, 0;
-        local questLogIndex = questID and C_QuestLog.GetLogIndexForQuestID(questID);
+        local questLogIndex = questID and GetLogIndexForQuestID(questID);
 
         if questLogIndex then
             local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
@@ -2276,7 +2300,7 @@ do  -- Quest
     end
 
     function API.GetQuestProgressTexts(questID, hideFinishedObjectives)
-        local questLogIndex = questID and C_QuestLog.GetLogIndexForQuestID(questID);
+        local questLogIndex = questID and GetLogIndexForQuestID(questID);
 
         if questLogIndex then
             local texts = {};
@@ -2353,7 +2377,7 @@ do  -- Quest
             return true
         end
 
-        if C_QuestInfoSystem.HasQuestRewardCurrencies(questID) then
+        if C_QuestLog.GetQuestRewardCurrencies and C_QuestInfoSystem.HasQuestRewardCurrencies(questID) then
             local currencies = {};
             local currencyRewards = C_QuestLog.GetQuestRewardCurrencies(questID);
             local currencyID, quality;
@@ -2385,7 +2409,7 @@ do  -- Quest
             end
         end
 
-        if C_QuestInfoSystem.HasQuestRewardSpells(questID) then
+        if C_QuestInfoSystem.GetQuestRewardSpells and C_QuestInfoSystem.HasQuestRewardSpells(questID) then
             local spells = {};
             local spellRewards = C_QuestInfoSystem.GetQuestRewardSpells(questID);
             local info;

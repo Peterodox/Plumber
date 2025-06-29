@@ -1,0 +1,30 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="Basic.lua"/>
+	<Script file="Timer.lua"/>
+	<Script file="EditBox.lua"/>
+	<Script file="ScrollView.lua"/>
+	<Script file="SharedListButton.lua"/>
+	<Script file="API_Quest.lua"/>
+	<Script file="API_Encounter.lua"/>
+	<Script file="TooltipUpdator.lua"/>
+	<Script file="Search.lua"/>
+	<Script file="GreatVault.lua"/>
+	<Script file="ItemUpgrade.lua"/>
+
+	<Script file="TWW/ItemUpgradeFrame.lua"/>
+	<Script file="TWW/ActivityData.lua"/>
+	<Script file="TWW/ResourceList.lua"/>
+
+	<Script file="Currency.lua"/>
+	<Script file="FactionUtil.lua"/>
+	<Script file="FactionTab.lua"/>
+	<Script file="ActivityTab.lua"/>
+	<Script file="MajorFactionRenown.lua"/>
+	<Script file="EncounterData.lua"/>
+	<Script file="EncounterJournal.lua"/>
+	<Script file="TrackerTab.lua"/>
+	<Script file="ExpansionLandingPage.lua"/>
+	<Script file="ModuleRegistry.lua"/>
+
+	<Include file="SharedTemplates.xml"/>
+</Ui>

@@ -1,4 +1,5 @@
 ## X-Flavor: classic
+## X-Expansion: CATA
 ## Interface: 40402
 ## Version: 1.7.0
 

@@ -21,6 +21,14 @@ if addon.IsToCVersionEqualOrNewerThan(110200) then
     tinsert(JournalInstanceIDs, 1, 1302);   --Manaforge Omega   --debug
 end
 
+if addon.IS_MOP then
+    JournalInstanceIDs = {
+        317,    --Mogu'shan Vaults
+        330,    --Heart of Fear
+        320,    --Terrace of Endless Spring
+    };
+end
+
 
 local RaidTab, LootContainer;
 local EncounterList = {};
@@ -40,6 +48,15 @@ local function GetPlayerClassName(playerClassID, markYourClass)
     end
 
    return name
+end
+
+
+local function IsRaidCollapsed(mapID)
+    return addon.GetDBBool("LandingPage_Raid_CollapsedRaid_"..mapID)
+end
+
+local function SetRaidCollapsed(mapID, isCollapsed)
+    return addon.SetDBValue("LandingPage_Raid_CollapsedRaid_"..mapID, isCollapsed, true)
 end
 
 
@@ -75,6 +92,7 @@ do
         if self.dataIndex and EncounterList[self.dataIndex] then
             local isCollapsed = not EncounterList[self.dataIndex].isCollapsed;
             EncounterList[self.dataIndex].isCollapsed = isCollapsed;
+            SetRaidCollapsed(EncounterList[self.dataIndex].mapID, isCollapsed);
             RaidTab:RefreshList();
             return isCollapsed
         end
@@ -107,6 +125,7 @@ do
         self.Light2:Hide();
         self.Light3:Hide();
         self.Light4:Hide();
+        self.Light5:Hide();
     end
 
     function ListButtonMixin:UpdateProgress()
@@ -147,7 +166,7 @@ do
         f:SetScript("OnLeave", f.OnLeave);
         f:SetScript("OnClick", f.OnClick);
 
-        for i = 1, 4 do
+        for i = 1, 5 do
             local texture = f:CreateTexture(nil, "OVERLAY");
             f["Light"..i] = texture;
             texture:SetSize(24, 24);
@@ -557,7 +576,7 @@ do
         local difficultyID = self.difficultyID or LandingPageUtil:GetDefaultRaidDifficulty();
         self.difficultyID = difficultyID;
         EJ_SetDifficulty(difficultyID);
-        self.DifficultyDropdown:SetText(DifficultyUtil.GetDifficultyName(difficultyID));
+        self.DifficultyDropdown:SetText(LandingPageUtil.GetDifficultyName(difficultyID));
 
         local playerClassID = self.playerClassID or LandingPageUtil:GetDefaultPlayerClassID();
         self.playerClassID = playerClassID;
@@ -708,7 +727,7 @@ do
         for i, difficultyID in ipairs(LandingPageUtil.RaidDifficulties) do
             widgets[i] = {
                 type = "Radio",
-                text = DifficultyUtil.GetDifficultyName(difficultyID),
+                text = LandingPageUtil.GetDifficultyName(difficultyID),
                 selected = difficultyID == LootContainer.difficultyID,
                 closeAfterClick = true,
                 onClickFunc = function()
@@ -848,9 +867,12 @@ do
         "UPDATE_INSTANCE_INFO",
         "BOSS_KILL",
         "ACHIEVEMENT_EARNED",
-        "CONTENT_TRACKING_UPDATE",
         --"EJ_LOOT_DATA_RECIEVED",
     };
+
+    if C_EventUtils.IsEventValid("CONTENT_TRACKING_UPDATE") then
+        table.insert(DynamicEvents, "CONTENT_TRACKING_UPDATE");
+    end
 
     function RaidTabMixin:OnShow()
         API.RegisterFrameForEvents(self, DynamicEvents);
@@ -874,21 +896,25 @@ do
         end
     end
 
-    function RaidTabMixin:GetInstanceData(instanceID)
+    function RaidTabMixin:GetInstanceData(journalInstanceID)
         --journalInstanceID
         --EJ_DIFFICULTIES
 
-        local name, _, _, _, _, _, _, _, _, mapID = EJ_GetInstanceInfo(instanceID);
+        local name, _, _, _, _, _, _, _, _, mapID = EJ_GetInstanceInfo(journalInstanceID);
         if not name then return end;
 
-        local difficultyID = DifficultyUtil.ID.PrimaryRaidNormal;
+        local difficultyID = LandingPageUtil.GetBaseRaidDifficulty();
         EJ_SetDifficulty(difficultyID);   --This is essential otherwise "EJ_GetEncounterInfoByIndex" returns nil
 
         local encounters = {};
         local i = 1;
-        local bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, instanceID);
+        local bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);    --No dungeonEncounterID in Classic
 
         while journalEncounterID do
+            if not dungeonEncounterID then
+                dungeonEncounterID = LandingPageUtil.GetDungeonEncounteID(journalEncounterID);
+            end
+
             encounters[i] = {
                 name = bossName,
                 id = journalEncounterID,
@@ -896,12 +922,12 @@ do
                 dungeonEncounterID = dungeonEncounterID,
             };
             i = i + 1;
-            bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, instanceID);
+            bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);
         end
 
         local data = {
             name = name,
-            instanceID = instanceID,
+            instanceID = journalInstanceID,
             mapID = mapID,
             encounters = encounters,
         };
@@ -922,7 +948,7 @@ do
             if data then
                 local mapID = data.mapID;
                 n = n + 1;
-                EncounterList[n] = {dataIndex = n, name = data.name, isCollapsed = false, isHeader = true, journalInstanceID = journalInstanceID};
+                EncounterList[n] = {dataIndex = n, name = data.name, isCollapsed = IsRaidCollapsed(mapID), isHeader = true, journalInstanceID = journalInstanceID, mapID = mapID};
                 for _, encounterInfo in ipairs(data.encounters) do
                     n = n + 1;
                     EncounterList[n] = {dataIndex = n, name = encounterInfo.name, journalEncounterID = encounterInfo.id, dungeonEncounterID = encounterInfo.dungeonEncounterID, mapID = mapID, journalInstanceID = journalInstanceID, };

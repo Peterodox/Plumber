@@ -279,4 +279,6 @@ do
     addon.IsToCVersionEqualOrNewerThan = IsToCVersionEqualOrNewerThan;
 
     addon.IS_CLASSIC = C_AddOns.GetAddOnMetadata(addonName, "X-Flavor") ~= "retail";
+
+    addon.IS_MOP = C_AddOns.GetAddOnMetadata(addonName, "X-Expansion") == "MOP";
 end

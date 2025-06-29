@@ -1,6 +1,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local Mixin = API.Mixin;
 
 
 local LandingPageUtil = {};
@@ -97,7 +98,7 @@ do  --Object Pool
 
     function CreateObjectPool(create, onAcquired, onRemoved)
         local pool = {};
-        API.Mixin(pool, ObjectPoolMixin);
+        Mixin(pool, ObjectPoolMixin);
 
         pool.objects = {};
         pool.activeObjects = {};
@@ -232,7 +233,7 @@ do
             end
         end);
 
-        API.Mixin(f, ExpansionThemeFrameMixin);
+        Mixin(f, ExpansionThemeFrameMixin);
 
         return f
     end
@@ -294,7 +295,7 @@ do
 
     function LandingPageUtil.CreateListCategoryButton(parent, name)
         local f = CreateFrame("Frame", nil, parent);
-        API.Mixin(f, ListCategoryButtonMixin);
+        Mixin(f, ListCategoryButtonMixin);
         f:SetSize(240, 32); --debug
 
         f.bg = f:CreateTexture(nil, "BACKGROUND");
@@ -320,7 +321,7 @@ do
         local MinimizeButton = CreateFrame("Button", nil, f);
         f.MinimizeButton = MinimizeButton;
         MinimizeButton:Hide();
-        API.Mixin(MinimizeButton, MinimizeButtonMixin);
+        Mixin(MinimizeButton, MinimizeButtonMixin);
         MinimizeButton:SetSize(24, 24);
         MinimizeButton:SetPoint("CENTER", f.Left, "CENTER", 0, 0);
         MinimizeButton.Texture = MinimizeButton:CreateTexture(nil, "OVERLAY");
@@ -505,6 +506,7 @@ end
 
 
 local MainDropdownMenu;
+local MainContextMenu;
 do  --Dropdown Menu
     local SharedMenuMixin = {};
     local MenuButtonMixin = {};
@@ -515,12 +517,25 @@ do  --Dropdown Menu
     end
 
     function MenuButtonMixin:OnLeave()
+        self:UpdateVisual();
+        self.parent:HighlightButton(nil);
+    end
+
+    function MenuButtonMixin:UpdateVisual()
+        if self.isHeader then
+            self.Text:SetTextColor(0.804, 0.667, 0.498);
+            return
+        end
+
         if self:IsEnabled() then
-            self.Text:SetTextColor(0.922, 0.871, 0.761);
+            if self.isDangerousAction then
+                self.Text:SetTextColor(1.000, 0.125, 0.125);
+            else
+                self.Text:SetTextColor(0.922, 0.871, 0.761);
+            end
         else
             self.Text:SetTextColor(0.5, 0.5, 0.5);
         end
-        self.parent:HighlightButton(nil);
     end
 
     function MenuButtonMixin:OnClick(button)
@@ -542,21 +557,33 @@ do  --Dropdown Menu
         if icon then
             self.rightOffset = 20;
         else
-            self.rightOffset = 0;
+            self.rightOffset = 4;
         end
     end
 
     function MenuButtonMixin:SetRegular()
         self.leftOffset = 4;
         self.selected = nil;
+        self.isHeader = nil;
         self.LeftTexture:Hide();
+        self:Layout();
+    end
+
+    function MenuButtonMixin:SetHeader(text)
+        self.leftOffset = 4;
+        self.selected = nil;
+        self.isHeader = true;
+        self.LeftTexture:Hide();
+        self.Text:SetText(text);
+        self:Disable();
         self:Layout();
     end
 
     function MenuButtonMixin:SetRadio(selected)
         self.leftOffset = 20;
-        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         self.selected = selected;
+        self.isHeader = nil;
+        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         if selected then
             self.LeftTexture:SetTexCoord(32/512, 64/512, 0/512, 32/512);
         else
@@ -568,8 +595,9 @@ do  --Dropdown Menu
 
     function MenuButtonMixin:SetCheckbox(selected)
         self.leftOffset = 20;
-        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         self.selected = selected;
+        self.isHeader = nil;
+        self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         if selected then
             self.LeftTexture:SetTexCoord(96/512, 128/512, 0/512, 32/512);
         else
@@ -584,13 +612,13 @@ do  --Dropdown Menu
     end
 
     function MenuButtonMixin:GetContentWidth()
-        return self.Text:GetWrappedWidth() + self.leftOffset + self.rightOffset + 3 * self.paddingH;
+        return self.Text:GetWrappedWidth() + self.leftOffset + self.rightOffset + 2 * self.paddingH;
     end
 
     local function CreateMenuButton(parent)
         local f = CreateFrame("Button", nil, parent);
         f:SetSize(240, 24);
-        API.Mixin(f, MenuButtonMixin);
+        Mixin(f, MenuButtonMixin);
         f.leftOffset = 0;
         f.rightOffset = 0;
         f.paddingH = 8;
@@ -646,12 +674,17 @@ do  --Dropdown Menu
         end
     end
 
+    function SharedMenuMixin:ReleaseAllObjects()
+        self.buttonPool:ReleaseAll();
+        self.texturePool:ReleaseAll();
+    end
+
     function SharedMenuMixin:HideMenu()
         if self.Frame then
             self.Frame:Hide();
             self.Frame:ClearAllPoints();
             if not self.keepContentOnHide then
-                self.buttonPool:ReleaseAll();
+                self:ReleaseAllObjects();
             end
         end
     end
@@ -682,6 +715,18 @@ do  --Dropdown Menu
         end
     end
 
+    function SharedMenuMixin:AnchorToCursor(owner, offsetX, offsetY)
+        local f = self.Frame;
+        if f then
+            f:ClearAllPoints();
+            f:SetParent(UIParent);
+            local x, y = API.GetScaledCursorPosition();
+            offsetX = offsetX or 0;
+            offsetY = offsetY or 0;
+            f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x + offsetX, y + offsetY);
+        end
+    end
+
     function SharedMenuMixin:ShowMenu(owner, menuInfo)
         if self.Init then
             self:Init();
@@ -696,14 +741,18 @@ do  --Dropdown Menu
             self.NoContentAlert:Hide();
 
             local f = self.Frame;
-            self:AnchorToObject(owner);
+            if self.openAtCursorPosition or menuInfo.openAtCursorPosition then
+                self:AnchorToCursor(owner, 16, 8);
+            else
+                self:AnchorToObject(owner);
+            end
 
             local buttonHeight = 24;
             local n = 0;
             local widget;
             local offsetX = 0;
             local offsetY = self.paddingV;
-            local contentWidth = owner:GetWidth();
+            local contentWidth = ((menuInfo.fitToOwner or self.fitToOwner) and owner:GetWidth()) or 0;
             local contentHeight = 0;
             local widgetWidth;
             local widgets = {};
@@ -711,7 +760,7 @@ do  --Dropdown Menu
 
             for _, v in ipairs(menuInfo.widgets) do
                 n = n + 1;
-                if v.type == "Checkbox" or v.type == "Radio" or v.type == "Button" then
+                if v.type == "Checkbox" or v.type == "Radio" or v.type == "Button" or v.type == "Header" then
                     widget = self.buttonPool:Acquire();
                     widget:SetRightTexture(v.rightTexture);
                     if numWidgets == 1 then
@@ -723,20 +772,37 @@ do  --Dropdown Menu
                     contentHeight = contentHeight + buttonHeight;
                     widget.onClickFunc = v.onClickFunc;
                     widget.closeAfterClick = v.closeAfterClick;
+                    widget.isDangerousAction = v.isDangerousAction;
                     widget:SetLeftText(v.text);
                     if v.type == "Radio" then
                         widget:SetRadio(v.selected);
                     elseif v.type == "Checkbox" then
                         widget:SetCheckbox(v.selected);
+                    elseif v.type == "Header" then
+                        widget:SetHeader(v.text);
                     else
                         widget:SetRegular();
                     end
+                    widget:UpdateVisual();
+                elseif v.type == "Divider" then
+                    widget = self.texturePool:Acquire();
+                    widget:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu");
+                    widget:SetTexCoord(0/512, 128/512, 32/512, 48/512);
+                    widget:SetSize(64, 8);
+                    local dividerHeight = 8;
+                    local gap = 2;
+                    offsetY = offsetY + gap;
+                    widget:SetPoint("TOPLEFT", f, "TOPLEFT", offsetX, -offsetY);
+                    offsetY = offsetY + dividerHeight + gap;
+                    contentHeight = contentHeight + dividerHeight + 2 * gap;
                 end
                 widget.parent = self;
                 widgets[n] = widget;
-                widgetWidth = widget:GetContentWidth();
-                if widgetWidth > contentWidth then
-                    contentWidth = widgetWidth;
+                if widget.GetContentWidth then
+                    widgetWidth = widget:GetContentWidth();
+                    if widgetWidth > contentWidth then
+                        contentWidth = widgetWidth;
+                    end
                 end
             end
 
@@ -766,11 +832,11 @@ do  --Dropdown Menu
         end
     end
 
-    function SharedMenuMixin:ToggleMenu(owner)
+    function SharedMenuMixin:ToggleMenu(owner, menuInfoGetter)
         if self.owner == owner and (self.Frame and self.Frame:IsShown()) then
             self:HideMenu();
         else
-            local menuInfo = owner.menuInfoGetter and owner.menuInfoGetter() or nil;
+            local menuInfo = (owner.menuInfoGetter and owner.menuInfoGetter()) or (menuInfoGetter and menuInfoGetter()) or nil;
             self:ShowMenu(owner, menuInfo);
         end
     end
@@ -823,7 +889,19 @@ do  --Dropdown Menu
         local function MenuButton_Create()
             return CreateMenuButton(Frame);
         end
-        self.buttonPool = CreateObjectPool(MenuButton_Create);
+
+        local function MenuButton_OnAcquire(obj)
+            obj:Enable();
+        end
+
+        self.buttonPool = CreateObjectPool(MenuButton_Create, nil, MenuButton_OnAcquire);
+
+
+        local function Texture_Create()
+            local tex = Frame:CreateTexture(nil, "OVERLAY");
+            return tex
+        end
+        self.texturePool = CreateObjectPool(Texture_Create);
 
 
         self.Highlight = LandingPageUtil.CreateButtonHighlight(Frame);
@@ -875,7 +953,7 @@ do  --Dropdown Menu
 
     local function CreateMenuFrame(parent, obj)
         obj = obj or {};
-        API.Mixin(obj, SharedMenuMixin);
+        Mixin(obj, SharedMenuMixin);
         obj.parent = parent;
         return obj
     end
@@ -883,7 +961,13 @@ do  --Dropdown Menu
 
 
     MainDropdownMenu = CreateMenuFrame(UIParent, {name = "MainDropdownMenu"});
+    MainDropdownMenu.fitToOwner = true;
     LandingPageUtil.DropdownMenu = MainDropdownMenu;
+
+
+    MainContextMenu = CreateMenuFrame(UIParent, {name = "MainContextMenu"});
+    MainContextMenu.openAtCursorPosition = true;
+    LandingPageUtil.MainContextMenu = MainContextMenu;
 end
 
 
@@ -968,7 +1052,7 @@ do  --Dropdown Button
 
     function LandingPageUtil.CreateDropdownButton(parent)
         local f = CreateFrame("Button", nil, parent);
-        API.Mixin(f, DropdownButtonMixin);
+        Mixin(f, DropdownButtonMixin);
         f:SetSize(240, 24);
         f:SetHitRectInsets(-2, -2, -4, -4);
 
@@ -1109,7 +1193,7 @@ do  --Red Button
 
     local function CreateRedButton(parent)
         local f = CreateFrame("Button", nil, parent);
-        API.Mixin(f, RedButtonMixin);
+        Mixin(f, RedButtonMixin);
 
         f.buttonState = 1;
         f:SetSize(240, 24);
@@ -1271,7 +1355,7 @@ do  --Checkbox Button
     function LandingPageUtil.CreateCheckboxButton(parent)
         local f = CreateFrame("Button", nil, parent);
         f:SetSize(24, 24);
-        API.Mixin(f, CheckboxButtonMixin);
+        Mixin(f, CheckboxButtonMixin);
 
         f.Texture = f:CreateTexture(nil, "OVERLAY");
         f.Texture:SetSize(32, 32);
@@ -1296,6 +1380,99 @@ do  --Checkbox Button
         f:SetScript("OnClick", f.OnClick);
         f:SetScript("OnEnable", f.OnEnable);
         f:SetScript("OnDisable", f.OnDisable);
+
+        return f
+    end
+end
+
+
+do  --IconTextButton
+    local BasicIconTextButtonMixin = {};
+
+    function BasicIconTextButtonMixin:OnMouseDown()
+        if self:IsEnabled() then
+            self.Content:SetPoint("LEFT", self, "LEFT", 0, -1);
+        end
+    end
+
+    function BasicIconTextButtonMixin:OnMouseUp()
+        self.Content:SetPoint("LEFT", self, "LEFT", 0, 0);
+    end
+
+    function BasicIconTextButtonMixin:OnEnter()
+        self:UpdateVisual();
+    end
+
+    function BasicIconTextButtonMixin:OnLeave()
+        self:UpdateVisual();
+    end
+
+    function BasicIconTextButtonMixin:OnEnable()
+        self:UpdateVisual();
+    end
+
+    function BasicIconTextButtonMixin:OnDisable()
+        self:UpdateVisual();
+    end
+
+    function BasicIconTextButtonMixin:UpdateVisual()
+        if self:IsEnabled() then
+            if self:IsMouseMotionFocus() then
+                self.Label:SetTextColor(1, 1, 1);
+            else
+                if self.useDarkYellowLabel then
+                    self.Label:SetTextColor(1, 0.82, 0);
+                else
+                    self.Label:SetTextColor(0.922, 0.871, 0.761);
+                end
+            end
+        else
+            self.Label:SetTextColor(0.5, 0.5, 0.5);
+        end
+    end
+
+    function BasicIconTextButtonMixin:SetTexture(texture, left, right, top, bottom)
+        self.Icon:SetTexture(texture);
+        self.Icon:SetTexCoord(left or 0, right or 1, top or 0, bottom or 1);
+        self.Highlight:SetTexture(texture);
+        self.Highlight:SetTexCoord(left or 0, right or 1, top or 0, bottom or 1);
+    end
+
+    function BasicIconTextButtonMixin:SetText(text, changeWidth)
+        self.Label:SetText(text);
+        if changeWidth then
+            local textWidth = math.max(24, API.Round(self.Label:GetWrappedWidth()));
+            self:SetWidth(textWidth + 24);
+        end
+    end
+
+    function LandingPageUtil.CreateBasicIconTextButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        f:SetSize(48, 24);
+        Mixin(f, BasicIconTextButtonMixin);
+
+        f.Content = CreateFrame("Frame", nil, f);
+        f.Content:SetSize(24, 24);
+        f.Content:SetPoint("LEFT", f, "LEFT", 0, 0);
+        f.Content:SetUsingParentLevel(true);
+
+        f.Icon = f:CreateTexture(nil, "OVERLAY");
+        f.Icon:SetSize(32, 32);
+        f.Icon:SetPoint("CENTER", f.Content, "LEFT", 8, 0);
+
+        f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Label:SetJustifyH("LEFT");
+        f.Label:SetPoint("LEFT", f.Content, "LEFT", 24, 0);
+
+        f.Highlight = f:CreateTexture(nil, "HIGHLIGHT");
+        f.Highlight:SetPoint("TOPLEFT", f.Icon, "TOPLEFT", 0, 0);
+        f.Highlight:SetPoint("BOTTOMRIGHT", f.Icon, "BOTTOMRIGHT", 0, 0);
+        f.Highlight:SetBlendMode("ADD");
+
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
 
         return f
     end

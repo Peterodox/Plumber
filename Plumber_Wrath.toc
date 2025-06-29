@@ -1,4 +1,5 @@
 ## X-Flavor: wrath
+## X-Expansion: WOTLK
 ## Interface: 30404
 ## Version: 1.7.0
 

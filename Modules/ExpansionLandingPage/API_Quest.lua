@@ -53,6 +53,7 @@ local function GetQuestData(questID)
     data.isOnQuest = IsOnQuest(questID);
     data.readyForTurnIn = ReadyForTurnIn(questID);
     data.completed = IsQuestFlaggedCompleted(questID);
+    data.warbandCompleted = IsQuestFlaggedCompletedOnAccount(questID);
 
     if data.readyForTurnIn then
         data.iconAtlas = "QuestTurnin";
@@ -74,11 +75,24 @@ end
 API.GetQuestData = GetQuestData;
 
 
+local function IsQuestCompleted(questID, checkWarband)
+    if IsQuestFlaggedCompleted(questID) then
+        return true
+    end
+
+    if checkWarband and IsQuestFlaggedCompletedOnAccount(questID) then
+        return true
+    end
+end
+API.IsQuestCompleted = IsQuestCompleted;
+
+
+
 --Rares
 do
     local KnownCreatureFlagQuests = {
-        [207802] = 81763,       --Beledar's Spawn
 
+        --Ringing  Deeps
         [218393] = 80003,       --Disturbed Earthgorger
         [220265] = 81674,       --Automaxor
         [220266] = 81511,       --Coalesced Monstrosity
@@ -97,11 +111,40 @@ do
         [220287] = 81485,       --Kelpmire
         [221199] = 81648,       --Hungerer of the Deeps
         [221217] = 81652,       --Spore-infused Shalewing
+
+
+        --Hallowsfall
+        [206184] = 82559,       --Deathpetal
+        [206203] = 82557,       --Moth'ethk
+        [206514] = 82558,       --Crazed Cabbage Smacker
+        [206977] = 82563,       --Parasidious
+        [207780] = 82564,       --Finclaw Bloodtide
+        [207802] = 81763,       --Beledar's Spawn
+        [207803] = 82561,       --Toadstomper
+        [207826] = 82566,       --Ravageant
+        [214757] = 82560,       --Croakit
+        [215805] = 79271,       --Sloshmuck
+        [218426] = 80006,       --Ixlorb the Spinner
+        [218444] = 80009,       --The Taskmaker
+        [218452] = 80010,       --Murkshade
+        [218458] = 80011,       --Deepfiend Azellix
+        [220771] = 82565,       --Murkspike
+        [221179] = 82562,       --Duskshadow
+        [221534] = 81756,       --Lytfang the Lost
+        [221551] = 81761,       --Grimslice
+        [221648] = 81791,       --The Perchfather
+        [221668] = 81836,       --Horror of the Shallows
+        [221690] = 81849,       --Strength of Beledar
+        [221708] = 81853,       --Sir Alastair Purefire
+        [221753] = 81880,       --Deathtide
+        [221767] = 81881,       --Funglour
+        [221786] = 81882,       --Pride of Beledar
+
     };
 
-    local function IsRareCreatureKilled(creatureID, flagQuestID)
+    local function IsRareCreatureKilled(creatureID, flagQuestID, accountwide)
         flagQuestID = KnownCreatureFlagQuests[creatureID] or flagQuestID;
-        return flagQuestID and IsQuestFlaggedCompleted(flagQuestID)
+        return flagQuestID and (IsQuestFlaggedCompleted(flagQuestID) or (accountwide and IsQuestFlaggedCompletedOnAccount(flagQuestID)))
     end
     API.IsRareCreatureKilled = IsRareCreatureKilled;
 

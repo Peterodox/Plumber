@@ -3,6 +3,7 @@ local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil;
+local IS_MOP = addon.IS_MOP;
 
 
 local MainFrame;
@@ -134,11 +135,15 @@ do
 
         NineSlice = LandingPageUtil.CreateExpansionThemeFrame(self.RightSection, 10);
         self.RightSection.NineSlice = NineSlice;
-        NineSlice.Background:SetAtlas("thewarwithin-landingpage-background", false);
+
         NineSlice:ShowCloseButton(true);
         NineSlice:SetCloseButtonOwner(self);
-        local a = 0.25;
-        NineSlice.Background:SetVertexColor(a, a, a);
+
+        if not IS_MOP then
+            NineSlice.Background:SetAtlas("thewarwithin-landingpage-background", false);
+            local a = 0.25;
+            NineSlice.Background:SetVertexColor(a, a, a);
+        end
 
         local Divider = LandingPageUtil.CreateMajorDivider(self.RightSection.Header);
         Divider:SetPoint("LEFT", self.RightSection.Header, "BOTTOMLEFT", 32, 0);
@@ -173,6 +178,7 @@ do
 
     function PlumberExpansionLandingPageMixin:OnHide()
         LandingPageUtil.PlayUISound("LandingPageClose");
+        LandingPageUtil.MainContextMenu:HideMenu();
     end
 
     function PlumberExpansionLandingPageMixin:InitTabButtons()
@@ -241,7 +247,7 @@ do
 
     function PlumberExpansionLandingPageMixin:InitLeftSection()
         local categories = {
-            {name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsPlayerAtMaxLevel},
+            {name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
             {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
             {name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
         };
@@ -283,6 +289,7 @@ do
     end
 
     function PlumberExpansionLandingPageMixin:DimBackground(state)
+        if IS_MOP then return end;
         local a = state and 0.25 or 0.4;
         self.RightSection.NineSlice.Background:SetVertexColor(a, a, a);
     end

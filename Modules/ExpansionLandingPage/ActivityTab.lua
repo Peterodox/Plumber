@@ -8,7 +8,7 @@ local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 
 
 local ipairs = ipairs;
-local ReadyForTurnIn = C_QuestLog.ReadyForTurnIn;
+local ReadyForTurnIn = C_QuestLog.ReadyForTurnIn or IsQuestComplete;
 
 
 local ActivityTab;
@@ -232,10 +232,20 @@ do
         "QUEST_REMOVED",
         "QUEST_ACCEPTED",
         "QUEST_TURNED_IN",
-        "QUESTLINE_UPDATE",
         --"LOOT_CLOSED",       --Looting some items triggers hidden quest flag, but the quest events don't fire
         "ZONE_CHANGED_NEW_AREA",
     };
+
+    local OptionalEvents = {
+        --For Classic
+        "QUESTLINE_UPDATE",
+    };
+
+    for _, event in ipairs(OptionalEvents) do
+        if C_EventUtils.IsEventValid(event) then
+            table.insert(DynamicEvents, event);
+        end
+    end
 
     function ActivityTabMixin:FullUpdate()
         self.fullUpdate = nil;
@@ -348,10 +358,16 @@ do
         local WeeklyResetTimer = LandingPageUtil.CreateTimerFrame(self);
         self.WeeklyResetTimer = WeeklyResetTimer;
         WeeklyResetTimer:SetPoint("TOPLEFT", self, "TOPLEFT", 58, headerWidgetOffsetY);
-        WeeklyResetTimer:SetTimeGetter(C_DateAndTime.GetSecondsUntilWeeklyReset);
-        WeeklyResetTimer:SetTimeTextFormat(L["Weeky Reset Format"]);
+        if addon.IS_MOP then
+            WeeklyResetTimer:SetTimeGetter(C_DateAndTime.GetSecondsUntilDailyReset);
+            WeeklyResetTimer:SetTimeTextFormat(L["Daily Reset Format"]);
+            WeeklyResetTimer:SetLowThresholdAndColor(2*3600, "ffe24c45");
+        else
+            WeeklyResetTimer:SetTimeGetter(C_DateAndTime.GetSecondsUntilWeeklyReset);
+            WeeklyResetTimer:SetTimeTextFormat(L["Weeky Reset Format"]);
+            WeeklyResetTimer:SetLowThresholdAndColor(6*3600, "ffe24c45");
+        end
         WeeklyResetTimer:SetDisplayStyle("FormattedText");
-        WeeklyResetTimer:SetLowThresholdAndColor(6*3600, "ffe24c45");
         WeeklyResetTimer:SetAutoStart(true);
         WeeklyResetTimer:SetShownThreshold(86400);
         WeeklyResetTimer:OnShow();

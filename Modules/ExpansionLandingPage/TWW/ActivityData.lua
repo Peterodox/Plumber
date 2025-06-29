@@ -62,7 +62,7 @@ local ActivityData = {  --Constant
 
     {isHeader = true, name = "Council of Dornogal", factionID = 2590, uiMapID = 2248,
         entries = {
-            {name = "Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST, uiMapID = 2248},
+            {name = "The Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST, uiMapID = 2248},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83317, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
             --{name = "Debug Quest", questID = 49738, atlas = DAILY_QUEST},
         }
@@ -122,8 +122,6 @@ local ActivityData = {  --Constant
         }
     },
 };
-
-addon.ActivityData = ActivityData;
 
 do  --Assign ID
     for k, v in ipairs(ActivityData) do

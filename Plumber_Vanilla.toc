@@ -1,4 +1,5 @@
 ## X-Flavor: era
+## X-Expansion: VANILLA
 ## Interface: 11507
 ## Version: 1.7.0
 

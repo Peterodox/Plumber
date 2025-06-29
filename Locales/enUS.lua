@@ -421,9 +421,11 @@ L["Warband Weekly Reward Tooltip"] = "You Warband can only receive this reward o
 L["Completed"] = CRITERIA_COMPLETED or "Completed";
 L["Filter Hide Completed Format"] = "Hide Completed (%d)";
 L["Weeky Reset Format"] = "Weekly Reset: %s";
+L["Daily Reset Format"] = "Daily Reset: %s";
 L["Ready To Turn In Tooltip"] = "Ready to turn in.";
 L["Trackers"] = "Trackers";
 L["New Tracker Title"] = "New Tracker";     --Create a new Tracker
+L["Edit Tracker Title"] = "Edit Tracker";
 L["Type"] = "Type";
 L["Select Instruction"] = LFG_LIST_SELECT or "Select";
 L["Name"] = "Name";
@@ -443,10 +445,12 @@ L["Boss Name"] = "Boss name";
 L["Instance Or Boss Name"] = "Instance or boss name";
 L["Name EditBox Disabled Reason Format"] = "This box will be filled automatically when you enter a valid %s.";
 L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "No Matches";
-L["Creater New Tracker"] = "New Tracker";
+L["Create New Tracker"] = "New Tracker";
 L["FailureReason Already Exist"] = "This entry already exists.";
 L["Quest ID"] = "Quest ID";
 L["Creature ID"] = "Creature ID";
+L["Edit"] = EDIT or "Edit";
+L["Delete"] = DELETE or "Delete";
 
 
 --Generic

@@ -4,6 +4,9 @@ local LandingPageUtil = addon.LandingPageUtil;
 local StringTrim = API.StringTrim;
 
 
+local After = C_Timer.After;
+
+
 local EditBoxMixin = {};
 do
     function EditBoxMixin:OnEnable()
@@ -99,10 +102,6 @@ do
     end
 
     function EditBoxMixin:OnEditFocusGained()
-        if self.layoutDirty then
-            self:UpdateTextInsets();
-        end
-
         self.Instruction:Hide();
         self.Magnifier:SetVertexColor(1, 1, 1);
         self:LockHighlight();
@@ -113,7 +112,6 @@ do
     end
 
     function EditBoxMixin:UpdateTextInsets()
-        self.layoutDirty = nil;
         local leftOffset;
         if self.isSearchbox then
             leftOffset = 28;
@@ -121,10 +119,12 @@ do
             leftOffset = 8;
         end
         self:SetTextInsets(leftOffset, 8, 0, 0);
+        After(0, function()
+            self:SetTextInsets(leftOffset, 8, 0, 0);
+        end);
     end
 
     function EditBoxMixin:SetIsSearchBox(state)
-        self.layoutDirty = true;
         self.isSearchbox = state;
         local leftOffset;
         if state then
@@ -138,6 +138,7 @@ do
         self.Instruction:SetPoint("LEFT", self, "LEFT", leftOffset, 0);
         self:UpdateText();
         self:UpdateVisual();
+        self:UpdateTextInsets();
     end
 
     function EditBoxMixin:SetInstruction(text)
@@ -166,6 +167,10 @@ do
             self.t = 0;
             self:SetScript("OnUpdate", self.OnUpdate);
         end
+    end
+
+    function EditBoxMixin:TriggerOnTextChanged()
+        self:OnTextChanged(true);
     end
 
     function EditBoxMixin:OnUpdate(elapsed)

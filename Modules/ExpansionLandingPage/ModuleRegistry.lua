@@ -5,10 +5,11 @@ local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
 local FactionUtil = addon.FactionUtil;
+local IsExpansionLandingPageUnlockedForPlayer = C_PlayerInfo.IsExpansionLandingPageUnlockedForPlayer or API.Nop;
 
 
 local function ShouldShowWarWithinLandingPage()
-    return C_PlayerInfo.IsExpansionLandingPageUnlockedForPlayer(10)
+    return IsExpansionLandingPageUnlockedForPlayer(10)
 end
 
 

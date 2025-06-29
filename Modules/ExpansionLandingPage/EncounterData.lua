@@ -6,6 +6,8 @@ local LandingPageUtil = addon.LandingPageUtil;
 
 local ipairs = ipairs;
 local IsEncounterComplete = C_RaidLocks.IsEncounterComplete;
+local DifficultyUtil = DifficultyUtil;
+
 
 local PLAYER_CLASS_ID;
 
@@ -35,12 +37,23 @@ local EncounterData = {
 };
 
 
-local Difficulties = {
-    DifficultyUtil.ID.PrimaryRaidLFR,
-	DifficultyUtil.ID.PrimaryRaidNormal,
-	DifficultyUtil.ID.PrimaryRaidHeroic,
-	DifficultyUtil.ID.PrimaryRaidMythic,
-};
+local Difficulties;
+if addon.IS_MOP then
+    Difficulties = {
+        DifficultyUtil.ID.RaidLFR,
+        DifficultyUtil.ID.Raid10Normal,
+        DifficultyUtil.ID.Raid10Heroic,
+        DifficultyUtil.ID.Raid25Normal,
+        DifficultyUtil.ID.Raid25Heroic,
+    };
+else
+    Difficulties = {
+        DifficultyUtil.ID.PrimaryRaidLFR,
+        DifficultyUtil.ID.PrimaryRaidNormal,
+        DifficultyUtil.ID.PrimaryRaidHeroic,
+        DifficultyUtil.ID.PrimaryRaidMythic,
+    };
+end
 LandingPageUtil.RaidDifficulties = Difficulties;
 
 
@@ -59,8 +72,57 @@ local PlayerClassList_Modern = {
     12, --DEMONHUNTER
     13, --EVOKER
 };
-LandingPageUtil.PlayerClassList = PlayerClassList_Modern;
 
+local PlayerClassList_MOP = {
+    1,  --WARRIOR 	
+    2,  --PALADIN 	
+    3,  --HUNTER 	
+    4,  --ROGUE 	
+    5,  --PRIEST 	
+    6,  --DEATHKNIGHT
+    7,  --SHAMAN 	
+    8,  --MAGE 	
+    9,  --WARLOCK 	
+    10, --MONK
+    11, --DRUID 	
+};
+
+if addon.IS_MOP then
+    LandingPageUtil.PlayerClassList = PlayerClassList_MOP;
+else
+    LandingPageUtil.PlayerClassList = PlayerClassList_Modern;
+end
+
+
+local DungeonEncounterLookup = {
+    --For Classic
+    --[journalEncounterID] = dungeonEncounterID
+
+    --Mogu'shan Vaults: journalInstanceID 317
+    [677] = 1407,   --Will of the Emperor
+    [679] = 1395,   --The Stone Guard
+    [682] = 1434,   --Gara'jal the Spiritbinder
+    [687] = 1436,   --The Spirit Kings
+    [689] = 1390,   --Feng the Accursed
+    [726] = 1500,   --Elegon
+
+    --Heart of Fear: journalInstanceID 330
+    [713] = 1463,   --Garalon
+    [737] = 1499,   --Amber-Shaper Un'sok
+    [741] = 1498,   --Wind Lord Mel'jarak
+    [743] = 1501,   --Grand Empress Shek'zeer
+    [744] = 1504,   --Blade Lord Ta'yak
+    [745] = 1507,   --Imperial Vizier Zor'lok
+
+    --Terrace of Endless Spring: journalInstanceID 320
+    [683] = 1409,   --Protectors of the Endless
+    [709] = 1431,   --Sha of Fear
+    [729] = 1506,   --Lei Shi
+    [742] = 1505,   --Tsulong
+};
+function LandingPageUtil.GetDungeonEncounteID(journalEncounterID)
+    return DungeonEncounterLookup[journalEncounterID]
+end
 
 
 function LandingPageUtil.GetEncounterIcon(journalEncounterID)
@@ -99,9 +161,35 @@ function LandingPageUtil.GetDefaultRaidDifficulty()
     return Difficulties[2]
 end
 
+function LandingPageUtil.GetBaseRaidDifficulty()
+    if addon.IS_MOP then
+        return DifficultyUtil.ID.Raid25Heroic;
+    else
+        return DifficultyUtil.ID.PrimaryRaidNormal;
+    end
+end
+
 function LandingPageUtil.GetDefaultPlayerClassID()
     if not PLAYER_CLASS_ID then
         _, _, PLAYER_CLASS_ID = UnitClass("player");
     end
     return PLAYER_CLASS_ID
 end
+
+local function GetEJDifficultySize(difficultyID)
+	if difficultyID ~= DifficultyUtil.ID.RaidTimewalker and not DifficultyUtil.IsPrimaryRaid(difficultyID) then
+		return DifficultyUtil.GetMaxPlayers(difficultyID);
+	end
+	return nil;
+end
+
+local function GetEJDifficultyString(difficultyID)
+	local name = DifficultyUtil.GetDifficultyName(difficultyID);
+	local size = GetEJDifficultySize(difficultyID);
+	if size then
+		return string.format(ENCOUNTER_JOURNAL_DIFF_TEXT, size, name);
+	else
+		return name;
+	end
+end
+LandingPageUtil.GetDifficultyName = GetEJDifficultyString;
