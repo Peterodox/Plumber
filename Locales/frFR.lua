@@ -260,7 +260,7 @@ L["Plumber Experimental Feature Tooltip"] = "Une fonction expérimentale de l'ad
 L["Bountiful Delves Rep Tooltip"] = "Ouvrir un coffre abondant a une chance d'augmenter votre réputation avec cette faction.";
 L["Warband Weekly Reward Tooltip"] = "Votre bataillon ne peut recevoir cette récompense qu'une fois par semaine.";
 L["Completed"] = CRITERIA_COMPLETED or "Terminé";
-L["Filter Hide Completed Format"] = "Masquer activités les terminées (%d)";
+L["Filter Hide Completed Format"] = "Masquer les activités terminées (%d)";
 L["Weeky Reset Format"] = "Reset hebdo: %s";
 
 
