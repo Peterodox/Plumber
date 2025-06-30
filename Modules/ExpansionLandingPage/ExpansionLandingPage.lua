@@ -289,7 +289,13 @@ do
     end
 
     function PlumberExpansionLandingPageMixin:DimBackground(state)
-        if IS_MOP then return end;
+        if IS_MOP then
+            self.LeftSection.NineSlice.Background:SetAlpha(0.8);
+            self.RightSection.NineSlice.Background:SetAlpha(0.8);
+            self:EnableMouse(false);
+            --self:EnableDynamicTransparency(true);
+            return
+        end
         local a = state and 0.25 or 0.4;
         self.RightSection.NineSlice.Background:SetVertexColor(a, a, a);
     end
@@ -304,5 +310,62 @@ do
     function PlumberExpansionLandingPageMixin:ResetPosition()
         self:ClearAllPoints();
         self:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 64, -150);
+    end
+
+    function PlumberExpansionLandingPageMixin:EnableDynamicTransparency(state)
+        local events = {
+            "PLAYER_STARTED_LOOKING",
+            "PLAYER_STARTED_MOVING",
+            "PLAYER_STARTED_TURNING",
+            "PLAYER_STOPPED_LOOKING",
+            "PLAYER_STOPPED_MOVING",
+            "PLAYER_STOPPED_TURNING",
+        };
+
+        if state and not self.TransparencyListener then
+            local f = CreateFrame("Frame", nil, self);
+            self.TransparencyListener = f;
+            f:Hide();
+            f.t = 0;
+
+            f:SetScript("OnShow", function()
+                API.RegisterFrameForEvents(f, events);
+            end);
+
+            f:SetScript("OnHide", function()
+                API.UnregisterFrameForEvents(f, events);
+            end);
+
+            f:SetScript("OnEvent", function(_, event, ...)
+                local alpha;
+                if IsMouselooking() or IsPlayerMoving() then
+                    alpha = 0.2;
+                else
+                    alpha = 0.8;
+                end
+                self.RightSection.NineSlice.Background:SetAlpha(alpha);
+            end);
+
+            f:SetScript("OnUpdate", function(_, elapsed)
+                f.t = f.t + elapsed;
+                if f.t > 0.25 then
+                    f.t = 0;
+                    f._isMouseOver = self:IsMouseOver();
+                    if f.isMouseOver ~= f._isMouseOver then
+                        f.isMouseOver = f._isMouseOver;
+                    end
+                end
+            end);
+        end
+
+        if state then
+            self.TransparencyListener:Show();
+        else
+            if self.TransparencyListener then
+                self.TransparencyListener:Hide();
+            end
+        end
+
+        self:EnableMouse(false);
     end
 end

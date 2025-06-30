@@ -3,10 +3,16 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local DailyUtil = addon.DailyUtil;
 
 
 local ActivityUtil = {};
 addon.ActivityUtil = ActivityUtil;
+
+
+local IsQuestActiveFromCache = DailyUtil.IsQuestActive;
+local IsQuestCompletedFromCache = DailyUtil.IsQuestCompleted;
+
 
 ActivityUtil.hideCompleted = false;
 ActivityUtil.collapsedHeader = {};
@@ -20,7 +26,7 @@ local IsOnQuest = C_QuestLog.IsOnQuest;
 local GetFactionInfoByID = GetFactionInfoByID;
 
 
-local DAILY_QUEST = "QuestNormal";
+local DAILY_QUEST = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/DailyQuestAvailable.png";  --"QuestNormal"
 
 
 local function ShownIfOnQuest(questID)
@@ -28,23 +34,34 @@ local function ShownIfOnQuest(questID)
 end
 
 
-local Dailies_Tillers = {
-    --Completing 1 quest flags 5 quests as completed
-    31672, 31942, 31673, 31941, 31670, 31669, 31674, 31675, 31943, 31671,
-    32642, 32643, 32647, 32648, 32645, 32646, 32649, 32650, 32942, 32943, 32653, 32657, 32658, 32659,
-    30337, 30335, 30334, 30336, 30333,
-    30318, 30322, 30324, 30319, 30326, 30323, 30317, 30321, 30325, 30327,
-    30471, 30474, 30473, 30475, 30479, 30477, 30478, 30476, 30472, 30470,
-    30329, 30332, 30331, 30328, 30330,
-};
+local QuestPools = {};
+do
+    QuestPools.Anglers = {
+        --3 quests plus up to 3 rare fish quests
+        30613, 30754, 30588, 30658, 30586, 30753, 30678, 30763, 30698, 30584, 30700, 30701, 30585, 30598,
+        31443, 31446, 31444,
+    };
+
+    QuestPools.Tillers = {
+        --Completing 1 quest flags 5 quests as completed
+        31672, 31942, 31673, 31941, 31670, 31669, 31674, 31675, 31943, 31671,
+        32642, 32643, 32647, 32648, 32645, 32646, 32649, 32650, 32942, 32943, 32653, 32657, 32658, 32659,
+        30337, 30335, 30334, 30336, 30333,
+        30318, 30322, 30324, 30319, 30326, 30323, 30317, 30321, 30325, 30327,
+        30471, 30474, 30473, 30475, 30479, 30477, 30478, 30476, 30472, 30470,
+        30329, 30332, 30331, 30328, 30330,
+    };
+
+
+    for k, questPool in ipairs(QuestPools) do
+        DailyUtil.AddQuestPool(questPool);
+    end
+end
+
 
 local ActivityData = {  --Constant
-
-    {isHeader = true, name = "The Tillers", factionID = 1272, uiMapID = 376,
-        entries = {
-            --{name = "Debug Quest", questID = 49738, atlas = DAILY_QUEST},
-        }
-    },
+    {isHeader = true, name = "The Anglers", factionID = 1302, uiMapID = 418, questsPerDay = 6, questPool = QuestPools.Anglers},
+    {isHeader = true, name = "The Tillers", factionID = 1272, uiMapID = 376, questsPerDay = 6, questPool = QuestPools.Tillers},
 };
 
 do  --Assign ID
@@ -53,30 +70,57 @@ do  --Assign ID
     end
 end
 
-local function InsertQuestsFromPool(headerIndex, quests)
-    local uiMapID = ActivityData[headerIndex].uiMapID;
+local function CreateQuestCounter(questPool, questsPerDay)
+    local tbl = {};
+    local numCompleted = 0;
+    local completed;
+
+    for _, questID in ipairs(questPool) do
+        if DailyUtil.IsQuestCompleted(questID) then
+            numCompleted = numCompleted + 1;
+            if numCompleted >= questsPerDay then
+                completed = true;
+                break
+            end
+        end
+    end
+
+    tbl.localizedName = string.format("%s: %d/%d", L["Completed"], numCompleted, questsPerDay);
+    tbl.completed = completed;
+    tbl.dataIndex = 128;    --At bottom
+    tbl.sortToTop = true;
+    tbl.icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png";
+
+    return tbl
+end
+
+local function BuildEntriesForCategory(category)
+    local uiMapID = category.uiMapID;
     local entries = {};
     local n = 0;
+    local questPool = category.questPool
 
-    for _, questID in ipairs(quests) do
+    for _, questID in ipairs(questPool) do
         n = n + 1;
         entries[n] = {
             questID = questID,
-            atlas = DAILY_QUEST,
+            icon = DAILY_QUEST,
             shownIfOnQuest = true,
             uiMapID = uiMapID,
         };
     end
 
-    ActivityData[headerIndex].entries = entries;
+    n = n + 1;
+    entries[n] = CreateQuestCounter(questPool, category.questsPerDay);
+
+    category.entries = entries;
 end
-InsertQuestsFromPool(1, Dailies_Tillers);
 
 
-local function GetQuestPoolProgress(quests)
+local function GetQuestPoolProgress(questPool)
     local completed = 0;
     local active = 0;
-    for _, questID in ipairs(quests) do
+    for _, questID in ipairs(questPool) do
         if IsQuestFlaggedCompleted(questID) then
             completed = completed + 1;
         elseif IsOnQuest(questID) then
@@ -86,11 +130,32 @@ local function GetQuestPoolProgress(quests)
     print("completed:", completed, "in progress:", active);
 end
 
-local function GetQuestGroupTotal(quests)
-    print("total:", #quests)
-    return #quests
+local function GetQuestGroupTotal(questPool)
+    print("total:", #questPool)
+    return #questPool
 end
 
+
+local InProgressQuestIconFile = {
+	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
+	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",   --5
+	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+};
+
+local function InitQuestData(info)
+    --Most quests are daily
+
+    info.isOnQuest = IsOnQuest(info.questID);
+
+    if info.isOnQuest then
+        info.icon = InProgressQuestIconFile[5];
+    else
+        info.icon = DAILY_QUEST;
+    end
+
+    info.isActive = IsQuestActiveFromCache(info.questID)
+end
 
 --[[
 local EL = CreateFrame("Frame");
@@ -99,10 +164,10 @@ EL:RegisterEvent("QUEST_TURNED_IN");
 EL:RegisterEvent("PLAYER_ENTERING_WORLD");
 EL:SetScript("OnEvent", function(self, event, ...)
     if event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" then
-        GetQuestPoolProgress(Dailies_Tillers);
+        GetQuestPoolProgress(QuestPools.Tillers);
     elseif event == "PLAYER_ENTERING_WORLD" then
-        GetQuestPoolProgress(Dailies_Tillers);
-        GetQuestGroupTotal(Dailies_Tillers);
+        GetQuestPoolProgress(QuestPools.Tillers);
+        GetQuestGroupTotal(QuestPools.Tillers);
     end
 end);
 --]]
@@ -112,12 +177,27 @@ end);
 local SortFuncs = {};
 do
     function SortFuncs.DataIndex(a, b)
+        if a.sortToTop ~= b.sortToTop then
+            return a.sortToTop
+        end
         return a.dataIndex < b.dataIndex
     end
 
     function SortFuncs.IncompleteFirst(a, b)
+        if a.sortToTop ~= b.sortToTop then
+            return a.sortToTop
+        end
+
+        if a.isActive ~= b.isActive then
+            return a.isActive
+        end
+
         if a.completed ~= b.completed then
             return b.completed
+        end
+
+        if a.isOnQuest ~= b.isOnQuest then
+            return b.isOnQuest
         end
 
         return a.dataIndex < b.dataIndex
@@ -200,7 +280,7 @@ end
 
 function ActivityUtil.ShouldShowActivity(data)
     if data.shownIfOnQuest then
-        return ShownIfOnQuest(data.questID)
+        return ShownIfOnQuest(data.questID) or IsQuestActiveFromCache(data.questID)
     end
 
     return true
@@ -229,7 +309,6 @@ do
         numCompleted = numCompleted or 0
 
         for _, category in ipairs(activityData) do
-            local anyIncomplted;
             local numEntries = 0;
             local entries = {};
             local flagQuest;
@@ -240,11 +319,11 @@ do
                 showActivity = true;
 
                 if entry.questID then
-                    
+                    InitQuestData(entry);
                 end
 
                 if flagQuest then
-                    entry.completed = IsQuestFlaggedCompleted(flagQuest);
+                    entry.completed = entry.completed or IsQuestCompletedFromCache(flagQuest);
                 elseif entry.conditions then
                     if entry.conditions.ShouldShowActivity then
                         showActivity = entry.conditions.ShouldShowActivity();
@@ -253,25 +332,27 @@ do
                         entry.completed = entry.conditions.IsActivityCompleted();
                     end
                 else
-                    entry.completed = false;
+                    entry.completed = entry.completed or false;
                 end
 
                 if entry.shownIfOnQuest then
-                    if hideCompleted then
-                        if not entry.isOnQuest then
-                            showActivity = false;
-                        end
+                    if entry.isActive then
+                        showActivity = true;
                     else
-                        if not (entry.completed or entry.isOnQuest) then
-                            showActivity = false
+                        if hideCompleted then
+                            if not entry.isOnQuest then
+                                showActivity = false;
+                            end
+                        else
+                            if not (entry.completed or entry.isOnQuest) then
+                                showActivity = false
+                            end
                         end
                     end
                 end
 
                 if entry.completed then
                     numCompleted = numCompleted + 1;
-                elseif showActivity then
-                    anyIncomplted = true;
                 end
 
                 if showActivity then
@@ -287,29 +368,13 @@ do
                 end
             end
 
-            if hideCompleted then
-                if anyIncomplted then
+            n = n + 1;
+            outputTbl[n] = category;
+            if numEntries > 0 then
+                tsort(entries, SortFuncs.IncompleteFirst);
+                for _, entry in ipairs(entries) do
                     n = n + 1;
-                    outputTbl[n] = category;
-                    if numEntries > 0 then
-                        tsort(entries, SortFuncs.DataIndex);
-                        for _, entry in ipairs(entries) do
-                            n = n + 1;
-                            outputTbl[n] = entry;
-                        end
-                    end
-                end
-            else
-                if true then
-                    n = n + 1;
-                    outputTbl[n] = category;
-                    if numEntries > 0 then
-                        tsort(entries, SortFuncs.IncompleteFirst);
-                        for _, entry in ipairs(entries) do
-                            n = n + 1;
-                            outputTbl[n] = entry;
-                        end
-                    end
+                    outputTbl[n] = entry;
                 end
             end
         end
@@ -318,12 +383,15 @@ do
     end
 
     function ActivityUtil.GetSortedActivity()
+        DailyUtil.CheckDailyResetTime();
+
         local tbl = {};
         local n = 0;
         local numCompleted = 0;
 
         for _, category in ipairs(ActivityData) do
             category.isCollapsed = ActivityUtil.collapsedHeader[category.headerIndex];
+            BuildEntriesForCategory(category);
         end
 
         n, numCompleted = FlattenData(ActivityData, n, tbl, numCompleted);
@@ -342,7 +410,7 @@ do
         if entry then
             local flagQuest = entry.flagQuest or entry.questID;
             if flagQuest then
-                entry.completed = IsQuestFlaggedCompleted(flagQuest);
+                entry.completed = IsQuestCompletedFromCache(flagQuest);
             else
                 entry.completed = false;
             end
@@ -358,8 +426,6 @@ do
             if v.headerIndex then
                 ActivityUtil.collapsedHeader[v.headerIndex] = not ActivityUtil.collapsedHeader[v.headerIndex];
             end
-
-            --print(dataIndex, v.localizedName or v.name, v.isDynamicQuest, v.questMapID, v.isCollapsed);
 
             return v.isCollapsed
         end

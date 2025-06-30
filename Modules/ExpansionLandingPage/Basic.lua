@@ -381,8 +381,16 @@ do  --TabUtil
     local Tabs = {};
     local SelectedTabKay;
 
+    local function SortFunc_Tab(a, b)
+        if a.uiOrder ~= b.uiOrder then
+            return a.uiOrder < b.uiOrder
+        end
+        return a.key < b.key
+    end
+
     function LandingPageUtil.AddTab(tabInfo)
         table.insert(Tabs, tabInfo);
+        table.sort(Tabs, SortFunc_Tab);
     end
 
     function LandingPageUtil.AcquireTabFrame(tabContainer, index)

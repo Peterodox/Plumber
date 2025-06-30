@@ -9,21 +9,23 @@
 	<Script file="TooltipUpdator.lua"/>
 	<Script file="Search.lua"/>
 	<Script file="ItemUpgrade.lua"/>
-
-	<Script file="MOP/ItemUpgradeFrame.lua"/>
-	<Script file="MOP/ActivityData.lua"/>
-	<Script file="MOP/ResourceList.lua"/>
-
 	<Script file="Currency.lua"/>
 	<Script file="FactionUtil.lua"/>
 	<!--Script file="FactionTab.lua"/-->
-	<Script file="ActivityTab.lua"/>
 	<!--Script file="MajorFactionRenown.lua"/-->
 	<Script file="EncounterData.lua"/>
 	<Script file="EncounterJournal.lua"/>
 	<Script file="TrackerTab.lua"/>
+
+
+	<Script file="MOP/DailyTracker.lua"/>
+	<Script file="MOP/ItemUpgradeFrame.lua"/>
+	<Script file="MOP/ActivityData.lua"/>
+	<Script file="MOP/ResourceList.lua"/>
+
+
+	<Script file="ActivityTab.lua"/>
 	<Script file="ExpansionLandingPage.lua"/>
 	<Script file="ModuleRegistry.lua"/>
-
 	<Include file="SharedTemplates.xml"/>
 </Ui>

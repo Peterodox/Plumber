@@ -17,9 +17,6 @@ local BreakUpLargeNumbers = BreakUpLargeNumbers;
 local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
 
 
-local DefaultResources = LandingPageUtil.ResourceList;
-
-
 local function GetResourcesQuantity(data)
     if data.currencyID then
         local info = GetCurrencyInfo(data.currencyID);
@@ -243,7 +240,7 @@ do
         local objectHeight;
         local valid;
 
-        for _, v in ipairs(DefaultResources) do
+        for _, v in ipairs(LandingPageUtil.ResourceList) do
             valid = true;
             if v.shownInDelves then
                 valid = API.IsInDelves();
