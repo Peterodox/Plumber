@@ -451,6 +451,7 @@ L["Quest ID"] = "Quest ID";
 L["Creature ID"] = "Creature ID";
 L["Edit"] = EDIT or "Edit";
 L["Delete"] = DELETE or "Delete";
+L["Visit Quest Hub To Log Quests"] = "Visit the quest hub and interact with the quest givers to log today's quests."
 
 
 --Generic

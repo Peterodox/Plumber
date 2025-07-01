@@ -122,28 +122,57 @@ do  --Checklist Button
         self:UpdateVisual();
     end
 
-    function ChecklistButtonMixin:SetQuest(questID)
-        self.type = "Quest";
-        self.id = questID;
+    if addon.IS_MOP then
+        --Classic
+        local DailyUtil = addon.DailyUtil;
 
-        self.Text1:SetText(nil);
+        function ChecklistButtonMixin:SetQuest(questID)
+            self.type = "Quest";
+            self.id = questID;
 
-        local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex);
-        self.Name:SetText(name);
-        if not isLocalized then
-            CallbackRegistry:LoadQuest(questID, function(_questID)
-                if questID == self.id then
-                    local name = API.GetQuestName(_questID);
-                    ActivityUtil.StoreQuestActivityName( _questID, name);
-                    self.Name:SetText(name);
-                    self:UpdateProgress();
-                    if self:IsMouseMotionFocus() then
-                        self:OnEnter();
+            self.Text1:SetText(nil);
+
+            local name = DailyUtil.GetQuestTitle(questID);
+            self.Name:SetText(name);
+            if not name then
+                CallbackRegistry:LoadQuest(questID, function(_questID)
+                    if questID == self.id then
+                        local name = DailyUtil.GetQuestTitle(_questID);
+                        self.Name:SetText(name);
+                        self:UpdateProgress();
+                        if self:IsMouseMotionFocus() then
+                            self:OnEnter();
+                        end
                     end
-                end
-            end);
+                end);
+            end
+        end
+    else
+        --Retail
+        function ChecklistButtonMixin:SetQuest(questID)
+            self.type = "Quest";
+            self.id = questID;
+
+            self.Text1:SetText(nil);
+
+            local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex);
+            self.Name:SetText(name);
+            if not isLocalized then
+                CallbackRegistry:LoadQuest(questID, function(_questID)
+                    if questID == self.id then
+                        local name = API.GetQuestName(_questID);
+                        ActivityUtil.StoreQuestActivityName( _questID, name);
+                        self.Name:SetText(name);
+                        self:UpdateProgress();
+                        if self:IsMouseMotionFocus() then
+                            self:OnEnter();
+                        end
+                    end
+                end);
+            end
         end
     end
+
 
     function ChecklistButtonMixin:SetItem(itemID)
         self.type = "Item";
@@ -388,6 +417,9 @@ do
         end
 
         ScrollView:AddTemplate("ChecklistButton", ChecklistButton_Create, ChecklistButton_OnAcquired, ChecklistButton_OnRemoved);
+
+
+        CallbackRegistry:Register("Classic.QuestLogged", self.RequestFullUpdateIfShown, self);
     end
 
     function ActivityTabMixin:UpdateScrollViewContent()
@@ -401,6 +433,12 @@ do
         self:SetScript("OnUpdate", self.OnUpdate);
         if fullUpdate then
             self.fullUpdate = true;
+        end
+    end
+
+    function ActivityTabMixin:RequestFullUpdateIfShown()
+        if self:IsVisible() then
+            self:RequestUpdate(true);
         end
     end
 

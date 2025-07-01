@@ -2217,7 +2217,7 @@ end
 do  -- Quest
     local GetRegularQuestTitle = C_QuestLog.GetTitleForQuestID or C_QuestLog.GetQuestInfo;
     local RequestLoadQuest = C_QuestLog.RequestLoadQuestByID or Nop;
-    local GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID or Nop;
+    local GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID or GetQuestLogIndexByID or Nop;
 
     local function GetQuestName(questID)
         local questName = C_TaskQuest.GetQuestInfoByQuestID(questID);
@@ -2252,79 +2252,64 @@ do  -- Quest
         end
     end
 
-    function API.GetQuestProgressPercent(questID, asText)
-        --Unify progression text and bar
-        --C_QuestLog.GetNumQuestObjectives
+    if addon.IS_CLASSIC then
+        --Classic
+        function API.GetQuestProgressPercent(questID, asText)
+            local value, max = 0, 0;
+            local questLogIndex = questID and GetLogIndexForQuestID(questID);
 
-        local value, max = 0, 0;
-        local questLogIndex = questID and GetLogIndexForQuestID(questID);
-
-        if questLogIndex then
-            local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
-            local text, objectiveType, finished, fulfilled, required;
-            for objectiveIndex = 1, numObjectives do
-                text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
-                --print(questID, GetQuestName(questID), numObjectives, finished, fulfilled, required)
-                if fulfilled > required then
-                    fulfilled = required;
-                end
-
-                if objectiveType == "progressbar" then
-                    fulfilled = 0.01 * GetQuestProgressBarPercent(questID);
-                    required = 1;
-                else
-                    if not finished then
-                        if fulfilled == required then
-                            --"Complete the scenario Nightfall" fulfilled = required = 1 when accepting the quest
+            if questLogIndex and questLogIndex ~= 0 then
+                local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
+                local text, objectiveType, finished, fulfilled, required;
+                for objectiveIndex = 1, numObjectives do
+                    text, objectiveType, finished = GetQuestLogLeaderBoard(objectiveIndex, questLogIndex);
+                    --print(questID, GetQuestName(questID), numObjectives, finished, fulfilled, required)
+                    if objectiveType ~= "spell" and objectiveType ~= "log" then
+                        fulfilled, required = match(text, "(%d+)/(%d+)");
+                        if not (fulfilled and required) then
                             fulfilled = 0;
+                            required = 1;
                         end
+                        if fulfilled > required then
+                            fulfilled = required;
+                        end
+                        value = value + fulfilled;
+                        max = max + required;
                     end
                 end
-                value = value + fulfilled;
-                max = max + required;
-            end
-        else
-            return
-        end
-
-        if max == 0 then
-            value = 0;
-            max = 1;
-        end
-
-        if asText then
-            return floor(100 * value / max).."%"
-        else
-            return value / max
-        end
-    end
-
-    function API.GetQuestProgressTexts(questID, hideFinishedObjectives)
-        local questLogIndex = questID and GetLogIndexForQuestID(questID);
-
-        if questLogIndex then
-            local texts = {};
-            if C_QuestLog.ReadyForTurnIn(questID) then
-                texts[1] = QUEST_PROGRESS_TOOLTIP_QUEST_READY_FOR_TURN_IN;
-                return texts
+            else
+                return
             end
 
-            local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
-            local text, objectiveType, finished, fulfilled, required;
+            if max == 0 then
+                value = 0;
+                max = 1;
+            end
 
-            for objectiveIndex = 1, numObjectives do
-                text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
-                text = text or "";
-                if (not finished) or not hideFinishedObjectives then
-                    if objectiveType == "progressbar" then
-                        fulfilled = GetQuestProgressBarPercent(questID);
-                        fulfilled = floor(fulfilled);
-                        if finished then
-                            tinsert(texts, format("|cff808080- %s%% %s|r", fulfilled, text));
-                        else
-                            tinsert(texts, format("- %s", text));
-                        end
-                    else
+            if asText then
+                return floor(100 * value / max).."%"
+            else
+                return value / max
+            end
+        end
+
+        function API.GetQuestProgressTexts(questID, hideFinishedObjectives)
+            local questLogIndex = questID and GetLogIndexForQuestID(questID);
+
+            if questLogIndex and questLogIndex ~= 0 then
+                local texts = {};
+                if IsQuestComplete(questID) then
+                    texts[1] = QUEST_PROGRESS_TOOLTIP_QUEST_READY_FOR_TURN_IN or ("|cff20ff20"..L["Ready To Turn In Tooltip"].."|r");
+                    return texts
+                end
+
+                local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
+                local text, objectiveType, finished, fulfilled, required;
+
+                for objectiveIndex = 1, numObjectives do
+                    text, objectiveType, finished = GetQuestLogLeaderBoard(objectiveIndex, questLogIndex);
+                    text = text or "";
+                    if (objectiveType ~= "spell" and objectiveType ~= "log") and ((not finished) or not hideFinishedObjectives) then
                         if finished then
                             tinsert(texts, format("|cff808080- %s|r", text));
                         else
@@ -2332,28 +2317,133 @@ do  -- Quest
                         end
                     end
                 end
+
+                return texts
+            else
+                if not C_QuestLog.IsOnQuest(questID) then
+                    local texts = {};
+
+                    if C_QuestLog.IsQuestFlaggedCompleted(questID) then
+                        texts[1] = format("|cff808080%s|r", QUEST_COMPLETE);
+                    else
+                        texts[1] = format("|cffff2020%s|r", L["Not On Quest"]);
+                        local description = API.GetDescriptionFromTooltip(questID);
+                        if description and description ~= QUEST_TOOLTIP_REQUIREMENTS then
+                            tinsert(texts, " ");
+                            tinsert(texts, description);
+                        end
+                    end
+
+                    return texts;
+                end
+            end
+        end
+    else
+        --Retail
+        function API.GetQuestProgressPercent(questID, asText)
+            --Unify progression text and bar
+            --C_QuestLog.GetNumQuestObjectives
+
+            local value, max = 0, 0;
+            local questLogIndex = questID and GetLogIndexForQuestID(questID);
+
+            if questLogIndex and questLogIndex ~= 0 then
+                local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
+                local text, objectiveType, finished, fulfilled, required;
+                for objectiveIndex = 1, numObjectives do
+                    text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
+                    --print(questID, GetQuestName(questID), numObjectives, finished, fulfilled, required)
+                    if fulfilled > required then
+                        fulfilled = required;
+                    end
+
+                    if objectiveType == "progressbar" then
+                        fulfilled = 0.01 * GetQuestProgressBarPercent(questID);
+                        required = 1;
+                    else
+                        if not finished then
+                            if fulfilled == required then
+                                --"Complete the scenario Nightfall" fulfilled = required = 1 when accepting the quest
+                                fulfilled = 0;
+                            end
+                        end
+                    end
+                    value = value + fulfilled;
+                    max = max + required;
+                end
+            else
+                return
             end
 
-            return texts
-        else
-            if not C_QuestLog.IsOnQuest(questID) then
-                local texts = {};
+            if max == 0 then
+                value = 0;
+                max = 1;
+            end
 
-                if C_QuestLog.IsQuestFlaggedCompleted(questID) then
-                    texts[1] = format("|cff808080%s|r", QUEST_COMPLETE);
-                else
-                    texts[1] = format("|cffff2020%s|r", L["Not On Quest"]);
-                    local description = API.GetDescriptionFromTooltip(questID);
-                    if description and description ~= QUEST_TOOLTIP_REQUIREMENTS then
-                        tinsert(texts, " ");
-                        tinsert(texts, description);
+            if asText then
+                return floor(100 * value / max).."%"
+            else
+                return value / max
+            end
+        end
+
+        function API.GetQuestProgressTexts(questID, hideFinishedObjectives)
+            local questLogIndex = questID and GetLogIndexForQuestID(questID);
+
+            if questLogIndex and questLogIndex ~= 0 then
+                local texts = {};
+                if C_QuestLog.ReadyForTurnIn(questID) then
+                    texts[1] = QUEST_PROGRESS_TOOLTIP_QUEST_READY_FOR_TURN_IN;
+                    return texts
+                end
+
+                local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
+                local text, objectiveType, finished, fulfilled, required;
+
+                for objectiveIndex = 1, numObjectives do
+                    text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
+                    text = text or "";
+                    if (not finished) or not hideFinishedObjectives then
+                        if objectiveType == "progressbar" then
+                            fulfilled = GetQuestProgressBarPercent(questID);
+                            fulfilled = floor(fulfilled);
+                            if finished then
+                                tinsert(texts, format("|cff808080- %s%% %s|r", fulfilled, text));
+                            else
+                                tinsert(texts, format("- %s", text));
+                            end
+                        else
+                            if finished then
+                                tinsert(texts, format("|cff808080- %s|r", text));
+                            else
+                                tinsert(texts, format("- %s", text));
+                            end
+                        end
                     end
                 end
 
-                return texts;
+                return texts
+            else
+                if not C_QuestLog.IsOnQuest(questID) then
+                    local texts = {};
+
+                    if C_QuestLog.IsQuestFlaggedCompleted(questID) then
+                        texts[1] = format("|cff808080%s|r", QUEST_COMPLETE);
+                    else
+                        texts[1] = format("|cffff2020%s|r", L["Not On Quest"]);
+                        local description = API.GetDescriptionFromTooltip(questID);
+                        if description and description ~= QUEST_TOOLTIP_REQUIREMENTS then
+                            tinsert(texts, " ");
+                            tinsert(texts, description);
+                        end
+                    end
+
+                    return texts;
+                end
             end
         end
     end
+
 
     function API.GetQuestRewards(questID)
         --Ignore XP, Money     --GetQuestLogRewardXP()

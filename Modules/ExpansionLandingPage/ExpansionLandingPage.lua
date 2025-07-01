@@ -174,6 +174,9 @@ do
     function PlumberExpansionLandingPageMixin:OnShow()
         self:UpdateTabs();    --The selected tab will be created here
         LandingPageUtil.PlayUISound("LandingPageOpen");
+        if not self:IsUserPlaced() then
+            self:ResetPosition();
+        end
     end
 
     function PlumberExpansionLandingPageMixin:OnHide()
@@ -309,7 +312,11 @@ do
 
     function PlumberExpansionLandingPageMixin:ResetPosition()
         self:ClearAllPoints();
-        self:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 64, -150);
+        if IS_MOP then
+            self:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 16, -116);
+        else
+            self:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 64, -150);
+        end
     end
 
     function PlumberExpansionLandingPageMixin:EnableDynamicTransparency(state)

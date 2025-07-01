@@ -3,6 +3,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local CallbackRegistry = addon.CallbackRegistry;
 
 
 local ipairs = ipairs;
@@ -75,6 +76,12 @@ do
         for questID in pairs(self.CompletedDailyQuests) do
             QuestStatus[questID] = 2;
         end
+
+        local locale = GetLocale();
+        if not PlumberDB["QuestTitles_"..locale] then
+            PlumberDB["QuestTitles_"..locale] = {};
+        end
+        self.QuestTitleCache = PlumberDB["QuestTitles_"..locale];
     end
 
     function SV:SetQuestCompleted(questID)
@@ -94,6 +101,19 @@ do
         end
         return false
     end
+
+    function SV:SaveQuestTitle(questID, title)
+        if not self.QuestTitleCache[questID] then
+            if title and title ~= "" then
+                self.QuestTitleCache[questID] = title;
+                print(title)
+            end
+        end
+    end
+
+    function SV:GetQuestTitle(questID)
+        return self.QuestTitleCache[questID]
+    end
 end
 
 
@@ -106,8 +126,8 @@ do
         self:UnregisterEvent("PLAYER_ENTERING_WORLD");
         self:RegisterEvent("GOSSIP_SHOW");
         self:RegisterEvent("QUEST_DETAIL");
-        self:RegisterEvent("QUEST_GREETING");
         self:RegisterEvent("QUEST_TURNED_IN");
+        --self:RegisterEvent("QUEST_GREETING");
         self:SetScript("OnEvent", EL.OnEvent);
     end);
 
@@ -116,10 +136,10 @@ do
             self:HandleGossip();
         elseif event == "QUEST_DETAIL" then
             self:HandleQuestDetail();
-        elseif event == "QUEST_GREETING" then
-            self:HandleQuestGreeting();
         elseif event == "QUEST_TURNED_IN" then
             self:HandleQuestTurnedIn(...);
+        --elseif event == "QUEST_GREETING" then
+            --self:HandleQuestGreeting();
         end
     end
 
@@ -147,6 +167,7 @@ do
     end
 
     function EL:HandleQuestGreeting()
+        --Unused, no APIs to get questID in Clasic
         local title, questID;
 
         for i = 1, GetNumAvailableQuests() do
@@ -175,10 +196,19 @@ do  --DailyUtil
         end
     end
 
+    function DailyUtil.AddQuestSet(questSet)
+        for _, quests in ipairs(questSet) do
+            for _, questID in ipairs(quests) do
+                QuestStatus[questID] = 0;
+            end
+        end
+    end
+
     function DailyUtil.TryFlagQuestActive(questID)
         if QuestStatus[questID] and QuestStatus[questID] == 0 then
             QuestStatus[questID] = 1;
             SV:SetQuestStatus(questID, 1);
+            CallbackRegistry:Trigger("Classic.QuestLogged", questID);
         end
     end
 
@@ -191,14 +221,27 @@ do  --DailyUtil
     end
 
     function DailyUtil.IsQuestActive(questID)
+        --IsQuestActiveFromCache
         return QuestStatus[questID] == 1 or QuestStatus[questID] == 2
     end
 
     function DailyUtil.IsQuestCompleted(questID)
+        --IsQuestCompletedFromCache
         return QuestStatus[questID] == 2
     end
 
     function DailyUtil.CheckDailyResetTime()
         SV:CheckDailyResetTime();
+    end
+
+    function DailyUtil.GetQuestTitle(questID)
+        local name = SV:GetQuestTitle(questID);
+        if not name then
+            name = API.GetQuestName(questID);
+            if name then
+                SV:SaveQuestTitle(questID, name);
+            end
+        end
+        return name
     end
 end

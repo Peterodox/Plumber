@@ -35,7 +35,7 @@ end
 
 
 local QuestPools = {};
-do
+do  --QuestPools (Random quests from pool)
     QuestPools.Anglers = {
         --3 quests plus up to 3 rare fish quests
         30613, 30754, 30588, 30658, 30586, 30753, 30678, 30763, 30698, 30584, 30700, 30701, 30585, 30598,
@@ -52,16 +52,59 @@ do
         30329, 30332, 30331, 30328, 30330,
     };
 
+    QuestPools.Klaxxi = {
+        31216, 31808,
+    };
 
-    for k, questPool in ipairs(QuestPools) do
+    QuestPools.Chiji = {
+        30065, 30063, 30006, 30066, 30064,
+        30068, 30067,
+    };
+
+    QuestPools.Tiger = {
+        31517, 31491, 31492,
+    };
+
+    for k, questPool in pairs(QuestPools) do
         DailyUtil.AddQuestPool(questPool);
     end
 end
 
 
+local QuestSets = {};
+do  --QuestSets (One set of quest per day. Detecting a quest to find the active set)
+    QuestSets.Klaxxi = {
+        {31267, 31268, 31024, 31270, 31269, 31271, 31272},
+        {31231, 31235, 31238, 31232, 31233, 31234, 31237, 31677},
+        {31109, 31494, 31487, 31496, 31503, 31502, 31504, 31599},
+        {31111, 31505, 31506, 31507, 31509, 31508, 31510, 31598},
+    };
+
+    QuestSets.Niuzao = {
+        {30956, 30959, 30957, 30958},
+        {30954, 30952, 30953, 30955},
+    };
+
+    QuestSets.Tiger = {
+        {30879, 30881, 30883, 30907},
+        {30880, 30882, 30885, 30902},
+    };
+
+    for k, questSet in pairs(QuestSets) do
+        DailyUtil.AddQuestSet(questSet);
+    end
+end
+
+
+
 local ActivityData = {  --Constant
+    --questsPerDay: number of quests each day from the questPool. Need to add the # from questSet
     {isHeader = true, name = "The Anglers", factionID = 1302, uiMapID = 418, questsPerDay = 6, questPool = QuestPools.Anglers},
     {isHeader = true, name = "The Tillers", factionID = 1272, uiMapID = 376, questsPerDay = 6, questPool = QuestPools.Tillers},
+    {isHeader = true, name = "The Klaxxi", factionID = 1337, uiMapID = 422, questsPerDay = 1, questPool = QuestPools.Klaxxi, questSet = QuestSets.Klaxxi},
+    {isHeader = true, name = "The August Celestials: Cradle of Chi-Ji", factionID = 1341, uiMapID = 418, areaID = 6155, questsPerDay = 4, questPool = QuestPools.Chiji},
+    {isHeader = true, name = "The August Celestials: Niuzao Temple", factionID = 1341, uiMapID = 388, areaID = 6213, fixedQuestsPerDay = 4, questSet = QuestSets.Niuzao},
+    {isHeader = true, name = "The August Celestials: Temple of the White Tiger", factionID = 1341, uiMapID = 379, areaID = 6174, fixedQuestsPerDay = 5, questPool = QuestPools.Tiger, questSet = QuestSets.Tiger},
 };
 
 do  --Assign ID
@@ -70,26 +113,36 @@ do  --Assign ID
     end
 end
 
-local function CreateQuestCounter(questPool, questsPerDay)
+local function CreateQuestCounter(questPool, numCompleted, questsPerDay)
     local tbl = {};
-    local numCompleted = 0;
+    numCompleted = numCompleted or 0;
     local completed;
 
-    for _, questID in ipairs(questPool) do
-        if DailyUtil.IsQuestCompleted(questID) then
-            numCompleted = numCompleted + 1;
-            if numCompleted >= questsPerDay then
-                completed = true;
-                break
+    if questPool then
+        for _, questID in ipairs(questPool) do
+            if DailyUtil.IsQuestCompleted(questID) then
+                numCompleted = numCompleted + 1;
+                if numCompleted >= questsPerDay then
+                    completed = true;
+                    break
+                end
             end
         end
     end
 
-    tbl.localizedName = string.format("%s: %d/%d", L["Completed"], numCompleted, questsPerDay);
+    completed = questsPerDay > 0 and numCompleted >= questsPerDay;
+    if questsPerDay == 0 then
+        questsPerDay = "?";
+    end
+
+    tbl.localizedName = string.format("%s: %s/%s", L["Completed"], numCompleted, questsPerDay);
     tbl.completed = completed;
     tbl.dataIndex = 128;    --At bottom
     tbl.sortToTop = true;
     tbl.icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png";
+    if not completed then
+        tbl.tooltip = L["Visit Quest Hub To Log Quests"];
+    end
 
     return tbl
 end
@@ -98,20 +151,64 @@ local function BuildEntriesForCategory(category)
     local uiMapID = category.uiMapID;
     local entries = {};
     local n = 0;
-    local questPool = category.questPool
+    local numCompleted = 0;
+    local questsPerDay = category.questsPerDay or 0;
 
-    for _, questID in ipairs(questPool) do
-        n = n + 1;
-        entries[n] = {
-            questID = questID,
-            icon = DAILY_QUEST,
-            shownIfOnQuest = true,
-            uiMapID = uiMapID,
-        };
+
+    if category.questPool then
+        for _, questID in ipairs(category.questPool) do
+            n = n + 1;
+            entries[n] = {
+                questID = questID,
+                icon = DAILY_QUEST,
+                shownIfOnQuest = true,
+                uiMapID = uiMapID,
+            };
+        end
     end
 
+
+    if category.questSet then
+        local questSetIndex, completed;
+        for i, quests in ipairs(category.questSet) do
+            for _, questID in ipairs(quests) do
+                if IsQuestActiveFromCache(questID) then
+                    questSetIndex = i;
+                    for _, questID in ipairs(quests) do
+                        n = n + 1;
+                        completed = IsQuestFlaggedCompleted(questID);
+                        entries[n] = {
+                            questID = questID,
+                            icon = DAILY_QUEST,
+                            shownIfOnQuest = true,
+                            uiMapID = uiMapID,
+                            isActive = true,
+                            completed = completed,
+                        };
+
+                        if completed then
+                            DailyUtil.TryFlagQuestCompleted(questID);
+                            numCompleted = numCompleted + 1;
+                        end
+                    end
+                    questsPerDay = questsPerDay + #quests;
+                    break
+                end
+            end
+            if questSetIndex then
+                break
+            end
+        end
+    end
+
+
+    if category.fixedQuestsPerDay then
+        questsPerDay = category.fixedQuestsPerDay;
+    end
+
+
     n = n + 1;
-    entries[n] = CreateQuestCounter(questPool, category.questsPerDay);
+    entries[n] = CreateQuestCounter(category.questPool, numCompleted, questsPerDay);
 
     category.entries = entries;
 end
@@ -154,7 +251,9 @@ local function InitQuestData(info)
         info.icon = DAILY_QUEST;
     end
 
-    info.isActive = IsQuestActiveFromCache(info.questID)
+    if info.isActive == nil then
+        info.isActive = IsQuestActiveFromCache(info.questID);
+    end
 end
 
 --[[
@@ -248,6 +347,12 @@ function ActivityUtil.GetActivityName(dataIndex)
         if v.isHeader and v.factionID then
             local name = GetFactionInfoByID(v.factionID);
             if name then
+                if v.areaID then
+                    local zoneName = API.GetZoneName(v.areaID);
+                    if zoneName then
+                        name = name .. ": "..zoneName;
+                    end
+                end
                 v.localizedName = name;
                 return name, true
             end
