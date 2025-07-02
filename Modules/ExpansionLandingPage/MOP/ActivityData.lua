@@ -33,6 +33,13 @@ local function ShownIfOnQuest(questID)
     return questID and IsOnQuest(questID)
 end
 
+local function IsCategoryCollapsed(cateogryID)
+    return addon.GetDBBool("LandingPage_Activity_Collapsed_"..cateogryID)
+end
+
+local function SetCategoryCollapsed(cateogryID, isCollapsed)
+    return addon.SetDBValue("LandingPage_Activity_Collapsed_"..cateogryID, isCollapsed, true)
+end
 
 local QuestPools = {};
 do  --QuestPools (Random quests from pool)
@@ -57,17 +64,25 @@ do  --QuestPools (Random quests from pool)
     };
 
     QuestPools.Chiji = {
+        30725, 30726, 30727, 30728, 30729, 30730, 30731, 30732, 30733, 30734, 30735, 30736, 30737, 30738, 30739, 30740,
+    };
+
+    QuestPools.Yulon = {
         30065, 30063, 30006, 30066, 30064,
         30068, 30067,
     };
 
-    QuestPools.Tiger = {
+    QuestPools.Xuen = {
         31517, 31491, 31492,
     };
 
     for k, questPool in pairs(QuestPools) do
         DailyUtil.AddQuestPool(questPool);
     end
+
+    DailyUtil.AddAugustCelestialQuests(QuestPools.Chiji, 1);
+    DailyUtil.AddAugustCelestialQuests(QuestPools.Yulon, 2);
+    DailyUtil.AddAugustCelestialQuests(QuestPools.Xuen, 4);
 end
 
 
@@ -80,12 +95,16 @@ do  --QuestSets (One set of quest per day. Detecting a quest to find the active 
         {31111, 31505, 31506, 31507, 31509, 31508, 31510, 31598},
     };
 
+    QuestSets.Chiji = {
+        {30718, 30716, 30717},
+    };
+
     QuestSets.Niuzao = {
         {30956, 30959, 30957, 30958},
         {30954, 30952, 30953, 30955},
     };
 
-    QuestSets.Tiger = {
+    QuestSets.Xuen = {
         {30879, 30881, 30883, 30907},
         {30880, 30882, 30885, 30902},
     };
@@ -93,18 +112,186 @@ do  --QuestSets (One set of quest per day. Detecting a quest to find the active 
     for k, questSet in pairs(QuestSets) do
         DailyUtil.AddQuestSet(questSet);
     end
+
+    DailyUtil.AddAugustCelestialQuests(QuestSets.Chiji, 1);
+    DailyUtil.AddAugustCelestialQuests(QuestSets.Niuzao, 3);
+    DailyUtil.AddAugustCelestialQuests(QuestSets.Xuen, 4);
 end
 
 
+local QuestUnlockConditions = {};
+do
+    local GetAchievementCriteriaInfo = GetAchievementCriteriaInfo;
+
+    QuestUnlockConditions.KlaxxiParagonUnlocked = {};
+
+    function QuestUnlockConditions.RefreshKlaxxiParagon()
+        local tbl = {};
+        local _, completed;
+        for i = 1, 10 do
+            _, _, completed = GetAchievementCriteriaInfo(7312, i);
+            tbl[i] = completed;
+        end
+        QuestUnlockConditions.KlaxxiParagonUnlocked = tbl;
+    end
+
+    function QuestUnlockConditions.AddKlaxxiParagonToTooltip(tooltip)
+        --Only show locked npc
+        local text, _, completed;
+        local noHeader = true;
+        for i = 1, 10 do
+            text, _, completed = GetAchievementCriteriaInfo(7312, i);
+            if not completed then
+                if noHeader then
+                    noHeader = false;
+                    tooltip:AddLine(" ");
+                    tooltip:AddLine(L["Unavailable Klaxxi Paragons"], 1, 0.82, 0, true);
+                end
+                tooltip:AddLine("- "..text, 0.5, 0.5, 0.5, true);
+            end
+        end
+    end
+
+    function QuestUnlockConditions.Kilruk()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[1]
+    end
+
+    function QuestUnlockConditions.Malik()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[2]
+    end
+
+    function QuestUnlockConditions.Iyyokuk()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[3]
+    end
+
+    function QuestUnlockConditions.Kaztik()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[4]
+    end
+
+    function QuestUnlockConditions.Korven()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[5]
+    end
+
+    function QuestUnlockConditions.Karoz()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[6]
+    end
+
+    function QuestUnlockConditions.Rikkal()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[7]
+    end
+
+    function QuestUnlockConditions.Skeer()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[8]
+    end
+
+    function QuestUnlockConditions.Hisek()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[9]
+    end
+
+    function QuestUnlockConditions.Xaril()
+        return QuestUnlockConditions.KlaxxiParagonUnlocked[10]
+    end
+end
+
+
+local QuestXCondition = {};
+do
+    QuestXCondition[31267] = QuestUnlockConditions.Kilruk;
+    QuestXCondition[31235] = QuestUnlockConditions.Kilruk;
+    QuestXCondition[31231] = QuestUnlockConditions.Kilruk;
+    QuestXCondition[31109] = QuestUnlockConditions.Kilruk;
+    QuestXCondition[31111] = QuestUnlockConditions.Kilruk;
+    QuestXCondition[31505] = QuestUnlockConditions.Kilruk;
+    QuestXCondition[31677] = QuestUnlockConditions.Kilruk;
+
+    QuestXCondition[31268] = QuestUnlockConditions.Kaztik;
+    QuestXCondition[31024] = QuestUnlockConditions.Kaztik;
+    QuestXCondition[31238] = QuestUnlockConditions.Kaztik;
+    QuestXCondition[31494] = QuestUnlockConditions.Kaztik;
+    QuestXCondition[31487] = QuestUnlockConditions.Kaztik;
+    QuestXCondition[31506] = QuestUnlockConditions.Kaztik;
+    QuestXCondition[31808] = QuestUnlockConditions.Kaztik;
+
+    QuestXCondition[31270] = QuestUnlockConditions.Korven;
+    QuestXCondition[31269] = QuestUnlockConditions.Korven;
+    QuestXCondition[31232] = QuestUnlockConditions.Korven;
+    QuestXCondition[31233] = QuestUnlockConditions.Korven;
+    QuestXCondition[31496] = QuestUnlockConditions.Korven;
+    QuestXCondition[31507] = QuestUnlockConditions.Korven;
+
+    QuestXCondition[31271] = QuestUnlockConditions.Rikkal;
+    QuestXCondition[31234] = QuestUnlockConditions.Rikkal;
+    QuestXCondition[31503] = QuestUnlockConditions.Rikkal;
+    QuestXCondition[31502] = QuestUnlockConditions.Rikkal;
+    QuestXCondition[31509] = QuestUnlockConditions.Rikkal;
+    QuestXCondition[31508] = QuestUnlockConditions.Rikkal;
+
+    QuestXCondition[31272] = QuestUnlockConditions.Hisek;
+    QuestXCondition[31237] = QuestUnlockConditions.Hisek;
+    QuestXCondition[31504] = QuestUnlockConditions.Hisek;
+    QuestXCondition[31510] = QuestUnlockConditions.Hisek;
+
+    QuestXCondition[31216] = QuestUnlockConditions.Xaril;
+end
+
+
+local CategoryCandidates = {
+    Chiji = {isHeader = true, subFactionID = 1, name = "The August Celestials: Cradle of Chi-Ji", factionID = 1341, cateogryID = 13411, uiMapID = 418, areaID = 6155, questsPerDay = 4, questPool = QuestPools.Chiji, questSet = QuestSets.Chiji,
+            staticEntries = {
+                {questID = 31378, shownIfOnQuest = true},
+                {questID = 31379, shownIfOnQuest = true},
+            },
+        },
+    Yulon = {isHeader = true, subFactionID = 2, name = "The August Celestials: Temple of the Jade Serpent", factionID = 1341, cateogryID = 13412, uiMapID = 371, areaID = 5975, questsPerDay = 4, questPool = QuestPools.Yulon,
+            staticEntries = {
+                {questID = 31376, shownIfOnQuest = true},
+                {questID = 31377, shownIfOnQuest = true},
+            },
+        },
+    Niuzao = {isHeader = true, subFactionID = 3, name = "The August Celestials: Niuzao Temple", factionID = 1341, cateogryID = 13413, uiMapID = 388, areaID = 6213, fixedQuestsPerDay = 4, questSet = QuestSets.Niuzao,
+            staticEntries = {
+                {questID = 31382, shownIfOnQuest = true},
+                {questID = 31383, shownIfOnQuest = true},
+            },
+        },
+    Xuen = {isHeader = true, subFactionID = 4, name = "The August Celestials: Temple of the White Tiger", factionID = 1341, cateogryID = 13414, uiMapID = 379, areaID = 6174, fixedQuestsPerDay = 5, questPool = QuestPools.Xuen, questSet = QuestSets.Xuen,
+            staticEntries = {
+                {questID = 31380, shownIfOnQuest = true},
+                {questID = 31381, shownIfOnQuest = true},
+            },
+        },
+};
+
+local function CategoryDataGetter_AugustCelestials()
+    local subFactionID = DailyUtil.TryGetActiveAugustCelestial();
+    if subFactionID then
+        if subFactionID == 1 then
+            return CategoryCandidates.Chiji
+        elseif subFactionID == 2 then
+            return CategoryCandidates.Yulon
+        elseif subFactionID == 3 then
+            return CategoryCandidates.Niuzao
+        elseif subFactionID == 4 then
+            return CategoryCandidates.Xuen
+        end
+    end
+end
+
+local function GetOverrideCategory(category)
+    if category.categoryDataGetter then
+        return category.categoryDataGetter() or category;
+    else
+        return category
+    end
+end
 
 local ActivityData = {  --Constant
     --questsPerDay: number of quests each day from the questPool. Need to add the # from questSet
-    {isHeader = true, name = "The Anglers", factionID = 1302, uiMapID = 418, questsPerDay = 6, questPool = QuestPools.Anglers},
-    {isHeader = true, name = "The Tillers", factionID = 1272, uiMapID = 376, questsPerDay = 6, questPool = QuestPools.Tillers},
-    {isHeader = true, name = "The Klaxxi", factionID = 1337, uiMapID = 422, questsPerDay = 1, questPool = QuestPools.Klaxxi, questSet = QuestSets.Klaxxi},
-    {isHeader = true, name = "The August Celestials: Cradle of Chi-Ji", factionID = 1341, uiMapID = 418, areaID = 6155, questsPerDay = 4, questPool = QuestPools.Chiji},
-    {isHeader = true, name = "The August Celestials: Niuzao Temple", factionID = 1341, uiMapID = 388, areaID = 6213, fixedQuestsPerDay = 4, questSet = QuestSets.Niuzao},
-    {isHeader = true, name = "The August Celestials: Temple of the White Tiger", factionID = 1341, uiMapID = 379, areaID = 6174, fixedQuestsPerDay = 5, questPool = QuestPools.Tiger, questSet = QuestSets.Tiger},
+    {isHeader = true, name = "The Anglers", factionID = 1302, cateogryID = 1302, uiMapID = 418, questsPerDay = 6, questPool = QuestPools.Anglers},
+    {isHeader = true, name = "The Tillers", factionID = 1272, cateogryID = 1272, uiMapID = 376, questsPerDay = 6, questPool = QuestPools.Tillers},
+    {isHeader = true, name = "The Klaxxi", factionID = 1337, cateogryID = 1337, uiMapID = 422, questsPerDay = 1, questPool = QuestPools.Klaxxi, questSet = QuestSets.Klaxxi, tooltipSetter = QuestUnlockConditions.AddKlaxxiParagonToTooltip},
+    {isHeader = true, name = "The August Celestials", factionID = 1341, cateogryID = 1341, uiMapID = 390, categoryDataGetter = CategoryDataGetter_AugustCelestials, tooltip = L["Quest Hub Instruction Celestials"]},
+    --{isHeader = true, name = "Golden Lotus", }
 };
 
 do  --Assign ID
@@ -113,7 +300,7 @@ do  --Assign ID
     end
 end
 
-local function CreateQuestCounter(questPool, numCompleted, questsPerDay)
+local function CreateQuestCounter(questPool, numCompleted, questsPerDay, tooltip)
     local tbl = {};
     numCompleted = numCompleted or 0;
     local completed;
@@ -141,57 +328,79 @@ local function CreateQuestCounter(questPool, numCompleted, questsPerDay)
     tbl.sortToTop = true;
     tbl.icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png";
     if not completed then
-        tbl.tooltip = L["Visit Quest Hub To Log Quests"];
+        tbl.tooltip = tooltip or L["Visit Quest Hub To Log Quests"];
     end
 
     return tbl
 end
 
 local function BuildEntriesForCategory(category)
+    category = GetOverrideCategory(category);
+
     local uiMapID = category.uiMapID;
     local entries = {};
     local n = 0;
+
+    if category.staticEntries then
+        for _, entry in ipairs(category.staticEntries) do
+            n = n + 1;
+            entry.icon = DAILY_QUEST;
+            if not entry.uiMapID then
+                entry.uiMapID = uiMapID;
+            end
+            entries[n] = entry;
+        end
+    end
+
     local numCompleted = 0;
     local questsPerDay = category.questsPerDay or 0;
-
+    local unlockCondition;
 
     if category.questPool then
         for _, questID in ipairs(category.questPool) do
-            n = n + 1;
-            entries[n] = {
-                questID = questID,
-                icon = DAILY_QUEST,
-                shownIfOnQuest = true,
-                uiMapID = uiMapID,
-            };
+            unlockCondition = QuestXCondition[questID];
+            if (not unlockCondition) or (unlockCondition()) then
+                n = n + 1;
+                entries[n] = {
+                    questID = questID,
+                    icon = DAILY_QUEST,
+                    shownIfOnQuest = true,
+                    uiMapID = uiMapID,
+                };
+            end
         end
     end
 
 
     if category.questSet then
         local questSetIndex, completed;
+        local numAvailable = 0;
         for i, quests in ipairs(category.questSet) do
             for _, questID in ipairs(quests) do
                 if IsQuestActiveFromCache(questID) then
                     questSetIndex = i;
                     for _, questID in ipairs(quests) do
-                        n = n + 1;
-                        completed = IsQuestFlaggedCompleted(questID);
-                        entries[n] = {
-                            questID = questID,
-                            icon = DAILY_QUEST,
-                            shownIfOnQuest = true,
-                            uiMapID = uiMapID,
-                            isActive = true,
-                            completed = completed,
-                        };
+                        unlockCondition = QuestXCondition[questID];
+                        if (not unlockCondition) or (unlockCondition()) then
+                            n = n + 1;
+                            numAvailable = numAvailable + 1;
+                            completed = IsQuestFlaggedCompleted(questID);
+                            entries[n] = {
+                                questID = questID,
+                                icon = DAILY_QUEST,
+                                shownIfOnQuest = true,
+                                uiMapID = uiMapID,
+                                isActive = true,
+                                completed = completed,
+                            };
 
-                        if completed then
-                            DailyUtil.TryFlagQuestCompleted(questID);
-                            numCompleted = numCompleted + 1;
+                            if completed then
+                                DailyUtil.TryFlagQuestCompleted(questID);
+                                numCompleted = numCompleted + 1;
+                            end
                         end
                     end
-                    questsPerDay = questsPerDay + #quests;
+                    questsPerDay = questsPerDay + numAvailable;
                     break
                 end
             end
@@ -207,8 +416,11 @@ local function BuildEntriesForCategory(category)
     end
 
 
+    local counterEntry = CreateQuestCounter(category.questPool, numCompleted, questsPerDay, category.tooltip);
+    counterEntry.tooltipSetter = category.tooltipSetter;
     n = n + 1;
-    entries[n] = CreateQuestCounter(category.questPool, numCompleted, questsPerDay);
+    entries[n] = counterEntry;
+
 
     category.entries = entries;
 end
@@ -397,6 +609,7 @@ do
         local n = 0;
         for _, category in ipairs(activityData) do
             n = n + 1;
+            category = GetOverrideCategory(category);
             category.dataIndex = n;
             for _, entry in ipairs(category.entries) do
                 n = n + 1;
@@ -414,6 +627,8 @@ do
         numCompleted = numCompleted or 0
 
         for _, category in ipairs(activityData) do
+            category = GetOverrideCategory(category);
+
             local numEntries = 0;
             local entries = {};
             local flagQuest;
@@ -489,13 +704,14 @@ do
 
     function ActivityUtil.GetSortedActivity()
         DailyUtil.CheckDailyResetTime();
+        QuestUnlockConditions.RefreshKlaxxiParagon();
 
         local tbl = {};
         local n = 0;
         local numCompleted = 0;
 
         for _, category in ipairs(ActivityData) do
-            category.isCollapsed = ActivityUtil.collapsedHeader[category.headerIndex];
+            category.isCollapsed = category.cateogryID and IsCategoryCollapsed(category.cateogryID); --ActivityUtil.collapsedHeader[category.headerIndex];
             BuildEntriesForCategory(category);
         end
 
@@ -530,6 +746,10 @@ do
 
             if v.headerIndex then
                 ActivityUtil.collapsedHeader[v.headerIndex] = not ActivityUtil.collapsedHeader[v.headerIndex];
+            end
+
+            if v.cateogryID then
+                SetCategoryCollapsed(v.cateogryID, v.isCollapsed);
             end
 
             return v.isCollapsed

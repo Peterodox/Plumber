@@ -34,6 +34,31 @@ local QuestStatus = {
     --[questID] = 0 (not found), 1 (not completed), 2 (completed)
 };
 
+local AugustCelestialQuests = {
+    --[questID] = 1 Chiji, 2 Yulon, 3 Niuzao, 4 Xuen
+
+    --Challenge at the Temple of the Red Crane
+    [31378] = 1,
+    [31379] = 1,
+
+    --Attack At The Temple of the Jade Serpent
+    [31376] = 2,
+    [31377] = 2,
+
+    --Defense At Niuzao Temple
+    [31382] = 3,
+    [31383] = 3,
+
+    --Trial at the Temple of the White Tiger
+    [31380] = 4,
+    [31381] = 4,
+};
+
+
+for questID in pairs(AugustCelestialQuests) do
+    QuestStatus[questID] = 0;
+end
+
 
 local SV = {};  --SavedVariables
 do
@@ -62,6 +87,11 @@ do
             --Horde
             PlumberDB.DailyQuestStatus_H = {};
         end
+
+        if wipeOldData then
+            PlumberDB.activeAugustCelestial = nil;
+        end
+        self.activeAugustCelestial = PlumberDB.activeAugustCelestial;
 
         if UnitFactionGroup("player") == "Horde" then
             self.QuestStatus = PlumberDB.DailyQuestStatus_H;
@@ -106,7 +136,6 @@ do
         if not self.QuestTitleCache[questID] then
             if title and title ~= "" then
                 self.QuestTitleCache[questID] = title;
-                print(title)
             end
         end
     end
@@ -210,6 +239,9 @@ do  --DailyUtil
             SV:SetQuestStatus(questID, 1);
             CallbackRegistry:Trigger("Classic.QuestLogged", questID);
         end
+        if AugustCelestialQuests[questID] then
+            DailyUtil.TryFlagActiveAugustCelestial(AugustCelestialQuests[questID]);
+        end
     end
 
     function DailyUtil.TryFlagQuestCompleted(questID)
@@ -243,5 +275,31 @@ do  --DailyUtil
             end
         end
         return name
+    end
+
+    function DailyUtil.AddAugustCelestialQuests(questPoolOrSet, subFactionID)
+        if type(questPoolOrSet[1]) == "table" then
+            for _, questSet in ipairs(questPoolOrSet) do
+                for _, questID in ipairs(questSet) do
+                    AugustCelestialQuests[questID] = subFactionID;
+                end
+            end
+        else
+            for _, questID in ipairs(questPoolOrSet) do
+                AugustCelestialQuests[questID] = subFactionID;
+            end
+        end
+    end
+
+    function DailyUtil.TryFlagActiveAugustCelestial(subFactionID)
+        if not SV.activeAugustCelestial then
+            PlumberDB.activeAugustCelestial = subFactionID;
+            SV.activeAugustCelestial = subFactionID;
+            CallbackRegistry:Trigger("activeAugustCelestial", subFactionID);
+        end
+    end
+
+    function DailyUtil.TryGetActiveAugustCelestial()
+        return PlumberDB.activeAugustCelestial
     end
 end

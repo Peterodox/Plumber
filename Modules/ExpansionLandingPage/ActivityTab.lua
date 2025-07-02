@@ -232,6 +232,7 @@ do  --Checklist Button
                 end
 
                 TooltipUpdator:RequestTooltipLines(tooltipLines);
+                TooltipUpdator:RequestTooltipSetter(data.tooltipSetter);
             end
         end
     end
@@ -420,6 +421,7 @@ do
 
 
         CallbackRegistry:Register("Classic.QuestLogged", self.RequestFullUpdateIfShown, self);
+        CallbackRegistry:Register("activeAugustCelestial", self.RequestFullUpdateIfShown, self);
     end
 
     function ActivityTabMixin:UpdateScrollViewContent()

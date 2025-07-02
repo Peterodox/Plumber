@@ -452,6 +452,8 @@ L["Creature ID"] = "Creature ID";
 L["Edit"] = EDIT or "Edit";
 L["Delete"] = DELETE or "Delete";
 L["Visit Quest Hub To Log Quests"] = "Visit the quest hub and interact with the quest givers to log today's quests."
+L["Quest Hub Instruction Celestials"] = "Visit the August Celestials Quartermaster in Vale of Eternal Blossoms to find out which temple needs your assistance."
+L["Unavailable Klaxxi Paragons"] = "Unavailable Klaxxi Paragons:";
 
 
 --Generic

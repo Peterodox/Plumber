@@ -2497,6 +2497,37 @@ do  -- Quest
             if #currencyRewards == 0 then
                 missingData = true;
             end
+        elseif GetQuestLogRewardCurrencyInfo then
+            local numCurrencies = GetNumQuestLogRewardCurrencies(questID) or 0;
+            local name, texture, quantity, currencyID, quality;
+            local currencies;
+            for i = 1, numCurrencies do
+                name, texture, quantity, currencyID, quality = GetQuestLogRewardCurrencyInfo(i, questID);
+                if name then
+                    if not currencies then
+                        currencies = {};
+                    end
+                    local info = {
+                        name = name,
+                        texture = texture,
+                        quantity = quantity,
+                        id = currencyID,
+                        questRewardContextFlags = 0,
+                        quality = quality,
+                    };
+                    tinsert(currencies, info);
+                else
+                    missingData = true;
+                end
+            end
+
+            if currencies then
+                table.sort(currencies, SortFunc_QualityID);
+                if not rewards then
+                    rewards = {};
+                end
+                rewards.currencies = currencies;
+            end
         end
 
         if C_QuestInfoSystem.GetQuestRewardSpells and C_QuestInfoSystem.HasQuestRewardSpells(questID) then

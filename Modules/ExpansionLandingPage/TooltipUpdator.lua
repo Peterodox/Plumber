@@ -30,6 +30,7 @@ function TooltipUpdator:StopUpdating()
     self.showRewards = nil;
     self.poiID = nil;
     self.tooltipLines = nil;
+    self.tooltipSetter = nil;
 end
 
 function TooltipUpdator:SetFocusedObject(obj)
@@ -65,6 +66,10 @@ end
 
 function TooltipUpdator:RequestTooltipLines(tooltipLines)
     self.tooltipLines = tooltipLines;
+end
+
+function TooltipUpdator:RequestTooltipSetter(tooltipSetter)
+    self.tooltipSetter = tooltipSetter;
 end
 
 function TooltipUpdator:OnUpdate(elapsed)
@@ -140,13 +145,17 @@ function TooltipUpdator:OnUpdate(elapsed)
                     if hasLineAbove then
                         tooltip:AddLine(" ");
                     end
-                    tooltip:AddLine(WORLD_QUEST_REWARD_FILTERS_TITLE, 1, 1, 1);
+                    tooltip:AddLine(QUEST_REWARDS, 1, 0.82);
 
                     for _, rewards in ipairs(questRewards) do
                         for index, info in ipairs(rewards) do
                             Tooltip_AddRewardLine(tooltip, info.texture, info.name, info.quality, info.quantity);
                         end
                     end
+                end
+
+                if self.tooltipSetter then
+                    self.tooltipSetter(tooltip);
                 end
 
                 if isRetrievingData then
