@@ -3,6 +3,7 @@
 	<Script file="Timer.lua"/>
 	<Script file="EditBox.lua"/>
 	<Script file="ScrollView.lua"/>
+	<Script file="StatusBar.lua"/>
 	<Script file="SharedListButton.lua"/>
 	<Script file="API_Quest.lua"/>
 	<Script file="API_Encounter.lua"/>

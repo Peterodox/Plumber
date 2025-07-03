@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.7.0";
-local VERSION_DATE = 1750700000;
+local VERSION_TEXT = "v1.7.1";
+local VERSION_DATE = 1751500000;
 
 
 local addonName, addon = ...
@@ -155,6 +155,7 @@ local DefaultValues = {
         LootUI_BackgroundAlpha = 0.5,
         LootUI_ShowItemCount = false,
         LootUI_NewTransmogIcon = true,
+        LootUI_UseCustomColor = false,
         LootUI_ForceAutoLoot = true,
         LootUI_LootUnderMouse = false,
         LootUI_UseHotkey = true,

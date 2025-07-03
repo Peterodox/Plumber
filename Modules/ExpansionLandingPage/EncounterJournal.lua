@@ -293,51 +293,106 @@ do
         tooltip:Show();
     end
 
-    function AchievementButtonMixin:IsAchievementTracked()
-        local id = self.achievementID;
-        local trackType = Enum.ContentTrackingType.Achievement;
-        local trackedIDs = C_ContentTracking.GetTrackedIDs(trackType) or {};
+    if C_ContentTracking then
+        --Retail
+        function AchievementButtonMixin:IsAchievementTracked()
+            local id = self.achievementID;
+            local trackType = Enum.ContentTrackingType.Achievement;
+            local trackedIDs = C_ContentTracking.GetTrackedIDs(trackType) or {};
 
-        for _, _id in ipairs(trackedIDs) do
-            if id == _id then
+            for _, _id in ipairs(trackedIDs) do
+                if id == _id then
+                    return true
+                end
+            end
+
+            return false
+        end
+
+        function AchievementButtonMixin:ToggleTracking()
+            local id = self.achievementID;
+            local trackType = Enum.ContentTrackingType.Achievement;
+
+            local trackedIDs = C_ContentTracking.GetTrackedIDs(trackType) or {};
+
+            for _, _id in ipairs(trackedIDs) do
+                if id == _id then
+                    C_ContentTracking.StopTracking(trackType, id, Enum.ContentTrackingStopType.Manual);
+                    return false
+                end
+            end
+
+            if #trackedIDs >= Constants.ContentTrackingConsts.MaxTrackedAchievements then
+                UIErrorsFrame:AddMessage(format(ACHIEVEMENT_WATCH_TOO_MANY, Constants.ContentTrackingConsts.MaxTrackedAchievements), 1.0, 0.1, 0.1, 1.0);
+                return
+            end
+
+            local _, _, _, completed, _, _, _, _, _, _, _, isGuild, wasEarnedByMe = GetAchievementInfo(id)
+            if (completed and isGuild) or wasEarnedByMe then
+                UIErrorsFrame:AddMessage(ERR_ACHIEVEMENT_WATCH_COMPLETED, 1.0, 0.1, 0.1, 1.0);
+                return
+            end
+
+            local trackingError = C_ContentTracking.StartTracking(trackType, id);
+            if trackingError then
+                ContentTrackingUtil.DisplayTrackingError(trackingError);
+            else
                 return true
             end
         end
+    else
+        --Classic
+        function AchievementButtonMixin:IsAchievementTracked()
+            local id = self.achievementID;
+            local trackedIDs = {GetTrackedAchievements()};
 
-        return false
-    end
-
-    function AchievementButtonMixin:ToggleTracking()
-        local id = self.achievementID;
-        local trackType = Enum.ContentTrackingType.Achievement;
-
-        local trackedIDs = C_ContentTracking.GetTrackedIDs(trackType) or {};
-
-        for _, _id in ipairs(trackedIDs) do
-            if id == _id then
-                C_ContentTracking.StopTracking(trackType, id, Enum.ContentTrackingStopType.Manual);
-                return false
+            for _, _id in ipairs(trackedIDs) do
+                if id == _id then
+                    return true
+                end
             end
+
+            return false
         end
 
-        if #trackedIDs >= Constants.ContentTrackingConsts.MaxTrackedAchievements then
-            UIErrorsFrame:AddMessage(format(ACHIEVEMENT_WATCH_TOO_MANY, Constants.ContentTrackingConsts.MaxTrackedAchievements), 1.0, 0.1, 0.1, 1.0);
-            return
-        end
+        function AchievementButtonMixin:ToggleTracking()
+            local id = self.achievementID;
+            local trackedIDs = {GetTrackedAchievements()}
+            local result;
 
-        local _, _, _, completed, _, _, _, _, _, _, _, isGuild, wasEarnedByMe = GetAchievementInfo(id)
-        if (completed and isGuild) or wasEarnedByMe then
-            UIErrorsFrame:AddMessage(ERR_ACHIEVEMENT_WATCH_COMPLETED, 1.0, 0.1, 0.1, 1.0);
-            return
-        end
+            for _, _id in ipairs(trackedIDs) do
+                if id == _id then
+                    RemoveTrackedAchievement(id);
+                    result = false;
+                end
+            end
 
-        local trackingError = C_ContentTracking.StartTracking(trackType, id);
-        if trackingError then
-            ContentTrackingUtil.DisplayTrackingError(trackingError);
-        else
-            return true
+            if result == nil then
+                if #trackedIDs >= Constants.ContentTrackingConsts.MaxTrackedAchievements then
+                    UIErrorsFrame:AddMessage(format(ACHIEVEMENT_WATCH_TOO_MANY, Constants.ContentTrackingConsts.MaxTrackedAchievements), 1.0, 0.1, 0.1, 1.0);
+                    return
+                end
+
+                local _, _, _, completed, _, _, _, _, _, _, _, isGuild, wasEarnedByMe = GetAchievementInfo(id)
+                if (completed and isGuild) or wasEarnedByMe then
+                    UIErrorsFrame:AddMessage(ERR_ACHIEVEMENT_WATCH_COMPLETED, 1.0, 0.1, 0.1, 1.0);
+                    return
+                end
+
+                AddTrackedAchievement(id);
+                result = true;
+            end
+
+            if not InCombatLockdown() then
+                --This is not event-driven in Classic
+                WatchFrame_Update();
+            end
+
+            return result
         end
     end
+
+
 
 
     local AchievementContainerMixin = {};
@@ -872,6 +927,8 @@ do
 
     if C_EventUtils.IsEventValid("CONTENT_TRACKING_UPDATE") then
         table.insert(DynamicEvents, "CONTENT_TRACKING_UPDATE");
+    else
+        table.insert(DynamicEvents, "TRACKED_ACHIEVEMENT_LIST_CHANGED");
     end
 
     function RaidTabMixin:OnShow()
@@ -891,7 +948,7 @@ do
             RequestRaidInfo();
         elseif event == "ACHIEVEMENT_EARNED" then
             self:UpdateAchievements();
-        elseif event == "CONTENT_TRACKING_UPDATE" then
+        elseif event == "CONTENT_TRACKING_UPDATE" or event == "TRACKED_ACHIEVEMENT_LIST_CHANGED" then
             self.AchievementContainer:UpdateTooltip();
         end
     end
@@ -1027,7 +1084,9 @@ do
     end
 
     function RaidTabMixin:UpdateAchievements()
-        self.AchievementContainer:Update();
+        if self.AchievementContainer then
+            self.AchievementContainer:Update();
+        end
     end
 
     function RaidTabMixin:SelectEncounterByDataIndex(dataIndex)

@@ -1525,6 +1525,7 @@ do  --Edit Mode
                 onMouseDownFunc = Options_OpacitySlider_OnMouseDown, onMouseUpFunc = Options_OpacitySlider_OnMouseUp, onEnterFunc = Options_OpacitySlider_OnMouseDown, onLeaveFunc = Options_OpacitySlider_OnMouseUp},
             {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},
+            {type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return C_ColorOverrides and ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
 
             {type = "Divider"},
             {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
@@ -1595,11 +1596,17 @@ do  --Edit Mode
         end
     end
 
+    function MainFrame:UpdateSampleItems()
+        if self:IsShown() and self.inEditMode then
+            self:ShowSampleItems();
+        end
+    end
+
     --Callback Registery
     local function SettingChanged_ShowItemCount(state, userInput)
         SHOW_ITEM_COUNT = state;
-        if userInput and MainFrame:IsShown() and MainFrame.inEditMode then
-            MainFrame:ShowSampleItems();
+        if userInput then
+            MainFrame:UpdateSampleItems();
         end
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowItemCount", SettingChanged_ShowItemCount);

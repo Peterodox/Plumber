@@ -1638,10 +1638,29 @@ do  -- Reputation
     local C_MajorFactions = C_MajorFactions;
     local GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation;
     local GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks;
-    local GetFactionParagonInfo = C_Reputation.GetFactionParagonInfo;
-    local GetFactionInfoByID = C_Reputation.GetFactionDataByID;
+    local GetFactionParagonInfo = C_Reputation.GetFactionParagonInfo or Nop;
     local UnitSex = UnitSex;
     local GetText = GetText;
+
+    local GetFactionDataByID;
+    if C_Reputation.GetFactionDataByID then
+        GetFactionDataByID = C_Reputation.GetFactionDataByID;
+    else    --Classic
+        function GetFactionDataByID(factionID)
+            local name, description, standingID, barMin, barMax, barValue = GetFactionInfoByID(factionID);
+            if name then
+                local tbl = {
+                    name = name,
+                    factionID = factionID,
+                    reaction = standingID,
+                    currentStanding = barValue,
+                    currentReactionThreshold = barMin,
+                    nextReactionThreshold = barMax,
+                }
+                return tbl
+            end
+        end
+    end
 
     local function GetReputationProgress(factionID)
         if not factionID then return end;
@@ -1673,7 +1692,7 @@ do  -- Reputation
             isFull = level >= rankInfo.maxLevel;
         end
 
-        if C_Reputation.IsMajorFaction(factionID) then
+        if C_Reputation.IsMajorFaction and C_Reputation.IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID);
             if majorFactionData then
                 reputationType = 3;
@@ -1687,11 +1706,12 @@ do  -- Reputation
         end
 
         if not reputationType then
-            repInfo = GetFactionInfoByID(factionID);
+            repInfo = GetFactionDataByID(factionID);
             if repInfo then
                 reputationType = 1;
                 name = repInfo.name;
                 isUnlocked = true;
+
                 if repInfo.currentReactionThreshold then
                     currentValue = repInfo.currentStanding - repInfo.currentReactionThreshold;
                     maxValue = repInfo.nextReactionThreshold - repInfo.currentReactionThreshold;
@@ -1711,7 +1731,7 @@ do  -- Reputation
             end
         end
 
-        if C_Reputation.IsFactionParagon(factionID) then
+        if C_Reputation.IsFactionParagon and C_Reputation.IsFactionParagon(factionID) then
             isFull = true;
             if paragonRepEarned and paragonThreshold and paragonThreshold ~= 0 then
                 local paragonLevel = floor(paragonRepEarned / paragonThreshold);
@@ -1753,6 +1773,10 @@ do  -- Reputation
 
 
     local function GetReputationStandingText(reaction)
+        if type(reaction) == "string" then
+            --Friendship
+            return reaction
+        end
         local gender = UnitSex("player");
         local reputationStandingtext = GetText("FACTION_STANDING_LABEL"..reaction, gender);    --GetText: Game API that returns localized texts
         return reputationStandingtext
@@ -1763,7 +1787,7 @@ do  -- Reputation
     local function GetFactionStatusText(factionID)
         --Derived from Blizzard ReputationFrame_InitReputationRow in ReputationFrame.lua
         if not factionID then return end;
-        local p1, description, standingID, barMin, barMax, barValue = GetFactionInfoByID(factionID);
+        local p1, description, standingID, barMin, barMax, barValue = GetFactionDataByID(factionID);
 
         if type(p1) == "table" then
             standingID = p1.reaction;
@@ -1772,8 +1796,8 @@ do  -- Reputation
             barValue = p1.currentStanding;
         end
 
-        local isParagon = C_Reputation.IsFactionParagon(factionID);
-        local isMajorFaction = C_Reputation.IsMajorFaction(factionID);
+        local isParagon = C_Reputation.IsFactionParagon and C_Reputation.IsFactionParagon(factionID);
+        local isMajorFaction = C_Reputation.IsMajorFaction and C_Reputation.IsMajorFaction(factionID);
         local repInfo = GetFriendshipReputation(factionID);
 
         local isCapped;

@@ -16,6 +16,7 @@ local IsCosmeticItem = C_Item.IsCosmeticItem or API.Nop;
 local GetItemCount = C_Item.GetItemCount;
 local GetCursorPosition = GetCursorPosition;
 local IsDressableItemByID = C_Item.IsDressableItemByID or API.Nop;
+local QualityColorGetter = API.GetItemQualityColor;
 
 
 -- User Settings
@@ -399,8 +400,8 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:SetNameByColor(name, color)
-        color = color or API.GetItemQualityColor(1);
-        local r, g, b = color:GetRGB();
+        color = color or QualityColorGetter(1);
+        local r, g, b = color.r, color.g, color.b;
         self.Text:SetText(name);
         self.Text:SetTextColor(r, g, b);
         self:SetBorderColor(r, g, b);
@@ -409,7 +410,7 @@ do  --UI ItemButton
     function ItemFrameMixin:SetNameByQuality(name, quality)
         quality = quality or 1;
         self.quality = quality;
-        local color = API.GetItemQualityColor(quality);
+        local color = QualityColorGetter(quality);
         self:SetNameByColor(name, color);
     end
 
@@ -1735,6 +1736,22 @@ do  --Callback Registery
         end
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_HotkeyName", SettingChanged_HotkeyName);
+
+    local function SettingChanged_UseCustomColor(state, userInput)
+        if state then
+            if ColorManager.GetColorDataForItemQuality then
+                QualityColorGetter = ColorManager.GetColorDataForItemQuality;
+            else
+                QualityColorGetter = API.GetItemQualityColor;
+            end
+        else
+            QualityColorGetter = API.GetItemQualityColor;
+        end
+        if userInput then
+            MainFrame:UpdateSampleItems();
+        end
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseCustomColor", SettingChanged_UseCustomColor);
 end
 
 

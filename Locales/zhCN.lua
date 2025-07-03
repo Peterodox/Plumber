@@ -357,6 +357,8 @@ L["LootUI Option Use Default UI"] = "使用默认拾取窗口";
 L["LootUI Option Use Default UI Tooltip"] = "使用WoW默认的拾取窗口。\n\n|cffff4800勾选此选项会使以上所有选项无效。|r";
 L["LootUI Option Background Opacity"] = "不透明度";
 L["LootUI Option Background Opacity Tooltip"] = "改变通知模式下背景的不透明度。\n\n此选项不影响手动拾取模式。";
+L["LootUI Option Custom Quality Color"] = "使用自定义品质颜色";
+L["LootUI Option Custom Quality Color Tooltip"] = "使用你在 游戏设置> 辅助功能> 颜色 中设置的颜色。"
 
 
 --Quick Slot For Third-party Dev

@@ -33,12 +33,12 @@ local function ShownIfOnQuest(questID)
     return questID and IsOnQuest(questID)
 end
 
-local function IsCategoryCollapsed(cateogryID)
-    return addon.GetDBBool("LandingPage_Activity_Collapsed_"..cateogryID)
+local function IsCategoryCollapsed(categoryID)
+    return addon.GetDBBool("LandingPage_Activity_Collapsed_"..categoryID)
 end
 
-local function SetCategoryCollapsed(cateogryID, isCollapsed)
-    return addon.SetDBValue("LandingPage_Activity_Collapsed_"..cateogryID, isCollapsed, true)
+local function SetCategoryCollapsed(categoryID, isCollapsed)
+    return addon.SetDBValue("LandingPage_Activity_Collapsed_"..categoryID, isCollapsed, true)
 end
 
 local QuestPools = {};
@@ -76,6 +76,39 @@ do  --QuestPools (Random quests from pool)
         31517, 31491, 31492,
     };
 
+    QuestPools.ShadowPan = {
+        31198, 31200, 31199, 31201, 31196, 31197, 31204, 31203,
+        31118, 31114, 31113, 31119, 31116, 31117, 31120,
+    };
+
+    QuestPools.CloudSerpent = {
+        30151, 31704, 30150, 31705,
+        30157, 30156, 30158, 31194,
+        31699, 31700, 31703,
+        30154, 30155, 31698, 31701, 31702,
+        30152, 31717, 31718, 31719, 31721, 31720,
+        31707, 31709, 31708, 31710, 31706, 31711,
+        31713, 31712, 30159, 31714, 31715,
+    };
+
+    QuestPools.GoldenLotus = {
+        30307, 31755, 30312, 31760, 31762, 30309, 30308, 30310, 31757, 31754, 30320, 31756, 31758,
+        30286, 30285, 30289, 30290, 31293, 30288,
+        30196, 30193, 30231, 30263, 30238, 30232, 30237, 30194, 30192, 30191, 30190, 30195,
+        30283, 30282, 30293, 30292, 30281,
+        30314, 30313, 30341, 30284, 30342, 30338, 30265, 30291, 30340, 30339,
+        30298, 30301, 30481, 30305, 30299, 30300,
+        30200, 30204, 30304, 30206, 30205, 30228, 30226,
+        30306, 30242, 30240, 30266, 30243, 30245, 30244, 30261, 30246, 30444,
+        30297, 30296,
+        30236, 30239, 30235,
+        30302, 30280,
+        30225, 30227, 30277,
+        30248, 30249, 30251, 30264,
+        31136,
+        30233, 30482, 30234,
+    };
+
     for k, questPool in pairs(QuestPools) do
         DailyUtil.AddQuestPool(questPool);
     end
@@ -107,6 +140,12 @@ do  --QuestSets (One set of quest per day. Detecting a quest to find the active 
     QuestSets.Xuen = {
         {30879, 30881, 30883, 30907},
         {30880, 30882, 30885, 30902},
+    };
+
+    QuestSets.ShadowPan = {
+        {31039, 31040, 31041, 31046, 31049},
+        {31042, 31043, 31047, 31105, 31061},
+        {31044, 31045, 31048, 31106, 31062},
     };
 
     for k, questSet in pairs(QuestSets) do
@@ -236,25 +275,25 @@ end
 
 
 local CategoryCandidates = {
-    Chiji = {isHeader = true, subFactionID = 1, name = "The August Celestials: Cradle of Chi-Ji", factionID = 1341, cateogryID = 13411, uiMapID = 418, areaID = 6155, questsPerDay = 4, questPool = QuestPools.Chiji, questSet = QuestSets.Chiji,
+    Chiji = {isHeader = true, subFactionID = 1, name = "The August Celestials: Cradle of Chi-Ji", factionID = 1341, categoryID = 13411, uiMapID = 418, areaID = 6155, questsPerDay = 4, questPool = QuestPools.Chiji, questSet = QuestSets.Chiji,
             staticEntries = {
                 {questID = 31378, shownIfOnQuest = true},
                 {questID = 31379, shownIfOnQuest = true},
             },
         },
-    Yulon = {isHeader = true, subFactionID = 2, name = "The August Celestials: Temple of the Jade Serpent", factionID = 1341, cateogryID = 13412, uiMapID = 371, areaID = 5975, questsPerDay = 4, questPool = QuestPools.Yulon,
+    Yulon = {isHeader = true, subFactionID = 2, name = "The August Celestials: Temple of the Jade Serpent", factionID = 1341, categoryID = 13412, uiMapID = 371, areaID = 5975, questsPerDay = 4, questPool = QuestPools.Yulon,
             staticEntries = {
                 {questID = 31376, shownIfOnQuest = true},
                 {questID = 31377, shownIfOnQuest = true},
             },
         },
-    Niuzao = {isHeader = true, subFactionID = 3, name = "The August Celestials: Niuzao Temple", factionID = 1341, cateogryID = 13413, uiMapID = 388, areaID = 6213, fixedQuestsPerDay = 4, questSet = QuestSets.Niuzao,
+    Niuzao = {isHeader = true, subFactionID = 3, name = "The August Celestials: Niuzao Temple", factionID = 1341, categoryID = 13413, uiMapID = 388, areaID = 6213, fixedQuestsPerDay = 4, questSet = QuestSets.Niuzao,
             staticEntries = {
                 {questID = 31382, shownIfOnQuest = true},
                 {questID = 31383, shownIfOnQuest = true},
             },
         },
-    Xuen = {isHeader = true, subFactionID = 4, name = "The August Celestials: Temple of the White Tiger", factionID = 1341, cateogryID = 13414, uiMapID = 379, areaID = 6174, fixedQuestsPerDay = 5, questPool = QuestPools.Xuen, questSet = QuestSets.Xuen,
+    Xuen = {isHeader = true, subFactionID = 4, name = "The August Celestials: Temple of the White Tiger", factionID = 1341, categoryID = 13414, uiMapID = 379, areaID = 6174, fixedQuestsPerDay = 5, questPool = QuestPools.Xuen, questSet = QuestSets.Xuen,
             staticEntries = {
                 {questID = 31380, shownIfOnQuest = true},
                 {questID = 31381, shownIfOnQuest = true},
@@ -287,18 +326,21 @@ end
 
 local ActivityData = {  --Constant
     --questsPerDay: number of quests each day from the questPool. Need to add the # from questSet
-    {isHeader = true, name = "The Anglers", factionID = 1302, cateogryID = 1302, uiMapID = 418, questsPerDay = 6, questPool = QuestPools.Anglers},
-    {isHeader = true, name = "The Tillers", factionID = 1272, cateogryID = 1272, uiMapID = 376, questsPerDay = 6, questPool = QuestPools.Tillers},
-    {isHeader = true, name = "The Klaxxi", factionID = 1337, cateogryID = 1337, uiMapID = 422, questsPerDay = 1, questPool = QuestPools.Klaxxi, questSet = QuestSets.Klaxxi, tooltipSetter = QuestUnlockConditions.AddKlaxxiParagonToTooltip},
-    {isHeader = true, name = "The August Celestials", factionID = 1341, cateogryID = 1341, uiMapID = 390, categoryDataGetter = CategoryDataGetter_AugustCelestials, tooltip = L["Quest Hub Instruction Celestials"]},
-    --{isHeader = true, name = "Golden Lotus", }
+    {isHeader = true, name = "The Klaxxi", factionID = 1337, categoryID = 1337, uiMapID = 422, questsPerDay = 1, questPool = QuestPools.Klaxxi, questSet = QuestSets.Klaxxi, tooltipSetter = QuestUnlockConditions.AddKlaxxiParagonToTooltip},
+    {isHeader = true, name = "The August Celestials", factionID = 1341, categoryID = 1341, uiMapID = 390, categoryDataGetter = CategoryDataGetter_AugustCelestials, tooltip = L["Quest Hub Instruction Celestials"]},
+    {isHeader = true, name = "Shado-Pan", factionID = 1270, categoryID = 1270, uiMapID = 388, fixedQuestsPerDay = 5, questPool = QuestPools.ShadowPan, questSet = QuestSets.ShadowPan,},
+    {isHeader = true, name = "Order of the Cloud Serpent", factionID = 1271, categoryID = 1271, uiMapID = 371, fixedQuestsPerDay = 7, questPool = QuestPools.CloudSerpent,
+        staticEntries = {
+            {questID = 30149, name = "A Feast for the Senses"},
+            {questID = 30147, name = "Fragments of the Past"},
+            {questID = 30148, name = "Just a Flesh Wound"},
+            {questID = 30146, name = "Snack Time"},
+        };
+    },
+    {isHeader = true, name = "Golden Lotus", factionID = 1269, categoryID = 1269, uiMapID = 390, questsPerDay = 5, questPool = QuestPools.GoldenLotus},
+    {isHeader = true, name = "The Anglers", factionID = 1302, categoryID = 1302, uiMapID = 418, questsPerDay = 6, questPool = QuestPools.Anglers},
+    {isHeader = true, name = "The Tillers", factionID = 1272, categoryID = 1272, uiMapID = 376, questsPerDay = 6, questPool = QuestPools.Tillers},
 };
-
-do  --Assign ID
-    for k, v in ipairs(ActivityData) do
-        v.headerIndex = k;
-    end
-end
 
 local function CreateQuestCounter(questPool, numCompleted, questsPerDay, tooltip)
     local tbl = {};
@@ -326,6 +368,8 @@ local function CreateQuestCounter(questPool, numCompleted, questsPerDay, tooltip
     tbl.completed = completed;
     tbl.dataIndex = 128;    --At bottom
     tbl.sortToTop = true;
+    tbl.alwaysShown = true;
+    tbl.ignoredInQuestCount = true;
     tbl.icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png";
     if not completed then
         tbl.tooltip = tooltip or L["Visit Quest Hub To Log Quests"];
@@ -499,12 +543,12 @@ do
             return a.sortToTop
         end
 
-        if a.isActive ~= b.isActive then
-            return a.isActive
-        end
-
         if a.completed ~= b.completed then
             return b.completed
+        end
+
+        if a.isActive ~= b.isActive then
+            return a.isActive
         end
 
         if a.isOnQuest ~= b.isOnQuest then
@@ -624,7 +668,7 @@ do
         IndexData(activityData);
 
         local hideCompleted = ActivityUtil.hideCompleted;
-        numCompleted = numCompleted or 0
+        numCompleted = numCompleted or 0;
 
         for _, category in ipairs(activityData) do
             category = GetOverrideCategory(category);
@@ -671,13 +715,13 @@ do
                     end
                 end
 
-                if entry.completed then
+                if entry.completed and not entry.ignoredInQuestCount then
                     numCompleted = numCompleted + 1;
                 end
 
                 if showActivity then
                     if hideCompleted then
-                        if entry.isHeader or (not entry.completed) then
+                        if entry.isHeader or entry.alwaysShown or (not entry.completed) then
                             numEntries = numEntries + 1;
                             entries[numEntries] = entry;
                         end
@@ -711,7 +755,7 @@ do
         local numCompleted = 0;
 
         for _, category in ipairs(ActivityData) do
-            category.isCollapsed = category.cateogryID and IsCategoryCollapsed(category.cateogryID); --ActivityUtil.collapsedHeader[category.headerIndex];
+            category.isCollapsed = category.categoryID and IsCategoryCollapsed(category.categoryID);
             BuildEntriesForCategory(category);
         end
 
@@ -744,12 +788,8 @@ do
         if v and v.isHeader then
             v.isCollapsed = not v.isCollapsed;
 
-            if v.headerIndex then
-                ActivityUtil.collapsedHeader[v.headerIndex] = not ActivityUtil.collapsedHeader[v.headerIndex];
-            end
-
-            if v.cateogryID then
-                SetCategoryCollapsed(v.cateogryID, v.isCollapsed);
+            if v.categoryID then
+                SetCategoryCollapsed(v.categoryID, v.isCollapsed);
             end
 
             return v.isCollapsed

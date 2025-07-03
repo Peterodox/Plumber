@@ -357,6 +357,8 @@ L["LootUI Option Use Default UI"] = "Use Default Loot Window";
 L["LootUI Option Use Default UI Tooltip"] = "Use WoW\'s default loot window.\n\n|cffff4800Enabling this option nullifies all settings above.|r";
 L["LootUI Option Background Opacity"] = "Opacity";
 L["LootUI Option Background Opacity Tooltip"] = "Set the background's opacity in Loot Notification Mode.\n\nThis option doesn't affect Manual Loot Mode.";
+L["LootUI Option Custom Quality Color"] = "Use Custom Quality Color";
+L["LootUI Option Custom Quality Color Tooltip"] = "Use the colors you set in Game Options> Accessibility> Colors."
 
 
 --Quick Slot For Third-party Dev

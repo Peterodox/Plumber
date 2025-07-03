@@ -132,7 +132,7 @@ do  --Checklist Button
 
             self.Text1:SetText(nil);
 
-            local name = DailyUtil.GetQuestTitle(questID);
+            local name = DailyUtil.GetQuestTitle(questID) or ActivityUtil.GetActivityName(self.dataIndex);
             self.Name:SetText(name);
             if not name then
                 CallbackRegistry:LoadQuest(questID, function(_questID)

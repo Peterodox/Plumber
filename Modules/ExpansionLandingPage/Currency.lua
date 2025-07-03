@@ -195,6 +195,7 @@ do
     function CurrencyListMixin:OnHide()
         self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
         self:UnregisterEvent("BAG_UPDATE_DELAYED");
+        self:UnregisterEvent("UPDATE_FACTION");
         self.anyCurrency = nil;
         self.anyItem = nil;
     end
@@ -224,18 +225,22 @@ do
                 end
             end
             self.ScrollView:ProcessActiveObjects("CurrencyButton", processFunc);
+        elseif event == "UPDATE_FACTION" then
+            self.ScrollView:CallObjectMethod("RepBar", "Refresh");
         end
     end
 
     function CurrencyListMixin:FullUpdate()
         self.anyCurrency = nil;
         self.anyItem = nil;
+        self.anyRep = nil;
 
         local n = 0;
         local content = {};
         local offsetY = 0;
         local offsetX = -0.5 * BUTTON_WIDTH;
         local gap = 0;
+        local repBarGap = 10;
         local top, bottom;
         local objectHeight;
         local valid;
@@ -263,6 +268,20 @@ do
                         bottom = bottom,
                         point = "TOPLEFT",
                         offsetX = offsetX,
+                    };
+                elseif v.faction then
+                    self.anyRep = true;
+                    objectHeight = BUTTON_HEIGHT;
+                    bottom = offsetY + objectHeight + repBarGap;
+                    content[n] = {
+                        templateKey = "RepBar",
+                        top = top,
+                        bottom = bottom,
+                        point = "TOPLEFT",
+                        offsetX = offsetX,
+                        setupFunc = function(obj)
+                            obj:SetFaction(v.faction);
+                        end;
                     };
                 else
                     objectHeight = BUTTON_HEIGHT;
@@ -316,6 +335,12 @@ do
         else
             self:UnregisterEvent("BAG_UPDATE_DELAYED");
         end
+
+        if self.anyRep then
+            self:RegisterEvent("UPDATE_FACTION");
+        else
+            self:UnregisterEvent("UPDATE_FACTION");
+        end
     end
 
     function CurrencyListMixin:UpdateScrollViewContent()
@@ -358,17 +383,17 @@ function LandingPageUtil.CreateCurrencyList(parent)
         return CreateButton(ScrollView)
     end
 
-    local function CurrencyButton_OnAcquired(button)
+    local function CurrencyButton_OnAcquired(obj)
         if ScrollView:IsScrollable() then
-            button:SetWidth(BUTTON_WIDTH - 20);
+            obj:SetWidth(BUTTON_WIDTH - 20);
         else
-            button:SetWidth(BUTTON_WIDTH);
+            obj:SetWidth(BUTTON_WIDTH);
         end
     end
 
-    local function CurrencyButton_OnRemoved(button)
-        button.currencyID = nil;
-        button.itemID = nil;
+    local function CurrencyButton_OnRemoved(obj)
+        obj.currencyID = nil;
+        obj.itemID = nil;
     end
 
     ScrollView:AddTemplate("CurrencyButton", CurrencyButton_Create, CurrencyButton_OnAcquired, CurrencyButton_OnRemoved);
@@ -382,6 +407,30 @@ function LandingPageUtil.CreateCurrencyList(parent)
     end
 
     ScrollView:AddTemplate("HeaderTitle", HeaderTitle_Create);
+
+
+    --Simple Reputation List
+    local function RepBar_Create()
+        local obj = LandingPageUtil.CreateStatusBar(ScrollView);
+        obj:SetPaddingH(8);
+        return obj;
+    end
+
+    local function RepBar_OnAcquired(obj)
+        if ScrollView:IsScrollable() then
+            obj:SetWidth(BUTTON_WIDTH - 20);
+        else
+            obj:SetWidth(BUTTON_WIDTH);
+        end
+    end
+
+    local function RepBar_OnRemoved(obj)
+        obj.currencyID = nil;
+        obj.itemID = nil;
+    end
+
+    ScrollView:AddTemplate("RepBar", RepBar_Create, RepBar_OnAcquired, RepBar_OnRemoved);
+
 
     f:SetScript("OnShow", f.OnShow);
     f:SetScript("OnHide", f.OnHide);

@@ -25,7 +25,6 @@ local SUBFACTION_BUTTON_SIZE = 40;
 
 local function HideTooltip()
     GameTooltip:Hide();
-    EmbeddedItemTooltip:Hide();
 end
 
 
@@ -100,7 +99,7 @@ do
     end
 
     function ReputationTooltipScripts.ShowParagonRewardsTooltip(self)
-        local tooltip = EmbeddedItemTooltip;
+        local tooltip = GameTooltip;
 
         --AddParagonRewardsToTooltip
         local factionID = self.factionID;
