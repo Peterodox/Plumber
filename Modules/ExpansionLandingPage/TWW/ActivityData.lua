@@ -7,7 +7,6 @@ local ActivityUtil = {};
 addon.ActivityUtil = ActivityUtil;
 
 ActivityUtil.hideCompleted = false;
-ActivityUtil.collapsedHeader = {};
 
 
 local ipairs = ipairs;
@@ -29,6 +28,14 @@ local WEEKLY_QUEST = "quest-wrapper-available";     --questlog-questtypeicon-wee
 
 local function ShownIfOnQuest(questID)
     return questID and IsOnQuest(questID)
+end
+
+local function IsCategoryCollapsed(categoryID)
+    return addon.GetDBBool("LandingPage_Activity_Collapsed_"..categoryID)
+end
+
+local function SetCategoryCollapsed(categoryID, isCollapsed)
+    return addon.SetDBValue("LandingPage_Activity_Collapsed_"..categoryID, isCollapsed, true)
 end
 
 
@@ -60,7 +67,7 @@ end
 
 local ActivityData = {  --Constant
 
-    {isHeader = true, name = "Council of Dornogal", factionID = 2590, uiMapID = 2248,
+    {isHeader = true, name = "Council of Dornogal", factionID = 2590, categoryID = 2590, uiMapID = 2248,
         entries = {
             {name = "The Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST, uiMapID = 2248},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83317, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
@@ -68,7 +75,7 @@ local ActivityData = {  --Constant
         }
     },
 
-    {isHeader = true, name = "The Assembly of the Deeps", factionID = 2594, uiMapID = 2214,
+    {isHeader = true, name = "The Assembly of the Deeps", factionID = 2594, categoryID = 2594, uiMapID = 2214,
         entries = {
             {name = "Rollin\' Down in the Deeps", questID = 82946, atlas = WEEKLY_QUEST, uiMapID = 2214},
             {name = "Gearing Up for Trouble", questID = 83333, atlas = WEEKLY_QUEST, uiMapID = 2214}, --Awakening the Machine
@@ -76,14 +83,14 @@ local ActivityData = {  --Constant
         }
     },
 
-    {isHeader = true, name = "Hallowfall Arathi", factionID = 2570, uiMapID = 2215,
+    {isHeader = true, name = "Hallowfall Arathi", factionID = 2570, categoryID = 2570, uiMapID = 2215,
         entries = {
             {name = "Speading the Light", questID = 76586, atlas = WEEKLY_QUEST, uiMapID = 2215},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83320, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
 
-    {isHeader = true, name = "The Severed Threads", factionID = 2600, uiMapID = 2255,
+    {isHeader = true, name = "The Severed Threads", factionID = 2600, categoryID = 2560, uiMapID = 2255,
         entries = {
             {name = "Forge a Pact", questID = 80592, atlas = WEEKLY_QUEST, uiMapID = 2255},
             {name = "Blade of the General", questID = 80671, atlas = WEEKLY_QUEST, factionID = 2605, shownIfOnQuest = true, uiMapID = 2255},
@@ -93,7 +100,7 @@ local ActivityData = {  --Constant
         }
     },
 
-    {isHeader = true, name = "The Cartels of Undermine", factionID = 2653, uiMapID = 2346,
+    {isHeader = true, name = "The Cartels of Undermine", factionID = 2653, categoryID = 2553, uiMapID = 2346,
         entries = {
             {name = "Many Jobs, Handle It!", questID = 85869, atlas = WEEKLY_QUEST, uiMapID = 2346},
             {name = "Urge to Surge", questID = 86775, atlas = WEEKLY_QUEST, uiMapID = 2346},
@@ -103,7 +110,7 @@ local ActivityData = {  --Constant
         }
     },
 
-    {isHeader = true, name = "Flame\'s Radiance", factionID = 2688, uiMapID = 2215,
+    {isHeader = true, name = "Flame\'s Radiance", factionID = 2688, categoryID = 2688, uiMapID = 2215,
         entries = {
             {name = "The Flame Burns Eternal", questID = 91173, atlas = WEEKLY_QUEST, uiMapID = 2215},
             {name = "Sureki Incursion: The Eastern Assault", questID = 87480, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
@@ -115,13 +122,31 @@ local ActivityData = {  --Constant
         }
     },
 
-    {isHeader = true, name = "Delves", localizedName = DELVES_LABEL,
+    {isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
         entries = {
             {name = "The Key to Success", questID = 84370, atlas = WEEKLY_QUEST, accountwide = true},
             {name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187},
         }
     },
 };
+
+if addon.IsToCVersionEqualOrNewerThan(110200) then  --PTR debug
+    table.insert(ActivityData, 1, {
+        isHeader = true, name = "K\'aresh", factionID = 2658, categoryID = 2658, uiMapID = 2371, --areaID = 15792 (Oasis)
+        entries = {
+            {name = "More Than Just a Phase", questID = 91093, atlas = WEEKLY_QUEST, uiMapID = 2371},
+            {name = "Ecological Succession", questID = 85460, atlas = WEEKLY_QUEST, uiMapID = 2371},
+            {name = "Anima Reclamation Program", questID = 85459, atlas = WEEKLY_QUEST, uiMapID = 2371},
+            {name = "Food Run", questID = 85461, atlas = WEEKLY_QUEST, uiMapID = 2371},
+            {name = "A Reel Problem", questID = 90545, atlas = WEEKLY_QUEST, uiMapID = 2371},
+            --the following don't reward rep
+            {name = "Funny Buzzness", questID = 89195, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Making a Deposit", questID = 89063, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Making a Deposit", questID = 85722, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Making a Deposit", questID = 89061, shownIfOnQuest = true, uiMapID = 2371},
+        },
+    });
+end
 
 do  --Assign ID
     for k, v in ipairs(ActivityData) do
@@ -202,8 +227,6 @@ end
 
 local DynamicQuestDataProvider = {};
 do  --Dynamic Quests are acquired using Game API, instead of using a pre-determined table
-    DynamicQuestDataProvider.collapsedMap = {};
-
     local MapMetaQuestLines = {
         [2339] = {  --Dornogal
             5572,   --Worldsoul: Weekly Meata
@@ -220,13 +243,15 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
         },
     };
 
+    local DynamicQuestMaps = {
+        --Automatically find repeatable quests from these maps
+        --[uiMapID] = categoryID,
+        [2339] = "map2339",     --Dornogal
+    };
+
     function DynamicQuestDataProvider:Reset()
         self.addedQuests = {};
         self.questsByMap = {};
-    end
-
-    function DynamicQuestDataProvider:SetMapCollapsed(uiMapID, isCollapsed)
-        self.collapsedMap[uiMapID] = isCollapsed;
     end
 
     function DynamicQuestDataProvider:AddQuestsFromTable(uiMapID, tbl)
@@ -255,7 +280,7 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
         end
     end
 
-    function DynamicQuestDataProvider:AddQuestsFromMap(uiMapID)
+    function DynamicQuestDataProvider:AddQuestsFromMap(uiMapID, categoryID)
         C_QuestLine.RequestQuestLinesForMap(uiMapID);
 
         self.questsByMap[uiMapID] = nil;
@@ -307,7 +332,8 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
                 entries = self.questsByMap[uiMapID],
                 isDynamicQuest = true,
                 questMapID = uiMapID,
-                isCollapsed = self.collapsedMap[uiMapID] == true,
+                categoryID = categoryID,
+                isCollapsed = IsCategoryCollapsed(categoryID),
             };
             if not MapQuestData then
                 MapQuestData = {};
@@ -340,6 +366,12 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
             end
         end
     end
+
+    function DynamicQuestDataProvider:QueryQuests()
+        for uiMapID, categoryID in pairs(DynamicQuestMaps) do
+            self:AddQuestsFromMap(uiMapID, categoryID);
+        end
+    end
 end
 
 
@@ -370,7 +402,11 @@ function ActivityUtil.GetActivityName(dataIndex)
             end
         end
 
-        if v.isHeader and v.factionID then
+        if v.isHeader and (v.areaID or v.factionID) then
+            if v.areaID then
+                local zoneName = API.GetZoneName(v.areaID);
+                return zoneName, true
+            end
             local data = C_Reputation.GetFactionDataByID(v.factionID);
             if data and data.name then
                 v.localizedName = data.name;
@@ -529,7 +565,7 @@ function ActivityUtil.GetSortedActivity()
     --Wipe old data
     MapQuestData = nil;
     DynamicQuestDataProvider:Reset();
-    DynamicQuestDataProvider:AddQuestsFromMap(2339);     --Dornogal
+    DynamicQuestDataProvider:QueryQuests();
 
 
     local tbl = {};
@@ -537,7 +573,7 @@ function ActivityUtil.GetSortedActivity()
     local numCompleted = 0;
 
     for _, category in ipairs(ActivityData) do
-        category.isCollapsed = ActivityUtil.collapsedHeader[category.headerIndex];
+        category.isCollapsed = IsCategoryCollapsed(category.categoryID);
     end
 
     n, numCompleted = FlattenData(MapQuestData, n, tbl, numCompleted);
@@ -574,12 +610,8 @@ function ActivityUtil.ToggleCollapsed(dataIndex)
     if v and v.isHeader then
         v.isCollapsed = not v.isCollapsed;
 
-        if v.headerIndex then
-            ActivityUtil.collapsedHeader[v.headerIndex] = not ActivityUtil.collapsedHeader[v.headerIndex];
-        end
-
-        if v.isDynamicQuest and v.questMapID then
-            DynamicQuestDataProvider:SetMapCollapsed(v.questMapID, v.isCollapsed);
+        if v.categoryID then
+            SetCategoryCollapsed(v.categoryID, v.isCollapsed);
         end
 
         --print(dataIndex, v.localizedName or v.name, v.isDynamicQuest, v.questMapID, v.isCollapsed);

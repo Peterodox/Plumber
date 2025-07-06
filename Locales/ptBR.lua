@@ -455,6 +455,7 @@ L["currency-2916"] = "Rúnico";
 L["currency-2917"] = "Dourado";
 
 L["Season Maximum Colon"] = "Máximo da série:";
+L["Item Changed"] = "mudou para";   --CHANGED_OWN_ITEM
 
 
 --Map Pin Filter Name (name should be plural)

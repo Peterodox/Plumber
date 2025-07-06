@@ -470,6 +470,7 @@ L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
+L["Uncollected Set Counter Format"] = "You have |cffffffff%d|r uncollected transmog |4set:sets;.";
 
 
 --Plumber AddOn Settings
@@ -497,6 +498,7 @@ L["GameObject Door"] = "Door";
 L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
 
 L["Season Maximum Colon"] = "Season Maximum:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
+L["Item Changed"] = "was changed to";   --CHANGED_OWN_ITEM
 
 
 --Map Pin Filter Name (name should be plural)

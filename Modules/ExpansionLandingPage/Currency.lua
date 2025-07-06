@@ -30,18 +30,20 @@ end
 
 local CurrencyButtonMixin = {};
 do
-    function CurrencyButtonMixin:SetCurrency(currencyID, isMinor)
+    function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendedTooltipFunc)
         self.currencyID = currencyID;
         self.itemID = nil;
         self.buttonDitry = true;
+        self.appendedTooltipFunc = appendedTooltipFunc;
         self:Refresh();
         self:SetShownAsMinor(isMinor);
     end
 
-    function CurrencyButtonMixin:SetItem(itemID, isMinor)
+    function CurrencyButtonMixin:SetItem(itemID, isMinor, appendedTooltipFunc)
         self.currencyID = nil;
         self.itemID = itemID;
         self.buttonDitry = true;
+        self.appendedTooltipFunc = appendedTooltipFunc;
         self:Refresh();
         self:SetShownAsMinor(isMinor);
     end
@@ -121,6 +123,14 @@ do
             tooltip:SetCurrencyByID(self.currencyID);
         elseif self.itemID then
             tooltip:SetItemByID(self.itemID);
+        end
+
+        if self.appendedTooltipFunc and tooltip.ProcessInfo then
+            local info = API.CreateAppendTooltipInfo();
+            if self.appendedTooltipFunc(info) then
+               tooltip:ProcessInfo(info);
+               tooltip:Show();
+            end
         end
     end
 
@@ -249,6 +259,8 @@ do
             valid = true;
             if v.shownInDelves then
                 valid = API.IsInDelves();
+            elseif v.conditionFunc then
+                valid = v.conditionFunc();
             elseif v.shownIfOwned then
                 valid = GetResourcesQuantity(v) > 0;
             end
@@ -296,12 +308,12 @@ do
                     if v.currencyID then
                         self.anyCurrency = true;
                         content[n].setupFunc = function(obj)
-                            obj:SetCurrency(v.currencyID, v.isMinor);
+                            obj:SetCurrency(v.currencyID, v.isMinor, v.appendedTooltipFunc);
                         end;
                     elseif v.itemID then
                         self.anyItem = true;
                         content[n].setupFunc = function(obj)
-                            obj:SetItem(v.itemID, v.isMinor);
+                            obj:SetItem(v.itemID, v.isMinor, v.appendedTooltipFunc);
                         end;
                     end
                 end

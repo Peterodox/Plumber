@@ -461,6 +461,7 @@ L["GameObject Door"] = "Дверь";
 L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameObjectID once it shows up in the database
 
 L["Season Maximum Colon"] = "Максимум за сезон:";
+L["Item Changed"] = "в предмет";   --CHANGED_OWN_ITEM
 
 
 --Map Pin Filter Name (name should be plural)

@@ -1310,14 +1310,14 @@ do  -- TokenFrame   -- Money   -- Coin
         end
     end
 
-    function TokenDisplayMixin:SetFrameOwner(owner, position, offsetX, offsetY)
+    function TokenDisplayMixin:SetFrameOwner(owner, position, offsetX, offsetY, frameStrata)
         --local b = owner:GetBottom();
         --local r = owner:GetRight();
         offsetX = offsetX or 0;
         offsetY = offsetY or 0;
 
         self:ClearAllPoints();
-        self:SetFrameStrata("FULLSCREEN");
+        self:SetFrameStrata(frameStrata or "FULLSCREEN");
 
         local realParent = owner;   --UIParent
 

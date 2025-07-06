@@ -478,6 +478,7 @@ L["GameObject Door"] = "Door";
 L["Delve Chest 1 Rare"] = "풍요의 금고";   --We'll use the GameObjectID once it shows up in the database
 
 L["Season Maximum Colon"] = "시즌 상한선:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
+L["Item Changed"] = "당신의";   --CHANGED_OWN_ITEM
 
 
 --Map Pin Filter Name (name should be plural)

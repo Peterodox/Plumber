@@ -2825,6 +2825,58 @@ do  -- Tooltip
             end
         end
     end
+
+
+    local PseudoTooltipInfoMixin = {};
+    do
+        function PseudoTooltipInfoMixin:AddBlankLine()
+            tinsert(self.tooltipData.lines, {
+                leftText = " ",
+                wrapText = true,
+            });
+        end
+
+        function PseudoTooltipInfoMixin:AddLine(text, r, g, b, wrapText)
+            local color;
+            if type(r) == "table" then
+                color = r;
+            else
+                color = CreateColor(r, g, b);
+            end
+            tinsert(self.tooltipData.lines, {
+                leftText = text,
+                leftColor = color,
+                wrapText = true,
+            });
+        end
+
+        function PseudoTooltipInfoMixin:AddDoubleLine(leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB)
+            local leftColor, rightColor;
+            if type(leftR) == "table" then
+                leftColor = leftR;
+                rightColor = leftG;
+            else
+                leftColor = CreateColor(leftR, leftG, leftB);
+                rightColor = CreateColor(rightR, rightG, rightB);
+            end
+            tinsert(self.tooltipData.lines, {
+                leftText = leftText,
+                leftColor = leftColor,
+                rightText = rightText,
+                rightColor = rightColor,
+            });
+        end
+    end
+
+    function API.CreateAppendTooltipInfo()
+        local info = {};
+        info.append = true;
+        info.tooltipData = {};
+        info.tooltipData.lines = {};
+        API.Mixin(info, PseudoTooltipInfoMixin);
+        info:AddBlankLine();
+        return info
+    end
 end
 
 do  -- AsyncCallback

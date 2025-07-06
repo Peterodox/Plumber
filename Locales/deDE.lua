@@ -459,6 +459,7 @@ L["currency-2917"] = "Vergoldetes";
 L["Delve Chest 1 Rare"] = "Großzügiger Kasten";
 
 L["Season Maximum Colon"] = "Saisonmaximum:";
+L["Item Changed"] = "r Gegenstand";   --CHANGED_OWN_ITEM
 
 
 --Map Pin Filter Name (name should be plural)

@@ -457,6 +457,7 @@ L["currency-2916"] = "符文";
 L["currency-2917"] = "鍍金";
 
 L["Season Maximum Colon"] = "賽季上限：";
+L["Item Changed"] = "已改為";   --CHANGED_OWN_ITEM
 
 
 --Map Pin Filter Name (name should be plural)

@@ -438,6 +438,7 @@ L["Paragon Reputation"] = "巅峰";
 L["Level Maxed"] = "已满级";   --Reached max level
 L["Current Colon"] = "当前：";
 L["Unclaimed Reward Alert"] = "你有未领取的巅峰宝箱";
+L["Uncollected Set Counter Format"] = "你有|cffffffff%d|r套未收集的幻化套装。";
 
 
 --Plumber AddOn Settings
@@ -465,6 +466,7 @@ L["GameObject Door"] = "门";
 L["Delve Chest 1 Rare"] = "丰裕宝匣";
 
 L["Season Maximum Colon"] = "赛季上限："
+L["Item Changed"] = "已被替换为";   --CHANGED_OWN_ITEM
 
 
 --Map Pin Filter Name (name should be plural)
