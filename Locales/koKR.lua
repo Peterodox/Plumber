@@ -356,6 +356,8 @@ L["LootUI Option Use Default UI"] = "기본 전리품 창 사용";
 L["LootUI Option Use Default UI Tooltip"] = "기본 전리품 창을 사용합니다\n\n|cffff4800이 항목을 사용하면 앞서 설정한 옵션들이 적용되지 않습니다.|r";
 L["LootUI Option Background Opacity"] = "투명도";
 L["LootUI Option Background Opacity Tooltip"] = "전리품 알림 모드에서 배경 투명도를 조절할 수 있어요. 이 설정은 수동 루팅 모드에는 적용되지 않아요.";
+L["LootUI Option Custom Quality Color"] = "사용자 지정 품질 색상 사용";
+L["LootUI Option Custom Quality Color Tooltip"] = "게임 설정 > 손쉬운 사용 > 색상 - 설정한 색상을 사용합니다."
 
 
 --Quick Slot For Third-party Dev
