@@ -30,20 +30,20 @@ end
 
 local CurrencyButtonMixin = {};
 do
-    function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendedTooltipFunc)
+    function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc)
         self.currencyID = currencyID;
         self.itemID = nil;
         self.buttonDitry = true;
-        self.appendedTooltipFunc = appendedTooltipFunc;
+        self.appendTooltipFunc = appendTooltipFunc;
         self:Refresh();
         self:SetShownAsMinor(isMinor);
     end
 
-    function CurrencyButtonMixin:SetItem(itemID, isMinor, appendedTooltipFunc)
+    function CurrencyButtonMixin:SetItem(itemID, isMinor, appendTooltipFunc)
         self.currencyID = nil;
         self.itemID = itemID;
         self.buttonDitry = true;
-        self.appendedTooltipFunc = appendedTooltipFunc;
+        self.appendTooltipFunc = appendTooltipFunc;
         self:Refresh();
         self:SetShownAsMinor(isMinor);
     end
@@ -125,9 +125,9 @@ do
             tooltip:SetItemByID(self.itemID);
         end
 
-        if self.appendedTooltipFunc and tooltip.ProcessInfo then
+        if self.appendTooltipFunc and tooltip.ProcessInfo then
             local info = API.CreateAppendTooltipInfo();
-            if self.appendedTooltipFunc(info) then
+            if self.appendTooltipFunc(info) then
                tooltip:ProcessInfo(info);
                tooltip:Show();
             end
@@ -292,6 +292,7 @@ do
                         point = "TOPLEFT",
                         offsetX = offsetX,
                         setupFunc = function(obj)
+                            obj.appendTooltipFunc = v.appendTooltipFunc;
                             obj:SetFaction(v.faction);
                         end;
                     };
@@ -308,12 +309,12 @@ do
                     if v.currencyID then
                         self.anyCurrency = true;
                         content[n].setupFunc = function(obj)
-                            obj:SetCurrency(v.currencyID, v.isMinor, v.appendedTooltipFunc);
+                            obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc);
                         end;
                     elseif v.itemID then
                         self.anyItem = true;
                         content[n].setupFunc = function(obj)
-                            obj:SetItem(v.itemID, v.isMinor, v.appendedTooltipFunc);
+                            obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
                         end;
                     end
                 end

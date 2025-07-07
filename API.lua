@@ -1784,9 +1784,10 @@ do  -- Reputation
     API.GetReputationStandingText = GetReputationStandingText;
 
 
-    local function GetFactionStatusText(factionID)
+    local function GetFactionStatusText(factionID, simplified)
         --Derived from Blizzard ReputationFrame_InitReputationRow in ReputationFrame.lua
         if not factionID then return end;
+        local factionName;
         local p1, description, standingID, barMin, barMax, barValue = GetFactionDataByID(factionID);
 
         if type(p1) == "table" then
@@ -1794,6 +1795,9 @@ do  -- Reputation
             barMin = p1.currentReactionThreshold;
             barMax = p1.nextReactionThreshold;
             barValue = p1.currentStanding;
+            factionName = p1.name;
+        else
+            factionName = p1;
         end
 
         local isParagon = C_Reputation.IsFactionParagon and C_Reputation.IsFactionParagon(factionID);
@@ -1803,8 +1807,10 @@ do  -- Reputation
         local isCapped;
         local factionStandingtext;  --Revered/Junior/Renown 1
         local cappedAlert;
+        local isFriendship;
 
         if repInfo and repInfo.friendshipFactionID > 0 then --Friendship
+            isFriendship = true;
             factionStandingtext = repInfo.reaction;
 
             if repInfo.nextThreshold then
@@ -1816,7 +1822,7 @@ do  -- Reputation
 
             local rankInfo = GetFriendshipReputationRanks(repInfo.friendshipFactionID);
             if rankInfo then
-                factionStandingtext = factionStandingtext .. string.format(" (Lv. %s/%s)", rankInfo.currentLevel, rankInfo.maxLevel);
+                factionStandingtext = factionStandingtext .. format(" (Lv. %s/%s)", rankInfo.currentLevel, rankInfo.maxLevel);
             end
 
         elseif isMajorFaction then
@@ -1851,7 +1857,11 @@ do  -- Reputation
 
         local rolloverText; --(0/24000)
         if barMin and barValue and barMax and (not isCapped) then
-            rolloverText = string.format("(%s/%s)", barValue - barMin, barMax - barMin);
+            rolloverText = format("(%s/%s)", barValue - barMin, barMax - barMin);
+            if simplified then
+                factionStandingtext = isFriendship and repInfo.reaction or factionStandingtext or "";
+                return (factionStandingtext.." "..rolloverText), factionName
+            end
         end
 
         local text;
@@ -1876,7 +1886,7 @@ do  -- Reputation
             end
         end
 
-        return text
+        return text, factionName
     end
     API.GetFactionStatusText = GetFactionStatusText;
 

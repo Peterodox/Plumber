@@ -53,7 +53,7 @@ end
 
 local ResourceList = {
     {itemID = 244465, shownInDelves = true},
-    {currencyID = 3309, conditionFunc = HasUncollectedSets, appendedTooltipFunc = ShowUncollectedSets},    --Hellstone Shard (Greedy Emissary)
+    {currencyID = 3309, conditionFunc = HasUncollectedSets, appendTooltipFunc = ShowUncollectedSets},    --Hellstone Shard (Greedy Emissary)
 
     {currencyID = 3028},    --Restored Coffer Key
     {itemID = 236096, isMinor = false},   --Coffer Key Shard

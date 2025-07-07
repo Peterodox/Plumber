@@ -17,9 +17,11 @@ local GetLootSlotType = GetLootSlotType;
 local GetLootSlotInfo = GetLootSlotInfo;
 local GetNumLootItems = GetNumLootItems;
 local IsFishingLoot = IsFishingLoot;
+local StripHyperlinks = StripHyperlinks;
+local time = time;
 
 local GetMoney = GetMoney;
-local GetItemReagentQualityByItemInfo = C_TradeSkillUI.GetItemReagentQualityByItemInfo or API.Nop;
+local GetItemCraftingQuality = API.GetItemCraftingQuality;
 local GetItemInfoInstant = C_Item.GetItemInfoInstant;
 local GetItemInfo = C_Item.GetItemInfo;
 local IsModifiedClick = IsModifiedClick;
@@ -120,7 +122,7 @@ local function SortFunc_LootSlot(a, b)
 end
 
 local function GetItemCountFromText(text)
-    local count = match(text, "|rx(%d+)$");
+    local count = match(text, "|rx(%d+)");
     if count then
         return tonumber(count)
     else
@@ -152,24 +154,39 @@ local function MergeData(d1, d2)
 end
 
 
+local ItemIDxQuestTypes = {};   --Cache
+
 local function CreateItemDataFromLink(link, slotIndex, icon, name, quantity, quality, locked, questType)
     local id, _, _, _, texture, classID, subclassID = GetItemInfoInstant(link);
     if not icon then
         icon = texture;
     end
+
+    if questType and questType ~= 0 then
+        ItemIDxQuestTypes[id] = questType;
+    elseif questType == nil then
+        questType = ItemIDxQuestTypes[id];
+    end
+
+    local craftQuality = GetItemCraftingQuality(link);
+
     if not (name and quality) then
         --From chat events. Ignore quest item
-        if classID == 12 then return end;
+        if classID == 12 then
+            if (not EL.lootOpenedTime) or (time() - EL.lootOpenedTime) > 2 then
+                return
+            end
+        end
         local itemName, _, itemQuality = GetItemInfo(link);
         name = name or itemName;
         quality = quality or itemQuality;
+        if craftQuality then
+            name = StripHyperlinks(name);
+        end
     end
 
-    local craftQuality;
     local hideCount = false;
-    if classID == 5 or classID == 7 then
-        craftQuality = GetItemReagentQualityByItemInfo(link);
-    elseif classID == 2 or classID == 4 then
+    if classID == 2 or classID == 4 then
         hideCount = true;
     end
 
@@ -257,9 +274,12 @@ local function CreateMoneyData(link, slotIndex, icon, name, quantity, quality, l
     return data
 end
 
+
 local MerchantFrame = MerchantFrame;
+local MailFrame = MailFrame;
 local function IsMerchantFrameVisible()
-    return MerchantFrame and MerchantFrame:IsVisible()
+    --(when alwaysListenLootMsg is true) we don't want to show alert when interacting with vendor or mailbox
+    return MailFrame:IsVisible() or MerchantFrame:IsVisible()
 end
 
 
@@ -306,9 +326,9 @@ do  --Process Loot Message
                         if not data.looted then
                             if data.slotType == Defination.SLOT_TYPE_ITEM and data.id == itemID then
                                 data.looted = true;
-                                local count = GetItemCountFromText(text);
-                                if count then
-                                    data.quantity = count;
+                                local quantity = GetItemCountFromText(text);
+                                if quantity then
+                                    data.quantity = quantity;
                                 end
                                 if AUTO_LOOT_ENABLE_TOOLTIP then
                                     local link = match(text, "|H(item[:%d]+)|h", 1);
@@ -471,7 +491,6 @@ do  --Event Handler
                 end
                 data = CreateItemDataFromLink(link, slotIndex, icon, name, quantity, quality, locked, questType);
             elseif currencyID then
-                id = currencyID;
                 data = CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, icon, name, quantity, quality, locked, questType);
             end
         end
@@ -516,6 +535,7 @@ do  --Event Handler
         self.lootOpened = true;
         self.dirtySlots = {};
         self.playerMoney = GetMoney();
+        self.lootOpenedTime = time();
 
         --print("isAutoLoot", isAutoLoot, GetCVarBool("autoLootDefault"), IsModifiedClick("AUTOLOOTTOGGLE"));
         local useManualMode;
@@ -712,7 +732,7 @@ do  --Event Handler
             local hideCount = false;
             local craftQuality = 0;
             if classID == 5 or classID == 7 then
-                craftQuality = GetItemReagentQualityByItemInfo(itemLink);
+                craftQuality = GetItemCraftingQuality(itemLink);
             elseif classID == 2 or classID == 4 then
                 hideCount = true;
             end

@@ -1,5 +1,35 @@
 local _, addon = ...
 local LandingPageUtil = addon.LandingPageUtil;
+local GetFactionStatusText = addon.API.GetFactionStatusText;
+
+
+local TillersSubFactions = {
+    1277,     --Chee Chee
+    1275,     --Ella
+    1282,     --Fish Fellreed
+    1283,     --Farmer Fung
+    1281,     --Gina Mudclaw
+    1273,     --Jogu the Drunk
+    1279,     --Haohan Mudclaw
+    1276,     --Old Hillpaw
+    1278,     --Sho
+    1280,     --Tina Mudclaw
+};
+
+local function AppendTooltip_TillersSubFactions(tooltip)
+    local status, factionName;
+    local n = 0;
+    for _, factionID in ipairs(TillersSubFactions) do
+        status, factionName = GetFactionStatusText(factionID, true);
+        if status and factionName then
+            if n % 5 == 0 then
+                tooltip:AddLine(" ");
+            end
+            n = n + 1;
+            tooltip:AddDoubleLine(factionName, status, 1, 0.82, 0, 1, 1, 1);
+        end
+    end
+end
 
 
 local ResourceList = {
@@ -16,7 +46,7 @@ local ResourceList = {
     {faction = 1271},       --Order of the Cloud Serpent
     {faction = 1269},       --Golden Lotus
     {faction = 1302},       --Anglers
-    {faction = 1272},       --Tillers
+    {faction = 1272, appendTooltipFunc = AppendTooltip_TillersSubFactions},       --Tillers
 
     --[[
     {faction = 1277},     --Chee Chee

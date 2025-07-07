@@ -158,10 +158,13 @@ do
 
     function StatusBarMixin:OnEnter()
         self:UpdateVisual();
-        if self.Label:IsTruncated() then
+        if self.Label:IsTruncated() or self.appendTooltipFunc then
             local tooltip = GameTooltip;
             tooltip:SetOwner(self, "ANCHOR_RIGHT");
             tooltip:SetText(self.Label:GetText(), 1, 1, 1, 1, true);
+            if self.appendTooltipFunc then
+                self.appendTooltipFunc(tooltip);
+            end
             tooltip:Show();
         end
     end
