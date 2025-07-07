@@ -281,8 +281,8 @@ L["Click To Disable"] = "点击禁用";
 
 
 --NameplateWidget
-L["ModuleName NameplateWidget"] = "姓名版: 钥焰";
-L["ModuleDescription NameplateWidget"] = "在钥焰的姓名版进度条上显示你拥有的光耀残渣的数量。";
+L["ModuleName NameplateWidget"] = "姓名板: 钥焰";
+L["ModuleDescription NameplateWidget"] = "在钥焰的姓名板进度条上显示你拥有的光耀残渣的数量。";
 
 
 --PartyInviterInfo
