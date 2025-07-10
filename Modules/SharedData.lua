@@ -22,10 +22,19 @@ do  --Item Upgrade Track
 
         CrestSources = {
             (PLAYER_DIFFICULTY6 or "Mythic") .. ", +7",
-            (PLAYER_DIFFICULTY2 or "Heroic") .. ", +6",
+            (PLAYER_DIFFICULTY2 or "Heroic") .. ", +2",
             (PLAYER_DIFFICULTY1 or "Normal"),
             (PLAYER_DIFFICULTY3 or "Raid Finder"),
         };
-    }
+    };
+
+    if addon.IsToCVersionEqualOrNewerThan(110200) then
+        ItemUpgradeConstant.Crests = {
+            3290, 3288, 3286, 3284,
+        };
+
+        ItemUpgradeConstant.CatalystCurrencyID = 3269;
+    end
+
     addon.ItemUpgradeConstant = ItemUpgradeConstant;
 end

@@ -462,6 +462,7 @@ L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameO
 
 L["Season Maximum Colon"] = "Максимум за сезон:";
 L["Item Changed"] = "в предмет";   --CHANGED_OWN_ITEM
+L["Completed CHETT List"] = "Заполненный список КРОТ";
 
 
 --Map Pin Filter Name (name should be plural)

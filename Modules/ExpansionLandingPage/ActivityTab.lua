@@ -104,7 +104,8 @@ do  --Checklist Button
             end
         elseif self.conditions then
             if self.conditions.IsReadyForTurnIn then
-                self.readyForTurnIn = self.conditions.IsReadyForTurnIn();
+                local arg = self.conditions.useItemName and self.Name:GetText() or self.id;
+                self.readyForTurnIn = self.conditions.IsReadyForTurnIn(arg);
             end
         end
 

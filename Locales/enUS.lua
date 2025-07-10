@@ -499,6 +499,7 @@ L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID onc
 
 L["Season Maximum Colon"] = "Season Maximum:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
 L["Item Changed"] = "was changed to";   --CHANGED_OWN_ITEM
+L["Completed CHETT List"] = "Completed C.H.E.T.T. List";
 
 
 --Map Pin Filter Name (name should be plural)

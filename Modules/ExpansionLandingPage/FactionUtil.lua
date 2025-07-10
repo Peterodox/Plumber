@@ -81,7 +81,7 @@ local OverrideFactionInfo = {
     },
 
     [2658] = {  --The K'aresh Trust
-        barColor = {197/255, 142/255, 255/255},
+        barColor = {173/255, 152/255, 255/255},
         rewardQuestID = 85109,
     },
 

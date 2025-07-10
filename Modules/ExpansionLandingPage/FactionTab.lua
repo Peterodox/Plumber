@@ -714,6 +714,9 @@ do
         self:Refresh();
         API.RegisterFrameForEvents(self, DynamicEvents);
         LandingPageUtil.ShowLeftFrame(self.isOverview);
+        if self:IsViewingFactionDetail() then
+            self:UpdateRewardsList(true);
+        end
     end
 
     function FactionTabMixin:OnHide()

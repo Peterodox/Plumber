@@ -19,6 +19,7 @@ L["currency-2917"] = "dorado";
 
 L["Season Maximum Colon"] = "Máximo de temporada:";
 L["Item Changed"] = "pasó a ser";   --CHANGED_OWN_ITEM
+L["Completed CHETT List"] = "Lista de T.A.R.E.A.S. completa";
 
 
 --Map Pin Filter Name (name should be plural)

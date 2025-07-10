@@ -684,6 +684,8 @@ do
 
                 if entry.questID then
                     InitQuestData(entry);
+                else
+                    entry.isOnQuest = false;
                 end
 
                 if flagQuest then

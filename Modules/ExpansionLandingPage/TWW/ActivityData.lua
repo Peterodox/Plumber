@@ -19,6 +19,7 @@ local GetQuestClassification = C_QuestInfoSystem.GetQuestClassification;
 local IsOnQuest = C_QuestLog.IsOnQuest;
 local GetQuestLineInfo = C_QuestLine.GetQuestLineInfo;
 local GetItemCount = C_Item.GetItemCount;
+local HaveQuestData = HaveQuestData;
 
 
 local DELVES_BOUNTIFUL = "delves-bountiful";
@@ -47,20 +48,27 @@ local DELVES_REP_TOOLTIP = L["Bountiful Delves Rep Tooltip"];
 
 local ConditionFuncs = {};
 do
-    function ConditionFuncs.OwnItem(itemID)
-        if itemID then
-            return GetItemCount(itemID) > 0
+    function ConditionFuncs.OwnItem(itemInfo)
+        --itemInfo can be item name
+        if itemInfo then
+            return GetItemCount(itemInfo) > 0
         end
-        return 0
+        return false
     end
 end
 
 
 local Conditions = {};
 do
-    Conditions.ItemReadyToTurnInWhenLooted = {
+    Conditions.ItemReadyToTurnInWhenLooted_ItemID = {
         ShouldShowActivity = ConditionFuncs.OwnItem,
         IsReadyForTurnIn = ConditionFuncs.OwnItem,
+    };
+
+    Conditions.ItemReadyToTurnInWhenLooted_ItemName = {
+        ShouldShowActivity = ConditionFuncs.OwnItem,
+        IsReadyForTurnIn = ConditionFuncs.OwnItem,
+        useItemName = true,
     };
 end
 
@@ -105,7 +113,8 @@ local ActivityData = {  --Constant
             {name = "Many Jobs, Handle It!", questID = 85869, atlas = WEEKLY_QUEST, uiMapID = 2346},
             {name = "Urge to Surge", questID = 86775, atlas = WEEKLY_QUEST, uiMapID = 2346},
             {name = "Reduce, Reuse, Resell", questID = 85879, atlas = WEEKLY_QUEST, uiMapID = 2346},
-            {name = "Completed C.H.E.T.T. List", itemID = 235053, conditions = Conditions.ItemReadyToTurnInWhenLooted, icon = 134391, tooltip = L["Ready To Turn In Tooltip"], uiMapID = 2346},
+            {name = "Completed C.H.E.T.T. List", itemID = 235053, localizedName = L["Completed CHETT List"], conditions = Conditions.ItemReadyToTurnInWhenLooted_ItemName,   --The incompleted and completed items have the same itemID, needs checking count by name
+                icon = 134391, tooltip = L["Ready To Turn In Tooltip"], uiMapID = 2346},
             {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 87407, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
         }
     },
@@ -141,9 +150,10 @@ if addon.IsToCVersionEqualOrNewerThan(110200) then  --PTR debug
             {name = "A Reel Problem", questID = 90545, atlas = WEEKLY_QUEST, uiMapID = 2371},
             --the following don't reward rep
             {name = "Funny Buzzness", questID = 89195, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Making a Deposit", questID = 89063, shownIfOnQuest = true, uiMapID = 2371},
             {name = "Making a Deposit", questID = 85722, shownIfOnQuest = true, uiMapID = 2371},
             {name = "Making a Deposit", questID = 89061, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Making a Deposit", questID = 89062, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Making a Deposit", questID = 89063, shownIfOnQuest = true, uiMapID = 2371},
         },
     });
 end
@@ -162,8 +172,16 @@ do
     end
 
     function SortFuncs.IncompleteFirst(a, b)
+        if a.sortToTop ~= b.sortToTop then
+            return a.sortToTop
+        end
+
         if a.completed ~= b.completed then
             return b.completed
+        end
+
+        if a.isOnQuest ~= b.isOnQuest then
+            return b.isOnQuest
         end
 
         return a.dataIndex < b.dataIndex
@@ -210,7 +228,9 @@ local InProgressQuestIconFile = {
 
 local function InitQuestData(info)
     local questClassification = info.questClassification or GetQuestClassification(info.questID);
-    info.questClassification = questClassification;
+    if HaveQuestData(info.questID) then
+        info.questClassification = questClassification;
+    end
 
     info.isOnQuest = IsOnQuest(info.questID);
 
@@ -481,6 +501,8 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 
             if entry.questID then
                 InitQuestData(entry);
+            else
+                entry.isOnQuest = false;
             end
 
             if flagQuest then
@@ -490,11 +512,12 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                     entry.completed = IsQuestFlaggedCompleted(flagQuest);
                 end
             elseif entry.conditions then
+                local arg = entry.conditions.useItemName and entry.localizedName or entry.itemID;
                 if entry.conditions.ShouldShowActivity then
-                    showActivity = entry.conditions.ShouldShowActivity();
+                    showActivity = entry.conditions.ShouldShowActivity(arg);
                 end
                 if entry.conditions.IsActivityCompleted then
-                    entry.completed = entry.conditions.IsActivityCompleted();
+                    entry.completed = entry.conditions.IsActivityCompleted(arg);
                 end
             else
                 entry.completed = false;
@@ -536,7 +559,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 n = n + 1;
                 outputTbl[n] = category;
                 if numEntries > 0 then
-                    tsort(entries, SortFuncs.DataIndex);
+                    tsort(entries, SortFuncs.IncompleteFirst);
                     for _, entry in ipairs(entries) do
                         n = n + 1;
                         outputTbl[n] = entry;

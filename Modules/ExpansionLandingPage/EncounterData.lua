@@ -13,7 +13,21 @@ local PLAYER_CLASS_ID;
 
 
 local EncounterData = {
-    --[journalEncounterID] = {}
+    --[journalEncounterID] = { achv = {Mythic, Special} }
+
+    --https://wago.tools/db2/JournalEncounter?page=1
+    --/dump GetMouseFoci()[1].icon:GetTexture()
+
+
+    --Manaforge Omega
+    [2684] = {icon = 6922080, achv = {41604, 42118}},      --Plexus Sentinel
+    [2686] = {icon = 6922087, achv = {41605, 41613}},      --Loom'ithar
+    [2685] = {icon = 6922081, achv = {41606, 41614}},      --Soulbinder Naazindhri
+    [2687] = {icon = 6922084, achv = {41607, 41615}},      --Forgeweaver Araz
+    [2688] = {icon = 6922082, achv = {41608, 41616}},      --The Soul Hunters
+    [2747] = {icon = 6922085, achv = {41609, 41617}},      --Fractillus
+    [2690] = {icon = 6922086, achv = {41610, 41618}},      --Nexus-King Salhadaar
+    [2691] = {icon = 6922083, achv = {41611, 41619}},      --Dimensius, the All-Devouring
 
     --Liberation of Undermine
     [2639] = {icon = 6392628, achv = {41229, 41208}},      --Vexie and the Geargrinders

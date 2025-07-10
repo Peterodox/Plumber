@@ -467,6 +467,7 @@ L["Delve Chest 1 Rare"] = "丰裕宝匣";
 
 L["Season Maximum Colon"] = "赛季上限："
 L["Item Changed"] = "已被替换为";   --CHANGED_OWN_ITEM
+L["Completed CHETT List"] = "完成的C.H.E.T.T.清单";
 
 
 --Map Pin Filter Name (name should be plural)

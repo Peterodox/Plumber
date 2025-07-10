@@ -481,6 +481,7 @@ L["Delve Chest 1 Rare"] = "풍요의 금고";   --We'll use the GameObjectID onc
 
 L["Season Maximum Colon"] = "시즌 상한선:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
 L["Item Changed"] = "당신의";   --CHANGED_OWN_ITEM
+L["Completed CHETT List"] = "완료한 안.녕.거.기. 목록";
 
 
 --Map Pin Filter Name (name should be plural)
