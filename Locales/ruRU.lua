@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.0 b
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.1 d
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -240,6 +240,7 @@ L["ModuleDescription Delves_Dashboard"] = "Отображать прогресс
 L["Delve Crest Stash No Info"] = "Эта информация недоступна в вашем текущем местоположении.";
 L["Delve Crest Stash Requirement"] = "Появляется на 11-м уровне многообещающих вылазок.";
 L["Overcharged Delve"] = "Перегруженная Вылазка";
+L["Delves History Requires AddOn"] = "История Вылазок хранится локально с помощью аддона Plumber.";
 
 
 --WoW Anniversary
@@ -356,6 +357,8 @@ L["LootUI Option Use Default UI"] = "Использовать окно добы�
 L["LootUI Option Use Default UI Tooltip"] = "Использовать стандартное окно добычи WoW.\n\n|cffff4800Включение этой опции отменяет все настройки выше.|r";
 L["LootUI Option Background Opacity"] = "Непрозрачность";
 L["LootUI Option Background Opacity Tooltip"] = "Установите прозрачность фона в режиме уведомления о добыче.\n\nЭта опция не влияет на режим ручной добычи.";
+L["LootUI Option Custom Quality Color"] = "Использовать свой цвет для качества предметов";
+L["LootUI Option Custom Quality Color Tooltip"] = "Используйте цвета, установленные в разделе «Параметры» > «Спец. возможности» > «Цвета»."
 
 
 --Quick Slot For Third-party Dev
@@ -419,7 +422,40 @@ L["Bountiful Delves Rep Tooltip"] = "Открытие Щедрого ларца 
 L["Warband Weekly Reward Tooltip"] = "Ваш Боевой Отряд может получить эту награду только раз в неделю.";
 L["Completed"] = CRITERIA_COMPLETED or "Завершено";
 L["Filter Hide Completed Format"] = "Скрыть завершенные (%d)";
-L["Weeky Reset Format"] = "Сброс: %s";
+L["Weeky Reset Format"] = "Еженедельный сброс: %s";
+L["Daily Reset Format"] = "Ежедневный сброс: %s";
+L["Ready To Turn In Tooltip"] = "Готов к сдаче.";
+L["Trackers"] = "Отслеживание";
+L["New Tracker Title"] = "Новое отслеживание";     --Create a new Tracker
+L["Edit Tracker Title"] = "Редактировать отслеживание";
+L["Type"] = "Тип";
+L["Select Instruction"] = LFG_LIST_SELECT or "Выбор";
+L["Name"] = "Name";
+L["Difficulty"] = LFG_LIST_DIFFICULTY or "Сложность";
+L["All Difficulties"] = "Все сложностя";
+L["TrackerType Boss"] = "Босс";
+L["TrackerType Instance"] = "Подземелье";
+L["TrackerType Quest"] = "Задание";
+L["TrackerType Rare"] = "Редкий монстр";
+L["TrackerTypePlural Boss"] = "Боссы";
+L["TrackerTypePlural Instance"] = "Подземелья";
+L["TrackerTypePlural Quest"] = "Задания";
+L["TrackerTypePlural Rare"] = "Редкие монстры";
+L["Accountwide"] = "Для всего аккаунта";
+L["Flag Quest"] = "Фракция задания";
+L["Boss Name"] = "Имя босса";
+L["Instance Or Boss Name"] = "Название подземелья или имя босса";
+L["Name EditBox Disabled Reason Format"] = "Это поле будет заполнено автоматически после ввода действительного %s.";
+L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "Нет совпадений";
+L["Create New Tracker"] = "Новое отслеживание";
+L["FailureReason Already Exist"] = "Эта запись уже существует.";
+L["Quest ID"] = "ID задания";
+L["Creature ID"] = "ID монстра";
+L["Edit"] = EDIT or "Редактировать";
+L["Delete"] = DELETE or "Удалить";
+L["Visit Quest Hub To Log Quests"] = "Посетите место взятия заданий и пообщайтесь с теми, кто выдает задания, чтобы взять сегодняшние задания."
+L["Quest Hub Instruction Celestials"] = "Посетите интенданта Небожителей в Вечноцветущем доле, чтобы узнать, какой храм нуждается в вашей помощи."
+L["Unavailable Klaxxi Paragons"] = "Недоступные Идеалы Клакси:";
 
 
 --Generic
@@ -434,6 +470,7 @@ L["Paragon Reputation"] = "Парагон";
 L["Level Maxed"] = "(Максимально)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Текущий:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "У вас есть невостребованные награды";
+L["Uncollected Set Counter Format"] = "У вас |cffffffff%d|r несобранных |4сета:сетов; трансмогрификации.";
 
 
 --Plumber AddOn Settings

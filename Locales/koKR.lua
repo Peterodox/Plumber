@@ -120,15 +120,15 @@ L["ModuleDescription BlizzFixEventToast"] = "이벤트 알림가 마우스 클�
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Talking Head";
 L["ModuleDescription TalkingHead"] = "기본 말머리 UI를 깔끔한 얼굴 없는 형태로 교체.";
 L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
-L["TalkingHead Option InstantText"] = "Instant Text";   --Should texts immediately, no gradual fading
-L["TalkingHead Option TextOutline"] = "Text Outline";   --Added a stroke/outline to the letter
-L["TalkingHead Option Condition Header"] = "Hide Texts From Source:";
+L["TalkingHead Option InstantText"] = "대화 글자 즉시 표시";   --텍스트 즉시 표시
+L["TalkingHead Option TextOutline"] = "글자 외곽선";   --문자에 외곽선(테두리)을 추가
+L["TalkingHead Option Condition Header"] = "출처 글자 숨기기:";
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "World Quests";
-L["TalkingHead Option Condition WorldQuest Tooltip"] = "Hide the transcription if it's from a World Quest.\nSometimes Talking Head is triggered before accepting the World Quest, and we won't be able to hide it.";
+L["TalkingHead Option Condition WorldQuest Tooltip"] = "전역 퀘스트에서 발생한 경우에는 자막을 숨깁니다. 가끔은 전역 퀘스트를 수락하기 전에 말머리가 먼저 표시되기 때문에, 숨길 수 없는 경우도 있습니다.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
-L["TalkingHead Option Condition Instance Tooltip"] = "Hide the transcription when you are in an instance.";
-L["TalkingHead Option Below WorldMap"] = "Send To Back When Map Opened";
-L["TalkingHead Option Below WorldMap Tooltip"] = "Send the Talking Head to the back when you open the World Map so it doesn't block it.";
+L["TalkingHead Option Condition Instance Tooltip"] = "인스턴스에 있을 때 자막을 숨깁니다.";
+L["TalkingHead Option Below WorldMap"] = "지도가 열릴 때 뒤로 보내기";
+L["TalkingHead Option Below WorldMap Tooltip"] = "월드맵을 열면 말머를 뒤로 보내 화면을 가리지 않도록 합니다.";
 
 
 --AzerothianArchives
