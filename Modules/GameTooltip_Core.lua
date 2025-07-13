@@ -191,6 +191,10 @@ do  --GameTooltipManager
         return self:GetHandler(1)   ----Enum.TooltipDataType.Spell
     end
 
+    function GameTooltipManager:GetCurrencyManager()
+        return self:GetHandler(5)   ----Enum.TooltipDataType.Currency
+    end
+
     function GameTooltipManager:GetMinimapManager()
         local useLeftTextAsArgument = true;
         return self:GetHandler(21, useLeftTextAsArgument)   ----Enum.TooltipDataType.MinimapMouseover

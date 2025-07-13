@@ -271,7 +271,7 @@ L["Reposition Button Tooltip"] = "Cliquez gauche et faites glisser pour déplace
 L["Font Size"] = FONT_SIZE or "Taille de la police";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Réinitialiser à la position par défaut";
 
-L["Renown Level Label"] = RENOWN_LEVEL_LABEL or "Renom ";  --There is a space
+L["Renown Level Label"] = "Renom ";  --There is a space
 L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maximum)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Actuel:";
