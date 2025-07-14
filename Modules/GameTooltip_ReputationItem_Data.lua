@@ -1,4 +1,5 @@
 --Look up SpellEffect. Effect = 103 (Reputation), EffectMiscValue_0 is the factionID
+--Note: these items can go into your bags. There are other items that auto consumed on pickup (See spell 1221237)
 --https://wago.tools/db2/SpellEffect?filter%5BEffect%5D=103&page=1
 
 
@@ -450,3 +451,6 @@ SpellFaction = {
     [63841] = 68,
     [69757] = 1119,
 };
+
+
+SpellFaction[1221237] = 2600;       --Severed Threads

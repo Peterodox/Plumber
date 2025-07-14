@@ -122,7 +122,7 @@ local function SortFunc_LootSlot(a, b)
 end
 
 local function GetItemCountFromText(text)
-    local count = match(text, "|rx(%d+)");
+    local count = match(text, "|r%s*x(%d+)");
     if count then
         return tonumber(count)
     else
