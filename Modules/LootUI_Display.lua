@@ -38,6 +38,7 @@ local tonumber = tonumber;
 local CreateFrame = CreateFrame;
 
 local GetReputationChangeFromText = API.GetReputationChangeFromText;
+local GetItemCountFromText = API.GetItemCountFromText;
 
 
 local MAX_ITEM_PER_PAGE = 5;
@@ -121,14 +122,6 @@ local function SortFunc_LootSlot(a, b)
     return a.slotIndex < b.slotIndex
 end
 
-local function GetItemCountFromText(text)
-    local count = match(text, "|r%s*x(%d+)");
-    if count then
-        return tonumber(count)
-    else
-        return 1
-    end
-end
 
 local function MergeData(d1, d2)
     if d1 and d2 then

@@ -3630,6 +3630,42 @@ do  --FrameUtil
     end
 end
 
+do  --Locale-dependent API
+    local locale = GetLocale();
+    if locale == "ruRU" then
+        function API.GetItemCountFromText(text)
+            --"r%s*[xх](%d+)" doesn't work
+            local count = match(text, "r%s*x(%d+)");
+            if not count then
+                count = match(text, "r%s*х(%d+)");
+            end
+            if count then
+                return tonumber(count)
+            else
+                return 1
+            end
+        end
+    elseif locale == "zhCN" or locale == "zhTW" then
+        function API.GetItemCountFromText(text)
+            local count = match(text, "r%s*x(%d+)");
+            if count then
+                return tonumber(count)
+            else
+                return 1
+            end
+        end
+    else
+        function API.GetItemCountFromText(text)
+            local count = match(text, "|r%s*x(%d+)");
+            if count then
+                return tonumber(count)
+            else
+                return 1
+            end
+        end
+    end
+end
+
 --[[
 local DEBUG = CreateFrame("Frame");
 DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
