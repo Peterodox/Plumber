@@ -163,7 +163,7 @@ do
                 end
             end
 
-            table.sort(records, function(a, b)
+            table.sort(tbl, function(a, b)
                 if a.tier ~= b.tier then
                     return a.tier > b.tier
                 end

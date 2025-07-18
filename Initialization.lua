@@ -156,6 +156,7 @@ local DefaultValues = {
         LootUI_ShowItemCount = false,
         LootUI_NewTransmogIcon = true,
         LootUI_UseCustomColor = false,
+        LootUI_GrowUpwards = false,
         LootUI_ForceAutoLoot = true,
         LootUI_LootUnderMouse = false,
         LootUI_UseHotkey = true,

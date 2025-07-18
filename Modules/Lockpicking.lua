@@ -13,7 +13,7 @@ local IsWarningColor = API.IsWarningColor;
 
 local _G = _G;
 local InCombatLockdown = InCombatLockdown;
-local IsSpellKnown = IsSpellKnown;
+local IsSpellKnown = C_SpellBook.IsSpellKnown or IsSpellKnown;
 local SpellIsTargeting = SpellIsTargeting;
 local GetMouseFocus = API.GetMouseFocus;
 local GetSpellInfo = API.GetSpellInfo;

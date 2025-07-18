@@ -1224,6 +1224,7 @@ do  --UI Manually Pickup Mode
             EventGenerator:Stop();
         end
         self:EnableMouseScript(state);
+        self:AddToUISpecialFrames(state);
     end
 
     function MainFrame:DisplayPendingLoot()
@@ -1634,6 +1635,19 @@ do  --Edit Mode
         return L["Manual Loot Instruction Format"]:format(key)
     end
 
+    local function Tooltip_GrowDirection()
+        local tooltipFormat = " \n|cffffffff%s|r\n\n%s";
+        if PlumberDB.LootUI_GrowUpwards then
+            return string.format(tooltipFormat, L["LootUI Option Grow Direction Tooltip 1"], L["LootUI Option Grow Direction Tooltip 2"])
+        else
+            return string.format(tooltipFormat, L["LootUI Option Grow Direction Tooltip 2"], L["LootUI Option Grow Direction Tooltip 1"])
+        end
+    end
+
+    local function Options_GrowDirection_OnClick(self)
+        MainFrame:LoadPosition();
+    end
+
     local function Validation_TransmogInvented()
         return addon.IsToCVersionEqualOrNewerThan(40000)
     end
@@ -1654,7 +1668,7 @@ do  --Edit Mode
             {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},
             {type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return C_ColorOverrides and ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
-
+            {type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
             {type = "Divider"},
             {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
             {type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
@@ -1681,7 +1695,7 @@ do  --Edit Mode
                 self.OptionFrame:ClearAllPoints();
                 local top = self:GetTop();
                 local left = self:GetLeft();
-                self.OptionFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left, top + 64);
+                self.OptionFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left + 288, top + 64);
             end
         else
             if self.OptionFrame then
@@ -1701,16 +1715,16 @@ do  --Edit Mode
     end
 
     function MainFrame:OnDragStop()
+        local DB = PlumberDB;
         self:StopMovingOrSizing();
 
         local left = self:GetLeft();
-        local top = self:GetTop();
+        local top = DB.LootUI_GrowUpwards and self:GetBottom() or self:GetTop();
 
         left = API.Round(left);
         top = API.Round(top);
 
         --Convert anchor and save position
-        local DB = PlumberDB;
         DB.LootUI_PositionX = left;
         DB.LootUI_PositionY = top;
 

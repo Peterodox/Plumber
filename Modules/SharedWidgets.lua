@@ -259,15 +259,17 @@ do  -- Checkbox
 
     local CheckboxMixin = {};
 
-    function CheckboxMixin:OnEnter()
-        if IsMouseButtonDown() then return end;
-
+    function CheckboxMixin:ShowTooltip()
         if self.tooltip then
             local f = GameTooltip;
             f:Hide();
             f:SetOwner(self, "ANCHOR_RIGHT");
             f:SetText(self.Label:GetText(), 1, 1, 1, true);
-            f:AddLine(self.tooltip, 1, 0.82, 0, true);
+            if type(self.tooltip) == "function" then
+                f:AddLine(self.tooltip(), 1, 0.82, 0, true);
+            else
+                f:AddLine(self.tooltip, 1, 0.82, 0, true);
+            end
             if self.tooltip2 then
                 local tooltip2;
                 if type(self.tooltip2) == "function" then
@@ -282,7 +284,11 @@ do  -- Checkbox
             end
             f:Show();
         end
+    end
 
+    function CheckboxMixin:OnEnter()
+        if IsMouseButtonDown() then return end;
+        self:ShowTooltip();
         if self.onEnterFunc then
             self.onEnterFunc(self);
         end
@@ -320,6 +326,12 @@ do  -- Checkbox
         end
 
         GameTooltip:Hide();
+
+        if self.keepTooltipAfterClicks then
+            if self:IsMouseMotionFocus() then
+                self:ShowTooltip();
+            end
+        end
     end
 
     function CheckboxMixin:GetChecked()
@@ -371,6 +383,7 @@ do  -- Checkbox
         self.onClickFunc = data.onClickFunc;
         self.onEnterFunc = data.onEnterFunc;
         self.onLeaveFunc = data.onLeaveFunc;
+        self.keepTooltipAfterClicks = data.keepTooltipAfterClicks;
 
         if data.label then
             return self:SetLabel(data.label)
@@ -1003,6 +1016,7 @@ do  -- TokenFrame   -- Money   -- Coin
 
 
     local TokenDisplayMixin = {};
+    local ITEM_COUNT_HANDLED_ALIENT;
 
     local function CreateTokenDisplay(parent, layoutName)
         local f = addon.CreateThreeSliceFrame(parent, layoutName);
@@ -1082,7 +1096,30 @@ do  -- TokenFrame   -- Money   -- Coin
     end
 
 
+    local function CheckOtherItemAddOns()
+        ITEM_COUNT_HANDLED_ALIENT = false;
+        local addons = {
+            "Syndicator", "Bagnon",
+            "ElvUI", "NDui",
+        };
+        local IsAddOnLoaded = C_AddOns.IsAddOnLoaded;
+        for _, name in ipairs(addons) do
+            if IsAddOnLoaded(name) then
+                ITEM_COUNT_HANDLED_ALIENT = true;
+                return
+            end
+        end
+    end
+
     local function AppendItemCount(tooltip, itemID)
+        if ITEM_COUNT_HANDLED_ALIENT == nil then
+            CheckOtherItemAddOns();
+        end
+
+        if ITEM_COUNT_HANDLED_ALIENT then
+            return
+        end
+
         local inBag = GetItemCount(itemID);
         local total = GetItemCount(itemID, true, false, true, true);
         local inBank = total - inBag;
@@ -1095,6 +1132,8 @@ do  -- TokenFrame   -- Money   -- Coin
 
         tooltip:AddLine(text, 1, 0.82, 0, true);
         tooltip:Show();
+
+        return true
     end
 
     local function TokenButton_OnEnter(self)
@@ -1111,7 +1150,9 @@ do  -- TokenFrame   -- Money   -- Coin
             else
                 GameTooltip:SetItemByID(self.itemID);
             end
-            AppendItemCount(GameTooltip, self.itemID);
+            if not AppendItemCount(GameTooltip, self.itemID) then
+                GameTooltip:Show();
+            end
             self.UpdateTooltip = function()
                 TokenButton_OnEnter(self)
             end
@@ -5806,7 +5847,7 @@ end
 
 do  --Blizzard Check Button
     local BlizzardCheckButtonMixin = {};
-    
+
     BlizzardCheckButtonMixin.ButtonMixin = {};
     do
         function BlizzardCheckButtonMixin.ButtonMixin:OnEnter()

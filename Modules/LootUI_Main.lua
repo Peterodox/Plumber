@@ -29,7 +29,7 @@ local AUTO_LOOT_ENABLE_TOOLTIP = true;
 ------------------
 
 
-local MainFrame = CreateFrame("Frame", nil, UIParent);
+local MainFrame = CreateFrame("Frame", "PlumberLootWindow", UIParent);
 MainFrame:Hide();
 MainFrame:SetAlpha(0);
 MainFrame:SetFrameStrata("DIALOG");
@@ -38,6 +38,7 @@ MainFrame:SetClampedToScreen(true);
 MainFrame.HeaderWidgetContainer = CreateFrame("Frame", nil, MainFrame);
 MainFrame.HeaderWidgetContainer:Hide();
 MainFrame.HeaderWidgets = {};
+MainFrame.isUISpecialFrame = false;
 
 
 local P_Loot = {};
@@ -917,7 +918,7 @@ do  --UI Background
     end
 
     function MainFrame:SetBackgroundSize(width, height)
-        if self:IsShown() then
+        if self:IsShown() and not self.growUpwards then
             self.BackgroundFrame:AnimateSize(width, height);
         else
             self.BackgroundFrame:SetScript("OnUpdate", nil);
@@ -1350,16 +1351,17 @@ do  --UI Basic
     function MainFrame:LoadPosition()
         self:ClearAllPoints();
         local DB = PlumberDB;
+        local growUpwards = DB and DB.LootUI_GrowUpwards;
+        self.growUpwards = growUpwards;
+        local point = growUpwards and "BOTTOMLEFT" or "TOPLEFT";
         if DB and DB.LootUI_PositionX and DB.LootUI_PositionY then
-            self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", DB.LootUI_PositionX, DB.LootUI_PositionY);
+            self:SetPoint(point, UIParent, "BOTTOMLEFT", DB.LootUI_PositionX, DB.LootUI_PositionY);
         else
             local viewportWidth, viewportHeight = WorldFrame:GetSize();
             viewportWidth = math.min(viewportWidth, viewportHeight * 16/9);
-
             local scale = UIParent:GetEffectiveScale();
             local offsetX = math.floor((0.5 - 0.3333) * viewportWidth /scale);
-
-            self:SetPoint("TOPLEFT", nil, "CENTER", offsetX, 0);
+            self:SetPoint(point, nil, "CENTER", offsetX, 0);
         end
     end
 
@@ -1601,6 +1603,9 @@ do  --UI Basic
     end
 
     function MainFrame:OnHide()
+        if self.manualMode then
+            CloseLoot();
+        end
         if self:IsShown() then return end;  --Due to hiding UIParent
         self:ReleaseAll();
         self.isFocused = false;
@@ -1675,6 +1680,28 @@ do  --UI Basic
         self:SetFocused(false);
     end
     MainFrame:SetScript("OnLeave", MainFrame.OnLeave);
+
+    function MainFrame:AddToUISpecialFrames(state)
+        if state ~= self.isUISpecialFrame then
+            self.isUISpecialFrame = state;
+            local selfName = "PlumberLootWindow";
+            if state then
+                for i, name in ipairs(UISpecialFrames) do
+                    if name == selfName then
+                        return
+                    end
+                end
+                table.insert(UISpecialFrames, selfName);
+            else
+                for i, name in ipairs(UISpecialFrames) do
+                    if name == selfName then
+                        table.remove(UISpecialFrames, i);
+                        return
+                    end
+                end
+            end
+        end
+    end
 end
 
 

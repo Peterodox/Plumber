@@ -20,6 +20,7 @@ local IsOnQuest = C_QuestLog.IsOnQuest;
 local GetQuestLineInfo = C_QuestLine.GetQuestLineInfo;
 local GetItemCount = C_Item.GetItemCount;
 local HaveQuestData = HaveQuestData;
+local GetCurrentRenownLevel = C_MajorFactions.GetCurrentRenownLevel;
 
 
 local DELVES_BOUNTIFUL = "delves-bountiful";
@@ -70,6 +71,12 @@ do
         IsReadyForTurnIn = ConditionFuncs.OwnItem,
         useItemName = true,
     };
+
+    Conditions.KareshWarrant = {
+        ShouldShowActivity = function()
+            return GetCurrentRenownLevel(2658) >= 3
+        end,
+    }
 end
 
 
@@ -148,6 +155,9 @@ if addon.IsToCVersionEqualOrNewerThan(110200) then  --PTR debug
             {name = "Anima Reclamation Program", questID = 85459, atlas = WEEKLY_QUEST, uiMapID = 2371},
             {name = "Food Run", questID = 85461, atlas = WEEKLY_QUEST, uiMapID = 2371},
             {name = "A Reel Problem", questID = 90545, atlas = WEEKLY_QUEST, uiMapID = 2371},
+
+            {name = "Eliminate Grubber", questID = 90126, atlas = WEEKLY_QUEST, uiMapID = 2371, conditions = Conditions.KareshWarrant},
+
             --the following don't reward rep
             {name = "Funny Buzzness", questID = 89195, shownIfOnQuest = true, uiMapID = 2371},
             {name = "Making a Deposit", questID = 85722, shownIfOnQuest = true, uiMapID = 2371},
@@ -511,7 +521,11 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 else
                     entry.completed = IsQuestFlaggedCompleted(flagQuest);
                 end
-            elseif entry.conditions then
+            else
+                entry.completed = false;
+            end
+
+            if entry.conditions then
                 local arg = entry.conditions.useItemName and entry.localizedName or entry.itemID;
                 if entry.conditions.ShouldShowActivity then
                     showActivity = entry.conditions.ShouldShowActivity(arg);
@@ -519,8 +533,6 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 if entry.conditions.IsActivityCompleted then
                     entry.completed = entry.conditions.IsActivityCompleted(arg);
                 end
-            else
-                entry.completed = false;
             end
 
             if entry.shownIfOnQuest then
@@ -530,7 +542,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                     end
                 else
                     if not (entry.completed or entry.isOnQuest) then
-                        showActivity = false
+                        showActivity = false;
                     end
                 end
             end

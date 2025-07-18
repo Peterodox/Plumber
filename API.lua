@@ -3465,7 +3465,7 @@ end
 
 do  -- Macro Util
     local WoWAPI = {
-        IsSpellKnown = IsSpellKnownOrOverridesKnown or IsSpellKnown,
+        IsSpellKnown = C_SpellBook.IsSpellKnown or IsSpellKnownOrOverridesKnown or IsSpellKnown,
         IsPlayerSpell = IsPlayerSpell,
         PlayerHasToy = PlayerHasToy or Nop,
         GetItemCount = C_Item.GetItemCount,

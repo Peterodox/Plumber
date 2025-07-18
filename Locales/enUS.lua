@@ -359,6 +359,9 @@ L["LootUI Option Background Opacity"] = "Opacity";
 L["LootUI Option Background Opacity Tooltip"] = "Set the background's opacity in Loot Notification Mode.\n\nThis option doesn't affect Manual Loot Mode.";
 L["LootUI Option Custom Quality Color"] = "Use Custom Quality Color";
 L["LootUI Option Custom Quality Color Tooltip"] = "Use the colors you set in Game Options> Accessibility> Colors."
+L["LootUI Option Grow Direction"] = "Grow Upwards";
+L["LootUI Option Grow Direction Tooltip 1"] = "When enabled: the bottom left of the window remains still, and new notifications will appear on top of the old ones.";
+L["LootUI Option Grow Direction Tooltip 2"] = "When disabled: the top left of the window remains still, and new notifications will appear on bottom of the old ones.";
 
 
 --Quick Slot For Third-party Dev

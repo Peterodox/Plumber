@@ -359,6 +359,9 @@ L["LootUI Option Background Opacity"] = "不透明度";
 L["LootUI Option Background Opacity Tooltip"] = "改变通知模式下背景的不透明度。\n\n此选项不影响手动拾取模式。";
 L["LootUI Option Custom Quality Color"] = "使用自定义品质颜色";
 L["LootUI Option Custom Quality Color Tooltip"] = "使用你在 游戏设置> 辅助功能> 颜色 中设置的颜色。"
+L["LootUI Option Grow Direction"] = "向上生长";
+L["LootUI Option Grow Direction Tooltip 1"] = "勾选时：窗口左下角位置保持不变，新提示出现在旧提示的上方。";
+L["LootUI Option Grow Direction Tooltip 2"] = "未勾选时：窗口左上角位置保持不变，新提示出现在旧提示的下方。";
 
 
 --Quick Slot For Third-party Dev

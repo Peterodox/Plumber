@@ -236,4 +236,8 @@ do  --QuantityOverride
     QuantityOverride[467635] = {
         [230905] = 2,   --Fractured Spark TWW S2
     };
+
+    QuantityOverride[468717] = {
+        [231757] = 2,   --Fractured Spark TWW S3
+    };
 end
