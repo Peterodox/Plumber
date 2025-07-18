@@ -357,15 +357,16 @@ L["LootUI Option Use Default UI Tooltip"] = "기본 전리품 창을 사용합�
 L["LootUI Option Background Opacity"] = "투명도";
 L["LootUI Option Background Opacity Tooltip"] = "전리품 알림 모드에서 배경 투명도를 조절할 수 있어요. 이 설정은 수동 루팅 모드에는 적용되지 않아요.";
 L["LootUI Option Custom Quality Color"] = "사용자 지정 품질 색상 사용";
-L["LootUI Option Custom Quality Color Tooltip"] = "게임 설정 > 손쉬운 사용 > 색상 - 설정한 색상을 사용합니다."
-
+L["LootUI Option Custom Quality Color Tooltip"] = "게임 설정 > 손쉬운 사용 > 색상 - 설정한 색상을 사용합니다.";
+L["LootUI Option Grow Direction"] = "위로 쌓기";
+L["LootUI Option Grow Direction Tooltip 1"] = "활성화 시: 창의 왼쪽 하단이 고정되며, 새로운 알림이 기존 알림 위에 표시됩니다.";
+L["LootUI Option Grow Direction Tooltip 2"] = "비활성화 시: 창의 왼쪽 상단이 고정되며, 새로운 알림이 기존 알림 아래에 표시됩니다.";
 
 --Quick Slot For Third-party Dev
-L["Quickslot Module Info"] = "Module Info";
-L["QuickSlot Error 1"] = "Quick Slot: You have already added this controller.";
-L["QuickSlot Error 2"] = "Quick Slot: The controller is missing \"%s\"";
-L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" already exists.";
-
+L["Quickslot Module Info"] = "모듈 정보";
+L["QuickSlot Error 1"] = "퀵 슬롯: 이 컨트롤러는 이미 추가되었습니다.";
+L["QuickSlot Error 2"] = "퀵 슬롯: 컨트롤러에 \"%s\"이(가) 없습니다.";
+L["QuickSlot Error 3"] = "퀵 슬롯: 동일한 키 \"%s\"을(를) 가진 컨트롤러가 이미 존재합니다.";
 
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. 매크로";
