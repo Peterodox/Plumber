@@ -141,6 +141,12 @@ local DefaultValues = {
     LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
 
 
+    --Reduction
+    BossBanner_MasterSwitch = false,
+        BossBanner_HideLootWhenSolo = true,
+        BossBanner_ValuableItemOnly = true,
+
+
     --New Expansion Landing Page
     NewExpansionLandingPage = true,
         LandingPage_Activity_HideCompleted = true,

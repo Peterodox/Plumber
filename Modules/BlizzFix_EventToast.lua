@@ -3,6 +3,7 @@
 --But there are other ways to do this without consuming mouse clicks
 
 local _, addon = ...
+local API = addon.API;
 
 local BlizzardFrame = EventToastManagerFrame;
 
@@ -151,11 +152,7 @@ local function TopBannerManager_OnShowCallback(banner)
 end
 
 function Module:GetActiveToast()
-    if _G.TopBannerQueue and #_G.TopBannerQueue > 0 then
-        return _G.TopBannerMgr.currentBanner and _G.TopBannerMgr.currentBanner.frame
-    end
-
-    return BlizzardFrame.currentDisplayingToast
+    return (_G.TopBannerMgr.currentBanner and _G.TopBannerMgr.currentBanner.frame) or (BlizzardFrame.currentDisplayingToast)
 end
 
 function Module:StartWatching()
@@ -188,6 +185,9 @@ function Module:OnEvent(event, ...)
                     activeBanner:Hide();
                     CloseActiveToasts();
                     HideGameTooltip();
+                    if activeBanner == BossBanner then
+                        API.CloseBossBanner();
+                    end
                 end
             else
                 self:Hide();

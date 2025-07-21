@@ -334,6 +334,18 @@ do  -- Checkbox
         end
     end
 
+    function CheckboxMixin:OnEnable()
+        self.CheckedTexture:SetDesaturated(false);
+        self.CheckedTexture:SetVertexColor(1, 1, 1);
+        self.Label:SetTextColor(1, 0.82, 0);
+    end
+
+    function CheckboxMixin:OnDisable()
+        self.CheckedTexture:SetDesaturated(true);
+        self.CheckedTexture:SetVertexColor(0.5, 0.5, 0.5);
+        self.Label:SetTextColor(0.5, 0.5, 0.5);
+    end
+
     function CheckboxMixin:GetChecked()
         return self.checked
     end
@@ -429,6 +441,8 @@ do  -- Checkbox
         b:SetScript("OnClick", CheckboxMixin.OnClick);
         b:SetScript("OnEnter", CheckboxMixin.OnEnter);
         b:SetScript("OnLeave", CheckboxMixin.OnLeave);
+        b:SetScript("OnEnable", CheckboxMixin.OnEnable);
+        b:SetScript("OnDisable", CheckboxMixin.OnDisable);
 
         return b
     end

@@ -2082,6 +2082,39 @@ do  -- System
             ExpansionLandingPageMinimapButton:TriggerAlert(text);
         end
     end
+
+    function API.CloseBossBanner()
+        local banner = BossBanner;
+        if not banner then return end;
+
+        banner:StopAnimating();
+        banner:Hide();
+        banner.lootShown = 0;
+        banner.pendingLoot = {};
+
+        if banner.baseHeight then
+            banner:SetHeight(banner.baseHeight);
+        end
+
+        if banner.LootFrames then
+            for _, f in ipairs(banner.LootFrames) do
+                f:Hide();
+            end
+        end
+
+        local textureKeys = {
+            "BannerTop", "BannerBottom", "BannerMiddle", "BottomFillagree", "SkullSpikes", "RightFillagree", "LeftFillagree",
+            "Title", "SubTitle", "FlashBurst", "FlashBurstLeft", "FlashBurstCenter", "RedFlash",
+        };
+
+        for _, key in ipairs(textureKeys) do
+            if banner[key] then
+                banner[key]:SetAlpha(0);
+            end
+        end
+
+        TopBannerManager_BannerFinished();
+    end
 end
 
 do  -- Player

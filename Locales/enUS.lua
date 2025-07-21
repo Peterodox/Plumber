@@ -37,6 +37,8 @@ L["Module Category NPC Interaction"] = "NPC Interaction";
 L["Module Category Tooltip"] = "Tooltip";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
+--- order: 5
+L["Module Category Reduction"] = "Reduction";   --Reduce UI elements
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
 L["Module Category Plumber"] = "Plumber";   --This addon's name
@@ -325,6 +327,15 @@ L["Available Knowledge Format"] = "Available Knowledge: |cffffffff%s|r";
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "Minimap Target";
 L["ModuleDescription MinimapMouseover"] = "Alt Click a creature on the Minimap to set it as your target.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+
+
+--BossBanner
+L["ModuleName BossBanner"] = "Boss Loot Banner";
+L["ModuleDescription BossBanner"] = "Modify the banner that appears on the top of the screen when a player in your group receives a loot.\n\n- Hide when solo\n\n- Show valuable items only.";
+L["BossBanner Hide When Solo"] = "Hide When Solo";
+L["BossBanner Hide When Solo Tooltip"] = "Hide the banner if there is only one person (you) in your group.";
+L["BossBanner Valuable Item Only"] = "Valuable Items Only";
+L["BossBanner Valuable Item Only Tooltip"] = "Only display mounts, class tokens, and items that are marked as Very Rare or Extremely Rare on the banner.";
 
 
 --Loot UI
