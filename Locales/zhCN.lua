@@ -37,6 +37,8 @@ L["Module Category NPC Interaction"] = "NPC 交互";
 L["Module Category Tooltip"] = "鼠标提示";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "职业";   --Player Class (rogue, paladin...)
+--- order: 5
+L["Module Category Reduction"] = "做减法";   --Reduce UI elements
 
 L["Module Category Dragonflight"] = "巨龙时代";
 L["Module Category Plumber"] = "Plumber";   --This addon's name
@@ -325,6 +327,15 @@ L["Available Knowledge Format"] = "可用知识：|cffffffff%s|r";
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "小地图目标";
 L["ModuleDescription MinimapMouseover"] = "按住Alt键并点击小地图上的一个生物来尝试将其设为你的目标。".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+
+
+--BossBanner
+L["ModuleName BossBanner"] = "首领拾取通知";
+L["ModuleDescription BossBanner"] = "修改当你或者你队友获得首领掉落物品时出现在屏幕上方的通知。\n\n- 单刷时隐藏\n\n- 仅显示稀有物品";
+L["BossBanner Hide When Solo"] = "单刷时隐藏";
+L["BossBanner Hide When Solo Tooltip"] = "如果你队伍里没有其他玩家，隐藏此通知。";
+L["BossBanner Valuable Item Only"] = "仅显示稀有物品";
+L["BossBanner Valuable Item Only Tooltip"] = "仅显示坐骑、职业套装兑换物和地下城手册中标注为稀有掉落的物品。";
 
 
 --Loot UI

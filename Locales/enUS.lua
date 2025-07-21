@@ -115,7 +115,7 @@ L["Instruction Pick Lock"] = "<Right Click to Pick Lock>";
 
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
-L["ModuleName BlizzFixEventToast"] = "Blitz Fix: Event Toast";
+L["ModuleName BlizzFixEventToast"] = "Event Toast";
 L["ModuleDescription BlizzFixEventToast"] = "Modify the behavior of Event Toasts so they don't consume your mouse clicks. Also allow you to Right Click on the toast and close it immediately.\n\n*Event Toasts are banners that appear on the top of the screen when you complete certain activities.";
 
 
@@ -331,7 +331,7 @@ L["ModuleDescription MinimapMouseover"] = "Alt Click a creature on the Minimap t
 
 --BossBanner
 L["ModuleName BossBanner"] = "Boss Loot Banner";
-L["ModuleDescription BossBanner"] = "Modify the banner that appears on the top of the screen when a player in your group receives a loot.\n\n- Hide when solo\n\n- Show valuable items only.";
+L["ModuleDescription BossBanner"] = "Modify the banner that appears on the top of the screen when a player in your group receives a loot.\n\n- Hide when solo.\n\n- Show valuable items only.";
 L["BossBanner Hide When Solo"] = "Hide When Solo";
 L["BossBanner Hide When Solo Tooltip"] = "Hide the banner if there is only one person (you) in your group.";
 L["BossBanner Valuable Item Only"] = "Valuable Items Only";

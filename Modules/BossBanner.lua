@@ -178,6 +178,7 @@ do  --Module Registry
         toggleFunc = EL.LoadSettings,
         categoryID = 5,
         uiOrder = 1,
+        moduleAddedTime = 1753100000,
 
         subOptions = {
             {

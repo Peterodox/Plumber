@@ -32,6 +32,7 @@ local GetMacroBody = GetMacroBody;
 local GetMacroInfo = GetMacroInfo;
 local GetMacroIndexByName = GetMacroIndexByName;
 local EditMacro = EditMacro;
+local GetNumMacros = GetNumMacros;
 local GetActiveAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or API.Nop;
 local GetMountInfoByID = C_MountJournal and C_MountJournal.GetMountInfoByID or API.Nop;
 local FindSpellOverrideByID = FindSpellOverrideByID;
@@ -153,8 +154,10 @@ local IsMacroSpell = {};
 
 
 local EL = CreateFrame("Frame");
-EL.macroIndexMin = 1;
-EL.macroIndexMax = 138;
+EL.macroIndexMin1 = 1;
+EL.macroIndexMax1 = MAX_ACCOUNT_MACROS or 120;
+EL.macroIndexMin2 = EL.macroIndexMax1 + 1;
+EL.macroIndexMax2 = EL.macroIndexMin2 + (MAX_CHARACTER_MACROS or 30);
 EL.macroEvents = {};
 
 
@@ -175,32 +178,46 @@ function EL:CheckSupportedMacros()
     local body;
     local command;
     local n = 0;
+    local numAccountMacros, numCharacterMacros = GetNumMacros();
 
-    for index = self.macroIndexMin, self.macroIndexMax do
-        body = GetMacroBody(index);
-        if body then
-            command = match(body, "#plumber:(%w+)");
-            if command and PlumberMacros[command] then
-                n = n + 1;
+    for i = 1, 2 do
+        local fromIndex, toIndex;
+        if i == 1 then
+            fromIndex = self.macroIndexMin1;
+            toIndex = fromIndex + numAccountMacros - 1;
+        else
+            fromIndex = self.macroIndexMin2;
+            toIndex = fromIndex + numCharacterMacros - 1;
+        end
 
-                if not self.activeCommands[command] then
-                    self.activeCommands[command] = {};
-                end
-                tinsert(self.activeCommands[command], index);
+        if toIndex >= fromIndex then
+            for index = fromIndex, toIndex do
+                body = GetMacroBody(index);
+                if body then
+                    command = match(body, "#plumber:(%w+)");
+                    if command and PlumberMacros[command] then
+                        n = n + 1;
 
-                if PlumberMacros[command].events then
-                    for _, event in ipairs(PlumberMacros[command].events) do
-                        if not self.macroEvents[event] then
-                            self.macroEvents[event] = {};
+                        if not self.activeCommands[command] then
+                            self.activeCommands[command] = {};
                         end
-                        tinsert(self.macroEvents[event], {
-                            index = index,
-                            command = command,
-                        });
+                        tinsert(self.activeCommands[command], index);
+
+                        if PlumberMacros[command].events then
+                            for _, event in ipairs(PlumberMacros[command].events) do
+                                if not self.macroEvents[event] then
+                                    self.macroEvents[event] = {};
+                                end
+                                tinsert(self.macroEvents[event], {
+                                    index = index,
+                                    command = command,
+                                });
+                            end
+                        end
+
+                        MacroInterpreter.macroCommand[index] = command;
                     end
                 end
-
-                MacroInterpreter.macroCommand[index] = command;
             end
         end
     end
