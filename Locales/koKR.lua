@@ -13,15 +13,15 @@ BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Toggle Plumber Expansion Summary";   
 L["Module Control"] = "애드온 설정 관리";
 L["Quick Slot Generic Description"] = "\n\n*단축 버튼 칸은 사용자의 현재 상태에 따라 자동 표시.";
 L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Edit Mode";
-L["Quick Slot High Contrast Mode"] = "Toggle High Contrast Mode";
-L["Quick Slot Reposition"] = "Change Position";
-L["Quick Slot Layout"] = "Layout";
-L["Quick Slot Layout Linear"] = "Linear";
-L["Quick Slot Layout Radial"] = "Radial";
-L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
+L["Quick Slot High Contrast Mode"] = "고대비 모드 전환";
+L["Quick Slot Reposition"] = "위치 변경";
+L["Quick Slot Layout"] = "배치 방식";
+L["Quick Slot Layout Linear"] = "직선형";
+L["Quick Slot Layout Radial"] = "원형";
+L["Restriction Combat"] = "전투 중에는 작동하지 않습니다.";  --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*세계 지도 > 지도 필터 > Plumber에서 핀 크기를 변경";
-L["Toggle Plumber UI"] = "Toggle Plumber UI";
-L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
+L["Toggle Plumber UI"] = "Plumber UI 전환";
+L["Toggle Plumber UI Tooltip"] = "편집 모드에서 다음 Plumber UI를 표시합니다:\n%s\n\n이 체크박스는 편집 모드에서의 UI 표시 여부만 제어합니다.\n이 모듈들을 활성화하거나 비활성화하지는 않습니다.";
 
 --Module Categories
 --- order: 0
@@ -33,14 +33,17 @@ L["Module Category NPC Interaction"] = "NPC 상호 작용";
 --- order: 3
 L["Module Category Tooltip"] = "도움말";   --Additional Info on Tooltips
 --- order: 4
-L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
+L["Module Category Class"] = "클래스";   --Player Class (rogue, paladin...)
+
+L["Module Category Reduction"] = "단순화";   --Reduce UI elements
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
 L["Module Category Plumber"] = "Plumber";   --This addon's name
 
 --Deprecated
-L["Module Category Dreamseeds"] = "Dreamseeds";     --Added in patch 10.2.0
-L["Module Category AzerothianArchives"] = "Azerothian Archives";     --Added in patch 10.2.5
+L["Module Category Dreamseeds"] = "꿈의 씨앗";     --Added in patch 10.2.0
+L["Module Category AzerothianArchives"] = "아제로스 기록보관소";     --Added in patch 10.2.5
+
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "이벤트 자동 참여";
@@ -49,25 +52,25 @@ L["ModuleDescription AutoJoinEvents"] = "NPC와 상호 작용할 때 다음 이�
 --BackpackItemTracker
 L["ModuleName BackpackItemTracker"] = "가방 아이템 추적기";
 L["ModuleDescription BackpackItemTracker"] = "가방 UI에서 중첩 가능한 아이템을 통화처럼 추적합니다.\n\n이벤트 토큰은 자동으로 추적되며, 좌측에 고정 표시됩니다.";
-L["Instruction Track Item"] = "Track Item";
-L["Hide Not Owned Items"] = "Hide Not Owned Items";
-L["Hide Not Owned Items Tooltip"] = "If you no longer own an item you tracked, it will be moved to a hidden menu.";
-L["Concise Tooltip"] = "Concise Tooltip";
-L["Concise Tooltip Tooltip"] = "Only shows the item's binding type and its max quantity.";
-L["Item Track Too Many"] = "You may only track %d items at a time."
-L["Tracking List Empty"] = "Your custom tracking list is empty.";
+L["Instruction Track Item"] = "아이템 추적";
+L["Hide Not Owned Items"] = "보유하지 않은 아이템 숨기기";
+L["Hide Not Owned Items Tooltip"] = "추적 중인 아이템을 더 이상 보유하지 않을 경우 숨김 메뉴로 이동됩니다.";
+L["Concise Tooltip"] = "간결한 툴팁";
+L["Concise Tooltip Tooltip"] = "아이템의 귀속 방식과 최대 수량만 표시합니다.";
+L["Item Track Too Many"] = "한 번에 최대 %d개의 아이템만 추적할 수 있습니다.";
+L["Tracking List Empty"] = "사용자 지정 추적 목록이 비어 있습니다.";
 L["Holiday Ends Format"] = "Ends: %s";
-L["Not Found"] = "Not Found";   --Item not found
-L["Own"] = "Own";   --Something that the player has/owns
-L["Numbers To Earn"] = "# To Earn";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
-L["Numbers Of Earned"] = "# Earned";    --The number of stuff the player has earned
-L["Track Upgrade Currency"] = "Track Crests";       --Crest: e.g. Drake’s Dreaming Crest
-L["Track Upgrade Currency Tooltip"] = "Pin the top-tier crest you have earned to the bar.";
-L["Track Holiday Item"] = "Track Holiday Currency";       --e.g. Tricky Treats (Hallow's End)
-L["Currently Pinned Colon"] = "Currently Pinned:";  --Tells the currently pinned item
-L["Bar Inside The Bag"] = "Bar Inside The Bag";     --Put the bar inside the bag UI (below money/currency)
-L["Bar Inside The Bag Tooltip"] = "Place the bar inside the bag UI.\n\nIt only works in Blizzard's Separate Bags mode.";
-L["Catalyst Charges"] = "Catalyst Charges";
+L["Not Found"] = "찾을 수 없음";   --Item not found
+L["Own"] = "보유 중";   --Something that the player has/owns
+L["Numbers To Earn"] = "# 획득 가능 수";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
+L["Numbers Of Earned"] = "# 획득 수";    --The number of stuff the player has earned
+L["Track Upgrade Currency"] = "문장 추적";       --Crest: e.g. Drake’s Dreaming Crest
+L["Track Upgrade Currency Tooltip"] = "획득한 최고 등급 문장을 막대에 고정합니다.";
+L["Track Holiday Item"] = "이벤트 화폐 추적";       --e.g. Tricky Treats (Hallow's End)
+L["Currently Pinned Colon"] = "현재 고정됨:";  --Tells the currently pinned item
+L["Bar Inside The Bag"] = "가방 내부 막대";     --Put the bar inside the bag UI (below money/currency)
+L["Bar Inside The Bag Tooltip"] = "가방 UI 내부에 막대를 배치합니다.\n\n이 기능은 블리자드의 가방 분리 모드에서만 작동합니다.";
+L["Catalyst Charges"] = "변환 촉매 횟수";
 
 --GossipFrameMedal
 L["ModuleName GossipFrameMedal"] = "용 조련 경주 메달";
@@ -95,9 +98,9 @@ L["ModuleName AlternativePlayerChoiceUI"] = "선택 UI: 꿈의 씨앗 가꾸기"
 L["ModuleDescription AlternativePlayerChoiceUI"] = "기본 꿈의 씨앗 UI를 간결한 형태로 교체하고, 보유 수량 표시 및 버튼 길게 누르기로 자동 기여를 지원합니다.";
 
 --HandyLockpick (Right-click a lockbox in your bag to unlock when you are not in combat. Available to rogues and mechagnomes)
-L["ModuleName HandyLockpick"] = "Handy Lockpick";
-L["ModuleDescription HandyLockpick"] = "Right click a lockbox in your bag or Trade UI to unlock it.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Cannot directly unlock a bank item\n- Affected by Soft Targeting Mode";
-L["Instruction Pick Lock"] = "<Right Click to Pick Lock>";
+L["ModuleName HandyLockpick"] = "핸디 자물쇠 따기";
+L["ModuleDescription HandyLockpick"] = "가방 또는 거래 UI에 있는 잠금 상자를 마우스 오른쪽 클릭하여 해제합니다.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- 은행 아이템은 직접 잠금 해제할 수 없습니다\n- 소프트 타겟팅 모드에 영향을 받습니다";
+L["Instruction Pick Lock"] = "<오른쪽 클릭으로 자물쇠 해제>";
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
 L["ModuleName BlizzFixEventToast"] = "긴급 수정: 이벤트 알림";
@@ -107,8 +110,8 @@ L["ModuleDescription BlizzFixEventToast"] = "이벤트 알림가 마우스 클�
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Talking Head";
 L["ModuleDescription TalkingHead"] = "기본 말머리 UI를 깔끔한 얼굴 없는 형태로 교체.";
 L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
-L["TalkingHead Option InstantText"] = "대화 글자 즉시 표시";   --텍스트 즉시 표시
-L["TalkingHead Option TextOutline"] = "글자 외곽선";   --문자에 외곽선(테두리)을 추가
+L["TalkingHead Option InstantText"] = "대화 글자 즉시 표시";   --Should texts immediately, no gradual fading
+L["TalkingHead Option TextOutline"] = "글자 외곽선";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "출처 글자 숨기기:";
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "World Quests";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "전역 퀘스트에서 발생한 경우에는 자막을 숨깁니다. 가끔은 전역 퀘스트를 수락하기 전에 말머리가 먼저 표시되기 때문에, 숨길 수 없는 경우도 있습니다.";
@@ -122,29 +125,29 @@ L["ModuleName Technoscryers"] = "단축 버튼 칸: 기술탐지기";
 L["ModuleDescription Technoscryers"] = "기술탐지기 퀘스트 중 착용 버튼 표시."..L["Quick Slot Generic Description"];
 
 --Navigator(Waypoint/SuperTrack) Shared Strings
-L["Priority"] = "Priority";
-L["Priority Default"] = "Default";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
-L["Priority Default Tooltip"] = "Follow WoW's default settings. Prioritize quest, corpse, vendor locations if possible. Otherwise, start tracking active seeds.";
-L["Stop Tracking"] = "Stop Tracking";
-L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "Left click to track locations";
-L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "Left click to track in TomTom";
+L["Priority"] = "우선순위";
+L["Priority Default"] = "기본값";  -- WoW의 기본 길찾기 우선순위: 시체, 퀘스트, 시나리오, 콘텐츠
+L["Priority Default Tooltip"] = "WoW의 기본 설정을 따릅니다. 퀘스트, 시체, 상인 위치를 우선 추적하며, 해당 위치가 없을 경우 활성화된 씨앗을 추적합니다.";
+L["Stop Tracking"] = "추적 중지";
+L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "왼쪽 클릭으로 위치 추적";
+L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "왼쪽 클릭으로 TomTom에서 위치 추적";
 
 --Navigator_Dreamseed (Use Super Tracking to navigate players)
-L["ModuleName Navigator_Dreamseed"] = "Navigator: Dreamseeds";
-L["ModuleDescription Navigator_Dreamseed"] = "Use the Waypoint system to guide you to the Dreamseeds.\n\n*Right click on the location indicator (if any) for more options.\n\n|cffd4641cThe game's default waypoints will be replaced while you are in the Emerald Dream.\n\nSeed location indicator may be overridden by quests.|r";
-L["Priority New Seeds"] = "Finding New Seeds";
-L["Priority Rewards"] = "Collecting Rewards";
-L["Stop Tracking Dreamseed Tooltip"] = "Stop tracking seeds until you Left Click on a map pin.";
+L["ModuleName Navigator_Dreamseed"] = "내비게이터: 꿈의 씨앗";
+L["ModuleDescription Navigator_Dreamseed"] = "길찾기 시스템을 이용해 꿈의 씨앗 위치를 안내합니다.\n\n* 위치 표시기를 마우스 오른쪽 클릭하면 추가 옵션이 나타납니다.\n\n|cffd4641c에메랄드 드림 지역에서는 게임의 기본 길찾기 위치가 변경됩니다.\n\n씨앗 위치 표시기는 퀘스트에 의해 덮어씌워질 수 있습니다.|r";
+L["Priority New Seeds"] = "새로운 씨앗 찾기";
+L["Priority Rewards"] = "보상 수집";
+L["Stop Tracking Dreamseed Tooltip"] = "지도의 핀을 왼쪽 클릭할 때까지 씨앗 추적을 중지합니다.";
 
 --BlizzFixWardrobeTrackingTip (Permanently disable the tip for wardrobe shortcuts)
-L["ModuleName BlizzFixWardrobeTrackingTip"] = "Blitz Fix: Wardrobe Tip";
-L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Hide the tutorial for Wardrobe shortcuts.";
+L["ModuleName BlizzFixWardrobeTrackingTip"] = "Blitz 수정: 외형 단축키 팁";
+L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "외형 단축키에 대한 튜토리얼을 숨깁니다.";
 
 --Rare/Location Announcement
-L["Announce Location Tooltip"] = "Share this location in chat.";
-L["Announce Forbidden Reason In Cooldown"] = "You have shared a location recently.";
-L["Announce Forbidden Reason Duplicate Message"] = "This location has been shared by another player recently.";
-L["Announce Forbidden Reason Soon Despawn"] = "You cannot share this location because it will soon despawn.";
+L["Announce Location Tooltip"] = "이 위치를 채팅창에 공유합니다.";
+L["Announce Forbidden Reason In Cooldown"] = "최근에 위치를 공유했습니다.";
+L["Announce Forbidden Reason Duplicate Message"] = "다른 플레이어가 최근에 이 위치를 공유했습니다.";
+L["Announce Forbidden Reason Soon Despawn"] = "곧 사라질 위치이므로 공유할 수 없습니다.";
 L["Available In Format"] = "Available in: |cffffffff%s|r";
 L["Seed Color Epic"] = ICON_TAG_RAID_TARGET_DIAMOND3 or "Purple";   --Using GlobalStrings as defaults
 L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Blue";
@@ -170,9 +173,9 @@ L["Can Create Multiple Item Format"] = "|cffffffff%d|r개의 항목을 생성할
 
 --Plunderstore
 L["ModuleName Plunderstore"] = "약탈 상점";
-L["ModuleDescription Plunderstore"] = "Modify the store opened via Group Finder:\n\n- Added a checkbox to hide collected items.\n\n- Display the number of uncollected items on the category buttons.\n\n- Added weapon and armor equip location to their tooltips.\n\n- Allow you to view equippable items in the Dressing Room.";
-L["Store Full Purchase Price Format"] = "Earn |cffffffff%s|r Plunder to purchase everything in the store.";
-L["Store Item Fully Collected"] = "You have collected everything in the store!";
+L["ModuleDescription Plunderstore"] = "파티 찾기를 통해 열리는 상점을 다음과 같이 변경합니다:\n\n- 수집한 아이템 숨기기 체크박스 추가\n\n- 카테고리 버튼에 미수집 아이템 수 표시\n\n- 무기 및 방어구의 착용 위치를 툴팁에 표시\n\n- 착용 가능한 아이템을 외형 미리보기에서 확인 가능";
+L["Store Full Purchase Price Format"] = "상점의 모든 아이템을 구매하려면 |cffffffff%s|r 약탈품을 모으세요.";
+L["Store Item Fully Collected"] = "상점의 모든 아이템을 수집했습니다!";
 
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "상점 판매가";
@@ -203,20 +206,20 @@ L["ModuleDescription WorldMapPin_TWW"] = "카즈 알가르 전역에 걸쳐 추�
 L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Tier %s";
 L["Item Level Format"] = ITEM_LEVEL or "Item Level %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
-L["Delves Reputation Name"] = "Delver's Journey";
+L["Delves Reputation Name"] = "구렁 탐험가의 여정";
 L["ModuleName Delves_SeasonProgress"] = "구렁: 구렁 탐험가의 여정";
 L["ModuleDescription Delves_SeasonProgress"] = "구렁 탐험가의 여정 획득 시, 상단에 실시간 진행률 표시";
 L["ModuleName Delves_Dashboard"] = "구렁: 주간 보상";
 L["ModuleDescription Delves_Dashboard"] = "구렁 대시보드에 당신의 위대한 금고와 금빛 보관함 진행 상황이 표시.";
-L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
-L["Delve Crest Stash Requirement"] = "Appears in Tier 11 Bountiful Delves.";
-L["Overcharged Delve"] = "Overcharged Delve";
+L["Delve Crest Stash No Info"] = "현재 위치에서는 이 정보를 확인할 수 없습니다.";
+L["Delve Crest Stash Requirement"] = "11단계 풍요로운 구렁에서 나타납니다.";
+L["Overcharged Delve"] = "과충전된 구렁";
 L["Delves History Requires AddOn"] = "구렁 기록은 Plumber 애드온에 의해 로컬에 저장.";
 
 --WoW Anniversary
-L["ModuleName WoWAnniversary"] = "WoW Anniversary";
-L["ModuleDescription WoWAnniversary"] = "- Summon the corresponding mount easily during the Mount Maniac event.\n\n- Show voting results during the Fashion Frenzy event. ";
-L["Voting Result Header"] = "Results";
+L["ModuleName WoWAnniversary"] = "WoW 기념 이벤트";
+L["ModuleDescription WoWAnniversary"] = "- 탈것 광란 이벤트에서 해당 탈것을 간편하게 소환합니다.\n\n- 패션 열풍 이벤트에서 투표 결과를 표시합니다.";
+L["Voting Result Header"] = "결과";
 L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "You have not collected this mount.";
 
 --BlizzFixFishingArtifact
@@ -231,19 +234,19 @@ L["ModuleDescription QuestItemDestroyAlert"] = "퀘스트를 시작하는 아이
 L["ModuleName SpellcastingInfo"] = "대상의 주문 시전 정보";
 L["ModuleDescription SpellcastingInfo"] = "- 대상 프레임의 시전 바에 마우스를 올리면 주문 툴팁이 표시.\n\n- 대상 프레임에서 우클릭하여 나중에 확인할 수 있도록 몬스터의 능력을 저장합니다.";
 L["Abilities"] = ABILITIES or "Abilities";
-L["Spell Colon"] = "Spell: ";   --Display SpellID
-L["Icon Colon"] = "Icon: ";     --Display IconFileID
+L["Spell Colon"] = "주문: ";   --Display SpellID
+L["Icon Colon"] = "아이콘: ";     --Display IconFileID
 
 --Chat Options
 L["ModuleName ChatOptions"] = "채팅 채널 설정";
 L["ModuleDescription ChatOptions"] = "채팅창에서 채널 이름을 우클릭했을 때 표시되는 메뉴에 ‘나가기’ 버튼을 추가합니다.";
 L["Chat Leave"] = CHAT_LEAVE or "Leave";
-L["Chat Leave All Characters"] = "Leave On All Characters";
-L["Chat Leave All Characters Tooltip"] = "You will automatically leave this channel when you log in on a character.";
-L["Chat Auto Leave Alert Format"] = "Do you wish to automatically leave |cffffc0c0[%s]|r on all your characters?";
-L["Chat Auto Leave Cancel Format"] = "Auto Leave Disabled for %s. Please use /join command to rejoin the channel.";
-L["Auto Leave Channel Format"] = "Auto Leave \"%s\"";
-L["Click To Disable"] = "Click to disable";
+L["Chat Leave All Characters"] = "모든 캐릭터에서 나가기";
+L["Chat Leave All Characters Tooltip"] = "이 채널은 캐릭터 접속 시 자동으로 나가게 됩니다.";
+L["Chat Auto Leave Alert Format"] = "|cffffc0c0[%s]|r 채널에서 모든 캐릭터가 자동으로 나가도록 설정하시겠습니까?";
+L["Chat Auto Leave Cancel Format"] = "%s에 대한 자동 나가기 기능이 비활성화되었습니다. 다시 참여하려면 /join 명령어를 사용하세요.";
+L["Auto Leave Channel Format"] = "자동 나가기 \"%s\"";
+L["Click To Disable"] = "클릭하여 비활성화";
 
 --NameplateWidget
 L["ModuleName NameplateWidget"] = "이름표: 열쇠창";
@@ -255,17 +258,17 @@ L["ModuleDescription PartyInviterInfo"] = "파티 또는 길드 초대를 받을
 L["Additional Info"] = "자세한 정보";
 L["Race"] = RACE or "Race";
 L["Faction"] = FACTION or "Faction";
-L["Click To Search Player"] = "Search This Player";
+L["Click To Search Player"] = "이 플레이어 검색";
 L["Searching Player In Progress"] = FRIENDS_FRIENDS_WAITING or "Searching...";
 L["Player Not Found"] = ERR_FRIEND_NOT_FOUND or "Player not found.";
 
 --PlayerTitleUI
 L["ModuleName PlayerTitleUI"] = "칭호 관리자";
 L["ModuleDescription PlayerTitleUI"] = "기본 캐릭터 창에 검색창과 필터를 추가.";
-L["Right Click To Reset Filter"] = "Right click to reset.";
+L["Right Click To Reset Filter"] = "오른쪽 클릭으로 초기화";
 L["Earned"] = ACHIEVEMENTFRAME_FILTER_COMPLETED or "Earned";
-L["Unearned"] = "Unearned";
-L["Unearned Filter Tooltip"] = "You may see duplicated titles that are unavailable to your faction.";
+L["Unearned"] = "미획득";
+L["Unearned Filter Tooltip"] = "자신의 진영에서는 획득할 수 없는 칭호가 중복되어 표시될 수 있습니다.";
 
 --BlizzardSuperTrack
 L["ModuleName BlizzardSuperTrack"] = "목표 지점: 이벤트 시간";
@@ -290,11 +293,11 @@ L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "기본 전리품 UI를 대체하고 다양한 선택 기능을 추가:\n\n- 아이템을 빠르게 획득.\n\n- 자동 전리품 획득 실패 오류를 수정.\n\n- 직접 전리품을 챙길 때 '모두 받기' 버튼이 나타납니다.";
 L["Take All"] = "모두 받기";     --Take all items from a loot window
 L["You Received"] = YOU_RECEIVED_LABEL or "You recieved";
-L["Reach Currency Cap"] = "Reached currency caps";
-L["Sample Item 4"] = "Awesome Epic Item";
-L["Sample Item 3"] = "Awesome Rare Item";
-L["Sample Item 2"] = "Awesome Uncommon Item";
-L["Sample Item 1"] = "Common Item";
+L["Reach Currency Cap"] = "화폐 한도에 도달함";
+L["Sample Item 4"] = "영웅 아이템";
+L["Sample Item 3"] = "희귀 아이템";
+L["Sample Item 2"] = "고급 아이템";
+L["Sample Item 1"] = "일반 아이템";
 L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
 L["Manual Loot Instruction Format"] = "특정 아이템을 획득할 때 자동 전리품을 일시적으로 취소하려면 전리품 창이 나타날 때까지 |cffffffff%s|r 키를 길게 누르세요.";
 L["LootUI Option Force Auto Loot"] = "자동 전리품 획득을 강제 적용";
@@ -326,6 +329,14 @@ L["Quickslot Module Info"] = "모듈 정보";
 L["QuickSlot Error 1"] = "퀵 슬롯: 이 컨트롤러는 이미 추가되었습니다.";
 L["QuickSlot Error 2"] = "퀵 슬롯: 컨트롤러에 \"%s\"이(가) 없습니다.";
 L["QuickSlot Error 3"] = "퀵 슬롯: 동일한 키 \"%s\"을(를) 가진 컨트롤러가 이미 존재합니다.";
+
+--BossBanner
+L["ModuleName BossBanner"] = "보스 전리품 배너";
+L["ModuleDescription BossBanner"] = "파티원이 전리품을 획득했을 때 화면 상단에 표시되는 배너를 변경합니다.\n\n- 솔로 플레이 시 숨기기\n\n- 가치 있는 아이템만 표시";
+L["BossBanner Hide When Solo"] = "솔로일 때 숨기기";
+L["BossBanner Hide When Solo Tooltip"] = "파티에 본인만 있을 경우 배너를 표시하지 않습니다.";
+L["BossBanner Valuable Item Only"] = "가치 있는 아이템만 표시";
+L["BossBanner Valuable Item Only Tooltip"] = "탈것, 직업 토큰, 매우 희귀 또는 극히 희귀로 분류된 아이템만 배너에 표시됩니다.";
 
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. 매크로";
@@ -383,7 +394,7 @@ L["Filter Hide Completed Format"] = "완료한 항목 숨기기 (%d)";
 L["Weeky Reset Format"] = "주간 초기화: %s";
 L["Ready To Turn In Tooltip"] = "“퀘스트 완료 상태.";
 L["Trackers"] = "추적기";
-L["New Tracker Title"] = "추적기 추가 [ + ]";     --새 추적기 만들기
+L["New Tracker Title"] = "추적기 추가 [ + ]";     --Create a new Tracker
 L["Type"] = "유형";
 L["Select Instruction"] = LFG_LIST_SELECT or "Select";
 L["Name"] = "이름";
@@ -441,18 +452,18 @@ L["Completed CHETT List"] = "완료한 안.녕.거.기. 목록";
 L["Bountiful Delve"] =  "풍요로운 구렁";
 L["Special Assignment"] = "특별 과제";
 
-L["Match Pattern Gold"] = "([%d%,]+) Gold";
-L["Match Pattern Silver"] = "([%d]+) Silver";
-L["Match Pattern Copper"] = "([%d]+) Copper";
+L["Match Pattern Gold"] = "([%d%,]+) 골드";
+L["Match Pattern Silver"] = "([%d]+) 실버";
+L["Match Pattern Copper"] = "([%d]+) 코퍼";
 
 L["Match Pattern Rep 1"] = "(.+)에 대한 전투부대의 평판이 ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "(.+)에 대한 평판이 ([%d%,]+)";   --FACTION_STANDING_INCREASED
 
-L["Match Pattern Item Level"] = "^Item Level (%d+)";
-L["Match Pattern Item Upgrade Tooltip"] = "^Upgrade Level: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
-L["Upgrade Track 1"] = "Adventurer";
-L["Upgrade Track 2"] = "Explorer";
-L["Upgrade Track 3"] = "Veteran";
-L["Upgrade Track 4"] = "Champion";
-L["Upgrade Track 5"] = "Hero";
-L["Upgrade Track 6"] = "Myth";
+L["Match Pattern Item Level"] = "^아이템 레벨 (%d+)";
+L["Match Pattern Item Upgrade Tooltip"] = "^업그레이드 단계: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Upgrade Track 1"] = "모험가";
+L["Upgrade Track 2"] = "탐험가";
+L["Upgrade Track 3"] = "노련가";
+L["Upgrade Track 4"] = "챔피언";
+L["Upgrade Track 5"] = "영웅";
+L["Upgrade Track 6"] = "신화";
