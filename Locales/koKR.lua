@@ -77,8 +77,8 @@ L["ModuleName GossipFrameMedal"] = "용 조련 경주 메달";
 L["ModuleDescription GossipFrameMedal Format"] = "기본 아이콘 %s을(를) 당신이 획득한 메달 %s로 교체합니다. \n\nNPC와 상호작용할 때 기록을 불러오는 데 잠시 시간이 걸릴 수 있습니다.";
 
 --DruidModelFix (Disabled after 10.2.0)
-L["ModuleName DruidModelFix"] = "Druid Model Fix";
-L["ModuleDescription DruidModelFix"] = "Fix the Character UI model display issue caused by using Glyph of Stars\n\nThis bug will be fixed by Blizzard in 10.2.0 and this module will be removed.";
+L["ModuleName DruidModelFix"] = "드루이드 모델 수정";
+L["ModuleDescription DruidModelFix"] = "별의 문양(Glyph of Stars) 사용 시 발생하는 캐릭터 UI 모델 표시 문제를 수정합니다.\n\n이 버그는 블리자드가 10.2.0 패치에서 수정할 예정이며, 해당 모듈은 이후 제거됩니다.";
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
 L["ModuleName PlayerChoiceFrameToken"] = "선택 UI: 아이템 비용";
@@ -339,7 +339,7 @@ L["BossBanner Valuable Item Only"] = "가치 있는 아이템만 표시";
 L["BossBanner Valuable Item Only Tooltip"] = "탈것, 직업 토큰, 매우 희귀 또는 극히 희귀로 분류된 아이템만 배너에 표시됩니다.";
 
 --Plumber Macro
-L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. 매크로";
+L["PlumberMacro Drive"] = "Plumber 고.속.주.행. 매크로";
 L["PlumberMacro Drawer"] = "Plumber 패널 매크로";
 L["PlumberMacro DrawerFlag Combat"] = "전투 종료 시 서랍이 갱신됩니다.";
 L["PlumberMacro DrawerFlag Stuck"] = "패널 갱신에 실패했습니다.";
