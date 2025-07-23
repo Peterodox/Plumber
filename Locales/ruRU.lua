@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.1 d
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.2
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -37,6 +37,8 @@ L["Module Category NPC Interaction"] = "Взаимодействие с НПС";
 L["Module Category Tooltip"] = "Подсказка";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "Класс";   --Player Class (rogue, paladin...)
+--- order: 5
+L["Module Category Reduction"] = "Уменьшение";   --Reduce UI elements
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
 L["Module Category Plumber"] = "Plumber";   --This addon's name
@@ -327,6 +329,15 @@ L["ModuleName MinimapMouseover"] = "Цель на миникарте";
 L["ModuleDescription MinimapMouseover"] = "Alt+Клик на существе на мини-карте, чтобы сделать его целью.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
 
 
+--BossBanner
+L["ModuleName BossBanner"] = "Баннер добычи с боссов";
+L["ModuleDescription BossBanner"] = "Изменяет баннер, появляющийся в верхней части экрана, когда игрок в вашей группе получает добычу.\n\n- Скрывать, если вы один.\n\n- Показывать только ценные предметы.";
+L["BossBanner Hide When Solo"] = "Скрывать, если один";
+L["BossBanner Hide When Solo Tooltip"] = "Скрывать баннер, если в вашей группе только один человек (вы).";
+L["BossBanner Valuable Item Only"] = "Только ценные предметы";
+L["BossBanner Valuable Item Only Tooltip"] = "Отображать на баннере только маунтов, классовые токены и предметы, помеченные как очень редкие или чрезвычайно редкие.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Окно добычи";
 L["ModuleDescription LootUI"] = "Заменить стандартное окно добычи и предоставить некоторые дополнительные функции:\n\n- Быстрый сбор предметов.\n\n- Исправлена ​​ошибка сбоя автоматического сбора добычи.\n\n- Показывать кнопку взять все при ручном сборе.";
@@ -359,6 +370,9 @@ L["LootUI Option Background Opacity"] = "Непрозрачность";
 L["LootUI Option Background Opacity Tooltip"] = "Установите прозрачность фона в режиме уведомления о добыче.\n\nЭта опция не влияет на режим ручной добычи.";
 L["LootUI Option Custom Quality Color"] = "Использовать свой цвет для качества предметов";
 L["LootUI Option Custom Quality Color Tooltip"] = "Используйте цвета, установленные в разделе «Параметры» > «Спец. возможности» > «Цвета»."
+L["LootUI Option Grow Direction"] = "Рост вверх";
+L["LootUI Option Grow Direction Tooltip 1"] = "Когда включено: нижний левый угол окна остается неподвижным, а новые уведомления будут появляться над старыми.";
+L["LootUI Option Grow Direction Tooltip 2"] = "Когда отключено: верхний левый угол окна остается неподвижным, а новые уведомления будут появляться под старыми.";
 
 
 --Quick Slot For Third-party Dev
