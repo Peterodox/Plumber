@@ -257,7 +257,9 @@ do
 
         for _, v in ipairs(LandingPageUtil.ResourceList) do
             valid = true;
-            if v.shownInDelves then
+            if v.hidden then
+                valid = false;      --for transition between WoW content updates
+            elseif v.shownInDelves then
                 valid = API.IsInDelves();
             elseif v.conditionFunc then
                 valid = v.conditionFunc();

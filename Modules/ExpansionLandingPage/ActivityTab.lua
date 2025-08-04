@@ -215,25 +215,33 @@ do  --Checklist Button
             end
         else
             local data = ActivityUtil.GetActivityData(self.dataIndex);
-            if data and data.tooltip then
-                TooltipUpdator:SetFocusedObject(self);
-                TooltipUpdator:SetHeaderText(self.Name:GetText());
-                local tooltipLines = {};
+            if data then
+                if data.tooltip or data.children then
+                    TooltipUpdator:SetFocusedObject(self);
+                    TooltipUpdator:SetHeaderText(self.Name:GetText());
+                    local tooltipLines = {};
 
-                if data.completed then
-                    table.insert(tooltipLines, string.format("|cff808080%s|r", L["Completed"]));
-                    table.insert(tooltipLines, " ");
+                    if data.children then
+                        TooltipUpdator:RequestEntryChildren(data.children);
+                    else
+                        if data.completed then
+                            table.insert(tooltipLines, string.format("|cff808080%s|r", L["Completed"]));
+                            table.insert(tooltipLines, " ");
+                        end
+                    end
+
+                    if data.tooltip then
+                        table.insert(tooltipLines, data.tooltip);
+                    end
+
+                    if data.accountwide then
+                        table.insert(tooltipLines, " ");
+                        table.insert(tooltipLines, string.format("|cff00ccff%s|r", L["Warband Weekly Reward Tooltip"]));
+                    end
+
+                    TooltipUpdator:RequestTooltipLines(tooltipLines);
+                    TooltipUpdator:RequestTooltipSetter(data.tooltipSetter);
                 end
-
-                table.insert(tooltipLines, data.tooltip);
-
-                if data.accountwide then
-                    table.insert(tooltipLines, " ");
-                    table.insert(tooltipLines, string.format("|cff00ccff%s|r", L["Warband Weekly Reward Tooltip"]));
-                end
-
-                TooltipUpdator:RequestTooltipLines(tooltipLines);
-                TooltipUpdator:RequestTooltipSetter(data.tooltipSetter);
             end
         end
     end

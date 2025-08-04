@@ -31,6 +31,7 @@ function TooltipUpdator:StopUpdating()
     self.poiID = nil;
     self.tooltipLines = nil;
     self.tooltipSetter = nil;
+    self.entryChildren = nil;
 end
 
 function TooltipUpdator:SetFocusedObject(obj)
@@ -72,6 +73,10 @@ function TooltipUpdator:RequestTooltipSetter(tooltipSetter)
     self.tooltipSetter = tooltipSetter;
 end
 
+function TooltipUpdator:RequestEntryChildren(entryChildren)
+    self.entryChildren = entryChildren;
+end
+
 function TooltipUpdator:OnUpdate(elapsed)
     self.t = self.t + elapsed;
     if self.t >= 0.5 then
@@ -79,7 +84,7 @@ function TooltipUpdator:OnUpdate(elapsed)
         self:SetScript("OnUpdate", nil);
         self.keepUpdating = nil;
 
-        if self.obj and self.obj:IsMouseMotionFocus() and (self.questID or self.tooltipLines) then
+        if self.obj and self.obj:IsMouseMotionFocus() and (self.questID or self.tooltipLines or self.entryChildren) then
             local anyContent;
             local questRewards = {};
             local isRetrievingData;
@@ -134,6 +139,22 @@ function TooltipUpdator:OnUpdate(elapsed)
 
                 tooltip:SetText(self.headerText, 1, 0.82, 0, true);
 
+                if self.entryChildren then
+                    for k, v in iparis(self.entryChildren) do
+                        local name;
+                        if v.questID then
+                            name = API.GetQuestName(v.questID) or "";
+                            if (v.accountWide and C_QuestLog.IsQuestFlaggedCompletedOnAccount(v.questID)) or (not v.accountWide and C_QuestLog.IsQuestFlaggedCompleted(v.questID)) then
+                                tooltip:AddLine("- "..name, 0.251, 0.753, 0.251, false);
+                            else
+                                tooltip:AddLine("- "..name, 0.5, 0.5, 0.5, false);
+                            end
+                        end
+                    end
+                    self.keepUpdating = true;
+                    hasLineAbove = true;
+                end
+
                 if tooltipLines[1] then
                     hasLineAbove = true;
                     for _, text in ipairs(tooltipLines) do
@@ -145,7 +166,7 @@ function TooltipUpdator:OnUpdate(elapsed)
                     if hasLineAbove then
                         tooltip:AddLine(" ");
                     end
-                    tooltip:AddLine(QUEST_REWARDS, 1, 0.82);
+                    tooltip:AddLine(QUEST_REWARDS, 1, 0.82, 0);
 
                     for _, rewards in ipairs(questRewards) do
                         for index, info in ipairs(rewards) do

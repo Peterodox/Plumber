@@ -581,6 +581,12 @@ do  -- Item
             end
         end
     end
+
+
+    function API.IsMountCollected(mountID)
+        local isCollected = select(11, C_MountJournal.GetMountInfoByID(mountID));
+        return isCollected
+    end
 end
 
 do  -- Tooltip Parser
@@ -2919,6 +2925,39 @@ do  -- Tooltip
         API.Mixin(info, PseudoTooltipInfoMixin);
         info:AddBlankLine();
         return info
+    end
+
+
+    local TextureInfoTable = {
+        width = 14,
+        height = 14,
+        margin = { left = 0, right = 4, top = 0, bottom = 0 },
+        texCoords = { left = 0.0625, right = 0.9375, top = 0.0625, bottom = 0.9375 },
+    };
+
+    function API.AddCraftingReagentToTooltip(tooltip, item, quantityRequired)
+        local name = C_Item.GetItemNameByID(item) or ("item:"..item);
+        local count = C_Item.GetItemCount(item, true, false, true, true);
+        local icon =  C_Item.GetItemIconByID(item);
+        local rightText;
+        local isRed;
+
+        if quantityRequired then
+            rightText = count.."/"..quantityRequired;
+            isRed = count < quantityRequired;
+        else
+            rightText = count;
+        end
+
+        if isRed then
+            tooltip:AddDoubleLine(name, rightText, 1, 0.125, 0.125, 1, 0.125, 0.125);
+        else
+            tooltip:AddDoubleLine(name, rightText, 1, 1, 1, 1, 1, 1);
+        end
+
+        tooltip:AddTexture(icon, TextureInfoTable);
+
+        return true
     end
 end
 

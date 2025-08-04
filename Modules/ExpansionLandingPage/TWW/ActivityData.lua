@@ -11,6 +11,7 @@ ActivityUtil.hideCompleted = false;
 
 local ipairs = ipairs;
 local tsort = table.sort;
+local format = string.format;
 
 
 local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted;
@@ -77,6 +78,20 @@ do
             return GetCurrentRenownLevel(2658) >= 3
         end,
     }
+end
+
+
+local TooltipFuncs = {};
+do
+    function TooltipFuncs.DevouredEnergyPod(tooltip)
+        --Devoured Energy-Pod (20)  Translocated Gorger
+        --Add item count if mount not learnt
+        if API.IsMountCollected(2602) then return end;
+        local quantityRequired = 20;
+        tooltip:AddLine(" ");
+        API.AddCraftingReagentToTooltip(tooltip, 246240, quantityRequired);
+        return true
+    end
 end
 
 
@@ -156,14 +171,35 @@ if addon.IsToCVersionEqualOrNewerThan(110200) then  --PTR debug
             {name = "Food Run", questID = 85461, atlas = WEEKLY_QUEST, uiMapID = 2371},
             {name = "A Reel Problem", questID = 90545, atlas = WEEKLY_QUEST, uiMapID = 2371},
 
-            {name = "Eliminate Grubber", questID = 90126, atlas = WEEKLY_QUEST, uiMapID = 2371, conditions = Conditions.KareshWarrant},
+            --{name = "Eliminate Grubber", questID = 90126, atlas = WEEKLY_QUEST, uiMapID = 2371, conditions = Conditions.KareshWarrant},   --one-time?
 
             --the following don't reward rep
             {name = "Funny Buzzness", questID = 89195, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Making a Deposit", questID = 85722, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Making a Deposit", questID = 89061, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Making a Deposit", questID = 89062, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Making a Deposit", questID = 89063, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Leafing Things on the Ground", questID = 89221, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Who You Gonna Call?", questID = 88980, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Ray-ket Ball, Redux", questID = 89056, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Dream-Dream-Dream-Dream-Dreameringeding!", questID = 89240, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Ray-cing for the Future", questID = 89065, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Not as Cute When They Are Bigger and Angrier", questID = 89297, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Pee-Yew de Foxy", questID = 89057, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Flights of Fancy", questID = 89213, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "A Challenge for Dominance", questID = 85462, shownIfOnQuest = true, uiMapID = 2371},
+
+            --Devourer Attack
+            {name = "Devourer Attack", label = L["Devourer Attack"], uiMapID = 2371, questClassification = 5, tooltipSetter = TooltipFuncs.DevouredEnergyPod,
+                children = {
+                    --Sorted by location: North-South
+                    {name = "Devourer Attack: The Oasis", questID = 84993, uiMapID = 2371},
+                    {name = "Devourer Attack: Eco-dome: Primus", questID = 86447, uiMapID = 2371},
+                    {name = "Devourer Attack: Atrium", questID = 86464, uiMapID = 2371},
+                    {name = "Devourer Attack: Tazavesh", questID = 86465, uiMapID = 2371},
+                },
+            },
+
+            --{name = "Making a Deposit", questID = 85722, shownIfOnQuest = true, uiMapID = 2371},
+            --{name = "Making a Deposit", questID = 89061, shownIfOnQuest = true, uiMapID = 2371},
+            --{name = "Making a Deposit", questID = 89062, shownIfOnQuest = true, uiMapID = 2371},
+            --{name = "Making a Deposit", questID = 89063, shownIfOnQuest = true, uiMapID = 2371},
         },
     });
 end
@@ -206,7 +242,11 @@ do
             return a.questClassification ~= nil
         end
 
-        return a.questID > b.questID
+        if a.questID and b.questID then
+            return a.questID > b.questID
+        end
+
+        return a.name < b.name
     end
 end
 
@@ -234,6 +274,8 @@ local InProgressQuestIconFile = {
 	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
 	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
 	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+
+    [128] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png",
 };
 
 local function InitQuestData(info)
@@ -506,23 +548,45 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
         local showActivity;
 
         for _, entry in ipairs(category.entries) do
-            flagQuest = entry.flagQuest or entry.questID;
             showActivity = true;
+            flagQuest = nil;
 
-            if entry.questID then
-                InitQuestData(entry);
-            else
-                entry.isOnQuest = false;
-            end
-
-            if flagQuest then
-                if entry.accountwide then
-                    entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
-                else
-                    entry.completed = IsQuestFlaggedCompleted(flagQuest);
+            if entry.children then
+                entry.icon = InProgressQuestIconFile[128];
+                local completed = true;
+                local totalChildren = #entry.children;
+                local numCompletedChildren = 0;
+                for k, v in ipairs(entry.children) do
+                    flagQuest = v.questID;
+                    if flagQuest then
+                        if (v.accountwide and IsQuestFlaggedCompletedOnAccount(flagQuest)) or (not v.accountwide and IsQuestFlaggedCompleted(flagQuest)) then
+                            numCompletedChildren = numCompletedChildren + 1;
+                        else
+                            completed = false;
+                        end
+                    end
+                end
+                entry.completed = completed;
+                if entry.label then
+                    entry.localizedName = format("%s/%s %s", numCompletedChildren, totalChildren, entry.label);
                 end
             else
-                entry.completed = false;
+                flagQuest = entry.flagQuest or entry.questID;
+                if entry.questID then
+                    InitQuestData(entry);
+                else
+                    entry.isOnQuest = false;
+                end
+
+                if flagQuest then
+                    if entry.accountwide then
+                        entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
+                    else
+                        entry.completed = IsQuestFlaggedCompleted(flagQuest);
+                    end
+                else
+                    entry.completed = false;
+                end
             end
 
             if entry.conditions then

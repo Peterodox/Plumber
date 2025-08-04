@@ -2,12 +2,10 @@ local _, addon = ...
 local LandingPageUtil = addon.LandingPageUtil;
 
 
+--Greedy Emissary Events
+--[[
 local IsBaseSetCollected = C_TransmogSets.IsBaseSetCollected;
 
-
-
-
---Greedy Emissary Events
 local IsSetCollected;
 local HellstoneTransmogSets = {
     4567, 4566, 4571, 4562, 4563, 4570, 4565, 4574, 4572, 4568, 4569, 4573, 4564,
@@ -47,17 +45,17 @@ local function ShowUncollectedSets(tooltip)
         return true
     end
 end
+--]]
 
 
-
+local IS_1102 = addon.IsToCVersionEqualOrNewerThan(110200);     --PTR debug
 
 local ResourceList = {
-    {itemID = 244465, shownInDelves = true},
-    {currencyID = 3309, conditionFunc = HasUncollectedSets, appendTooltipFunc = ShowUncollectedSets},    --Hellstone Shard (Greedy Emissary)
+    {itemID = 244465, shownInDelves = true, hidden = IS_1102},
 
     {currencyID = 3028},    --Restored Coffer Key
-    {itemID = 236096, isMinor = false},   --Coffer Key Shard
-    {itemID = 235897},      --Radiant Echo
+    {itemID = IS_1102 and 245653 or 236096, isMinor = false},   --Coffer Key Shard
+    {itemID = IS_1102 and 246771 or 235897},      --Radiant Echo
 
     {currencyID = 1602, shownIfOwned = true},    --Conquest
     {currencyID = 1792, shownIfOwned = true},    --Honor
@@ -74,5 +72,8 @@ local ResourceList = {
     ---{isHeader = true, name = PVP},
     {currencyID = 2123, shownIfOwned = true},    --Bloody Tokens
     {currencyID = 2797, shownIfOwned = true},    --Trophy of Strife
+
+
+    --{currencyID = 3309, conditionFunc = HasUncollectedSets, appendTooltipFunc = ShowUncollectedSets},    --Hellstone Shard (Greedy Emissary)
 };
 LandingPageUtil.ResourceList = ResourceList;
