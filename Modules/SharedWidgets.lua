@@ -1125,7 +1125,7 @@ do  -- TokenFrame   -- Money   -- Coin
         end
     end
 
-    local function AppendItemCount(tooltip, itemID)
+    local function AppendItemCount(tooltip, itemID, questionableData)
         if ITEM_COUNT_HANDLED_ALIENT == nil then
             CheckOtherItemAddOns();
         end
@@ -1145,6 +1145,9 @@ do  -- TokenFrame   -- Money   -- Coin
         end
 
         tooltip:AddLine(text, 1, 0.82, 0, true);
+        if questionableData and total > 0 then
+            tooltip:AddLine(L["Questionable Item Count Tooltip"], 0.5, 0.5, 0.5, true);
+        end
         tooltip:Show();
 
         return true
@@ -1156,15 +1159,15 @@ do  -- TokenFrame   -- Money   -- Coin
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
         if self.tokenType == 0 and self.currencyID then
             GameTooltip:SetCurrencyByID(self.currencyID);
-        elseif self.tokenType == 1 and self.itemID then
+        elseif self.tokenType == 1 and self.item then
             if self.merchantSlot and self.metchantCostIndex then
                 GameTooltip:SetMerchantCostItem(self.merchantSlot, self.metchantCostIndex)
-            elseif self.link then
-                GameTooltip:SetHyperlink(self.link);
+            elseif self.link or type(self.item) == "string" then
+                GameTooltip:SetHyperlink(self.link or self.item);
             else
-                GameTooltip:SetItemByID(self.itemID);
+                GameTooltip:SetItemByID(self.item);
             end
-            if not AppendItemCount(GameTooltip, self.itemID) then
+            if not AppendItemCount(GameTooltip, self.item, self.questionableData) then
                 GameTooltip:Show();
             end
             self.UpdateTooltip = function()
@@ -1187,9 +1190,9 @@ do  -- TokenFrame   -- Money   -- Coin
             local link;
             if self.tokenType == 0 and self.currencyID then
                 link = C_CurrencyInfo.GetCurrencyLink(self.currencyID);
-            elseif self.tokenType == 1 and self.itemID then
+            elseif self.tokenType == 1 and self.item then
                 local _;
-                _, link = C_Item.GetItemInfo(self.itemID);
+                _, link = C_Item.GetItemInfo(self.item);
             end
             local linkedToChat = link and HandleModifiedItemClick(link);
             if linkedToChat then
@@ -1228,12 +1231,13 @@ do  -- TokenFrame   -- Money   -- Coin
         tokenButton.link = link;
         tokenButton.merchantSlot = currencyData[6];
         tokenButton.metchantCostIndex = currencyData[7];
+        tokenButton.questionableData = nil;
 
         if tokenType == TOKEN_TYPE_CURRENCY then
             --Currency
             self.anyCurrency = true;
             tokenButton.currencyID = id;
-            tokenButton.itemID = nil;
+            tokenButton.item = nil;
 
             local info;
 
@@ -1255,8 +1259,13 @@ do  -- TokenFrame   -- Money   -- Coin
             --Item
             self.anyItem = true;
             tokenButton.currencyID = nil;
-            tokenButton.itemID = id;
+            tokenButton.item = id;
             icon = GetItemIconByID(id)
+
+            if type(id) == "string" then
+                --here "id" can be itemlink, but the count may not be accurate
+                tokenButton.questionableData = true;
+            end
 
             if self.includeBank then
                 quantity = GetItemCount(id, true, false, true, true);
@@ -1391,6 +1400,69 @@ do  -- TokenFrame   -- Money   -- Coin
     function TokenDisplayMixin:DisplayCurrencyOnFrame(tokens, owner, position, offsetX, offsetY)
         self:SetFrameOwner(owner, position, offsetX, offsetY);
         self:SetTokens(tokens);
+    end
+
+    function TokenDisplayMixin:DisplayMerchantPriceOnFrame(tokens, owner, offsetX, offsetY, merchantSlotIndexList)
+        local position = "BOTTOMRIGHT";
+        local fullyLoaded = true;
+        if merchantSlotIndexList then
+            --We use C_Tooltip.GetMerchantCostItem to get the real itemlink b/c GetMerchantItemCostItem only returns the basic itemlink
+            local GetMerchantCostItem = C_TooltipInfo.GetMerchantCostItem;
+            local numCost, slot;
+            local uniqueLinks = {};
+            for _, v in ipairs(merchantSlotIndexList) do
+                slot, numCost = v[1], v[2];
+                if numCost > 0 then
+                    for costIndex = 1, numCost do
+                        local info = GetMerchantCostItem(slot, costIndex);
+                        local itemLevel = 0;
+                        if info and info.hyperlink then
+                            for _, line in ipairs(info.lines) do
+                                if line.itemLevel then
+                                    itemLevel = line.itemLevel;
+                                    break
+                                end
+                            end
+                            uniqueLinks[info.hyperlink] = itemLevel;
+                        else
+                            fullyLoaded = false;
+                        end
+                    end
+                end
+            end
+            local linkList = {};
+            for link, itemLevel in pairs(uniqueLinks) do
+                tinsert(linkList, {link, itemLevel});
+            end
+
+            table.sort(linkList, function(a, b)
+                --Sort by itemLevel then link
+                if a[2] ~= b[2] and a[2] > 0 and b[2] > 0 then
+                    return a[2] < b[2]
+                end
+                return a[1] < b[1]
+            end);
+
+            tokens = {};
+            local match = string.match;
+            local currencyType;
+            local id;
+            for i, v in ipairs(linkList) do
+                local hyperlink = v[1];
+                id = match(hyperlink, "currency:(%d+)");
+                if id then
+                    currencyType = 0;
+                    id = tonumber(id);
+                    tokens[i] = {currencyType, id, nil, nil, hyperlink};
+                else    --item
+                    currencyType = 1;
+                    tokens[i] = {currencyType, hyperlink, nil, nil, hyperlink};
+                end
+            end
+        end
+
+        self:DisplayCurrencyOnFrame(tokens, owner, position, offsetX, offsetY);
+        return fullyLoaded
     end
 
     function TokenDisplayMixin:ShowMoneyFrame(state)

@@ -3170,31 +3170,6 @@ do  -- Container Item Processor
     local ITEM_OPENABLE = ITEM_OPENABLE or "<Right Click to Open>";
     local OPENABLE_ITEM = {};
 
-    local function IsItemOpenable(item)
-        local itemID, _, _, _, _, classID, subClassID = GetItemInfoInstant(item);
-        if OPENABLE_ITEM[itemID] ~= nil then
-            return OPENABLE_ITEM[itemID]
-        end
-
-        if classID == 15 and subClassID == 4 then
-            local bag, slot = GetItemBagPosition(itemID);
-            if bag and slot then
-                local tooltipData = GetBagItem(bag, slot);
-                if tooltipData then
-                    local lines = tooltipData.lines;
-                    local leftText = lines[#lines].leftText;
-                    if leftText and leftText == ITEM_OPENABLE then
-                        OPENABLE_ITEM[itemID] = true;
-                        return true
-                    else
-                        OPENABLE_ITEM[itemID] = false;
-                    end
-                end
-            end
-        end
-        return false
-    end
-
     function Processor:OnUpdate_Queue(elapsed)
         self.t = self.t + elapsed;
         if self.t > 0.1 then
@@ -3292,6 +3267,11 @@ do  -- Container Item Processor
     function API.DoesItemReallyExist(item)
         local a = item and GetItemInfoInstant(item);
         return a ~= nil
+    end
+
+    function API.IsItemContextToken(item)
+        local _, _, _, _, _, classID, subClassID = GetItemInfoInstant(item);
+        return classID == 5 and subClassID == 2
     end
 end
 

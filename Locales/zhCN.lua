@@ -208,6 +208,7 @@ L["Num Items In Bank Format"] = "银行: |cffffffff%d|r";
 L["Num Items In Bag Format"] = "背包: |cffffffff%d|r";
 L["Number Thousands"] = "K";
 L["Number Millions"] = "M";
+L["Questionable Item Count Tooltip"] = "受技术所限该物品数量可能不准确。";
 
 
 --Landing Page (Expansion Summary Minimap)
@@ -482,6 +483,7 @@ L["Delve Chest 1 Rare"] = "丰裕宝匣";
 L["Season Maximum Colon"] = "赛季上限："
 L["Item Changed"] = "已被替换为";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "完成的C.H.E.T.T.清单";
+L["Devourer Attack"] = "吞噬者入侵";
 
 
 --Map Pin Filter Name (name should be plural)

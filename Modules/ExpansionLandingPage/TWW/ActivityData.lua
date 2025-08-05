@@ -156,7 +156,7 @@ local ActivityData = {  --Constant
     {isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
         entries = {
             {name = "The Key to Success", questID = 84370, atlas = WEEKLY_QUEST, accountwide = true},
-            {name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187},
+            --{name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187},
         }
     },
 };

@@ -118,14 +118,22 @@ local function GetCurrentDelvesInfo()
                     if widgetInfo and widgetInfo.shownState ~= Enum.WidgetShownState.Hidden then
                         local _, _, _, instanceID = UnitPosition("player");
                         local uiMapID = C_Map.GetBestMapForUnit("player");
-                        local stageName = widgetInfo.headerText;    --Delve Name / Treasure Room / Collect Your Reward!
+                        --local stageName = widgetInfo.headerText;    --Delve Name / Treasure Room / Collect Your Reward!
                         local tierText = widgetInfo.tierText;
                         local tier = tonumber(string.match(tierText, "%d+") or 0);
+                        local mapName, overrideName;
+                        if uiMapID then
+                            mapName = API.GetMapName(uiMapID);
+                        else
+                            overrideName = GetInstanceInfo();
+                        end
+                        --note: in 11.2 Delves, player can enter a ethereal portal where uiMapID is nil
                         local tbl = {
-                            name = API.GetMapName(uiMapID),
+                            name = mapName,
                             tier = tier,
                             instanceID = instanceID,
                             uiMapID = uiMapID,
+                            overrideName = overrideName,
                         };
                         return tbl
                     end
@@ -184,14 +192,14 @@ do
                     if i > numRuns then
                         break
                     end
-                    mapName = mapNames[v.uiMapID];
-                    if not mapName then
+                    mapName = v.overrideName or mapNames[v.uiMapID];
+                    if (not mapName) and (v.uiMapID) then
                         mapName = API.GetMapName(v.uiMapID);
                         mapName = "|cff40c040"..mapName.."|r";
                         mapNames[v.uiMapID] = mapName;
                     end
                     --tooltip:AddDoubleLine(tierFormat:format(v.tier), mapName, 0.098, 1.000, 0.098, 0.098, 1.000, 0.098);
-                    tooltip:AddLine("- "..tierFormat:format(v.tier).."   ".. mapName, 0.098, 1.000, 0.098);
+                    tooltip:AddLine("- "..tierFormat:format(v.tier).."   ".. (mapName or UNKNOWN), 0.098, 1.000, 0.098);
                 end
 
                 tooltip:AddLine(" ");
@@ -235,6 +243,7 @@ do  --Event Listener
             record.instanceID = info.instanceID;
             record.tier = info.tier;
             record.time = time();
+            record.overrideName = info.overrideName;
             if DBManager:SaveRecord(record) then
                 print(string.format("Tier %d %s Complete", record.tier, API.GetMapName(record.uiMapID)));
             end

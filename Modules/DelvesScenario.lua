@@ -115,7 +115,7 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
         local widgets = C_UIWidgetManager.GetAllWidgetsBySetID(widgetSetID);
         if not widgets then return end;
 
-        local TYPE_ID =  29;    --Enum.UIWidgetVisualizationType.ScenarioHeaderDelves
+        local TYPE_ID = 29;    --Enum.UIWidgetVisualizationType.ScenarioHeaderDelves
         local widgetID;
 
         for _, widgetInfo in ipairs(widgets) do
@@ -126,7 +126,7 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
 
         if not widgetID then return end;
 
-        local SPELL_ID = 472952;    --Nemisis Strongbox    /dump GetMouseFoci()[1].spellID
+        local SPELL_ID = 1239535;    --Nemisis Strongbox    /dump GetMouseFoci()[1].spellID
         local spellIndex;
 
         local widgetInfo = C_UIWidgetManager.GetScenarioHeaderDelvesWidgetVisualizationInfo(widgetID);
@@ -273,8 +273,6 @@ do  --Seasonal Journey Progress
         ProgressBar:SetLevel(level, threshold <= 0);
         ProgressBar:SetMaxValue(threshold);
         ProgressBar:SetValue(earned);
-
-        PB = ProgressBar;   --Debug
 
         function ProgressBar:Test()
             local level, earned, threshold = 2, 3300, 4200;

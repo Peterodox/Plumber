@@ -22,6 +22,9 @@ local ceil = math.ceil;
 local match = string.match;
 local tonumber = tonumber;
 local tsort = table.sort;
+local type = type;
+
+local IsItemContextToken = API.IsItemContextToken;
 
 local ShopUI;
 local Controller = CreateFrame("Frame");
@@ -156,6 +159,10 @@ local function SortFunc_CurrencyType(a, b)
         return a[1] < b[1]
     end
 
+    if type(a) ~= type(b) then
+        return type(a) == "number"
+    end
+
     return a[2] < b[2]
 end
 
@@ -231,6 +238,8 @@ function Controller:UpdateMerchantInfo()
     local merchantButton;
     local anyGold;
     local altCurreny;
+    local hasAnyContextToken = false;
+    local slotIndexList = {};
 
     local playerMoney = GetMoney();
 
@@ -300,6 +309,10 @@ function Controller:UpdateMerchantInfo()
                         if id and not altCurreny[id] then
                             --assume itemID and currencyID don't accidently overlap
                             altCurreny[id] = currencyType;
+
+                            if (not hasAnyContextToken) and IsItemContextToken(id) then
+                                hasAnyContextToken = true;
+                            end
                         end
 
                         requiredCurrency[n] = {currencyType, id, itemValue, itemTexture, itemLink, i, n};
@@ -308,7 +321,11 @@ function Controller:UpdateMerchantInfo()
                     self:RequestUpdate(0.2);
                 end
             end
+        else
+            numCost = 0;
         end
+
+        slotIndexList[buttonIndex] = {i, numCost};
 
         priceFrame:SetFrameOwner(merchantButton, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0, "MEDIUM");
         priceFrame:SetMoneyAndAltCurrency(price, requiredCurrency, playerMoney);
@@ -341,7 +358,9 @@ function Controller:UpdateMerchantInfo()
 
     --TokenDisplay:DisplayCurrencyOnFrame(tokens, ShopUI, "BOTTOMLEFT", 4, 6);
     if not self.otherTabShown then
-        TokenDisplay:DisplayCurrencyOnFrame(tokens, ShopUI, "BOTTOMRIGHT", -5, 6);
+        if not TokenDisplay:DisplayMerchantPriceOnFrame(tokens, ShopUI, -5, 6, hasAnyContextToken and slotIndexList or nil) then
+            self:RequestUpdate(0.2);
+        end
     end
 end
 
@@ -534,8 +553,8 @@ do  --For some Merchant UI addon users we only update the token frame
         local fromIndex = (page - 1) * itemPerPage;
         local anyGold;
         local altCurreny;
-
-        local playerMoney = GetMoney();
+        local hasAnyContextToken = false;
+        local slotIndexList = {};
 
         local buttonIndex = 0;
         local numPages = ceil(numMerchantItems / itemPerPage);
@@ -588,6 +607,10 @@ do  --For some Merchant UI addon users we only update the token frame
                             if id and not altCurreny[id] then
                                 --assume itemID and currencyID don't accidently overlap
                                 altCurreny[id] = currencyType;
+
+                                if (not hasAnyContextToken) and IsItemContextToken(id) then
+                                    hasAnyContextToken = true;
+                                end
                             end
 
                             requiredCurrency[n] = {currencyType, id, itemValue, itemTexture};
@@ -596,7 +619,11 @@ do  --For some Merchant UI addon users we only update the token frame
                         self:RequestUpdate(0.2);
                     end
                 end
+            else
+                numCost = 0;
             end
+
+            slotIndexList[buttonIndex] = {i, numCost};
         end
 
         self:SetupTokenDisplay();
@@ -624,7 +651,9 @@ do  --For some Merchant UI addon users we only update the token frame
         end
 
         if not self.otherTabShown then
-            TokenDisplay:DisplayCurrencyOnFrame(tokens, ShopUI, "BOTTOMRIGHT", -5, 6);
+            if not TokenDisplay:DisplayMerchantPriceOnFrame(tokens, ShopUI, -5, 6, hasAnyContextToken and slotIndexList or nil) then
+                self:RequestUpdate(0.2);
+            end
         end
     end
 
