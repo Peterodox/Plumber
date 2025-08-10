@@ -1754,7 +1754,7 @@ do  --Edit Mode
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowItemCount", SettingChanged_ShowItemCount);
 
     local function SettingChanged_FadeDelayPerItem(value, userInput)
-        AUTO_HIDE_DELAY = GetValidFadeOutDelay(value);
+        FADE_DELAY_PER_ITEM = GetValidFadeOutDelay(value);
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_FadeDelayPerItem", SettingChanged_FadeDelayPerItem);
 
