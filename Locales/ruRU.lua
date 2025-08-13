@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.2
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.2 b
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -208,6 +208,7 @@ L["Num Items In Bank Format"] = (BANK or "Банк") ..": |cffffffff%d|r";
 L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Сумка") ..": |cffffffff%d|r";
 L["Number Thousands"] = "Т";    --15K  15,000
 L["Number Millions"] = "М";     --1.5M 1,500,000
+L["Questionable Item Count Tooltip"] = "Количество предметов может быть неверным из-за ограничений аддона.";
 
 
 --Landing Page (Expansion Summary Minimap)
@@ -514,6 +515,7 @@ L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameO
 L["Season Maximum Colon"] = "Максимум за сезон:";
 L["Item Changed"] = "в предмет";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "Заполненный список КРОТ";
+L["Devourer Attack"] = "Атака Пожирателей";
 
 
 --Map Pin Filter Name (name should be plural)
