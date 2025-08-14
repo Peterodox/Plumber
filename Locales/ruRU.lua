@@ -516,6 +516,8 @@ L["Season Maximum Colon"] = "Максимум за сезон:";
 L["Item Changed"] = "в предмет";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "Заполненный список КРОТ";
 L["Devourer Attack"] = "Атака Пожирателей";
+L["Restored Coffer Key"] = "Отреставрированный ключ от сундука";
+L["Coffer Key Shard"] = "Осколок ключа от сундука";
 
 
 --Map Pin Filter Name (name should be plural)

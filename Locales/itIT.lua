@@ -20,6 +20,8 @@ L["currency-2917"] = "Dorato";
 L["Season Maximum Colon"] = "Limite stagionale:";
 L["Item Changed"] = "stato cambiato";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "Lista C.I.H.T.T. Completa";
+L["Restored Coffer Key"] = "Chiave dello Scrigno Ripristinata";
+L["Coffer Key Shard"] = "Scheggia di Chiave dello Scrigno";
 
 
 --Map Pin Filter Name (name should be plural)

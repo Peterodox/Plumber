@@ -459,6 +459,8 @@ L["currency-2917"] = "鍍金";
 L["Season Maximum Colon"] = "賽季上限：";
 L["Item Changed"] = "已改為";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "完成的C.H.E.T.T.清單";
+L["Restored Coffer Key"] = "復原的寶庫鑰匙";
+L["Coffer Key Shard"] = "寶庫鑰匙裂片";
 
 
 --Map Pin Filter Name (name should be plural)

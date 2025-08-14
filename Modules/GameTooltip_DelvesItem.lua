@@ -129,8 +129,8 @@ do
         description = addon.L["ModuleDescription TooltipDelvesItem"],
         toggleFunc = EnableModule,
         categoryID = 3,
-        uiOrder = 1121,
-        moduleAddedTime = 1726674500,
+        uiOrder = 1200,
+        moduleAddedTime = 1755200000,
     };
 
     addon.ControlCenter:AddModule(moduleData);

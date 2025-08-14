@@ -439,6 +439,10 @@ L["Completed"] = "已完成";
 L["Filter Hide Completed Format"] = "隐藏已完成的条目 (%d)";
 L["Weeky Reset Format"] = "周常重置：%s";
 L["Ready To Turn In Tooltip"] = "可以上交任务。";
+L["Weekly Coffer Key Tooltip"] = "每周获得的前四个周常宝箱里有一把修复的宝匣钥匙。";
+L["Weekly Coffer Key Shards Tooltip"] = "每周获得的前四个周常宝箱里有宝匣钥匙碎片。";
+L["Weekly Cap"] = "每周上限";
+L["Weekly Cap Reached"] = "已达到每周上限。";
 
 
 --Generic
@@ -484,6 +488,8 @@ L["Season Maximum Colon"] = "赛季上限："
 L["Item Changed"] = "已被替换为";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "完成的C.H.E.T.T.清单";
 L["Devourer Attack"] = "吞噬者入侵";
+L["Restored Coffer Key"] = "修复的宝匣钥匙";
+L["Coffer Key Shard"] = "宝匣钥匙碎片";
 
 
 --Map Pin Filter Name (name should be plural)

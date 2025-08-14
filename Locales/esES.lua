@@ -516,6 +516,8 @@ L["Season Maximum Colon"] = "Máximo de la temporada:";
 L["Item Changed"] = "ha cambiado";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "Lista de la T.C.E.H.T. completada";
 L["Devourer Attack"] = "Ataque de devoradores";
+L["Restored Coffer Key"] = "Llave de arca restaurada";
+L["Coffer Key Shard"] = "Fragmento de llave de arca";
 
 
 --Map Pin Filter Name (name should be plural)

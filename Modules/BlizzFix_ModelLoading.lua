@@ -3,6 +3,7 @@
 
 local _, addon = ...
 local API = addon.API;
+local L = addon.L;
 
 
 local Loader = CreateFrame("Frame", nil, UIParent);
@@ -63,6 +64,17 @@ do
     Loader.queuedModels = {};
 
     local tremove = table.remove;
+
+
+    local ModelLayoutOptions = {
+        --{row, col}
+        {2, 3},     --Addon Default
+        {2, 4},
+        {3, 3},
+        {3, 4},
+        {3, 5},
+        {3, 6},     --Game Default
+    };
 
     function Loader:ClearQueue()
         self.t = 0;
@@ -295,24 +307,18 @@ do
             end
         end
 
+        self:HookIntoMenu();
+
         self:LoadSettings();
     end
 
     function Loader:LoadSettings(userInput)
-        local values = {
-            {2, 3},     --Addon Default
-            {2, 4},
-            {3, 3},
-            {3, 4},
-            {3, 5},
-            {3, 6},     --Game Default
-        };
-
+        local values = ModelLayoutOptions;
         local optionIndex = addon.GetDBValue("AppearanceTab_ModelCount");
         if not (optionIndex and values[optionIndex]) then
             optionIndex = 1;
         end
-
+        self.modelLayoutOptionIndex = optionIndex;
         self:SetRowAndCol(values[optionIndex][1], values[optionIndex][2], userInput);
     end
 
@@ -348,6 +354,18 @@ do
         end
 
         if userInput and appearanceTab:IsVisible() then
+            local reloadSlot = appearanceTab:GetActiveSlot();
+            if reloadSlot then
+                self:ClearQueue();
+                for i, model in ipairs(appearanceTab.Models) do
+                    model:ClearModel();
+                    model.visualInfo = nil;
+                    model:Reload(reloadSlot);
+                end
+            end
+            if appearanceTab.filteredVisualsList then
+                appearanceTab.PagingFrame:SetMaxPages(math.ceil(#appearanceTab.filteredVisualsList / appearanceTab.PAGE_SIZE));
+            end
             appearanceTab:ResetPage();
         end
     end
@@ -359,6 +377,42 @@ do
             if self.Init then
                 self:Init();
             end
+        end
+    end
+
+    function Loader:HookIntoMenu()
+        if not self.isMenuHooked then
+            self.isMenuHooked = true;
+        else
+            return
+        end
+
+        self.isMenuHooked = true;
+
+        if Menu and Menu.ModifyMenu then
+            Menu.ModifyMenu("MENU_WARDROBE_FILTER", function(owner, rootDescription, contextData)
+                if not Loader.enabled then return end;
+
+                rootDescription:CreateDivider();
+                rootDescription:CreateTitle("Plumber");
+
+                local submenu = rootDescription:CreateButton(L["Model Layout"]);
+
+                local function IsSelected(index)
+                    return index == Loader.modelLayoutOptionIndex;
+                end
+
+                local function SetSelected(index)
+                    addon.SetDBValue("AppearanceTab_ModelCount", index, true);
+                    Loader:LoadSettings(true);
+                    return (MenuResponse and MenuResponse.Refresh) or 2
+                end
+
+                for index, v in ipairs(ModelLayoutOptions) do
+                    local text = string.format("%s x %s", v[1], v[2]);
+                    submenu:CreateRadio(text, IsSelected, SetSelected, index);
+                end
+            end);
         end
     end
 
@@ -393,81 +447,14 @@ end
 
 do
     local moduleData = {
-        name = addon.L["ModuleName AppearanceTab"],
+        name = L["ModuleName AppearanceTab"],
         dbKey = "AppearanceTab",
-        description = addon.L["ModuleDescription AppearanceTab"],
+        description = L["ModuleDescription AppearanceTab"],
         toggleFunc = EnableModule,
         categoryID = 1,
-        uiOrder = 1120,
-        moduleAddedTime = 1755000000,
+        uiOrder = 1180,
+        moduleAddedTime = 1755200000,
     };
 
     addon.ControlCenter:AddModule(moduleData);
-end
-
-
-local function EL_Modify()
-    local models = WardrobeCollectionFrame.ItemsCollectionFrame.Models;
-    local Mixin = Mixin;
-
-    local NUM_ROWS = 2; --3
-	local NUM_COLS = 4; --6
-
-    NUM_ROWS = math.min(NUM_ROWS, 3);
-    NUM_COLS = math.min(NUM_COLS, 6);
-	local PAGE_SIZE = NUM_ROWS * NUM_COLS;
-
-    local gapH, gapV = 16, 24;
-    local modelWidth, modelHeight = 78, 104;
-
-    local f = WardrobeCollectionFrame.ItemsCollectionFrame;
-    f.NUM_ROWS = NUM_ROWS;
-    f.NUM_COLS = NUM_COLS;
-    f.PAGE_SIZE = PAGE_SIZE;
-
-    local fromOffsetY = -92;
-    local fromOffsetX = -math.floor(0.5 * (NUM_COLS * (modelWidth + gapH) - gapH));
-
-    local row = 0;
-    local col = 0;
-
-    for i, model in ipairs(models) do
-        model.RealSetUnit = model.SetUnit;
-        Mixin(model, AppendItemModelMixin);
-        model:SetScript("OnModelLoaded", AppendItemModelMixin.OnModelLoaded);
-
-        if i > PAGE_SIZE then
-            model:Hide();
-            model:ClearModel();
-        else
-            col = col + 1;
-            if col > NUM_COLS then
-                col = 1;
-                row = row + 1;
-            end
-            model:ClearAllPoints();
-            model:SetPoint("TOPLEFT", f, "TOP", fromOffsetX + (col - 1) * (modelWidth + gapH), fromOffsetY - row * (modelHeight + gapV));
-        end
-    end
-
-
-    local processed = false;
-    WardrobeCollectionFrame:HookScript("OnKeyDown", function(self, key)
-        if (not hooked) and (key == "ESCAPE" and not InCombatLockdown()) then
-            processed = true;
-            self:SetPropagateKeyboardInput(true);
-        end
-    end)
-
-    if not InCombatLockdown() then
-        WardrobeCollectionFrame:SetPropagateKeyboardInput(true);
-    end
-
-    --[[
-        WardrobeSlotButtonTemplate
-        function WardrobeItemsCollectionSlotButtonMixin:OnClick()
-            PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK);
-            WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetActiveSlot(self.transmogLocation);
-        end
-    --]]
 end

@@ -15,6 +15,14 @@ local GAP_H = 2;
 local GAP_V = 8;
 
 
+local function ShowGreatVaultUI()
+    if API.CheckAndDisplayErrorIfInCombat() then
+        return
+    end
+    WeeklyRewards_ShowUI();
+end
+
+
 local GreatVaultButtonMixin = {};
 do
     function GreatVaultButtonMixin:SetUnlockedState()
@@ -73,9 +81,7 @@ do
     end
 
     function GreatVaultButtonMixin:OnClick()
-        if not InCombatLockdown() then
-            WeeklyRewards_ShowUI();
-        end
+        ShowGreatVaultUI();
     end
 
     function GreatVaultButtonMixin:CanShowPreviewItemTooltip()
@@ -334,7 +340,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
 
 
     --Notify player of unclaimed chest
-    local ClaimChestAlert = CreateFrame("Frame", nil, f);
+    local ClaimChestAlert = CreateFrame("Button", nil, f);
     f.ClaimChestAlert = ClaimChestAlert;
     ClaimChestAlert:Hide();
     ClaimChestAlert:SetAllPoints(true);
@@ -357,6 +363,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
     ag:SetLooping("REPEAT");
     ClaimChestAlert.AnimSwirl = ag;
 
+
     local AlertText = ClaimChestAlert:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     ClaimChestAlert.AlertText = AlertText;
     AlertText:SetWidth(208);
@@ -376,6 +383,10 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
 
     ClaimChestAlert:SetScript("OnLeave", function()
         GameTooltip:Hide();
+    end);
+
+    ClaimChestAlert:SetScript("OnClick", function()
+        ShowGreatVaultUI();
     end);
 
     return f, height

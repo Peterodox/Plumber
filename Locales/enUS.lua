@@ -85,6 +85,7 @@ L["ModuleDescription GossipFrameMedal Format"] = "Replace the default icon %s wi
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "Druid Model Fix";
 L["ModuleDescription DruidModelFix"] = "Fix the Character UI model display issue caused by using Glyph of Stars\n\nThis bug will be fixed by Blizzard in 10.2.0 and this module will be removed.";
+L["Model Layout"] = "Model Layout";
 
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)

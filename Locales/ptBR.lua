@@ -457,6 +457,8 @@ L["currency-2917"] = "Dourado";
 L["Season Maximum Colon"] = "Máximo da série:";
 L["Item Changed"] = "mudou para";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "Lista da C.H.A.T.A. Concluída";
+L["Restored Coffer Key"] = "Chave de Cofre Restaurada";
+L["Coffer Key Shard"] = "Estilhaço de Chave de Cofre";
 
 
 --Map Pin Filter Name (name should be plural)

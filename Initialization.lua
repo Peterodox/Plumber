@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.7.2";
-local VERSION_DATE = 1754400000;
+local VERSION_TEXT = "v1.7.3";
+local VERSION_DATE = 1755200000;
 
 
 local addonName, addon = ...
@@ -135,7 +135,7 @@ local DefaultValues = {
     EditModeShowPlumberUI = true,
     LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
 
-    AppearanceTab = true,               --Adjust Appearance Tab models to reduce GPU usage spike
+    AppearanceTab = false,              --Adjust Appearance Tab models to reduce GPU usage spike
         AppearanceTab_ModelCount = 1,
 
 
@@ -229,6 +229,12 @@ local DefaultValues = {
     --MinimapMouseover = false,             --Ridden with compatibility issue
 };
 
+
+local NeverEnableByDefault = {
+    AppearanceTab = true,
+};
+
+
 local function LoadDatabase()
     PlumberDB = PlumberDB or {};
     PlumberStorage = PlumberStorage or {};  --Save large data (Spell)
@@ -243,7 +249,7 @@ local function LoadDatabase()
     for dbKey, value in pairs(DefaultValues) do
         if DB[dbKey] == nil then
             DB[dbKey] = value;
-            if alwaysEnableNew and type(value) == "boolean" then
+            if alwaysEnableNew and type(value) == "boolean" and not NeverEnableByDefault[dbKey] then
                 --Not all Booleans are the master switch of individual module
                 --Send these new ones to ControlCenter
                 --Test: /run PlumberDB = {EnableNewByDefault = true}
