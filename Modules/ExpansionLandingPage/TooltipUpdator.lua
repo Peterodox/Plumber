@@ -176,11 +176,14 @@ function TooltipUpdator:OnUpdate(elapsed)
                 end
 
                 if self.tooltipSetter then
-                    self.tooltipSetter(tooltip);
+                    if not self.tooltipSetter(tooltip) then
+                        isRetrievingData = true;
+                    end
                 end
 
                 if isRetrievingData then
                     tooltip:AddLine(RETRIEVING_DATA, 0.5, 0.5, 0.5, true);
+                    self.keepUpdating = true;
                 end
 
                 tooltip:Show();

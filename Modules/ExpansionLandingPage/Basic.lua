@@ -379,6 +379,7 @@ end
 
 do  --TabUtil
     local Tabs = {};
+    local SelectedTabIndex = 1;
     local SelectedTabKay;
 
     local function SortFunc_Tab(a, b)
@@ -432,12 +433,14 @@ do  --TabUtil
 
         SelectedTabKay = tabKey;
 
-        for _, tabInfo in ipairs(Tabs) do
+        for index, tabInfo in ipairs(Tabs) do
             if tabInfo.frame then
                 tabInfo.frame:SetShown(tabInfo.key == tabKey);
             end
 
             if tabInfo.key == tabKey then
+                SelectedTabIndex = index;
+
                 if not tabInfo.useCustomLeftFrame then
                     LandingPageUtil.ShowLeftFrame(true);
                 end
@@ -462,6 +465,20 @@ do  --TabUtil
 
     function LandingPageUtil.GetSelectedTabKey()
         return SelectedTabKay
+    end
+
+    function LandingPageUtil.SelectTabByDelta(delta)
+        --Prev -1, Next +1
+        local index = SelectedTabIndex + (delta > 0 and 1 or -1);
+        local numTabs = #Tabs;
+        if index < 0 then
+            index = numTabs;
+        elseif index > numTabs then
+            index = 1;
+        else
+            LandingPageUtil.SelectTabByIndex(index);
+            return true
+        end
     end
 end
 

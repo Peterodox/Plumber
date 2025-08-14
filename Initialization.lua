@@ -113,10 +113,6 @@ local DefaultValues = {
     AlternativePlayerChoiceUI = true,   --Revamp PlayerChoiceFrame for Dreamseed Nurturing
     HandyLockpick = true,               --Right-click to lockpick inventory items (Rogue/Mechagnome)
     Technoscryers = true,               --Show Technoscryers on QuickSlot (Azerothian Archives World Quest)
-    TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
-    TooltipRepTokens = true,            --Show faction info for items that grant rep
-    TooltipSnapdragonTreats = true,     --Show info on Snapdragon Treats (An item that changes this mount's color)
-    TooltipItemReagents = false,        --For items with "use to combine": show the reagent count
     PlayerChoiceFrameToken = true,      --Add owned token count to PlayerChoiceFrame
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
     Delves_Dashboard = true,            --Show Great Vault Progress on DelvesDashboardFrame
@@ -136,9 +132,20 @@ local DefaultValues = {
         Plunderstore_HideCollected = true,
     BlizzardSuperTrack = false,         --Add timer to the SuperTrackedFrame when tracking a POI with time format
     ProfessionsBook = true,             --Show unspent points on ProfessionsBookFrame
-    TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
     EditModeShowPlumberUI = true,
     LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
+
+    AppearanceTab = true,               --Adjust Appearance Tab models to reduce GPU usage spike
+        AppearanceTab_ModelCount = 1,
+
+
+    --Tooltip
+    TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
+    TooltipRepTokens = true,            --Show faction info for items that grant rep
+    TooltipSnapdragonTreats = true,     --Show info on Snapdragon Treats (An item that changes this mount's color)
+    TooltipItemReagents = false,        --For items with "use to combine": show the reagent count
+    TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
+    TooltipDelvesItem = true,           --Show weekly Coffer Key cap on chest tooltip
 
 
     --Reduction

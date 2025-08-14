@@ -213,6 +213,14 @@ do
         end
 
         self:UpdateTabButtons();
+
+
+        local function Header_OnMouseWheel(_, delta)
+            --Scroll up will go the left tab
+            LandingPageUtil.SelectTabByDelta(-delta);
+            self:UpdateTabs();
+        end
+        buttonContainer:SetScript("OnMouseWheel", Header_OnMouseWheel);
     end
 
     function PlumberExpansionLandingPageMixin:UpdateTabButtons()

@@ -753,6 +753,29 @@ function ControlCenter:AddModule(moduleData)
     end
 end
 
+function Plumber_GetNumModules()
+    --debug
+    local lastCategoryID, lastUIOrderID;
+    local categoryID, uiOrder;
+    local cates = {};
+
+    for _, module in ipairs(ControlCenter.modules) do
+        categoryID = module.categoryID;
+        uiOrder = module.uiOrder;
+        if categoryID then
+            if not cates[categoryID] then
+                cates[categoryID] = uiOrder;
+            elseif cates[categoryID] and uiOrder > cates[categoryID] then
+                cates[categoryID] = uiOrder;
+            end
+        end
+    end
+
+    for categoryID = 1, #CATEGORY_ORDER do
+        print("cate:", categoryID, "maxUiOrder:", cates[categoryID]);
+    end
+end
+
 
 ControlCenter:RegisterEvent("PLAYER_ENTERING_WORLD");
 

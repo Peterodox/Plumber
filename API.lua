@@ -2230,6 +2230,7 @@ do  -- ObjectPool
 
         self.numUnused = #self.objects;
     end
+    ObjectPoolMixin.Release = ObjectPoolMixin.ReleaseAll;
 
     function ObjectPoolMixin:GetTotalObjects()
         return #self.objects
@@ -2934,6 +2935,10 @@ do  -- Tooltip
         margin = { left = 0, right = 4, top = 0, bottom = 0 },
         texCoords = { left = 0.0625, right = 0.9375, top = 0.0625, bottom = 0.9375 },
     };
+
+    function API.AddTextureToTooltip(tooltip, texture)
+        tooltip:AddTexture(texture, TextureInfoTable);
+    end
 
     function API.AddCraftingReagentToTooltip(tooltip, item, quantityRequired)
         local name = C_Item.GetItemNameByID(item) or ("item:"..item);

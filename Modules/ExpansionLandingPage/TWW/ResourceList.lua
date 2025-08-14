@@ -48,14 +48,11 @@ end
 --]]
 
 
-local IS_1102 = addon.IsToCVersionEqualOrNewerThan(110200);     --PTR debug
 
 local ResourceList = {
-    {itemID = 244465, shownInDelves = true, hidden = IS_1102},
-
     {currencyID = 3028},    --Restored Coffer Key
-    {itemID = IS_1102 and 245653 or 236096, isMinor = false},   --Coffer Key Shard
-    {itemID = IS_1102 and 246771 or 235897},      --Radiant Echo
+    {itemID = 245653, isMinor = false},   --Coffer Key Shard
+    {itemID = 246771},      --Radiant Echo
 
     {currencyID = 1602, shownIfOwned = true},    --Conquest
     {currencyID = 1792, shownIfOwned = true},    --Honor
@@ -77,3 +74,11 @@ local ResourceList = {
     --{currencyID = 3309, conditionFunc = HasUncollectedSets, appendTooltipFunc = ShowUncollectedSets},    --Hellstone Shard (Greedy Emissary)
 };
 LandingPageUtil.ResourceList = ResourceList;
+
+
+if addon.ItemUpgradeConstant.CatalystCurrencyID then
+    table.insert(ResourceList, 1, {
+        currencyID = addon.ItemUpgradeConstant.CatalystCurrencyID,
+        shownIfOwned = true,
+    });
+end

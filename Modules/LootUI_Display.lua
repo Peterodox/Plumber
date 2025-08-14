@@ -1553,13 +1553,13 @@ do  --Edit Mode
         end);
     end
 
-    local function GetValidFadeOutDelay(value)
+    local function GetValidFadeOutDelayPerItem(value)
         value = value or 0.25;
         return API.Clamp(value, 0.25, 1.0);
     end
 
     local function Options_FadeOutDelaySlider_OnValueChanged(value)
-        value = GetValidFadeOutDelay(value);
+        value = GetValidFadeOutDelayPerItem(value);
         PlumberDB.LootUI_FadeDelayPerItem = value;
         FADE_DELAY_PER_ITEM = value;
     end
@@ -1754,7 +1754,7 @@ do  --Edit Mode
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowItemCount", SettingChanged_ShowItemCount);
 
     local function SettingChanged_FadeDelayPerItem(value, userInput)
-        FADE_DELAY_PER_ITEM = GetValidFadeOutDelay(value);
+        FADE_DELAY_PER_ITEM = GetValidFadeOutDelayPerItem(value);
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_FadeDelayPerItem", SettingChanged_FadeDelayPerItem);
 

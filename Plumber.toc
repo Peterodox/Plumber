@@ -70,6 +70,7 @@ Modules\EquipmentFlyout.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
 Modules\ExpansionLandingPage\ExpansionLandingPage_TWW.xml
+Modules\BlizzFix_ModelLoading.lua
 
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua
