@@ -5,7 +5,7 @@ do  --Item Upgrade Track
     local ItemUpgradeConstant = {
         BaseCurrencyID = 3008,      --Flightstones
         CatalystCurrencyID = 3269;  --Item conversion   /dump ItemInteractionFrame.currencyTypeId
-        DelveWeeklyStashCurrencyID = 3110,
+        DelveWeeklyStashCurrencyID = 3290,
 
         Crests = {
             --Universal Upgrade System (Crests)
