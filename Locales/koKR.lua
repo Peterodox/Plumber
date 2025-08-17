@@ -198,6 +198,11 @@ L["ModuleDescription LandingPageSwitch"] = "미니맵의 명성 요약 버튼을
 L["Mission Complete Count Format"] = "%d 완료 가능";
 L["Open Mission Report Tooltip"] = "우클릭하여 임무 보고서를 열기.";
 
+--Tooltip DelvesItem
+L["ModuleName TooltipDelvesItem"] = "구렁 아이템"
+L["ModuleDescription TooltipDelvesItem"] = "주간 보관함에서 획득한 보관함 열쇠와 파편의 개수를 표시합니다."
+
+
 --WorldMapPin_TWW (Show Pins On Continent Map)
 L["ModuleName WorldMapPin_TWW"] = "지도 핀: "..(EXPANSION_NAME10 or "The War Within");
 L["ModuleDescription WorldMapPin_TWW"] = "카즈 알가르 전역에 걸쳐 추가 목적지가 지도에 핀으로 표시:\n\n- %s\n\n- %s";  --Wwe'll replace %s with locales (See Map Pin Filter Name at the bottom)
@@ -287,6 +292,10 @@ L["Available Knowledge Format"] = "Available Knowledge: |cffffffff%s|r";
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "미니맵 대상 표시";
 L["ModuleDescription MinimapMouseover"] = "미니맵에서 생물을 Alt 클릭하면 해당 대상을 타겟으로 설정합니다.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+
+--AppearanceTab
+L["ModuleName AppearanceTab"] = "형상 탭"
+L["ModuleDescription AppearanceTab"] = "워밴드 수집품의 형상 탭을 수정합니다:\n\n- 모델 로딩 순서를 개선하고 페이지당 표시되는 아이템 수를 조정하여 GPU 부하를 줄입니다. 이를 통해 UI를 열 때 그래픽 충돌 가능성을 낮출 수 있습니다.\n\n- 슬롯을 변경한 후 방문한 페이지를 기억합니다."
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
