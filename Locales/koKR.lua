@@ -202,7 +202,6 @@ L["Open Mission Report Tooltip"] = "우클릭하여 임무 보고서를 열기."
 L["ModuleName TooltipDelvesItem"] = "구렁 아이템"
 L["ModuleDescription TooltipDelvesItem"] = "주간 보관함에서 획득한 보관함 열쇠와 파편의 개수를 표시합니다."
 
-
 --WorldMapPin_TWW (Show Pins On Continent Map)
 L["ModuleName WorldMapPin_TWW"] = "지도 핀: "..(EXPANSION_NAME10 or "The War Within");
 L["ModuleDescription WorldMapPin_TWW"] = "카즈 알가르 전역에 걸쳐 추가 목적지가 지도에 핀으로 표시:\n\n- %s\n\n- %s";  --Wwe'll replace %s with locales (See Map Pin Filter Name at the bottom)
