@@ -495,7 +495,12 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:SetCurrency(data)
-        self:SetNameByQuality(data.name, data.quality);
+        local extraTooltip = API.GetExtraTooltipForCurrency(data.id);
+        local name = data.name;
+        if extraTooltip then
+            name = name.."\n"..extraTooltip;
+        end
+        self:SetNameByQuality(name, data.quality);
         self:SetIcon(data.icon, data);
         self:SetCount(data);
         self:Layout();

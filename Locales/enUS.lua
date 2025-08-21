@@ -355,6 +355,7 @@ L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "Legion Remix";
 L["Artifact Weapon"] = "Artifact Weapon";
 L["Earn X To Upgrade Y Format"] = "Earn another |cffffffff%s|r %s to upgrade %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Until Next Upgrade Format"] = "%s until next upgrade";
 L["New Trait Available"] = "New trait available.";
 
 

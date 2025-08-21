@@ -2960,6 +2960,22 @@ do  -- Tooltip
 
         return true
     end
+
+
+    local AdditionalTooltip = {};
+
+    function API.SetExtraTooltipForCurrency(currencyID, line)
+        --line: string or function
+        AdditionalTooltip[currencyID] = line;
+    end
+
+    function API.GetExtraTooltipForCurrency(currencyID)
+        local text = AdditionalTooltip[currencyID];
+        if type(text) == "function" then
+            text = text();
+        end
+        return text
+    end
 end
 
 do  -- AsyncCallback

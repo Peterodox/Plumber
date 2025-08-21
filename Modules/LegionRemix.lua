@@ -19,6 +19,8 @@ local GetEntryInfo = C_Traits.GetEntryInfo;
 local GetDefinitionInfo = C_Traits.GetDefinitionInfo;
 local CanPurchaseRank = C_Traits.CanPurchaseRank;
 local PurchaseRank = C_Traits.PurchaseRank;
+local GetConfigInfo = C_Traits.GetConfigInfo;
+
 
 local InCombatLockdown = InCombatLockdown;
 
@@ -142,9 +144,9 @@ do	--DataProvider
 		[108112] = true,
 		[108875] = true,
 
-		--Arcane Shield
-		[108107] = true,
-		[108118] = true,
+		--Arcane Shield, Storm
+		[108103] = true,
+		[108104] = true,
 	};
 
 	DataProvider.PurchaseRoute_Basic = {
@@ -253,7 +255,7 @@ do	--DataProvider
 		local traitTreeID = C_RemixArtifactUI.GetCurrTraitTreeID();
 		local configID = itemID and traitTreeID and C_Traits.GetConfigIDByTreeID(traitTreeID);
 		if configID then
-			local configInfo = C_Traits.GetConfigInfo(configID);
+			local configInfo = GetConfigInfo(configID);
 			local treeID = configInfo.treeIDs[1];
 			local nodeIDs = C_Traits.GetTreeNodes(treeID);
 			local n = 0;
@@ -338,7 +340,7 @@ do	--DataProvider
 
 		self.configID = configID;
 
-		local configInfo = C_Traits.GetConfigInfo(configID);
+		local configInfo = GetConfigInfo(configID);
 		local treeID = configInfo.treeIDs[1] or 1161;
 		self.treeID = treeID;
 	end
@@ -361,7 +363,7 @@ do	--DataProvider
 		--local treeID = 1161;	--1162
 		local configID = self:GetCurrentConfigID();
 		if configID then
-			local configInfo = C_Traits.GetConfigInfo(configID);
+			local configInfo = GetConfigInfo(configID);
 			local treeID = configInfo.treeIDs[1];
 			local excludeStagedChanges = false;
 			local treeCurrencyInfo = GetTreeCurrencyInfo(configID, treeID, excludeStagedChanges);
@@ -377,7 +379,7 @@ do	--DataProvider
 		local configID = self.configID;
 		if not configID then return end;
 
-		local configInfo = C_Traits.GetConfigInfo(configID);
+		local configInfo = GetConfigInfo(configID);
 		local treeID = configInfo.treeIDs[1];
 		local nodeIDs = C_Traits.GetTreeNodes(treeID);
 		local numUnspent = self:GetNumUnspentPower();
@@ -471,12 +473,13 @@ do	--DataProvider
 		end
 	end
 
-	YEETRX = function()
-		DataProvider:GetPurchasableTrait();
-	end
-
-	YEETIC = function()
-		DataProvider:GetNumUnspentPower();
+	function DataProvider:GetRequiredAmountBeforeNextUpgrade()
+		local traitInfo = self:GetNextTraitForUpgrade();
+		if traitInfo and traitInfo.cost >= 0 then
+			local numUnspent = self:GetNumUnspentPower();
+			local diff = traitInfo.cost - numUnspent;
+			return diff
+		end
 	end
 end
 
@@ -509,9 +512,13 @@ do
 			if traitInfo then
 				local traitName = DataProvider:GetTraitName(traitInfo.entryID);
 				print("You can upgrade: "..traitName);
-				if (not DataProvider:IsChoiceNode()) and not InCombatLockdown() then
-					print("Auto upgrade: "..traitName);
-					CommitUtil:TryPurchaseToNode(traitInfo.nodeID);
+				if (not DataProvider:IsChoiceNode(traitInfo.nodeID)) then
+					if InCombatLockdown() then
+						print("We will purchase "..traitName.." after combat");
+						CommitUtil:TryPurchaseUpgradeAfterCombat();
+					else
+						CommitUtil:TryPurchaseToNode(traitInfo.nodeID);
+					end
 				end
 			end
 		end
@@ -536,10 +543,19 @@ end
 
 
 do	--CommitUtil
+	function CommitUtil:Enable(state)
+		if state then
+			self:SetScript("OnEvent", self.OnEvent);
+		else
+			self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
+			self:UnregisterEvent("CONFIG_COMMIT_FAILED");
+			self:UnregisterEvent("PLAYER_REGEN_ENABLED");
+		end
+	end
+
 	function CommitUtil:SetCommitStarted(configID)
 		self:RegisterEvent("TRAIT_CONFIG_UPDATED");
 		self:RegisterEvent("CONFIG_COMMIT_FAILED");
-		self:SetScript("OnEvent", self.OnEvent);
 
 		self.commitedConfigID = configID;
 		self.commitingResult = nil;
@@ -569,6 +585,12 @@ do	--CommitUtil
 			local configID = ...
 			if configID == self.commitedConfigID then
 				self.commitingResult = 0;
+			end
+		elseif event == "PLAYER_REGEN_ENABLED" then
+			self:UnregisterEvent(event);
+			if self.processAfterCombat then
+				self.processAfterCombat = nil;
+				self:TryPurchaseNextUpgrade();
 			end
 		end
 
@@ -679,7 +701,11 @@ do	--CommitUtil
 
 		local configID = DataProvider:GetCurrentConfigID();
 		local nodeID, entryID = 108700, 134246;
-		while PurchaseRank(configID, nodeID) do
+		--while PurchaseRank(configID, nodeID) do
+		--	self.anySuccessPurchase = true;
+		--end
+		if C_Traits.TryPurchaseToNode(configID, nodeID) then
+			--This will purchase to as much as possible
 			self.anySuccessPurchase = true;
 		end
 	end
@@ -720,6 +746,22 @@ do	--CommitUtil
 		if self.anySuccessPurchase then
 			self:SetCommitStarted(configID);
 		end
+	end
+
+	function CommitUtil:TryPurchaseNextUpgrade()
+		local traitInfo = DataProvider:GetNextTraitForUpgrade(true);
+		if traitInfo then
+			local traitName = DataProvider:GetTraitName(traitInfo.entryID);
+			if (not DataProvider:IsChoiceNode(traitInfo.nodeID)) then
+				print("Purchasing "..traitName);
+				CommitUtil:TryPurchaseToNode(traitInfo.nodeID);
+			end
+		end
+	end
+
+	function CommitUtil:TryPurchaseUpgradeAfterCombat()
+		self:RegisterEvent("PLAYER_REGEN_ENABLED");
+		self.processAfterCombat = true;
 	end
 
 	YEETPC = function(index)
@@ -778,22 +820,16 @@ do	--GameTooltip Infinite Power
 	function CurrencyTooltipModule:ProcessData(tooltip, currencyID)
 		if self.enabled then
 			if currencyID == CURRENCY_ID_IP then
-				local numUnspent = DataProvider:GetNumUnspentPower();
-				if numUnspent > 0 then
-					local traitInfo = DataProvider:GetNextTraitForUpgrade();
-					if traitInfo and traitInfo.cost > 0 then
-						local diff = traitInfo.cost - numUnspent;
-						tooltip:AddLine(" ");
-						if diff > 0 then
-							diff = BreakUpLargeNumbers(diff);
-							tooltip:AddLine(string.format(L["Earn X To Upgrade Y Format"], diff, API.GetCurrencyName(CURRENCY_ID_IP), L["Artifact Weapon"]), 1, 0.82, 0, true);
-						else
-							tooltip:AddLine(L["New Trait Available"], 0.098, 1.000, 0.098, true);
-						end
-
-						return true
-					end
+				local diff = DataProvider:GetRequiredAmountBeforeNextUpgrade();
+				tooltip:AddLine(" ");
+				if diff > 0 then
+					diff = BreakUpLargeNumbers(diff);
+					tooltip:AddLine(string.format(L["Earn X To Upgrade Y Format"], diff, API.GetCurrencyName(CURRENCY_ID_IP), L["Artifact Weapon"]), 1, 0.82, 0, true);
+				else
+					tooltip:AddLine(L["New Trait Available"], 0.098, 1.000, 0.098, true);
 				end
+
+				return true
 			end
 		end
 		return false
@@ -813,6 +849,17 @@ do	--GameTooltip Infinite Power
 	end
 
 	GameTooltipCurrencyManager:AddSubModule(CurrencyTooltipModule);
+
+
+	local function ExtraTooltipLineGetter()
+		local diff = DataProvider:GetRequiredAmountBeforeNextUpgrade();
+		if diff > 0 then
+			--return "|cffcccccc"..L["Until Next Upgrade Format"]:format(diff).."|r"
+		else
+			return "|cff19ff19"..L["New Trait Available"].."|r"
+		end
+	end
+	API.SetExtraTooltipForCurrency(CURRENCY_ID_IP, ExtraTooltipLineGetter);
 end
 
 
@@ -829,6 +876,7 @@ do	--Module Registry
 
 		EventListener:Enable(state);
 		CurrencyTooltipModule:SetEnabled(state);
+		CommitUtil:Enable(state);
 	end
 
     local moduleData = {
