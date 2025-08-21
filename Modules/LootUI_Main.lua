@@ -17,6 +17,7 @@ local GetItemCount = C_Item.GetItemCount;
 local GetCursorPosition = GetCursorPosition;
 local IsDressableItemByID = C_Item.IsDressableItemByID or API.Nop;
 local QualityColorGetter = API.GetItemQualityColor;
+local IsInteractingWithNpcOfType = C_PlayerInteractionManager.IsInteractingWithNpcOfType;
 
 
 -- User Settings
@@ -1601,6 +1602,20 @@ do  --UI Basic
             self:SetClickedFrameIndex(nil);
         end
     end
+
+    function MainFrame:OnShow()
+        if IsInteractingWithNpcOfType(40) then
+            --Lower frame strata when using Scrapping Machine
+            self:SetFrameStrata("LOW");
+        else
+            if self.inEditMode then
+                self:SetFrameStrata("HIGH");
+            else
+                self:SetFrameStrata("DIALOG");
+            end
+        end
+    end
+    MainFrame:SetScript("OnShow", MainFrame.OnShow);
 
     function MainFrame:OnHide()
         if self.manualMode then

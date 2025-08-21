@@ -1419,37 +1419,33 @@ end
 do  -- Currency
     local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
     local CurrencyDataProvider = CreateFrame("Frame");
-    CurrencyDataProvider.cache = {};
+    CurrencyDataProvider.names = {};
     CurrencyDataProvider.icons = {};
+    CurrencyDataProvider.qualities = {};
 
-    local RelevantKeys = {"name", "quantity", "iconFileID", "maxQuantity", "quality"};
+    function API.GetCurrencyName(currencyID, colorized)
+        local name = CurrencyDataProvider.names[currencyID];
+        local quality = colorized and CurrencyDataProvider.qualities[currencyID] or 1;
 
-    CurrencyDataProvider:SetScript("OnEvent", function(self, event, currencyID, quantity, quantityChange)
-        if currencyID and self.cache[currencyID] then
-            self.cache[currencyID] = nil;
-        end
-    end);
-
-    function CurrencyDataProvider:CacheAndGetCurrencyInfo(currencyID)
-        if not self.cache[currencyID] then
+        if not name then
             local info = GetCurrencyInfo(currencyID);
-            if not info then return end;
-            local vital = {};
+            name = info and info.name;
+            if name then
+                CurrencyDataProvider.names[currencyID] = name;
+                CurrencyDataProvider.qualities[currencyID] = info.quality;
+            else
+                name = "Currency:"..currencyID;
+                quality = 1;
+            end
         end
 
-        if not self.registered then
-            self.registered = true;
-            self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+        if colorized then
+            return API.ColorizeTextByQuality(name, quality)
+        else
+            return name
         end
-
-        return self.cache[currencyID]
     end
 
-    function CurrencyDataProvider:GetIcon(currencyID)
-        if not self.icons[currencyID] then
-            self:CacheAndGetCurrencyInfo(currencyID);
-        end
-    end
 
     local IGNORED_OVERFLOW_ID = {
         [3068] = true,      --Delver's Journey

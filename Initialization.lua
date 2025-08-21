@@ -216,6 +216,10 @@ local DefaultValues = {
         SpellFlyout_UpdateFrequently = false,
 
 
+    --LegionRemix
+    LegionRemix = true,
+
+
     EnableNewByDefault = false,             --Always enable newly added features
 
 

@@ -433,6 +433,9 @@ do
             self.enabled = nil;
             self:UnregisterEvent("ADDON_LOADED");
             self:SetScript("OnEvent", nil);
+            if not self.Init then
+                self:SetRowAndCol(3, 6);
+            end
         end
     end
 end

@@ -678,6 +678,14 @@ function ControlCenter:InitializeModules()
     local enabled, isForceEnabled;
 
     for _, moduleData in pairs(self.modules) do
+        if moduleData.timerunningSeason and moduleData.timerunningSeason ~= self.timerunningSeason then
+            moduleData.validityCheck = function()
+                return false
+            end;
+        end
+    end
+
+    for _, moduleData in pairs(self.modules) do
         isForceEnabled = false;
         if (not moduleData.validityCheck) or (moduleData.validityCheck()) then
             enabled = db[moduleData.dbKey];
@@ -782,6 +790,11 @@ ControlCenter:RegisterEvent("PLAYER_ENTERING_WORLD");
 ControlCenter:SetScript("OnEvent", function(self, event, ...)
     self:UnregisterEvent(event);
     self:SetScript("OnEvent", nil);
+
+    if PlayerGetTimerunningSeasonID then
+        self.timerunningSeason = PlayerGetTimerunningSeasonID();
+    end
+
     ControlCenter:InitializeModules();
 end);
 

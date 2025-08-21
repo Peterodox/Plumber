@@ -181,7 +181,7 @@ do
             if n > 0 then
                 local maxRuns = threshold or 8;
                 local numRuns = math.min(n, maxRuns);
-                local tierFormat = addon.L["Great Vault Tier Format"];
+                local tierFormat = "- "..addon.L["Great Vault Tier Format"].."   ".."|cff40c040%s|r";
                 local mapName;
                 local mapNames = {};
 
@@ -195,11 +195,12 @@ do
                     mapName = v.overrideName or mapNames[v.uiMapID];
                     if (not mapName) and (v.uiMapID) then
                         mapName = API.GetMapName(v.uiMapID);
-                        mapName = "|cff40c040"..mapName.."|r";
                         mapNames[v.uiMapID] = mapName;
                     end
+                    if not mapName then mapName = UNKNOWN; end;
+
                     --tooltip:AddDoubleLine(tierFormat:format(v.tier), mapName, 0.098, 1.000, 0.098, 0.098, 1.000, 0.098);
-                    tooltip:AddLine("- "..tierFormat:format(v.tier).."   ".. (mapName or UNKNOWN), 0.098, 1.000, 0.098);
+                    tooltip:AddLine(tierFormat:format(v.tier, mapName), 0.098, 1.000, 0.098);
                 end
 
                 tooltip:AddLine(" ");
