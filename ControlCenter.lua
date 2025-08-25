@@ -15,6 +15,7 @@ local LEFT_SECTOR_WIDTH = math.floor(0.618*FRAME_WIDTH + 0.5);
 
 local CATEGORY_ORDER = {
     --Must match the keys in the localization
+    [-1] = "Timerunning",
 
     [0] = "Unknown",    --Used during development
 
@@ -761,40 +762,12 @@ function ControlCenter:AddModule(moduleData)
     end
 end
 
-function Plumber_GetNumModules()
-    --debug
-    local lastCategoryID, lastUIOrderID;
-    local categoryID, uiOrder;
-    local cates = {};
-
-    for _, module in ipairs(ControlCenter.modules) do
-        categoryID = module.categoryID;
-        uiOrder = module.uiOrder;
-        if categoryID then
-            if not cates[categoryID] then
-                cates[categoryID] = uiOrder;
-            elseif cates[categoryID] and uiOrder > cates[categoryID] then
-                cates[categoryID] = uiOrder;
-            end
-        end
-    end
-
-    for categoryID = 1, #CATEGORY_ORDER do
-        print("cate:", categoryID, "maxUiOrder:", cates[categoryID]);
-    end
-end
-
 
 ControlCenter:RegisterEvent("PLAYER_ENTERING_WORLD");
 
 ControlCenter:SetScript("OnEvent", function(self, event, ...)
     self:UnregisterEvent(event);
     self:SetScript("OnEvent", nil);
-
-    if PlayerGetTimerunningSeasonID then
-        self.timerunningSeason = PlayerGetTimerunningSeasonID();
-    end
-
     ControlCenter:InitializeModules();
 end);
 
@@ -829,6 +802,10 @@ end
 do
     addon.CallbackRegistry:Register("NewDBKeysAdded", function(newDBKeys)
         ControlCenter.newDBKeys = newDBKeys;
+    end);
+
+    addon.CallbackRegistry:Register("TimerunningSeason", function(seasonID)
+        ControlCenter.timerunningSeason = seasonID;
     end);
 
 

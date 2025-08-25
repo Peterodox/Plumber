@@ -1,4 +1,5 @@
 local _, addon = ...
+local API = addon.API;
 
 
 do  --Item Upgrade Track
@@ -6,6 +7,7 @@ do  --Item Upgrade Track
         BaseCurrencyID = 3008,      --Flightstones
         CatalystCurrencyID = 3269;  --Item conversion   /dump ItemInteractionFrame.currencyTypeId
         DelveWeeklyStashCurrencyID = 3290,
+        RadiantEchoItemID = 246771,
 
         Crests = {
             --Universal Upgrade System (Crests)
@@ -59,8 +61,30 @@ do  --Weekly Caches (Meta quest rewards)
         CofferKeyShardFlags = {
             84736, 84737, 84738, 84739,
         },
+
+        DelvesGreatVaultItemLevel = {
+            --Hardcode this because BLZ API is unreliable in 11.2.0
+            668,
+            671,
+            675,
+            678,
+            681,
+
+            688,
+            691,
+            694,    --Tier 8 Max
+            694,
+            694,
+
+            694,
+        },
     };
 
 
     addon.WeeklyRewardsConstant = WeeklyRewardsConstant;
+
+
+    function API.GetDelvesGreatVaultItemLevel(tier)
+        return WeeklyRewardsConstant.DelvesGreatVaultItemLevel[tier] or 0
+    end
 end

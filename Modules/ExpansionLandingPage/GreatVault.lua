@@ -142,7 +142,7 @@ do
         local button;
         local n = 0;
 
-        for _, type in ipairs(Layout) do
+        for row, type in ipairs(Layout) do
             activities = C_WeeklyRewards.GetActivities(type);
             if activities then
                 table.sort(activities, SortFunc_Index);
@@ -150,8 +150,15 @@ do
                     n = n + 1;
                     activityInfo = activities[i];
                     if activityInfo then
-                        itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(activityInfo.id);
-                        itemLevel, upgradeItemLevel = nil, nil;
+                        itemLevel, upgradeItemLevel, itemLink = nil, nil, nil;
+
+                        if row == 3 then
+                            itemLevel = API.GetDelvesGreatVaultItemLevel(activityInfo.level);
+                        end
+
+                        if not itemLevel then
+                            itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(activityInfo.id);
+                        end
 
                         if itemLink then
                             --itemLink is "" when the reward is not earned
@@ -285,17 +292,21 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
     };
 
     local function ShowTooltip(self)
-        BlizzardMixin.OnEnter(self);
         local tooltip = GameTooltip;
+
+        if self.info.type == Enum.WeeklyRewardChestThresholdType.World then
+            tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
+            API.DisplayDelvesGreatVaultTooltip(self, tooltip, self.info.activityTierID, self.info.level, self.info.id);
+            if API.AddRecentDelvesRecordsToTooltip(tooltip, self.info.threshold) then
+                tooltip:Show();
+            end
+        else
+            BlizzardMixin.OnEnter(self);
+        end
+
         if tooltip:IsShown() and tooltip:GetOwner() == self then
             tooltip:ClearAllPoints();
             tooltip:SetPoint("BOTTOMLEFT", self, "TOPRIGHT", -4, -4);
-
-            if self.info.type == Enum.WeeklyRewardChestThresholdType.World then
-                if API.AddRecentDelvesRecordsToTooltip(tooltip, self.info.threshold) then
-                    tooltip:Show();
-                end
-            end
         end
     end
 

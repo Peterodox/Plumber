@@ -1999,6 +1999,22 @@ do  --(In)Secure Button Pool
         end
     end
 
+    function SecureButtonMixin:SetUseItem(item, mouseButton)
+        mouseButton = mouseButton or "LeftButton";
+
+        if mouseButton == "RightButton" then
+            self:SetAttribute("type2", "macro");
+        else
+            self:SetAttribute("type1", "macro");
+        end
+
+        if type(item) == "number" then
+            self:SetMacroText("/use item:"..item);
+        else
+            self:SetMacroText("/use "..item);
+        end
+    end
+
     local function CreateSecureActionButton()
         if InCombatLockdown() then return end;
         local index = #SecureButtons + 1;
@@ -2017,7 +2033,7 @@ do  --(In)Secure Button Pool
         return button
     end
 
-    local function AcquireSecureActionButton(privateKey)
+    local function AcquireSecureActionButton(privateKey, propagateMouseMotion)
         if InCombatLockdown() then return end;
 
         local button;
@@ -2042,16 +2058,19 @@ do  --(In)Secure Button Pool
             end
         end
 
-        button.isActive = true;
-        SecureButtonContainer:RegisterEvent("PLAYER_REGEN_DISABLED");
+        if button then
+            button.isActive = true;
+            button:SetPropagateMouseMotion(propagateMouseMotion or false);
+            SecureButtonContainer:RegisterEvent("PLAYER_REGEN_DISABLED");
 
-        if GetCVarBool("ActionButtonUseKeyDown") then
-            button:RegisterForClicks("LeftButtonDown", "RightButtonDown");
-        else
-            button:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+            if GetCVarBool("ActionButtonUseKeyDown") then
+                button:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+            else
+                button:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+            end
+
+            return button
         end
-
-        return button
     end
     addon.AcquireSecureActionButton = AcquireSecureActionButton;
 

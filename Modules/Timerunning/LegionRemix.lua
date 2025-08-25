@@ -22,19 +22,32 @@ local PurchaseRank = C_Traits.PurchaseRank;
 local GetConfigInfo = C_Traits.GetConfigInfo;
 
 
+local GetInventoryItemID = GetInventoryItemID;
 local InCombatLockdown = InCombatLockdown;
 
 
 local DataProvider = {};
 local EventListener = CreateFrame("Frame");
 local CommitUtil = CreateFrame("Frame");
+local MASTER_ENABLED = false;
 
 
 local CURRENCY_ID_IP = 3268;
+--traitSystemID = 33	--C_Traits.GetConfigIDBySystemID
 
 
 local function IsCurrencyEnough(numUnspent, costs)
 	return (#costs == 0) or costs[1].amount <= numUnspent
+end
+
+local function UnequipInventorySlot(slotID)
+	--Test, Debug
+	if InCombatLockdown() then return end;
+
+	local action = EquipmentManager_UnequipItemInSlot(slotID)
+	if action then
+		EquipmentManager_RunAction(action)
+	end
 end
 
 
@@ -53,7 +66,7 @@ do	--DataProvider
 		{108700, 134246, 139022}, --Limits Unbound
 	};
 
-	local ArtifactTracks = {
+	DataProvider.ArtifactTracks = {
 		{	--1
 			{108114, 133497, 138283}, --Call of the Forest
 			{108106, 133489, 138275}, --Souls of the Caw
@@ -101,7 +114,7 @@ do	--DataProvider
 		},
 	};
 
-	local IncreasableTraits = {
+	DataProvider.IncreasableTraits = {
 		{108106, 133489, 138275}, --Souls of the Caw
 		{108110, 133493, 138279}, --Highmountain Fortitude
 		{108702, 134248, 139024}, --Touch of Malice
@@ -117,7 +130,7 @@ do	--DataProvider
 		{109265, 135326, 140093}, --Light's Vengeance
 	};
 
-	local ArtifactAbilityNodes = {
+	DataProvider.ArtifactAbilityNodes = {
 		--From top to bottom
 		--{nodeID, entryID, definitionID}
 		{108114, 133497, 133283},
@@ -127,7 +140,7 @@ do	--DataProvider
 		{108875, 133449, 139220},
 	};
 
-	local FinalTraitNodes = {
+	DataProvider.FinalTraitNodes = {
 		--{nodeID, entryID}
 		{108121, 133507},
 		{108975, 134745},
@@ -136,7 +149,7 @@ do	--DataProvider
 		{109272, 135333},
 	};
 
-	local ChoiceNodes = {
+	DataProvider.ChoiceNodes = {
 		--Artifact Abilities
 		[108114] = true,
 		[108113] = true,
@@ -147,6 +160,18 @@ do	--DataProvider
 		--Arcane Shield, Storm
 		[108103] = true,
 		[108104] = true,
+	};
+
+	DataProvider.ForbiddenNodes = {
+		--11.2.5.62687 Bug: If a choice node has rank bonus from equipment, then it cannot be unleaned (cannot Apply Changes)
+		[3] = {
+			{108103, 133486, 138272}, --Arcane Aegis
+			{108103, 133508, 138294}, --Arcane Ward
+		},
+		[4] = {
+			{108104, 133487, 138273}, --Storm Surger
+			{108104, 135715, 140470}, --Brewing Storm
+		},
 	};
 
 	DataProvider.PurchaseRoute_Basic = {
@@ -178,6 +203,10 @@ do	--DataProvider
 		{108870, 134444, 139215},	--Erus's Aggression
 	};
 
+	DataProvider.JewelrySlots = {
+		2, 11, 12, 13, 14,
+	};
+
 	local function IsValidNodeInfo(nodeInfo)
 		--Enum.TraitNodeType: 3 (SubTreeSelection)
 		return (nodeInfo) and (nodeInfo.type ~= 3) and (nodeInfo.isVisible) and (nodeInfo.posY >= 0)
@@ -194,21 +223,25 @@ do	--DataProvider
 	end
 
 	function DataProvider:IsChoiceNode(nodeID)
-		return ChoiceNodes[nodeID]
+		return self.ChoiceNodes[nodeID]
 	end
 
 	function DataProvider:GetArtifactNodeInfoByIndex(index)
-		local v = ArtifactAbilityNodes[index];
+		local v = self.ArtifactAbilityNodes[index];
 		return v[1], v[2], v[3]
 	end
 
 	function DataProvider:GetFinalNodeInfoIndex(index)
-		local v = FinalTraitNodes[index];
+		local v = self.FinalTraitNodes[index];
 		return v[1], v[2], v[3]
 	end
 
 	function DataProvider:GetNodeInfo(nodeID)
 		return GetNodeInfo(self:GetCurrentConfigID(), nodeID)
+	end
+
+	function DataProvider:GetEntryInfo(entryID)
+		return GetEntryInfo(self:GetCurrentConfigID(), entryID)
 	end
 
 	function DataProvider:GetCost(nodeID)
@@ -223,7 +256,7 @@ do	--DataProvider
 	function DataProvider:GetActiveArtifactTrackIndex()
 		local artifactTrackIndex;
 
-		for index = 1, #ArtifactAbilityNodes do
+		for index = 1, #self.ArtifactAbilityNodes do
 			local nodeID, entryID, definitionID = self:GetArtifactNodeInfoByIndex(index);
 			local nodeInfo = self:GetNodeInfo(nodeID);
 			if nodeInfo and nodeInfo.currentRank > 0 then
@@ -236,6 +269,23 @@ do	--DataProvider
 		return artifactTrackIndex
 	end
 
+	function DataProvider:ShouldChooseArtifactTrack()
+		for index = 1, #self.ArtifactAbilityNodes do
+			local nodeID, entryID, definitionID = self:GetArtifactNodeInfoByIndex(index);
+			local nodeInfo = self:GetNodeInfo(nodeID);
+			if nodeInfo and nodeInfo.canPurchaseRank then
+				return true
+			end
+		end
+	end
+
+	function DataProvider:GetDefaultArtifactNodeData()
+		local trackIndex = 1;
+		if self.ArtifactAbilityNodes[trackIndex] then
+			return unpack(self.ArtifactAbilityNodes[trackIndex])
+		end
+	end
+
 	function DataProvider:GetParagonLevel()
 		local nodeID = 108700;
 		local nodeInfo = self:GetNodeInfo(nodeID);
@@ -243,6 +293,102 @@ do	--DataProvider
 			return nodeInfo.currentRank
 		end
 		return 0
+	end
+
+	function DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, newTrackIndex)
+		local tbl;
+		if (not activeTrackIndex) or (activeTrackIndex == newTrackIndex) then
+			tbl = {newTrackIndex};
+		else
+			tbl = {activeTrackIndex, newTrackIndex};
+		end
+
+		for _, artifactTrackIndex in ipairs(tbl) do
+			if self.ForbiddenNodes[artifactTrackIndex] then
+				for _, v in ipairs(self.ForbiddenNodes[artifactTrackIndex]) do
+					local nodeID, entryID = v[1], v[2];
+					local nodeInfo = self:GetNodeInfo(nodeID);
+					local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
+					if increasedRanks > 0 then
+						return true
+					end
+				end
+			end
+		end
+
+		return false
+	end
+
+	function DataProvider:GetItemNameByID(itemID)
+		--Cache jewelry name
+		if not self.itemNameCache then
+			self.itemNameCache = {};
+		end
+
+		if not self.itemNameCache[itemID] then
+			local itemName = C_Item.GetItemNameByID(itemID);
+			if itemName then
+				self.itemNameCache[itemID] = itemName;
+			end
+		end
+
+		return self.itemNameCache[itemID]
+	end
+
+	function DataProvider:GetForbiddenSelectionNodeItems()
+		local nodeInfo, nodeID, entryID, items;
+
+		for artifactTrackIndex, nodes in pairs(self.ForbiddenNodes) do
+			for _, v in ipairs(nodes) do
+				nodeID, entryID = v[1], v[2];
+				nodeInfo = self:GetNodeInfo(nodeID);
+				--local increasedRanks = nodeInfo and nodeInfo.ranksincreased or 0;
+				--For choice node, use this
+				local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
+				if increasedRanks > 0 then
+					local increasedTraitDataList = C_Traits.GetIncreasedTraitData(nodeID, entryID);
+					for _index, increasedTraitData in ipairs(increasedTraitDataList) do
+						local qualityColor = API.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
+						local itemName = increasedTraitData.itemNameIncreasing or "";
+						local coloredItemName = qualityColor:WrapTextInColorCode(itemName);
+						local slotID = 0;
+						local itemID = 0;
+
+						--local numPointsIncreased = increasedTraitData.numPointsIncreased;
+						if not items then
+							items = {};
+						end
+						--GetInventoryItemID: itemName to slotName
+
+						for _, _slotID in ipairs(self.JewelrySlots) do
+							local _itemID = GetInventoryItemID("player", _slotID);
+							if _itemID and itemName == self:GetItemNameByID(_itemID) then
+								coloredItemName = string.format("(%s) %s", API.GetInventorySlotName(_slotID), coloredItemName);
+								slotID = _slotID;
+								itemID = _itemID;
+							end
+						end
+
+						table.insert(items, {
+							slotID = slotID,
+							itemID = itemID,
+							itemName = itemName,
+							coloredItemName = coloredItemName,
+						});
+					end
+				end
+			end
+		end
+
+		if items then
+			table.sort(items, function(a, b)
+				if a.slotID ~= b.slotID then
+					return a.slotID < b.slotID
+				end
+				return a.itemName < b.itemName
+			end);
+		end
+		return items
 	end
 
 	function DataProvider:GetTreeInfo()
@@ -301,7 +447,7 @@ do	--DataProvider
 	function DataProvider:GetIncreasedTraits()
 		local GetIncreasedTraitData = C_Traits.GetIncreasedTraitData;
 		local isLoaded = true;
-		for _, v in ipairs(IncreasableTraits) do
+		for _, v in ipairs(self.IncreasableTraits) do
 			local nodeID, entryID, definitionID = v[1], v[2], v[3];
 			local increasedTraitDataList = GetIncreasedTraitData(nodeID, entryID);
 			if increasedTraitDataList and #increasedTraitDataList > 0 then
@@ -334,6 +480,9 @@ do	--DataProvider
 	end
 
 	function DataProvider:UpdateConfigInfo()
+		--traitTreeID is always 1161
+		--configID is different for each artifact weawpon
+
 		local traitTreeID = C_RemixArtifactUI.GetCurrTraitTreeID() or 1161;
 		local configID = GetConfigIDByTreeID(traitTreeID);
 		if not configID then return end;
@@ -343,6 +492,8 @@ do	--DataProvider
 		local configInfo = GetConfigInfo(configID);
 		local treeID = configInfo.treeIDs[1] or 1161;
 		self.treeID = treeID;
+
+		print("current configID:", configID);
 	end
 
 	function DataProvider:GetCurrentConfigID()
@@ -425,6 +576,7 @@ do	--DataProvider
 
 	function DataProvider:GetNextTraitForUpgrade(enoughCurrencyOnly)
 		local nodeInfo, nodeID, entryID;
+		local shouldChooseArtifactTrack;
 
 		nodeID = 108700;	--Paragon Node
 		nodeInfo = self:GetNodeInfo(nodeID);
@@ -434,9 +586,21 @@ do	--DataProvider
 		else
 			nodeID = nil;
 			nodeInfo = nil;
+			entryID = nil;
 			local activeTrackIndex = self:GetActiveArtifactTrackIndex();
 			if activeTrackIndex then
-				local trackData = ArtifactTracks[activeTrackIndex];
+				local trackData = self.ArtifactTracks[activeTrackIndex];
+				nodeID = trackData[1][1];
+				local _nodeInfo = self:GetNodeInfo(nodeID);
+				while _nodeInfo and _nodeInfo.visibleEdges and _nodeInfo.visibleEdges[1] and _nodeInfo.visibleEdges[1].targetNode do
+					nodeID = _nodeInfo.visibleEdges[1].targetNode;
+					_nodeInfo = self:GetNodeInfo(nodeID);
+					if _nodeInfo and _nodeInfo.canPurchaseRank then
+						entryID = _nodeInfo.entryIDs[1];
+						break
+					end
+				end
+				--[[
 				for i = 2, #trackData do
 					nodeID = trackData[i][1];
 					if type(nodeID) == "table" then
@@ -448,6 +612,7 @@ do	--DataProvider
 						break
 					end
 				end
+				--]]
 			else
 				for _, v in ipairs(self.PurchaseRoute_Basic) do
 					nodeID = v[1];
@@ -455,6 +620,13 @@ do	--DataProvider
 					if nodeInfo.canPurchaseRank then
 						entryID = nodeInfo.entryIDs[1];
 						break
+					end
+				end
+
+				if not entryID then
+					if DataProvider:ShouldChooseArtifactTrack() then
+						shouldChooseArtifactTrack = true;
+						nodeID, entryID = DataProvider:GetDefaultArtifactNodeData();
 					end
 				end
 			end
@@ -469,6 +641,7 @@ do	--DataProvider
 				nodeID = nodeID,
 				entryID = entryID,
 				cost = cost,
+				shouldChooseArtifactTrack = shouldChooseArtifactTrack,
 			};
 		end
 	end
@@ -485,42 +658,82 @@ end
 
 
 do
+	EventListener.dynamicEvents = {
+		"CURRENCY_DISPLAY_UPDATE",
+		"REMIX_ARTIFACT_ITEM_SPECS_LOADED",		--loadSuccessful
+		"REMIX_ARTIFACT_UPDATE",				--Seems to only trigger when Shift RightClick artifact weapons
+		"ACTIVE_TALENT_GROUP_CHANGED",
+		"TRAIT_CONFIG_UPDATED",
+		"TRAIT_SYSTEM_NPC_CLOSED",
+	};
+
 	function EventListener:Enable(state)
 		if state then
 			--self:RegisterEvent("TRAIT_CONFIG_UPDATED");
 			--self:RegisterEvent("TRAIT_TREE_CURRENCY_INFO_UPDATED");
-			self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+			API.RegisterFrameForEvents(self, self.dynamicEvents);
 			self:SetScript("OnEvent", self.OnEvent);
 		else
-			self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+			API.UnregisterFrameForEvents(self, self.dynamicEvents);
+			self:UnregisterEvent("BAG_UPDATE_DELAYED");
+			self:UnregisterEvent("PLAYER_REGEN_ENABLED");
 		end
 	end
 
 	function EventListener:OnUpdate(elapsed)
 		self.t = self.t + elapsed;
-		if self.t > 1.0 then
-			self.t = 0;
-			self:SetScript("OnUpdate", nil);
-			--[[
-			local unspent = DataProvider:GetNumUnspentPower();
-			if unspent then
-				print("Unspent:", unspent);
+
+		if self.specDirty then
+			if self.t > 0.5 then
+				self.specDirty = nil;
+
+				local specIndex = C_SpecializationInfo.GetSpecialization();
+				local itemSpecIndex = C_RemixArtifactUI.GetCurrItemSpecIndex();	--need artifact being equipped
+
+				if specIndex then
+					local _, name = C_SpecializationInfo.GetSpecializationInfo(specIndex);
+					print(name, specIndex, itemSpecIndex);
+
+					DataProvider:UpdateConfigInfo();
+				end
 			end
-			--]]
-			--local nodeID, entryID = DataProvider:GetPurchasableTrait();
-			local traitInfo = DataProvider:GetNextTraitForUpgrade(true);
-			if traitInfo then
-				local traitName = DataProvider:GetTraitName(traitInfo.entryID);
-				print("You can upgrade: "..traitName);
-				if (not DataProvider:IsChoiceNode(traitInfo.nodeID)) then
-					if InCombatLockdown() then
-						print("We will purchase "..traitName.." after combat");
-						CommitUtil:TryPurchaseUpgradeAfterCombat();
+		end
+
+		if self.currencyDirty then
+			if self.t > 1.0 then
+				self.currencyDirty = nil;
+
+				--[[
+				local unspent = DataProvider:GetNumUnspentPower();
+				if unspent then
+					print("Unspent:", unspent);
+				end
+				--]]
+				--local nodeID, entryID = DataProvider:GetPurchasableTrait();
+				local traitInfo = DataProvider:GetNextTraitForUpgrade(true);
+				if traitInfo then
+					local traitName = DataProvider:GetTraitName(traitInfo.entryID);
+					if traitInfo.shouldChooseArtifactTrack then
+						print("You can choose an Artifact Ability");
+						CommitUtil:TryPurchaseToNode(traitInfo.nodeID, true);
 					else
-						CommitUtil:TryPurchaseToNode(traitInfo.nodeID);
+						print("You can upgrade: "..traitName);
+						if (not DataProvider:IsChoiceNode(traitInfo.nodeID)) then
+							if InCombatLockdown() then
+								print("We will purchase "..traitName.." after combat");
+								CommitUtil:TryPurchaseUpgradeAfterCombat();
+							else
+								CommitUtil:TryPurchaseToNode(traitInfo.nodeID, true);
+							end
+						end
 					end
 				end
 			end
+		end
+
+		if not (self.specDirty or self.currencyDirty) then
+			self.t = 0;
+			self:SetScript("OnUpdate", nil);
 		end
 	end
 
@@ -529,13 +742,44 @@ do
 		self:SetScript("OnUpdate", self.OnUpdate);
 	end
 
+	function EventListener:ListenLeavingCombat()
+		if MASTER_ENABLED then
+			self:RegisterEvent("PLAYER_REGEN_ENABLED");
+		end
+	end
+
+	function EventListener:ListenBagUpdateDelayed()
+		if MASTER_ENABLED then
+			self:RegisterEvent("BAG_UPDATE_DELAYED");
+		end
+	end
+
 	function EventListener:OnEvent(event, ...)
 		--TRAIT_CONFIG_UPDATED fires upon initial login for all artifact including the uncollected ones
 		if event == "CURRENCY_DISPLAY_UPDATE" then
 			--The value we need changes after TRAIT_TREE_CURRENCY_INFO_UPDATED
 			local currencyID = ...
 			if currencyID == CURRENCY_ID_IP then
+				self.currencyDirty = true;
 				self:RequestUpdate();
+			end
+		else
+			print(event, ...);
+			if event == "ACTIVE_TALENT_GROUP_CHANGED" then
+				self.specDirty = true;
+				self:RequestUpdate();
+			elseif event == "REMIX_ARTIFACT_UPDATE" then
+				DataProvider:UpdateConfigInfo();
+			elseif event == "BAG_UPDATE_DELAYED" then
+				self:UnregisterEvent(event);
+				if InCombatLockdown() then
+					self:RegisterEvent("PLAYER_REGEN_ENABLED");
+				else
+					CommitUtil:ReEquipFailedItems();
+				end
+			elseif event == "PLAYER_REGEN_ENABLED" then
+				self:UnregisterEvent(event);
+				CommitUtil:ReEquipFailedItems();
 			end
 		end
 	end
@@ -550,6 +794,7 @@ do	--CommitUtil
 			self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
 			self:UnregisterEvent("CONFIG_COMMIT_FAILED");
 			self:UnregisterEvent("PLAYER_REGEN_ENABLED");
+			self:UnregisterEvent("BAG_UPDATE_DELAYED");
 		end
 	end
 
@@ -566,6 +811,7 @@ do	--CommitUtil
 
 	function CommitUtil:OnCommitingFinished()
 		self.commitedConfigID = nil;
+		self:SetScript("OnUpdate", nil);
 		self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
 		self:UnregisterEvent("CONFIG_COMMIT_FAILED");
 		if self.commitingResult == 1 then
@@ -573,6 +819,7 @@ do	--CommitUtil
 		elseif self.commitingResult == 0 then
 			print("COMMIT FAILED");
 		end
+		self.commitingResult = nil;
 	end
 
 	function CommitUtil:OnEvent(event, ...)
@@ -592,10 +839,21 @@ do	--CommitUtil
 				self.processAfterCombat = nil;
 				self:TryPurchaseNextUpgrade();
 			end
+		elseif event == "BAG_UPDATE_DELAYED" then
+			if self.equipItemAfterCommit then
+				print("equipItemAfterCommit")
+				self.equipItemAfterCommit = nil;
+				self:UnregisterEvent(event);
+				self:ReEquipItems(self.replacedEquipment);
+				self.replacedEquipment = nil;
+			end
 		end
 
 		if self.commitingResult then
 			self:OnCommitingFinished();
+			if self.equipItemAfterCommit then
+				self:RegisterEvent("BAG_UPDATE_DELAYED");
+			end
 		end
 	end
 
@@ -612,6 +870,7 @@ do	--CommitUtil
 		end
 	end
 
+	--[[
 	function CommitUtil:OnUpdate_Purchase(elapsed)
 		self.t = self.t + elapsed;
 		if self.t > 0.016 then
@@ -620,7 +879,7 @@ do	--CommitUtil
 
 			local nodeID, entryID, isSelectionNode, needMassPurchase = DataProvider:GetPurchasableTrait();
 			if nodeID then
-				print(nodeID, DataProvider:GetTraitName(entryID), isSelectionNode and "Choice" or "");
+				--print(nodeID, DataProvider:GetTraitName(entryID), isSelectionNode and "Choice" or "");
 				local success;
 				if needMassPurchase then
 					success = C_Traits.TryPurchaseToNode(self.configID, nodeID);
@@ -643,19 +902,7 @@ do	--CommitUtil
 			end
 		end
 	end
-
-	function CommitUtil:PurchaseAvailableTraits()
-		--Unused
-		local configID = DataProvider.configID;
-		self.configID = configID;
-		self.t = 0;
-		self:SetScript("OnUpdate", self.OnUpdate_Purchase);
-		local nodeID, entryID = DataProvider:GetFinalNodeInfoIndex(1);	--HasMassPurchase, TryPurchaseToNode
-		local name = DataProvider:GetTraitName(entryID);
-		local success = C_Traits.TryPurchaseToNode(self.configID, nodeID);
-		print("TryPurchaseToNode", name, tostring(success));
-		self.anySuccessPurchase = success;
-	end
+	--]]
 
 	function CommitUtil:TryPurchaseBasicTraits()
 		--Select all traits to the left the Artifact abilities
@@ -677,7 +924,7 @@ do	--CommitUtil
 		return true
 	end
 
-	function CommitUtil:TryPurchaseToNode(nodeID)
+	function CommitUtil:TryPurchaseToNode(nodeID, autoPurchase)
 		if self:IsCommitingInProcess() then
 			return
 		end
@@ -690,6 +937,11 @@ do	--CommitUtil
 
 		if self.anySuccessPurchase then
 			self:SetCommitStarted(configID);
+			if autoPurchase then
+				local nodeInfo = DataProvider:GetNodeInfo(nodeID);
+				local entryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID;
+				self:SendRankUpgradeToLootUI(entryID)
+			end
 		end
 	end
 
@@ -710,13 +962,133 @@ do	--CommitUtil
 		end
 	end
 
+	function CommitUtil:SetReplacedEquipment(replacedEquipment)
+		self.replacedEquipment = replacedEquipment;
+		self.equipItemAfterCommit = true;
+		for itemID, v in pairs(replacedEquipment) do
+			UnequipInventorySlot(v.slotID);
+		end
+	end
+
+	function CommitUtil:ReEquipItems(replacedEquipment, fromRequery)
+		if not replacedEquipment then return end;
+
+		local numPending = 0;
+		local itemFound = {};
+		for itemID, v in pairs(replacedEquipment) do
+			numPending = numPending + 1;
+			itemFound[itemID] = false;
+		end
+		print("numPending", numPending);
+		if InCombatLockdown() then
+			print("In Combat");
+			self.failedItems = API.CopyTable(replacedEquipment);
+			EventListener:ListenLeavingCombat();
+		else
+			local itemID, containerInfo;
+			local GetContainerItemID = C_Container.GetContainerItemID;
+			local GetContainerItemInfo = C_Container.GetContainerItemInfo;
+
+			local fromIndex = 0;	--BACKPACK_CONTAINER
+			local toIndex = 4;		--NUM_TOTAL_EQUIPPED_BAG_SLOTS - 1
+
+			for bag = fromIndex, toIndex do
+				for slot = 1, C_Container.GetContainerNumSlots(bag) do
+					itemID = GetContainerItemID(bag, slot);
+					if (not itemFound[itemID]) and replacedEquipment[itemID] then
+						containerInfo = GetContainerItemInfo(bag, slot);
+						if containerInfo.isBound and containerInfo.hyperlink == replacedEquipment[itemID].hyperlink then
+							itemFound[itemID] = true;
+							local invSlot = replacedEquipment[itemID].slotID;
+
+							local action = {};
+							action.bag = bag;
+							action.slot = slot;
+							action.invSlot = invSlot;
+
+							ClearCursor();
+							C_Container.PickupContainerItem(action.bag, action.slot);
+
+							if ( not CursorHasItem() ) then
+								print("Error PickupContainerItem");
+							elseif not C_PaperDollInfo.CanCursorCanGoInSlot(action.invSlot) then
+								print("Error CannotGoInSlot");
+							elseif IsInventoryItemLocked(action.invSlot) then
+								print("Error InventoryItemLocked");
+							else
+								PickupInventoryItem(action.invSlot);
+								numPending = numPending - 1;
+							end
+
+							if numPending <= 0 then
+								print("Reequip Complete");
+								self.failedItems = nil;
+								return true
+							end
+						end
+					end
+				end
+			end
+
+			if numPending > 0 and not fromRequery then
+				--Something is wrong
+				print("TRY REEQUIP AGAIN");
+				self.failedItems = API.CopyTable(replacedEquipment);
+				EventListener:ListenBagUpdateDelayed();
+			else
+				self.failedItems = nil;
+			end
+		end
+	end
+
+	function CommitUtil:ReEquipFailedItems()
+		if not self.failedItems then return end;
+		self:ReEquipItems(self.failedItems);
+	end
+
 	function CommitUtil:TryPurchaseArtifactTrack(index)
+		if InCombatLockdown() then return end;
+
 		if self:IsCommitingInProcess() then
 			return
 		end
 
-		local configID = DataProvider:GetCurrentConfigID();
 		local activeTrackIndex = DataProvider:GetActiveArtifactTrackIndex();
+
+		if DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, index) then
+			local items = DataProvider:GetForbiddenSelectionNodeItems();
+			if items then
+				print("Unequip these items before changing traits:")
+				for _, v in ipairs(items) do
+					print(v.slotID, v.coloredItemName);
+				end
+
+				--Auto unequip/re-equip
+				local total = #items;
+				local numFound = 0;
+				if CalculateTotalNumberOfFreeBagSlots() > total then
+					local itemIDxData = {};
+					for _, v in ipairs(items) do
+						local hyperlink = GetInventoryItemLink("player", v.slotID);
+						if hyperlink then
+							numFound = numFound + 1;
+							itemIDxData[v.itemID] = {
+								hyperlink = hyperlink,
+								slotID = v.slotID
+							};
+						end
+					end
+
+					if numFound == total then
+						self:SetReplacedEquipment(itemIDxData);
+					end
+				end
+			end
+			--return
+		end
+
+		local configID = DataProvider:GetCurrentConfigID();
+
 		if activeTrackIndex and (activeTrackIndex ~= index) then
 			C_Traits.ResetTree(configID, DataProvider:GetCurrentTreeID());
 		end
@@ -734,8 +1106,6 @@ do	--CommitUtil
 				if success then
 					self.anySuccessPurchase = true;
 				end
-			else
-				print("Insufficient Infinite Power");
 			end
 		else
 			print("Cannot Purchase", DataProvider:GetTraitName(entryID));
@@ -763,6 +1133,41 @@ do	--CommitUtil
 		self:RegisterEvent("PLAYER_REGEN_ENABLED");
 		self.processAfterCombat = true;
 	end
+
+	function CommitUtil:SendRankUpgradeToLootUI(entryID)
+		if not (entryID and addon.GetDBBool("LootUI")) then return end;
+
+		local spellID;
+		local entryInfo = DataProvider:GetEntryInfo(entryID);
+		if entryInfo then	--nodeInfo.canPurchaseRank or nodeInfo.canRefundRank
+			local definitionInfo = GetDefinitionInfo(entryInfo.definitionID);
+			spellID = definitionInfo and definitionInfo.spellID;
+		end
+
+		if not spellID then return end;
+
+		local icon = C_Spell.GetSpellTexture(spellID);
+		local name = C_Spell.GetSpellName(spellID);
+
+		if name then
+			name = string.format("%s\n|cff19ff19%s|r", name, L["Rank Increased"]);
+		else
+			return
+		end
+
+		local data = {
+			slotType = -1,
+			id = spellID,
+			icon = icon,
+			quantity = 1,
+			name = name,
+			hideCount = true,
+			showGlow = true,
+			tooltipMethod = "SetSpellByID",
+		};
+		addon.LootWindow:QueueDisplayLoot(data);
+	end
+
 
 	YEETPC = function(index)
 		index = index or 1;
@@ -800,15 +1205,16 @@ do	--Debug
 				end
 			end
 
-
 			tooltip:AddDoubleLine("posX", nodeInfo.posX);
 			tooltip:AddDoubleLine("posY", nodeInfo.posY);
 			tooltip:AddDoubleLine("nodeInfo.type", nodeInfo.type);
-			tooltip:AddDoubleLine("maxRanks", node.maxRanks or "Nil");
+			tooltip:AddDoubleLine("maxRanks", nodeInfo.maxRanks or "Nil");
+			if nodeInfo.visibleEdges and nodeInfo.visibleEdges[1] then
+				tooltip:AddDoubleLine("visibleEdges[1].targetNode", nodeInfo.visibleEdges[1].targetNode);
+			end
 		end
 		tooltip:Show();
 	end);
-
 end
 
 
@@ -821,15 +1227,17 @@ do	--GameTooltip Infinite Power
 		if self.enabled then
 			if currencyID == CURRENCY_ID_IP then
 				local diff = DataProvider:GetRequiredAmountBeforeNextUpgrade();
-				tooltip:AddLine(" ");
-				if diff > 0 then
-					diff = BreakUpLargeNumbers(diff);
-					tooltip:AddLine(string.format(L["Earn X To Upgrade Y Format"], diff, API.GetCurrencyName(CURRENCY_ID_IP), L["Artifact Weapon"]), 1, 0.82, 0, true);
-				else
-					tooltip:AddLine(L["New Trait Available"], 0.098, 1.000, 0.098, true);
-				end
+				if diff then
+					tooltip:AddLine(" ");
+					if diff > 0 then
+						diff = BreakUpLargeNumbers(diff);
+						tooltip:AddLine(string.format(L["Earn X To Upgrade Y Format"], diff, API.GetCurrencyName(CURRENCY_ID_IP), L["Artifact Weapon"]), 1, 0.82, 0, true);
+					else
+						tooltip:AddLine(L["New Trait Available"], 0.098, 1.000, 0.098, true);
+					end
 
-				return true
+					return true
+				end
 			end
 		end
 		return false
@@ -853,10 +1261,12 @@ do	--GameTooltip Infinite Power
 
 	local function ExtraTooltipLineGetter()
 		local diff = DataProvider:GetRequiredAmountBeforeNextUpgrade();
-		if diff > 0 then
-			--return "|cffcccccc"..L["Until Next Upgrade Format"]:format(diff).."|r"
-		else
-			return "|cff19ff19"..L["New Trait Available"].."|r"
+		if diff then
+			if diff > 0 then
+				--return "|cffcccccc"..L["Until Next Upgrade Format"]:format(diff).."|r"
+			else
+				--return "|cff19ff19"..L["New Trait Available"].."|r"
+			end
 		end
 	end
 	API.SetExtraTooltipForCurrency(CURRENCY_ID_IP, ExtraTooltipLineGetter);
@@ -865,15 +1275,16 @@ end
 
 do	--Module Registry
 	local function EnableModule(state)
-		if state and not DataProvider.isEnabled then
+		if state and not MASTER_ENABLED then
 			DataProvider:UpdateConfigInfo();
 
-		elseif not state and DataProvider.isEnabled then
+		elseif not state and MASTER_ENABLED then
 
 		else
 			return
 		end
 
+		MASTER_ENABLED = state;
 		EventListener:Enable(state);
 		CurrencyTooltipModule:SetEnabled(state);
 		CommitUtil:Enable(state);
@@ -884,8 +1295,8 @@ do	--Module Registry
         dbKey = "LegionRemix",
         description = L["ModuleDescription LegionRemix"],
         toggleFunc = EnableModule,
-        categoryID = 1,
-        uiOrder = -1,
+        categoryID = -1,
+        uiOrder = 0,
         moduleAddedTime = 1755200000,
 		timerunningSeason = 2,
     };
@@ -913,4 +1324,17 @@ end
 
 	C_Traits.GetTreeCurrencyInfo(configID, treeID, excludeStagedChanges)
 	/dump C_Traits.GetConfigIDByTreeID(1161)	--	TraitSystemID: 31
+
+
+	--C_RemixArtifactUI.GetCurrItemSpecIndex()
+	--REMIX_ARTIFACT_ITEM_SPECS_LOADED
+
+	--local success = C_CVar.SetCVarBitfield("closedRemixArtifactTutorialFrames", specIndex, true);
+
+	EventRegistry:TriggerEvent("RemixArtifactFrame.VisibilityUpdated", shown);
+
+
+	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW);	SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW
+
+	BLZ uses RemixArtifactFrame.Model as background. See RemixArtifactFrameMixin:RefreshBackgroundModel()
 --]]

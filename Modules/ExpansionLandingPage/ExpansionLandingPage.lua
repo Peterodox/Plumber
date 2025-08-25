@@ -150,7 +150,7 @@ do
         Divider:SetPoint("RIGHT", self.RightSection.Header, "BOTTOMRIGHT", -32, 0);
 
         self:InitTabButtons();
-        self:InitLeftSection();
+        --self:InitLeftSection();
 
         table.insert(UISpecialFrames, self:GetName());
 
@@ -170,8 +170,18 @@ do
         LandingPageUtil.SelectTab(tabKey);
     end);
 
+    addon.CallbackRegistry:Register("TimerunningSeason", function(seasonID)
+        if seasonID == 2 then
+            MainFrame.isLegionRemix = true;
+        end
+    end);
+
 
     function PlumberExpansionLandingPageMixin:OnShow()
+        if self.InitLeftSection then
+            self:InitLeftSection();
+        end
+
         self:UpdateTabs();    --The selected tab will be created here
         LandingPageUtil.PlayUISound("LandingPageOpen");
         if not self:IsUserPlaced() then
@@ -257,11 +267,18 @@ do
     end
 
     function PlumberExpansionLandingPageMixin:InitLeftSection()
+        self.InitLeftSection = nil;
+
         local categories = {
             {name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
             {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
             {name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
         };
+
+        if self.isLegionRemix then
+            table.remove(categories, 1);
+            table.remove(categories, 1);
+        end
 
         local numCategories = #categories;
 

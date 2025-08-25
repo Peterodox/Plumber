@@ -35,15 +35,17 @@ do
         self.itemID = nil;
         self.buttonDitry = true;
         self.appendTooltipFunc = appendTooltipFunc;
+        self.useActionButton = nil;
         self:Refresh();
         self:SetShownAsMinor(isMinor);
     end
 
-    function CurrencyButtonMixin:SetItem(itemID, isMinor, appendTooltipFunc)
+    function CurrencyButtonMixin:SetItem(itemID, isMinor, appendTooltipFunc, useActionButton)
         self.currencyID = nil;
         self.itemID = itemID;
         self.buttonDitry = true;
         self.appendTooltipFunc = appendTooltipFunc;
+        self.useActionButton = useActionButton;
         self:Refresh();
         self:SetShownAsMinor(isMinor);
     end
@@ -88,6 +90,10 @@ do
             return false
         end
 
+        if self:IsMouseMotionFocus() then
+            self:ShowTooltip();
+        end
+
         if quantity then
             if quantity > 0 then
                 self.anyOwned = true;
@@ -115,21 +121,71 @@ do
         self.Name:SetPoint("LEFT", self, "LEFT", (isMinor and 22) or 8, 0);
     end
 
-    function CurrencyButtonMixin:OnEnter()
-        self:UpdateVisual();
+    function CurrencyButtonMixin:SetupActionButton()
+        if not self.itemID then return end;
+
+        local propagateMouseMotion = true;
+        local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion);
+        if actionButton then
+            actionButton:SetParent(self);
+            actionButton:CoverParent();
+            actionButton:SetUseItem(self.itemID, "RightButton");
+            actionButton:Show();
+            actionButton.onHideCallback = function()
+                if self:IsMouseMotionFocus() then
+                    self:ShowTooltip();
+                end
+            end;
+            return true
+        end
+    end
+
+    function CurrencyButtonMixin:ReleaseActionButton()
+        addon.HideSecureActionButton("ExpansionLandingPage");
+    end
+
+    function CurrencyButtonMixin:ShowTooltip()
         local tooltip = GameTooltip;
-        tooltip:SetOwner(self.Icon, "ANCHOR_RIGHT", 0, 0);
+        local owner = self.Icon;
+        tooltip:SetOwner(owner, "ANCHOR_RIGHT", 0, 0);
+
         if self.currencyID then
             tooltip:SetCurrencyByID(self.currencyID);
         elseif self.itemID then
             tooltip:SetItemByID(self.itemID);
         end
 
-        if self.appendTooltipFunc and tooltip.ProcessInfo then
-            local info = API.CreateAppendTooltipInfo();
-            if self.appendTooltipFunc(info) then
-               tooltip:ProcessInfo(info);
-               tooltip:Show();
+        if tooltip.ProcessInfo then
+            if self.appendTooltipFunc then
+                local info = API.CreateAppendTooltipInfo();
+                if self.appendTooltipFunc(info) then
+                    tooltip:ProcessInfo(info);
+                    tooltip:Show();
+                end
+            end
+        end
+    end
+
+    function CurrencyButtonMixin:OnEnter()
+        self:UpdateVisual();
+        self:ShowTooltip();
+
+        local contextualTooltipFunc;
+        if self.itemID and self.useActionButton and self:SetupActionButton() then
+            contextualTooltipFunc = function(tooltip)
+                tooltip:AddLine(L["Instruction Right Click To Use"], 0.098, 1.000, 0.098, true);
+                return true
+            end
+        end
+
+        if contextualTooltipFunc then
+            local tooltip = GameTooltip;
+            if tooltip.ProcessInfo then
+                local info = API.CreateAppendTooltipInfo();
+                if contextualTooltipFunc(info) then
+                    tooltip:ProcessInfo(info);
+                    tooltip:Show();
+                end
             end
         end
     end
@@ -316,7 +372,7 @@ do
                     elseif v.itemID then
                         self.anyItem = true;
                         content[n].setupFunc = function(obj)
-                            obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
+                            obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc, v.useActionButton);
                         end;
                     end
                 end

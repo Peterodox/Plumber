@@ -190,10 +190,7 @@ do
         end
 
 
-        self.lastPages = {};
-
         hooksecurefunc(appearanceTab, "SetActiveCategory", function(f, category)
-            local lastPage;
             if category then
                 local _, isWeapon = C_TransmogCollection.GetCategoryInfo(category);
                 if isWeapon or (appearanceTab.transmogLocation and appearanceTab.transmogLocation:IsIllusion()) then
@@ -201,26 +198,14 @@ do
                 else
                     Loader.isWeapon = false;
                 end
-                lastPage = self.lastPages[category];
             else    --Illusion
                 Loader.isWeapon = true;
-                lastPage = self.lastPages[-1];
             end
             self.activeCategory = category;
-
-            if true then return end;
-
-            if lastPage then
-                --maxPages at this stage is 0
-                --lastPage = math.min(lastPage, appearanceTab.PagingFrame:GetMaxPages());
-
-                C_Timer.After(0, function()
-                    appearanceTab.PagingFrame:SetCurrentPage(lastPage);
-                    appearanceTab:UpdateItems();
-                end);
-            end
         end);
 
+
+        self.lastPages = {};
 
         local function SaveCurrentPage(lastPage)
             local category = appearanceTab.activeCategory or -1;  --illusion has no category
@@ -274,6 +259,10 @@ do
             end
 
             function appearanceTab:ResetPage()
+                if ( C_TransmogCollection.IsSearchInProgress(self:GetParent():GetSearchType()) ) then
+                    self.resetPageOnSearchUpdated = true;
+                end
+
                 if not self.pendingResetPage then
                     self.pendingResetPage = true;
                     C_Timer.After(0, function()

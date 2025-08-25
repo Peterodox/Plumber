@@ -53,45 +53,8 @@ do
 
     function GreatVaultItemButtonMixin:ShowPreviewItemTooltip()
         local tooltip = GameTooltip;
-
         tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
-        GameTooltip_SetTitle(tooltip, WEEKLY_REWARDS_CURRENT_REWARD);
-
-        local itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(self.id);
-        local itemLevel, upgradeItemLevel;
-
-        if itemLink then
-            itemLevel = C_Item.GetDetailedItemLevelInfo(itemLink);
-        end
-        if upgradeItemLink then
-            upgradeItemLevel = C_Item.GetDetailedItemLevelInfo(upgradeItemLink);
-        end
-
-        if not itemLevel then
-            GameTooltip_AddErrorLine(tooltip, RETRIEVING_ITEM_INFO);
-            self.UpdateTooltip = self.ShowPreviewItemTooltip;
-        else
-            self.UpdateTooltip = nil;
-
-            local hasData, nextActivityTierID, nextLevel, nextItemLevel = C_WeeklyRewards.GetNextActivitiesIncrease(self.activityTierID, self.level);
-            if hasData then
-                upgradeItemLevel = nextItemLevel;
-            else
-                nextLevel = self.level + 1;
-            end
-
-            GameTooltip_AddNormalLine(tooltip, string.format(WEEKLY_REWARDS_ITEM_LEVEL_WORLD, itemLevel, self.level));
-
-            GameTooltip_AddBlankLineToTooltip(tooltip);
-            if upgradeItemLevel then
-                GameTooltip_AddColoredLine(tooltip, string.format(WEEKLY_REWARDS_IMPROVE_ITEM_LEVEL, upgradeItemLevel), GREEN_FONT_COLOR);
-                GameTooltip_AddHighlightLine(tooltip, string.format(WEEKLY_REWARDS_COMPLETE_WORLD, nextLevel));
-            else
-                GameTooltip_AddColoredLine(tooltip, WEEKLY_REWARDS_MAXED_REWARD, GREEN_FONT_COLOR);
-            end
-        end
-
-        tooltip:Show();
+        API.DisplayDelvesGreatVaultTooltip(self, tooltip, self.activityTierID, self.level, self.id)
     end
 
     function GreatVaultItemButtonMixin:ShowIncompleteTooltip()
@@ -589,6 +552,7 @@ do
         local requery = false;
 
         for i, activityInfo in ipairs(activities) do
+            --[[
             itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(activityInfo.id);
             itemLevel, upgradeItemLevel = nil, nil;
 
@@ -599,8 +563,10 @@ do
             if upgradeItemLink then
                 upgradeItemLevel = C_Item.GetDetailedItemLevelInfo(upgradeItemLink);
             end
+            --]]
 
             tier = activityInfo.level;
+            itemLevel = API.GetDelvesGreatVaultItemLevel(activityInfo.level);
             progressDelta = activityInfo.threshold - activityInfo.progress;
 
             frame = self.Items[i];

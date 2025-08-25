@@ -51,8 +51,8 @@ end
 
 local ResourceList = {
     {currencyID = 3028},    --Restored Coffer Key
-    {itemID = 245653, isMinor = false},   --Coffer Key Shard
-    {itemID = 246771},      --Radiant Echo
+    {itemID = 245653, isMinor = false, useActionButton = true},   --Coffer Key Shard
+    {itemID = addon.ItemUpgradeConstant.RadiantEchoItemID},      --Radiant Echo
 
     {currencyID = 1602, shownIfOwned = true},    --Conquest
     {currencyID = 1792, shownIfOwned = true},    --Honor

@@ -39,6 +39,9 @@ L["Module Category Tooltip"] = "鼠标提示";   --Additional Info on Tooltips
 L["Module Category Class"] = "职业";   --Player Class (rogue, paladin...)
 --- order: 5
 L["Module Category Reduction"] = "做减法";   --Reduce UI elements
+--- order: -1
+L["Module Category Timerunning"] = "军团再临：幻境新生";    --Change this based on timerunning season
+
 
 L["Module Category Dragonflight"] = "巨龙时代";
 L["Module Category Plumber"] = "Plumber";   --This addon's name
@@ -339,6 +342,11 @@ L["BossBanner Valuable Item Only"] = "仅显示稀有物品";
 L["BossBanner Valuable Item Only Tooltip"] = "仅显示坐骑、职业套装兑换物和地下城手册中标注为稀有掉落的物品。";
 
 
+--AppearanceTab
+L["ModuleName AppearanceTab"] = "外观页面";
+L["ModuleDescription AppearanceTab"] = "修改战团藏品-外观页面：\n\n- 调整模型加载进程并减少每页显示的模型数量来改善显卡负载，从而此降低你使用此界面时显卡崩溃的几率。\n\n- 当你改变装备栏时，自动跳转到上次浏览的页码。";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
@@ -443,6 +451,7 @@ L["Weekly Coffer Key Tooltip"] = "每周获得的前四个周常宝箱里有一�
 L["Weekly Coffer Key Shards Tooltip"] = "每周获得的前四个周常宝箱里有宝匣钥匙碎片。";
 L["Weekly Cap"] = "每周上限";
 L["Weekly Cap Reached"] = "已达到每周上限。";
+L["Instruction Right Click To Use"] = "<右键单击来使用>"
 
 
 --Generic

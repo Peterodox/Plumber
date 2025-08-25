@@ -15,6 +15,7 @@
 	<Script file="TWW/ItemUpgradeFrame.lua"/>
 	<Script file="TWW/ActivityData.lua"/>
 	<Script file="TWW/ResourceList.lua"/>
+	<Script file="TWW/ResourceList_LegionRemix.lua"/>
 
 	<Script file="Currency.lua"/>
 	<Script file="FactionUtil.lua"/>

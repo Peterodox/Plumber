@@ -587,6 +587,41 @@ do  -- Item
         local isCollected = select(11, C_MountJournal.GetMountInfoByID(mountID));
         return isCollected
     end
+
+
+    local InventorySlotName = {
+        "HEADSLOT",
+        "NECKSLOT",
+        "SHOULDERSLOT",
+        "SHIRTSLOT",
+        "CHESTSLOT",
+
+        "WAISTSLOT",
+        "LEGSSLOT",
+        "FEETSLOT",
+        "WRISTSLOT",
+        "HANDSSLOT",
+
+        "FINGER0SLOT_UNIQUE",   --FINGER0SLOT
+        "FINGER1SLOT_UNIQUE",   --FINGER1SLOT
+        "TRINKET0SLOT_UNIQUE",  --TRINKET0SLOT
+        "TRINKET1SLOT_UNIQUE",  --TRINKET1SLOT
+        "BACKSLOT",
+
+        "MAINHANDSLOT",
+        "SECONDARYHANDSLOT",
+        "RANGEDSLOT",
+        "TABARDSLOT",
+    };
+
+    function API.GetInventorySlotName(slotID)
+        local key = InventorySlotName[slotID];
+        if key and _G[key] then
+            return _G[key]
+        else
+            return "Slot"..slotID
+        end
+    end
 end
 
 do  -- Tooltip Parser
@@ -1786,7 +1821,7 @@ do  -- Reputation
     API.GetReputationStandingText = GetReputationStandingText;
 
 
-    local function GetFactionStatusText(factionID, simplified)
+    local function GetFactionStatusText(factionID, simplified, showFactionName)
         --Derived from Blizzard ReputationFrame_InitReputationRow in ReputationFrame.lua
         if not factionID then return end;
         local factionName;
@@ -1869,19 +1904,23 @@ do  -- Reputation
         local text;
 
         if factionStandingtext then
+            if showFactionName and not text then text = factionName.." "; end;
             if not text then text = L["Current Colon"] end;
             factionStandingtext = " |cffffffff"..factionStandingtext.."|r";
             text = text .. factionStandingtext;
         end
 
         if rolloverText then
+            if showFactionName and not text then text = factionName.." "; end;
             if not text then text = L["Current Colon"] end;
             rolloverText = "  |cffffffff"..rolloverText.."|r";
             text = text .. rolloverText;
         end
 
         if text then
-            text = " \n"..text;
+            if not showFactionName then
+                text = " \n"..text;
+            end
 
             if cappedAlert then
                 text = text.."\n"..cappedAlert;
@@ -3735,6 +3774,64 @@ do  --Locale-dependent API
     end
 end
 
+do  --Delves
+    function API.DisplayDelvesGreatVaultTooltip(owner, tooltip, activityTierID, level, id)
+        --Set the tooltip owner prior to this
+        --for Delves, level is the tier number
+
+
+        GameTooltip_SetTitle(tooltip, WEEKLY_REWARDS_CURRENT_REWARD);
+
+
+        --[[
+        --This default method is unreliable since 11.2.0, so we hardcode itemlevel
+        local itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(id);
+        local itemLevel, upgradeItemLevel;
+
+        if itemLink then
+            itemLevel = C_Item.GetDetailedItemLevelInfo(itemLink);
+        end
+        if upgradeItemLink then
+            upgradeItemLevel = C_Item.GetDetailedItemLevelInfo(upgradeItemLink);
+        end
+        --]]
+
+        local itemLevel = API.GetDelvesGreatVaultItemLevel(level);
+
+        if not itemLevel then
+            GameTooltip_AddErrorLine(tooltip, RETRIEVING_ITEM_INFO);
+            owner.UpdateTooltip = owner.ShowPreviewItemTooltip;
+        else
+            owner.UpdateTooltip = nil;
+
+            --World activityTierID is 42
+
+            --[[
+            local hasData, nextActivityTierID, nextLevel, nextItemLevel = C_WeeklyRewards.GetNextActivitiesIncrease(activityTierID, level);
+            if hasData then
+                upgradeItemLevel = nextItemLevel;
+            else
+                nextLevel = level + 1;
+            end
+            --]]
+
+            local nextLevel = level + 1;
+            local upgradeItemLevel = API.GetDelvesGreatVaultItemLevel(nextLevel);
+
+            GameTooltip_AddNormalLine(tooltip, string.format(WEEKLY_REWARDS_ITEM_LEVEL_WORLD, itemLevel, level));
+
+            GameTooltip_AddBlankLineToTooltip(tooltip);
+            if upgradeItemLevel then
+                GameTooltip_AddColoredLine(tooltip, string.format(WEEKLY_REWARDS_IMPROVE_ITEM_LEVEL, upgradeItemLevel), GREEN_FONT_COLOR);
+                GameTooltip_AddHighlightLine(tooltip, string.format(WEEKLY_REWARDS_COMPLETE_WORLD, nextLevel));
+            else
+                GameTooltip_AddColoredLine(tooltip, WEEKLY_REWARDS_MAXED_REWARD, GREEN_FONT_COLOR);
+            end
+        end
+
+        tooltip:Show();
+    end
+end
 --[[
 local DEBUG = CreateFrame("Frame");
 DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");

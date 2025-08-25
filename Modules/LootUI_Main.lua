@@ -31,6 +31,7 @@ local AUTO_LOOT_ENABLE_TOOLTIP = true;
 
 
 local MainFrame = CreateFrame("Frame", "PlumberLootWindow", UIParent);
+addon.LootWindow = MainFrame;
 MainFrame:Hide();
 MainFrame:SetAlpha(0);
 MainFrame:SetFrameStrata("DIALOG");
@@ -53,6 +54,7 @@ local Defination = {
     SLOT_TYPE_REP = 9,          --Custom Value
     SLOT_TYPE_ITEM = 1,
     SLOT_TYPE_OVERFLOW = 128,   --Display overflown currency
+    SLOT_TYPE_CUSTOM = -1,      --Display custom info like a notifaction sent by other module
 
     QUEST_TYPE_NEW = 2,
     QUEST_TYPE_ONGOING = 1,
@@ -432,6 +434,8 @@ do  --UI ItemButton
             self:SetMoney(data);
         elseif data.slotType == Defination.SLOT_TYPE_OVERFLOW then
             self:SetOverflowCurrency(data);
+        elseif data.slotType == Defination.SLOT_TYPE_CUSTOM then
+            self:SetCustomInfo(data);
         end
 
         self.data = data;
@@ -559,9 +563,17 @@ do  --UI ItemButton
         self:Layout();
     end
 
+    function ItemFrameMixin:SetCustomInfo(data)
+        self:SetIcon(data.icon);
+        self:SetCount(data);
+        self:SetNameByQuality(data.name, data.quality or 1);
+        self:ShowGlow(data.showGlow);
+        self:Layout();
+    end
+
     function ItemFrameMixin:IsSameItem(data)
         if self.data then
-            if self.data.slotType == data.slotType then
+            if self.data.slotType == data.slotType and data.slotType ~= Defination.SLOT_TYPE_CUSTOM then
                 if data.slotType == Defination.SLOT_TYPE_REP then
                     return self.data.name == data.name
                 else
@@ -617,7 +629,7 @@ do  --UI ItemButton
     function ItemFrameMixin:ShowTooltip()
         --Effective during Manual Mode
         local tooltip = GameTooltip;
-        if self.enableState == 1 then
+        if self.enableState == 1 then   --Manual Loot
             if self.data.slotType == Defination.SLOT_TYPE_ITEM then
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
                 tooltip:SetLootItem(self.data.slotIndex);
@@ -636,12 +648,15 @@ do  --UI ItemButton
                 end
             end
 
-        elseif self.enableState == 2 then
+        elseif self.enableState == 2 then   --Auto Loot
             if self.data.link then
                 local width = self:GetWidth();
                 local textWidth = self.Text:GetWrappedWidth();
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -(width - textWidth - (self.textOffset or 0)), 0);
                 tooltip:SetHyperlink(self.data.link);
+            elseif self.data.tooltipMethod then
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
+                tooltip[self.data.tooltipMethod](tooltip, self.data.id);
             end
         end
     end

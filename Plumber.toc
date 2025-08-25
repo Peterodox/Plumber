@@ -71,6 +71,7 @@ Modules\Macros.lua
 Modules\ProfessionsBook.lua
 Modules\ExpansionLandingPage\ExpansionLandingPage_TWW.xml
 Modules\BlizzFix_ModelLoading.lua
+#Modules\Timerunning\LegionRemix.xml
 
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua
