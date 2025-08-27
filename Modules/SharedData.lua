@@ -41,6 +41,7 @@ do  --Weekly Caches (Meta quest rewards)
             244842,     --Fabled Veteran's Cache
             244865,     --Pninnacle Cache
             245611,     --Wriggling Pinnacle Cache
+            255676,     --Phase Diver's Cache
         },
 
         MinorChests = {
