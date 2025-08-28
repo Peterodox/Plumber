@@ -163,6 +163,7 @@ EL.macroEvents = {};
 
 function EL:CheckSupportedMacros()
     self:UnregisterAllEvents();
+
     if not self.isInitialized then
         self:RegisterEvent("PLAYER_ENTERING_WORLD");
     end
@@ -351,8 +352,14 @@ function EL:UpdateMacros(commands)
                                 anyEdit = true;
                             end
 
-                            if commandData.initFunc then
-                                body = commandData.initFunc(body);
+                            if commandData.writeFunc then
+                                local _body, _icon = commandData.writeFunc(body);
+                                if _body then
+                                    body = _body;
+                                end
+                                if _icon then
+                                    icon = _icon;
+                                end
                                 anyEdit = true;
                             end
 
@@ -1716,6 +1723,7 @@ do  --DrawerUpdator
     local UpdateEvents_Lazy = {
         ["SPELLS_CHANGED"] = true,
         ["BAG_UPDATE_DELAYED"] = true,
+        ["TRAIT_CONFIG_UPDATED"] = true,
     };
 
     function DrawerUpdator:SetEnabled(state)
@@ -1845,4 +1853,16 @@ do  --Settings Registry
             UpdateAfterSettingsChanged();
         end
     end);
+end
+
+
+do  --For other modules like Legion Remix
+    local function AddPlumberMacro(commandInfo)
+        local command = commandInfo.command;
+        local type = commandInfo.modifyType and ModifyType[commandInfo.modifyType];
+        if not PlumberMacros[command] then
+            PlumberMacros[command] = commandInfo;
+        end
+    end
+    addon.AddPlumberMacro = AddPlumberMacro;
 end

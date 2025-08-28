@@ -1991,7 +1991,7 @@ do  -- Spell
             end
         end
     end
-    
+
     if C_Spell.GetSpellCharges then
         API.GetSpellCharges = C_Spell.GetSpellCharges;
     else
@@ -2009,6 +2009,16 @@ do  -- Spell
                 return tbl
             end
         end
+    end
+
+    if C_SpellBook and C_SpellBook.IsSpellInSpellBook then
+        function API.IsSpellKnown(spellID, isPet)
+            local spellBank = isPet and Enum.SpellBookSpellBank.Pet or Enum.SpellBookSpellBank.Player;
+            local includeOverrides = false;
+            return C_SpellBook.IsSpellInSpellBook(spellID, spellBank, includeOverrides);
+        end
+    else
+        API.IsSpellKnown = C_SpellBook.IsSpellKnown or IsSpellKnownOrOverridesKnown or IsSpellKnown;
     end
 end
 
@@ -2204,6 +2214,10 @@ do  -- ObjectPool
         if obj.OnRemoved then
             obj:OnRemoved();
         end
+
+        if self.onRemovedFunc then
+            self.onRemovedFunc(obj);
+        end
     end
 
     function ObjectPoolMixin:RecycleObject(obj)
@@ -2285,7 +2299,7 @@ do  -- ObjectPool
         return self.activeObjects
     end
 
-    local function CreateObjectPool(createObjectFunc)
+    local function CreateObjectPool(createObjectFunc, onRemovedFunc)
         local pool = {};
         API.Mixin(pool, ObjectPoolMixin);
 
@@ -2299,6 +2313,7 @@ do  -- ObjectPool
         pool.unusedObjects = {};
         pool.numUnused = 0;
         pool.createObjectFunc = createObjectFunc;
+        pool.onRemovedFunc = onRemovedFunc;
 
         return pool
     end
@@ -3573,7 +3588,6 @@ end
 
 do  -- Macro Util
     local WoWAPI = {
-        IsSpellKnown = C_SpellBook.IsSpellKnown or IsSpellKnownOrOverridesKnown or IsSpellKnown,
         IsPlayerSpell = IsPlayerSpell,
         PlayerHasToy = PlayerHasToy or Nop,
         GetItemCount = C_Item.GetItemCount,
@@ -3587,7 +3601,7 @@ do  -- Macro Util
 
     function API.CanPlayerPerformAction(actionType, arg1, arg2)
         if actionType == "spell" then
-            return WoWAPI.IsSpellKnown(arg1) or WoWAPI.IsPlayerSpell(arg1)
+            return API.IsSpellKnown(arg1) or WoWAPI.IsPlayerSpell(arg1)
         elseif actionType == "item" then
             if API.IsToyItem(arg1) then
                 return WoWAPI.PlayerHasToy(arg1)

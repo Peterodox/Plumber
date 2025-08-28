@@ -353,6 +353,14 @@ L["ModuleName AppearanceTab"] = "Appearances Tab";
 L["ModuleDescription AppearanceTab"] = "Modify the Appearances Tab in the Warband Collections:\n\n- Reduce GPU load by improving model loading sequence and changing the number of items shown per page. It can reduce the chance of graphics crash when opening this UI.\n\n- Remember the page you visit after changing slots.";
 
 
+--SoftTargetName
+L["ModuleName SoftTargetName"] = "Nameplate: Soft Target";
+L["ModuleDescription SoftTargetName"] = "Display the soft target object's name.";
+L["SoftTargetName Req Title"] = "|cffd4641cYou need to manually change these settings to make it work:|r";
+L["SoftTargetName Req 1"] = "|cffffd100Enable Interact Key|r in Game Options> Gameplay> Controls.";
+L["SoftTargetName Req 2"] = "Set CVar |cffffd100SoftTargetIconGameObject|r to |cffffffff1|r";
+
+
 --LegionRemix
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "Legion Remix";
@@ -361,6 +369,7 @@ L["Earn X To Upgrade Y Format"] = "Earn another |cffffffff%s|r %s to upgrade %s"
 L["Until Next Upgrade Format"] = "%s until next upgrade";
 L["New Trait Available"] = "New trait available.";
 L["Rank Increased"] = "Rank Increased";
+L["Infinite Knowledge Tooltip"] = "You can obtain Inifite Knowledge by earning certain Legion Remix achievements.";
 
 
 --Loot UI

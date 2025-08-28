@@ -51,6 +51,7 @@ Modules\TalkingHead.lua
 Modules\AzerothianArchives.lua
 Modules\MerchantPrice.lua
 Modules\BossBanner.lua
+Modules\SoftTargetName.lua
 
 #TWW
 Modules\DelvesScenario.lua

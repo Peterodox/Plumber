@@ -425,12 +425,23 @@ local function CreateUI()
     parent.CategoryButtons = {};
 
     local function Checkbox_OnEnter(self)
-        description:SetText(self.data.description);
+        local desc = self.data.description;
+        local additonalDesc = self.data.descriptionFunc and self.data.descriptionFunc() or nil;
+        if additonalDesc then
+            if desc then
+                desc = desc.."\n\n"..additonalDesc;
+            else
+                desc = additonalDesc;
+            end
+        end
+        description:SetText(desc);
+
         if self.parentDBKey then
             preview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..self.parentDBKey);
         else
             preview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..self.dbKey);
         end
+
         SelectionTexture:ClearAllPoints();
         SelectionTexture:SetPoint("LEFT", self, "LEFT", -PADDING, 0);
         SelectionTexture:Show();

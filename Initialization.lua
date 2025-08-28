@@ -134,6 +134,7 @@ local DefaultValues = {
     ProfessionsBook = true,             --Show unspent points on ProfessionsBookFrame
     EditModeShowPlumberUI = true,
     LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
+    SoftTargetName = false,             --Show object's name on SoftTargetFrame
 
     AppearanceTab = false,              --Adjust Appearance Tab models to reduce GPU usage spike
         AppearanceTab_ModelCount = 1,

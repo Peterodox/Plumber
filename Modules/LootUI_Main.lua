@@ -491,11 +491,13 @@ do  --UI ItemButton
             self:ShowGlow(false);
         end
 
+        --[[
         if data.classID == 15 and data.subclassID == 4 then
             API.InquiryOpenableItem(data.id, function(bag, slot)
                 self:ShowGlow(true);
             end);
         end
+        --]]
     end
 
     function ItemFrameMixin:SetCurrency(data)

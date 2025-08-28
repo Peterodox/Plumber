@@ -3,12 +3,14 @@ if not C_RemixArtifactUI then return end;
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local CallbackRegistry = addon.CallbackRegistry;
 
 
-local type = type;
+local RemixAPI = {};
+addon.RemixAPI = RemixAPI;
+
+
 local ipairs = ipairs;
-
-
 local C_RemixArtifactUI = C_RemixArtifactUI;
 local C_Traits = C_Traits;
 local GetConfigIDByTreeID = C_Traits.GetConfigIDByTreeID;
@@ -32,7 +34,11 @@ local CommitUtil = CreateFrame("Frame");
 local MASTER_ENABLED = false;
 
 
-local CURRENCY_ID_IP = 3268;
+RemixAPI.DataProvider = DataProvider;
+RemixAPI.CommitUtil = CommitUtil;
+
+
+local CURRENCY_ID_IP = 3268;	--Infinite Knowledge: 3292
 --traitSystemID = 33	--C_Traits.GetConfigIDBySystemID
 
 
@@ -128,6 +134,14 @@ do	--DataProvider
 		{108104, 133487, 138273}, --Storm Surger
 		{108104, 135715, 140470}, --Brewing Storm
 		{109265, 135326, 140093}, --Light's Vengeance
+	};
+
+	DataProvider.ArtifactAbilitySpells = {
+		1233577,
+		1237711,
+		1233775,
+		1233181,
+		1251045,
 	};
 
 	DataProvider.ArtifactAbilityNodes = {
@@ -253,6 +267,19 @@ do	--DataProvider
 		end
 	end
 
+	function DataProvider:GetArtifactAbilities()
+		return self.ArtifactAbilitySpells
+	end
+
+	function DataProvider:GetActiveArtifactAbility()
+		local IsSpellKnown = API.IsSpellKnown;
+		for _, spellID in ipairs(DataProvider.ArtifactAbilitySpells) do
+			if IsSpellKnown(spellID) then
+				return spellID
+			end
+		end
+	end
+
 	function DataProvider:GetActiveArtifactTrackIndex()
 		local artifactTrackIndex;
 
@@ -264,7 +291,6 @@ do	--DataProvider
 				break
 			end
 		end
-		self.artifactTrackIndex = artifactTrackIndex;
 
 		return artifactTrackIndex
 	end
@@ -479,6 +505,18 @@ do	--DataProvider
 		end
 	end
 
+	function DataProvider:UpdateClassSpecInfo()
+		local specIndex = C_SpecializationInfo.GetSpecialization();
+		--local itemSpecIndex = C_RemixArtifactUI.GetCurrItemSpecIndex();	--need artifact being equipped
+
+		if specIndex ~= self.specIndex then
+			self.specIndex = specIndex;
+			local _, name = C_SpecializationInfo.GetSpecializationInfo(specIndex);
+			CallbackRegistry:Trigger("LegionRemix.ClassSpecChanged", specIndex);
+			C_RemixArtifactUI.ClearRemixArtifactItem();
+		end
+	end
+
 	function DataProvider:UpdateConfigInfo()
 		--traitTreeID is always 1161
 		--configID is different for each artifact weawpon
@@ -654,17 +692,63 @@ do	--DataProvider
 			return diff
 		end
 	end
+
+
+
+
+	--Saved Variables
+	CallbackRegistry:Register("TimerunningSeason", function(seasonID)
+		--This happens after PLAYER_ENTERING_WORLD
+		if PlumberDB_PC then
+			if not PlumberDB_PC.LegionRemix then
+				PlumberDB_PC.LegionRemix = {};
+			end
+			DataProvider.playerDB = PlumberDB_PC.LegionRemix;
+		else
+			DataProvider.playerDB = {};
+		end
+
+		DataProvider:UpdateClassSpecInfo();
+	end);
+
+	function DataProvider:GetLastArtifactTrackIndexForCurrentSpec()
+		if not self.playerDB then return end;
+
+		if not self.specIndex then
+			self:UpdateClassSpecInfo();
+		end
+
+		if self.specIndex then
+			local artifactTrackIndex = self.playerDB["spec"..self.specIndex.."artifactTrackIndex"];
+			return artifactTrackIndex
+		end
+	end
+
+	function DataProvider:SaveLastArtifactTrackIndexForCurrentSpec()
+		if not self.playerDB then return end;
+
+		local artifactTrackIndex = self:GetActiveArtifactTrackIndex();
+
+		if artifactTrackIndex then
+			if not self.specIndex then
+				self:UpdateClassSpecInfo();
+			end
+
+			if self.specIndex then
+				self.playerDB["spec"..self.specIndex.."artifactTrackIndex"] = artifactTrackIndex;
+			end
+		end
+	end
 end
 
 
 do
 	EventListener.dynamicEvents = {
 		"CURRENCY_DISPLAY_UPDATE",
-		"REMIX_ARTIFACT_ITEM_SPECS_LOADED",		--loadSuccessful
+		"REMIX_ARTIFACT_ITEM_SPECS_LOADED",		--return loadSuccessful
 		"REMIX_ARTIFACT_UPDATE",				--Seems to only trigger when Shift RightClick artifact weapons
 		"ACTIVE_TALENT_GROUP_CHANGED",
 		"TRAIT_CONFIG_UPDATED",
-		"TRAIT_SYSTEM_NPC_CLOSED",
 	};
 
 	function EventListener:Enable(state)
@@ -686,16 +770,9 @@ do
 		if self.specDirty then
 			if self.t > 0.5 then
 				self.specDirty = nil;
-
-				local specIndex = C_SpecializationInfo.GetSpecialization();
-				local itemSpecIndex = C_RemixArtifactUI.GetCurrItemSpecIndex();	--need artifact being equipped
-
-				if specIndex then
-					local _, name = C_SpecializationInfo.GetSpecializationInfo(specIndex);
-					print(name, specIndex, itemSpecIndex);
-
-					DataProvider:UpdateConfigInfo();
-				end
+				DataProvider:UpdateClassSpecInfo();
+				DataProvider:UpdateConfigInfo();
+				CommitUtil:TryPurchaseAllTraits();
 			end
 		end
 
@@ -770,6 +847,7 @@ do
 				self:RequestUpdate();
 			elseif event == "REMIX_ARTIFACT_UPDATE" then
 				DataProvider:UpdateConfigInfo();
+				RemixAPI.ShowArtifactUI();
 			elseif event == "BAG_UPDATE_DELAYED" then
 				self:UnregisterEvent(event);
 				if InCombatLockdown() then
@@ -816,6 +894,7 @@ do	--CommitUtil
 		self:UnregisterEvent("CONFIG_COMMIT_FAILED");
 		if self.commitingResult == 1 then
 			print("COMMIT SUCCEEDED");
+			DataProvider:SaveLastArtifactTrackIndexForCurrentSpec();
 		elseif self.commitingResult == 0 then
 			print("COMMIT FAILED");
 		end
@@ -1043,7 +1122,7 @@ do	--CommitUtil
 
 	function CommitUtil:ReEquipFailedItems()
 		if not self.failedItems then return end;
-		self:ReEquipItems(self.failedItems);
+		self:ReEquipItems(self.failedItems, true);
 	end
 
 	function CommitUtil:TryPurchaseArtifactTrack(index)
@@ -1115,6 +1194,20 @@ do	--CommitUtil
 
 		if self.anySuccessPurchase then
 			self:SetCommitStarted(configID);
+		end
+	end
+
+	function CommitUtil:TryPurchaseAllTraits()
+		--We run this after player changes spec and has unspent power
+		local activeTrackIndex = DataProvider:GetActiveArtifactTrackIndex();
+		if not activeTrackIndex then
+			activeTrackIndex = DataProvider:GetLastArtifactTrackIndexForCurrentSpec() or 1;
+		end
+		self:TryPurchaseArtifactTrack(activeTrackIndex);
+
+		--Disable tutorial
+		if DataProvider.specIndex then
+			C_CVar.SetCVarBitfield("closedRemixArtifactTutorialFrames", DataProvider.specIndex, true);
 		end
 	end
 
@@ -1196,12 +1289,14 @@ do	--Debug
 			tooltip:AddDoubleLine("canPurchaseRank", tostring(nodeInfo.canPurchaseRank));
 
 			local configID = GetConfigIDByTreeID(1161);
-			local costs = GetNodeCost(configID, nodeID);
-			if (not costs) or #costs == 0 then
-				tooltip:AddLine("No Cost");
-			else
-				for _, cost in ipairs(costs) do
-					tooltip:AddDoubleLine("TraitCurrencyID: "..cost.ID, cost.amount);
+			if configID then
+				local costs = GetNodeCost(configID, nodeID);
+				if (not costs) or #costs == 0 then
+					tooltip:AddLine("No Cost");
+				else
+					for _, cost in ipairs(costs) do
+						tooltip:AddDoubleLine("TraitCurrencyID: "..cost.ID, cost.amount);
+					end
 				end
 			end
 
@@ -1238,6 +1333,10 @@ do	--GameTooltip Infinite Power
 
 					return true
 				end
+			elseif currencyID == 3292 then
+				tooltip:AddLine(" ");
+				tooltip:AddLine(L["Infinite Knowledge Tooltip"], 0.400, 0.733, 1.00, true);	--BRIGHTBLUE_FONT_COLOR
+				return true
 			end
 		end
 		return false
@@ -1277,9 +1376,9 @@ do	--Module Registry
 	local function EnableModule(state)
 		if state and not MASTER_ENABLED then
 			DataProvider:UpdateConfigInfo();
-
+			UIParent:UnregisterEvent("REMIX_ARTIFACT_UPDATE");
 		elseif not state and MASTER_ENABLED then
-
+			UIParent:RegisterEvent("REMIX_ARTIFACT_UPDATE");
 		else
 			return
 		end
@@ -1324,6 +1423,7 @@ end
 
 	C_Traits.GetTreeCurrencyInfo(configID, treeID, excludeStagedChanges)
 	/dump C_Traits.GetConfigIDByTreeID(1161)	--	TraitSystemID: 31
+	/run C_RemixArtifactUI.ClearRemixArtifactItem();	--This reset the active configID to current artifact.
 
 
 	--C_RemixArtifactUI.GetCurrItemSpecIndex()
@@ -1337,4 +1437,8 @@ end
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW);	SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW
 
 	BLZ uses RemixArtifactFrame.Model as background. See RemixArtifactFrameMixin:RefreshBackgroundModel()
+
+
+	Achievement Category: 15554(Main), 15562
+	https://wago.tools/db2/Achievement?filter%5BReward_lang%5D=Infinite%20Knowledge&page=2&sort%5BID%5D=asc
 --]]

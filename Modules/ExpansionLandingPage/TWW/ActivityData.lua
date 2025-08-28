@@ -92,7 +92,7 @@ do
     function TooltipFuncs.DevouredEnergyPod(tooltip)
         --Devoured Energy-Pod (20)  Translocated Gorger
         --Add item count if mount not learnt
-        if API.IsMountCollected(2602) then return end;
+        if API.IsMountCollected(2602) then return true end;
         local quantityRequired = 20;
         tooltip:AddLine(" ");
         API.AddCraftingReagentToTooltip(tooltip, 246240, quantityRequired);
@@ -186,6 +186,9 @@ local ActivityData = {  --Constant
             {name = "Dry Cleaning", questID = 89198, shownIfOnQuest = true, uiMapID = 2371},
             {name = "Flights of Fancy", questID = 89213, shownIfOnQuest = true, uiMapID = 2371},
             {name = "A Challenge for Dominance", questID = 85462, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "A Hard Day's Work", questID = 89192, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Ray Ranching", questID = 89197, shownIfOnQuest = true, uiMapID = 2371},
+            {name = "Sizing Them Up", questID = 85710, shownIfOnQuest = true, uiMapID = 2371},
 
             --Devourer Attack
             {name = "Devourer Attack", label = L["Devourer Attack"], uiMapID = 2371, questClassification = 5, tooltipSetter = TooltipFuncs.DevouredEnergyPod, addChildrenToTooltip = true,

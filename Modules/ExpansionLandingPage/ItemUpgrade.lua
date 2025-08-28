@@ -22,12 +22,12 @@ do
                 self.Text:SetText(info.quantity);
             end
 
-            local totalEarned = info.totalEarned or 0;
+            local quantity = info.useTotalEarnedForMaxQty and info.totalEarned or info.quantity;
             local maxQuantity = info.maxQuantity or 0;
 
             if info.quantity > 0 then
-                if maxQuantity > 0 and (((maxQuantity - totalEarned) == 0) or (info.quantity >= maxQuantity)) then
-                    --Full
+	            local isCapped = maxQuantity > 0 and quantity >= maxQuantity;
+                if isCapped then
                     self.Text:SetTextColor(0.098, 1.000, 0.098);
                 else
                     self.Text:SetTextColor(0.88, 0.88, 0.88);
