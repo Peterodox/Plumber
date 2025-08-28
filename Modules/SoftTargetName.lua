@@ -293,7 +293,7 @@ do  --Module Registery
         toggleFunc = EnableModule,
         categoryID = 2,
         uiOrder = 9,
-        moduleAddedTime = 1734426000,
+        moduleAddedTime = 1756400000,
     };
 
     addon.ControlCenter:AddModule(moduleData);

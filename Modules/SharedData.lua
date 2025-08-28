@@ -86,6 +86,6 @@ do  --Weekly Caches (Meta quest rewards)
 
 
     function API.GetDelvesGreatVaultItemLevel(tier)
-        return WeeklyRewardsConstant.DelvesGreatVaultItemLevel[tier] or 0
+        return WeeklyRewardsConstant.DelvesGreatVaultItemLevel[tier]
     end
 end

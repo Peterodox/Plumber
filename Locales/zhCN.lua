@@ -197,6 +197,11 @@ L["ModuleDescription TooltipItemReagents"] = "如果一个物品可被使用来�
 L["Can Create Multiple Item Format"] = "你拥有的材料能够合成|cffffffff%d|r件物品。";
 
 
+--Tooltip DelvesItem
+L["ModuleName TooltipDelvesItem"] = "地下堡宝匣钥匙";
+L["ModuleDescription TooltipDelvesItem"] = "在周常宝箱的鼠标提示上显示你本CD已获得的宝匣钥匙及碎片数量。";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "霸业风暴：珍宝商店";
 L["ModuleDescription Plunderstore"] = "调整从队伍查找器界面打开的珍宝商店：\n\n- 允许仅显示未收集物品。\n\n- 在类别按钮上显示未收集物品的数量。\n\n- 在武器和护甲的鼠标提示上显示其穿戴位置。\n\n- 允许你在试衣间里显示可穿戴的物品。";
@@ -345,6 +350,14 @@ L["BossBanner Valuable Item Only Tooltip"] = "仅显示坐骑、职业套装兑�
 --AppearanceTab
 L["ModuleName AppearanceTab"] = "外观页面";
 L["ModuleDescription AppearanceTab"] = "修改战团藏品-外观页面：\n\n- 调整模型加载进程并减少每页显示的模型数量来改善显卡负载，从而此降低你使用此界面时显卡崩溃的几率。\n\n- 当你改变装备栏时，自动跳转到上次浏览的页码。";
+
+
+--SoftTargetName
+L["ModuleName SoftTargetName"] = "姓名板: 软目标";
+L["ModuleDescription SoftTargetName"] = "显示软目标物体的名字。";
+L["SoftTargetName Req Title"] = "|cffd4641c你还需要手动更改以下设置来使此功能生效：|r";
+L["SoftTargetName Req 1"] = "前往游戏选项> 游戏功能> 控制，|cffffd100开启交互按键|r";
+L["SoftTargetName Req 2"] = "将CVar |cffffd100SoftTargetIconGameObject|r 的值设为 |cffffffff1|r";
 
 
 --Loot UI
