@@ -296,6 +296,13 @@ L["ModuleDescription MinimapMouseover"] = "미니맵에서 생물을 Alt 클릭�
 L["ModuleName AppearanceTab"] = "형상 탭"
 L["ModuleDescription AppearanceTab"] = " 전쟁부대 수집품의 형상 탭을 수정합니다:\n\n- 모델 로딩 순서를 개선하고 페이지당 표시되는 아이템 수를 조정하여 GPU 부하를 줄입니다. 이를 통해 UI를 열 때 그래픽 충돌 가능성을 낮출 수 있습니다.\n\n- 슬롯을 변경한 후 방문한 페이지를 기억합니다."
 
+--SoftTargetName
+L["ModuleName SoftTargetName"] = "이름표: 자동 조준 대상"
+L["ModuleDescription SoftTargetName"] = "자동 조준된 대상의 이름을 표시합니다."
+L["SoftTargetName Req Title"] = "|cffd4641c이 기능을 사용하려면 다음 설정을 수동으로 변경해야 합니다:|r"
+L["SoftTargetName Req 1"] = "게임 설정 > 게임 플레이 > 조작에서 |cffffd100상호작용 키|r를 활성화하세요."
+L["SoftTargetName Req 2"] = "CVar |cffffd100SoftTargetIconGameObject|r 값을 |cffffffff1|r로 설정하세요."
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "기본 전리품 UI를 대체하고 다양한 선택 기능을 추가:\n\n- 아이템을 빠르게 획득.\n\n- 자동 전리품 획득 실패 오류를 수정.\n\n- 직접 전리품을 챙길 때 '모두 받기' 버튼이 나타납니다.";
