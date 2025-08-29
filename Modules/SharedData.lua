@@ -39,7 +39,7 @@ do  --Weekly Caches (Meta quest rewards)
     local WeeklyRewardsConstant = {
         MajorChests = { --Change every season
             244842,     --Fabled Veteran's Cache
-            244865,     --Pninnacle Cache
+            244865,     --Pinnacle Cache
             245611,     --Wriggling Pinnacle Cache
             255676,     --Phase Diver's Cache
         },
@@ -53,6 +53,73 @@ do  --Weekly Caches (Meta quest rewards)
             250767,     --The General's War Chest
             250768,     --The Vizier's Capital
             250769,     --The Weaver's Gratuity
+        },
+
+        ChestSources = {
+            [244842] = {
+                quests = {
+                    89293,  --Special Assignment: Overshadowed
+                    89294,  --Special Assignment: Aligned Views
+                },
+            },
+
+            [244865] = {
+                questMap = 2339,    --Dornogal Meta Quest
+            },
+
+            [245611] = {
+                quests = {
+                    85460,  --Ecological Succession
+                },
+            },
+
+            [255676] = {
+                quests = {
+                    91093,  --More Than Just a Phase
+                },
+            },
+
+            [250763] = {
+                quests = {
+                    83240,  --The Theater Troupe
+                },
+            },
+
+            [250764] = {
+                quests = {
+                    86775,  --Urge to Surge
+                },
+            },
+
+            [250765] = {
+                quests = {
+                    83333,  --Gearing Up for Trouble
+                },
+            },
+
+            [250766] = {
+                quests = {
+                    76586,  --Speading the Light
+                },
+            },
+
+            [250767] = {
+                quests = {
+                    80671,  --Blade of the General
+                },
+            },
+
+            [250768] = {
+                quests = {
+                    80672,  --Hand of the Vizier
+                },
+            },
+
+            [250769] = {
+                quests = {
+                    80670,  --Eyes of the Weaver
+                },
+            },
         },
 
         CofferKeyFlags = {

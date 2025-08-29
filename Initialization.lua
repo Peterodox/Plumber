@@ -159,6 +159,7 @@ local DefaultValues = {
     NewExpansionLandingPage = true,
         LandingPage_Activity_HideCompleted = true,
         LandingPage_Raid_CollapsedAchievement = false,
+        LandingPage_AdvancedTooltip = true,
 
 
     --Custom Loot Window

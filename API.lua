@@ -561,6 +561,16 @@ do  -- Item
     API.GetColorizedItemName = GetColorizedItemName;
 
 
+    function API.GetItemColor(itemID)
+        local quality = C_Item.GetItemQualityByID(itemID) or 1;
+        local color = API.GetItemQualityColor(quality);
+        if color then
+            return color.r, color.g, color.b
+        else
+            return 1, 1, 1
+        end
+    end
+
     local function GetItemSpellID(item)
         local spellName, spellID = GetItemSpell(item);
         return spellID
@@ -3789,53 +3799,60 @@ do  --Locale-dependent API
 end
 
 do  --Delves
-    function API.DisplayDelvesGreatVaultTooltip(owner, tooltip, activityTierID, level, id)
+    function API.DisplayDelvesGreatVaultTooltip(owner, tooltip, index, level, id, progressDelta)
         --Set the tooltip owner prior to this
         --for Delves, level is the tier number
 
 
-        GameTooltip_SetTitle(tooltip, WEEKLY_REWARDS_CURRENT_REWARD);
+        if level == 0 then
+            GameTooltip_SetTitle(tooltip, WEEKLY_REWARDS_UNLOCK_REWARD);
 
+            local description;
 
-        --[[
-        --This default method is unreliable since 11.2.0, so we hardcode itemlevel
-        local itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(id);
-        local itemLevel, upgradeItemLevel;
+            if index == 2 then
+                description = GREAT_VAULT_REWARDS_WORLD_COMPLETED_FIRST;
+            elseif index == 3 then
+                description = GREAT_VAULT_REWARDS_WORLD_COMPLETED_SECOND;
+            else
+                description = GREAT_VAULT_REWARDS_WORLD_INCOMPLETE;
+            end
 
-        if itemLink then
-            itemLevel = C_Item.GetDetailedItemLevelInfo(itemLink);
-        end
-        if upgradeItemLink then
-            upgradeItemLevel = C_Item.GetDetailedItemLevelInfo(upgradeItemLink);
-        end
-        --]]
+            local formatRemainingProgress = true;
 
-        local itemLevel = API.GetDelvesGreatVaultItemLevel(level);
-
-        if not itemLevel then
-            GameTooltip_AddErrorLine(tooltip, RETRIEVING_ITEM_INFO);
-            owner.UpdateTooltip = owner.ShowPreviewItemTooltip;
+            if formatRemainingProgress then
+                GameTooltip_AddNormalLine(tooltip, description:format(progressDelta));
+            else
+                GameTooltip_AddNormalLine(tooltip, description);
+            end
         else
-            owner.UpdateTooltip = nil;
+            GameTooltip_SetTitle(tooltip, WEEKLY_REWARDS_CURRENT_REWARD);
 
-            --World activityTierID is 42
 
             --[[
-            local hasData, nextActivityTierID, nextLevel, nextItemLevel = C_WeeklyRewards.GetNextActivitiesIncrease(activityTierID, level);
-            if hasData then
-                upgradeItemLevel = nextItemLevel;
-            else
-                nextLevel = level + 1;
+            --This default method is unreliable since 11.2.0, so we hardcode itemlevel
+            local itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(id);
+            local itemLevel, upgradeItemLevel;
+
+            if itemLink then
+                itemLevel = C_Item.GetDetailedItemLevelInfo(itemLink);
+            end
+            if upgradeItemLink then
+                upgradeItemLevel = C_Item.GetDetailedItemLevelInfo(upgradeItemLink);
             end
             --]]
+
+            local itemLevel = API.GetDelvesGreatVaultItemLevel(level);
 
             local nextLevel = level + 1;
             local upgradeItemLevel = API.GetDelvesGreatVaultItemLevel(nextLevel);
 
-            GameTooltip_AddNormalLine(tooltip, string.format(WEEKLY_REWARDS_ITEM_LEVEL_WORLD, itemLevel, level));
+            if level > 0 and itemLevel then
+                GameTooltip_AddNormalLine(tooltip, string.format(WEEKLY_REWARDS_ITEM_LEVEL_WORLD, itemLevel, level));
+            end
 
             GameTooltip_AddBlankLineToTooltip(tooltip);
-            if upgradeItemLevel then
+
+            if level == 0 or (upgradeItemLevel and upgradeItemLevel > itemLevel) then
                 GameTooltip_AddColoredLine(tooltip, string.format(WEEKLY_REWARDS_IMPROVE_ITEM_LEVEL, upgradeItemLevel), GREEN_FONT_COLOR);
                 GameTooltip_AddHighlightLine(tooltip, string.format(WEEKLY_REWARDS_COMPLETE_WORLD, nextLevel));
             else

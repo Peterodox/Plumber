@@ -296,7 +296,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
 
         if self.info.type == Enum.WeeklyRewardChestThresholdType.World then
             tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
-            API.DisplayDelvesGreatVaultTooltip(self, tooltip, self.info.activityTierID, self.info.level, self.info.id);
+            API.DisplayDelvesGreatVaultTooltip(self, tooltip, self.col, self.info.level, self.info.id, self.progressDelta);
             if API.AddRecentDelvesRecordsToTooltip(tooltip, self.info.threshold) then
                 tooltip:Show();
             end
@@ -316,6 +316,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
             local button = CreateButton(ButtonContainer);
             buttons[n] = button;
             button.id = n;
+            button.col = col;
             button:SetPoint("TOPLEFT", f, "TOPLEFT", offsetX, -offsetY);
             offsetX = offsetX + BUTTON_WIDTH + GAP_H;
             if BlizzardMixin then

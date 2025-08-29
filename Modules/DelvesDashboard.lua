@@ -54,7 +54,7 @@ do
     function GreatVaultItemButtonMixin:ShowPreviewItemTooltip()
         local tooltip = GameTooltip;
         tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
-        API.DisplayDelvesGreatVaultTooltip(self, tooltip, self.activityTierID, self.level, self.id)
+        API.DisplayDelvesGreatVaultTooltip(self, tooltip, self.index, self.level, self.id, self.progressDelta)
     end
 
     function GreatVaultItemButtonMixin:ShowIncompleteTooltip()
@@ -91,13 +91,7 @@ do
 
     function GreatVaultItemButtonMixin:OnEnter()
         GreatVaultFrame:HighlightButton(self);
-
-        if self.unlocked then
-            self:ShowPreviewItemTooltip();
-        else
-            self:ShowIncompleteTooltip();
-        end
-
+        self:ShowPreviewItemTooltip();
         API.AddRecentDelvesRecordsToTooltip(GameTooltip, self.threshold);
         --self:AppendOpenGVInstruction(GameTooltip);
         GameTooltip:Show();
@@ -414,6 +408,7 @@ do
         for i = 1, numButtons do
             button = CreateGreatVaultItemButton(ButtonContainer);
             self.Items[i] = button;
+            button.index = i;
             button:SetSize(buttonWidth, buttonHeight);
             button:SetPoint("TOP", self, "TOP", 0, fromOffsetY + (buttonHeight + gap) * (1 - i));
         end

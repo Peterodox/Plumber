@@ -8,6 +8,8 @@ local Round = API.Round;
 
 local UIParent = UIParent;
 local UnitName = UnitName;
+local UnitIsPlayer = UnitIsPlayer;
+local StripHyperlinks = StripHyperlinks;
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
 local GetCVarBool = C_CVar.GetCVarBool;
 local GetWorldCursor = C_TooltipInfo.GetWorldCursor;
@@ -165,10 +167,13 @@ do  --EL
         local unit = "softinteract";
         local nameplate = GetNamePlateForUnit(unit);
 
-        if nameplate then
+        if nameplate and not UnitIsPlayer(unit) then
             local f = nameplate.UnitFrame.SoftTargetFrame;
             if f:IsShown() then
                 local objectName = UnitName(unit);
+                if objectName then
+                    objectName = StripHyperlinks(objectName);
+                end
                 Display:ClearAllPoints();
                 Display:SetParent(nameplate);
                 Display:SetPoint("TOP", f.Icon, "BOTTOM", 0, -6);

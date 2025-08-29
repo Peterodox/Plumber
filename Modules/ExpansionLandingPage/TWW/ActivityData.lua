@@ -1,6 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local GetDBBool = addon.GetDBBool;
 
 
 local ActivityUtil = {};
@@ -34,7 +35,7 @@ local function ShownIfOnQuest(questID)
 end
 
 local function IsCategoryCollapsed(categoryID)
-    return addon.GetDBBool("LandingPage_Activity_Collapsed_"..categoryID)
+    return GetDBBool("LandingPage_Activity_Collapsed_"..categoryID)
 end
 
 local function SetCategoryCollapsed(categoryID, isCollapsed)
@@ -46,6 +47,8 @@ local SortedActivity;
 local MapQuestData;     --Show quests available on certain maps. The quest markers need to be visible on the world map
 
 local DELVES_REP_TOOLTIP = L["Bountiful Delves Rep Tooltip"];
+
+local DynamicQuestDataProvider = {};
 
 
 local ConditionFuncs = {};
@@ -89,6 +92,27 @@ end
 
 local TooltipFuncs = {};
 do
+    local function ShouldShowAdvancedTooltip()
+        return GetDBBool("LandingPage_AdvancedTooltip");
+    end
+
+    --Similar to Bullet list
+    local function Tooltip_AddListNewLine(tooltip, text, r, g, b)
+        tooltip:AddLine("|TInterface/AddOns/Plumber/Art/Tooltip/TabChar_Dash:0:0|t"..text, r, g, b);
+    end
+    local function Tooltip_AddListInLine(tooltip, text, r, g, b)
+        tooltip:AddLine("|TInterface/AddOns/Plumber/Art/Tooltip/TabChar_Space:0:0|t"..text, r, g, b);
+    end
+
+    local function Tooltip_AddListQuest(tooltip, questID, questName)
+        if IsQuestFlaggedCompleted(questID) then
+            Tooltip_AddListInLine(tooltip, questName, 0.251, 0.753, 0.251)
+        else
+            Tooltip_AddListInLine(tooltip, questName, 0.5, 0.5, 0.5);
+        end
+    end
+
+
     function TooltipFuncs.DevouredEnergyPod(tooltip)
         --Devoured Energy-Pod (20)  Translocated Gorger
         --Add item count if mount not learnt
@@ -99,34 +123,87 @@ do
         return true
     end
 
-    function TooltipFuncs.WeeklyRestoredCofferKey(tooltip)
+    function TooltipFuncs.WeeklyCofferKey_Shared(tooltip, title, dataKey)
         local loaded = true;
-        tooltip:AddLine(L["Weekly Coffer Key Tooltip"], 1, 1, 1, true);
-        tooltip:AddLine(" ");
-        for _, itemID in ipairs(addon.WeeklyRewardsConstant.MajorChests) do
-            local name = C_Item.GetItemNameByID(itemID);
-            if name then
-                tooltip:AddLine("- "..name, 1, 1, 1, false);
-            else
-                loaded = false;
+        local keepUpdating = false;
+
+        tooltip:AddLine(title, 1, 1, 1, true);
+
+        local tbl = addon.WeeklyRewardsConstant;
+
+        if ShouldShowAdvancedTooltip() then
+            for _, itemID in ipairs(tbl[dataKey]) do
+                local itemName = C_Item.GetItemNameByID(itemID);
+                local sources = tbl.ChestSources[itemID];
+
+                if itemName then
+                    tooltip:AddLine(" ");
+                    Tooltip_AddListNewLine(tooltip, itemName, 1, 0.82, 0);
+                else
+                    loaded = false;
+                end
+
+                if sources then
+                    local quests = sources.quests or (sources.questMap and DynamicQuestDataProvider:GetQuestsByMap(sources.questMap));
+                    if quests then
+                        if sources.questMap then
+                            keepUpdating = true;
+                            for _, questInfo in ipairs(quests) do
+                                local questID = questInfo.questID;
+                                local rewards, missingData = API.GetQuestRewards(questID);
+                                if missingData then
+                                    loaded = false;
+                                end
+                                if rewards then
+                                    if rewards.items then
+                                        for _, v in ipairs(rewards.items) do
+                                            if v.id == itemID then
+                                                local questName = API.GetQuestName(questID);
+                                                if questName then
+                                                    Tooltip_AddListQuest(tooltip, questID, questName);
+                                                else
+                                                    loaded = false;
+                                                end
+                                                break
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        else
+                            for _, questID in ipairs(quests) do
+                                local questName = API.GetQuestName(questID);
+                                if questName then
+                                    Tooltip_AddListQuest(tooltip, questID, questName);
+                                else
+                                    loaded = false;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            tooltip:AddLine(" ");
+            for _, itemID in ipairs(tbl.MajorChests) do
+                local name = C_Item.GetItemNameByID(itemID);
+                if name then
+                    tooltip:AddLine("- "..name, 1, 1, 1, false);
+                else
+                    loaded = false;
+                end
             end
         end
-        return loaded
+
+        return loaded, keepUpdating
+    end
+
+    function TooltipFuncs.WeeklyRestoredCofferKey(tooltip)
+        return TooltipFuncs.WeeklyCofferKey_Shared(tooltip, L["Weekly Coffer Key Tooltip"], "MajorChests");
     end
 
     function TooltipFuncs.WeeklyCofferKeyShard(tooltip)
-        local loaded = true;
-        tooltip:AddLine(L["Weekly Coffer Key Shards Tooltip"], 1, 1, 1, true);
-        tooltip:AddLine(" ");
-        for _, itemID in ipairs(addon.WeeklyRewardsConstant.MinorChests) do
-            local name = C_Item.GetItemNameByID(itemID);
-            if name then
-                tooltip:AddLine("- "..name, 1, 1, 1, false);
-            else
-                loaded = false;
-            end
-        end
-        return loaded
+        return TooltipFuncs.WeeklyCofferKey_Shared(tooltip, L["Weekly Coffer Key Shards Tooltip"], "MinorChests");
     end
 end
 
@@ -293,7 +370,7 @@ do
             return b.completed
         end
 
-        if a.isOnQuest ~= b.isOnQuest then
+        if (a.isOnQuest ~= nil) and (b.isOnQuest ~= nil) and a.isOnQuest ~= b.isOnQuest then
             return b.isOnQuest
         end
 
@@ -364,8 +441,7 @@ local function InitQuestData(info)
 end
 
 
-local DynamicQuestDataProvider = {};
-do  --Dynamic Quests are acquired using Game API, instead of using a pre-determined table
+do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, instead of using a pre-determined table
     local MapMetaQuestLines = {
         [2339] = {  --Dornogal
             5572,   --Worldsoul: Weekly Meata
@@ -510,6 +586,10 @@ do  --Dynamic Quests are acquired using Game API, instead of using a pre-determi
         for uiMapID, categoryID in pairs(DynamicQuestMaps) do
             self:AddQuestsFromMap(uiMapID, categoryID);
         end
+    end
+
+    function DynamicQuestDataProvider:GetQuestsByMap(uiMapID)
+        return self.questsByMap[uiMapID]
     end
 end
 

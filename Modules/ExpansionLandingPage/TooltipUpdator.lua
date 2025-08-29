@@ -176,8 +176,12 @@ function TooltipUpdator:OnUpdate(elapsed)
                 end
 
                 if self.tooltipSetter then
-                    if not self.tooltipSetter(tooltip) then
+                    local loaded, keepUpdating = self.tooltipSetter(tooltip);
+                    if not loaded then
                         isRetrievingData = true;
+                    end
+                    if keepUpdating then
+                        self.keepUpdating = true;
                     end
                 end
 
