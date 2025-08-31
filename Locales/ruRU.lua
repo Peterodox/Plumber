@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.2 b
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.4 b
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -39,6 +39,9 @@ L["Module Category Tooltip"] = "Подсказка";   --Additional Info on Tool
 L["Module Category Class"] = "Класс";   --Player Class (rogue, paladin...)
 --- order: 5
 L["Module Category Reduction"] = "Уменьшение";   --Reduce UI elements
+--- order: -1
+L["Module Category Timerunning"] = "Legion Remix";   --Change this based on timerunning season
+
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
 L["Module Category Plumber"] = "Plumber";   --This addon's name
@@ -85,6 +88,7 @@ L["ModuleDescription GossipFrameMedal Format"] = "Замените значок 
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "Исправлена модель друида";
 L["ModuleDescription DruidModelFix"] = "Исправлена проблема с отображением модели пользовательского интерфейса персонажа, вызванная использованием символа звезд\n\nЭта ошибка будет исправлена Blizzard в версии 10.2.0, и этот модуль будет удален.";
+L["Model Layout"] = "Макет модели";
 
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
@@ -192,6 +196,11 @@ L["Color Applied"] = "Это текущий цвет.";
 L["ModuleName TooltipItemReagents"] = "Реагенты";
 L["ModuleDescription TooltipItemReagents"] = "Если предметы можно использовать для объединения во что-то новое, показать все \"реагенты\" использованые в процессе.\n\nНажмите и удерживайте Shift, чтобы отобразить созданный предмет, если поддерживается.";
 L["Can Create Multiple Item Format"] = "У вас есть ресурсы для создания |cffffffff%d|r предмета.";
+
+
+--Tooltip DelvesItem
+L["ModuleName TooltipDelvesItem"] = "Предметы из Вылазок";
+L["ModuleDescription TooltipDelvesItem"] = "Показать, сколько ключей и осколков вы заработали из еженедельных сундуков.";
 
 
 --Plunderstore
@@ -339,6 +348,30 @@ L["BossBanner Valuable Item Only"] = "Только ценные предметы
 L["BossBanner Valuable Item Only Tooltip"] = "Отображать на баннере только маунтов, классовые токены и предметы, помеченные как очень редкие или чрезвычайно редкие.";
 
 
+--AppearanceTab
+L["ModuleName AppearanceTab"] = "Вкладка Модели";
+L["ModuleDescription AppearanceTab"] = "Измените вкладку Модели в коллекциях отрядов:\n\n- Уменьшите нагрузку на графический процессор, улучшив последовательность загрузки моделей и изменив количество предметов, отображаемых на странице. Это может снизить вероятность графического сбоя при открытии этого интерфейса.\n\n- Запоминает страницу, которую вы посетили после смены слотов.";
+
+
+--SoftTargetName
+L["ModuleName SoftTargetName"] = "Табличка: Мягкая цель";
+L["ModuleDescription SoftTargetName"] = "Отображать имя объекта мягкой цели.";
+L["SoftTargetName Req Title"] = "|cffd4641cВам нужно вручную изменить эти настройки, чтобы это работало:|r";
+L["SoftTargetName Req 1"] = "|cffffd100Включите клавишу взаимодействия|r в параметрах игры > Игровой процесс > Управление.";
+L["SoftTargetName Req 2"] = "Установите CVar |cffffd100SoftTargetIconGameObject|r на |cffffffff1|r";
+
+
+--LegionRemix
+L["ModuleName LegionRemix"] = "Legion Remix";
+L["ModuleDescription LegionRemix"] = "Legion Remix";
+L["Artifact Weapon"] = "Артефактное оружие";
+L["Earn X To Upgrade Y Format"] = "Заработайте еще |cffffffff%s|r %s для улучшения %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Until Next Upgrade Format"] = "%s до следующего улучшения";
+L["New Trait Available"] = "Доступен новый талант.";
+L["Rank Increased"] = "Ранг повышен";
+L["Infinite Knowledge Tooltip"] = "Вы можете получить Бесконечное знание, зарабатывая определенные достижения Legion Remix.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Окно добычи";
 L["ModuleDescription LootUI"] = "Заменить стандартное окно добычи и предоставить некоторые дополнительные функции:\n\n- Быстрый сбор предметов.\n\n- Исправлена ​​ошибка сбоя автоматического сбора добычи.\n\n- Показывать кнопку взять все при ручном сборе.";
@@ -471,6 +504,11 @@ L["Delete"] = DELETE or "Удалить";
 L["Visit Quest Hub To Log Quests"] = "Посетите место взятия заданий и пообщайтесь с теми, кто выдает задания, чтобы взять сегодняшние задания."
 L["Quest Hub Instruction Celestials"] = "Посетите интенданта Небожителей в Вечноцветущем доле, чтобы узнать, какой храм нуждается в вашей помощи."
 L["Unavailable Klaxxi Paragons"] = "Недоступные Идеалы Клакси:";
+L["Weekly Coffer Key Tooltip"] = "Первые четыре еженедельных сундука, которые вы зарабатываете каждую неделю, содержат Отреставрированный ключ от сундука.";
+L["Weekly Coffer Key Shards Tooltip"] = "Первые четыре еженедельных сундука, которые вы зарабатываете каждую неделю, содержат осколки ключа от сундука.";
+L["Weekly Cap"] = "Еженедельный лимит";
+L["Weekly Cap Reached"] = "Достигнут недельный лимит.";
+L["Instruction Right Click To Use"] = "<ПКМ, чтобы использовать>";
 
 
 --Generic
