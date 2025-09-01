@@ -140,6 +140,14 @@ local ButtonMenu = {
 
         --{type = "Button", name = DRAGONFLIGHT_LANDING_PAGE_TITLE, OnClick = function() ELPOverride.OpenExpansionLandingPage(LE_EXPANSION_DRAGONFLIGHT) end},
         --{type = "Button", name = WAR_WITHIN_LANDING_PAGE_TITLE, OnClick = function() ELPOverride.OpenExpansionLandingPage(LE_EXPANSION_WAR_WITHIN) end},
+        {type = "Button", name = "Reshii Wraps",
+            OnClick = function()
+                GenericTraitUI_LoadUI();
+                GenericTraitFrame:SetSystemID(29);
+                GenericTraitFrame:SetTreeID(1115);
+                ToggleFrame(GenericTraitFrame);
+            end
+        },
     },
 };
 
