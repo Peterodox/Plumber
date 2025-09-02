@@ -7,6 +7,8 @@ local WeeklyRewardsConstant = addon.WeeklyRewardsConstant;
 
 local DataProvider = {};
 do
+    DataProvider.DelvesNemesisSummonItem = 248017;  --Shrieking Quartz
+
     function DataProvider:Init()
         self.Init = nil;
 
@@ -63,6 +65,20 @@ do
             end
         end
     end
+
+    function DataProvider:SetNemesisSummonItem(tooltip)
+        local flagQuest = 86371;
+        if C_QuestLog.IsQuestFlaggedCompleted(flagQuest) then
+            local rewardItemID = 233071;    --Delver's Bounty
+            local itemName = C_Item.GetItemNameByID(rewardItemID);
+            if not itemName then
+                itemName = "item:"..rewardItemID;
+            end
+            tooltip:AddLine(" ");
+            tooltip:AddLine(string.format(L["You Have Received Weekly Item Format"], itemName), 0.5, 0.5, 0.5, true);
+            return true
+        end
+    end
 end
 
 
@@ -73,6 +89,8 @@ local function ProcessItemTooltip(tooltip, itemID, itemLink, isDialogueUI)
     elseif DataProvider.Chests2[itemID] then
         DataProvider:SetWeeklyShardTooltip(tooltip, isDialogueUI);
         return true
+    elseif itemID == DataProvider.DelvesNemesisSummonItem then
+        return DataProvider:SetNemesisSummonItem(tooltip);
     end
     return false
 end

@@ -201,6 +201,7 @@ L["Can Create Multiple Item Format"] = "You have the resources to create |cfffff
 --Tooltip DelvesItem
 L["ModuleName TooltipDelvesItem"] = "Delves Items";
 L["ModuleDescription TooltipDelvesItem"] = "Show how many Coffer Keys and Shards you have earned from weekly caches.";
+L["You Have Received Weekly Item Format"] = "You have received %s this week.";
 
 
 --Plunderstore

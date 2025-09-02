@@ -200,6 +200,7 @@ L["Can Create Multiple Item Format"] = "你拥有的材料能够合成|cffffffff
 --Tooltip DelvesItem
 L["ModuleName TooltipDelvesItem"] = "地下堡宝匣钥匙";
 L["ModuleDescription TooltipDelvesItem"] = "在周常宝箱的鼠标提示上显示你本CD已获得的宝匣钥匙及碎片数量。";
+L["You Have Received Weekly Item Format"] = "你本周已获得%s。";
 
 
 --Plunderstore

@@ -241,6 +241,7 @@ local ActivityData = {  --Constant
             {name = "Anima Reclamation Program", questID = 85459, atlas = WEEKLY_QUEST, uiMapID = 2371},
             {name = "Food Run", questID = 85461, atlas = WEEKLY_QUEST, uiMapID = 2371},
             {name = "A Reel Problem", questID = 90545, atlas = WEEKLY_QUEST, uiMapID = 2371},
+            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 91453, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
 
             --{name = "Eliminate Grubber", questID = 90126, atlas = WEEKLY_QUEST, uiMapID = 2371, conditions = Conditions.KareshWarrant},   --one-time?
 

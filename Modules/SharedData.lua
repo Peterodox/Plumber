@@ -47,12 +47,13 @@ do  --Weekly Caches (Meta quest rewards)
         MinorChests = {
             245280,     --Seasoned Khaz Algar Adventurer's Cache
             250763,     --Theater Troupe's Trove
-            250764,     --Nanny's Surge Dividends
             250765,     --Awakened Mechanical Cache
             250766,     --Radiant Cache
             250767,     --The General's War Chest
             250768,     --The Vizier's Capital
             250769,     --The Weaver's Gratuity
+            250764,     --Nanny's Surge Dividends
+            244883,     --Seasoned Undermine Adventurer's Cache
         },
 
         ChestSources = {

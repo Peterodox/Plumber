@@ -8,11 +8,12 @@ local Round = API.Round;
 
 local UIParent = UIParent;
 local UnitName = UnitName;
-local UnitIsPlayer = UnitIsPlayer;
+local UnitIsGameObject = UnitIsGameObject;
 local StripHyperlinks = StripHyperlinks;
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
 local GetCVarBool = C_CVar.GetCVarBool;
-local GetWorldCursor = C_TooltipInfo.GetWorldCursor;
+local GetWorldCursor = C_TooltipInfo and C_TooltipInfo.GetWorldCursor or API.Nop;
+local GetUnitIDGeneral = API.GetUnitIDGeneral;
 
 
 local Display = CreateFrame("Frame");
@@ -20,8 +21,17 @@ local EL = CreateFrame("Frame");
 
 local Colors = {
     Yellow = {r = 1, g = 0.82, b = 0},
-    UnabledColor = {r = 0.6, g= 0.6, b = 0.6},
+    UnabledColor = {r = 0.6, g = 0.6, b = 0.6},
+    Red = {r = 1, g = 0.125, b = 0.125},
+    White = {r = 1, g = 1, b = 1},
 }
+
+
+local IgnoredGameObjects = {
+    [35591] = true,     --Fish Bobber (Other bobbers may have different ids)
+};
+
+local SpecialGameObjects = {};
 
 
 do  --Display
@@ -167,9 +177,16 @@ do  --EL
         local unit = "softinteract";
         local nameplate = GetNamePlateForUnit(unit);
 
-        if nameplate and not UnitIsPlayer(unit) then
+        if nameplate and UnitIsGameObject(unit) then
             local f = nameplate.UnitFrame.SoftTargetFrame;
             if f:IsShown() then
+                local unitID = GetUnitIDGeneral(unit);
+                --print("GameObject:", unitID);
+                if unitID and IgnoredGameObjects[unitID] then
+                    Display:Remove();
+                    return
+                end
+
                 local objectName = UnitName(unit);
                 if objectName then
                     objectName = StripHyperlinks(objectName);
@@ -206,18 +223,26 @@ do  --EL
                 end
                 --]]
 
-                local tooltipInfo = GetWorldCursor();
-                if tooltipInfo and tooltipInfo.lines then
-                    local numLines = #tooltipInfo.lines;
-                    for index, line in ipairs(tooltipInfo.lines) do
-                        if index == 1 then
-                            if not (objectName == line.leftText) then
-                                break
-                            end
-                        else
-                            if index == numLines and line.type == 8 then  --quest criteria
-                                fontHeight = Round(13*uiScale);
-                                Display:SetSubtext(line.leftText, (unabled and Colors.UnabledColor) or line.leftColor, fontHeight);
+                local subtextFontHeight = Round(13*uiScale);
+
+                if unitID and SpecialGameObjects[unitID] then
+                    local subtext, color = SpecialGameObjects[unitID]();
+                    if subtext then
+                        Display:SetSubtext(subtext, color, subtextFontHeight);
+                    end
+                else
+                    local tooltipInfo = GetWorldCursor();
+                    if tooltipInfo and tooltipInfo.lines then
+                        local numLines = #tooltipInfo.lines;
+                        for index, line in ipairs(tooltipInfo.lines) do
+                            if index == 1 then
+                                if not (objectName == line.leftText) then
+                                    break
+                                end
+                            else
+                                if index == numLines and line.type == 8 then  --quest criteria
+                                    Display:SetSubtext(line.leftText, (unabled and Colors.UnabledColor) or line.leftColor, subtextFontHeight);
+                                end
                             end
                         end
                     end
@@ -302,4 +327,20 @@ do  --Module Registery
     };
 
     addon.ControlCenter:AddModule(moduleData);
+end
+
+
+do  --SpecialGameObjects
+    local function SubtextFunc_RestoredCofferKey()
+        local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(3028);
+        if currencyInfo then
+            --local name = currencyInfo.name;
+            local numOwned = currencyInfo.quantity;
+            local icon = currencyInfo.iconFileID;
+            local subtext = string.format("%d / %d |T%s:16:16|t", numOwned, 1, icon);
+            return subtext, (numOwned >= 1 and Colors.White) or Colors.Red
+        end
+    end
+
+    SpecialGameObjects[413590] = SubtextFunc_RestoredCofferKey;
 end

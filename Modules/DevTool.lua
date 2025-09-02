@@ -3,7 +3,7 @@ local M = {
     Prof = false,
     CurrencyWatcher = false,
     POI = false,
-    Quest = false,
+    Quest = true,
     ModelStressTest = false;
     SetAlphaGradient = false,
 };
@@ -254,14 +254,44 @@ end
 
 if IsEnabled("Quest") then
     local EL = CreateFrame("Frame");
+    local CompletedQuests = {};
 
     EL:RegisterEvent("QUEST_ACCEPTED");
     EL:RegisterEvent("QUEST_TURNED_IN");
+    EL:RegisterEvent("QUEST_REMOVED");
+    EL:RegisterEvent("QUEST_WATCH_UPDATE");
+    EL:RegisterEvent("PLAYER_ENTERING_WORLD");
 
     EL:SetScript("OnEvent", function(self, event, ...)
+        if event == "PLAYER_ENTERING_WORLD" then
+            self:UnregisterEvent(event);
+            CompletedQuests = C_QuestLog.GetAllCompletedQuestIDs();
+            return
+        end
         local questID = ...
         print(event, questID, API.GetQuestName(questID));
     end);
+
+    function YeetNewlyCompletedQuests()
+        local wasQuestCompleted = {};
+        for _, questID in ipairs(CompletedQuests) do
+            wasQuestCompleted[questID] = true;
+        end
+        local tbl = C_QuestLog.GetAllCompletedQuestIDs();
+        for _, questID in ipairs(tbl) do
+            if not wasQuestCompleted[questID] then
+                local questName = API.GetQuestName(questID);
+                if questName then
+                    print("(NEW)", questID, questName);
+                else
+                    C_Timer.After(0.5, function()
+                        print("(NEW)", questID, API.GetQuestName(questID));
+                    end);
+                end
+            end
+        end
+        CompletedQuests = tbl;
+    end
 end
 
 if IsEnabled("ModelStressTest") then

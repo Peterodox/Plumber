@@ -133,9 +133,9 @@ local function Post_GetWorldCursor(tooltip, tooltipData)
 
             if numOwned then
                 if numOwned < numRequired then
-                    tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numRequired, numOwned, icon), 1.000, 0.125, 0.125, 1.000, 0.125, 0.125);
+                    tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numOwned, numRequired, icon), 1.000, 0.125, 0.125, 1.000, 0.125, 0.125);
                 else
-                    tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numRequired, numOwned, icon));
+                    tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numOwned, numRequired, icon));
                 end
 
                 tooltip:Show();
