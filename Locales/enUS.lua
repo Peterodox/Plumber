@@ -360,6 +360,10 @@ L["ModuleDescription SoftTargetName"] = "Display the soft target object's name."
 L["SoftTargetName Req Title"] = "|cffd4641cYou need to manually change these settings to make it work:|r";
 L["SoftTargetName Req 1"] = "|cffffd100Enable Interact Key|r in Game Options> Gameplay> Controls.";
 L["SoftTargetName Req 2"] = "Set CVar |cffffd100SoftTargetIconGameObject|r to |cffffffff1|r";
+L["SoftTargetName CastBar"] = "Show Cast Bar";
+L["SoftTargetName CastBar Tooltip"] = "Show a radial cast bar on the nameplate.\n\n|cffff4800The addon will not be able to tell which object is your spell's target.|r"
+L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "Show Quest Objectives";
+L["SoftTargetName ShowNPC"] = "Include NPC";
 
 
 --LegionRemix

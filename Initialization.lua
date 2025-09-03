@@ -135,7 +135,10 @@ local DefaultValues = {
     EditModeShowPlumberUI = true,
     LandingPageSwitch = true,           --Right click on ExpansionLandingPageMinimapButton to open a menu to access mission report
     SoftTargetName = false,             --Show object's name on SoftTargetFrame
-
+        SoftTarget_TextOutline = true,
+        SoftTarget_FontSize = 1,
+        SoftTarget_CastBar = true,
+        SoftTarget_Objectives = false,
     AppearanceTab = false,              --Adjust Appearance Tab models to reduce GPU usage spike
         AppearanceTab_ModelCount = 1,
 

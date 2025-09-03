@@ -609,7 +609,7 @@ local OPTIONS_SCHEMATIC = {
     widgets = {
         {type = "Checkbox", label = L["TalkingHead Option InstantText"], onClickFunc = Options_InstantText_OnClick, dbKey = "TalkingHead_InstantText"},
         {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "TalkingHead_TextOutline"},
-        {type = "Slider", label = L["Font Size"], minValue = 100, maxValue = 120, valueStep = 10, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue,  dbKey = "TalkingHead_FontSize"},
+        {type = "Slider", label = L["Font Size"], minValue = 100, maxValue = 120, valueStep = 10, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue, dbKey = "TalkingHead_FontSize"},
 
         {type = "Divider"},
         {type = "Header", label = L["TalkingHead Option Condition Header"]};
