@@ -9,6 +9,10 @@ local UnitName = UnitName;
 local RACE_TIMES = "^Race Times";
 local Timekeepers = {};
 
+local SpecialNPCs = {
+    234643,     --Omtroid, Ecological Succession
+};
+
 local RankIcons = {
     [1] = "Interface\\AddOns\\Plumber\\Art\\GossipIcons\\Medal_Gold",
     [2] = "Interface\\AddOns\\Plumber\\Art\\GossipIcons\\Medal_Silver",
@@ -315,6 +319,11 @@ local function UdpateGossipIcons_Storyline(ranks)
     end)
 end
 
+local function OnCreatureNameReceived(creatureID, creatureName)
+    if creatureName and creatureName ~= "" then
+        Timekeepers[creatureName] = true;
+    end
+end
 
 function EL:EnableModule()
     self:RegisterEvent("GOSSIP_SHOW");
@@ -331,6 +340,8 @@ function EL:EnableModule()
             UpdateGossipIcons = UdpateGossipIcons_Storyline;
         end
     end
+
+    addon.API.LoadCreatureNameWithCallback(SpecialNPCs, OnCreatureNameReceived);
 end
 
 function EL:DisableModule()

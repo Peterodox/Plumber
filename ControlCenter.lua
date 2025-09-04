@@ -783,7 +783,7 @@ ControlCenter:SetScript("OnEvent", function(self, event, ...)
 end);
 
 ControlCenter:SetScript("OnShow", function(self)
-    local hideBackground = true;
+    local hideBackground = SettingsPanel and SettingsPanel:IsShown();
     self:ShowUI(hideBackground);
 end);
 

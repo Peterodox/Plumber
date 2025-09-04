@@ -294,12 +294,20 @@ do  --Process Loot Message
         EL.IsMessageSenderPlayer = EL.IsMessageSenderPlayer_Classic;
     end
 
+    local function Debug_LogLootMessage(text)
+        if not PlumberDevData.LootMessages then
+            PlumberDevData.LootMessages = {};
+        end
+        table.insert(PlumberDevData.CurrencyMessages, text);
+    end
+
     function EL:ProcessMessageItem(text)
         --Do we need to use the whole itemlink?
         local itemID = match(text, "item:(%d+)", 1);
         if itemID then
             itemID = tonumber(itemID);
             if itemID then
+                --Debug_LogLootMessage(text)
                 if self.alwaysListenLootMsg then
                     local link, name = match(text, "(|Hitem:.+|h)%[(.+)%]|h");
                     if link then
@@ -342,6 +350,8 @@ do  --Process Loot Message
         local currencyID = match(text, "currency:(%d+)", 1);
         if currencyID then
             currencyID = tonumber(currencyID);
+            --Debug_LogLootMessage(text)
+            table.insert(PlumberDevData.CurrencyMessages, text);
             if currencyID then
                 if self.alwaysListenLootMsg then
                     local link, name = match(text, "(|Hcurrency:.+|h)%[(.+)%]|h");

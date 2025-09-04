@@ -363,7 +363,10 @@ L["SoftTargetName Req 2"] = "Set CVar |cffffd100SoftTargetIconGameObject|r to |c
 L["SoftTargetName CastBar"] = "Show Cast Bar";
 L["SoftTargetName CastBar Tooltip"] = "Show a radial cast bar on the nameplate.\n\n|cffff4800The addon will not be able to tell which object is your spell's target.|r"
 L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "Show Quest Objectives";
+L["SoftTargetName QuestObjective Tooltip"] = "Show quest objectives (if any) below the name.";
+L["SoftTargetName QuestObjective Alert"] = "This feature requires enabling |cffffffffShow Target Tooltip|r in Game Options> Accessibility> General.";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "Include NPC";
+L["SoftTargetName ShowNPC Tooltip"] = "If disabled, the name will only appear on interactable Game Objects";
 
 
 --LegionRemix

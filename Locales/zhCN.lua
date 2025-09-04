@@ -88,6 +88,7 @@ L["ModuleDescription GossipFrameMedal Format"] = "将默认图标 %s 替换为�
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "德鲁伊模型修复";
 L["ModuleDescription DruidModelFix"] = "修复使用群星雕文导致人物界面模型变白的问题。\n\n暴雪将在10.2.0版本修复这个问题。";
+L["Model Layout"] = "模型布局";
 
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
@@ -359,6 +360,13 @@ L["ModuleDescription SoftTargetName"] = "显示软目标物体的名字。";
 L["SoftTargetName Req Title"] = "|cffd4641c你还需要手动更改以下设置来使此功能生效：|r";
 L["SoftTargetName Req 1"] = "前往游戏选项> 游戏功能> 控制，|cffffd100开启交互按键|r";
 L["SoftTargetName Req 2"] = "将CVar |cffffd100SoftTargetIconGameObject|r 的值设为 |cffffffff1|r";
+L["SoftTargetName CastBar"] = "显示施法条";
+L["SoftTargetName CastBar Tooltip"] = "在姓名版上显示环形施法条。\n\n|cffff4800此插件无法辨别你的软目标是否为当前施法目标。|r"
+L["SoftTargetName QuestObjective"] = "显示任务目标";
+L["SoftTargetName QuestObjective Tooltip"] = "在名字下方显示任务目标（如果存在的话）。";
+L["SoftTargetName QuestObjective Alert"] = "此功能需要你前往游戏选项> 辅助功能> 综合，并勾选|cffffffff动作瞄准提示信息|r。";   --See globals: TARGET_TOOLTIP_OPTION
+L["SoftTargetName ShowNPC"] = "包括NPC";
+L["SoftTargetName ShowNPC Tooltip"] = "若禁用此选项，我们将只显示可互动物体（Game Objects）的名字。";
 
 
 --Loot UI

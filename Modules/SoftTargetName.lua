@@ -9,6 +9,7 @@ local Round = API.Round;
 
 local UIParent = UIParent;
 local UnitName = UnitName;
+local UnitIsPlayer = UnitIsPlayer;
 local UnitIsGameObject = UnitIsGameObject;
 local StripHyperlinks = StripHyperlinks;
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
@@ -28,7 +29,16 @@ local Colors = {
     UnabledColor = {r = 0.6, g = 0.6, b = 0.6},
     Red = {r = 1, g = 0.125, b = 0.125},
     White = {r = 1, g = 1, b = 1},
-}
+};
+
+local Settings = {
+    titleHeight = 15,
+    subtextHeight = 13,
+    showCastBar = true,
+    fontObject = "GameFontNormal",
+    textOutline = false,
+    showObjectives = false,
+};
 
 
 local IgnoredGameObjects = {
@@ -59,35 +69,56 @@ do  --Display
         return bg
     end
 
+    function Display:UpdateFonts()
+        local file, height, flags = _G[Settings.fontObject]:GetFont();
+        if Settings.textOutline then
+            flags = "OUTLINE";
+        else
+            flags = "";
+        end
+
+        local uiScale = UIParent:GetEffectiveScale() or 1;
+
+        if self.Title then
+            height = Round(Settings.titleHeight*uiScale);
+            self.Title:SetFont(file, height, flags);
+            if Settings.textOutline then
+                self.Title:SetShadowOffset(0, 0);
+            else
+                self.Title:SetShadowOffset(1, -1);
+            end
+        end
+
+        if self.Subtext then
+            height = Round(Settings.subtextHeight*uiScale);
+            self.Subtext:SetFont(file, height, flags);
+            if Settings.textOutline then
+                self.Subtext:SetShadowOffset(0, 0);
+            else
+                self.Subtext:SetShadowOffset(1, -1);
+            end
+        end
+    end
+
     function Display:Init()
         self.Init = nil;
 
-        if not self.DisplayedName then
-            self.DisplayedName = Display:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            self.DisplayedName:SetPoint("TOP", self, "TOP", 0, 0);
-            local file, height, flags = GameFontNormal:GetFont();
-            self.DisplayedName:SetFont(file, height, "OUTLINE");
-            self.DisplayedName:SetShadowOffset(0, 0);
+        if not self.Title then
+            self.Title = Display:CreateFontString(nil, "OVERLAY", Settings.fontObject);
+            self.Title:SetPoint("TOP", self, "TOP", 0, 0);
+            local file, height, flags = _G[Settings.fontObject]:GetFont();
+            self.Title:SetFont(file, height, "OUTLINE");
+            self.Title:SetShadowOffset(0, 0);
         end
 
         if not self.Background then
-            self.Background = CreateTextBackground(self.DisplayedName, 30);
+            self.Background = CreateTextBackground(self.Title, 30);
         end
 
-        if not self.subtextPool then
-            local function Subtext_Create()
-                local fs = Display:CreateFontString(nil, "OVERLAY", "SystemFont_Tiny");
-                fs:SetShadowOffset(1, -1);
-                fs:SetShadowColor(0, 0, 0);
-                fs.Background = CreateTextBackground(fs, 28, 12);
-                return fs
-            end
-
-            local function Subtext_OnRemove(fs)
-                fs.Background:Hide();
-            end
-
-            self.subtextPool = API.CreateObjectPool(Subtext_Create, Subtext_OnRemove);
+        if not self.Subtext then
+            self.Subtext = Display:CreateFontString(nil, "OVERLAY", Settings.fontObject);
+            self.Subtext:SetPoint("TOP", self.Title, "BOTTOM", 0, -2);
+            self.Subtext.Background = CreateTextBackground(self.Subtext, 28, 12);
         end
 
         local iconOffsetY = 16;
@@ -120,27 +151,37 @@ do  --Display
         self:SetScript("OnEvent", self.OnEvent);
 
         self:Remove();
+        self:UpdateFonts();
+    end
+
+    function Display:ListenSpellCastEvents(state)
+        if state then
+            self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
+            self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
+            self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+            self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
+            self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
+        else
+            self:UnregisterEvent("UNIT_SPELLCAST_START");
+            self:UnregisterEvent("UNIT_SPELLCAST_STOP");
+            self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
+            self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
+            self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
+        end
     end
 
     function Display:OnShow()
-        self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
-        self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
-        self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
-        self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
-        self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
+        if Settings.showCastBar then
+            self:ListenSpellCastEvents(true);
+        end
     end
 
     function Display:OnHide()
         self:Remove();
-        self:UnregisterEvent("UNIT_SPELLCAST_START");
-        self:UnregisterEvent("UNIT_SPELLCAST_STOP");
-        self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-        self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
-        self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
+        self:ListenSpellCastEvents(false);
     end
 
     function Display:OnEvent(event, ...)
-        print(event)
         if event == "UNIT_SPELLCAST_SUCCEEDED" then
             local unitTarget, castGUID, spellID = ...
             self.succeededSpellID = spellID;
@@ -166,6 +207,34 @@ do  --Display
             self:SetScript("OnUpdate", nil);
         end
         self:SetAlpha(self.alpha);
+    end
+
+    function Display:EditModeShowCastingIndicator(state)
+        local f = self.CastingIndicator;
+        if not f then return end;
+
+        if state then
+            if self:IsVisible() then
+                local seconds = 1.5;
+                f:SetCooldown(GetTime(), seconds);
+                f:SetEdgeScale(self:GetEffectiveScale());
+                f:SetDrawEdge(true);
+                f:Resume();
+                f.alpha = 0;
+                f:SetAlpha(0);
+                f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+                f:SetScript("OnCooldownDone", function()
+                    self.InteractIcon:Show();
+                end);
+                f.SuccessGlow:Hide();
+                self.InteractIcon:Hide();
+            end
+        else
+            f:SetScript("OnUpdate", nil);
+            f:Hide();
+            f.SuccessGlow:Hide();
+            self.InteractIcon:Show();
+        end
     end
 
     function Display:UpdateCastingIndicator()
@@ -227,22 +296,20 @@ do  --Display
     end
 
     function Display:SetTitle(text, color, fontHeight)
-        self.DisplayedName:SetText(text);
-        self.DisplayedName:SetTextColor(color.r, color.g, color.b);
+        self.Title:SetText(text);
+        self.Title:SetTextColor(color.r, color.g, color.b);
 
         if fontHeight then
-            self.DisplayedName:SetFontHeight(fontHeight);
+            self.Title:SetFontHeight(fontHeight);
         end
     end
 
     function Display:SetSubtext(text, color, fontHeight)
-        self.subtextPool:Release();
-        local fs = self.subtextPool:Acquire();
+        local fs = self.Subtext;
         fs:SetText(text);
         fs:SetTextColor(1, 1, 1);
+        fs:Show();
         fs.Background:Show();
-        fs:ClearAllPoints();
-        fs:SetPoint("TOP", self.DisplayedName, "BOTTOM", 0, -2);
 
         if fontHeight then
             fs:SetFontHeight(fontHeight);
@@ -261,15 +328,43 @@ do  --Display
         self:Hide();
         self.alpha = 0;
         self:SetAlpha(0);
-        self:ClearAllPoints();
-        if self.subtextPool then
-            self.subtextPool:Release();
+        if self.Subtext then
+            self.Subtext:Hide();
+            self.Subtext.Background:Hide();
         end
     end
 
     function Display:ShowFrame()
         self:SetScript("OnUpdate", self.OnUpdate);
         self:Show();
+    end
+
+    function Display:LoadSettings()
+        local GetDBValue = addon.GetDBValue;
+
+        local fontSizeIndex = GetDBValue("SoftTarget_FontSize");
+        if not (fontSizeIndex and Settings.FonSize[fontSizeIndex]) then
+            fontSizeIndex = 2;
+        end
+        Settings.titleHeight, Settings.subtextHeight = unpack(Settings.FonSize[fontSizeIndex]);
+
+        Settings.showCastBar = addon.GetDBBool("SoftTarget_CastBar");
+        Settings.showObjectives = addon.GetDBBool("SoftTarget_Objectives");
+        Settings.textOutline = addon.GetDBBool("SoftTarget_TextOutline");
+
+        if self.Init then return end;
+
+        if self:IsVisible() then
+            EL:ProcessSoftInteractNameplate();
+
+            if Settings.showCastBar then
+                self:ListenSpellCastEvents(true);
+                self:UpdateCastingIndicator();
+            else
+                self:ListenSpellCastEvents(false);
+                self.CastingIndicator:Hide();
+            end
+        end
     end
 end
 
@@ -291,6 +386,7 @@ do  --EL
 
     function EL:ProcessSoftInteractNameplate()
         if Display.Init then
+            Display:LoadSettings();
             Display:Init();
         end
 
@@ -308,7 +404,7 @@ do  --EL
         local unit = "softinteract";
         local nameplate = GetNamePlateForUnit(unit);
 
-        if nameplate and UnitIsGameObject(unit) then
+        if nameplate and (UnitIsGameObject(unit) or (Settings.includeNPC and not UnitIsPlayer(unit))) then
             local f = nameplate.UnitFrame.SoftTargetFrame;
             if f:IsShown() then
                 local unitID = GetUnitIDGeneral(unit);
@@ -325,11 +421,12 @@ do  --EL
                 Display:ClearAllPoints();
                 Display:SetParent(nameplate);
                 Display:SetPoint("TOP", f.Icon, "BOTTOM", 0, -6);
-                Display.subtextPool:Release();
+                Display.Subtext:Hide();
+                Display.Subtext.Background:Hide();
                 Display:ShowFrame();
 
                 local uiScale = UIParent:GetEffectiveScale() or 1;
-                local fontHeight = Round(15*uiScale);
+                local fontHeight = Round(Settings.titleHeight*uiScale);
 
                 SetUnitCursorTexture(Display.InteractIcon, unit);
                 local textureFile = Display.InteractIcon:GetAtlas();
@@ -360,14 +457,14 @@ do  --EL
                 end
                 --]]
 
-                local subtextFontHeight = Round(13*uiScale);
+                local subtextFontHeight = Round(Settings.subtextHeight*uiScale);
 
                 if unitID and SpecialGameObjects[unitID] then
                     local subtext, color = SpecialGameObjects[unitID]();
                     if subtext then
                         Display:SetSubtext(subtext, color, subtextFontHeight);
                     end
-                else
+                elseif Settings.showObjectives then
                     local tooltipInfo = GetWorldCursor();
                     if tooltipInfo and tooltipInfo.lines then
                         local numLines = #tooltipInfo.lines;
@@ -385,7 +482,9 @@ do  --EL
                     end
                 end
 
-                Display:UpdateCastingIndicator();
+                if Settings.showCastBar then
+                    Display:UpdateCastingIndicator();
+                end
             else
                 Display:Hide();
             end
@@ -415,30 +514,50 @@ end
 
 
 local OptionToggle_OnClick;
-do  --Options
-    local function Options_TextOutline_OnClick(self, state)
+do  --Options, Settings
+    Settings.FonSize = {
+        --{titleHeight, subtextHeight}
+        {14, 12},
+        {15, 13},
+        {16, 14},
+        {18, 16},
+        {20, 18},
+    };
 
+    local function Options_TextOutline_OnClick(self, state)
+        Display:LoadSettings();
+        Display:UpdateFonts();
     end
 
     local function Options_FontSizeSlider_OnValueChanged(value)
-        print(value)
+        addon.SetDBValue("SoftTarget_FontSize", value);
+        Display:LoadSettings();
     end
 
     local function Options_FontSizeSlider_FormatValue(value)
-        value = API.Round(value);
+        value = Round(value);
         return value
     end
 
-    local function Options_CastBar_OnClick(self, state)
-        
+    local function Options_ShowCastBar_OnClick(self, state)
+        Display:LoadSettings();
+        Display:EditModeShowCastingIndicator(state);
     end
 
-    local function Options_Objectives_OnClick(self, state)
+    local function Options_ShowObjectives_OnClick(self, state)
+        Display:LoadSettings();
+    end
 
+    local function Options_ShowObjectives_Tooltip()
+        if C_CVar.GetCVarBool("SoftTargetTooltipInteract") then
+            return L["SoftTargetName QuestObjective Tooltip"]
+        else
+            return L["SoftTargetName QuestObjective Tooltip"].."\n\n"..L["SoftTargetName QuestObjective Alert"]
+        end
     end
 
     local function Options_ShowNPC_OnClick(self, state)
-
+        Display:LoadSettings();
     end
 
     local OPTIONS_SCHEMATIC = {
@@ -448,8 +567,8 @@ do  --Options
             {type = "Slider", label = L["Font Size"], minValue = 1, maxValue = 4, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
 
             {type = "Divider"},
-            {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_CastBar_OnClick, dbKey = "SoftTarget_CastBar"},
-            {type = "Checkbox", label = L["SoftTargetName QuestObjective"], tooltip = L["SoftTargetName QuestObjective Tooltip"], onClickFunc = Options_Objectives_OnClick, dbKey = "SoftTarget_Objectives"},
+            {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"},
+            {type = "Checkbox", label = L["SoftTargetName QuestObjective"], tooltip = Options_ShowObjectives_Tooltip, onClickFunc = Options_ShowObjectives_OnClick, dbKey = "SoftTarget_Objectives"},
 
             {type = "Divider"},
             --{type = "Header", label = L["SoftTargetName Option Condition Header"]};
