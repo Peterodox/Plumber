@@ -351,7 +351,6 @@ do  --Process Loot Message
         if currencyID then
             currencyID = tonumber(currencyID);
             --Debug_LogLootMessage(text)
-            table.insert(PlumberDevData.CurrencyMessages, text);
             if currencyID then
                 if self.alwaysListenLootMsg then
                     local link, name = match(text, "(|Hcurrency:.+|h)%[(.+)%]|h");
