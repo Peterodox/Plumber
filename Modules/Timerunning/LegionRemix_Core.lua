@@ -1376,7 +1376,7 @@ do	--Module Registry
 	local function EnableModule(state)
 		if state and not MASTER_ENABLED then
 			DataProvider:UpdateConfigInfo();
-			UIParent:UnregisterEvent("REMIX_ARTIFACT_UPDATE");
+			--UIParent:UnregisterEvent("REMIX_ARTIFACT_UPDATE");
 		elseif not state and MASTER_ENABLED then
 			UIParent:RegisterEvent("REMIX_ARTIFACT_UPDATE");
 		else

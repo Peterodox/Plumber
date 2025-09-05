@@ -22,15 +22,18 @@ local function InitArtifactUI()
 
     --Artifact Abilities
     local buttonSize = 40;
+    local gap = 8;
+
     for index, spellID in ipairs(DataProvider:GetArtifactAbilities()) do
         local button = CreateFrame("Button", nil, f, "TalentButtonCircleTemplate");
         button.Icon:SetTexture(C_Spell.GetSpellTexture(spellID));
-        button:SetPoint("TOP", f, "TOP", 0, (1 - index) * buttonSize);
+        button:SetPoint("TOP", f, "TOP", 0, (1 - index) * (buttonSize + gap));
         button.artifactTrackIndex = index;
         button:SetVisualState(TalentButtonUtil.BaseVisualState.Normal);
     end
 
-    f:SetSize(40 * 5);
+    local height = 5 * (buttonSize + gap) - gap;
+    f:SetSize(40, height);
 end
 
 local function ShowArtifactUI()

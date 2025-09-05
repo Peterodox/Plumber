@@ -67,7 +67,7 @@ Modules\NameplateResources.lua
 Modules\StaticPopupEnhancement.xml
 Modules\PlayerTitleUI.lua
 Modules\BlizzardSuperTrack.lua
-Modules\EquipmentFlyout.xml
+#Modules\EquipmentFlyout.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
 Modules\ExpansionLandingPage\ExpansionLandingPage_TWW.xml

@@ -52,12 +52,13 @@ do  --Display
     Display:Hide();
     Display:SetSize(16, 16);
     Display:SetIgnoreParentScale(true);
+    Display.TooltipWatcher = CreateFrame("Frame", nil, Display);
 
 
-    local function CreateTextBackground(fontString, height, extensionX)
+    local function CreateTextBackground(parent, fontString, height, extensionX)
         height = height or 32;
         extensionX = extensionX or 16;
-        local bg = Display:CreateTexture(nil, "BACKGROUND");
+        local bg = parent:CreateTexture(nil, "BACKGROUND");
         bg:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateTextShadow");
         bg:SetTextureSliceMargins(40, 24, 40, 24);
         bg:SetTextureSliceMode(0);
@@ -112,13 +113,20 @@ do  --Display
         end
 
         if not self.Background then
-            self.Background = CreateTextBackground(self.Title, 30);
+            self.Background = CreateTextBackground(self, self.Title, 30);
+        end
+
+        if not self.SubtextContainer then
+            self.SubtextContainer = CreateFrame("Frame", nil, self);
+            self.SubtextContainer:SetSize(16, 16);
+            self.SubtextContainer:SetPoint("CENTER", self, "CENTER", 0, 0);
+            self.SubtextContainer.alpha = 0;
         end
 
         if not self.Subtext then
-            self.Subtext = Display:CreateFontString(nil, "OVERLAY", Settings.fontObject);
+            self.Subtext = self.SubtextContainer:CreateFontString(nil, "OVERLAY", Settings.fontObject);
             self.Subtext:SetPoint("TOP", self.Title, "BOTTOM", 0, -2);
-            self.Subtext.Background = CreateTextBackground(self.Subtext, 28, 12);
+            self.Subtext.Background = CreateTextBackground(self.SubtextContainer, self.Subtext, 28, 12);
         end
 
         local iconOffsetY = 16;
@@ -127,6 +135,7 @@ do  --Display
             self.InteractIcon = self:CreateTexture(nil, "ARTWORK");
             self.InteractIcon:SetSize(18, 18);
             self.InteractIcon:SetPoint("CENTER", self, "TOP", 0, iconOffsetY);
+            self.InteractIcon:Hide();
         end
 
         if not self.CastingIndicator then
@@ -209,6 +218,13 @@ do  --Display
         self:SetAlpha(self.alpha);
     end
 
+    function Display:ShowBlizzardInteractIcon(state)
+        local nameplate = GetNamePlateForUnit("softinteract");
+        if nameplate then
+            nameplate.UnitFrame.SoftTargetFrame.Icon:SetShown(state)
+        end
+    end
+
     function Display:EditModeShowCastingIndicator(state)
         local f = self.CastingIndicator;
         if not f then return end;
@@ -224,16 +240,16 @@ do  --Display
                 f:SetAlpha(0);
                 f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
                 f:SetScript("OnCooldownDone", function()
-                    self.InteractIcon:Show();
+                    self:ShowBlizzardInteractIcon(true);
                 end);
                 f.SuccessGlow:Hide();
-                self.InteractIcon:Hide();
+                self:ShowBlizzardInteractIcon(false);
             end
         else
             f:SetScript("OnUpdate", nil);
             f:Hide();
             f.SuccessGlow:Hide();
-            self.InteractIcon:Show();
+            self:ShowBlizzardInteractIcon(true);
         end
     end
 
@@ -246,7 +262,7 @@ do  --Display
             _, _, _, startTime, endTime = UnitChannelInfo("player");
         end
         if startTime and endTime and (endTime - startTime) > 0.1 then
-            self.InteractIcon:Hide();
+            self:ShowBlizzardInteractIcon(false);
             local duration = endTime - startTime;
             local f = self.CastingIndicator;
             f:SetCooldown(startTime / 1000.0, duration / 1000.0);
@@ -258,7 +274,7 @@ do  --Display
             f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
             f.SuccessGlow:Hide();
         else
-            self.InteractIcon:Show();
+            self:ShowBlizzardInteractIcon(true);
             self.CastingIndicator:Hide();
         end
     end
@@ -283,7 +299,7 @@ do  --Display
         f.SuccessGlow:Show();
         f.alpha = 1;
         f:SetScript("OnUpdate", SuccessVisual_OnUpdate);
-        self.InteractIcon:Show();
+        self:ShowBlizzardInteractIcon(true);
     end
 
     function Display:OnUpdate(elapsed)
@@ -296,9 +312,10 @@ do  --Display
     end
 
     function Display:SetTitle(text, color, fontHeight)
+        self.objectName = text;
         self.Title:SetText(text);
         self.Title:SetTextColor(color.r, color.g, color.b);
-
+        self.Title:Show();
         if fontHeight then
             self.Title:SetFontHeight(fontHeight);
         end
@@ -308,8 +325,6 @@ do  --Display
         local fs = self.Subtext;
         fs:SetText(text);
         fs:SetTextColor(1, 1, 1);
-        fs:Show();
-        fs.Background:Show();
 
         if fontHeight then
             fs:SetFontHeight(fontHeight);
@@ -320,6 +335,9 @@ do  --Display
         else
             fs:SetTextColor(1, 1, 1);
         end
+
+        self.SubtextContainer:Show();
+        self.SubtextContainer:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
     end
 
     function Display:Remove()
@@ -328,15 +346,51 @@ do  --Display
         self:Hide();
         self.alpha = 0;
         self:SetAlpha(0);
-        if self.Subtext then
-            self.Subtext:Hide();
-            self.Subtext.Background:Hide();
+        if self.SubtextContainer then
+            self.SubtextContainer.alpha = 0;
+            self.SubtextContainer:SetAlpha(0);
+            self.SubtextContainer:Hide();
         end
     end
 
     function Display:ShowFrame()
         self:SetScript("OnUpdate", self.OnUpdate);
         self:Show();
+    end
+
+    local function TooltipWatcher_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= 0.25 then
+            self.t = 0;
+            Display:UpdateTooltip();
+        end
+    end
+
+    function Display:WatchTooltip(state)
+        if state then
+            self.TooltipWatcher.t = 0.25;
+            self.TooltipWatcher:SetScript("OnUpdate", TooltipWatcher_OnUpdate);
+        else
+            self.TooltipWatcher:SetScript("OnUpdate", nil);
+        end
+    end
+
+    function Display:UpdateTooltip()
+        local tooltipInfo = GetWorldCursor();
+        if tooltipInfo and tooltipInfo.lines then
+            local numLines = #tooltipInfo.lines;
+            for index, line in ipairs(tooltipInfo.lines) do
+                if index == 1 then
+                    if not (self.objectName and self.objectName == line.leftText) then
+                        break
+                    end
+                else
+                    if index == numLines and line.type == 8 then  --quest criteria
+                        Display:SetSubtext(line.leftText, (self.unabled and Colors.UnabledColor) or line.leftColor, self.subtextFontHeight);
+                    end
+                end
+            end
+        end
     end
 
     function Display:LoadSettings()
@@ -348,9 +402,11 @@ do  --Display
         end
         Settings.titleHeight, Settings.subtextHeight = unpack(Settings.FonSize[fontSizeIndex]);
 
-        Settings.showCastBar = addon.GetDBBool("SoftTarget_CastBar");
-        Settings.showObjectives = addon.GetDBBool("SoftTarget_Objectives");
-        Settings.textOutline = addon.GetDBBool("SoftTarget_TextOutline");
+        local GetDBBool = addon.GetDBBool;
+        Settings.showCastBar = GetDBBool("SoftTarget_CastBar");
+        Settings.showObjectives = GetDBBool("SoftTarget_Objectives");
+        Settings.textOutline = GetDBBool("SoftTarget_TextOutline");
+        Settings.includeNPC = GetDBBool("SoftTarget_ShowNPC");
 
         if self.Init then return end;
 
@@ -421,8 +477,7 @@ do  --EL
                 Display:ClearAllPoints();
                 Display:SetParent(nameplate);
                 Display:SetPoint("TOP", f.Icon, "BOTTOM", 0, -6);
-                Display.Subtext:Hide();
-                Display.Subtext.Background:Hide();
+                Display.SubtextContainer:Hide();
                 Display:ShowFrame();
 
                 local uiScale = UIParent:GetEffectiveScale() or 1;
@@ -430,11 +485,9 @@ do  --EL
 
                 SetUnitCursorTexture(Display.InteractIcon, unit);
                 local textureFile = Display.InteractIcon:GetAtlas();
-                if f.Icon then
-                    f.Icon:SetAlpha(0);
-                end
+
                 --Icon size is determined by SoftTargetFrame
-                --f:SetSize(18, 18);  --default 24, 24
+                f:SetSize(16, 16);  --default 24, 24
                 --local textureFile = f.Icon:GetAtlas();
 
                 if not textureFile then
@@ -443,6 +496,7 @@ do  --EL
 
                 --To determine if the interaction is in range:
                 local unabled = (not textureFile) or string.find(string.lower(textureFile), "unable");
+                Display.unabled = unabled;
                 if unabled then
                     Display:SetTitle(objectName, Colors.UnabledColor, fontHeight);
                 else
@@ -450,6 +504,12 @@ do  --EL
                 end
                 self.softTargetUnit = unit;
 
+                if nameplate.UnitFrame.name:IsShown() then
+                    Display.Title:Hide();
+                    Display.Background:Hide();
+                else
+                    Display.Background:Show();
+                end
                 --[[
                 local guid = UnitGUID(unit);
                 if guid then
@@ -458,6 +518,7 @@ do  --EL
                 --]]
 
                 local subtextFontHeight = Round(Settings.subtextHeight*uiScale);
+                Display.subtextFontHeight = subtextFontHeight;
 
                 if unitID and SpecialGameObjects[unitID] then
                     local subtext, color = SpecialGameObjects[unitID]();
@@ -465,21 +526,10 @@ do  --EL
                         Display:SetSubtext(subtext, color, subtextFontHeight);
                     end
                 elseif Settings.showObjectives then
-                    local tooltipInfo = GetWorldCursor();
-                    if tooltipInfo and tooltipInfo.lines then
-                        local numLines = #tooltipInfo.lines;
-                        for index, line in ipairs(tooltipInfo.lines) do
-                            if index == 1 then
-                                if not (objectName == line.leftText) then
-                                    break
-                                end
-                            else
-                                if index == numLines and line.type == 8 then  --quest criteria
-                                    Display:SetSubtext(line.leftText, (unabled and Colors.UnabledColor) or line.leftColor, subtextFontHeight);
-                                end
-                            end
-                        end
-                    end
+                    Display:UpdateTooltip();
+                    Display:WatchTooltip(true);
+                else
+                    Display:WatchTooltip(false);
                 end
 
                 if Settings.showCastBar then
@@ -549,7 +599,7 @@ do  --Options, Settings
     end
 
     local function Options_ShowObjectives_Tooltip()
-        if C_CVar.GetCVarBool("SoftTargetTooltipInteract") then
+        if GetCVarBool("SoftTargetTooltipInteract") then
             return L["SoftTargetName QuestObjective Tooltip"]
         else
             return L["SoftTargetName QuestObjective Tooltip"].."\n\n"..L["SoftTargetName QuestObjective Alert"]
