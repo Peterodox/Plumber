@@ -482,12 +482,13 @@ do  --EL
 
                 local uiScale = UIParent:GetEffectiveScale() or 1;
                 local fontHeight = Round(Settings.titleHeight*uiScale);
+                local iconSize = fontHeight*2;
 
                 SetUnitCursorTexture(Display.InteractIcon, unit);
                 local textureFile = Display.InteractIcon:GetAtlas();
 
                 --Icon size is determined by SoftTargetFrame
-                f:SetSize(16, 16);  --default 24, 24
+                f:SetSize(iconSize, iconSize);  --default 24, 24
                 --local textureFile = f.Icon:GetAtlas();
 
                 if not textureFile then
