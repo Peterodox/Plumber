@@ -141,6 +141,7 @@ local DefaultValues = {
         SoftTarget_Objectives = false,
     AppearanceTab = false,              --Adjust Appearance Tab models to reduce GPU usage spike
         AppearanceTab_ModelCount = 1,
+    ItemUpgradeUI = true,
 
 
     --Tooltip

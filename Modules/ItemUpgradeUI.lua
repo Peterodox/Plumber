@@ -376,7 +376,7 @@ do	--Item Upgrade Frame
 	local INTERACTION_TYPE = Enum.PlayerInteractionType.ItemUpgrade;
 
 	function MainFrame:OnShow()
-		if not InCombatLockdown() then
+		if (ItemUpgradeModule.enabled) and (not InCombatLockdown()) then
 			C_Timer.After(0, function()	--Crucial for PaperDollFrame layout
 				ToggleCharacter("PaperDollFrame", true);	--Show PaperDollFrame when opening ItemUpgradeFrame
 			end)
@@ -486,8 +486,6 @@ do	--Item Upgrade Frame
 			MainFrame:SetScript("OnEvent", nil);
 		end
 	end
-
-	ItemUpgradeModule.Enable(true);
 end
 
 
@@ -542,4 +540,23 @@ do	--ItemButton
 		self.TierIcon:SetSize(64 * scale, 64 * scale);
 		self.TierIcon:SetPoint("CENTER", self, "CENTER", -4*scale, 4*scale);
 	end
+end
+
+
+do	--Module Registry
+    local function EnableModule(state)
+        ItemUpgradeModule.Enable(state);
+    end
+
+    local moduleData = {
+        name = addon.L["ModuleName ItemUpgradeUI"],
+        dbKey = "ItemUpgradeUI",
+        description = addon.L["ModuleDescription ItemUpgradeUI"],
+        toggleFunc = EnableModule,
+        categoryID = 2,
+        uiOrder = 20,
+        moduleAddedTime = 1728990000,
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
 end

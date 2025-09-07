@@ -28,7 +28,7 @@ Modules\ScenarioTracker.lua
 #Modules\DirectionArrow.lua
 #Modules\SuperTrack.xml
 
-#Modules\DevTool.lua
+Modules\DevTool.lua
 
 ControlCenter.lua
 
@@ -67,7 +67,7 @@ Modules\NameplateResources.lua
 Modules\StaticPopupEnhancement.xml
 Modules\PlayerTitleUI.lua
 Modules\BlizzardSuperTrack.lua
-#Modules\EquipmentFlyout.xml
+Modules\ItemUpgradeUI.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
 Modules\ExpansionLandingPage\ExpansionLandingPage_TWW.xml
