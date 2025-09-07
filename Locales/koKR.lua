@@ -23,9 +23,10 @@ L["Map Pin Change Size Method"] = "\n\n*세계 지도 > 지도 필터 > Plumber�
 L["Toggle Plumber UI"] = "Plumber UI 전환";
 L["Toggle Plumber UI Tooltip"] = "편집 모드에서 다음 Plumber UI를 표시합니다:\n%s\n\n이 체크박스는 편집 모드에서의 UI 표시 여부만 제어합니다.\n이 모듈들을 활성화하거나 비활성화하지는 않습니다.";
 
+
 --Module Categories
 --- order: 0
-L["Module Category Unknown"] = "Unknown"    --Don't need to translate
+L["Module Category Unknown"] = "Unknown";    --Don't need to translate
 --- order: 1
 L["Module Category General"] = "일반";
 --- order: 2
@@ -34,8 +35,11 @@ L["Module Category NPC Interaction"] = "NPC 상호 작용";
 L["Module Category Tooltip"] = "도움말";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "클래스";   --Player Class (rogue, paladin...)
+--- order: 5
+L["Module Category Reduction"] = "UI 단순화";
+--- order: -1
+L["Module Category Timerunning"] = "군단 리믹스";
 
-L["Module Category Reduction"] = "단순화";   --Reduce UI elements
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
 L["Module Category Plumber"] = "Plumber";   --This addon's name
@@ -170,6 +174,11 @@ L["Color Applied"] = "현재 적용된 색상입니다.";
 L["ModuleName TooltipItemReagents"] = "재료";
 L["ModuleDescription TooltipItemReagents"] = "아이템이 다른 것으로 조합될 수 있다면, 관련된 모든 조합 정보를 표시 \"재료\" 조합/제작에 사용.\n\nShift 키를 길게 누르면 제작 결과 아이템이 표시.";
 L["Can Create Multiple Item Format"] = "|cffffffff%d|r개의 항목을 생성할 수 있는 재료가 있습니다..";
+--Tooltip DelvesItem
+L["ModuleName TooltipDelvesItem"] = "구렁 아이템";
+L["ModuleDescription TooltipDelvesItem"] = "주간 보상 상자에서 획득한 보관함 열쇠와 파편 수량을 표시합니다.";
+L["You Have Received Weekly Item Format"] = "이번 주에 %s을(를) 획득했습니다.";
+
 
 --Plunderstore
 L["ModuleName Plunderstore"] = "약탈 상점";
@@ -197,10 +206,6 @@ L["ModuleName LandingPageSwitch"] = "미니맵 임무 보고서";
 L["ModuleDescription LandingPageSwitch"] = "미니맵의 명성 요약 버튼을 우클릭하여 주둔지 및 직업 전당 임무 보고서를 확인하세요.";
 L["Mission Complete Count Format"] = "%d 완료 가능";
 L["Open Mission Report Tooltip"] = "우클릭하여 임무 보고서를 열기.";
-
---Tooltip DelvesItem
-L["ModuleName TooltipDelvesItem"] = "구렁 아이템"
-L["ModuleDescription TooltipDelvesItem"] = "주간 보관함에서 획득한 보관함 열쇠와 파편의 개수를 표시합니다."
 
 --WorldMapPin_TWW (Show Pins On Continent Map)
 L["ModuleName WorldMapPin_TWW"] = "지도 핀: "..(EXPANSION_NAME10 or "The War Within");
@@ -291,17 +296,41 @@ L["Available Knowledge Format"] = "Available Knowledge: |cffffffff%s|r";
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "미니맵 대상 표시";
 L["ModuleDescription MinimapMouseover"] = "미니맵에서 생물을 Alt 클릭하면 해당 대상을 타겟으로 설정합니다.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+--BossBanner
+L["ModuleName BossBanner"] = "보스 전리품 배너";
+L["ModuleDescription BossBanner"] = "파티원이 전리품을 획득했을 때 화면 상단에 표시되는 배너를 변경합니다.\n\n- 솔로 플레이 시 숨기기\n\n- 가치 있는 아이템만 표시";
+L["BossBanner Hide When Solo"] = "솔로일 때 숨기기";
+L["BossBanner Hide When Solo Tooltip"] = "파티에 본인만 있을 경우 배너를 표시하지 않습니다.";
+L["BossBanner Valuable Item Only"] = "가치 있는 아이템만 표시";
+L["BossBanner Valuable Item Only Tooltip"] = "탈것, 직업 토큰, 매우 희귀 또는 극히 희귀로 분류된 아이템만 배너에 표시됩니다.";
 
 --AppearanceTab
-L["ModuleName AppearanceTab"] = "형상 탭"
-L["ModuleDescription AppearanceTab"] = " 전쟁부대 수집품의 형상 탭을 수정합니다:\n\n- 모델 로딩 순서를 개선하고 페이지당 표시되는 아이템 수를 조정하여 GPU 부하를 줄입니다. 이를 통해 UI를 열 때 그래픽 충돌 가능성을 낮출 수 있습니다.\n\n- 슬롯을 변경한 후 방문한 페이지를 기억합니다."
+L["ModuleName AppearanceTab"] = "형상 탭";
+L["ModuleDescription AppearanceTab"] = " 전쟁부대 수집품의 형상 탭을 수정합니다:\n\n- 모델 로딩 순서를 개선하고 페이지당 표시되는 아이템 수를 조정하여 GPU 부하를 줄입니다. 이를 통해 UI를 열 때 그래픽 충돌 가능성을 낮출 수 있습니다.\n\n- 슬롯을 변경한 후 방문한 페이지를 기억합니다.";
 
 --SoftTargetName
-L["ModuleName SoftTargetName"] = "이름표: 자동 조준 대상"
-L["ModuleDescription SoftTargetName"] = "자동 조준된 대상의 이름을 표시합니다."
-L["SoftTargetName Req Title"] = "|cffd4641c이 기능을 사용하려면 다음 설정을 수동으로 변경해야 합니다:|r"
-L["SoftTargetName Req 1"] = "게임 설정 > 게임 플레이 > 조작에서 |cffffd100상호작용 키|r를 활성화하세요."
-L["SoftTargetName Req 2"] = "CVar |cffffd100SoftTargetIconGameObject|r 값을 |cffffffff1|r로 설정하세요."
+L["ModuleName SoftTargetName"] = "이름표: 자동 조준 대상";
+L["ModuleDescription SoftTargetName"] = "자동 조준된 대상의 이름을 표시합니다.";
+L["SoftTargetName Req Title"] = "|cffd4641c이 기능을 사용하려면 다음 설정을 수동으로 변경해야 합니다:|r";
+L["SoftTargetName Req 1"] = "게임 설정 > 게임 플레이 > 조작에서 |cffffd100상호작용 키|r를 활성화하세요.";
+L["SoftTargetName Req 2"] = "CVar |cffffd100SoftTargetIconGameObject|r 값을 |cffffffff1|r로 설정하세요.";
+L["SoftTargetName CastBar"] = "시전 바 표시";
+L["SoftTargetName CastBar Tooltip"] = "이름표에 원형 시전 바를 표시합니다.\n\n|cffff4800애드온은 주문의 실제 대상이 어떤 오브젝트인지 알 수 없습니다.|r";
+L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "퀘스트 목표 표시";
+L["SoftTargetName QuestObjective Tooltip"] = "이름 아래에 퀘스트 목표(있는 경우)를 표시합니다.";
+L["SoftTargetName QuestObjective Alert"] = "이 기능을 사용하려면 게임 설옵션 > 게임 플레이 > 조작 설정에서 |cffffffff대상 툴팁 표시|r 옵션을 활성화해야 합니다.";
+L["SoftTargetName ShowNPC"] = "NPC 포함";
+L["SoftTargetName ShowNPC Tooltip"] = "비활성화하면 이름은 상호작용 가능한 게임 오브젝트에만 표시됩니다.";
+--LegionRemix
+L["ModuleName LegionRemix"] = "군단 리믹스";
+L["ModuleDescription LegionRemix"] = "군단 리믹스";
+L["Artifact Weapon"] = "유물 무기";
+L["Earn X To Upgrade Y Format"] = "|cffffffff%s|r %s을(를) 추가로 획득하여 %s을(를) 업그레이드하세요";
+L["Until Next Upgrade Format"] = "다음 업그레이드까지 %s";
+L["New Trait Available"] = "새로운 특성이 사용 가능합니다.";
+L["Rank Increased"] = "등급이 상승했습니다.";
+L["Infinite Knowledge Tooltip"] = "특정 군단 리믹스 업적을 달성하면 무한한 지식을 획득할 수 있습니다.";
+
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
@@ -345,14 +374,6 @@ L["QuickSlot Error 1"] = "퀵 슬롯: 이 컨트롤러는 이미 추가되었습
 L["QuickSlot Error 2"] = "퀵 슬롯: 컨트롤러에 \"%s\"이(가) 없습니다.";
 L["QuickSlot Error 3"] = "퀵 슬롯: 동일한 키 \"%s\"을(를) 가진 컨트롤러가 이미 존재합니다.";
 
---BossBanner
-L["ModuleName BossBanner"] = "보스 전리품 배너";
-L["ModuleDescription BossBanner"] = "파티원이 전리품을 획득했을 때 화면 상단에 표시되는 배너를 변경합니다.\n\n- 솔로 플레이 시 숨기기\n\n- 가치 있는 아이템만 표시";
-L["BossBanner Hide When Solo"] = "솔로일 때 숨기기";
-L["BossBanner Hide When Solo Tooltip"] = "파티에 본인만 있을 경우 배너를 표시하지 않습니다.";
-L["BossBanner Valuable Item Only"] = "가치 있는 아이템만 표시";
-L["BossBanner Valuable Item Only Tooltip"] = "탈것, 직업 토큰, 매우 희귀 또는 극히 희귀로 분류된 아이템만 배너에 표시됩니다.";
-
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber 고.속.주.행. 매크로";
 L["PlumberMacro Drawer"] = "Plumber 패널 매크로";
@@ -377,7 +398,7 @@ L["Drawer Option SingleRow"] = "단일 행";
 L["Drawer Option SingleRow Tooltip"] = "선택 시 버튼이 4개씩 나뉘는 대신 한 줄에 모두 정렬됩니다.";
 L["Drawer Option Hide Unusable"] = "사용 불가 행동 숨김";
 L["Drawer Option Hide Unusable Tooltip"] = "미보유 아이템 및 미습득 주문 숨기기.";
-L["Drawer Option Hide Unusable Tooltip 2"] = "포션과 같은 소비 아이템은 항상 표시됩니다."
+L["Drawer Option Hide Unusable Tooltip 2"] = "포션과 같은 소비 아이템은 항상 표시됩니다.";
 L["Drawer Option Update Frequently"] = "“항상 최신 상태 유지";
 L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경이 있을 때마다 버튼 상태를 갱신합니다. 이 옵션을 켜면 시스템 자원을 약간 더 사용할 수 있습니다";
 
@@ -385,7 +406,7 @@ L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경
 L["ModuleName NewExpansionLandingPage"] = "확장팩 개요";
 L["ModuleDescription NewExpansionLandingPage"] = "세력, 주간 활동, 공격대 귀속 정보를 표시하는 UI입니다. 다음 방법으로 열 수 있습니다:\n\n- 미니맵에 있는 ‘카즈 알가르 요약’ 버튼을 클릭하세요.\n\n- 게임 설정의 키 바인딩 메뉴에서 단축키를 설정할 수 있습니다.";
 L["Reward Available"] = "보상 가능";  --As brief as possible
-L["Paragon Reward Available"] = "명예 평판 보상 가능"
+L["Paragon Reward Available"] = "명예 평판 보상 가능";
 L["Until Next Level Format"] = "%d 다음 레벨까지";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d 영예 레벨 보상까지";
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Click to view Renown>";
@@ -418,12 +439,31 @@ L["TrackerType Boss"] = "보스";
 L["TrackerType Instance"] = "인스턴스";
 L["TrackerType Quest"] = "퀘스트";
 L["TrackerType Rare"] = "희귀 몬스터";
+L["TrackerTypePlural Boss"] = "우두머리"
+L["TrackerTypePlural Instance"] = "인스턴스 던전"
+L["TrackerTypePlural Quest"] = "퀘스트"
+L["TrackerTypePlural Rare"] = "희귀 몬스터"
+
 L["Accountwide"] = "계정 전체 적용";
 L["Quest Flag"] = "퀘스트 속성";
 L["Boss Name"] = "보스 이름";
 L["Instance Or Boss Name"] = "인스턴스/보스 이름";
 L["Name EditBox Disabled Reason Format"] = "%s를 입력하면 자동으로 완성됩니다";
 L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "No Matches";
+L["Create New Tracker"] = "새 추적기 생성";
+L["FailureReason Already Exist"] = "이미 존재하는 항목입니다.";
+L["Quest ID"] = "퀘스트 ID";
+L["Creature ID"] = "생물 ID";
+L["Edit"] = EDIT or "Edit";
+L["Delete"] = DELETE or "Delete";
+L["Visit Quest Hub To Log Quests"] = "퀘스트 허브를 방문해 오늘의 퀘스트를 등록하세요.";
+L["Quest Hub Instruction Celestials"] = "영원꽃 골짜기에 있는 천신회 병참장교를 방문해 어떤 사원이 도움이 필요한지 확인하세요.";
+L["Unavailable Klaxxi Paragons"] = "사용할 수 없는 클락시 불멸자:";
+L["Weekly Coffer Key Tooltip"] = "매주 획득하는 첫 4개의 보상 상자에는 복원된 보관함 열쇠가 들어 있습니다.";
+L["Weekly Coffer Key Shards Tooltip"] = "매주 획득하는 첫 4개의 보;상 상자에는 보관함 열쇠 파편이 들어 있습니다.";
+L["Weekly Cap"] = "주간 제한";
+L["Weekly Cap Reached"] = "주간 제한에 도달했습니다.";
+L["Instruction Right Click To Use"] = "<우클릭하여 사용>";
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
@@ -460,10 +500,12 @@ L["GameObject Door"] = "Door";
 L["Delve Chest 1 Rare"] = "풍요의 금고";   --We'll use the GameObjectID once it shows up in the database
 
 L["Season Maximum Colon"] = "시즌 상한선:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
-L["Item Changed"] = "당신의";   --CHANGED_OWN_ITEM
+L["Item Changed"] = "다음으로 변경됨:"--CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "완료한 안.녕.거.기. 목록";
-L["Restored Coffer Key"] = "복원된 금고 열쇠";
-L["Coffer Key Shard"] = "금고 열쇠 파편";
+L["Devourer Attack"] = "포식자 습격"
+L["Restored Coffer Key"] = "복원된 보관함 열쇠"
+L["Coffer Key Shard"] = "보관함 열쇠 파편"
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "풍요로운 구렁";
