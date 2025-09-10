@@ -28,7 +28,7 @@ Modules\ScenarioTracker.lua
 #Modules\DirectionArrow.lua
 #Modules\SuperTrack.xml
 
-Modules\DevTool.lua
+#Modules\DevTool.lua
 
 ControlCenter.lua
 

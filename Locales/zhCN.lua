@@ -369,6 +369,22 @@ L["SoftTargetName ShowNPC"] = "包括NPC";
 L["SoftTargetName ShowNPC Tooltip"] = "若禁用此选项，我们将只显示可互动物体（Game Objects）的名字。";
 
 
+--LegionRemix
+L["ModuleName LegionRemix"] = "军团再临：幻境新生";
+L["ModuleDescription LegionRemix"] = "军团再临：幻境新生";
+L["Artifact Weapon"] = "神器武器";
+L["Earn X To Upgrade Y Format"] = "还差 |cffffffff%s|r %s 即可升级%s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Until Next Upgrade Format"] = "距下一级还差 %s";
+L["New Trait Available"] = "有新特质可用。";
+L["Rank Increased"] = "等级已提升";
+L["Infinite Knowledge Tooltip"] = "某些军团再临成就会奖励你永恒知识。";
+
+
+--ItemUpgradeUI
+L["ModuleName ItemUpgradeUI"] = "物品升级：自动打开装备栏";
+L["ModuleDescription ItemUpgradeUI"] = "当你与物品升级NPC交互时自动打开角色面板。";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
@@ -404,6 +420,9 @@ L["LootUI Option Custom Quality Color Tooltip"] = "使用你在 游戏设置> �
 L["LootUI Option Grow Direction"] = "向上生长";
 L["LootUI Option Grow Direction Tooltip 1"] = "勾选时：窗口左下角位置保持不变，新提示出现在旧提示的上方。";
 L["LootUI Option Grow Direction Tooltip 2"] = "未勾选时：窗口左上角位置保持不变，新提示出现在旧提示的下方。";
+L["Junk Items"] = "垃圾物品";
+L["LootUI Option Combine Items"] = "合并相似物品";
+L["LootUI Option Combine Items Tooltip"] = "在同一行显示相似物品。目前支持的分类为：\n\n- 垃圾物品\n- 纪元纪念品（军团再临：幻境新生）";
 
 
 --Quick Slot For Third-party Dev
@@ -482,6 +501,7 @@ L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window ho
 L["Reposition Button Vertical"] = "竖直方向移动";
 L["Reposition Button Tooltip"] = "左键点击并拖拉来移动这个窗口。";
 L["Font Size"] = "字体大小";
+L["Icon Size"] = "图标大小";
 L["Reset To Default Position"] = "重置到默认位置";
 L["Renown Level Label"] = "名望 ";  --There is a space
 L["Paragon Reputation"] = "巅峰";
@@ -521,6 +541,7 @@ L["Completed CHETT List"] = "完成的C.H.E.T.T.清单";
 L["Devourer Attack"] = "吞噬者入侵";
 L["Restored Coffer Key"] = "修复的宝匣钥匙";
 L["Coffer Key Shard"] = "宝匣钥匙碎片";
+L["Epoch Mementos"] = "纪元纪念品";
 
 
 --Map Pin Filter Name (name should be plural)

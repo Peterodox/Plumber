@@ -26,7 +26,7 @@ local USE_HOTKEY = true;
 local TAKE_ALL_KEY = "E";
 local TAKE_ALL_MODIFIER_KEY = nil;  --"LALT"
 local USE_MOG_MARKER = true;
-local AUTO_LOOT_ENABLE_TOOLTIP = true;
+local MERGE_JUNKS = true;
 ------------------
 
 
@@ -163,6 +163,110 @@ do
 end
 
 
+local SimilarItemGroups = {};
+local MergedSimilarItemNames = {};
+do  --Merge Similar Items
+    local tinsert = table.insert;
+
+    local SimilarItemData = {
+        {
+            items = {242516, 246937, 242515, 242513, 242508, 242501,242510, 242503, 242505, 242502, 242514, 242512, 242506, 242507, 242504, 242509, 242511},    --Epoch
+            name = L["Epoch Mementos"],
+        };
+    };
+
+    for groupID, v in ipairs(SimilarItemData) do
+        MergedSimilarItemNames[groupID] = v.name;
+        for _, itemID in ipairs(v.items) do
+            SimilarItemGroups[itemID] = groupID;
+        end
+    end
+    SimilarItemData = nil;
+
+    local function MergeSimilarItems(d1, d2)
+        local group1 = SimilarItemGroups[d1.id];
+        local group2 = SimilarItemGroups[d2.id];
+        if (MERGE_JUNKS and d1.quality == 0 and d2.quality == 0) or (group1 and group1 == group2) then
+            local idToData = {};
+            local v;
+
+            if d1.mergedData then
+                for _, data in ipairs(d1.mergedData) do
+                    v = idToData[data.id];
+                    if v then
+                        v.quantity = v.quantity + data.quantity;
+                    else
+                        idToData[data.id] = data;
+                    end
+                end
+            else
+                v = idToData[d1.id];
+                if v then
+                    v.quantity = v.quantity + d1.quantity;
+                else
+                    idToData[d1.id] = d1;
+                end
+            end
+
+            if d2.mergedData then
+                for _, data in ipairs(d2.mergedData) do
+                    v = idToData[data.id];
+                    if v then
+                        v.quantity = v.quantity + data.quantity;
+                    else
+                        idToData[data.id] = data;
+                    end
+                end
+            else
+                v = idToData[d2.id];
+                if v then
+                    v.quantity = v.quantity + d2.quantity;
+                else
+                    idToData[d2.id] = d2;
+                end
+            end
+
+            local n = 0;
+            local mergedData = {};
+            for id, data in pairs(idToData) do
+                n = n + 1;
+                mergedData[n] = data;
+            end
+            d1.mergedData = mergedData;
+            d2.mergedData = nil;
+
+
+            --[[
+            if not d1.mergedData then
+                d1.mergedData = {d1, d2};
+            else
+                local isNew = true;
+                for _, data in ipairs(d1.mergedData) do
+                    if d2.id == data.id then
+                        isNew = false;
+                        data.quantity = data.quantity + d2.quantity;
+                        break
+                    end
+                end
+
+                if isNew then
+                    tinsert(d1.mergedData, d2);
+                end
+            end
+            --]]
+
+            return true
+        else
+            return false
+        end
+    end
+    P_Loot.MergeSimilarItems = MergeSimilarItems;
+end
+
+
+
+
+
 local FocusSolver = CreateFrame("Frame");
 do
     function FocusSolver:OnUpdate(elapsed)
@@ -296,6 +400,7 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:SetIcon(texture, data)
+        self.StackedIconContainer:Hide();
         self.showIcon = texture ~= nil;
         local f = self.IconFrame;
         if texture then
@@ -425,7 +530,11 @@ do  --UI ItemButton
         end
 
         if data.slotType == Defination.SLOT_TYPE_ITEM then
-            self:SetItem(data);
+            if data.mergedData then
+                self:SetMergedItem(data);
+            else
+                self:SetItem(data);
+            end
         elseif data.slotType == Defination.SLOT_TYPE_CURRENCY then
             self:SetCurrency(data);
         elseif data.slotType == Defination.SLOT_TYPE_REP then
@@ -447,13 +556,14 @@ do  --UI ItemButton
             self.countWidth = nil;
             self.Count:Hide();
         else
-            local countWidth = Formatter:GetNumberWidth(data.quantity);
+            local quantity = data.totalQuantity or data.quantity;
+            local countWidth = Formatter:GetNumberWidth(quantity);
             self.countWidth = countWidth;
             if data.oldQuantity then
-                self:AnimateItemCount(data.oldQuantity, data.quantity);
+                self:AnimateItemCount(data.oldQuantity, quantity);
                 data.oldQuantity = nil;
             else
-                self.Count:SetText("+"..data.quantity);
+                self.Count:SetText("+"..quantity);
             end
             self.Count:Show();
         end
@@ -498,6 +608,92 @@ do  --UI ItemButton
             end);
         end
         --]]
+    end
+
+    local function CreateStackedIconPool(itemFrame)
+        local function OnCreate()
+            local f = CreateFrame("Frame", nil, itemFrame.StackedIconContainer, "PlumberLootUISharedIconTemplate");
+            return f
+        end
+        return API.CreateObjectPool(OnCreate);
+    end
+
+    local function SortFunc_Quality(a, b)
+        if a.quality ~= b.quality then
+            return a.quality > b.quality
+        end
+        return a.id > b.id
+    end
+
+    function ItemFrameMixin:SetMergedItem(data)
+        if not self.stackedIconPool then
+            self.stackedIconPool = CreateStackedIconPool(self);
+        end
+        self.stackedIconPool:ReleaseAll();
+
+        local maxQuality = -1;
+        local totalQuantity = 0;
+        local groupID, fallbackName, bestIcon;
+
+        table.sort(data.mergedData, SortFunc_Quality);
+
+        for _, v in ipairs(data.mergedData) do
+            if v.quality > maxQuality then
+                maxQuality = v.quality;
+                fallbackName = v.name;
+                bestIcon = v.icon;
+            end
+            totalQuantity = totalQuantity + v.quantity;
+            if not groupID then
+                groupID = SimilarItemGroups[data.mergedData[1].id];
+            end
+        end
+
+        if data.totalQuantity then
+            data.oldQuantity = data.totalQuantity;
+        end
+        data.totalQuantity = totalQuantity;
+        data.hideCount = false;
+
+        local name;
+        if maxQuality == 0 then
+            name = L["Junk Items"] or fallbackName;
+        else
+            name = MergedSimilarItemNames[groupID] or fallbackName;
+        end
+
+        self:SetNameByQuality(name, maxQuality);
+
+        local numIcons = math.min(#data.mergedData, 4);
+        if numIcons > 1 then
+            local overlapRatio = 0.15;
+            local iconSize = Formatter.ICON_SIZE / (1 + (numIcons - 1) * overlapRatio);
+            local iconOffset = iconSize * overlapRatio;
+            local baseFrameLevel = self.StackedIconContainer:GetFrameLevel() + numIcons + 1;
+            local fromY = Formatter.ICON_SIZE * 0.5;
+            for i = 1, numIcons do
+                local f = self.stackedIconPool:Acquire();
+                f:SetPoint("TOPLEFT", self.Reference, "LEFT", (i - 1)*iconOffset, fromY - (i - 1)*iconOffset);
+                f:SetFrameLevel(baseFrameLevel - i);
+                local v = data.mergedData[i];
+                f.Icon:SetTexture(v.icon);
+                local color = QualityColorGetter(v.quality);
+                local r, g, b = color.r, color.g, color.b;
+                --Make the icon below darker
+                local a = 1 - (i - 1) * 0.2;
+                f.Border:SetVertexColor(r * a, g * a, b * a);
+                f.Icon:SetVertexColor(a, a, a);
+                f:SetSize(iconSize, iconSize);
+            end
+            self.StackedIconContainer:Show();
+            self.IconFrame:Hide();
+            self.hasIcon = true;
+        else
+            self:SetIcon(bestIcon);
+        end
+
+        self:SetCount(data);
+        self:Layout();
     end
 
     function ItemFrameMixin:SetCurrency(data)
@@ -574,7 +770,7 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:IsSameItem(data)
-        if self.data then
+        if self.data and (not self.data.mergedData) and (not data.mergedData) then
             if self.data.slotType == data.slotType and data.slotType ~= Defination.SLOT_TYPE_CUSTOM then
                 if data.slotType == Defination.SLOT_TYPE_REP then
                     return self.data.name == data.name
@@ -592,10 +788,12 @@ do  --UI ItemButton
 
     function ItemFrameMixin:OnRemoved()
         self.data = nil;
+        self.items = nil;
         self:StopAnimating();
         self:ResetHoverVisual(true);
         self.hasGlowFX = nil;
         self.hasItem = nil;
+        self.oldQuantity = nil;
     end
 
     function ItemFrameMixin:AnimateItemCount(oldValue, newValue)
@@ -651,11 +849,12 @@ do  --UI ItemButton
             end
 
         elseif self.enableState == 2 then   --Auto Loot
-            if self.data.link then
+            local hyperLink = self.data.mergedData and self.data.mergedData[1].link or self.data.link;
+            if hyperLink then
                 local width = self:GetWidth();
                 local textWidth = self.Text:GetWrappedWidth();
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -(width - textWidth - (self.textOffset or 0)), 0);
-                tooltip:SetHyperlink(self.data.link);
+                tooltip:SetHyperlink(hyperLink);
             elseif self.data.tooltipMethod then
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
                 tooltip[self.data.tooltipMethod](tooltip, self.data.id);
@@ -708,6 +907,10 @@ do  --UI ItemButton
             self:EnableMouseMotion(false);
             self.enableState = 0;
         end
+    end
+
+    function ItemFrameMixin:LayoutStackedItems()
+
     end
 
     local function CreateIconFrame(itemFrame)
@@ -1342,6 +1545,9 @@ do  --UI Basic
         self.t = self.t + elapsed;
         if self.t > 0.1 then
             self.t = 0;
+            if self.timerFrame and self.timerFrame.t then
+                return
+            end
             if not self:IsMouseOver() then
                 self:TryHide(true);
             end
@@ -1349,7 +1555,7 @@ do  --UI Basic
     end
 
     function MainFrame:TryHide(forceHide)
-        if (not AUTO_LOOT_ENABLE_TOOLTIP) or forceHide then
+        if forceHide then
             self.lootQueue = nil;
             self.isUpdatingPage = nil;
             self.alpha = self:GetAlpha();
@@ -1816,6 +2022,11 @@ do  --Callback Registery
         end
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseCustomColor", SettingChanged_UseCustomColor);
+
+    local function SettingChanged_CombineItems(state, userInput)
+        MERGE_JUNKS = state;
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItems", SettingChanged_CombineItems);
 end
 
 

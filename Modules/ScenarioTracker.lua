@@ -186,7 +186,14 @@ do
                 local mapNames = {};
 
                 tooltip:AddLine(" ");
-                tooltip:AddLine(WEEKLY_REWARDS_MYTHIC_TOP_RUNS:format(threshold), 1, 1, 1);
+                
+                if n < threshold then
+                    local pattern = WEEKLY_REWARDS_MYTHIC_TOP_RUNS:gsub("%%d", "%%s");
+                    tooltip:AddLine(pattern:format(n.."/"..threshold), 1, 1, 1);
+                else
+                    tooltip:AddLine(WEEKLY_REWARDS_MYTHIC_TOP_RUNS:format(threshold), 1, 1, 1);
+                end
+                
 
                 for i, v in ipairs(tbl) do
                     if i > numRuns then

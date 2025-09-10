@@ -556,6 +556,7 @@ L["Completed CHETT List"] = "Заполненный список КРОТ";
 L["Devourer Attack"] = "Атака Пожирателей";
 L["Restored Coffer Key"] = "Отреставрированный ключ от сундука";
 L["Coffer Key Shard"] = "Осколок ключа от сундука";
+L["Epoch Mementos"] = "Сокровище эпох";
 
 
 --Map Pin Filter Name (name should be plural)

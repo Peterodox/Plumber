@@ -505,6 +505,7 @@ L["Completed CHETT List"] = "완료한 안.녕.거.기. 목록";
 L["Devourer Attack"] = "포식자 습격"
 L["Restored Coffer Key"] = "복원된 보관함 열쇠"
 L["Coffer Key Shard"] = "보관함 열쇠 파편"
+L["Epoch Mementos"] = "시대의 기념품";
 
 
 --Map Pin Filter Name (name should be plural)

@@ -22,6 +22,7 @@ L["Item Changed"] = "pasó a ser";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "Lista de T.A.R.E.A.S. completa";
 L["Restored Coffer Key"] = "Llave de arca restaurada";
 L["Coffer Key Shard"] = "Fragmento de llave de arca";
+L["Epoch Mementos"] = "Recuerdo de época";
 
 
 --Map Pin Filter Name (name should be plural)

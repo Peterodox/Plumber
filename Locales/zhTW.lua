@@ -461,6 +461,7 @@ L["Item Changed"] = "已改為";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "完成的C.H.E.T.T.清單";
 L["Restored Coffer Key"] = "復原的寶庫鑰匙";
 L["Coffer Key Shard"] = "寶庫鑰匙裂片";
+L["Epoch Mementos"] = "時代紀念物";
 
 
 --Map Pin Filter Name (name should be plural)

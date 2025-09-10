@@ -12,9 +12,9 @@
     <Script file="LootUI_Main.lua"/>
 	<Script file="LootUI_Display.lua"/>
 
-	<Frame name="PlumberLootUIIconTemplate" virtual="true">
-		<Size x="32" y="32"/>
-		<Layers>
+    <Frame name="PlumberLootUISharedIconTemplate" virtual="true">
+        <Size x="32" y="32"/>
+        <Layers>
 			<Layer level="OVERLAY" textureSubLevel="0">
 				<Texture parentKey="Icon" setAllPoints="true">
                     <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
@@ -26,6 +26,12 @@
                     <TextureSliceMargins left="4" right="4" top="4" bottom="4"/>
 				</Texture>
 			</Layer>
+        </Layers>
+    </Frame>
+
+	<Frame name="PlumberLootUIIconTemplate" inherits="PlumberLootUISharedIconTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
 			<Layer level="OVERLAY" textureSubLevel="2">
 				<Texture parentKey="IconOverlay" hidden="true">
                     <Size x="64" y="64"/>
@@ -128,6 +134,8 @@
                     <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT"/>
                 </Anchors>
             </Frame>
+
+            <Frame parentKey="StackedIconContainer" hidden="true"/>
         </Frames>
 		<Layers>
 			<Layer level="OVERLAY">

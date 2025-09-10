@@ -518,6 +518,7 @@ L["Completed CHETT List"] = "Lista de la T.C.E.H.T. completada";
 L["Devourer Attack"] = "Ataque de devoradores";
 L["Restored Coffer Key"] = "Llave de arca restaurada";
 L["Coffer Key Shard"] = "Fragmento de llave de arca";
+L["Epoch Mementos"] = "Recuerdo de época";
 
 
 --Map Pin Filter Name (name should be plural)

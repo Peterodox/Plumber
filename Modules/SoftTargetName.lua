@@ -34,6 +34,7 @@ local Colors = {
 local Settings = {
     titleHeight = 15,
     subtextHeight = 13,
+    iconSize = 16,
     showCastBar = true,
     fontObject = "GameFontNormal",
     textOutline = false,
@@ -394,15 +395,10 @@ do  --Display
     end
 
     function Display:LoadSettings()
-        local GetDBValue = addon.GetDBValue;
-
-        local fontSizeIndex = GetDBValue("SoftTarget_FontSize");
-        if not (fontSizeIndex and Settings.FonSize[fontSizeIndex]) then
-            fontSizeIndex = 2;
-        end
-        Settings.titleHeight, Settings.subtextHeight = unpack(Settings.FonSize[fontSizeIndex]);
-
         local GetDBBool = addon.GetDBBool;
+
+        Settings.titleHeight, Settings.subtextHeight = unpack(addon.GetValidOptionChoice(Settings.FontSizes, "SoftTarget_FontSize"));
+        Settings.iconSize = addon.GetValidOptionChoice(Settings.IconSizes, "SoftTarget_IconSize")
         Settings.showCastBar = GetDBBool("SoftTarget_CastBar");
         Settings.showObjectives = GetDBBool("SoftTarget_Objectives");
         Settings.textOutline = GetDBBool("SoftTarget_TextOutline");
@@ -487,7 +483,7 @@ do  --EL
                 local textureFile = Display.InteractIcon:GetAtlas();
 
                 --Icon size is determined by SoftTargetFrame
-                f:SetSize(16, 16);  --default 24, 24
+                f:SetSize(Settings.iconSize, Settings.iconSize);  --Game default: 24, Ours: 16
                 --local textureFile = f.Icon:GetAtlas();
 
                 if not textureFile then
@@ -565,14 +561,20 @@ end
 
 local OptionToggle_OnClick;
 do  --Options, Settings
-    Settings.FonSize = {
+    Settings.FontSizes = {
         --{titleHeight, subtextHeight}
         {14, 12},
         {15, 13},
         {16, 14},
         {18, 16},
         {20, 18},
+        {22, 20},
+        {24, 22},
         {26, 24},
+    };
+
+    Settings.IconSizes = {
+        14, 16, 18, 20, 22, 24, 26, 28,
     };
 
     local function Options_TextOutline_OnClick(self, state)
@@ -580,12 +582,17 @@ do  --Options, Settings
         Display:UpdateFonts();
     end
 
+    local function Options_IconSizeSlider_OnValueChanged(value)
+        addon.SetDBValue("SoftTarget_IconSize", value);
+        Display:LoadSettings();
+    end
+
     local function Options_FontSizeSlider_OnValueChanged(value)
         addon.SetDBValue("SoftTarget_FontSize", value);
         Display:LoadSettings();
     end
 
-    local function Options_FontSizeSlider_FormatValue(value)
+    local function Options_GenericSizeSlider_FormatValue(value)
         value = Round(value);
         return value
     end
@@ -614,8 +621,9 @@ do  --Options, Settings
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName SoftTargetName"],
         widgets = {
+            {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Settings.IconSizes, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
             {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "SoftTarget_TextOutline"},
-            {type = "Slider", label = L["Font Size"], minValue = 1, maxValue = 6, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
+            {type = "Slider", label = L["Font Size"], minValue = 1, maxValue = #Settings.FontSizes, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
 
             {type = "Divider"},
             {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"},
@@ -693,16 +701,28 @@ end
 
 
 do  --SpecialGameObjects
-    local function SubtextFunc_RestoredCofferKey()
-        local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(3028);
+    local function SubtextFunc_Currency(currencyID, useMaxQuantity, requiredNumber)
+        local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(currencyID);
         if currencyInfo then
             --local name = currencyInfo.name;
             local numOwned = currencyInfo.quantity;
             local icon = currencyInfo.iconFileID;
-            local subtext = string.format("%d / %d |T%s:16:16|t", numOwned, 1, icon);
-            return subtext, (numOwned >= 1 and Colors.White) or Colors.Red
+            local maxQuantity = useMaxQuantity and currencyInfo.maxQuantity or requiredNumber;
+            local subtext = string.format("%d / %d |T%s:16:16|t", numOwned, maxQuantity, icon);
+            return subtext, (numOwned < currencyInfo.maxQuantity and Colors.White) or Colors.Red
         end
     end
 
+    local function SubtextFunc_RestoredCofferKey()
+        return SubtextFunc_Currency(3028, false, 1)
+    end
     SpecialGameObjects[413590] = SubtextFunc_RestoredCofferKey;
+
+
+    local function SubtextFunc_AncientMana()
+        return SubtextFunc_Currency(1155, true)
+    end
+    SpecialGameObjects[252408] = SubtextFunc_AncientMana;   --Ancient Mana Shard +15
+    SpecialGameObjects[252772] = SubtextFunc_AncientMana;   --Ancient Mana Shard +30
+    SpecialGameObjects[252774] = SubtextFunc_AncientMana;   --Ancient Mana Shard +50 (item)
 end
