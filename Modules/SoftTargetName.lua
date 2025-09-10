@@ -709,7 +709,13 @@ do  --SpecialGameObjects
             local icon = currencyInfo.iconFileID;
             local maxQuantity = useMaxQuantity and currencyInfo.maxQuantity or requiredNumber;
             local subtext = string.format("%d / %d |T%s:16:16|t", numOwned, maxQuantity, icon);
-            return subtext, (numOwned < currencyInfo.maxQuantity and Colors.White) or Colors.Red
+            local color;
+            if (useMaxQuantity and numOwned >= currencyInfo.maxQuantity) or (requiredNumber and requiredNumber > numOwned) then
+                color = Colors.Red;
+            else
+                color = Colors.White;
+            end
+            return subtext, color
         end
     end
 
