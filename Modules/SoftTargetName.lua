@@ -572,6 +572,7 @@ do  --Options, Settings
         {16, 14},
         {18, 16},
         {20, 18},
+        {26, 24},
     };
 
     local function Options_TextOutline_OnClick(self, state)
@@ -614,7 +615,7 @@ do  --Options, Settings
         title = L["ModuleName SoftTargetName"],
         widgets = {
             {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "SoftTarget_TextOutline"},
-            {type = "Slider", label = L["Font Size"], minValue = 1, maxValue = 4, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
+            {type = "Slider", label = L["Font Size"], minValue = 1, maxValue = 6, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_FontSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
 
             {type = "Divider"},
             {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"},
