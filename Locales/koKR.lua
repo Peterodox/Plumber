@@ -321,6 +321,7 @@ L["SoftTargetName QuestObjective Tooltip"] = "이름 아래에 퀘스트 목표(
 L["SoftTargetName QuestObjective Alert"] = "이 기능을 사용하려면 게임 설옵션 > 게임 플레이 > 조작 설정에서 |cffffffff대상 툴팁 표시|r 옵션을 활성화해야 합니다.";
 L["SoftTargetName ShowNPC"] = "NPC 포함";
 L["SoftTargetName ShowNPC Tooltip"] = "비활성화하면 이름은 상호작용 가능한 게임 오브젝트에만 표시됩니다.";
+
 --LegionRemix
 L["ModuleName LegionRemix"] = "군단 리믹스";
 L["ModuleDescription LegionRemix"] = "군단 리믹스";
@@ -331,6 +332,9 @@ L["New Trait Available"] = "새로운 특성이 사용 가능합니다.";
 L["Rank Increased"] = "등급이 상승했습니다.";
 L["Infinite Knowledge Tooltip"] = "특정 군단 리믹스 업적을 달성하면 무한한 지식을 획득할 수 있습니다.";
 
+--ItemUpgradeUI
+L["ModuleName ItemUpgradeUI"] = "아이템 업그레이드: 캐릭터 창 표시"
+L["ModuleDescription ItemUpgradeUI"] = "아이템 업그레이드 NPC와 상호작용 시 캐릭터 창을 자동으로 엽니다."
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
