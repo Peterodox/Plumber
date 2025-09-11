@@ -367,6 +367,8 @@ L["LootUI Option Custom Quality Color Tooltip"] = "게임 설정 > 손쉬운 사
 L["LootUI Option Grow Direction"] = "위로 쌓기";
 L["LootUI Option Grow Direction Tooltip 1"] = "활성화 시: 창의 왼쪽 하단이 고정되며, 새로운 알림이 기존 알림 위에 표시됩니다.";
 L["LootUI Option Grow Direction Tooltip 2"] = "비활성화 시: 창의 왼쪽 상단이 고정되며, 새로운 알림이 기존 알림 아래에 표시됩니다.";
+L["LootUI Option Combine Items"] = "유사 아이템 묶어서 표시"
+L["LootUI Option Combine Items Tooltip"] = "유사한 아이템을 하나의 행에 묶어 표시합니다.\n\n지원되는 분류:\n\n- 잡템\n- 시대의 기념품 (리전 리믹스)"
 
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "모듈 정보";
