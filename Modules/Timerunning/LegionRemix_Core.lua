@@ -847,7 +847,7 @@ do
 				self:RequestUpdate();
 			elseif event == "REMIX_ARTIFACT_UPDATE" then
 				DataProvider:UpdateConfigInfo();
-				RemixAPI.ShowArtifactUI();
+				--RemixAPI.ShowArtifactUI();
 			elseif event == "BAG_UPDATE_DELAYED" then
 				self:UnregisterEvent(event);
 				if InCombatLockdown() then

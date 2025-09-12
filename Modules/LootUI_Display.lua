@@ -844,7 +844,11 @@ do  --Event Handler
                     };
                     MainFrame:QueueDisplayLoot(data);
                 end
-                self.playerMoney = nil;
+                if MainFrame:IsVisible() then
+                    self.playerMoney = money;
+                else
+                    self.playerMoney = nil;
+                end
             end
         elseif event == "LOOT_SLOT_CHANGED" then
             --Can happen during AoE Loot

@@ -184,6 +184,8 @@ do  --Merge Similar Items
     SimilarItemData = nil;
 
     local function MergeSimilarItems(d1, d2)
+        if not (d1.id and d2.id) then return end;
+
         local group1 = SimilarItemGroups[d1.id];
         local group2 = SimilarItemGroups[d2.id];
         if (MERGE_JUNKS and d1.quality == 0 and d2.quality == 0) or (group1 and group1 == group2) then
