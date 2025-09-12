@@ -321,6 +321,7 @@ L["SoftTargetName QuestObjective Tooltip"] = "이름 아래에 퀘스트 목표(
 L["SoftTargetName QuestObjective Alert"] = "이 기능을 사용하려면 게임 설옵션 > 게임 플레이 > 조작 설정에서 |cffffffff대상 툴팁 표시|r 옵션을 활성화해야 합니다.";
 L["SoftTargetName ShowNPC"] = "NPC 포함";
 L["SoftTargetName ShowNPC Tooltip"] = "비활성화하면 이름은 상호작용 가능한 게임 오브젝트에만 표시됩니다.";
+
 --LegionRemix
 L["ModuleName LegionRemix"] = "군단 리믹스";
 L["ModuleDescription LegionRemix"] = "군단 리믹스";
@@ -331,6 +332,9 @@ L["New Trait Available"] = "새로운 특성이 사용 가능합니다.";
 L["Rank Increased"] = "등급이 상승했습니다.";
 L["Infinite Knowledge Tooltip"] = "특정 군단 리믹스 업적을 달성하면 무한한 지식을 획득할 수 있습니다.";
 
+--ItemUpgradeUI
+L["ModuleName ItemUpgradeUI"] = "아이템 업그레이드: 캐릭터 창 표시"
+L["ModuleDescription ItemUpgradeUI"] = "아이템 업그레이드 NPC와 상호작용 시 캐릭터 창을 자동으로 엽니다."
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
@@ -367,6 +371,8 @@ L["LootUI Option Custom Quality Color Tooltip"] = "게임 설정 > 손쉬운 사
 L["LootUI Option Grow Direction"] = "위로 쌓기";
 L["LootUI Option Grow Direction Tooltip 1"] = "활성화 시: 창의 왼쪽 하단이 고정되며, 새로운 알림이 기존 알림 위에 표시됩니다.";
 L["LootUI Option Grow Direction Tooltip 2"] = "비활성화 시: 창의 왼쪽 상단이 고정되며, 새로운 알림이 기존 알림 아래에 표시됩니다.";
+L["LootUI Option Combine Items"] = "유사 아이템 묶어서 표시"
+L["LootUI Option Combine Items Tooltip"] = "유사한 아이템을 하나의 행에 묶어 표시합니다.\n\n지원되는 분류:\n\n- 잡템\n- 시대의 기념품 (리전 리믹스)"
 
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "모듈 정보";
