@@ -1,7 +1,7 @@
 ## X-Flavor: retail
 ## X-Expansion: TWW
 ## Interface: 110200, 110205
-## Version: 1.7.4
+## Version: 1.7.5
 
 ## Title: Plumber
 
@@ -56,6 +56,7 @@ Modules\SoftTargetName.lua
 #TWW
 Modules\DelvesScenario.lua
 Modules\DelvesDashboard.lua
+Modules\DelvesAutomation.lua
 Modules\ExpansionLandingPage.xml
 Modules\LandingPageSwitch.lua
 Modules\GameTooltipExtension.xml

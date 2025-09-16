@@ -1841,7 +1841,7 @@ do  --EventGenerator
 end
 
 
-do
+do  --Module Registry
     local STOCK_UI_MUTED = false;
 
     local function SettingChanged_UseStockUI(state, userInput)
@@ -1951,4 +1951,36 @@ do
     };
 
     addon.ControlCenter:AddModule(moduleData);
+end
+
+
+do  --Use Loot UI as Notification Center
+    function MainFrame:QueueDisplaySpell(spellData)
+        if not spellData.spellID then return false end;
+
+        local spellID = spellData.spellID;
+        local icon = spellData.icon or C_Spell.GetSpellTexture(spellID);
+        local name = spellData.name or C_Spell.GetSpellName(spellID);
+        local quality = spellData.quality or 1;
+
+		if not name then return end;
+
+        if spellData.subtitle then
+            name = string.format("%s\n|cffebebeb%s|r", name, spellData.subtitle);
+        end
+
+		local data = {
+			slotType = -1,
+			id = spellID,
+			icon = icon,
+			quality = quality,
+            quantity = 1,
+			name = name,
+			hideCount = true,
+			showGlow = true,
+			tooltipMethod = "SetSpellByID",
+		};
+
+		self:QueueDisplayLoot(data);
+    end
 end

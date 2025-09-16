@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.7.4";
-local VERSION_DATE = 1756400000;
+local VERSION_TEXT = "v1.7.5";
+local VERSION_DATE = 1758000000;
 
 
 local addonName, addon = ...
@@ -21,51 +21,84 @@ CallbackRegistry.events = {};
 addon.CallbackRegistry = CallbackRegistry;
 
 local tinsert = table.insert;
+local tremove = table.remove;
 local type = type;
 local ipairs = ipairs;
 
---[[
-    callbackType:
-        1. Function func(owner)
-        2. Method owner:func()
---]]
+do  --CallbackRegistry
+    --[[
+        callbackType:
+            1. Function func(owner)
+            2. Method owner:func()
+    --]]
 
-function CallbackRegistry:Register(event, func, owner)
-    if not self.events[event] then
-        self.events[event] = {};
+    function CallbackRegistry:Register(event, func, owner)
+        if not self.events[event] then
+            self.events[event] = {};
+        end
+
+        local callbackType;
+
+        if type(func) == "string" then
+            callbackType = 2;
+        else
+            callbackType = 1;
+        end
+
+        tinsert(self.events[event], {callbackType, func, owner})
     end
+    CallbackRegistry.RegisterCallback = CallbackRegistry.Register;
 
-    local callbackType;
-
-    if type(func) == "string" then
-        callbackType = 2;
-    else
-        callbackType = 1;
-    end
-
-    tinsert(self.events[event], {callbackType, func, owner})
-end
-
-function CallbackRegistry:Trigger(event, ...)
-    if self.events[event] then
-        for _, cb in ipairs(self.events[event]) do
-            if cb[1] == 1 then
-                if cb[3] then
-                    cb[2](cb[3], ...);
+    function CallbackRegistry:Trigger(event, ...)
+        if self.events[event] then
+            for _, cb in ipairs(self.events[event]) do
+                if cb[1] == 1 then
+                    if cb[3] then
+                        cb[2](cb[3], ...);
+                    else
+                        cb[2](...);
+                    end
                 else
-                    cb[2](...);
+                    cb[3][cb[2]](cb[3], ...);
+                end
+            end
+        end
+    end
+
+    function CallbackRegistry:RegisterSettingCallback(dbKey, func, owner)
+        self:Register("SettingChanged."..dbKey, func, owner);
+    end
+
+    function CallbackRegistry:UnregisterCallback(event, callback, owner)
+        if not owner then return end;
+
+        if self.events[event] then
+            local callbacks = self.events[event];
+            local i = 1;
+            local cb = callbacks[i];
+
+            if type(callback) == "string" then
+                while cb do
+                    if cb[1] == 2 and cb[2] == callback and cb[3] == owner then
+                        tremove(callbacks, i);
+                    else
+                        i = i + 1;
+                    end
+                    cb = callbacks[i];
                 end
             else
-                cb[3][cb[2]](cb[3], ...);
+                while cb do
+                    if cb[1] == 1 and cb[2] == callback and cb[3] == owner then
+                        tremove(callbacks, i);
+                    else
+                        i = i + 1;
+                    end
+                    cb = callbacks[i];
+                end
             end
         end
     end
 end
-
-function CallbackRegistry:RegisterSettingCallback(dbKey, func, owner)
-    self:Register("SettingChanged."..dbKey, func, owner);
-end
-
 
 local function GetDBValue(dbKey)
     return DB[dbKey]
@@ -125,6 +158,7 @@ local DefaultValues = {
     ExpansionLandingPage = true,        --Display extra info on the ExpansionLandingPage
     Delves_Dashboard = true,            --Show Great Vault Progress on DelvesDashboardFrame
     Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
+    Delves_Automation = true,           --Auto select enhancement (PlayerChoiceFrame)
     WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
         VotingResultsExpanded = true,
     BlizzFixFishingArtifact = true,     --Fix Fishing Artifact Traits Not Showing bug

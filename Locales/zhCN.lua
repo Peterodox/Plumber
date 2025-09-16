@@ -250,10 +250,14 @@ L["ModuleName Delves_SeasonProgress"] = "地下堡: 赛季进度";
 L["ModuleDescription Delves_SeasonProgress"] = "在你提升“地下堡行者的旅程”时显示一个进度条。";
 L["ModuleName Delves_Dashboard"] = "地下堡: 每周奖励";
 L["ModuleDescription Delves_Dashboard"] = "在地下堡赛季界面显示宏伟宝库和鎏金藏匿物的进度。";
+L["ModuleName Delves_Automation"] = "地下堡: 自动选择特效";
+L["ModuleDescription Delves_Automation"] = "当你在地下堡内时，自动选择宝藏或稀有精英掉落的特效。";
 L["Delve Crest Stash No Info"] = "你所在区域无法获取该信息。";
 L["Delve Crest Stash Requirement"] = "仅在11层丰裕地下堡出现。";
 L["Overcharged Delve"] = "超载地下堡";
 L["Delves History Requires AddOn"] = "地下堡记录由Plumber插件在本地保存。";
+L["Auto Select"] = "自动选择";
+L["Power Borrowed"] = "获得特效";
 
 
 --WoW Anniversary

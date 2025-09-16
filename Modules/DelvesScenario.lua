@@ -466,7 +466,7 @@ end
 
 
 
-do
+do  --Module Registry: Delves_SeasonProgress
     local function EnableModule(state)
         SeasonTracker:SetEnabled(state);
     end

@@ -250,10 +250,14 @@ L["ModuleName Delves_SeasonProgress"] = "Delves: Delver's Journey";
 L["ModuleDescription Delves_SeasonProgress"] = "Display a progress bar on the top of the screen whenever you earn Delver's Journey";
 L["ModuleName Delves_Dashboard"] = "Delves: Weekly Reward";
 L["ModuleDescription Delves_Dashboard"] = "Show your Great Vault and Gilded Stash progress on the Delves Dashboard.";
+L["ModuleName Delves_Automation"] = "Delves: Auto Choose Power";
+L["ModuleDescription Delves_Automation"] = "Automatically choose the power dropped by treasures and rares.";
 L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
 L["Delve Crest Stash Requirement"] = "Appears in Tier 11 Bountiful Delves.";
 L["Overcharged Delve"] = "Overcharged Delve";
 L["Delves History Requires AddOn"] = "Delves history is stored locally by the Plumber AddOn.";
+L["Auto Select"] = "Auto Select";
+L["Power Borrowed"] = "Power Borrowed";
 
 
 --WoW Anniversary

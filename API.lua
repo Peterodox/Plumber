@@ -1407,15 +1407,6 @@ do  -- Map
     API.GetZoneName = GetZoneName;
 
 
-    local HasActiveDelve = C_DelvesUI and C_DelvesUI.HasActiveDelve or Nop;
-    local function IsInDelves()
-        --See Blizzard InstanceDifficulty.lua
-        local _, _, _, mapID = UnitPosition("player");
-        return HasActiveDelve(mapID);
-    end
-    API.IsInDelves = IsInDelves;
-
-
     function API.GetMapName(uiMapID)
         local info = GetMapInfo(uiMapID);
         if info then
@@ -3853,6 +3844,14 @@ do  --Locale-dependent API
 end
 
 do  --Delves
+    local function IsInDelves()
+        --See Blizzard InstanceDifficulty.lua
+        local _, _, _, mapID = UnitPosition("player");
+        local HasActiveDelve = C_DelvesUI and C_DelvesUI.HasActiveDelve or Nop;
+        return mapID and HasActiveDelve(mapID);
+    end
+    API.IsInDelves = IsInDelves;
+
     function API.DisplayDelvesGreatVaultTooltip(owner, tooltip, index, level, id, progressDelta)
         --Set the tooltip owner prior to this
         --for Delves, level is the tier number
@@ -3915,6 +3914,43 @@ do  --Delves
         end
 
         tooltip:Show();
+    end
+
+    if C_EventUtils.IsEventValid("WALK_IN_DATA_UPDATE") then
+        local EL = CreateFrame("Frame");
+        EL:RegisterEvent("PLAYER_ENTERING_WORLD");
+
+        function EL:UpdateInDelveStatus()
+            if IsInDelves() then
+                self:RegisterEvent("PLAYER_MAP_CHANGED");
+                self:RegisterEvent("PLAYER_ENTERING_WORLD");
+                if not self.wasInDelves then
+                    self.wasInDelves = true;
+                    CallbackRegistry:Trigger("PLAYER_IN_DELVES", true);
+                end
+                return true
+            else
+                self:RegisterEvent("WALK_IN_DATA_UPDATE");
+                self:UnregisterEvent("PLAYER_MAP_CHANGED");
+                self:UnregisterEvent("PLAYER_ENTERING_WORLD");
+                if self.wasInDelves then
+                    self.wasInDelves = nil;
+                    CallbackRegistry:Trigger("PLAYER_IN_DELVES", false);
+                end
+                return false
+            end
+        end
+
+        function EL:OnUpdate(elapsed)
+            self:SetScript("OnUpdate", nil);
+            self:UpdateInDelveStatus();
+        end
+
+        function EL:OnEvent(event, ...)
+            self.t = 0;
+            self:SetScript("OnUpdate", self.OnUpdate);
+        end
+        EL:SetScript("OnEvent", EL.OnEvent);
     end
 end
 --[[

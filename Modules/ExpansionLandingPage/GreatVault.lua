@@ -200,7 +200,7 @@ do
 
     function GreatVaultFrameMixin:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        if self.t > 0.2 then
+        if self.t > 0.5 then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             self:Refresh();
@@ -225,6 +225,7 @@ do
     function GreatVaultFrameMixin:OnShow()
         API.RegisterFrameForEvents(self, DynamicEvents);
         self:Refresh();
+        self:RequestFullUpdate();
     end
 
     function GreatVaultFrameMixin:OnEvent(event, ...)
