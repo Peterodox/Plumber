@@ -220,6 +220,8 @@ L["ModuleName Delves_SeasonProgress"] = "구렁: 구렁 탐험가의 여정";
 L["ModuleDescription Delves_SeasonProgress"] = "구렁 탐험가의 여정 획득 시, 상단에 실시간 진행률 표시";
 L["ModuleName Delves_Dashboard"] = "구렁: 주간 보상";
 L["ModuleDescription Delves_Dashboard"] = "구렁 대시보드에 당신의 위대한 금고와 금빛 보관함 진행 상황이 표시.";
+L["ModuleName Delves_Automation"] = "구렁: 능력 자동 선택";
+L["ModuleDescription Delves_Automation"] = "보물이나 희귀 몬스터가 드롭한 능력을 자동으로 선택합니다.";
 L["Delve Crest Stash No Info"] = "현재 위치에서는 이 정보를 확인할 수 없습니다.";
 L["Delve Crest Stash Requirement"] = "11단계 풍요로운 구렁에서 나타납니다.";
 L["Overcharged Delve"] = "과충전된 구렁";
@@ -372,6 +374,7 @@ L["LootUI Option Grow Direction"] = "위로 쌓기";
 L["LootUI Option Grow Direction Tooltip 1"] = "활성화 시: 창의 왼쪽 하단이 고정되며, 새로운 알림이 기존 알림 위에 표시됩니다.";
 L["LootUI Option Grow Direction Tooltip 2"] = "비활성화 시: 창의 왼쪽 상단이 고정되며, 새로운 알림이 기존 알림 아래에 표시됩니다.";
 L["LootUI Option Combine Items"] = "유사 아이템 묶어서 표시"
+L["Junk Items"] = "잡동사니 아이템";
 L["LootUI Option Combine Items Tooltip"] = "유사한 아이템을 하나의 행에 묶어 표시합니다.\n\n지원되는 분류:\n\n- 잡템\n- 시대의 기념품 (리전 리믹스)"
 
 --Quick Slot For Third-party Dev
