@@ -1196,10 +1196,16 @@ do  --Red Button
 
     function RedButtonMixin:OnEnter()
         self:UpdateVisual();
+        if self.onEnterFunc then
+            self.onEnterFunc(self);
+        end
     end
 
     function RedButtonMixin:OnLeave()
         self:UpdateVisual();
+        if self.onLeaveFunc then
+            self.onLeaveFunc(self);
+        end
     end
 
     function RedButtonMixin:OnEnable()
