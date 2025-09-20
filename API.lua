@@ -3953,6 +3953,74 @@ do  --Delves
         EL:SetScript("OnEvent", EL.OnEvent);
     end
 end
+
+do  --FocusSolver (Run something when being hovered long enough)
+    local FocusSolverMixin = {};
+
+    function FocusSolverMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.05 then
+            self.t = nil;
+            self:SetScript("OnUpdate", nil);
+            if self.object and self.object:IsMouseMotionFocus() then
+                if self.useModifierKeys then
+                    self:RegisterEvent("MODIFIER_STATE_CHANGED");
+                end
+                self.object:OnFocused();
+            else
+                self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+            end
+        end
+    end
+
+    function FocusSolverMixin:Stop()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+    end
+
+    function FocusSolverMixin:SetFocus(object)
+        self.object = object;
+        if object then
+            if not self.t then
+                self:SetScript("OnUpdate", self.OnUpdate);
+            end
+            self.t = 0;
+        else
+            self:Stop();
+        end
+    end
+
+    function FocusSolverMixin:OnEvent(event, ...)
+        if event == "MODIFIER_STATE_CHANGED" then
+            if self.object and self.object:IsMouseMotionFocus() then
+                self.object:OnFocused();
+            end
+        end
+    end
+
+    function FocusSolverMixin:SetDelay(delay)
+        self.delay = delay;
+    end
+
+    function FocusSolverMixin:SetUseModifierKeys(useModifierKeys)
+        self.useModifierKeys = useModifierKeys;
+    end
+
+    function FocusSolverMixin:OnHide()
+        self:Stop();
+    end
+
+    function API.CreateFocusSolver(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        API.Mixin(f, FocusSolverMixin);
+        f:SetScript("OnHide", f.OnHide);
+        f:SetDelay(0.05);
+        return f
+    end
+end
+
+
 --[[
 local DEBUG = CreateFrame("Frame");
 DEBUG:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");

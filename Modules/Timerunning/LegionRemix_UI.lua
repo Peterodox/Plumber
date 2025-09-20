@@ -4,12 +4,15 @@ if not RemixAPI then return end;
 
 
 local DEBUG_MODE= true;
+local ACTIVE_TRACK_INDEX = 1;
 
 
+local ipairs = ipairs;
 local API = addon.API;
 local DataProvider = RemixAPI.DataProvider;
 local CommitUtil = RemixAPI.CommitUtil;
 local Easing_OutQuart = addon.EasingFunctions.outQuart;
+
 
 local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Timerunning/LegionRemixUI.png";
 
@@ -40,6 +43,17 @@ local function SetFontStringColor(fontString, key)
     fontString:SetTextColor(color[1], color[2], color[3]);
 end
 
+local function SharedFadeIn_OnUpdate(self, elapsed)
+    self.t = self.t + elapsed;
+    local alpha = 8 * self.t;
+    if alpha > 1 then
+        alpha = 1;
+        self:SetScript("OnUpdate", nil);
+        self.t = 0;
+    end
+    self:SetAlpha(alpha);
+end
+
 
 local NodeButtonMixin = {};
 do
@@ -50,47 +64,67 @@ do
         self.Border:SetSize(64, 64);
         self.Icon:SetSize(36, 36);
         self.IconMask:SetSize(36, 36);
+        self:SetScript("OnEnter", self.OnEnter);
+        self:SetScript("OnLeave", self.OnLeave);
     end
 
     function NodeButtonMixin:OnEnter()
-
+        MainFrame:HoverNode(self);
     end
 
     function NodeButtonMixin:OnLeave()
+        self:HideTooltip();
+        MainFrame:HoverNode();
 
+        if self.nodeChoices or self.isFlyoutButton then
+            if not MainFrame:IsNodeFlyoutFocused(self) then
+                MainFrame:CloseNodeFlyout();
+            end
+        end
+    end
+
+    function NodeButtonMixin:OnClick()
+        --Only FlyoutButton is clickable
+        if not self.isFlyoutButton then return end;
+
+        MainFrame:CloseNodeFlyout();
+
+        self.parentNodeButton:SetData(self.nodeID, self.entryID, self.definitionID);
+    end
+
+    function NodeButtonMixin:OnFocused()
+        self:ShowTooltip();
+
+        if self.nodeChoices then
+            MainFrame:ShowNodeFlyout(self);
+        end
     end
 
     function NodeButtonMixin:SetSquare()
         self.entryType = 1;
-        self.Border:SetTexCoord(0/1024, 128/1024, 0/1024, 128/1024);
         self.IconMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Chamfer", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
         self.Icon:Show();
         self.IconMask:Show();
-        self.RankText:Hide();
     end
 
     function NodeButtonMixin:SetCircle()
         self.entryType = 2;
-        self.Border:SetTexCoord(128/1024, 256/1024, 0/1024, 128/1024);
         self.IconMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Circle", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
         self.Icon:Show();
         self.IconMask:Show();
-        self.RankText:Show();
     end
 
     function NodeButtonMixin:SetHex()
-        self:SetSquare();
-    end
-
-    function NodeButtonMixin:SetThreeArrows()
-        self.Icon:Hide();
-        self.IconMask:Hide();
-        self.RankText:Hide();
+        self.entryType = 0;
+        self.IconMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Hexagon", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+        self.Icon:Show();
+        self.IconMask:Show();
     end
 
     function NodeButtonMixin:SetSpell(spellID)
         local iconID, originalIconID = C_Spell.GetSpellTexture(spellID);
         self.Icon:SetTexture(originalIconID or iconID);
+        self.spellID = spellID;
     end
 
     function NodeButtonMixin:SetData(nodeID, entryID, definitionID)
@@ -105,13 +139,50 @@ do
         end
     end
 
+    function NodeButtonMixin:SetNodeChoices(nodeChoices)
+        local nodeID, entryID, definitionID = unpack(nodeChoices[1]);   --debug
+        self:SetData(nodeID, entryID, definitionID);
+        self.nodeChoices = nodeChoices;
+    end
+
     function NodeButtonMixin:Refresh()
+        local isActive = self.trackIndex == ACTIVE_TRACK_INDEX;
+        local isPurchased;
+        local visualState;
+        local rankText = "";
+
         if DEBUG_MODE then
-            self:SetNodeDisabled(self.trackIndex ~= 1);
-            if self.trackIndex == 1 and self.entryType == 2 then
-                self.RankText:SetText(3);
-                self.RankText:SetTextColor(1, 0.82, 0);
+            if not isActive then
+                visualState = 0;
+            else
+                if self.isFlyoutButton then
+                    isPurchased = self.parentNodeButton.entryID == self.entryID;
+                    if isPurchased then
+                        visualState = 1;
+                    else
+                        visualState = 2;
+                    end
+                else
+                    visualState = 1;
+                end
             end
+            self:SetVisualState(visualState);
+            if isActive then
+                if self.entryType == 1 then
+                    rankText = "1";
+                elseif self.entryType == 2 then
+                    rankText = "3";
+                end
+                if self.isFlyoutButton and not isPurchased then
+                    rankText = "0";
+                    self.RankText:SetTextColor(0.098, 1.000, 0.098);
+                else
+                    self.RankText:SetTextColor(1, 0.82, 0);
+                end
+            else
+
+            end
+            self.RankText:SetText(rankText);
             return
         end
 
@@ -130,7 +201,12 @@ do
         self:SetNodeDisabled(not(nodeInfo.activeRank > 0 or currentRank > 0));
     end
 
-    function NodeButtonMixin:SetNodeDisabled(disabled)
+    function NodeButtonMixin:SetVisualState(visualState)
+        --0:Disabled  1:Yellow  2:Green
+
+        self.visualState = visualState;
+        local disabled = visualState == 0;
+
         if disabled then
             self.Icon:SetDesaturated(true);
             self.Icon:SetVertexColor(0.8, 0.8, 0.8);
@@ -142,15 +218,200 @@ do
         if self.entryType == 1 then
             if disabled then
                 self.Border:SetTexCoord(384/1024, 512/1024, 0/1024, 128/1024);
+            elseif visualState == 2 then
+                self.Border:SetTexCoord(0/1024, 128/1024, 128/1024, 256/1024);
             else
                 self.Border:SetTexCoord(0/1024, 128/1024, 0/1024, 128/1024);
             end
         elseif self.entryType == 2 then
             if disabled then
                 self.Border:SetTexCoord(512/1024, 640/1024, 0/1024, 128/1024);
+            elseif visualState == 2 then
+                self.Border:SetTexCoord(128/1024, 256/1024, 128/1024, 256/1024);
             else
                 self.Border:SetTexCoord(128/1024, 256/1024, 0/1024, 128/1024);
             end
+        elseif self.entryType == 0 then
+            if disabled then
+                self.Border:SetTexCoord(896/1024, 1024/1024, 128/1024, 256/1024);
+            else
+                self.Border:SetTexCoord(768/1024, 896/1024, 128/1024, 256/1024);
+            end
+        end
+    end
+
+    function NodeButtonMixin:GetNodeInfo()
+        local nodeInfo = {
+            currentRank = 1,
+            maxRanks = 3,
+        }
+        return nodeInfo
+    end
+
+    function NodeButtonMixin:ShowTooltip()
+        if self.nodeChoices then
+            self.UpdateTooltip = nil;
+            return
+        end
+
+        local tooltip = GameTooltip;
+        tooltip:Hide();
+        tooltip:ClearHandlerInfo();
+        --tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
+        tooltip:SetOwner(self, "ANCHOR_NONE");
+        tooltip:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
+
+        local spellID = self.spellID;
+        --local overrideSpellID = C_Spell.GetOverrideSpell(spellID);
+        --[[
+        local spell = Spell:CreateFromSpellID(spellID);
+        if not spell:IsSpellDataCached() then
+            self.spellLoadCancel = spell:ContinueWithCancelOnSpellLoad(GenerateClosure(self.ShowTooltip, self));
+        end
+        --]]
+
+        local name = C_Spell.GetSpellName(spellID);
+        if not name then
+            name = RETRIEVING_DATA;
+        end
+
+        tooltip:SetText(name, 1, 1, 1, true);
+
+        local nodeInfo = self:GetNodeInfo();    --debug
+
+        tooltip:AddLine(string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks), 1, 1, 1, true);
+
+        local activeEntryID = self.entryID;   --self.nodeInfo.activeEntry;  --debug
+		if activeEntryID then
+			tooltip:AddLine(" ");
+			tooltip:AppendInfo("GetTraitEntry", activeEntryID, 1);
+		end
+
+        local nextEntryID = self.entryType ~= 1 and self.entryID; --self.nodeInfo.nextEntry;  --debug
+        local ranksPurchased = 1;
+		if nextEntryID and ranksPurchased > 0 then
+			tooltip:AddLine(" ");
+			tooltip:AddLine(TALENT_BUTTON_TOOLTIP_NEXT_RANK, 1, 1, 1);
+			tooltip:AppendInfo("GetTraitEntry", nextEntryID, 1);
+		end
+
+        self.UpdateTooltip = self.ShowTooltip;
+        tooltip:Show();
+    end
+
+    function NodeButtonMixin:HideTooltip()
+        GameTooltip:Hide();
+        self.UpdateTooltip = nil;
+        if self.spellLoadCancel then
+            self.spellLoadCancel();
+            self.spellLoadCancel = nil;
+        end
+    end
+end
+
+
+local ArrowsButtonMixin = {};
+do
+    ArrowsButtonMixin.HideTooltip = NodeButtonMixin.HideTooltip;
+
+    function ArrowsButtonMixin:OnLoad()
+        self:SetScript("OnEnter", self.OnEnter);
+        self:SetScript("OnLeave", self.OnLeave);
+        self.Border:SetTexture(TEXTURE_FILE);
+        self:SetTotalRanks(0);
+        self.entryType = -1;
+    end
+
+    function ArrowsButtonMixin:Refresh()
+        local totalRanks = self.trackIndex == ACTIVE_TRACK_INDEX and 3 or 0;
+        self:SetTotalRanks(totalRanks);
+    end
+
+    function ArrowsButtonMixin:SetupTextureByRanks(texture, totalRanks)
+        if totalRanks == 0 then
+            texture:SetTexCoord(320/1024, 384/1024, 64/1024, 128/1024);
+        elseif totalRanks == 1 then
+            texture:SetTexCoord(320/1024, 384/1024, 0/1024, 64/1024);
+        elseif totalRanks == 2 then
+            texture:SetTexCoord(256/1024, 320/1024, 64/1024, 128/1024);
+        else
+            texture:SetTexCoord(256/1024, 320/1024, 0/1024, 64/1024);
+        end
+    end
+
+    function ArrowsButtonMixin:SetTotalRanks(totalRanks)
+        self.totalRanks = totalRanks;
+        self:SetupTextureByRanks(self.Border, totalRanks);
+    end
+
+    function ArrowsButtonMixin:OnEnter()
+        MainFrame:HoverNode(self);
+    end
+
+    function ArrowsButtonMixin:OnLeave()
+        NodeButtonMixin.OnLeave(self);
+        MainFrame:HoverNode();
+    end
+
+    function ArrowsButtonMixin:OnFocused()
+        self:ShowTooltip();
+    end
+
+    function ArrowsButtonMixin:ShowTooltip()
+
+    end
+end
+
+
+local ActivateButtonMixin = {};
+do
+    function ActivateButtonMixin:OnLoad()
+        self:SetWidth(128);
+        self:SetHitRectInsets(0, 0, -8, -4);
+        self:SetButtonText(TALENT_SPEC_ACTIVATE);
+        self:Hide();
+        self.onEnterFunc = self.OnEnter;
+        self.onLeaveFunc = self.OnLeave;
+        self:SetScript("OnClick", self.OnClick);
+    end
+
+    function ActivateButtonMixin:OnEnter()
+        --local card = self:GetParent();
+        --card.HoverHighlight:Show();
+    end
+
+    function ActivateButtonMixin:OnLeave()
+        --local card = self:GetParent();
+        --card.HoverHighlight:Hide();
+    end
+
+    function ActivateButtonMixin:OnClick()
+        MainFrame:TryActivateArtifactTrack(self.trackIndex);
+    end
+
+    function ActivateButtonMixin:SetParentCard(card)
+        self:ClearAllPoints();
+        if card then
+            self.trackIndex = card.trackIndex;
+            self:SetParent(card);
+            self:SetPoint("TOP", card, "LEFT", 104, -2);
+            self:SetAlpha(0);
+            self.t = 0;
+            self:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+            self:Show();
+        else
+            self.trackIndex = nil;
+            self:SetParent(MainFrame);
+            self:Hide();
+        end
+    end
+
+    function ActivateButtonMixin:HideIfActive(trackIndex)
+        if not trackIndex then
+            trackIndex = DataProvider:GetActiveArtifactTrackIndex();
+        end
+        if self.trackIndex == trackIndex then
+            self:Hide();
         end
     end
 end
@@ -160,17 +421,6 @@ local TrackCardMixin = {};
 do
     local ANIM_OFFSET_H_BUTTON_HOVER = 12;
     local ANIM_DURATION_BUTTON_HOVER = 0.25;
-
-
-    local function ActivateButton_OnEnter(self)
-        --local card = self:GetParent();
-        --card.HoverHighlight:Show();
-    end
-
-    local function ActivateButton_OnLeave(self)
-        --local card = self:GetParent();
-        --card.HoverHighlight:Hide();
-    end
 
     function TrackCardMixin:OnLoad()
         self.titleCenterX = 104;
@@ -184,9 +434,9 @@ do
         self.HoverHighlight:SetSize(512 * s, Constants.CardBGHeight * s);
 
         self.Background:SetTexture(TEXTURE_FILE);
-        self.Background:SetTexCoord(0/1024, 768/1024, 128/1024, 288/1024);
+        self.Background:SetTexCoord(0/1024, 768/1024, 256/1024, 416/1024);
         self.Div:SetTexture(TEXTURE_FILE);
-        self.Div:SetTexCoord(992/1024, 1024/1024, 128/1024, 224/1024);
+        self.Div:SetTexCoord(992/1024, 1024/1024, 256/1024, 352/1024);
         self.HoverHighlight:SetTexture(TEXTURE_FILE);
         self.HoverHighlight:SetTexCoord(0/1024, 512/1024, 288/1024, 448/1024);
 
@@ -199,24 +449,14 @@ do
         self.EdgeGlow2:SetBlendMode("ADD");
         self.EdgeGlow2:SetVertexColor(205/255, 237/255, 59/255);
 
-        self:SetScript("OnEnter", self.OnEnter);
-        self:SetScript("OnLeave", self.OnLeave);
-
-        --debug
-        self.ActivateButton = addon.LandingPageUtil.CreateRedButton(self);
-        self.ActivateButton:SetWidth(128);
-        self.ActivateButton:SetButtonText(TALENT_SPEC_ACTIVATE);
-        self.ActivateButton:SetPoint("TOP", self, "LEFT", 104, -2);
-        self.ActivateButton:Hide();
-        self.ActivateButton:SetPropagateMouseMotion(true);
-        self.ActivateButton.onEnterFunc = ActivateButton_OnEnter;
-        self.ActivateButton.onLeaveFunc = ActivateButton_OnLeave;
+        --self:SetScript("OnEnter", self.OnEnter);
+        --self:SetScript("OnLeave", self.OnLeave);
     end
 
-    function TrackCardMixin:SetVisualState(state)
-        -- 1: Active  2: Inactive
-        self.visualState = state;
-        if state == 1 then
+    function TrackCardMixin:SetVisualState(visualState)
+        -- 1: Active  0: Inactive
+        self.visualState = visualState;
+        if visualState == 1 then
             self.Background:SetVertexColor(1, 1, 1);
             self.Background:SetDesaturated(false);
             self.EdgeGlow1:Show();
@@ -233,6 +473,7 @@ do
             self.EdgeGlow1:Hide();
             self.EdgeGlow2:Hide();
             self.Title:SetTextColor(0.6, 0.59, 0.49);
+            self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, 0);
             self.Subtitle:Hide();
         end
     end
@@ -240,11 +481,11 @@ do
     function TrackCardMixin:ShowActivateButton(state)
         if state and not self.activateButtonShown then
             self.activateButtonShown = true;
-            self.ActivateButton:Show();
+            MainFrame.ActivateButton:SetParentCard(self);
             self:ShowHoverVisual();
         elseif (not state) and self.activateButtonShown then
             self.activateButtonShown = nil;
-            self.ActivateButton:Hide();
+            MainFrame.ActivateButton:SetParentCard();
             self:ResetHoverVisual();
         end
     end
@@ -270,12 +511,6 @@ do
         end
         self.offset = offset;
         self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, offset);
-
-        local alpha = 8 * self.t;
-        if alpha > 1 then
-            alpha = 1;
-        end
-        self.ActivateButton:SetAlpha(alpha);
     end
 
     local function Anim_ResetButtonCentent_OnUpdate(self, elapsed)
@@ -298,7 +533,242 @@ do
 
     function TrackCardMixin:ResetHoverVisual()
         self.t = 0;
-        self:SetScript("OnUpdate", Anim_ResetButtonCentent_OnUpdate);
+        if ACTIVE_TRACK_INDEX == self.trackIndex then
+            self:SetScript("OnUpdate", nil);
+            self.offset = ANIM_OFFSET_H_BUTTON_HOVER;
+            self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, ANIM_OFFSET_H_BUTTON_HOVER);
+        else
+            if self:IsVisible() then
+                self:SetScript("OnUpdate", Anim_ResetButtonCentent_OnUpdate);
+            else
+                self:SetScript("OnUpdate", nil);
+                self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, 0);
+            end
+        end
+    end
+
+    function TrackCardMixin:Refresh()
+        for _, obj in ipairs(self.TraitNodes) do
+            obj:Refresh();
+        end
+
+        local isActive = self.trackIndex == ACTIVE_TRACK_INDEX;
+        self:SetVisualState(isActive and 1 or 2);
+
+        if isActive then
+            self:SetScript("OnUpdate", nil);
+            self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, ANIM_OFFSET_H_BUTTON_HOVER);
+        end
+    end
+end
+
+
+local MainFrameMixin = {};
+do
+    function MainFrameMixin:Refresh()
+        for _, card in ipairs(self.TrackCards) do
+            card:Refresh();
+        end
+        self.ActivateButton:HideIfActive(ACTIVE_TRACK_INDEX);
+    end
+
+    function MainFrameMixin:OnShow()
+        self:Refresh();
+    end
+
+    function MainFrameMixin:TryActivateArtifactTrack(trackIndex)
+        if InCombatLockdown() then return end;  --Activate button shouldn't be clickable
+
+        ACTIVE_TRACK_INDEX = trackIndex;
+        self:Refresh();
+    end
+
+    function MainFrameMixin:HoverNode(nodeButton)
+        local f = self.SharedNodeHighlight;
+        f:Hide();
+        f:ClearAllPoints();
+        self.NodeFocusSolver:SetFocus(nodeButton);
+        if nodeButton then
+            f:SetParent(nodeButton);
+            f:SetPoint("TOPLEFT", nodeButton.Border, "TOPLEFT", 0, 0);
+            f:SetPoint("BOTTOMRIGHT", nodeButton.Border, "BOTTOMRIGHT", 0, 0);
+            if nodeButton.entryType == 1 then
+                f.Texture:SetTexCoord(640/1024, 768/1024, 0/1024, 128/1024);
+            elseif nodeButton.entryType == 2 then
+                f.Texture:SetTexCoord(768/1024, 896/1024, 0/1024, 128/1024);
+            elseif nodeButton.entryType == 0 then
+                f.Texture:SetTexCoord(896/1024, 1024/1024, 0/1024, 128/1024);
+            elseif nodeButton.entryType == -1 then
+                --f.Texture:SetTexCoord(768/1024, 832/1024, 128/1024, 192/1024);
+                nodeButton:SetupTextureByRanks(f.Texture, nodeButton.totalRanks);
+            end
+            f.t = 0;
+            f:SetAlpha(0);
+            f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+            f:Show();
+        end
+    end
+
+    function MainFrameMixin:ShowNodeFlyout(nodeButton)
+        if not nodeButton.nodeChoices then return end;
+
+        local f = self.NodeFlyoutFrame;
+        if not f then
+            f = CreateFrame("Frame", nil, self);
+            self.NodeFlyoutFrame = f;
+            f:EnableMouse(true);
+            f:EnableMouseMotion(true);
+            f:SetSize(80, 80);
+
+            f:SetScript("OnLeave", function()
+                if not(f:IsMouseOver() or (f.owner and f.owner:IsVisible() and f.owner:IsMouseOver())) then
+                    MainFrame:CloseNodeFlyout();
+                end
+            end);
+
+            local function FlyoutButton_Create()
+                local button = CreateFrame("Button", nil, f, "PlumberLegionRemixNodeTemplate");
+                API.Mixin(button, NodeButtonMixin);
+                button.isFlyoutButton = true;
+                button:OnLoad();
+                button:SetScript("OnClick", button.OnClick);
+                local shadow = button:CreateTexture(nil, "BACKGROUND");
+                shadow:SetPoint("CENTER", button, "CENTER", 0, -8);
+                shadow:SetSize(128, 128);
+                shadow:SetTexture(TEXTURE_FILE);
+                shadow:SetTexCoord(768/1024, 896/1024, 256/1024, 384/1024);
+                return button
+            end
+            self.flyoutButtonPool = API.CreateObjectPool(FlyoutButton_Create);
+        end
+
+        if f:IsVisible() and f.owner == nodeButton then
+            return
+        end
+
+        f:ClearAllPoints();
+        self.flyoutButtonPool:Release();
+
+        local buttonSize = Constants.NodeSize;
+        local gapH = Constants.NodeGap;
+        local offsetX = 0;
+
+        for i, v in ipairs(nodeButton.nodeChoices) do
+            local button = self.flyoutButtonPool:Acquire();
+            button:SetData(v[1], v[2], v[3]);
+            button.trackIndex = nodeButton.trackIndex;
+            button.parentNodeButton = nodeButton;
+            button:SetPoint("TOPLEFT", f, "TOPLEFT", offsetX, 0);
+            button:SetCircle();
+            button:Refresh();
+            offsetX = offsetX + buttonSize + gapH;
+        end
+
+        local totalWidth = offsetX - gapH;
+        local bottomPadding = 6;
+        f:SetSize(totalWidth, buttonSize + bottomPadding);
+        f:SetPoint("BOTTOM", nodeButton, "TOP", 0, -10 -bottomPadding);
+        f:SetFrameStrata("DIALOG");
+        f.owner = nodeButton;
+
+        local duration = 0.2;
+        local function FlyoutFrame_OnUpdate(self, elapsed)
+            self.t = self.t + elapsed;
+            local scale;
+            if self.t < duration then
+                scale = Easing_OutQuart(self.t, 1.0, 1.6, duration);
+            else
+                scale = 1.6;
+                self:SetScript("OnUpdate", nil);
+            end
+            self:SetScale(scale);
+
+            local alpha = self.t * 8;
+            if alpha > 1 then
+                alpha = 1;
+            end
+            self:SetAlpha(alpha);
+        end
+
+        f:Show();
+
+        f:SetScale(1.0);
+        f:SetAlpha(0);
+        f.t = 0;
+        f:SetScript("OnUpdate", FlyoutFrame_OnUpdate);
+    end
+
+    function MainFrameMixin:CloseNodeFlyout()
+        if self.NodeFlyoutFrame then
+            self.NodeFlyoutFrame:Hide();
+            self.NodeFlyoutFrame:ClearAllPoints();
+        end
+    end
+
+    function MainFrameMixin:IsNodeFlyoutFocused(nodeButton)
+        if self.NodeFlyoutFrame then
+            if not self.NodeFlyoutFrame:IsVisible() then return end;
+            if self.NodeFlyoutFrame:IsMouseOver() then
+                return true
+            end
+
+            if self.NodeFlyoutFrame.owner:IsMouseOver() then
+                return true
+            end
+
+            if nodeButton then
+                if not self.NodeFlyoutFrame.owner == nodeButton then
+                    return false
+                end
+            end
+
+            for _, button in ipairs(self.flyoutButtonPool:GetActiveObjects()) do
+                if button:IsMouseMotionFocus() then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+
+    function MainFrameMixin:UpdateCardFocus()
+        local focusedCard;
+
+        if self:IsVisible() then
+            if self.NodeFlyoutFrame and self.NodeFlyoutFrame:IsVisible() then
+                if self.NodeFlyoutFrame:IsMouseOver() then
+                    focusedCard = self.NodeFlyoutFrame.owner.parentCard;
+                end
+            end
+
+            if not focusedCard then
+                for _, card in ipairs(self.TrackCards) do
+                    if card:IsMouseOver() then
+                        focusedCard = card;
+                        break
+                    end
+                end
+            end
+        end
+
+        for _, card in ipairs(self.TrackCards) do
+            if card ~= focusedCard then
+                card:OnLeave();
+            end
+        end
+
+        if focusedCard then
+            focusedCard:OnEnter();
+        end
+    end
+
+    function MainFrameMixin:OnHide()
+        self:UpdateCardFocus();
+        self:CloseNodeFlyout();
+    end
+
+    function MainFrameMixin:OnLoad()
+        self:SetScript("OnHide", self.OnHide);
     end
 end
 
@@ -309,14 +779,47 @@ local function InitArtifactUI()
 
     local frameName = "PlumberRemixArtifactUI";
     local f = CreateFrame("Frame", frameName, UIParent, "PlumberRemixArtifactUITemplate");
+    f:Hide();
     MainFrame = f;
+    API.Mixin(f, MainFrameMixin);
     f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
     table.insert(UISpecialFrames, frameName);
+    f:OnLoad();
+
+
+    local TrackCards = {};
+    MainFrame.TrackCards = TrackCards;
+
+
+    local SharedNodeHighlight = CreateFrame("Frame", nil, f);
+    f.SharedNodeHighlight = SharedNodeHighlight;
+    SharedNodeHighlight:Hide();
+    SharedNodeHighlight:SetUsingParentLevel(true);
+    SharedNodeHighlight.Texture = SharedNodeHighlight:CreateTexture(nil, "OVERLAY");
+    SharedNodeHighlight.Texture:SetAllPoints(true);
+    SharedNodeHighlight.Texture:SetTexture(TEXTURE_FILE);
+    SharedNodeHighlight.Texture:SetBlendMode("ADD");
+
+
+    local NodeFocusSolver = API.CreateFocusSolver(f);
+    f.NodeFocusSolver = NodeFocusSolver;
+    NodeFocusSolver:SetDelay(0.2);
+
+
+    local CardFocusSolver = CreateFrame("Frame", nil, f);
+    f.CardFocusSolver = CardFocusSolver;
+    CardFocusSolver.t = 0;
+    CardFocusSolver:SetScript("OnUpdate", function(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.1 then
+            self.t = 0;
+            MainFrame:UpdateCardFocus();
+        end
+    end);
 
 
     --Artifact Abilities
     local buttonSize = Constants.NodeSize;
-    local gapV = Constants.NodeSize;
     local gapH = Constants.NodeGap;
 
     local offsetX = 0;
@@ -324,7 +827,7 @@ local function InitArtifactUI()
 
     local numEntries, entryType;
     local nodeID, entryID, definitionID;
-    local activeTrackIndex = DEBUG_MODE and 1 or DataProvider:GetActiveArtifactTrackIndex();
+    local activeTrackIndex = DEBUG_MODE and ACTIVE_TRACK_INDEX or DataProvider:GetActiveArtifactTrackIndex();
 
     local cardWidth = Constants.CardWidth * Constants.CardScale;
     local cardHeight = Constants.CardHeight * Constants.CardScale;
@@ -336,30 +839,42 @@ local function InitArtifactUI()
         offsetY =  (1 - index) * (cardHeight + cardGap);
 
         local card = CreateFrame("Frame", nil, f, "PlumberLegionRemixCardTemplate");
+        TrackCards[index] = card;
         API.Mixin(card, TrackCardMixin);
         card:OnLoad();
         card:SetPoint("TOP", f, "TOP", 0, offsetY);
         card:SetFrameLevel(baseFrameLevel - index);
+        card.trackIndex = index;
+        card.TraitNodes = {};
 
         for i, v in ipairs(trackData) do
+            local button = CreateFrame("Button", nil, card, "PlumberLegionRemixNodeTemplate");
+            API.Mixin(button, NodeButtonMixin);
+            button.trackIndex = index;
+            button.parentCard = card
+            button:OnLoad();
+            table.insert(card.TraitNodes, button);
+            button:SetPoint("LEFT", card, "LEFT", offsetX, 0);
+
+            if i == 1 then
+                button.Title = card.Title;
+                local x = card.Div:GetCenter();
+                --print(card:GetLeft() - x);
+            end
+
             if type(v[1]) == "table" then
-                entryType = 0;   --Hex
-                v = v[1];   --debug
+                entryType = 0;   --Hex     --debug
+                button:SetNodeChoices(v);
             else
                 if i == 1 then
                     entryType = 1;  --Square
                 else
                     entryType = 2;  --Circle
                 end
+                nodeID, entryID, definitionID = v[1], v[2], v[3];
+                button:SetData(nodeID, entryID, definitionID);
             end
-            nodeID, entryID, definitionID = v[1], v[2], v[3];
 
-            local button = CreateFrame("Button", nil, card, "PlumberLegionRemixNodeTemplate");
-            API.Mixin(button, NodeButtonMixin);
-            button.trackIndex = index;
-            button:OnLoad();
-
-            button:SetPoint("LEFT", card, "LEFT", offsetX, 0);
             if entryType == 0 then
                 button:SetHex();
             elseif entryType == 1 then
@@ -372,37 +887,34 @@ local function InitArtifactUI()
 
             if i ~= numEntries then
                 local arrow = CreateFrame("Button", nil, card, "PlumberLegionRemixThreeArrowsTemplate");
-                arrow.Texture:SetTexture(TEXTURE_FILE);
-                arrow.Texture:SetTexCoord(256/1024, 320/1024, 0/1024, 64/1024);
+                API.Mixin(arrow, ArrowsButtonMixin);
+                arrow.trackIndex = index;
+                arrow:OnLoad();
+                table.insert(card.TraitNodes, arrow);
                 arrow:SetPoint("LEFT", card, "LEFT", offsetX, 0);
                 offsetX = offsetX + Constants.ThreeArrowsSize + gapH;
-                if index == activeTrackIndex then
-                    arrow.Texture:SetTexCoord(256/1024, 320/1024, 0/1024, 64/1024)
-                else
-                    arrow.Texture:SetTexCoord(320/1024, 384/1024, 64/1024, 128/1024)
-                end
             end
-
-            if i == 1 then
-                button.Title = card.Title;
-                local x = card.Div:GetCenter();
-                --print(card:GetLeft() - x);
-            end
-
-            button:SetData(nodeID, entryID, definitionID)
-            button:Refresh();
         end
 
-        card:SetVisualState(index == 1 and 1 or 2);
+        card:SetVisualState(index == ACTIVE_TRACK_INDEX and 1 or 0);
     end
 
     local height = 5 * (cardHeight + cardGap) - cardGap;
     f:SetSize(cardWidth, height);
+    f:SetScript("OnShow", f.OnShow);
+
+
+    local ActivateButton = addon.LandingPageUtil.CreateRedButton(f);
+    ActivateButton:Hide();
+    f.ActivateButton = ActivateButton;
+    API.Mixin(ActivateButton, ActivateButtonMixin);
+    ActivateButton:OnLoad();
 end
 
 local function ShowArtifactUI()
     if not MainFrame then
         InitArtifactUI();
+        MainFrame:Hide();
     end
     MainFrame:Show();
 end
