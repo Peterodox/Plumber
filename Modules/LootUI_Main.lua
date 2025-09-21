@@ -266,52 +266,9 @@ do  --Merge Similar Items
 end
 
 
-
-
-
-local FocusSolver = CreateFrame("Frame");
-do
-    function FocusSolver:OnUpdate(elapsed)
-        self.t = self.t + elapsed;
-        if self.t > 0.05 then
-            self.t = nil;
-            self:SetScript("OnUpdate", nil);
-            if self.object and self.object:IsMouseMotionFocus() then
-                self:RegisterEvent("MODIFIER_STATE_CHANGED");
-                self.object:OnFocused();
-            else
-                self:UnregisterEvent("MODIFIER_STATE_CHANGED");
-            end
-        end
-    end
-
-    function FocusSolver:SetFocus(itemFrame)
-        self.object = itemFrame;
-        if itemFrame then
-            if not self.t then
-                self:SetScript("OnUpdate", self.OnUpdate);
-            end
-            self.t = 0;
-        else
-            self:SetScript("OnUpdate", nil);
-            self:UnregisterEvent("MODIFIER_STATE_CHANGED");
-            self.t = nil;
-        end
-    end
-
-    function FocusSolver:IsLastFocus(itemFrame)
-        return self.object and self.object == itemFrame
-    end
-
-    function FocusSolver:OnEvent(event, ...)
-        if event == "MODIFIER_STATE_CHANGED" then
-            if self.object and self.object:IsMouseMotionFocus() then
-                self.object:OnFocused();
-            end
-        end
-    end
-    FocusSolver:SetScript("OnEvent", FocusSolver.OnEvent);
-end
+local FocusSolver = API.CreateFocusSolver();
+FocusSolver:SetUseModifierKeys(true);
+FocusSolver:SetDelay(0.05);
 
 
 local CreateItemFrame;
