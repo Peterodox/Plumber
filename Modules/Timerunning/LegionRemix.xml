@@ -61,7 +61,7 @@
 		</Layers>
 	</Button>
 
-	<Button name="PlumberLegionRemixCardTemplate" virtual="true">
+	<Button name="PlumberLegionRemixCardTemplate" enableMouse="true" enableMouseMotion="true" virtual="true">
 		<Size x="732" y="108"/>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -73,6 +73,24 @@
 				</Texture>
 			</Layer>
 			<Layer level="BACKGROUND" textureSubLevel="1">
+				<Texture parentKey="ActivateFX" texelSnappingBias="0.0" snapToPixelGrid="false" alpha="0" hidden="true">
+					<Size x="768" y="160"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Background" relativePoint="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Background" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture parentKey="ActivateFXMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Size x="64" y="64"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="104"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="ActivateFX"/>
+					</MaskedTextures>
+				</MaskTexture>
+			</Layer>
+			<Layer level="BACKGROUND" textureSubLevel="5">
 				<Texture parentKey="Div" texelSnappingBias="0.0" snapToPixelGrid="false">
 					<Size x="32" y="96"/>
 					<Anchors>
@@ -82,7 +100,7 @@
 				<Texture parentKey="EdgeGlow1">
 					<Size x="1024" y="1024"/>
 					<Anchors>
-						<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOPLEFT" x="80"/>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOPLEFT" x="80" y="64"/>
 					</Anchors>
 				</Texture>
 				<MaskTexture parentKey="EdgeMask1" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
@@ -98,7 +116,7 @@
 				<Texture parentKey="EdgeGlow2">
 					<Size x="1024" y="1024"/>
 					<Anchors>
-						<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP" x="0"/>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP" x="0" y="64"/>
 					</Anchors>
 				</Texture>
 				<MaskTexture parentKey="EdgeMask2" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
@@ -137,6 +155,11 @@
 			<AnimationGroup parentKey="AnimEdge" looping="REPEAT">
 				<Rotation degrees="360" duration="30" order="1" childKey="EdgeGlow1"/>
 				<Rotation degrees="360" duration="30" order="1" childKey="EdgeGlow2"/>
+			</AnimationGroup>
+			<AnimationGroup parentKey="AnimActivateFX" setToFinalAlpha="true">
+				<Alpha fromAlpha="0" toAlpha="1" duration="0.05" order="1" childKey="ActivateFX"/>
+				<Alpha fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.5" order="1" childKey="ActivateFX"/>
+				<Scale scaleX="28" scaleY="28" duration="1.5" order="1" smoothing="IN" childKey="ActivateFXMask"/>
 			</AnimationGroup>
 		</Animations>
 	</Button>

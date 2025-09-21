@@ -440,6 +440,10 @@ do
         self.HoverHighlight:SetTexture(TEXTURE_FILE);
         self.HoverHighlight:SetTexCoord(0/1024, 512/1024, 288/1024, 448/1024);
 
+        self.ActivateFX:SetTexture(TEXTURE_FILE);
+        self.ActivateFX:SetTexCoord(0/1024, 768/1024, 416/1024, 576/1024);
+        self.ActivateFXMask:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/Mask-Halo", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+
         self.EdgeMask1:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/TrackCardEdgeMask-Left", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
         self.EdgeMask2:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/TrackCardEdgeMask-Right", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
         self.EdgeGlow1:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/EdgeGlow");
@@ -467,6 +471,11 @@ do
             self.Subtitle:SetText(SPEC_ACTIVE);
             SetFontStringColor(self.Title, "White");
             SetFontStringColor(self.Subtitle, "FelGreenBright");
+            --debug
+            self.ActivateFX:Show();
+            self.ActivateFX:SetAlpha(0);
+            self.AnimActivateFX:Stop();
+            self.AnimActivateFX:Play();
         else
             self.Background:SetVertexColor(0.8, 0.8, 0.8);
             self.Background:SetDesaturated(true);
@@ -475,6 +484,8 @@ do
             self.Title:SetTextColor(0.6, 0.59, 0.49);
             self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, 0);
             self.Subtitle:Hide();
+            self.ActivateFX:Hide();
+            self.AnimActivateFX:Stop();
         end
     end
 
