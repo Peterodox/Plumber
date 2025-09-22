@@ -41,6 +41,45 @@
 					</Anchors>
 				</Texture>
 			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="0">
+				<Texture parentKey="GreenGlow" alphaMode="ADD" hidden="true">
+					<Size x="80" y="80"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Animations>
+						<AnimationGroup parentKey="Anim" looping="REPEAT" setToFinalAlpha="true">
+							<Alpha fromAlpha="0" toAlpha="1" duration="0.25" order="1" smoothing="OUT"/>
+							<Alpha fromAlpha="1" toAlpha="0" duration="0.75" order="2" smoothing="IN"/>
+						</AnimationGroup>
+					</Animations>
+					<Scripts>
+						<OnShow>
+							self.Anim:Play();
+						</OnShow>
+						<OnHide>
+							self.Anim:Stop();
+						</OnHide>
+					</Scripts>
+				</Texture>
+
+				<Texture parentKey="Sheen" alphaMode="ADD" texelSnappingBias="0.0" snapToPixelGrid="false" hidden="true">
+					<Size x="92" y="92"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+
+				<MaskTexture parentKey="SheenMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE" hidden="true">
+					<Size x="80" y="80"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Sheen"/>
+					</MaskedTextures>
+				</MaskTexture>
+			</Layer>
 			<Layer level="ARTWORK">
 				<Texture parentKey="Icon">
 					<Size x="38" y="38"/>
@@ -59,6 +98,13 @@
 				</MaskTexture>
 			</Layer>
 		</Layers>
+		<Animations>
+			<AnimationGroup parentKey="AnimSheen">
+				<Alpha fromAlpha="0" toAlpha="1" duration="0.05" order="1" childKey="Sheen"/>
+				<Alpha fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.5" order="1" childKey="Sheen"/>
+				<Scale scaleX="8" scaleY="8" duration="1.5" order="1" smoothing="IN" childKey="SheenMask"/>
+			</AnimationGroup>
+		</Animations>
 	</Button>
 
 	<Button name="PlumberLegionRemixCardTemplate" enableMouse="true" enableMouseMotion="true" virtual="true">

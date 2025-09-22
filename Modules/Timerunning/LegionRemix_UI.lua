@@ -59,6 +59,8 @@ local NodeButtonMixin = {};
 do
     function NodeButtonMixin:OnLoad()
         self.Border:SetTexture(TEXTURE_FILE);
+        self.GreenGlow:SetTexture(TEXTURE_FILE);
+        self.Sheen:SetTexture(TEXTURE_FILE);
         self:SetSquare();
         self.Icon:SetTexCoord(4/64, 60/64, 4/64, 60/64);
         self.Border:SetSize(64, 64);
@@ -66,6 +68,21 @@ do
         self.IconMask:SetSize(36, 36);
         self:SetScript("OnEnter", self.OnEnter);
         self:SetScript("OnLeave", self.OnLeave);
+
+
+        local function AnimSheen_OnPlay()
+            self.SheenMask:Show();
+            self.Sheen:Show();
+        end
+
+        local function AnimSheen_OnStop()
+            self.SheenMask:Hide();
+            self.Sheen:Hide();
+        end
+
+        self.AnimSheen:SetScript("OnPlay", AnimSheen_OnPlay);
+        self.AnimSheen:SetScript("OnFinished", AnimSheen_OnStop);
+        self.AnimSheen:SetScript("OnStop", AnimSheen_OnStop);
     end
 
     function NodeButtonMixin:OnEnter()
@@ -89,7 +106,16 @@ do
 
         MainFrame:CloseNodeFlyout();
 
-        self.parentNodeButton:SetData(self.nodeID, self.entryID, self.definitionID);
+        local shouldPlaySheen;
+        if self.parentNodeButton.entryID ~= self.entryID then
+            shouldPlaySheen = true;
+        end
+        self.parentNodeButton.selectedEntryID = self.entryID;
+        self.parentNodeButton:SetData(self.nodeID, self.entryID, self.definitionID);    --debug
+        self.parentNodeButton:Refresh();
+        if shouldPlaySheen then
+            self.parentNodeButton:PlaySheen();
+        end
     end
 
     function NodeButtonMixin:OnFocused()
@@ -119,6 +145,9 @@ do
         self.IconMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Hexagon", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
         self.Icon:Show();
         self.IconMask:Show();
+        self.GreenGlow:SetTexCoord(768/1024, 928/1024, 416/1024, 576/1024);
+        self.Sheen:SetTexCoord(768/1024, 928/1024, 576/1024, 736/1024);
+        self.SheenMask:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/Mask-Halo", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
     end
 
     function NodeButtonMixin:SetSpell(spellID)
@@ -163,7 +192,15 @@ do
                         visualState = 2;
                     end
                 else
-                    visualState = 1;
+                    if self.entryType == 0 then
+                        if self.selectedEntryID then
+                            visualState = 1;
+                        else
+                            visualState = 2;
+                        end
+                    else
+                        visualState = 1;
+                    end
                 end
             end
             self:SetVisualState(visualState);
@@ -172,6 +209,12 @@ do
                     rankText = "1";
                 elseif self.entryType == 2 then
                     rankText = "3";
+                elseif self.entryType == 0 then
+                    if self.selectedEntryID then
+                        self.GreenGlow:Hide();
+                    else
+                        self.GreenGlow:Show();
+                    end
                 end
                 if self.isFlyoutButton and not isPurchased then
                     rankText = "0";
@@ -210,6 +253,7 @@ do
         if disabled then
             self.Icon:SetDesaturated(true);
             self.Icon:SetVertexColor(0.8, 0.8, 0.8);
+            self.GreenGlow:Hide();
         else
             self.Icon:SetDesaturated(false);
             self.Icon:SetVertexColor(1, 1, 1);
@@ -234,10 +278,17 @@ do
         elseif self.entryType == 0 then
             if disabled then
                 self.Border:SetTexCoord(896/1024, 1024/1024, 128/1024, 256/1024);
+            elseif visualState == 2 then
+                self.Border:SetTexCoord(256/1024, 384/1024, 128/1024, 256/1024);
             else
                 self.Border:SetTexCoord(768/1024, 896/1024, 128/1024, 256/1024);
             end
         end
+    end
+
+    function NodeButtonMixin:PlaySheen()
+        self.AnimSheen:Stop();
+        self.AnimSheen:Play();
     end
 
     function NodeButtonMixin:GetNodeInfo()
@@ -399,6 +450,7 @@ do
             self.t = 0;
             self:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
             self:Show();
+            self:OnMouseUp();
         else
             self.trackIndex = nil;
             self:SetParent(MainFrame);
@@ -458,7 +510,7 @@ do
     end
 
     function TrackCardMixin:SetVisualState(visualState)
-        -- 1: Active  0: Inactive
+        -- 0:Inactive  1:Active
         self.visualState = visualState;
         if visualState == 1 then
             self.Background:SetVertexColor(1, 1, 1);
@@ -564,7 +616,7 @@ do
         end
 
         local isActive = self.trackIndex == ACTIVE_TRACK_INDEX;
-        self:SetVisualState(isActive and 1 or 2);
+        self:SetVisualState(isActive and 1 or 0);
 
         if isActive then
             self:SetScript("OnUpdate", nil);
