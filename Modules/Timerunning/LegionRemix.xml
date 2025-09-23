@@ -1,6 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\FrameXML\UI.xsd">
 	<Script file="LegionRemix_Core.lua"/>
+	<Script file="LegionRemix_Test.lua"/>
 	<Script file="LegionRemix_Macro.lua"/>
 	<Script file="LegionRemix_UI.lua"/>
 
@@ -177,7 +178,8 @@
 				</MaskTexture>
 			</Layer>
 			<Layer level="OVERLAY">
-				<FontString parentKey="Title" inherits="ObjectiveTrackerHeaderFont" justifyH="CENTER">
+				<FontString parentKey="Title" inherits="ObjectiveTrackerHeaderFont" justifyH="CENTER" mixin="AutoScalingFontStringMixin" maxLines="1">
+					<Size x="176"/>
 					<Anchors>
 						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="104" y="0"/>
 					</Anchors>

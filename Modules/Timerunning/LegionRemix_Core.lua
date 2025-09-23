@@ -60,63 +60,47 @@ end
 do	--DataProvider
 	DataProvider.traitNameCache = {};
 
-	local TraitData = {
-		--{nodeID, entryID, definitionID}
-		{108115, 133498, 138284}, --Remix Time
-		{108523, 133999, 138785}, --Momentus's Perseverance
-		{108180, 133581, 138367}, --Nostwin's Impatience"
-		{108873, 134447, 139218}, --Eternus's Ambition
-		{108701, 134247, 139023}, --Moratari's Calculation
-		{108870, 134444, 139215}, --Erus's Aggression
-
-		{108700, 134246, 139022}, --Limits Unbound
-	};
-
 	DataProvider.ArtifactTracks = {
+		--[index] = {majorNodeID1, majorNodeID2, ...}
+
 		{	--1
-			{108114, 133497, 138283}, --Call of the Forest
-			{108106, 133489, 138275}, --Souls of the Caw
-			{108110, 133493, 138279}, --Highmountain Fortitude
-			{108120, 133506, 138292}, --Waking Frenzy
-			{108121, 133507, 138293}, --Dreamweaving
+			108114, --Call of the Forest
+			108106, --Souls of the Caw
+			108110, --Highmountain Fortitude
+			108120, --Waking Frenzy
+			108121, --Dreamweaving
 		},
 
 		{	--2
-			{108113, 133496, 138282}, --Twisted Crusade
-			{108702, 134248, 139024}, --Touch of Malice
-			{108105, 133488, 138274}, --I Am My Scars!
-			{108132, 133525, 138311}, --Call of the Legion
-			{108975, 134745, 139513}, --Felspike
+			108113, --Twisted Crusade
+			108702, --Touch of Malice
+			108105, --I Am My Scars!
+			108132, --Call of the Legion
+			108975, --Felspike
 		},
 
 		{	--3
-			{108111, 133494, 138280}, --Naran's Everdisc
-			{108102, 133485, 138271}, --Volatile Magics
-			{
-				{108103, 133486, 138272}, --Arcane Aegis
-				{108103, 133508, 138294}, --Arcane Ward
-			},
-			{108107, 133490, 138276}, --Temporal Retaliation
-			{108118, 133504, 138290}, --Arcane Inspiration
+			108111, --Naran's Everdisc
+			108102, --Volatile Magics
+			108103, --[Selection] Arcane Aegis / Arcane Ward
+			108107, --Temporal Retaliation
+			108118, --Arcane Inspiration
 		},
 
 		{	--4
-			{108112, 133495, 138281}, --Tempest Wrath
-			{108108, 133491, 138277}, --Terror From Below
-			{
-				{108104, 133487, 138273}, --Storm Surger
-				{108104, 135715, 140470}, --Brewing Storm
-			},
-			{108119, 133505, 138291}, --Thunderstruck
-			{108699, 134245, 139021}, --Churning Waters
+			108112, --Tempest Wrath
+			108108, --Terror From Below
+			108104, --[Selection] Storm Surger / Brewing Storm
+			108119, --Thunderstruck
+			108699, --Churning Waters
 		},
 
 		{	--5
-			{108875, 134449, 139220}, --Vindicator's Judgment
-			{109265, 135326, 140093}, --Light's Vengeance
-			{109260, 135321, 140088}, --Flight of the Val'kyr
-			{109262, 135323, 140090}, --Xe'ra's Embrace
-			{109272, 135333, 140100}, --Empyreal Orders
+			108875, --Vindicator's Judgment
+			109265, --Light's Vengeance
+			109260, --Flight of the Val'kyr
+			109262, --Xe'ra's Embrace
+			109272, --Empyreal Orders
 		},
 	};
 
@@ -142,25 +126,6 @@ do	--DataProvider
 		1233775,
 		1233181,
 		1251045,
-	};
-
-	DataProvider.ArtifactAbilityNodes = {
-		--From top to bottom
-		--{nodeID, entryID, definitionID}
-		{108114, 133497, 133283},
-		{108113, 133496, 138282},
-		{108111, 133494, 138280},
-		{108112, 133495, 138281},
-		{108875, 133449, 139220},
-	};
-
-	DataProvider.FinalTraitNodes = {
-		--{nodeID, entryID}
-		{108121, 133507},
-		{108975, 134745},
-		{108118, 133504},
-		{108699, 134245},
-		{109272, 135333},
 	};
 
 	DataProvider.ChoiceNodes = {
@@ -191,30 +156,30 @@ do	--DataProvider
 	DataProvider.PurchaseRoute_Basic = {
 		--{nodeID, entryID, definitionID}
 		--entryID and definitionID can be inferred
-		{108115, 133498, 138284},	--Remix Time
-		{108182, 133583, 138369},	--Prim +1
-		{108181, 133582, 138368},	--STA +9
-		{108878, 134454, 139225},	--MAST +4
-		{108180, 133581, 138367},	--Nostwin's Impatience
+		108115, --Remix Time
+		108182, --Prim +1
+		108181, --STA +9
+		108878, --MAST +4
+		108180, --Nostwin's Impatience
 
 		--Purchase all small nodes, go up first
-		{108165, 133564, 138350},	--MAST +8
-		{108172, 133571, 138357},	--STA +13
+		108165, --MAST +8
+		108172, --STA +13
 		--Down
-		{108260, 133691, 138477},	--MAST +8
-		{108166, 133565, 138351},	--STA +13
+		108260, --MAST +8
+		108166, --STA +13
 		--Up
-		{108523, 133999, 138785},	--Momentus's Perseverance
-		{108874, 134448, 139219},	--Prim +2
-		{108869, 134443, 139214},	--Prim +2
+		108523, --Momentus's Perseverance
+		108874, --Prim +2
+		108869, --Prim +2
 		--Down
-		{108701, 134247, 139023},	--Moratari's Calculation
-		{108251, 133682, 138468},	--MAST +8
-		{108873, 134447, 139128},	--Eternus's Ambition
-		{108868, 134442, 139213},	--Prim +2
-		{108169, 133568, 138354},	--STA +13
+		108701, --Moratari's Calculation
+		108251, --MAST +8
+		108873, --Eternus's Ambition
+		108868, --Prim +2
+		108169, --STA +13
 		--Up
-		{108870, 134444, 139215},	--Erus's Aggression
+		108870, --Erus's Aggression
 	};
 
 	DataProvider.JewelrySlots = {
@@ -241,13 +206,15 @@ do	--DataProvider
 	end
 
 	function DataProvider:GetArtifactNodeInfoByIndex(index)
-		local v = self.ArtifactAbilityNodes[index];
-		return v[1], v[2], v[3]
+		local nodeID = self.ArtifactTracks[index][1];
+		local entryID = self:GetNodeEntryID(nodeID);
+		return nodeID, entryID
 	end
 
 	function DataProvider:GetFinalNodeInfoIndex(index)
-		local v = self.FinalTraitNodes[index];
-		return v[1], v[2], v[3]
+		local nodeID = self.ArtifactTracks[index][5];
+		local entryID = self:GetNodeEntryID(nodeID);
+		return nodeID, entryID
 	end
 
 	function DataProvider:GetNodeInfo(nodeID)
@@ -283,8 +250,8 @@ do	--DataProvider
 	function DataProvider:GetActiveArtifactTrackIndex()
 		local artifactTrackIndex;
 
-		for index = 1, #self.ArtifactAbilityNodes do
-			local nodeID, entryID, definitionID = self:GetArtifactNodeInfoByIndex(index);
+		for index = 1, #self.ArtifactTracks do
+			local nodeID = self:GetArtifactNodeInfoByIndex(index);
 			local nodeInfo = self:GetNodeInfo(nodeID);
 			if nodeInfo and nodeInfo.currentRank > 0 then
 				artifactTrackIndex = index;
@@ -296,8 +263,8 @@ do	--DataProvider
 	end
 
 	function DataProvider:ShouldChooseArtifactTrack()
-		for index = 1, #self.ArtifactAbilityNodes do
-			local nodeID, entryID, definitionID = self:GetArtifactNodeInfoByIndex(index);
+		for index = 1, #self.ArtifactTracks do
+			local nodeID = self:GetArtifactNodeInfoByIndex(index);
 			local nodeInfo = self:GetNodeInfo(nodeID);
 			if nodeInfo and nodeInfo.canPurchaseRank then
 				return true
@@ -307,9 +274,7 @@ do	--DataProvider
 
 	function DataProvider:GetDefaultArtifactNodeData()
 		local trackIndex = 1;
-		if self.ArtifactAbilityNodes[trackIndex] then
-			return unpack(self.ArtifactAbilityNodes[trackIndex])
-		end
+		return self:GetArtifactNodeInfoByIndex(trackIndex)
 	end
 
 	function DataProvider:GetParagonLevel()
@@ -628,13 +593,14 @@ do	--DataProvider
 			local activeTrackIndex = self:GetActiveArtifactTrackIndex();
 			if activeTrackIndex then
 				local trackData = self.ArtifactTracks[activeTrackIndex];
-				nodeID = trackData[1][1];
+				nodeID = trackData[1];
 				local _nodeInfo = self:GetNodeInfo(nodeID);
 				while _nodeInfo and _nodeInfo.visibleEdges and _nodeInfo.visibleEdges[1] and _nodeInfo.visibleEdges[1].targetNode do
 					nodeID = _nodeInfo.visibleEdges[1].targetNode;
 					_nodeInfo = self:GetNodeInfo(nodeID);
 					if _nodeInfo and _nodeInfo.canPurchaseRank then
-						entryID = _nodeInfo.entryIDs[1];
+						--entryID = _nodeInfo.entryIDs[1];
+						entryID = self:GetLastSelectedEntryID(nodeID, _nodeInfo.entryIDs)
 						break
 					end
 				end
@@ -652,9 +618,8 @@ do	--DataProvider
 				end
 				--]]
 			else
-				for _, v in ipairs(self.PurchaseRoute_Basic) do
-					nodeID = v[1];
-					nodeInfo = self:GetNodeInfo(nodeID);
+				for _, _nodeID in ipairs(self.PurchaseRoute_Basic) do
+					nodeInfo = self:GetNodeInfo(_nodeID);
 					if nodeInfo.canPurchaseRank then
 						entryID = nodeInfo.entryIDs[1];
 						break
@@ -691,6 +656,62 @@ do	--DataProvider
 			local diff = traitInfo.cost - numUnspent;
 			return diff
 		end
+	end
+
+	function DataProvider:GetLastSelectedEntryID(nodeID, entryIDs)
+		--For selection nodes
+		local entryID, saved;
+		if #entryIDs == 1 then
+			entryID = entryIDs[1];
+			saved = true;
+		else
+			if self.playerDB and self.playerDB.lastSelectedEntry then
+				local specIndex = C_SpecializationInfo.GetSpecialization() or 1;
+				if self.playerDB.lastSelectedEntryBySpec and self.playerDB.lastSelectedEntryBySpec[specIndex] then
+					entryID = self.playerDB.lastSelectedEntryBySpec[specIndex][nodeID]
+				end
+				if not entryID then
+					entryID = self.playerDB.lastSelectedEntry[nodeID];
+				end
+			end
+			if entryID then
+				local valid = false;
+				for _, id in ipairs(entryIDs) do
+					if id == entryID then
+						valid = true;
+						break
+					end
+				end
+				if valid then
+					saved = true;
+				else
+					entryID = entryIDs[1];
+					saved = false;
+				end
+			else
+				entryID = entryIDs[1];
+				saved = false;
+			end
+		end
+		return entryID, saved
+	end
+
+	function DataProvider:SaveLastSelectedEntryID(nodeID, entryID)
+		if not (nodeID and entryID and self.playerDB) then return end;
+
+		if not self.playerDB.lastSelectedEntry then
+			self.playerDB.lastSelectedEntry = {};
+		end
+		self.playerDB.lastSelectedEntry[nodeID] = entryID;
+
+		local specIndex = C_SpecializationInfo.GetSpecialization() or 1;
+		if not self.playerDB.lastSelectedEntryBySpec then
+			self.playerDB.lastSelectedEntryBySpec = {};
+		end
+		if not self.playerDB.lastSelectedEntryBySpec[specIndex] then
+			self.playerDB.lastSelectedEntryBySpec[specIndex] = {};
+		end
+		self.playerDB.lastSelectedEntryBySpec[specIndex][nodeID] = entryID;
 	end
 
 
@@ -887,15 +908,16 @@ do	--CommitUtil
 		C_Traits.CommitConfig(configID);
 	end
 
-	function CommitUtil:OnCommitingFinished()
+	function CommitUtil:OnCommitFinished()
 		self.commitedConfigID = nil;
 		self:SetScript("OnUpdate", nil);
 		self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
 		self:UnregisterEvent("CONFIG_COMMIT_FAILED");
 		if self.commitingResult == 1 then
-			print("COMMIT SUCCEEDED");
+			CallbackRegistry:Trigger("LegionRemix.CommitFinished", true);
 			DataProvider:SaveLastArtifactTrackIndexForCurrentSpec();
 		elseif self.commitingResult == 0 then
+			CallbackRegistry:Trigger("LegionRemix.CommitFinished", true);
 			print("COMMIT FAILED");
 		end
 		self.commitingResult = nil;
@@ -929,7 +951,7 @@ do	--CommitUtil
 		end
 
 		if self.commitingResult then
-			self:OnCommitingFinished();
+			self:OnCommitFinished();
 			if self.equipItemAfterCommit then
 				self:RegisterEvent("BAG_UPDATE_DELAYED");
 			end
@@ -988,11 +1010,9 @@ do	--CommitUtil
 		local configID = DataProvider:GetCurrentConfigID();
 		if not configID then return false end;
 
-		local nodeID, entryID;
 		local anySuccessPurchase = false;
 
-		for _, v in ipairs(DataProvider.PurchaseRoute_Basic) do
-			nodeID = v[1];
+		for _, nodeID in ipairs(DataProvider.PurchaseRoute_Basic) do
 			if PurchaseRank(configID, nodeID) then
 				anySuccessPurchase = true;
 			end
@@ -1174,7 +1194,7 @@ do	--CommitUtil
 
 		self:TryPurchaseBasicTraits();
 
-		local nodeID, entryID, definitionID = DataProvider:GetArtifactNodeInfoByIndex(index);
+		local nodeID, entryID = DataProvider:GetArtifactNodeInfoByIndex(index);
 
 		if configID then
 			local costs = GetNodeCost(configID, nodeID);
@@ -1265,6 +1285,7 @@ end
 
 
 do	--Debug
+	--[[
 	EventRegistry:RegisterCallback("TalentDisplay.TooltipCreated", function(_, node, tooltip)
 		local nodeInfo = node.nodeInfo;
 		if nodeInfo then
@@ -1305,6 +1326,7 @@ do	--Debug
 		end
 		tooltip:Show();
 	end);
+	--]]
 end
 
 

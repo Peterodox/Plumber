@@ -382,6 +382,7 @@ L["Until Next Upgrade Format"] = "%s until next upgrade";
 L["New Trait Available"] = "New trait available.";
 L["Rank Increased"] = "Rank Increased";
 L["Infinite Knowledge Tooltip"] = "You can obtain Inifite Knowledge by earning certain Legion Remix achievements.";
+L["Stat Bonuses"] = "Stat Bonuses";
 
 
 --ItemUpgradeUI

@@ -42,17 +42,32 @@ function EL:OnEvent(event, ...)
     end
 end
 
+function EL:OnUpdate(elapsed)
+    self.t = self.t + elapsed;
+    if self.t > 1 then
+        self.t = nil;
+        self:SetScript("OnUpdate", nil);
+        if self.enabled then
+            if API.IsInDelves() then
+                EL:PLAYER_IN_DELVES(true);
+            end
+        end
+    end
+end
+
 function EL.EnableModule(state)
+    EL.enabled = state;
     if state then
         addon.CallbackRegistry:Register("PLAYER_IN_DELVES", EL.PLAYER_IN_DELVES, EL);
         EL:SetScript("OnEvent", EL.OnEvent);
-        if API.IsInDelves() then
-            EL:PLAYER_IN_DELVES(true);
-        end
+        EL.t = 0;
+        EL:SetScript("OnUpdate", EL.OnUpdate);
     else
         addon.CallbackRegistry:UnregisterCallback("PLAYER_IN_DELVES", EL.PLAYER_IN_DELVES, EL);
         EL:UnregisterEvent("PLAYER_CHOICE_UPDATE");
         EL:SetScript("OnEvent", nil);
+        EL.t = 0;
+        EL:SetScript("OnUpdate", nil);
     end
 end
 

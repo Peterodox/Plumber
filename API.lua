@@ -3846,9 +3846,12 @@ end
 do  --Delves
     local function IsInDelves()
         --See Blizzard InstanceDifficulty.lua
+        --[[    --This fails when relogging inside a delve
         local _, _, _, mapID = UnitPosition("player");
         local HasActiveDelve = C_DelvesUI and C_DelvesUI.HasActiveDelve or Nop;
         return mapID and HasActiveDelve(mapID);
+        --]]
+        return C_PartyInfo.IsPartyWalkIn and C_PartyInfo.IsPartyWalkIn()    --See INSTANCE_WALK_IN_LEAVE
     end
     API.IsInDelves = IsInDelves;
 

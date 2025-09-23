@@ -3,15 +3,20 @@ local RemixAPI = addon.RemixAPI
 if not RemixAPI then return end;
 
 
-local DEBUG_MODE= true;
+local DEBUG_MODE = true;
 local ACTIVE_TRACK_INDEX = 1;
 
 
-local ipairs = ipairs;
+local L = addon.L;
 local API = addon.API;
+local CallbackRegistry = addon.CallbackRegistry;
 local DataProvider = RemixAPI.DataProvider;
 local CommitUtil = RemixAPI.CommitUtil;
 local Easing_OutQuart = addon.EasingFunctions.outQuart;
+
+
+local ipairs = ipairs;
+local InCombatLockdown = InCombatLockdown;
 
 
 local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Timerunning/LegionRemixUI.png";
@@ -106,15 +111,19 @@ do
 
         MainFrame:CloseNodeFlyout();
 
+        local parentNodeButton = self.parentNodeButton;
+        if not parentNodeButton then return end;
+
         local shouldPlaySheen;
-        if self.parentNodeButton.entryID ~= self.entryID then
+        if (parentNodeButton.entryID ~= self.entryID) and parentNodeButton.isActive then
             shouldPlaySheen = true;
         end
-        self.parentNodeButton.selectedEntryID = self.entryID;
-        self.parentNodeButton:SetData(self.nodeID, self.entryID, self.definitionID);    --debug
-        self.parentNodeButton:Refresh();
+        DataProvider:SaveLastSelectedEntryID(self.nodeID, self.entryID);
+        parentNodeButton.selectedEntryID = self.entryID;
+        parentNodeButton:SetData(self.nodeID, self.entryID, self.definitionID);    --debug
+        parentNodeButton:Refresh();
         if shouldPlaySheen then
-            self.parentNodeButton:PlaySheen();
+            parentNodeButton:PlaySheen();
         end
     end
 
@@ -156,29 +165,62 @@ do
         self.spellID = spellID;
     end
 
-    function NodeButtonMixin:SetData(nodeID, entryID, definitionID)
+    function NodeButtonMixin:SetData(nodeID, entryID)
         self.nodeID = nodeID;
+        local nodeInfo = DataProvider:GetNodeInfo(nodeID);
+        if nodeInfo.type == 2 then  --Enum.TraitNodeType.Selection
+            self:SetHex();
+        end
+        self:SetEntry(entryID);
+    end
+
+    function NodeButtonMixin:SetEntry(entryID)
         self.entryID = entryID;
-        self.definitionID = definitionID;
-        local spellID = C_Traits.GetDefinitionInfo(definitionID).spellID;
+        local entryInfo = DataProvider:GetEntryInfo(entryID);
+        self.definitionID = entryInfo.definitionID;
+        self.maxRanks = entryInfo.maxRanks;
+
+        if self.entryType ~= 0 then
+            if entryInfo.type == 1 then --SpendSquare
+                self:SetSquare();
+            elseif entryInfo.type == 2 then --SpendCircle
+                self:SetCircle();
+            end
+        end
+
+        local spellID = C_Traits.GetDefinitionInfo(self.definitionID).spellID;
         self:SetSpell(spellID);
         if self.Title then
-            local name = C_Spell.GetSpellName(spellID);
-            self.Title:SetText(name);
+            CallbackRegistry:LoadSpell(spellID, function()
+                local name = C_Spell.GetSpellName(spellID);
+                self.Title:SetText(name);
+            end);
         end
     end
 
-    function NodeButtonMixin:SetNodeChoices(nodeChoices)
-        local nodeID, entryID, definitionID = unpack(nodeChoices[1]);   --debug
-        self:SetData(nodeID, entryID, definitionID);
-        self.nodeChoices = nodeChoices;
+    function NodeButtonMixin:SetNodeChoices(nodeID, entryIDs)
+        local entryID = entryIDs[1];   --debug
+        self:SetData(nodeID, entryID);
+        self.entryIDs = entryIDs;
+        self.nodeChoices = {};
+        for i = 1, #entryIDs do
+            self.nodeChoices[i] = {nodeID, entryIDs[i]}
+        end
     end
 
     function NodeButtonMixin:Refresh()
-        local isActive = self.trackIndex == ACTIVE_TRACK_INDEX;
+        local isActive = (self.trackIndex == ACTIVE_TRACK_INDEX) and DataProvider:IsNodeActive(self.nodeID);
+        self.isActive = isActive;
         local isPurchased;
         local visualState;
         local rankText = "";
+
+        if self.entryIDs then
+            local selectedEntryID, saved = DataProvider:GetLastSelectedEntryID(self.nodeID, self.entryIDs);
+            if saved then
+                self.selectedEntryID = selectedEntryID;
+            end
+        end
 
         if DEBUG_MODE then
             if not isActive then
@@ -206,9 +248,9 @@ do
             self:SetVisualState(visualState);
             if isActive then
                 if self.entryType == 1 then
-                    rankText = "1";
+                    rankText = self.maxRanks;   --"1";
                 elseif self.entryType == 2 then
-                    rankText = "3";
+                    rankText = self.maxRanks;   --"3";
                 elseif self.entryType == 0 then
                     if self.selectedEntryID then
                         self.GreenGlow:Hide();
@@ -238,10 +280,21 @@ do
         end
         self.RankText:SetTextColor(1, 0.82, 0);
 
-        --local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
-        --local increasedTraitDataList = C_Traits.GetIncreasedTraitData(self.nodeID, self.entryID);
+        local isEntryCommitted = false;
+        local committedEntryID;
 
-        self:SetNodeDisabled(not(nodeInfo.activeRank > 0 or currentRank > 0));
+        if nodeInfo.entryIDsWithCommittedRanks then
+            for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+                committedEntryID = id;
+                isEntryCommitted = true;
+                break
+            end
+        end
+
+        local entryID = committedEntryID or self.entryID;
+        local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
+
+        self:SetNodeDisabled(not(increasedRanks > 0 or isEntryCommitted));
     end
 
     function NodeButtonMixin:SetVisualState(visualState)
@@ -294,7 +347,7 @@ do
     function NodeButtonMixin:GetNodeInfo()
         local nodeInfo = {
             currentRank = 1,
-            maxRanks = 3,
+            maxRanks = self.maxRanks or 1,
         }
         return nodeInfo
     end
@@ -308,7 +361,6 @@ do
         local tooltip = GameTooltip;
         tooltip:Hide();
         tooltip:ClearHandlerInfo();
-        --tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
         tooltip:SetOwner(self, "ANCHOR_NONE");
         tooltip:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
 
@@ -332,13 +384,37 @@ do
 
         tooltip:AddLine(string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks), 1, 1, 1, true);
 
+
+        --Bonus Ranks
+        local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
+        if increasedRanks > 0 then
+            local increasedTraitDataList = C_Traits.GetIncreasedTraitData(self.nodeID, self.entryID);
+            for	_index, increasedTraitData in ipairs(increasedTraitDataList) do
+                local r, g, b = C_Item.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
+                local qualityColor = CreateColor(r, g, b, 1);
+                local coloredItemName = qualityColor:WrapTextInColorCode(increasedTraitData.itemNameIncreasing);
+                local wrapText = true;
+                GameTooltip_AddColoredLine(tooltip, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName), GREEN_FONT_COLOR, wrapText);
+            end
+        end
+
+        --[[
+        local definitionInfo = C_Traits.GetDefinitionInfo(self.definitionID);
+        if definitionInfo.overrideSubtext then
+            tooltip:AddLine(definitionInfo.overrideSubtext, 1, 1, 1, true);
+        end
+        if definitionInfo.overrideDescription then
+            tooltip:AddLine(definitionInfo.overrideDescription, 1, 1, 1, true);
+        end
+        --]]
+
         local activeEntryID = self.entryID;   --self.nodeInfo.activeEntry;  --debug
 		if activeEntryID then
 			tooltip:AddLine(" ");
 			tooltip:AppendInfo("GetTraitEntry", activeEntryID, 1);
 		end
 
-        local nextEntryID = self.entryType ~= 1 and self.entryID; --self.nodeInfo.nextEntry;  --debug
+        local nextEntryID = (self.maxRanks and self.maxRanks > 1) and self.entryType ~= 1 and self.entryID; --self.nodeInfo.nextEntry;  --debug
         local ranksPurchased = 1;
 		if nextEntryID and ranksPurchased > 0 then
 			tooltip:AddLine(" ");
@@ -373,8 +449,43 @@ do
         self.entryType = -1;
     end
 
+    function ArrowsButtonMixin:SetData(leftNodeID)
+        self.nodeIDs = {};
+        self.entryIDs = {};
+        local numEntries = 0;
+        for i = 1, 3 do
+            local nodeInfo = DataProvider:GetRightNodeInfo(leftNodeID);
+            if nodeInfo then
+                numEntries = numEntries + 1;
+                if not self.firstNodeID then
+                    self.firstNodeID = nodeInfo.ID;
+                    local entryInfo = DataProvider:GetEntryInfo(nodeInfo.entryID);
+                    self.spellID = C_Traits.GetDefinitionInfo(entryInfo.definitionID).spellID;
+                end
+                self.nodeIDs[numEntries] = nodeInfo.ID;
+                self.entryIDs[numEntries] = nodeInfo.entryID;
+                leftNodeID = nodeInfo.ID;
+            else
+                self:Hide();
+            end
+        end
+        self.maxRanks = numEntries;
+    end
+
     function ArrowsButtonMixin:Refresh()
-        local totalRanks = self.trackIndex == ACTIVE_TRACK_INDEX and 3 or 0;
+        local totalRanks = 0;
+        if self.trackIndex == ACTIVE_TRACK_INDEX then
+            for _, nodeID in ipairs(self.nodeIDs) do
+                local nodeInfo = DataProvider:GetNodeInfo(nodeID);
+                if nodeInfo.entryIDsWithCommittedRanks and #nodeInfo.entryIDsWithCommittedRanks > 0 then
+                    totalRanks = totalRanks + 1;
+                end
+
+                if DataProvider:IsNodeActive(nodeID) then   --debug
+                    totalRanks = totalRanks + 1;
+                end
+            end
+        end
         self:SetTotalRanks(totalRanks);
     end
 
@@ -409,7 +520,39 @@ do
     end
 
     function ArrowsButtonMixin:ShowTooltip()
+        if not self.entryIDs then return end;
 
+        local tooltip = GameTooltip;
+        tooltip:Hide();
+        tooltip:ClearHandlerInfo();
+        tooltip:SetOwner(self, "ANCHOR_NONE");
+        tooltip:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
+
+        tooltip:SetText(L["Stat Bonuses"], 1, 1, 1, true);
+
+        local currentRank = self.totalRanks or 0;
+        local maxRanks = #self.entryIDs;
+
+        tooltip:AddLine(string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, currentRank, maxRanks), 1, 1, 1, true);
+
+        for index, entryID in ipairs(self.entryIDs) do
+            tooltip:AddLine(" ");
+            --local desc = C_Spell.GetSpellDescription(self.spellID);
+            local tooltipInfo = C_TooltipInfo.GetTraitEntry(entryID, 1);
+            if tooltipInfo then
+                local line = tooltipInfo.lines and tooltipInfo.lines[2];
+                if line and line.leftText then
+                    if index > currentRank then
+                        tooltip:AddLine(line.leftText, 0.5, 0.5, 0.5, true);
+                    else
+                        tooltip:AddLine(line.leftText, 1, 0.82, 00, true);
+                    end
+                end
+            end
+        end
+
+        self.UpdateTooltip = self.ShowTooltip;
+        tooltip:Show();
     end
 end
 
@@ -442,6 +585,7 @@ do
 
     function ActivateButtonMixin:SetParentCard(card)
         self:ClearAllPoints();
+        self.parentCard = card;
         if card then
             self.trackIndex = card.trackIndex;
             self:SetParent(card);
@@ -449,6 +593,7 @@ do
             self:SetAlpha(0);
             self.t = 0;
             self:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+            self:Update();
             self:Show();
             self:OnMouseUp();
         else
@@ -458,12 +603,19 @@ do
         end
     end
 
-    function ActivateButtonMixin:HideIfActive(trackIndex)
-        if not trackIndex then
-            trackIndex = DataProvider:GetActiveArtifactTrackIndex();
-        end
-        if self.trackIndex == trackIndex then
+    function ActivateButtonMixin:IsParentCard(card)
+        return self:IsShown() and self.parentCard == card
+    end
+
+    function ActivateButtonMixin:Update(inCombat)
+        if self.trackIndex == DataProvider:GetActiveArtifactTrackIndex() then
             self:Hide();
+        elseif inCombat then
+            self:Disable();
+        elseif CommitUtil:IsCommitingInProcess() then
+            self:Disable();
+        else
+            self:Enable();
         end
     end
 end
@@ -523,18 +675,17 @@ do
             self.Subtitle:SetText(SPEC_ACTIVE);
             SetFontStringColor(self.Title, "White");
             SetFontStringColor(self.Subtitle, "FelGreenBright");
-            --debug
-            self.ActivateFX:Show();
-            self.ActivateFX:SetAlpha(0);
-            self.AnimActivateFX:Stop();
-            self.AnimActivateFX:Play();
         else
             self.Background:SetVertexColor(0.8, 0.8, 0.8);
             self.Background:SetDesaturated(true);
             self.EdgeGlow1:Hide();
             self.EdgeGlow2:Hide();
             self.Title:SetTextColor(0.6, 0.59, 0.49);
-            self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, 0);
+            if MainFrame.ActivateButton:IsParentCard(self) then
+                self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, ANIM_OFFSET_H_BUTTON_HOVER);
+            else
+                self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, 0);
+            end
             self.Subtitle:Hide();
             self.ActivateFX:Hide();
             self.AnimActivateFX:Stop();
@@ -610,7 +761,7 @@ do
         end
     end
 
-    function TrackCardMixin:Refresh()
+    function TrackCardMixin:Refresh(playAnimation)
         for _, obj in ipairs(self.TraitNodes) do
             obj:Refresh();
         end
@@ -621,29 +772,83 @@ do
         if isActive then
             self:SetScript("OnUpdate", nil);
             self.Title:SetPoint("CENTER", self, "LEFT", self.titleCenterX, ANIM_OFFSET_H_BUTTON_HOVER);
+
+            if isActive ~= self.isActive and playAnimation then
+                self.ActivateFX:Show();
+                self.ActivateFX:SetAlpha(0);
+                self.AnimActivateFX:Stop();
+                self.AnimActivateFX:Play();
+            end
         end
+
+        self.isActive = isActive;
     end
 end
 
 
 local MainFrameMixin = {};
 do
-    function MainFrameMixin:Refresh()
-        for _, card in ipairs(self.TrackCards) do
-            card:Refresh();
-        end
-        self.ActivateButton:HideIfActive(ACTIVE_TRACK_INDEX);
-    end
+    local DynamicEvents = {
+        "PLAYER_REGEN_ENABLED",
+        "PLAYER_REGEN_DISABLED",
+    };
 
     function MainFrameMixin:OnShow()
+        API.RegisterFrameForEvents(self, DynamicEvents);
+        CallbackRegistry:Register("LegionRemix.CommitFinished", self.OnCommitFinished, self);
         self:Refresh();
+        self:SetScript("OnEvent", self.OnEvent);
+    end
+
+    function MainFrameMixin:OnHide()
+        API.UnregisterFrameForEvents(self, DynamicEvents);
+        CallbackRegistry:UnregisterCallback("DEBUG_TRAIT_CONFIG_UPDATED", self.OnCommitFinished, self);
+        self:UpdateCardFocus();
+        self:CloseNodeFlyout();
+        self:SetScript("OnEvent", nil);
+    end
+
+    function MainFrameMixin:OnEvent(event, ...)
+        if event == "PLAYER_REGEN_ENABLED" then
+            self.ActivateButton:Update();
+        elseif event == "PLAYER_REGEN_DISABLED" then
+            self.ActivateButton:Update(true);
+        end
+        print(event, ...)
+    end
+
+    function MainFrameMixin:Refresh(playAnimation)
+        ACTIVE_TRACK_INDEX = DataProvider:GetActiveArtifactTrackIndex();
+        for _, card in ipairs(self.TrackCards) do
+            card:Refresh(playAnimation);
+        end
+        self.ActivateButton:Update();
+        --self:DebugSaveAllNodes();
+    end
+
+    function MainFrameMixin:DebugSaveAllNodes()
+        local trackNodes = {};
+        for i, card in ipairs(self.TrackCards) do
+            local nodes = {};
+            trackNodes[i] = nodes;
+            for _, obj in ipairs(card.TraitNodes) do
+                if obj.nodeID then
+                    table.insert(nodes, obj.nodeID);
+                end
+                if obj.nodeIDs then
+                    for _, nodeID in ipairs(obj.nodeIDs) do
+                        table.insert(nodes, nodeID);
+                    end
+                end
+            end
+        end
+        PlumberDevData.RemixArtifactTrackNodes = trackNodes;
     end
 
     function MainFrameMixin:TryActivateArtifactTrack(trackIndex)
         if InCombatLockdown() then return end;  --Activate button shouldn't be clickable
-
-        ACTIVE_TRACK_INDEX = trackIndex;
-        self:Refresh();
+        self.ActivateButton:Disable();
+        CommitUtil:TryPurchaseArtifactTrack(trackIndex);
     end
 
     function MainFrameMixin:HoverNode(nodeButton)
@@ -825,13 +1030,14 @@ do
         end
     end
 
-    function MainFrameMixin:OnHide()
-        self:UpdateCardFocus();
-        self:CloseNodeFlyout();
-    end
+    function MainFrameMixin:OnCommitFinished(success)
+        local playAnimation;
+        if success then
+            playAnimation = true;
+        else
 
-    function MainFrameMixin:OnLoad()
-        self:SetScript("OnHide", self.OnHide);
+        end
+        self:Refresh(playAnimation);
     end
 end
 
@@ -847,7 +1053,6 @@ local function InitArtifactUI()
     API.Mixin(f, MainFrameMixin);
     f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
     table.insert(UISpecialFrames, frameName);
-    f:OnLoad();
 
 
     local TrackCards = {};
@@ -888,9 +1093,8 @@ local function InitArtifactUI()
     local offsetX = 0;
     local offsetY = 0;
 
-    local numEntries, entryType;
-    local nodeID, entryID, definitionID;
-    local activeTrackIndex = DEBUG_MODE and ACTIVE_TRACK_INDEX or DataProvider:GetActiveArtifactTrackIndex();
+    local numEntries;
+    ACTIVE_TRACK_INDEX = DataProvider:GetActiveArtifactTrackIndex();
 
     local cardWidth = Constants.CardWidth * Constants.CardScale;
     local cardHeight = Constants.CardHeight * Constants.CardScale;
@@ -910,11 +1114,11 @@ local function InitArtifactUI()
         card.trackIndex = index;
         card.TraitNodes = {};
 
-        for i, v in ipairs(trackData) do
+        for i, nodeID in ipairs(trackData) do
             local button = CreateFrame("Button", nil, card, "PlumberLegionRemixNodeTemplate");
             API.Mixin(button, NodeButtonMixin);
             button.trackIndex = index;
-            button.parentCard = card
+            button.parentCard = card;
             button:OnLoad();
             table.insert(card.TraitNodes, button);
             button:SetPoint("LEFT", card, "LEFT", offsetX, 0);
@@ -925,25 +1129,11 @@ local function InitArtifactUI()
                 --print(card:GetLeft() - x);
             end
 
-            if type(v[1]) == "table" then
-                entryType = 0;   --Hex     --debug
-                button:SetNodeChoices(v);
+            local entryID = DataProvider:GetNodeEntryID(nodeID);
+            if type(entryID) == "table" then
+                button:SetNodeChoices(nodeID, entryID);
             else
-                if i == 1 then
-                    entryType = 1;  --Square
-                else
-                    entryType = 2;  --Circle
-                end
-                nodeID, entryID, definitionID = v[1], v[2], v[3];
-                button:SetData(nodeID, entryID, definitionID);
-            end
-
-            if entryType == 0 then
-                button:SetHex();
-            elseif entryType == 1 then
-                button:SetSquare();
-            else
-                button:SetCircle();
+                button:SetData(nodeID, entryID);
             end
 
             offsetX = offsetX + buttonSize + gapH;
@@ -952,18 +1142,18 @@ local function InitArtifactUI()
                 local arrow = CreateFrame("Button", nil, card, "PlumberLegionRemixThreeArrowsTemplate");
                 API.Mixin(arrow, ArrowsButtonMixin);
                 arrow.trackIndex = index;
-                arrow:OnLoad();
                 table.insert(card.TraitNodes, arrow);
+                arrow:OnLoad();
+                arrow:SetData(nodeID);
                 arrow:SetPoint("LEFT", card, "LEFT", offsetX, 0);
                 offsetX = offsetX + Constants.ThreeArrowsSize + gapH;
             end
         end
-
-        card:SetVisualState(index == ACTIVE_TRACK_INDEX and 1 or 0);
     end
 
     local height = 5 * (cardHeight + cardGap) - cardGap;
     f:SetSize(cardWidth, height);
+    f:SetScript("OnHide", f.OnHide);
     f:SetScript("OnShow", f.OnShow);
 
 
