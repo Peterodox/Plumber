@@ -1222,6 +1222,33 @@ do  --Red Button
 
     end
 
+    function RedButtonMixin:SetTheme(theme)
+        local file;
+        if theme == "LEGION" then
+            file = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBorder_LEGION";
+        else
+            file = TEXTURE_FILE;
+        end
+        SetupThreeSliceBackground(self, file, -2.5, 2.5);
+    end
+
+    function RedButtonMixin:ShowLoadingIndicator(state)
+        if state then
+            if not self.LoadingIndicator then
+                self.LoadingIndicator = CreateFrame("Frame", nil, self, "PlumberLoadingIndicatorTemplate");
+                self.LoadingIndicator:SetSize(14, 14);
+                self.LoadingIndicator:SetAlpha(0.6);
+            end
+            local offset = -4 - 0.5 * (self.ButtonText:GetWrappedWidth() or 0);
+            self.LoadingIndicator:Show();
+            self.LoadingIndicator:SetPoint("RIGHT", self, "CENTER", offset, 0);
+        else
+            if self.LoadingIndicator then
+                self.LoadingIndicator:Hide();
+            end
+        end
+    end
+
     local function CreateRedButton(parent)
         local f = CreateFrame("Button", nil, parent);
         Mixin(f, RedButtonMixin);

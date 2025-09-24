@@ -486,7 +486,7 @@ end
 function CommitUtil:TryPurchaseArtifactTrack(index)
     local function OnUpdate(self, elapsed)
         self.t = self.t + elapsed;
-        if self.t > 0.2 then
+        if self.t > 1 then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             DataProvider.artifactTrackIndex = index;

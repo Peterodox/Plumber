@@ -1443,6 +1443,11 @@ do  -- Pixel
         return GetPixelForScale(scale, pixelSize);
     end
     API.GetPixelForWidget = GetPixelForWidget;
+
+    function API.UpdateTextureSliceScale(textureSlice)
+        local SCREEN_WIDTH, SCREEN_HEIGHT = GetPhysicalScreenSize();
+        textureSlice:SetScale((768/SCREEN_HEIGHT));
+    end
 end
 
 do  -- Easing

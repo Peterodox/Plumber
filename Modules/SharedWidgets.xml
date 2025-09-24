@@ -640,4 +640,28 @@
             </OnMouseDown>
         </Scripts>
     </Frame>
+
+    <Frame name="PlumberLoadingIndicatorTemplate" hidden="true" virtual="true">
+        <Size x="16" y="16"/>
+        <Layers>
+            <Layer level="OVERLAY">
+				<Texture parentKey="Spinner" setAllPoints="true" file="Interface\AddOns\Plumber\Art\Button\LoadingIndicator32" texelSnappingBias="0.0" snapToPixelGrid="false">
+
+				</Texture>
+            </Layer>
+        </Layers>
+        <Animations>
+            <AnimationGroup parentKey="Anim" looping="REPEAT">
+                <Rotation degrees="-360" duration="1" order="1" childKey="Spinner"/>
+            </AnimationGroup>
+        </Animations>
+        <Scripts>
+            <OnShow>
+                self.Anim:Play();
+            </OnShow>
+            <OnHide>
+                self.Anim:Stop();
+            </OnHide>
+        </Scripts>
+    </Frame>
 </Ui>

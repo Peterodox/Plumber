@@ -358,6 +358,7 @@ do
             return
         end
 
+
         local tooltip = GameTooltip;
         tooltip:Hide();
         tooltip:ClearHandlerInfo();
@@ -373,31 +374,6 @@ do
         end
         --]]
 
-        local name = C_Spell.GetSpellName(spellID);
-        if not name then
-            name = RETRIEVING_DATA;
-        end
-
-        tooltip:SetText(name, 1, 1, 1, true);
-
-        local nodeInfo = self:GetNodeInfo();    --debug
-
-        tooltip:AddLine(string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks), 1, 1, 1, true);
-
-
-        --Bonus Ranks
-        local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
-        if increasedRanks > 0 then
-            local increasedTraitDataList = C_Traits.GetIncreasedTraitData(self.nodeID, self.entryID);
-            for	_index, increasedTraitData in ipairs(increasedTraitDataList) do
-                local r, g, b = C_Item.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
-                local qualityColor = CreateColor(r, g, b, 1);
-                local coloredItemName = qualityColor:WrapTextInColorCode(increasedTraitData.itemNameIncreasing);
-                local wrapText = true;
-                GameTooltip_AddColoredLine(tooltip, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName), GREEN_FONT_COLOR, wrapText);
-            end
-        end
-
         --[[
         local definitionInfo = C_Traits.GetDefinitionInfo(self.definitionID);
         if definitionInfo.overrideSubtext then
@@ -408,22 +384,100 @@ do
         end
         --]]
 
-        local activeEntryID = self.entryID;   --self.nodeInfo.activeEntry;  --debug
-		if activeEntryID then
-			tooltip:AddLine(" ");
-			tooltip:AppendInfo("GetTraitEntry", activeEntryID, 1);
-		end
+
+        local function AddLine(oldText, newText)
+            return oldText.."\n"..newText
+        end
+
+        local text = C_Spell.GetSpellName(spellID);
+        if not text then
+            text = RETRIEVING_DATA;
+        end
+
+        local nodeInfo = self:GetNodeInfo();    --debug
+
+        text = AddLine(text, string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks));
+
+
+        --Bonus Ranks
+        local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
+        if increasedRanks > 0 then
+            local increasedTraitDataList = C_Traits.GetIncreasedTraitData(self.nodeID, self.entryID);
+            for	_index, increasedTraitData in ipairs(increasedTraitDataList) do
+                local r, g, b = C_Item.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
+                local qualityColor = CreateColor(r, g, b, 1);
+                local coloredItemName = qualityColor:WrapTextInColorCode(increasedTraitData.itemNameIncreasing);
+                --local wrapText = true;
+                --GameTooltip_AddColoredLine(tooltip, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName), GREEN_FONT_COLOR, wrapText);
+                text = AddLine(text, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName));
+            end
+        end
+
+
+        local activeEntryID = self.entryID; 
+        local data = C_TooltipInfo.GetTraitEntry(activeEntryID, 1);
+        if data and data.lines then
+            local lineText;
+            for i, line in ipairs(data.lines) do
+                lineText = line.leftText;
+                if lineText then
+                    if line.leftColor then
+                        lineText = line.leftColor:WrapTextInColorCode(lineText);
+                    end
+                    text = AddLine(text, lineText);
+                end
+                lineText = line.rightText;
+                if lineText then
+                    if line.rightColor then
+                        lineText = line.rightColor:WrapTextInColorCode(lineText);
+                    end
+                    text = text.."  "..lineText;
+                end
+            end
+        end
 
         local nextEntryID = (self.maxRanks and self.maxRanks > 1) and self.entryType ~= 1 and self.entryID; --self.nodeInfo.nextEntry;  --debug
         local ranksPurchased = 1;
 		if nextEntryID and ranksPurchased > 0 then
-			tooltip:AddLine(" ");
-			tooltip:AddLine(TALENT_BUTTON_TOOLTIP_NEXT_RANK, 1, 1, 1);
-			tooltip:AppendInfo("GetTraitEntry", nextEntryID, 1);
+            text = AddLine(text, " ");
+            text = AddLine(text, TALENT_BUTTON_TOOLTIP_NEXT_RANK);
+            local data = C_TooltipInfo.GetTraitEntry(nextEntryID, 1);
+            if data and data.lines then
+                local lineText;
+                for i, line in ipairs(data.lines) do
+                    lineText = line.leftText;
+                    if lineText then
+                        if line.leftColor then
+                            lineText = line.leftColor:WrapTextInColorCode(lineText);
+                        end
+                        text = AddLine(text, lineText);
+                    end
+                    lineText = line.rightText;
+                    if lineText then
+                        if line.rightColor then
+                            lineText = line.rightColor:WrapTextInColorCode(lineText);
+                        end
+                        text = text.."  "..lineText;
+                    end
+                end
+            end
 		end
 
-        self.UpdateTooltip = self.ShowTooltip;
-        tooltip:Show();
+
+        tooltip:Hide();
+
+        local padding = 16;
+        local TooltipFrame = MainFrame.TooltipFrame;
+        TooltipFrame.Desc:ClearAllPoints();
+        TooltipFrame.Desc:SetPoint("TOPLEFT", TooltipFrame, "TOPLEFT", padding, -padding);
+        TooltipFrame.Desc:SetText(text);
+        local width = TooltipFrame.Desc:GetWrappedWidth();
+        local height = TooltipFrame.Desc:GetHeight();
+        TooltipFrame:ClearAllPoints();
+        TooltipFrame:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
+        TooltipFrame:SetSize(width + 2*padding, height + 2*padding + 6);
+        API.UpdateTextureSliceScale(TooltipFrame.BackgroundFrame.Texture);
+        TooltipFrame:Show();
     end
 
     function NodeButtonMixin:HideTooltip()
@@ -433,6 +487,7 @@ do
             self.spellLoadCancel();
             self.spellLoadCancel = nil;
         end
+        --MainFrame.TooltipFrame:Hide();
     end
 end
 
@@ -567,6 +622,7 @@ do
         self.onEnterFunc = self.OnEnter;
         self.onLeaveFunc = self.OnLeave;
         self:SetScript("OnClick", self.OnClick);
+        --self:SetTheme("LEGION");  --Use the default red. Green feels too homogenized
     end
 
     function ActivateButtonMixin:OnEnter()
@@ -608,15 +664,18 @@ do
     end
 
     function ActivateButtonMixin:Update(inCombat)
+        local isLoading;
         if self.trackIndex == DataProvider:GetActiveArtifactTrackIndex() then
             self:Hide();
         elseif inCombat then
             self:Disable();
         elseif CommitUtil:IsCommitingInProcess() then
             self:Disable();
+            isLoading = true;
         else
             self:Enable();
         end
+        self:ShowLoadingIndicator(isLoading);
     end
 end
 
@@ -849,6 +908,7 @@ do
         if InCombatLockdown() then return end;  --Activate button shouldn't be clickable
         self.ActivateButton:Disable();
         CommitUtil:TryPurchaseArtifactTrack(trackIndex);
+        self.ActivateButton:Update();
     end
 
     function MainFrameMixin:HoverNode(nodeButton)
@@ -1162,6 +1222,10 @@ local function InitArtifactUI()
     f.ActivateButton = ActivateButton;
     API.Mixin(ActivateButton, ActivateButtonMixin);
     ActivateButton:OnLoad();
+
+    local TooltipFrame = CreateFrame("Frame", nil, f, "PlumberLegionRemixTooltipTemplate");
+    f.TooltipFrame = TooltipFrame;
+    TooltipFrame:Hide();
 end
 
 local function ShowArtifactUI()

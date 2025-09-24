@@ -108,6 +108,33 @@
 		</Animations>
 	</Button>
 
+	<Frame name="PlumberLegionRemixTooltipTemplate" virtual="true">
+		<Size x="256" y="256"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Desc" inherits="GameTooltipText" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
+					<Size x="240"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="8" y="-8"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="BackgroundFrame" setAllPoints="true" useParentLevel="true">
+				<Size x="256" y="256"/>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Texture" setAllPoints="true" file="Interface/AddOns/Plumber/Art/Timerunning/TooltipBackground.png" alpha="0.8">
+							<TextureSliceMode mode="Tiled"/>
+							<TextureSliceMargins left="32" right="32" top="32" bottom="60"/>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+
 	<Button name="PlumberLegionRemixCardTemplate" enableMouse="true" enableMouseMotion="true" virtual="true">
 		<Size x="732" y="108"/>
 		<Layers>
