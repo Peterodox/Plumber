@@ -227,7 +227,7 @@ L["Delve Crest Stash Requirement"] = "11단계 풍요로운 구렁에서 나타�
 L["Overcharged Delve"] = "과충전된 구렁";
 L["Delves History Requires AddOn"] = "구렁 기록은 Plumber 애드온에 의해 로컬에 저장.";
 L["AUTO_SELECT"] = "자동 선택";
-L["Power Borrowed"] = "한시적 능력";
+L["Power Borrowed"] = "한시적 능력 강화";
 
 
 --WoW Anniversary
