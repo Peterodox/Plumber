@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.4 g
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.5
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -250,10 +250,14 @@ L["ModuleName Delves_SeasonProgress"] = "Вылазки: Путешествие 
 L["ModuleDescription Delves_SeasonProgress"] = "Отображение шкалы прогресса в верхней части экрана каждый раз, когда вы получаете опыт для вылазки";
 L["ModuleName Delves_Dashboard"] = "Вылазки: Еженедельная награда";
 L["ModuleDescription Delves_Dashboard"] = "Отображать прогресс Великого хранилища и Позолоченных тайников на панели Вылазок.";
+L["ModuleName Delves_Automation"] = "Вылазки: Автоматический выбор усиления";
+L["ModuleDescription Delves_Automation"] = "Автоматически выбирать силу, выпадающую из сокровищ и редких монстров.";
 L["Delve Crest Stash No Info"] = "Эта информация недоступна в вашем текущем местоположении.";
 L["Delve Crest Stash Requirement"] = "Появляется на 11-м уровне многообещающих вылазок.";
 L["Overcharged Delve"] = "Перегруженная Вылазка";
 L["Delves History Requires AddOn"] = "История Вылазок хранится локально с помощью аддона Plumber.";
+L["Auto Select"] = "Автоматический выбор";
+L["Power Borrowed"] = "Заимствованная мощность";
 
 
 --WoW Anniversary
