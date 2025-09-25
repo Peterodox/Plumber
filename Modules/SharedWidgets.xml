@@ -645,9 +645,7 @@
         <Size x="16" y="16"/>
         <Layers>
             <Layer level="OVERLAY">
-				<Texture parentKey="Spinner" setAllPoints="true" file="Interface\AddOns\Plumber\Art\Button\LoadingIndicator32" texelSnappingBias="0.0" snapToPixelGrid="false">
-
-				</Texture>
+				<Texture parentKey="Spinner" setAllPoints="true" file="Interface\AddOns\Plumber\Art\Button\LoadingIndicator32" texelSnappingBias="0.0" snapToPixelGrid="false"/>
             </Layer>
         </Layers>
         <Animations>

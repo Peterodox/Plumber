@@ -48,6 +48,10 @@ local function SetFontStringColor(fontString, key)
     fontString:SetTextColor(color[1], color[2], color[3]);
 end
 
+local function AddLine(oldText, newText)
+    return oldText.."\n"..newText
+end
+
 local function SharedFadeIn_OnUpdate(self, elapsed)
     self.t = self.t + elapsed;
     local alpha = 8 * self.t;
@@ -359,12 +363,6 @@ do
         end
 
 
-        local tooltip = GameTooltip;
-        tooltip:Hide();
-        tooltip:ClearHandlerInfo();
-        tooltip:SetOwner(self, "ANCHOR_NONE");
-        tooltip:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
-
         local spellID = self.spellID;
         --local overrideSpellID = C_Spell.GetOverrideSpell(spellID);
         --[[
@@ -385,18 +383,14 @@ do
         --]]
 
 
-        local function AddLine(oldText, newText)
-            return oldText.."\n"..newText
-        end
-
-        local text = C_Spell.GetSpellName(spellID);
-        if not text then
-            text = RETRIEVING_DATA;
+        local name = C_Spell.GetSpellName(spellID);
+        if not name then
+            name = RETRIEVING_DATA;
         end
 
         local nodeInfo = self:GetNodeInfo();    --debug
-
-        text = AddLine(text, string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks));
+        local description;
+        description = string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks);
 
 
         --Bonus Ranks
@@ -409,85 +403,35 @@ do
                 local coloredItemName = qualityColor:WrapTextInColorCode(increasedTraitData.itemNameIncreasing);
                 --local wrapText = true;
                 --GameTooltip_AddColoredLine(tooltip, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName), GREEN_FONT_COLOR, wrapText);
-                text = AddLine(text, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName));
+                description = AddLine(description, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName));
             end
         end
 
 
-        local activeEntryID = self.entryID; 
-        local data = C_TooltipInfo.GetTraitEntry(activeEntryID, 1);
-        if data and data.lines then
-            local lineText;
-            for i, line in ipairs(data.lines) do
-                lineText = line.leftText;
-                if lineText then
-                    if line.leftColor then
-                        lineText = line.leftColor:WrapTextInColorCode(lineText);
-                    end
-                    text = AddLine(text, lineText);
-                end
-                lineText = line.rightText;
-                if lineText then
-                    if line.rightColor then
-                        lineText = line.rightColor:WrapTextInColorCode(lineText);
-                    end
-                    text = text.."  "..lineText;
-                end
-            end
-        end
+        local activeEntryID = self.entryID;
+        local rank = 1;
+        description = AddLine(description, " ");
+        description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", activeEntryID, rank);
 
         local nextEntryID = (self.maxRanks and self.maxRanks > 1) and self.entryType ~= 1 and self.entryID; --self.nodeInfo.nextEntry;  --debug
         local ranksPurchased = 1;
 		if nextEntryID and ranksPurchased > 0 then
-            text = AddLine(text, " ");
-            text = AddLine(text, TALENT_BUTTON_TOOLTIP_NEXT_RANK);
-            local data = C_TooltipInfo.GetTraitEntry(nextEntryID, 1);
-            if data and data.lines then
-                local lineText;
-                for i, line in ipairs(data.lines) do
-                    lineText = line.leftText;
-                    if lineText then
-                        if line.leftColor then
-                            lineText = line.leftColor:WrapTextInColorCode(lineText);
-                        end
-                        text = AddLine(text, lineText);
-                    end
-                    lineText = line.rightText;
-                    if lineText then
-                        if line.rightColor then
-                            lineText = line.rightColor:WrapTextInColorCode(lineText);
-                        end
-                        text = text.."  "..lineText;
-                    end
-                end
-            end
+            description = AddLine(description, " ");
+            description = AddLine(description, TALENT_BUTTON_TOOLTIP_NEXT_RANK);
+            local rank = 2;
+            description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", nextEntryID, rank);
 		end
 
+        local function updateTooltipFunc()
+            self.ShowTooltip(self);
+        end
 
-        tooltip:Hide();
-
-        local padding = 16;
-        local TooltipFrame = MainFrame.TooltipFrame;
-        TooltipFrame.Desc:ClearAllPoints();
-        TooltipFrame.Desc:SetPoint("TOPLEFT", TooltipFrame, "TOPLEFT", padding, -padding);
-        TooltipFrame.Desc:SetText(text);
-        local width = TooltipFrame.Desc:GetWrappedWidth();
-        local height = TooltipFrame.Desc:GetHeight();
-        TooltipFrame:ClearAllPoints();
-        TooltipFrame:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
-        TooltipFrame:SetSize(width + 2*padding, height + 2*padding + 6);
-        API.UpdateTextureSliceScale(TooltipFrame.BackgroundFrame.Texture);
-        TooltipFrame:Show();
+        local icon = self.Icon:GetTexture();
+        MainFrame:SetTooltip(icon, name, description, updateTooltipFunc);
     end
 
     function NodeButtonMixin:HideTooltip()
-        GameTooltip:Hide();
-        self.UpdateTooltip = nil;
-        if self.spellLoadCancel then
-            self.spellLoadCancel();
-            self.spellLoadCancel = nil;
-        end
-        --MainFrame.TooltipFrame:Hide();
+        MainFrame:HideTooltip();
     end
 end
 
@@ -577,37 +521,35 @@ do
     function ArrowsButtonMixin:ShowTooltip()
         if not self.entryIDs then return end;
 
-        local tooltip = GameTooltip;
-        tooltip:Hide();
-        tooltip:ClearHandlerInfo();
-        tooltip:SetOwner(self, "ANCHOR_NONE");
-        tooltip:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
-
-        tooltip:SetText(L["Stat Bonuses"], 1, 1, 1, true);
-
+        local name = L["Stat Bonuses"];
         local currentRank = self.totalRanks or 0;
         local maxRanks = #self.entryIDs;
+        local description = string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, currentRank, maxRanks);
+        local lineText;
 
-        tooltip:AddLine(string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, currentRank, maxRanks), 1, 1, 1, true);
+        description = AddLine(description, " ");
 
         for index, entryID in ipairs(self.entryIDs) do
-            tooltip:AddLine(" ");
             --local desc = C_Spell.GetSpellDescription(self.spellID);
             local tooltipInfo = C_TooltipInfo.GetTraitEntry(entryID, 1);
             if tooltipInfo then
                 local line = tooltipInfo.lines and tooltipInfo.lines[2];
                 if line and line.leftText then
                     if index > currentRank then
-                        tooltip:AddLine(line.leftText, 0.5, 0.5, 0.5, true);
+                        lineText = "|cff808080"..line.leftText.."|r";
                     else
-                        tooltip:AddLine(line.leftText, 1, 0.82, 00, true);
+                        lineText = "|cffffd100"..line.leftText.."|r";
                     end
+                    description = AddLine(description, lineText);
                 end
             end
         end
 
-        self.UpdateTooltip = self.ShowTooltip;
-        tooltip:Show();
+        local function updateTooltipFunc()
+            self.ShowTooltip(self);
+        end
+
+        MainFrame:SetTooltip(nil, name, description, updateTooltipFunc);
     end
 end
 
@@ -1099,6 +1041,67 @@ do
         end
         self:Refresh(playAnimation);
     end
+
+    local function TooltipFrame_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.5 then
+            self.t = 0;
+            if self.updateTooltipFunc then
+                self.updateTooltipFunc(self);
+            else
+                self:SetScript("OnUpdate", nil);
+            end
+        end
+
+        if self.isFading then
+            self.alpha = self.alpha + 8 * elapsed;
+            if self.alpha > 1 then
+                self.alpha = 1;
+                self.isFading = nil;
+            end
+            self:SetAlpha(self.alpha);
+        end
+    end
+
+    function MainFrameMixin:SetTooltip(icon, header, description, updateTooltipFunc)
+        local padding = 20;
+        local f = self.TooltipFrame;
+
+        f.Icon:SetTexture(icon);
+        f.Header:SetText(header);
+        f.Desc:SetText(description);
+        f.updateTooltipFunc = updateTooltipFunc;
+        f.t = 0;
+
+        local width = math.max(f.Header:GetWrappedWidth(), f.Desc:GetWrappedWidth());
+        local height = f.Header:GetHeight() + 4 + f.Desc:GetHeight();
+
+        f:ClearAllPoints();
+        f:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
+        f:SetSize(width + 2*padding, height + 2*padding + 6);
+        API.UpdateTextureSliceScale(f.BackgroundFrame.Texture);
+        f:SetScript("OnUpdate", TooltipFrame_OnUpdate);
+        f.isFading = true;
+        f:Show();
+    end
+
+    local function TooltipFrame_FadeOut_OnUpdate(self, elapsed)
+        self.alpha = self.alpha - 5 * elapsed;
+        if self.alpha < 0 then
+            self.alpha = 0;
+            self:SetScript("OnUpdate", nil);
+        end
+        self:SetAlpha(self.alpha);
+    end
+
+    function MainFrameMixin:HideTooltip()
+        --self.TooltipFrame:Hide();
+        local f = self.TooltipFrame;
+        f.updateTooltipFunc = nil;
+        if f:IsVisible() then
+            f:SetScript("OnUpdate", TooltipFrame_FadeOut_OnUpdate);
+        end
+    end
 end
 
 
@@ -1226,6 +1229,18 @@ local function InitArtifactUI()
     local TooltipFrame = CreateFrame("Frame", nil, f, "PlumberLegionRemixTooltipTemplate");
     f.TooltipFrame = TooltipFrame;
     TooltipFrame:Hide();
+    TooltipFrame.alpha = 0;
+    TooltipFrame:SetAlpha(0);
+    TooltipFrame.Icon:SetDesaturation(0.2);
+    TooltipFrame.Icon:SetVertexColor(0.8, 0.8, 0.8);
+    TooltipFrame:SetScript("OnHide", function(self)
+        self:Hide();
+        self.alpha = 0;
+        self.t = 0;
+        self:SetAlpha(0);
+        self:SetScript("OnUpdate", nil);
+        self.updateTooltipFunc = nil;
+    end);
 end
 
 local function ShowArtifactUI()

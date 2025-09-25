@@ -3030,6 +3030,41 @@ do  -- Tooltip
     end
 
 
+    function API.ConvertTooltipInfoToOneString(text, getterName, ...)
+        -- where ... are getterArgs
+        -- Ignore textures
+
+        local data = C_TooltipInfo[getterName](...)
+        if data and data.lines then
+            local lineText;
+            for i, line in ipairs(data.lines) do
+                lineText = line.leftText;
+                if i == 1 and lineText == "" then
+                    lineText = nil;
+                end
+                if lineText then
+                    if line.leftColor then
+                        lineText = line.leftColor:WrapTextInColorCode(lineText);
+                    end
+                    if text then
+                        text = text.."\n"..lineText;
+                    else
+                        text = lineText;
+                    end
+                end
+                lineText = line.rightText;
+                if lineText then
+                    if line.rightColor then
+                        lineText = line.rightColor:WrapTextInColorCode(lineText);
+                    end
+                    text = text.."    "..lineText;
+                end
+            end
+        end
+        return text
+    end
+
+
     local TextureInfoTable = {
         width = 14,
         height = 14,
