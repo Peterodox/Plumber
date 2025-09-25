@@ -229,7 +229,6 @@ L["Delves History Requires AddOn"] = "구렁 기록은 Plumber 애드온에 의�
 L["AUTO_SELECT"] = "자동 선택";
 L["Power Borrowed"] = "한시적 능력 강화";
 
-
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "WoW 기념 이벤트";
 L["ModuleDescription WoWAnniversary"] = "- 탈것 광란 이벤트에서 해당 탈것을 간편하게 소환합니다.\n\n- 패션 열풍 이벤트에서 투표 결과를 표시합니다.";
