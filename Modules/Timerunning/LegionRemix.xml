@@ -112,12 +112,36 @@
 		<Size x="256" y="256"/>
 		<Layers>
 			<Layer level="OVERLAY">
+				<FontString parentKey="Header" inherits="GameTooltipHeaderText" justifyH="LEFT" spacing="2">
+					<Size x="240"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="20" y="-20"/>
+					</Anchors>
+				</FontString>
 				<FontString parentKey="Desc" inherits="GameTooltipText" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
 					<Size x="240"/>
 					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="8" y="-8"/>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Header" relativePoint="BOTTOMLEFT" x="0" y="-4"/>
 					</Anchors>
 				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" alpha="0.5">
+					<Size x="64" y="64"/>
+					<TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x="-18" y="-18"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture parentKey="IconMask" file="Interface/AddOns/Plumber/Art/Timerunning/TooltipIconMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Icon"/>
+					</MaskedTextures>
+				</MaskTexture>
 			</Layer>
 		</Layers>
 		<Frames>

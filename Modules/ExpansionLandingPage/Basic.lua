@@ -1237,7 +1237,7 @@ do  --Red Button
             if not self.LoadingIndicator then
                 self.LoadingIndicator = CreateFrame("Frame", nil, self, "PlumberLoadingIndicatorTemplate");
                 self.LoadingIndicator:SetSize(14, 14);
-                self.LoadingIndicator:SetAlpha(0.6);
+                self.LoadingIndicator:SetAlpha(0.5);
             end
             local offset = -4 - 0.5 * (self.ButtonText:GetWrappedWidth() or 0);
             self.LoadingIndicator:Show();
