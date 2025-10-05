@@ -262,4 +262,90 @@
 			</AnimationGroup>
 		</Animations>
 	</Button>
+
+	<Button name="PlumberLegionRemixPaperDollWidgetTemplate" virtual="true">
+		<Size x="48" y="48"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" texelSnappingBias="0.0" snapToPixelGrid="false">
+					<Size x="60" y="48"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Sheen" alphaMode="ADD" hidden="true" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="60" y="48"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+				<MaskTexture parentKey="SheenMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Size x="16" y="16"/>
+					<Anchors>
+						<Anchor point="CENTER" y="6"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Sheen"/>
+					</MaskedTextures>
+				</MaskTexture>
+            </Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Tooltip" frameStrata="TOOLTIP" hidden="true">
+				<Size x="256" y="256"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPRIGHT" x="0" y="12"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND" textureSubLevel="1">
+						<Texture parentKey="BackgroundArt" alpha="0.2" hidden="true">
+							<Size x="128" y="128"/>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-4" y="4"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<FontString parentKey="Text1" inherits="GameTooltipText" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
+							<Size x="240"/>
+						</FontString>
+						<FontString parentKey="Text2" inherits="GameTooltipHeaderText" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
+							<Size x="240"/>
+						</FontString>
+						<FontString parentKey="Text3" inherits="GameTooltipText" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
+							<Size x="240"/>
+						</FontString>
+						<FontString parentKey="Instruction" inherits="GameTooltipText" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
+							<Size x="240"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame parentKey="BackgroundFrame" setAllPoints="true" useParentLevel="true">
+						<Size x="256" y="256"/>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture parentKey="Texture" setAllPoints="true" file="Interface/AddOns/Plumber/Art/Timerunning/TooltipBackground.png" alpha="0.8">
+									<TextureSliceMode mode="Tiled"/>
+									<TextureSliceMargins left="32" right="32" top="32" bottom="60"/>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Animations>
+			<AnimationGroup parentKey="AnimSheen" setToFinalAlpha="true">
+				<Alpha fromAlpha="0" toAlpha="1" duration="0.05" order="1" childKey="Sheen"/>
+				<Alpha fromAlpha="1" toAlpha="0" duration="0.2" startDelay="0.5" order="1" childKey="Sheen"/>
+				<Scale scaleX="6" scaleY="6" duration="0.6" order="1" smoothing="IN" childKey="SheenMask"/>
+			</AnimationGroup>
+		</Animations>
+	</Button>
+
+
+	<Script file="LegionRemix_PaperDoll.lua"/>
 </Ui>

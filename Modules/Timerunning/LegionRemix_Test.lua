@@ -429,6 +429,34 @@ local TrackNodes = {
     },
 };
 
+--[[
+do  --For debug on Retail
+    local debugNodeID = 93179;
+    local debugEntryID = 115462;
+    NextNodeDB[debugNodeID] = debugNodeID;
+    TraitNodeXEntryDB[debugNodeID] = debugEntryID;
+    TraitNodeEntryDB[debugEntryID] = {120474, 3, 2};
+
+    local tbl = {};
+    for i = 1, #TrackNodes do
+        tbl[i] = {};
+        for j = 1, #TrackNodes[i] do
+            tbl[i][j] = debugNodeID;
+        end
+    end
+    TrackNodes = tbl;
+
+    local tbl = {};
+    for i = 1, #DataProvider.ArtifactTracks do
+        tbl[i] = {};
+        for j = 1, #DataProvider.ArtifactTracks[i] do
+            tbl[i][j] = debugNodeID;
+        end
+    end
+    DataProvider.ArtifactTracks = tbl;
+end
+--]]
+
 function DataProvider:GetNodeEntryID(nodeID)
     return TraitNodeXEntryDB[nodeID]
 end
@@ -466,7 +494,7 @@ end
 function DataProvider:IsNodeActive(nodeID)
     if not self.activeNodeIDs then
         self.activeNodeIDs = {};
-        local threshold = 10;
+        local threshold = 20;
         for trackIndex, nodeIDs in ipairs(TrackNodes) do
             for i, _nodeID in ipairs(nodeIDs) do
                 if i <= threshold then

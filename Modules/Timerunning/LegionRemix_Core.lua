@@ -159,14 +159,14 @@ do	--DataProvider
 		108115, --Remix Time
 		108182, --Prim +1
 		108181, --STA +9
-		108878, --MAST +4
+		108878, --SPD +4
 		108180, --Nostwin's Impatience
 
 		--Purchase all small nodes, go up first
-		108165, --MAST +8
+		108165, --SPD +8
 		108172, --STA +13
 		--Down
-		108260, --MAST +8
+		108260, --SPD +8
 		108166, --STA +13
 		--Up
 		108523, --Momentus's Perseverance
@@ -174,7 +174,7 @@ do	--DataProvider
 		108869, --Prim +2
 		--Down
 		108701, --Moratari's Calculation
-		108251, --MAST +8
+		108251, --SPD +8
 		108873, --Eternus's Ambition
 		108868, --Prim +2
 		108169, --STA +13
@@ -478,7 +478,9 @@ do	--DataProvider
 			self.specIndex = specIndex;
 			local _, name = C_SpecializationInfo.GetSpecializationInfo(specIndex);
 			CallbackRegistry:Trigger("LegionRemix.ClassSpecChanged", specIndex);
-			C_RemixArtifactUI.ClearRemixArtifactItem();
+			if C_RemixArtifactUI then
+				C_RemixArtifactUI.ClearRemixArtifactItem();
+			end
 		end
 	end
 
@@ -1285,7 +1287,7 @@ end
 
 
 do	--Debug
-	--[[
+
 	EventRegistry:RegisterCallback("TalentDisplay.TooltipCreated", function(_, node, tooltip)
 		local nodeInfo = node.nodeInfo;
 		if nodeInfo then

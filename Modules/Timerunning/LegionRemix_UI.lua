@@ -40,6 +40,11 @@ local Constants = {
 
     White = {0.88, 0.88, 0.88},
     FelGreenBright = {220/255, 231/255, 96/255},
+
+    HeaderWidth = 444,
+    HeaderHeight = 96,
+    HeaderBGWidth = 512,
+    HeaderBGHeight = 192,
 };
 
 
@@ -346,6 +351,7 @@ do
     function NodeButtonMixin:PlaySheen()
         self.AnimSheen:Stop();
         self.AnimSheen:Play();
+        PlaySound(SOUNDKIT.UI_CLASS_TALENT_APPLY_COMPLETE);
     end
 
     function NodeButtonMixin:GetNodeInfo()
@@ -579,6 +585,7 @@ do
 
     function ActivateButtonMixin:OnClick()
         MainFrame:TryActivateArtifactTrack(self.trackIndex);
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
     end
 
     function ActivateButtonMixin:SetParentCard(card)
@@ -779,6 +786,7 @@ do
                 self.ActivateFX:SetAlpha(0);
                 self.AnimActivateFX:Stop();
                 self.AnimActivateFX:Play();
+                PlaySound(SOUNDKIT.UI_CLASS_TALENT_LEARN_TALENT)
             end
         end
 
@@ -799,6 +807,7 @@ do
         CallbackRegistry:Register("LegionRemix.CommitFinished", self.OnCommitFinished, self);
         self:Refresh();
         self:SetScript("OnEvent", self.OnEvent);
+        PlaySound(SOUNDKIT.UI_EXPANSION_LANDING_PAGE_OPEN);
     end
 
     function MainFrameMixin:OnHide()
@@ -807,6 +816,7 @@ do
         self:UpdateCardFocus();
         self:CloseNodeFlyout();
         self:SetScript("OnEvent", nil);
+        PlaySound(SOUNDKIT.UI_EXPANSION_LANDING_PAGE_CLOSE);
     end
 
     function MainFrameMixin:OnEvent(event, ...)
@@ -815,7 +825,6 @@ do
         elseif event == "PLAYER_REGEN_DISABLED" then
             self.ActivateButton:Update(true);
         end
-        print(event, ...)
     end
 
     function MainFrameMixin:Refresh(playAnimation)
@@ -824,6 +833,7 @@ do
             card:Refresh(playAnimation);
         end
         self.ActivateButton:Update();
+        self:UpdateNodeFlyoutFrame();
         --self:DebugSaveAllNodes();
     end
 
@@ -876,6 +886,14 @@ do
             f:SetAlpha(0);
             f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
             f:Show();
+        end
+    end
+
+    function MainFrameMixin:UpdateNodeFlyoutFrame()
+        if self.NodeFlyoutFrame and self.NodeFlyoutFrame:IsVisible() then
+            for _, button in ipairs(self.flyoutButtonPool:GetActiveObjects()) do
+                button:Refresh();
+            end
         end
     end
 
@@ -1086,12 +1104,16 @@ do
     end
 
     local function TooltipFrame_FadeOut_OnUpdate(self, elapsed)
-        self.alpha = self.alpha - 5 * elapsed;
-        if self.alpha < 0 then
-            self.alpha = 0;
-            self:SetScript("OnUpdate", nil);
+        self.t = self.t + elapsed;
+        if self.t >= 0 then
+            self.t = 0;
+            self.alpha = self.alpha - 5 * elapsed;
+            if self.alpha < 0 then
+                self.alpha = 0;
+                self:SetScript("OnUpdate", nil);
+            end
+            self:SetAlpha(self.alpha);
         end
-        self:SetAlpha(self.alpha);
     end
 
     function MainFrameMixin:HideTooltip()
@@ -1099,6 +1121,12 @@ do
         local f = self.TooltipFrame;
         f.updateTooltipFunc = nil;
         if f:IsVisible() then
+            f.t = 0;
+            if f.alpha >= 0.99 then
+                f.t = -0.2;
+            else
+                f.t = 0;
+            end
             f:SetScript("OnUpdate", TooltipFrame_FadeOut_OnUpdate);
         end
     end
@@ -1112,6 +1140,7 @@ local function InitArtifactUI()
     local frameName = "PlumberRemixArtifactUI";
     local f = CreateFrame("Frame", frameName, UIParent, "PlumberRemixArtifactUITemplate");
     f:Hide();
+    f:SetToplevel(true);
     MainFrame = f;
     API.Mixin(f, MainFrameMixin);
     f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
@@ -1226,6 +1255,7 @@ local function InitArtifactUI()
     API.Mixin(ActivateButton, ActivateButtonMixin);
     ActivateButton:OnLoad();
 
+
     local TooltipFrame = CreateFrame("Frame", nil, f, "PlumberLegionRemixTooltipTemplate");
     f.TooltipFrame = TooltipFrame;
     TooltipFrame:Hide();
@@ -1241,6 +1271,54 @@ local function InitArtifactUI()
         self:SetScript("OnUpdate", nil);
         self.updateTooltipFunc = nil;
     end);
+
+
+    local HeaderFrame = CreateFrame("Frame", nil, f);
+    HeaderFrame:SetSize(Constants.HeaderWidth * Constants.CardScale, Constants.HeaderHeight * Constants.CardScale);
+    HeaderFrame:SetPoint("BOTTOM", f, "TOP", 0, -4);
+
+    HeaderFrame.Background = HeaderFrame:CreateTexture(nil, "BACKGROUND");
+    HeaderFrame.Background:SetSize(Constants.HeaderBGWidth * Constants.CardScale, Constants.HeaderBGHeight * Constants.CardScale);
+    HeaderFrame.Background:SetPoint("CENTER", HeaderFrame, "CENTER", 0, 0);
+    HeaderFrame.Background:SetTexture(TEXTURE_FILE);
+    HeaderFrame.Background:SetTexCoord(0/1024, 512/1024, 576/1024, 768/1024);
+    HeaderFrame.Background:SetAlpha(1);
+
+    HeaderFrame.Text1 = HeaderFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    HeaderFrame.Text1:SetPoint("BOTTOM", HeaderFrame, "CENTER", 0, 4);
+    HeaderFrame.Text1:SetJustifyH("CENTER");
+    HeaderFrame.Text2 = HeaderFrame:CreateFontString(nil, "OVERLAY", "ObjectiveTrackerHeaderFont");
+    HeaderFrame.Text2:SetPoint("TOP", HeaderFrame, "CENTER", 0, 0);
+    HeaderFrame.Text2:SetJustifyH("CENTER");
+
+    HeaderFrame.Text1:SetText("42,000 to unlock");
+    HeaderFrame.Text1:SetTextColor(0.6, 0.6, 0.6);
+    HeaderFrame.Text2:SetText("Increase Speed Rating");
+    HeaderFrame.Text2:SetTextColor(177/255, 190/255, 95/255);
+
+    local function CreateTextBackground(parent, fontString, height, extensionX)
+        local bg = parent:CreateTexture(nil, "BACKGROUND", nil, 2);
+        bg:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateTextShadow");
+        bg:SetTextureSliceMargins(40, 24, 40, 24);
+        bg:SetTextureSliceMode(0);
+        bg:SetHeight(height);
+        local offsetY = 0;
+        bg:SetPoint("LEFT", fontString, "LEFT", -extensionX, offsetY);
+        bg:SetPoint("RIGHT", fontString, "RIGHT", extensionX, offsetY);
+        bg:SetAlpha(0.5);
+        return bg
+    end
+    HeaderFrame.Text1.Background = CreateTextBackground(HeaderFrame, HeaderFrame.Text1, 46, 18);
+    HeaderFrame.Text2.Background = CreateTextBackground(HeaderFrame, HeaderFrame.Text2, 54, 20);
+
+
+    local CardBackground = f:CreateTexture(nil, "BACKGROUND", nil, 1);
+    CardBackground:SetPoint("CENTER", TrackCards[3], "CENTER", 0, 0);
+    CardBackground:SetTexture(TEXTURE_FILE);
+    CardBackground:SetTexCoord(704/1024, 1, 768/1024, 1);
+    CardBackground:SetAlpha(0.6);
+    local s = 2.1;
+    CardBackground:SetSize(320 * s, 256 * s);
 end
 
 local function ShowArtifactUI()
@@ -1252,4 +1330,12 @@ local function ShowArtifactUI()
 end
 RemixAPI.ShowArtifactUI = ShowArtifactUI;
 
-YEET_ShowArtifactUI = ShowArtifactUI;
+
+local function ToggleArtifactUI()
+    if not MainFrame then
+        InitArtifactUI();
+        MainFrame:Hide();
+    end
+    MainFrame:SetShown(not MainFrame:IsShown());
+end
+RemixAPI.ToggleArtifactUI = ToggleArtifactUI;
