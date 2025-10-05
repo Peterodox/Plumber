@@ -267,7 +267,7 @@
 		<Size x="48" y="48"/>
 		<Layers>
 			<Layer level="BACKGROUND">
-				<Texture parentKey="Background" texelSnappingBias="0.0" snapToPixelGrid="false">
+				<Texture parentKey="Background">
 					<Size x="60" y="48"/>
 					<Anchors>
 						<Anchor point="CENTER"/>
@@ -275,7 +275,7 @@
 				</Texture>
 			</Layer>
             <Layer level="ARTWORK">
-                <Texture parentKey="Sheen" alphaMode="ADD" hidden="true" texelSnappingBias="0.0" snapToPixelGrid="false">
+                <Texture parentKey="Sheen" alphaMode="ADD" hidden="true">
                     <Size x="60" y="48"/>
                     <Anchors>
                         <Anchor point="CENTER"/>

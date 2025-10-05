@@ -5,6 +5,12 @@ if not RemixAPI then return end;
 
 local API = addon.API;
 local L = addon.L;
+local GetInventoryItemID = GetInventoryItemID;
+local GetSpellTexture = C_Spell.GetSpellTexture;
+local DataProvider = RemixAPI.DataProvider;
+
+
+local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Timerunning/LegionPaperDollWidget.png";
 
 
 local Controller = CreateFrame("Frame");
@@ -115,7 +121,7 @@ do  --Controller
         WidgetContainer:Show();
         WidgetContainer:SetFrameStrata("HIGH");
         WidgetContainer:SetScript("OnShow", self.UpdatePosition_OnShow);
-
+        self:SetScript("OnEvent", self.OnEvent);
         self:UpdateParent();
         self.isEnabled = true;
     end
@@ -146,8 +152,8 @@ do  --Controller
 
     function Controller:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        if self.delay >= 0.1 then
-            self.delay = nil;
+        if self.t >= 0.1 then
+            self.t = nil;
             self:SetScript("OnUpdate", nil);
             self:UpdateWidgets();
         end
@@ -198,6 +204,41 @@ do  --Controller
             end
         end
     end
+
+    function Controller:HideNarcissusWidgets()
+        local con = NarciPaperDollWidgetController;
+        if not con then return end;
+
+        con:ListenEvents(false);
+        con.WidgetContainer:Hide();
+    end
+
+    local PaperDollSlots = {
+        [1] = "HeadSlot",
+        [2] = "NeckSlot",
+        [3] = "ShoulderSlot",
+        [4] = "ShirtSlot",
+        [5] = "ChestSlot",
+        [6] = "WaistSlot",
+        [7] = "LegsSlot",
+        [8] = "FeetSlot",
+        [9] = "WristSlot",
+        [10]= "HandsSlot",
+        [11]= "Finger0Slot",
+        [12]= "Finger1Slot",
+        [13]= "Trinket0Slot",
+        [14]= "Trinket1Slot",
+        [15]= "BackSlot",
+        [16]= "MainHandSlot",
+        [17]= "SecondaryHandSlot",
+        [18]= "AmmoSlot",
+        [19]= "TabardSlot",
+    };
+
+    function Controller:GetSlotButton(slotID)
+        local slotButton = _G["Character"..PaperDollSlots[slotID]];
+        return slotButton
+    end
 end
 
 
@@ -223,16 +264,43 @@ do
 end
 
 
+local function CreateSubIconPool()
+    local function IconFrame_Create()
+        local object = CreateFrame("Frame");
+        object:SetSize(16, 16);
+        object.Icon = object:CreateTexture(nil, "OVERLAY");
+        object.Icon:SetSize(16, 16);
+        object.Icon:SetPoint("CENTER", object, "CENTER", 0, 0);
+        local shrink = 8;
+        object.Icon:SetTexCoord(shrink/64, 1-shrink/64, shrink/64, 1-shrink/64);
+        object.Border = object:CreateTexture(nil, "OVERLAY", nil, 2);
+        object.Border:SetTexture(TEXTURE_FILE);
+        object.Border:SetTexCoord(384/512, 448/512, 0, 64/512);
+        object.Border:SetSize(32, 32);
+        object.Border:SetPoint("CENTER", object, "CENTER", 0, 0);
+        object.Icon:SetTexture(134400);
+        return object
+    end
+
+    local function IconFrame_Remove(object)
+        object:ClearAllPoints();
+        object:Hide();
+        object:SetParent(nil);
+    end
+
+    return API.CreateObjectPool(IconFrame_Create, IconFrame_Remove);
+end
+
 local LegionWidget = CreatePaperDollWidget("PlumberLegionRemixPaperDollWidgetTemplate");
 do
     LegionWidget.enabled = true;
-    local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Timerunning/LegionPaperDollWidget.png";
     LegionWidget.Background:SetTexture(TEXTURE_FILE);
     LegionWidget.Sheen:SetTexture(TEXTURE_FILE);
     LegionWidget.Sheen:SetTexCoord(128/512, 248/512, 0, 96/512);
     LegionWidget.SheenMask:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/Mask-Halo", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
     LegionWidget.Tooltip.BackgroundArt:SetTexture(TEXTURE_FILE);
     LegionWidget.Tooltip.BackgroundArt:SetTexCoord(0/512, 160/512, 96/512, 256/512);
+    LegionWidget:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 
     Controller:AddWidget(LegionWidget, 1, "LegionRemixPaperDollWidget");
     Controller:Enable();
@@ -250,7 +318,7 @@ do
     function LegionWidget:OnEnter()
         self:UpdateVisual();
         self:PlaySheen();
-        self:ShowTooltip();
+        self:ShowTooltip(true);
     end
     LegionWidget:SetScript("OnEnter", LegionWidget.OnEnter);
 
@@ -265,6 +333,13 @@ do
     end
     LegionWidget:SetScript("OnClick", LegionWidget.OnClick);
 
+    function LegionWidget:OnHide()
+        self.Tooltip:Hide();
+        self.t = nil;
+        self:SetScript("OnUpdate", nil);
+    end
+    LegionWidget:SetScript("OnHide", LegionWidget.OnHide);
+
     local function SharedFadeIn_OnUpdate(self, elapsed)
         self.t = self.t + elapsed;
         local alpha = 8 * self.t;
@@ -276,25 +351,43 @@ do
         self:SetAlpha(alpha);
     end
 
-    function LegionWidget:ShowTooltip()
+    local DebugBonusTraits = {
+        1235159,
+        1242992,
+        1234774,
+        1233592,
+        1241996,
+    };
+
+    function LegionWidget:ShowTooltip(fadeIn)
         local tooltip = self.Tooltip;
 
 
+        local isLoaded = true;
         local text3;
 
-        local bonusTraits = {
-            1235159,
-            1242992,
-            1234774,
-            1233592,
-            1241996,
-        };
+        local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(3292);    --Infinite Knowledge
+        if currencyInfo then
+            text3 = string.format("|cffe6cc80%s:|r |cffffffff%s/%s|r\n", currencyInfo.name, currencyInfo.quantity, currencyInfo.maxQuantity);
+        end
+
+
+
+        if #DebugBonusTraits > 0 then
+            if text3 then
+                text3 = text3.."\n|cff999999"..L["Bonus Traits"].."|r";
+            end
+        end
 
         local traitFormat = "+%d  |T%s:16:16:0:-2:64:64:4:60:4:60|t |cffffd100%s|r";
-        for k, v in ipairs(bonusTraits) do
+        for k, v in ipairs(DebugBonusTraits) do
             local totalIncreased = 3;
-            local spellIcon = C_Spell.GetSpellTexture(v);
+            local spellIcon = GetSpellTexture(v) or 134400;
             local spellName = C_Spell.GetSpellName(v);
+            if not spellName then
+                spellName = " ";
+                isLoaded = false;
+            end
             local lineText = string.format(traitFormat, totalIncreased, spellIcon, spellName);
             if text3 then
                 text3 = text3.."\n"..lineText;
@@ -334,10 +427,109 @@ do
         end
 
         API.UpdateTextureSliceScale(tooltip.BackgroundFrame.Texture);
-        tooltip.t = 0;
-        tooltip:SetAlpha(0);
-        tooltip:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+        if fadeIn then
+            tooltip.t = 0;
+            tooltip:SetAlpha(0);
+            tooltip:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+        end
         tooltip:Show();
         tooltip:SetFrameStrata("TOOLTIP");
+
+        if not isLoaded then
+            self.t = 0;
+            self:SetScript("OnUpdate", self.OnUpdate);
+        end
     end
+
+    function LegionWidget:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.2 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            if self.Tooltip:IsVisible() then
+                self:ShowTooltip();
+            end
+        end
+    end
+
+    local IconPool;     --ItemButton SubIconTexture
+    local ValidSlots = {    --Neck, Rings, Trinkets
+        2, 11, 12, 13, 14
+    };
+
+    function LegionWidget:ShowSlotTraitIcons(state)
+        if IconPool then
+            IconPool:Release();
+        end
+
+        if state then
+            if not IconPool then
+                IconPool = CreateSubIconPool();
+            end
+
+            for i, slotID in ipairs(ValidSlots) do
+                local itemID = GetInventoryItemID("player", slotID);
+                if itemID then
+                    local slotButton = Controller:GetSlotButton(slotID);
+                    if slotButton then
+                        local texture = DataProvider:GetItemTraitTexture(itemID);
+                        if texture then
+                            local object = IconPool:Acquire();
+                            object:SetParent(slotButton);
+                            object:SetPoint("TOPRIGHT", slotButton, "TOPRIGHT", -2, -2);
+                            object.Icon:SetTexture(texture);
+                            slotButton.icon:SetTexture(texture);
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    function LegionWidget:Update()
+        --self:ShowSlotTraitIcons(true);
+    end
+end
+
+
+do  --EquipmentFlyout
+    local FlyoutIconPool = CreateSubIconPool();
+    local EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION = EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION or 0xFFFFFFFD;
+    local EquipmentManager_GetItemInfoByLocation = EquipmentManager_GetItemInfoByLocation;
+
+    local function UpdateFlyout()
+        FlyoutIconPool:Release();
+        local flyout = EquipmentFlyoutFrame;
+        --if not (flyout and flyout:IsVisible()) then return end;
+
+        local buttons = flyout.buttons;
+        local numButtons = flyout.numItemButtons or 0;
+
+        for i = 1, numButtons do
+            local location = buttons[i].location;
+            if location and location < EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION then
+                local itemID = EquipmentManager_GetItemInfoByLocation(location);
+                local texture = itemID and DataProvider:GetItemTraitTexture(itemID);
+                if texture then
+                    local object = FlyoutIconPool:Acquire();
+                    object:SetParent(buttons[i]);
+                    object:SetPoint("TOPRIGHT", buttons[i], "TOPRIGHT", -2, -2);
+                    object.Icon:SetTexture(texture);
+                end
+            end
+        end
+    end
+
+    hooksecurefunc("EquipmentFlyout_UpdateItems", UpdateFlyout);
+
+    hooksecurefunc("PaperDollItemSlotButton_Update", function(slotButton)
+        local slotID = slotButton:GetID();
+        local itemID = slotID and GetInventoryItemID("player", slotID);
+        if itemID then
+            local texture = DataProvider:GetItemTraitTexture(itemID);
+            if texture and slotButton.icon then
+                slotButton.icon:SetTexture(texture);
+            end
+        end
+    end)
 end

@@ -429,6 +429,40 @@ local TrackNodes = {
     },
 };
 
+local ItemXEntry = {
+    --[itemID] = entryID
+    [246195] = 135715,  --Brewing
+    [246191] = 133493,  --Highmountain
+    [246196] = 135326,  --Lights
+    [246192] = 133489,  --Caw
+    [246194] = 133487,  --Surger
+    [246193] = 133490,  --Temp Ret
+    [246190] = 134248,  --Malice
+    [245996] = 133485,  --Volatile
+
+    [245998] = 133486,  --Aegis
+    [246197] = 133508,  --Ward
+    [246202] = 135715,
+    [246200] = 133493,
+    [246198] = 133488,  --Scars
+    [246201] = 133490,
+    [245997] = 133491,  --Terror
+    [246199] = 133485,
+
+    [246204] = 133486,
+    [246206] = 133508,
+    [246208] = 133488,
+    [246207] = 135326,
+    [246203] = 133489,
+    [246205] = 133487,
+    [246000] = 133491,
+    [245999] = 134248,
+
+    --Test
+    [230633] = 133486,
+    [242397] = 133488,
+};
+
 --[[
 do  --For debug on Retail
     local debugNodeID = 93179;
@@ -504,6 +538,28 @@ function DataProvider:IsNodeActive(nodeID)
         end
     end
     return self.activeNodeIDs[nodeID]
+end
+
+function DataProvider:GetItemTraitEntry(itemID)
+    return ItemXEntry[itemID]
+end
+
+function DataProvider:GetItemTraitTexture(itemID)
+    local entryID = ItemXEntry[itemID];
+    if not entryID then return end;
+
+    if not self.itemTraitTextures then
+        self.itemTraitTextures = {};
+    end
+
+    if not self.itemTraitTextures[itemID] then
+        local definitionID = TraitNodeEntryDB[entryID][1];
+        local spellID = C_Traits.GetDefinitionInfo(definitionID).spellID;
+        local iconID, originalIconID = C_Spell.GetSpellTexture(spellID);
+        self.itemTraitTextures[itemID] = originalIconID or iconID;
+    end
+
+    return self.itemTraitTextures[itemID]
 end
 
 DataProvider.artifactTrackIndex = 1;

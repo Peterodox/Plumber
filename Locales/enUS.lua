@@ -383,6 +383,7 @@ L["New Trait Available"] = "New trait available.";
 L["Rank Increased"] = "Rank Increased";
 L["Infinite Knowledge Tooltip"] = "You can obtain Inifite Knowledge by earning certain Legion Remix achievements.";
 L["Stat Bonuses"] = "Stat Bonuses";
+L["Bonus Traits"] = "Bonus Traits:";
 
 
 --ItemUpgradeUI
