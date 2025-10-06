@@ -384,6 +384,7 @@ L["Rank Increased"] = "Rank Increased";
 L["Infinite Knowledge Tooltip"] = "You can obtain Inifite Knowledge by earning certain Legion Remix achievements.";
 L["Stat Bonuses"] = "Stat Bonuses";
 L["Bonus Traits"] = "Bonus Traits:";
+L["Instruction Open Artifact UI"] = "Left click to toggle Artifact UI\nRight click to show settings";
 
 
 --ItemUpgradeUI

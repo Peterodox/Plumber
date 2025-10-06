@@ -239,6 +239,22 @@ do  --Controller
         local slotButton = _G["Character"..PaperDollSlots[slotID]];
         return slotButton
     end
+
+    Controller.loadingCompleteCallbacks = {};
+    function Controller:AddLoadingCompleteCallback(func)
+        table.insert(self.loadingCompleteCallbacks, func);
+    end
+
+    Controller:RegisterEvent("PLAYER_ENTERING_WORLD");
+    Controller:SetScript("OnEvent", function(self, event, ...)
+        self:UnregisterEvent(event);
+        self:SetScript("OnEvent", nil);
+        self:Enable();
+        for _, func in ipairs(self.loadingCompleteCallbacks) do
+            func();
+        end
+        self.loadingCompleteCallbacks = nil;
+    end);
 end
 
 
@@ -264,32 +280,60 @@ do
 end
 
 
-local function CreateSubIconPool()
-    local function IconFrame_Create()
-        local object = CreateFrame("Frame");
-        object:SetSize(16, 16);
-        object.Icon = object:CreateTexture(nil, "OVERLAY");
-        object.Icon:SetSize(16, 16);
-        object.Icon:SetPoint("CENTER", object, "CENTER", 0, 0);
-        local shrink = 8;
-        object.Icon:SetTexCoord(shrink/64, 1-shrink/64, shrink/64, 1-shrink/64);
-        object.Border = object:CreateTexture(nil, "OVERLAY", nil, 2);
-        object.Border:SetTexture(TEXTURE_FILE);
-        object.Border:SetTexCoord(384/512, 448/512, 0, 64/512);
-        object.Border:SetSize(32, 32);
-        object.Border:SetPoint("CENTER", object, "CENTER", 0, 0);
-        object.Icon:SetTexture(134400);
-        return object
+local IconPoolUtil = {};
+do
+    IconPoolUtil.updateFuncs = {};
+    local SubIconPools = {};
+
+    function IconPoolUtil:CreateSubIconPool()
+        local function IconFrame_Create()
+            local object = CreateFrame("Frame");
+            object:SetSize(16, 16);
+            object.Icon = object:CreateTexture(nil, "OVERLAY");
+            object.Icon:SetSize(16, 16);
+            object.Icon:SetPoint("CENTER", object, "CENTER", 0, 0);
+            local shrink = 8;
+            object.Icon:SetTexCoord(shrink/64, 1-shrink/64, shrink/64, 1-shrink/64);
+            object.Border = object:CreateTexture(nil, "OVERLAY", nil, 2);
+            object.Border:SetTexture(TEXTURE_FILE);
+            object.Border:SetTexCoord(384/512, 448/512, 0, 64/512);
+            object.Border:SetSize(32, 32);
+            object.Border:SetPoint("CENTER", object, "CENTER", 0, 0);
+            object.Icon:SetTexture(134400);
+            return object
+        end
+
+        local function IconFrame_Remove(object)
+            object:ClearAllPoints();
+            object:Hide();
+            object:SetParent(nil);
+        end
+
+        local pool = API.CreateObjectPool(IconFrame_Create, IconFrame_Remove);
+        table.insert(SubIconPools, pool);
+        return pool
     end
 
-    local function IconFrame_Remove(object)
-        object:ClearAllPoints();
-        object:Hide();
-        object:SetParent(nil);
+    function IconPoolUtil.LoadSettings()
+        local v = addon.GetDBValue("LegionRemix_TraitSubIconStyle");
+        if not (v == 0 or v == 1 or v == 2) then
+            v = 1;
+        end
+        IconPoolUtil.traitSubIconStyle = v;
+
+        for _, func in ipairs(IconPoolUtil.updateFuncs) do
+            func();
+        end
     end
 
-    return API.CreateObjectPool(IconFrame_Create, IconFrame_Remove);
+    function IconPoolUtil:AddUpdator(func)
+        table.insert(self.updateFuncs, func)
+    end
+
+    Controller:AddLoadingCompleteCallback(IconPoolUtil.LoadSettings);
 end
+
+
 
 local LegionWidget = CreatePaperDollWidget("PlumberLegionRemixPaperDollWidgetTemplate");
 do
@@ -303,7 +347,6 @@ do
     LegionWidget:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 
     Controller:AddWidget(LegionWidget, 1, "LegionRemixPaperDollWidget");
-    Controller:Enable();
 
     function LegionWidget:UpdateVisual()
         self.Background:SetTexCoord(0, 120/512, 0, 96/512);
@@ -328,8 +371,21 @@ do
     end
     LegionWidget:SetScript("OnLeave", LegionWidget.OnLeave);
 
-    function LegionWidget:OnClick()
-        RemixAPI.ToggleArtifactUI()
+    function LegionWidget:OnClick(button)
+        if button == "RightButton" then
+            self.Tooltip:Hide();
+            local value = addon.GetDBValue("LegionRemix_TraitSubIconStyle");
+            if value == 2 then
+                value = 1;
+            else
+                value = 2;
+            end
+            addon.SetDBValue("LegionRemix_TraitSubIconStyle", value);
+            IconPoolUtil:LoadSettings();
+            return
+        end
+
+        RemixAPI.ToggleArtifactUI();
     end
     LegionWidget:SetScript("OnClick", LegionWidget.OnClick);
 
@@ -402,7 +458,7 @@ do
         tooltip.Text2:SetText("|cffb6b6b6Rank 3|r  Call of the Legion");
         tooltip.Text2:SetTextColor(177/255, 190/255, 95/255);
         tooltip.Text3:SetText(text3);
-        tooltip.Instruction:SetText("Click to show Artifact UI");
+        tooltip.Instruction:SetText(L["Instruction Open Artifact UI"]);
         tooltip.Instruction:SetTextColor(0.6, 0.6, 0.6);
 
         local spacing = 16;
@@ -462,9 +518,11 @@ do
             IconPool:Release();
         end
 
+        if IconPoolUtil.traitSubIconStyle ~= 1 then return end;
+
         if state then
             if not IconPool then
-                IconPool = CreateSubIconPool();
+                IconPool = IconPoolUtil:CreateSubIconPool();
             end
 
             for i, slotID in ipairs(ValidSlots) do
@@ -478,7 +536,6 @@ do
                             object:SetParent(slotButton);
                             object:SetPoint("TOPRIGHT", slotButton, "TOPRIGHT", -2, -2);
                             object.Icon:SetTexture(texture);
-                            slotButton.icon:SetTexture(texture);
                         end
                     end
                 end
@@ -487,18 +544,43 @@ do
     end
 
     function LegionWidget:Update()
-        --self:ShowSlotTraitIcons(true);
+        self:ShowSlotTraitIcons(true);
     end
+
+    IconPoolUtil:AddUpdator(function()
+        if PaperDollItemsFrame:IsVisible() then
+            LegionWidget:ShowSlotTraitIcons(true);
+        end
+    end);
+
+    IconPoolUtil:AddUpdator(function()
+        if not PaperDollItemsFrame:IsVisible() then return end;
+
+        local style = IconPoolUtil.traitSubIconStyle;
+        for i, slotID in ipairs(ValidSlots) do
+            local itemID = GetInventoryItemID("player", slotID);
+            if itemID then
+                local slotButton = Controller:GetSlotButton(slotID);
+                if slotButton then
+                    local texture = style == 2 and DataProvider:GetItemTraitTexture(itemID) or GetInventoryItemTexture("player", slotID);
+                    slotButton.icon:SetTexture(texture);
+                end
+            end
+        end
+    end);
 end
 
 
 do  --EquipmentFlyout
-    local FlyoutIconPool = CreateSubIconPool();
+    local FlyoutIconPool = IconPoolUtil:CreateSubIconPool();
     local EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION = EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION or 0xFFFFFFFD;
     local EquipmentManager_GetItemInfoByLocation = EquipmentManager_GetItemInfoByLocation;
 
     local function UpdateFlyout()
         FlyoutIconPool:Release();
+        local style = IconPoolUtil.traitSubIconStyle;
+        if not(style == 1 or style == 2) then return end;
+
         local flyout = EquipmentFlyoutFrame;
         --if not (flyout and flyout:IsVisible()) then return end;
 
@@ -509,12 +591,18 @@ do  --EquipmentFlyout
             local location = buttons[i].location;
             if location and location < EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION then
                 local itemID = EquipmentManager_GetItemInfoByLocation(location);
-                local texture = itemID and DataProvider:GetItemTraitTexture(itemID);
-                if texture then
-                    local object = FlyoutIconPool:Acquire();
-                    object:SetParent(buttons[i]);
-                    object:SetPoint("TOPRIGHT", buttons[i], "TOPRIGHT", -2, -2);
-                    object.Icon:SetTexture(texture);
+                if itemID then
+                    local texture = DataProvider:GetItemTraitTexture(itemID);
+                    if texture then
+                        if style == 1 then
+                            local object = FlyoutIconPool:Acquire();
+                            object:SetParent(buttons[i]);
+                            object:SetPoint("TOPRIGHT", buttons[i], "TOPRIGHT", -2, -2);
+                            object.Icon:SetTexture(texture);
+                        elseif style == 2 then
+                            buttons[i].icon:SetTexture(texture);
+                        end
+                    end
                 end
             end
         end
@@ -522,7 +610,15 @@ do  --EquipmentFlyout
 
     hooksecurefunc("EquipmentFlyout_UpdateItems", UpdateFlyout);
 
+    IconPoolUtil:AddUpdator(function()
+        if EquipmentFlyoutFrame:IsVisible() then
+            UpdateFlyout();
+        end
+    end);
+
+
     hooksecurefunc("PaperDollItemSlotButton_Update", function(slotButton)
+        if IconPoolUtil.traitSubIconStyle ~= 2 then return end;
         local slotID = slotButton:GetID();
         local itemID = slotID and GetInventoryItemID("player", slotID);
         if itemID then
