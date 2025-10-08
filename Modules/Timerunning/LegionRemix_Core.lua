@@ -1167,10 +1167,19 @@ do	--CommitUtil
 			local nodeIDs = DataProvider:GetArtifactTrackNodeIDs(nodeTrack);
 			for _, _nodeID in ipairs(nodeIDs) do
 				if DataProvider:IsSelectionNode(_nodeID) then
-					local nodeInfo = DataProvider:GetNodeInfo(nodeID);
-					local entryID = DataProvider:GetLastSelectedEntryID(nodeID, nodeInfo.entryIDs);
-					if C_Traits.SetSelection(configID, _nodeID, entryID) then
-						self.anySuccessPurchase = true;
+					local nodeInfo = DataProvider:GetNodeInfo(_nodeID);
+					local entryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
+					local committedEntryID;
+					if nodeInfo.entryIDsWithCommittedRanks then
+						for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+							committedEntryID = id;
+							break
+						end
+					end
+					if (committedEntryID ~= entryID) then
+						if C_Traits.SetSelection(configID, _nodeID, entryID) then
+							self.anySuccessPurchase = true;
+						end
 					end
 				end
 				if nodeID == _nodeID then
@@ -1617,7 +1626,7 @@ do	--Module Registry
         toggleFunc = EnableModule,
         categoryID = -1,
         uiOrder = 0,
-        moduleAddedTime = 1755200000,
+        moduleAddedTime = 1759900000,
 		timerunningSeason = 2,
     };
 
