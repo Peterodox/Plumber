@@ -995,7 +995,7 @@ do
 				self:RequestUpdate();
 			end
 		else
-			print(event, ...);
+			--print(event, ...);
 			if event == "ACTIVE_TALENT_GROUP_CHANGED" then
 				self.specDirty = true;
 				self:RequestUpdate();
@@ -1080,7 +1080,6 @@ do	--CommitUtil
 			end
 		elseif event == "BAG_UPDATE_DELAYED" then
 			if self.equipItemAfterCommit then
-				print("equipItemAfterCommit")
 				self.equipItemAfterCommit = nil;
 				self:UnregisterEvent(event);
 				self:ReEquipItems(self.replacedEquipment);
@@ -1206,6 +1205,7 @@ do	--CommitUtil
 		for itemID, v in pairs(replacedEquipment) do
 			UnequipInventorySlot(v.slotID);
 		end
+		self:RegisterEvent("BAG_UPDATE_DELAYED");	--In question
 	end
 
 	function CommitUtil:ReEquipItems(replacedEquipment, fromRequery)
@@ -1217,9 +1217,9 @@ do	--CommitUtil
 			numPending = numPending + 1;
 			itemFound[itemID] = false;
 		end
-		print("numPending", numPending);
+
 		if InCombatLockdown() then
-			print("In Combat");
+
 			self.failedItems = API.CopyTable(replacedEquipment);
 			EventListener:ListenLeavingCombat();
 		else
@@ -1248,18 +1248,18 @@ do	--CommitUtil
 							C_Container.PickupContainerItem(action.bag, action.slot);
 
 							if ( not CursorHasItem() ) then
-								print("Error PickupContainerItem");
+
 							elseif not C_PaperDollInfo.CanCursorCanGoInSlot(action.invSlot) then
-								print("Error CannotGoInSlot");
+
 							elseif IsInventoryItemLocked(action.invSlot) then
-								print("Error InventoryItemLocked");
+
 							else
 								PickupInventoryItem(action.invSlot);
 								numPending = numPending - 1;
 							end
 
 							if numPending <= 0 then
-								print("Reequip Complete");
+								--print("Reequip Complete");
 								self.failedItems = nil;
 								return true
 							end
@@ -1270,7 +1270,7 @@ do	--CommitUtil
 
 			if numPending > 0 and not fromRequery then
 				--Something is wrong
-				print("TRY REEQUIP AGAIN");
+				--print("TRY REEQUIP AGAIN");
 				self.failedItems = API.CopyTable(replacedEquipment);
 				EventListener:ListenBagUpdateDelayed();
 			else
@@ -1296,10 +1296,10 @@ do	--CommitUtil
 		if DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, index) then
 			local items = DataProvider:GetForbiddenSelectionNodeItems();
 			if items then
-				print("Unequip these items before changing traits:")
-				for _, v in ipairs(items) do
-					print(v.slotID, v.coloredItemName);
-				end
+				--print("Unequip these items before changing traits:")
+				--for _, v in ipairs(items) do
+				--	print(v.slotID, v.coloredItemName);
+				--end
 
 				--Auto unequip/re-equip
 				local total = #items;
@@ -1320,6 +1320,9 @@ do	--CommitUtil
 					if numFound == total then
 						self:SetReplacedEquipment(itemIDxData);
 					end
+				else
+					API.DisplayErrorMessage(L["Require More Bag Slot Alert"]);
+					return
 				end
 			end
 			--return
@@ -1346,7 +1349,7 @@ do	--CommitUtil
 				end
 			end
 		else
-			print("Cannot Purchase", DataProvider:GetTraitName(entryID));
+			--print("Cannot Purchase", DataProvider:GetTraitName(entryID));
 		end
 
 		self:TryPurchaseParagon();
@@ -1376,7 +1379,7 @@ do	--CommitUtil
 		if traitInfo then
 			local traitName = DataProvider:GetTraitName(traitInfo.entryID);
 			if (not DataProvider:IsChoiceNode(traitInfo.nodeID)) then
-				print("Purchasing "..traitName);
+				--print("Purchasing "..traitName);
 				CommitUtil:TryPurchaseToNode(traitInfo.nodeID);
 			end
 		end

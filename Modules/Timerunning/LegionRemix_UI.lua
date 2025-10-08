@@ -746,13 +746,15 @@ do
 
     function ActivateButtonMixin:Update(inCombat)
         local isLoading;
-        if self.trackIndex == DataProvider:GetActiveArtifactTrackIndex() or self.trackIndex == ACTIVE_TRACK_INDEX then
-            self:Hide();
-        elseif inCombat then
-            self:Disable();
-        elseif CommitUtil:IsCommitingInProcess() then
+
+        if CommitUtil:IsCommitingInProcess() then
             self:Disable();
             isLoading = true;
+        elseif self.trackIndex == DataProvider:GetActiveArtifactTrackIndex() or self.trackIndex == ACTIVE_TRACK_INDEX then
+            self:Hide();
+        elseif inCombat or InCombatLockdown() then
+            self:Disable();
+
         --elseif not DataProvider:CanPreActivateArtifactTrack() then
             --You can't purchase any artifact ability at this moment
             --but we'll save the trackIndex and automatically upgrade when eligible
@@ -1212,9 +1214,9 @@ do
         end
 
         self.ActivateButton:Disable();
+        DataProvider:SetLastArtifactTrackIndexForCurrentSpec(trackIndex);
         if not CommitUtil:TryPurchaseArtifactTrack(trackIndex) then
             if DataProvider:CanPreActivateArtifactTrack() then
-                DataProvider:SetLastArtifactTrackIndexForCurrentSpec(trackIndex);
                 self:OnCommitFinished(true);
             end
         end
