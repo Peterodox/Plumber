@@ -3,7 +3,6 @@ local RemixAPI = addon.RemixAPI
 if not RemixAPI then return end;
 
 
-local DEBUG_MODE = true;
 local ACTIVE_TRACK_INDEX = 1;
 
 
@@ -54,7 +53,11 @@ local function SetFontStringColor(fontString, key)
 end
 
 local function AddLine(oldText, newText)
-    return oldText.."\n"..newText
+    if oldText then
+        return oldText.."\n"..newText
+    else
+        return newText
+    end
 end
 
 local function SharedFadeIn_OnUpdate(self, elapsed)
@@ -82,6 +85,7 @@ do
         self.IconMask:SetSize(36, 36);
         self:SetScript("OnEnter", self.OnEnter);
         self:SetScript("OnLeave", self.OnLeave);
+        self:SetScript("OnDragStart", self.OnDragStart);
 
 
         local function AnimSheen_OnPlay()
@@ -104,7 +108,7 @@ do
     end
 
     function NodeButtonMixin:OnLeave()
-        self:HideTooltip();
+        MainFrame:HideTooltip();
         MainFrame:HoverNode();
 
         if self.nodeChoices or self.isFlyoutButton then
@@ -218,7 +222,11 @@ do
     end
 
     function NodeButtonMixin:Refresh()
-        local isActive = (self.trackIndex == ACTIVE_TRACK_INDEX) and DataProvider:IsNodeActive(self.nodeID);
+        local nodeInfo = DataProvider:GetNodeInfo(self.nodeID);
+        local currentRank = nodeInfo and nodeInfo.currentRank or 0;
+        local ranksPurchased = nodeInfo and nodeInfo.ranksPurchased or 0;
+
+        local isActive = (self.trackIndex == ACTIVE_TRACK_INDEX) and ranksPurchased > 0;
         self.isActive = isActive;
         local isPurchased;
         local visualState;
@@ -231,63 +239,59 @@ do
             end
         end
 
-        if DEBUG_MODE then
-            if not isActive then
-                visualState = 0;
-            else
-                if self.isFlyoutButton then
-                    isPurchased = self.parentNodeButton.entryID == self.entryID;
-                    if isPurchased then
-                        visualState = 1;
-                    else
-                        visualState = 2;
-                    end
-                else
-                    if self.entryType == 0 then
-                        if self.selectedEntryID then
-                            visualState = 1;
-                        else
-                            visualState = 2;
-                        end
-                    else
-                        visualState = 1;
-                    end
-                end
-            end
-            self:SetVisualState(visualState);
-            if isActive then
-                if self.entryType == 1 then
-                    rankText = self.maxRanks;   --"1";
-                elseif self.entryType == 2 then
-                    rankText = self.maxRanks;   --"3";
-                elseif self.entryType == 0 then
-                    if self.selectedEntryID then
-                        self.GreenGlow:Hide();
-                    else
-                        self.GreenGlow:Show();
-                    end
-                end
-                if self.isFlyoutButton and not isPurchased then
-                    rankText = "0";
-                    self.RankText:SetTextColor(0.098, 1.000, 0.098);
-                else
-                    self.RankText:SetTextColor(1, 0.82, 0);
-                end
-            else
-
-            end
-            self.RankText:SetText(rankText);
-            return
-        end
-
-        local nodeInfo = DataProvider:GetNodeInfo(self.nodeID);
-        local currentRank = nodeInfo.currentRank;
         if currentRank >= 1 then
             self.RankText:SetText(tostring(currentRank));
         else
             self.RankText:SetText("");
         end
-        self.RankText:SetTextColor(1, 0.82, 0);
+
+        if not isActive then
+            visualState = 0;
+        else
+            if self.isFlyoutButton then
+                isPurchased = self.parentNodeButton.entryID == self.entryID;
+                if isPurchased then
+                    visualState = 1;
+                else
+                    visualState = 2;
+                end
+            else
+                if self.entryType == 0 then
+                    if self.selectedEntryID then
+                        visualState = 1;
+                    else
+                        visualState = 2;
+                    end
+                else
+                    visualState = 1;
+                end
+            end
+        end
+
+        self:SetVisualState(visualState);
+
+        if isActive then
+            if self.entryType == 1 then
+                rankText = self.maxRanks;   --"1";
+            elseif self.entryType == 2 then
+                rankText = self.maxRanks;   --"3";
+            elseif self.entryType == 0 then
+                if self.selectedEntryID then
+                    self.GreenGlow:Hide();
+                else
+                    self.GreenGlow:Show();
+                end
+            end
+            if self.isFlyoutButton and not isPurchased then
+                rankText = "0";
+                self.RankText:SetTextColor(0.098, 1.000, 0.098);
+            else
+                self.RankText:SetTextColor(1, 0.82, 0);
+            end
+        else
+            
+        end
+        self.RankText:SetText(rankText);
 
         local isEntryCommitted = false;
         local committedEntryID;
@@ -302,8 +306,6 @@ do
 
         local entryID = committedEntryID or self.entryID;
         local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
-
-        self:SetNodeDisabled(not(increasedRanks > 0 or isEntryCommitted));
     end
 
     function NodeButtonMixin:SetVisualState(visualState)
@@ -354,9 +356,9 @@ do
         PlaySound(SOUNDKIT.UI_CLASS_TALENT_APPLY_COMPLETE);
     end
 
-    function NodeButtonMixin:GetNodeInfo()
+    function NodeButtonMixin:DebugGetNodeInfo()
         local nodeInfo = {
-            currentRank = 1,
+            currentRank = 0,
             maxRanks = self.maxRanks or 1,
         }
         return nodeInfo
@@ -394,7 +396,7 @@ do
             name = RETRIEVING_DATA;
         end
 
-        local nodeInfo = self:GetNodeInfo();    --debug
+        local nodeInfo = DataProvider:GetNodeInfo(self.nodeID) or self:DebugGetNodeInfo();
         local description;
         description = string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks);
 
@@ -428,24 +430,47 @@ do
             description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", nextEntryID, rank);
 		end
 
+        if self.isArtifactAbility then
+            if self.trackIndex == ACTIVE_TRACK_INDEX and self.visualState == 0 then
+                description = AddLine(description, "\n|cffb1be5f"..L["Artifact Ability Auto Unlock Tooltip"].."|r");
+            end
+        end
+
+        if self.isFlyoutButton and InCombatLockdown() then
+            description = AddLine(description, "\n|cffff2020"..L["Error Change Trait In Combat"].."|r");
+        end
+
         local function updateTooltipFunc()
             self.ShowTooltip(self);
         end
 
         local icon = self.Icon:GetTexture();
-        MainFrame:SetTooltip(icon, name, description, updateTooltipFunc);
+        MainFrame:SetTooltip(self.trackIndex, icon, name, description, updateTooltipFunc);
     end
 
-    function NodeButtonMixin:HideTooltip()
-        MainFrame:HideTooltip();
+    function NodeButtonMixin:OnDragStart()
+        --debug
+        if InCombatLockdown() then
+            API.DisplayErrorMessage(L["Error Drag Spell In Combat"]);
+            return
+        end
+
+        local macroID = RemixAPI.AcquireArtifactAbilityMacro();
+        if macroID then
+            PickupMacro(macroID);
+        else
+            C_Spell.PickupSpell(self.spellID);
+        end
+
+        if GetCursorInfo() ~= nil then
+            MainFrame:OnDraggingSpell(true);
+        end
     end
 end
 
 
 local ArrowsButtonMixin = {};
 do
-    ArrowsButtonMixin.HideTooltip = NodeButtonMixin.HideTooltip;
-
     function ArrowsButtonMixin:OnLoad()
         self:SetScript("OnEnter", self.OnEnter);
         self:SetScript("OnLeave", self.OnLeave);
@@ -555,7 +580,7 @@ do
             self.ShowTooltip(self);
         end
 
-        MainFrame:SetTooltip(nil, name, description, updateTooltipFunc);
+        MainFrame:SetTooltip(self.trackIndex, nil, name, description, updateTooltipFunc);
     end
 end
 
@@ -614,13 +639,17 @@ do
 
     function ActivateButtonMixin:Update(inCombat)
         local isLoading;
-        if self.trackIndex == DataProvider:GetActiveArtifactTrackIndex() then
+        if self.trackIndex == DataProvider:GetActiveArtifactTrackIndex() or self.trackIndex == ACTIVE_TRACK_INDEX then
             self:Hide();
         elseif inCombat then
             self:Disable();
         elseif CommitUtil:IsCommitingInProcess() then
             self:Disable();
             isLoading = true;
+        --elseif not DataProvider:CanActivateArtifactTrack() then
+            --You can't purchase any artifact ability at this moment
+            --but we'll save the trackIndex and automatically upgrade when eligible
+        --    self:Enable();
         else
             self:Enable();
         end
@@ -795,11 +824,143 @@ do
 end
 
 
+local TraitTooltipMixin = {};
+do
+    local TraitTooltipFrame;
+
+    function TraitTooltipMixin:OnHide()
+        self:Hide();
+        self.alpha = 0;
+        self.t = 0;
+        self:SetAlpha(0);
+        self:SetScript("OnUpdate", nil);
+        self.updateTooltipFunc = nil;
+    end
+
+    function TraitTooltipMixin:SetTooltipSpell(spellID)
+        local name = C_Spell.GetSpellName(spellID);
+        if not name then
+            name = RETRIEVING_DATA;
+        end
+        --local description = API.ConvertTooltipInfoToOneString(nil, "GetSpellByID", spellID);
+        local description = C_Spell.GetSpellDescription(spellID);
+        local icon = C_Spell.GetSpellTexture(spellID);
+        local function updateTooltipFunc()
+            if self:IsVisible() then
+                self:SetTooltipSpell(spellID);
+            end
+        end
+        self:SetTooltip(icon, name, description, updateTooltipFunc);
+    end
+
+    function TraitTooltipMixin:SetTooltipTrait(entryID, rank)
+        rank = rank or 1;
+        local spellID = DataProvider:GetTraitSpell(entryID);
+        local name = DataProvider:GetTraitName(entryID);
+        if not name then
+            name = RETRIEVING_DATA;
+        end
+        local description = API.ConvertTooltipInfoToOneString(nil, "GetTraitEntry", entryID, rank);
+        local icon = C_Spell.GetSpellTexture(spellID);
+        local function updateTooltipFunc()
+            if self:IsVisible() then
+                self:SetTooltipTrait(entryID, rank);
+            end
+        end
+        self:SetTooltip(icon, name, description, updateTooltipFunc);
+    end
+
+    function Tooltip_Show_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.5 then
+            self.t = 0;
+            if self.updateTooltipFunc then
+                self.updateTooltipFunc(self);
+            else
+                self:SetScript("OnUpdate", nil);
+            end
+        end
+
+        if self.isFading then
+            self.alpha = self.alpha + 8 * elapsed;
+            if self.alpha > 1 then
+                self.alpha = 1;
+                self.isFading = nil;
+            end
+            self:SetAlpha(self.alpha);
+        end
+    end
+
+    function TraitTooltipMixin:SetTooltip(icon, header, description, updateTooltipFunc)
+        local padding = 20;
+
+        self.Icon:SetTexture(icon);
+        self.Header:SetText(header);
+        self.Desc:SetText(description);
+        self.updateTooltipFunc = updateTooltipFunc;
+        self.t = 0;
+
+        local width = math.max(self.Header:GetWrappedWidth(), self.Desc:GetWrappedWidth());
+        local height = self.Header:GetHeight() + 4 + self.Desc:GetHeight();
+
+        self:SetSize(width + 2*padding, height + 2*padding + 6);
+        API.UpdateTextureSliceScale(self.BackgroundFrame.Texture);
+        self:SetScript("OnUpdate", Tooltip_Show_OnUpdate);
+        self.isFading = true;
+        self:SetFrameStrata("TOOLTIP");
+    end
+
+    local function Tooltip_FadeOut_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= 0 then
+            self.t = 0;
+            self.alpha = self.alpha - 5 * elapsed;
+            if self.alpha < 0 then
+                self.alpha = 0;
+                self:SetScript("OnUpdate", nil);
+            end
+            self:SetAlpha(self.alpha);
+        end
+    end
+
+    function TraitTooltipMixin:HideTooltip(fadeOut)
+        self.updateTooltipFunc = nil;
+        if fadeOut then
+            if self:IsVisible() then
+                self.t = 0;
+                if self.alpha >= 0.99 then
+                    self.t = -0.2;
+                else
+                    self.t = 0;
+                end
+                self:SetScript("OnUpdate", Tooltip_FadeOut_OnUpdate);
+            end
+        else
+            self:Hide();
+        end
+    end
+
+    function RemixAPI.GetTraitTooltipFrame(parent)
+        if not TraitTooltipFrame then
+            local f = CreateFrame("Frame", nil, parent or UIParent, "PlumberLegionRemixTooltipTemplate");
+            TraitTooltipFrame = f;
+            API.Mixin(f, TraitTooltipMixin);
+            f.alpha = 0;
+            f:SetAlpha(0);
+            f.Icon:SetDesaturation(0.2);
+            f.Icon:SetVertexColor(0.8, 0.8, 0.8);
+            f:SetScript("OnHide", f.OnHide);
+        end
+        return TraitTooltipFrame
+    end
+end
+
 local MainFrameMixin = {};
 do
     local DynamicEvents = {
         "PLAYER_REGEN_ENABLED",
         "PLAYER_REGEN_DISABLED",
+        "CURRENCY_DISPLAY_UPDATE",
     };
 
     function MainFrameMixin:OnShow()
@@ -810,12 +971,24 @@ do
         PlaySound(SOUNDKIT.UI_EXPANSION_LANDING_PAGE_OPEN);
     end
 
+    function MainFrameMixin:UpdateHeader()
+        local HeaderFrame = self.HeaderFrame;
+        if HeaderFrame then
+            local line1, line2 = DataProvider:GetNextUpgradeInfoForUI();
+            HeaderFrame.Text1:SetText(line1);
+            HeaderFrame.Text1:SetTextColor(0.6, 0.6, 0.6);
+            HeaderFrame.Text2:SetText(line2);
+            HeaderFrame.Text2:SetTextColor(177/255, 190/255, 95/255);
+        end
+    end
+
     function MainFrameMixin:OnHide()
         API.UnregisterFrameForEvents(self, DynamicEvents);
         CallbackRegistry:UnregisterCallback("DEBUG_TRAIT_CONFIG_UPDATED", self.OnCommitFinished, self);
         self:UpdateCardFocus();
         self:CloseNodeFlyout();
         self:SetScript("OnEvent", nil);
+        self:OnDraggingSpell(false);
         PlaySound(SOUNDKIT.UI_EXPANSION_LANDING_PAGE_CLOSE);
     end
 
@@ -824,16 +997,34 @@ do
             self.ActivateButton:Update();
         elseif event == "PLAYER_REGEN_DISABLED" then
             self.ActivateButton:Update(true);
+        elseif event == "CURRENCY_DISPLAY_UPDATE" then
+            local currencyID = ...
+            if currencyID == 3268 then
+                if not self.isUpdatingHeader then
+                    self.isUpdatingHeader = true;
+                    C_Timer.After(0.2, function()
+                        self.isUpdatingHeader = nil;
+                        self:UpdateHeader();
+                    end);
+                end
+            end
+        elseif event == "CURSOR_CHANGED" then
+            if self.isDraggingSpell then
+                if not GetCursorInfo() then
+                    self:OnDraggingSpell(false);
+                end
+            end
         end
     end
 
     function MainFrameMixin:Refresh(playAnimation)
-        ACTIVE_TRACK_INDEX = DataProvider:GetActiveArtifactTrackIndex();
+        ACTIVE_TRACK_INDEX = DataProvider:GetActiveArtifactTrackIndex() or DataProvider:GetLastArtifactTrackIndexForCurrentSpec();
         for _, card in ipairs(self.TrackCards) do
             card:Refresh(playAnimation);
         end
         self.ActivateButton:Update();
         self:UpdateNodeFlyoutFrame();
+        self:UpdateHeader();
         --self:DebugSaveAllNodes();
     end
 
@@ -857,9 +1048,18 @@ do
     end
 
     function MainFrameMixin:TryActivateArtifactTrack(trackIndex)
-        if InCombatLockdown() then return end;  --Activate button shouldn't be clickable
+        if InCombatLockdown() or CommitUtil:IsCommitingInProcess() then
+            --Activate button shouldn't be clickable in this scenario
+            return
+        end
+
         self.ActivateButton:Disable();
-        CommitUtil:TryPurchaseArtifactTrack(trackIndex);
+        if not CommitUtil:TryPurchaseArtifactTrack(trackIndex) then
+            if not DataProvider:CanActivateArtifactTrack() then
+                DataProvider:SetLastArtifactTrackIndexForCurrentSpec(trackIndex);
+                self:OnCommitFinished(true);
+            end
+        end
         self.ActivateButton:Update();
     end
 
@@ -1060,81 +1260,40 @@ do
         self:Refresh(playAnimation);
     end
 
-    local function TooltipFrame_OnUpdate(self, elapsed)
-        self.t = self.t + elapsed;
-        if self.t > 0.5 then
-            self.t = 0;
-            if self.updateTooltipFunc then
-                self.updateTooltipFunc(self);
-            else
-                self:SetScript("OnUpdate", nil);
-            end
-        end
-
-        if self.isFading then
-            self.alpha = self.alpha + 8 * elapsed;
-            if self.alpha > 1 then
-                self.alpha = 1;
-                self.isFading = nil;
-            end
-            self:SetAlpha(self.alpha);
-        end
-    end
-
-    function MainFrameMixin:SetTooltip(icon, header, description, updateTooltipFunc)
-        local padding = 20;
+    function MainFrameMixin:SetTooltip(row, icon, header, description, updateTooltipFunc)
         local f = self.TooltipFrame;
-
-        f.Icon:SetTexture(icon);
-        f.Header:SetText(header);
-        f.Desc:SetText(description);
-        f.updateTooltipFunc = updateTooltipFunc;
-        f.t = 0;
-
-        local width = math.max(f.Header:GetWrappedWidth(), f.Desc:GetWrappedWidth());
-        local height = f.Header:GetHeight() + 4 + f.Desc:GetHeight();
-
+        f:SetTooltip(icon, header, description, updateTooltipFunc);
         f:ClearAllPoints();
-        f:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
-        f:SetSize(width + 2*padding, height + 2*padding + 6);
-        API.UpdateTextureSliceScale(f.BackgroundFrame.Texture);
-        f:SetScript("OnUpdate", TooltipFrame_OnUpdate);
-        f.isFading = true;
+        f:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, (1 - row) * 94.4);
+        f:SetFrameStrata("TOOLTIP");
+        f:SetParent(self);
         f:Show();
     end
 
-    local function TooltipFrame_FadeOut_OnUpdate(self, elapsed)
-        self.t = self.t + elapsed;
-        if self.t >= 0 then
-            self.t = 0;
-            self.alpha = self.alpha - 5 * elapsed;
-            if self.alpha < 0 then
-                self.alpha = 0;
-                self:SetScript("OnUpdate", nil);
-            end
-            self:SetAlpha(self.alpha);
-        end
-    end
+
 
     function MainFrameMixin:HideTooltip()
-        --self.TooltipFrame:Hide();
-        local f = self.TooltipFrame;
-        f.updateTooltipFunc = nil;
-        if f:IsVisible() then
-            f.t = 0;
-            if f.alpha >= 0.99 then
-                f.t = -0.2;
-            else
-                f.t = 0;
-            end
-            f:SetScript("OnUpdate", TooltipFrame_FadeOut_OnUpdate);
+        self.TooltipFrame:HideTooltip(true);
+    end
+
+    function MainFrameMixin:OnDraggingSpell(isDraggingSpell)
+        self.isDraggingSpell = isDraggingSpell;
+        if isDraggingSpell then
+            self:RegisterEvent("CURSOR_CHANGED");
+            self:SetFrameStrata("LOW");
+            self:SetToplevel(false);
+        else
+            self:UnregisterEvent("CURSOR_CHANGED");
+            self:SetFrameStrata("MEDIUM");
+            self:SetToplevel(true);
         end
     end
 end
 
 
-local function InitArtifactUI()
+local function CreateMainUI()
     local baseFrameLevel = 20;
+    local headerHeight = 64;
     local CreateFrame = CreateFrame;
 
     local frameName = "PlumberRemixArtifactUI";
@@ -1183,7 +1342,7 @@ local function InitArtifactUI()
     local gapH = Constants.NodeGap;
 
     local offsetX = 0;
-    local offsetY = 0;
+    local offsetY = headerHeight;
 
     local numEntries;
     ACTIVE_TRACK_INDEX = DataProvider:GetActiveArtifactTrackIndex();
@@ -1217,7 +1376,9 @@ local function InitArtifactUI()
 
             if i == 1 then
                 button.Title = card.Title;
-                local x = card.Div:GetCenter();
+                button.isArtifactAbility = true;
+                button:RegisterForDrag("LeftButton");
+                --local x = card.Div:GetCenter();
                 --print(card:GetLeft() - x);
             end
 
@@ -1243,11 +1404,6 @@ local function InitArtifactUI()
         end
     end
 
-    local height = 5 * (cardHeight + cardGap) - cardGap;
-    f:SetSize(cardWidth, height);
-    f:SetScript("OnHide", f.OnHide);
-    f:SetScript("OnShow", f.OnShow);
-
 
     local ActivateButton = addon.LandingPageUtil.CreateRedButton(f);
     ActivateButton:Hide();
@@ -1256,24 +1412,12 @@ local function InitArtifactUI()
     ActivateButton:OnLoad();
 
 
-    local TooltipFrame = CreateFrame("Frame", nil, f, "PlumberLegionRemixTooltipTemplate");
+    local TooltipFrame = RemixAPI.GetTraitTooltipFrame(f);
     f.TooltipFrame = TooltipFrame;
-    TooltipFrame:Hide();
-    TooltipFrame.alpha = 0;
-    TooltipFrame:SetAlpha(0);
-    TooltipFrame.Icon:SetDesaturation(0.2);
-    TooltipFrame.Icon:SetVertexColor(0.8, 0.8, 0.8);
-    TooltipFrame:SetScript("OnHide", function(self)
-        self:Hide();
-        self.alpha = 0;
-        self.t = 0;
-        self:SetAlpha(0);
-        self:SetScript("OnUpdate", nil);
-        self.updateTooltipFunc = nil;
-    end);
 
 
     local HeaderFrame = CreateFrame("Frame", nil, f);
+    f.HeaderFrame = HeaderFrame;
     HeaderFrame:SetSize(Constants.HeaderWidth * Constants.CardScale, Constants.HeaderHeight * Constants.CardScale);
     HeaderFrame:SetPoint("BOTTOM", f, "TOP", 0, -4);
 
@@ -1291,10 +1435,6 @@ local function InitArtifactUI()
     HeaderFrame.Text2:SetPoint("TOP", HeaderFrame, "CENTER", 0, 0);
     HeaderFrame.Text2:SetJustifyH("CENTER");
 
-    HeaderFrame.Text1:SetText("42,000 to unlock");
-    HeaderFrame.Text1:SetTextColor(0.6, 0.6, 0.6);
-    HeaderFrame.Text2:SetText("Increase Speed Rating");
-    HeaderFrame.Text2:SetTextColor(177/255, 190/255, 95/255);
 
     local function CreateTextBackground(parent, fontString, height, extensionX)
         local bg = parent:CreateTexture(nil, "BACKGROUND", nil, 2);
@@ -1319,11 +1459,48 @@ local function InitArtifactUI()
     CardBackground:SetAlpha(0.6);
     local s = 2.1;
     CardBackground:SetSize(320 * s, 256 * s);
+
+
+    local CloseButton = CreateFrame("Button", nil, f);
+    local scale = 1.2;
+    CloseButton:SetSize(24*scale, 24*scale);
+    CloseButton:SetPoint("TOPRIGHT", f, "TOPRIGHT", -8, 48);
+    CloseButton.Background = CloseButton:CreateTexture(nil, "BACKGROUND");
+    CloseButton.Background:SetSize(64*scale, 48*scale);
+    CloseButton.Background:SetPoint("CENTER", CloseButton, "CENTER", 0, 0);
+    CloseButton.Background:SetTexture(TEXTURE_FILE);
+    CloseButton.Background:SetTexCoord(512/1024, 640/1024, 576/1024, 672/1024);
+
+    local NormalTexture = CloseButton:CreateTexture(nil, "OVERLAY");
+    CloseButton:SetNormalTexture(NormalTexture);
+    NormalTexture:SetTexture(TEXTURE_FILE);
+    NormalTexture:SetTexCoord(640/1024, 688/1024, 576/1024, 624/1024);
+
+    local PushedTexture = CloseButton:CreateTexture(nil, "OVERLAY");
+    CloseButton:SetPushedTexture(PushedTexture);
+    PushedTexture:SetTexture(TEXTURE_FILE);
+    PushedTexture:SetTexCoord(640/1024, 688/1024, 624/1024, 672/1024);
+
+    local HighlightTexture = CloseButton:CreateTexture(nil, "OVERLAY");
+    CloseButton:SetHighlightTexture(HighlightTexture);
+    HighlightTexture:SetTexture(TEXTURE_FILE);
+    HighlightTexture:SetTexCoord(688/1024, 736/1024, 576/1024, 624/1024);
+    HighlightTexture:SetBlendMode("ADD");
+
+    CloseButton:SetScript("OnClick", function()
+        MainFrame:Hide();
+    end);
+
+
+    local height = 5 * (cardHeight + cardGap) - cardGap + headerHeight;
+    f:SetSize(cardWidth, height);
+    f:SetScript("OnHide", f.OnHide);
+    f:SetScript("OnShow", f.OnShow);
 end
 
 local function ShowArtifactUI()
     if not MainFrame then
-        InitArtifactUI();
+        CreateMainUI();
         MainFrame:Hide();
     end
     MainFrame:Show();
@@ -1332,10 +1509,10 @@ RemixAPI.ShowArtifactUI = ShowArtifactUI;
 
 
 local function ToggleArtifactUI()
-    if not MainFrame then
-        InitArtifactUI();
-        MainFrame:Hide();
+    if MainFrame then
+        MainFrame:SetShown(not MainFrame:IsShown());
+    else
+        ShowArtifactUI();
     end
-    MainFrame:SetShown(not MainFrame:IsShown());
 end
 RemixAPI.ToggleArtifactUI = ToggleArtifactUI;

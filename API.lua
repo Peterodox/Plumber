@@ -3541,6 +3541,40 @@ do  -- 11.0 Menu Formatter
                     elementDescription = rootDescription:CreateButton(info.name, info.OnClick);
                 elseif info.type == "Checkbox" then
                     elementDescription = rootDescription:CreateCheckbox(info.name, info.IsSelected, info.ToggleSelected);
+                elseif info.type == "Submenu" then
+                    elementDescription = rootDescription:CreateButton(L["Pin Size"]);
+
+                    local function IsSelected(index)
+                        --Override
+                        return false
+                    end
+
+                    local response = info.response and MenuResponse and MenuResponse[info.response] or 2;
+
+                    local function SetSelected(index)
+                        info.SetSelected(index);
+                        return response
+                    end
+
+                    for index, text in ipairs(info.radios) do
+                        elementDescription:CreateRadio(text, info.IsSelected or IsSelected, SetSelected, index);
+                    end
+                elseif info.type == "Radio" then
+                    local function IsSelected(index)
+                        --Override
+                        return false
+                    end
+
+                    local response = info.response and MenuResponse and MenuResponse[info.response] or 2;
+
+                    local function SetSelected(index)
+                        info.SetSelected(index);
+                        return response
+                    end
+
+                    for index, text in ipairs(info.radios) do
+                        elementDescription = rootDescription:CreateRadio(text, info.IsSelected or IsSelected, SetSelected, index);
+                    end
                 end
 
                 if info.IsEnabledFunc then

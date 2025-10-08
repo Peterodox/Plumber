@@ -59,6 +59,7 @@ end
 
 do	--DataProvider
 	DataProvider.traitNameCache = {};
+	DataProvider.traitSpellCache = {};
 
 	DataProvider.ArtifactTracks = {
 		--[index] = {majorNodeID1, majorNodeID2, ...}
@@ -218,19 +219,33 @@ do	--DataProvider
 	end
 
 	function DataProvider:GetNodeInfo(nodeID)
-		return GetNodeInfo(self:GetCurrentConfigID(), nodeID)
+		local configID = self:GetCurrentConfigID();
+		if configID then
+			return GetNodeInfo(configID, nodeID)
+		end
 	end
 
 	function DataProvider:GetEntryInfo(entryID)
-		return GetEntryInfo(self:GetCurrentConfigID(), entryID)
+		local configID = self:GetCurrentConfigID();
+		if configID then
+			return GetEntryInfo(configID, entryID)
+		end
 	end
 
 	function DataProvider:GetCost(nodeID)
-		local costs = GetNodeCost(self:GetCurrentConfigID(), nodeID);
+		local configID = self:GetCurrentConfigID();
+		local costs = configID and GetNodeCost(configID, nodeID);
 		if costs and costs[1] then
 			return costs[1].amount
 		else
 			return 0
+		end
+	end
+
+	function DataProvider:IsNodeActive(nodeID)
+		local nodeInfo = self:GetNodeInfo(nodeID);
+		if nodeInfo then
+			return nodeInfo.currentRank > 0
 		end
 	end
 
@@ -269,6 +284,13 @@ do	--DataProvider
 			if nodeInfo and nodeInfo.canPurchaseRank then
 				return true
 			end
+		end
+	end
+
+	function DataProvider:CanActivateArtifactTrack()
+		--True if an artifact ability is purchased or can be purchased
+		if (self:GetActiveArtifactTrackIndex() ~= nil) or self:ShouldChooseArtifactTrack() then
+			return true
 		end
 	end
 
@@ -382,6 +404,7 @@ do	--DataProvider
 		return items
 	end
 
+	--[[
 	function DataProvider:GetTreeInfo()
 		if not PlumberDevData then
 			PlumberDevData = {};
@@ -411,7 +434,7 @@ do	--DataProvider
 								local name = spellInfo.name or spellID;
 								local rankText = nodeInfo.currentRank.."/"..nodeInfo.maxRanks;
 								local ranksIncreased = nodeInfo.ranksIncreased or 0;
-								Debug_SaveTraitInfo(nodeID, entryID, entryInfo.definitionID, name);
+								--Debug_SaveTraitInfo(nodeID, entryID, entryInfo.definitionID, name);
 								print(string.format("|T%s:16:16|t %s  Rank: %s, EntryID: %s", icon, name, rankText, entryID));
 								if ranksIncreased > 0 then
 									rankText = rankText..string.format("(+%d)", nodeInfo.ranksIncreased);
@@ -434,7 +457,9 @@ do	--DataProvider
 			end
 		end
 	end
+	--]]
 
+	--[[
 	function DataProvider:GetIncreasedTraits()
 		local GetIncreasedTraitData = C_Traits.GetIncreasedTraitData;
 		local isLoaded = true;
@@ -469,6 +494,32 @@ do	--DataProvider
 			end
 		end
 	end
+	--]]
+
+	function DataProvider:GetIncreasedTraitSpellsAndRanks()
+		local n = 0;
+		local tbl;
+		local GetIncreasedTraitData = C_Traits.GetIncreasedTraitData;
+		for _, v in ipairs(self.IncreasableTraits) do
+			local nodeID, entryID, definitionID = v[1], v[2], v[3];
+			local increasedTraitDataList = GetIncreasedTraitData(nodeID, entryID);
+			if increasedTraitDataList and #increasedTraitDataList > 0 then
+				local definitionInfo = GetDefinitionInfo(definitionID);
+				local spellID = definitionInfo and definitionInfo.spellID;
+				local totalIncreased = 0;
+				for _index, increasedTraitData in ipairs(increasedTraitDataList) do
+					local numPointsIncreased = increasedTraitData.numPointsIncreased;
+					totalIncreased = totalIncreased + numPointsIncreased;
+				end
+				if not tbl then
+					tbl = {};
+				end
+				n = n + 1;
+				tbl[n] = {spellID, totalIncreased};
+			end
+		end
+		return tbl
+	end
 
 	function DataProvider:UpdateClassSpecInfo()
 		local specIndex = C_SpecializationInfo.GetSpecialization();
@@ -489,7 +540,7 @@ do	--DataProvider
 		--configID is different for each artifact weawpon
 
 		local traitTreeID = C_RemixArtifactUI.GetCurrTraitTreeID() or 1161;
-		local configID = GetConfigIDByTreeID(traitTreeID);
+		local configID = traitTreeID and GetConfigIDByTreeID(traitTreeID);
 		if not configID then return end;
 
 		self.configID = configID;
@@ -497,8 +548,6 @@ do	--DataProvider
 		local configInfo = GetConfigInfo(configID);
 		local treeID = configInfo.treeIDs[1] or 1161;
 		self.treeID = treeID;
-
-		print("current configID:", configID);
 	end
 
 	function DataProvider:GetCurrentConfigID()
@@ -558,9 +607,9 @@ do	--DataProvider
 		end
 	end
 
-	function DataProvider:GetTraitName(entryID)
-		if self.traitNameCache[entryID] then
-			return self.traitNameCache[entryID]
+	function DataProvider:GetTraitSpell(entryID)
+		if self.traitSpellCache[entryID] then
+			return self.traitSpellCache[entryID]
 		end
 
 		if not self.configID then return end;
@@ -568,6 +617,18 @@ do	--DataProvider
 		local entryInfo = GetEntryInfo(self.configID, entryID);
 		local definitionInfo = GetDefinitionInfo(entryInfo.definitionID);
 		local spellID = definitionInfo and definitionInfo.spellID;
+		self.traitSpellCache[entryID] = spellID;
+		return spellID
+	end
+
+	function DataProvider:GetTraitName(entryID)
+		if self.traitNameCache[entryID] then
+			return self.traitNameCache[entryID]
+		end
+
+		if not self.configID then return end;
+
+		local spellID = self:GetTraitSpell(entryID);
 		local spellInfo = spellID and C_Spell.GetSpellInfo(spellID);
 		if spellInfo then
 			local icon = spellInfo.iconID or spellInfo.originalIconID;
@@ -602,7 +663,7 @@ do	--DataProvider
 					_nodeInfo = self:GetNodeInfo(nodeID);
 					if _nodeInfo and _nodeInfo.canPurchaseRank then
 						--entryID = _nodeInfo.entryIDs[1];
-						entryID = self:GetLastSelectedEntryID(nodeID, _nodeInfo.entryIDs)
+						entryID = self:GetLastSelectedEntryID(nodeID, _nodeInfo.entryIDs);
 						break
 					end
 				end
@@ -624,6 +685,7 @@ do	--DataProvider
 					nodeInfo = self:GetNodeInfo(_nodeID);
 					if nodeInfo.canPurchaseRank then
 						entryID = nodeInfo.entryIDs[1];
+						nodeID = _nodeID;
 						break
 					end
 				end
@@ -660,6 +722,55 @@ do	--DataProvider
 		end
 	end
 
+	function DataProvider:GetNextUpgradeInfoForUI()
+		local tbl;
+		local traitInfo = self:GetNextTraitForUpgrade();
+		if traitInfo and traitInfo.cost >= 0 then
+			local line1, line2, nextSpellID, nextEntryID, nextRank;
+			tbl = {};
+			local numUnspent = self:GetNumUnspentPower();
+			local diff = traitInfo.cost - numUnspent;
+			if diff <= 0 then
+				--Diff becomes negative when player receives lots of power at once to upgrade more than 1 trait
+				--We will automatically upgrade the second trait after CURRENCY_DISPLAY_UPDATE
+				diff = 0;
+				line1 = L["Soon To Unlock"];
+			else
+				line1 = L["Amount Required To Unlock Format"]:format(BreakUpLargeNumbers(diff));
+			end
+			nextSpellID = self:GetTraitSpell(traitInfo.entryID);
+			nextEntryID = traitInfo.entryID;
+			local entryInfo = self:GetEntryInfo(traitInfo.entryID);
+			if entryInfo then
+				if entryInfo.type == 3 then
+					--SpendSmallCircle: Stat Bonus
+					line2 = C_Spell.GetSpellDescription(nextSpellID);
+				else
+					local nodeInfo = DataProvider:GetNodeInfo(traitInfo.nodeID);
+					local maxRanks = entryInfo.maxRanks;
+					if maxRanks > 1 then
+						nextRank = (nodeInfo and nodeInfo.ranksPurchased or 0) + 1;
+					end
+				end
+			end
+			if not line2 then
+				line2 = self:GetTraitName(traitInfo.entryID);
+			end
+			if nextRank and line2 then
+				line2 = string.format("|cffb6b6b6%s|r  %s", L["Rank Format"]:format(nextRank), line2);
+			end
+
+			tbl = {
+				line1 = line1,
+				line2 = line2,
+				nextSpellID = nextSpellID,
+				nextEntryID = nextEntryID,
+				nextRank = nextRank,
+			}
+		end
+		return tbl
+	end
+
 	function DataProvider:GetLastSelectedEntryID(nodeID, entryIDs)
 		--For selection nodes
 		local entryID, saved;
@@ -687,12 +798,13 @@ do	--DataProvider
 				if valid then
 					saved = true;
 				else
-					entryID = entryIDs[1];
-					saved = false;
+					entryID = nil;
 				end
-			else
-				entryID = entryIDs[1];
+			end
+
+			if not entryID then
 				saved = false;
+				entryID = entryIDs[2];	--We use the 2nd one to avoid Arcane Aegis, which changes Moving Backward bahavior
 			end
 		end
 		return entryID, saved
@@ -730,7 +842,7 @@ do	--DataProvider
 		else
 			DataProvider.playerDB = {};
 		end
-
+		DataProvider:UpdateConfigInfo();
 		DataProvider:UpdateClassSpecInfo();
 	end);
 
@@ -747,12 +859,9 @@ do	--DataProvider
 		end
 	end
 
-	function DataProvider:SaveLastArtifactTrackIndexForCurrentSpec()
+	function DataProvider:SetLastArtifactTrackIndexForCurrentSpec(artifactTrackIndex)
 		if not self.playerDB then return end;
-
-		local artifactTrackIndex = self:GetActiveArtifactTrackIndex();
-
-		if artifactTrackIndex then
+		if artifactTrackIndex and self.ArtifactTracks[artifactTrackIndex] then
 			if not self.specIndex then
 				self:UpdateClassSpecInfo();
 			end
@@ -761,6 +870,11 @@ do	--DataProvider
 				self.playerDB["spec"..self.specIndex.."artifactTrackIndex"] = artifactTrackIndex;
 			end
 		end
+	end
+
+	function DataProvider:SaveLastArtifactTrackIndexForCurrentSpec()
+		local artifactTrackIndex = self:GetActiveArtifactTrackIndex();
+		self:SetLastArtifactTrackIndexForCurrentSpec(artifactTrackIndex);
 	end
 end
 
@@ -870,7 +984,7 @@ do
 				self:RequestUpdate();
 			elseif event == "REMIX_ARTIFACT_UPDATE" then
 				DataProvider:UpdateConfigInfo();
-				RemixAPI.ShowArtifactUI();
+				--RemixAPI.ShowArtifactUI();
 			elseif event == "BAG_UPDATE_DELAYED" then
 				self:UnregisterEvent(event);
 				if InCombatLockdown() then
@@ -919,7 +1033,7 @@ do	--CommitUtil
 			CallbackRegistry:Trigger("LegionRemix.CommitFinished", true);
 			DataProvider:SaveLastArtifactTrackIndexForCurrentSpec();
 		elseif self.commitingResult == 0 then
-			CallbackRegistry:Trigger("LegionRemix.CommitFinished", true);
+			CallbackRegistry:Trigger("LegionRemix.CommitFinished", false);
 			print("COMMIT FAILED");
 		end
 		self.commitingResult = nil;
@@ -1053,6 +1167,7 @@ do	--CommitUtil
 		end
 
 		local configID = DataProvider:GetCurrentConfigID();
+		if not configID then return end;
 		local nodeID, entryID = 108700, 134246;
 		--while PurchaseRank(configID, nodeID) do
 		--	self.anySuccessPurchase = true;
@@ -1216,6 +1331,7 @@ do	--CommitUtil
 
 		if self.anySuccessPurchase then
 			self:SetCommitStarted(configID);
+			return true
 		end
 	end
 
@@ -1287,7 +1403,7 @@ end
 
 
 do	--Debug
-
+	--[[
 	EventRegistry:RegisterCallback("TalentDisplay.TooltipCreated", function(_, node, tooltip)
 		local nodeInfo = node.nodeInfo;
 		if nodeInfo then
@@ -1395,9 +1511,9 @@ do	--Module Registry
 	local function EnableModule(state)
 		if state and not MASTER_ENABLED then
 			DataProvider:UpdateConfigInfo();
-			UIParent:UnregisterEvent("REMIX_ARTIFACT_UPDATE");
+			--UIParent:UnregisterEvent("REMIX_ARTIFACT_UPDATE");
 		elseif not state and MASTER_ENABLED then
-			UIParent:RegisterEvent("REMIX_ARTIFACT_UPDATE");
+			--UIParent:RegisterEvent("REMIX_ARTIFACT_UPDATE");
 		else
 			return
 		end

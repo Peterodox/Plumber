@@ -209,8 +209,11 @@ do  --Controller
         local con = NarciPaperDollWidgetController;
         if not con then return end;
 
-        con:ListenEvents(false);
-        con.WidgetContainer:Hide();
+        if con.isEnabled then
+            con:ListenEvents(false);
+            con.WidgetContainer:Hide();
+            con.isEnabled = false;
+        end
     end
 
     local PaperDollSlots = {
@@ -316,8 +319,8 @@ do
 
     function IconPoolUtil.LoadSettings()
         local v = addon.GetDBValue("LegionRemix_TraitSubIconStyle");
-        if not (v == 0 or v == 1 or v == 2) then
-            v = 1;
+        if not (v == 1 or v == 2 or v == 3) then
+            v = 3;
         end
         IconPoolUtil.traitSubIconStyle = v;
 
@@ -339,6 +342,9 @@ local LegionWidget = CreatePaperDollWidget("PlumberLegionRemixPaperDollWidgetTem
 do
     LegionWidget.enabled = true;
     LegionWidget.Background:SetTexture(TEXTURE_FILE);
+    LegionWidget.Background:SetTexCoord(0, 120/512, 0, 96/512);
+    LegionWidget.LoopingGlow:SetTexture(TEXTURE_FILE);
+    LegionWidget.LoopingGlow:SetTexCoord(256/512, 376/512, 128/512, 224/512);
     LegionWidget.Sheen:SetTexture(TEXTURE_FILE);
     LegionWidget.Sheen:SetTexCoord(128/512, 248/512, 0, 96/512);
     LegionWidget.SheenMask:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/Mask-Halo", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
@@ -348,25 +354,23 @@ do
 
     Controller:AddWidget(LegionWidget, 1, "LegionRemixPaperDollWidget");
 
-    function LegionWidget:UpdateVisual()
-        self.Background:SetTexCoord(0, 120/512, 0, 96/512);
-    end
-    LegionWidget:UpdateVisual();
-
     function LegionWidget:PlaySheen()
         self.Sheen:Show();
         self.AnimSheen:Play();
     end
 
+    function LegionWidget:PlayPulse()
+        self.LoopingGlow:Show();
+        self.AnimLoopPulse:Play();
+    end
+
     function LegionWidget:OnEnter()
-        self:UpdateVisual();
         self:PlaySheen();
         self:ShowTooltip(true);
     end
     LegionWidget:SetScript("OnEnter", LegionWidget.OnEnter);
 
     function LegionWidget:OnLeave()
-        self:UpdateVisual();
         self.Tooltip:Hide();
     end
     LegionWidget:SetScript("OnLeave", LegionWidget.OnLeave);
@@ -374,14 +378,7 @@ do
     function LegionWidget:OnClick(button)
         if button == "RightButton" then
             self.Tooltip:Hide();
-            local value = addon.GetDBValue("LegionRemix_TraitSubIconStyle");
-            if value == 2 then
-                value = 1;
-            else
-                value = 2;
-            end
-            addon.SetDBValue("LegionRemix_TraitSubIconStyle", value);
-            IconPoolUtil:LoadSettings();
+            self:ShowContextMenu();
             return
         end
 
@@ -407,17 +404,9 @@ do
         self:SetAlpha(alpha);
     end
 
-    local DebugBonusTraits = {
-        1235159,
-        1242992,
-        1234774,
-        1233592,
-        1241996,
-    };
-
     function LegionWidget:ShowTooltip(fadeIn)
         local tooltip = self.Tooltip;
-
+        tooltip:SetParent(UIParent);    --Change parent so FrameStrata can work
 
         local isLoaded = true;
         local text3;
@@ -428,35 +417,39 @@ do
         end
 
 
-
-        if #DebugBonusTraits > 0 then
+        local spellsAndRanks = DataProvider:GetIncreasedTraitSpellsAndRanks();
+        if spellsAndRanks then
             if text3 then
                 text3 = text3.."\n|cff999999"..L["Bonus Traits"].."|r";
             end
+
+            local traitFormat = "+%d  |T%s:16:16:0:-2:64:64:4:60:4:60|t |cffffd100%s|r";
+            for k, v in ipairs(spellsAndRanks) do
+                local spellID = v[1];
+                local totalIncreased = v[2];
+                local spellIcon = GetSpellTexture(spellID) or 134400;
+                local spellName = C_Spell.GetSpellName(spellID);
+                if not spellName then
+                    spellName = " ";
+                    isLoaded = false;
+                end
+                local lineText = string.format(traitFormat, totalIncreased, spellIcon, spellName);
+                if text3 then
+                    text3 = text3.."\n"..lineText;
+                else
+                    text3 = lineText;
+                end
+            end
         end
 
-        local traitFormat = "+%d  |T%s:16:16:0:-2:64:64:4:60:4:60|t |cffffd100%s|r";
-        for k, v in ipairs(DebugBonusTraits) do
-            local totalIncreased = 3;
-            local spellIcon = GetSpellTexture(v) or 134400;
-            local spellName = C_Spell.GetSpellName(v);
-            if not spellName then
-                spellName = " ";
-                isLoaded = false;
-            end
-            local lineText = string.format(traitFormat, totalIncreased, spellIcon, spellName);
-            if text3 then
-                text3 = text3.."\n"..lineText;
-            else
-                text3 = lineText;
-            end
+        local nextUpgradeInfo = DataProvider:GetNextUpgradeInfoForUI();
+        if nextUpgradeInfo then
+            tooltip.Text1:SetText(nextUpgradeInfo.line1);
+            tooltip.Text1:SetTextColor(0.6, 0.6, 0.6);
+            tooltip.Text2:SetText(nextUpgradeInfo.line2);
+            tooltip.Text2:SetTextColor(177/255, 190/255, 95/255);
         end
 
-
-        tooltip.Text1:SetText("42,000 to unlock");
-        tooltip.Text1:SetTextColor(0.6, 0.6, 0.6);
-        tooltip.Text2:SetText("|cffb6b6b6Rank 3|r  Call of the Legion");
-        tooltip.Text2:SetTextColor(177/255, 190/255, 95/255);
         tooltip.Text3:SetText(text3);
         tooltip.Instruction:SetText(L["Instruction Open Artifact UI"]);
         tooltip.Instruction:SetTextColor(0.6, 0.6, 0.6);
@@ -490,11 +483,53 @@ do
         end
         tooltip:Show();
         tooltip:SetFrameStrata("TOOLTIP");
+        tooltip:SetFixedFrameStrata(true);
+
+        if nextUpgradeInfo and nextUpgradeInfo.nextEntryID then
+            local TraitTooltipFrame = RemixAPI.GetTraitTooltipFrame(self);
+            --TraitTooltipFrame:SetTooltipSpell(nextSpellID);
+            TraitTooltipFrame:SetTooltipTrait(nextUpgradeInfo.nextEntryID, nextUpgradeInfo.nextRank);
+            TraitTooltipFrame:SetParent(tooltip);
+            TraitTooltipFrame:ClearAllPoints();
+            TraitTooltipFrame:SetPoint("TOPLEFT", tooltip, "TOPRIGHT", 4, 0);
+            TraitTooltipFrame:Show();
+        end
 
         if not isLoaded then
             self.t = 0;
             self:SetScript("OnUpdate", self.OnUpdate);
         end
+    end
+
+    local LegionContextMenu = {
+        tag = "PlumberPaperDollWidgetLegionRemix",
+        objects = {
+            {type = "Title", name = L["LegionRemix Widget Title"]},
+            {type = "Divider"},
+            {type = "Title", name = L["Trait Icon Mode"]},
+            {type = "Radio", response = "Refresh",
+                IsSelected = function(index)
+                    return addon.GetDBValue("LegionRemix_TraitSubIconStyle") == index
+                end,
+
+                SetSelected = function(index)
+                    addon.SetDBValue("LegionRemix_TraitSubIconStyle", index);
+                    IconPoolUtil:LoadSettings();
+                end,
+
+                radios = {
+                    L["Trait Icon Mode Hidden"],
+                    L["Trait Icon Mode Mini"],
+                    L["Trait Icon Mode Replace"],
+                },
+            },
+        };
+    };
+
+    function LegionWidget:ShowContextMenu()
+        local menu = API.ShowBlizzardMenu(self, LegionContextMenu);
+        menu:ClearAllPoints();
+        menu:SetPoint("TOPLEFT", self, "TOPRIGHT", 4, 0);
     end
 
     function LegionWidget:OnUpdate(elapsed)
@@ -518,7 +553,7 @@ do
             IconPool:Release();
         end
 
-        if IconPoolUtil.traitSubIconStyle ~= 1 then return end;
+        if IconPoolUtil.traitSubIconStyle ~= 2 then return end;
 
         if state then
             if not IconPool then
@@ -544,7 +579,14 @@ do
     end
 
     function LegionWidget:Update()
+        if not DataProvider:GetCurrentConfigID() then
+            self:Hide();
+            return
+        else
+            self:Show();
+        end
         self:ShowSlotTraitIcons(true);
+        Controller:HideNarcissusWidgets();
     end
 
     IconPoolUtil:AddUpdator(function()
@@ -562,7 +604,7 @@ do
             if itemID then
                 local slotButton = Controller:GetSlotButton(slotID);
                 if slotButton then
-                    local texture = style == 2 and DataProvider:GetItemTraitTexture(itemID) or GetInventoryItemTexture("player", slotID);
+                    local texture = style == 3 and DataProvider:GetItemTraitTexture(itemID) or GetInventoryItemTexture("player", slotID);
                     slotButton.icon:SetTexture(texture);
                 end
             end
@@ -579,7 +621,7 @@ do  --EquipmentFlyout
     local function UpdateFlyout()
         FlyoutIconPool:Release();
         local style = IconPoolUtil.traitSubIconStyle;
-        if not(style == 1 or style == 2) then return end;
+        if not(style == 2 or style == 3) then return end;
 
         local flyout = EquipmentFlyoutFrame;
         --if not (flyout and flyout:IsVisible()) then return end;
@@ -594,12 +636,12 @@ do  --EquipmentFlyout
                 if itemID then
                     local texture = DataProvider:GetItemTraitTexture(itemID);
                     if texture then
-                        if style == 1 then
+                        if style == 2 then
                             local object = FlyoutIconPool:Acquire();
                             object:SetParent(buttons[i]);
                             object:SetPoint("TOPRIGHT", buttons[i], "TOPRIGHT", -2, -2);
                             object.Icon:SetTexture(texture);
-                        elseif style == 2 then
+                        elseif style == 3 then
                             buttons[i].icon:SetTexture(texture);
                         end
                     end
@@ -618,7 +660,7 @@ do  --EquipmentFlyout
 
 
     hooksecurefunc("PaperDollItemSlotButton_Update", function(slotButton)
-        if IconPoolUtil.traitSubIconStyle ~= 2 then return end;
+        if IconPoolUtil.traitSubIconStyle ~= 3 then return end;
         local slotID = slotButton:GetID();
         local itemID = slotID and GetInventoryItemID("player", slotID);
         if itemID then

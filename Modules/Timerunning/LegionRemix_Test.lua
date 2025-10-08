@@ -463,6 +463,38 @@ local ItemXEntry = {
     --[242397] = 133488,
 };
 
+local ItemXIcon = {
+    --[itemID] = icon
+    [246200] = 1322283,
+    [246204] = 4638528,
+    [246208] = 236415,
+    [245999] = 1380367,
+    [246193] = 610472,
+    [246197] = 4638530,
+    [246201] = 610472,
+    [246205] = 136099,
+    [245996] = 4226154,
+    [246000] = 463487,
+    [246190] = 1380367,
+    [246194] = 136099,
+    [246198] = 236415,
+    [246202] = 136014,
+    [246206] = 4638530,
+    [245997] = 463487,
+    [246191] = 1322283,
+    [246195] = 136014,
+    [246199] = 4226154,
+    [246203] = 136126,
+    [246207] = 5764906,
+    [245998] = 4638528,
+    [246192] = 136126,
+    [246196] = 5764906,
+
+    --Test
+    [230633] = 4638528,
+    [242397] = 236415,
+};
+
 --[[
 do  --For debug on Retail
     local debugNodeID = 93179;
@@ -495,7 +527,8 @@ function DataProvider:GetNodeEntryID(nodeID)
     return TraitNodeXEntryDB[nodeID]
 end
 
-function DataProvider:GetNodeInfo(nodeID)
+
+function DataProvider:LocalGetNodeInfo(nodeID)
     local v = TraitNodeXEntryDB[nodeID];
     local info = {};
     info.ID = nodeID;
@@ -509,6 +542,7 @@ function DataProvider:GetNodeInfo(nodeID)
     return info
 end
 
+--[[
 function DataProvider:GetEntryInfo(entryID)
     local v = TraitNodeEntryDB[entryID]
     return {
@@ -517,14 +551,16 @@ function DataProvider:GetEntryInfo(entryID)
         type = v[3],
     };
 end
+--]]
 
 function DataProvider:GetRightNodeInfo(leftNodeID)
     local nodeID = NextNodeDB[leftNodeID]
     if nodeID then
-        return self:GetNodeInfo(nodeID)
+        return self:LocalGetNodeInfo(nodeID)
     end
 end
 
+--[[
 function DataProvider:IsNodeActive(nodeID)
     if not self.activeNodeIDs then
         self.activeNodeIDs = {};
@@ -539,11 +575,13 @@ function DataProvider:IsNodeActive(nodeID)
     end
     return self.activeNodeIDs[nodeID]
 end
+--]]
 
 function DataProvider:GetItemTraitEntry(itemID)
     return ItemXEntry[itemID]
 end
 
+--[[
 function DataProvider:GetItemTraitTexture(itemID)
     local entryID = ItemXEntry[itemID];
     if not entryID then return end;
@@ -561,12 +599,14 @@ function DataProvider:GetItemTraitTexture(itemID)
 
     return self.itemTraitTextures[itemID]
 end
+--]]
 
-DataProvider.artifactTrackIndex = 1;
-function DataProvider:GetActiveArtifactTrackIndex()
-    return self.artifactTrackIndex
+function DataProvider:GetItemTraitTexture(itemID)
+    return ItemXIcon[itemID]
 end
 
+
+--[[
 function CommitUtil:TryPurchaseArtifactTrack(index)
     local function OnUpdate(self, elapsed)
         self.t = self.t + elapsed;
@@ -585,7 +625,20 @@ end
 function CommitUtil:IsCommitingInProcess()
     return self.t ~= nil
 end
+--]]
 
-C_Timer.After(1, function()
-    addon.CallbackRegistry:Trigger("TimerunningSeason", 2);
-end)
+
+--[[
+function YeetItemTraitIcons()
+    if not PlumberDevData.ItemTraitIcons then
+        PlumberDevData.ItemTraitIcons = {};
+    end
+
+    for itemID, entryID in pairs(ItemXEntry) do
+        local definitionID = TraitNodeEntryDB[entryID][1];
+        local spellID = C_Traits.GetDefinitionInfo(definitionID).spellID;
+        local iconID, originalIconID = C_Spell.GetSpellTexture(spellID);
+        PlumberDevData.ItemTraitIcons[itemID] = originalIconID or iconID;
+    end
+end
+--]]

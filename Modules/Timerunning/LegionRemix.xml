@@ -108,7 +108,7 @@
 		</Animations>
 	</Button>
 
-	<Frame name="PlumberLegionRemixTooltipTemplate" virtual="true">
+	<Frame name="PlumberLegionRemixTooltipTemplate" hidden="true" clampedToScreen="true" virtual="true">
 		<Size x="256" y="256"/>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -274,7 +274,15 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-            <Layer level="ARTWORK">
+			<Layer level="ARTWORK">
+				<Texture parentKey="LoopingGlow" hidden="true" alphaMode="ADD">
+					<Size x="60" y="48"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+            <Layer level="OVERLAY">
                 <Texture parentKey="Sheen" alphaMode="ADD" hidden="true">
                     <Size x="60" y="48"/>
                     <Anchors>
@@ -342,6 +350,11 @@
 				<Alpha fromAlpha="0" toAlpha="1" duration="0.05" order="1" childKey="Sheen"/>
 				<Alpha fromAlpha="1" toAlpha="0" duration="0.2" startDelay="0.5" order="1" childKey="Sheen"/>
 				<Scale scaleX="6" scaleY="6" duration="0.6" order="1" smoothing="IN" childKey="SheenMask"/>
+			</AnimationGroup>
+			<AnimationGroup parentKey="AnimLoopPulse" looping="REPEAT">
+				<Alpha childKey="LoopingGlow" duration="0.5" order="1" fromAlpha="0" toAlpha="1"/>
+				<Alpha childKey="LoopingGlow" startDelay="0.5" duration="1" order="1" fromAlpha="1" toAlpha="0"/>
+				<Scale childKey="LoopingGlow" duration="0.75" order="1" fromScaleX="0.75" fromScaleY="0.75" toScaleX="1.1" toScaleY="1.1"/>
 			</AnimationGroup>
 		</Animations>
 	</Button>

@@ -268,7 +268,7 @@ local DefaultValues = {
 
     --LegionRemix
     LegionRemix = true,
-        LegionRemix_TraitSubIconStyle = 2,  --0: OFF, 1:Mini Icon, 2:Replace Icon
+        LegionRemix_TraitSubIconStyle = 3,  --1:OFF, 2:Mini Icon, 3:Replace Icon
 
 
     EnableNewByDefault = false,             --Always enable newly added features

@@ -377,14 +377,26 @@ L["SoftTargetName ShowNPC Tooltip"] = "If disabled, the name will only appear on
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "Legion Remix";
 L["Artifact Weapon"] = "Artifact Weapon";
+L["Artifact Ability"] = "Artifact Ability";
 L["Earn X To Upgrade Y Format"] = "Earn another |cffffffff%s|r %s to upgrade %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
 L["Until Next Upgrade Format"] = "%s until next upgrade";
 L["New Trait Available"] = "New trait available.";
+L["Rank Format"] = "Rank %s";
 L["Rank Increased"] = "Rank Increased";
 L["Infinite Knowledge Tooltip"] = "You can obtain Inifite Knowledge by earning certain Legion Remix achievements.";
 L["Stat Bonuses"] = "Stat Bonuses";
 L["Bonus Traits"] = "Bonus Traits:";
 L["Instruction Open Artifact UI"] = "Left click to toggle Artifact UI\nRight click to show settings";
+L["LegionRemix Widget Title"] = "Plumber Widget";
+L["Trait Icon Mode"] = "Trait Icon Mode:";
+L["Trait Icon Mode Hidden"] = "Don't show";
+L["Trait Icon Mode Mini"] = "Show mini icons";
+L["Trait Icon Mode Replace"] = "Replace item icons";
+L["Error Drag Spell In Combat"] = "You cannot drag a spell while in combat.";
+L["Error Change Trait In Combat"] = "You cannot change traits in combat.";
+L["Amount Required To Unlock Format"] = "%d to unlock";   --Earn another x amount to unlock (something)
+L["Soon To Unlock"] = "Soon to unlock";
+L["Artifact Ability Auto Unlock Tooltip"] = "This trait will be automatically unlocked once you have enough Infinite Power.";
 
 
 --ItemUpgradeUI
