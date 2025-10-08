@@ -128,16 +128,15 @@ do
         if not parentNodeButton then return end;
 
         local shouldPlaySheen;
-        if (parentNodeButton.entryID ~= self.entryID) and parentNodeButton.isActive then
+
+        DataProvider:SaveLastSelectedEntryID(self.nodeID, self.entryID);
+        if CommitUtil:TryPurchaseSelectionNode(self.nodeID, self.entryID) then
             shouldPlaySheen = true;
         end
-        DataProvider:SaveLastSelectedEntryID(self.nodeID, self.entryID);
-        parentNodeButton.selectedEntryID = self.entryID;
-        parentNodeButton:SetData(self.nodeID, self.entryID, self.definitionID);    --debug
+        --parentNodeButton.selectedEntryID = self.entryID;
+        --parentNodeButton:SetData(self.nodeID, self.entryID, self.definitionID);    --debug
+        parentNodeButton.shouldPlaySheen = shouldPlaySheen;
         parentNodeButton:Refresh();
-        if shouldPlaySheen then
-            parentNodeButton:PlaySheen();
-        end
     end
 
     function NodeButtonMixin:OnFocused()
@@ -221,9 +220,14 @@ do
         end
     end
 
-    function NodeButtonMixin:Refresh()
+    function NodeButtonMixin:Refresh(playAnimation)
         if self.entryIDs then
-            self:Refresh_SelectionNode();
+            self:Refresh_SelectionNode(playAnimation);
+            return
+        end
+
+        if self.isFlyoutButton then
+            self:Refresh_FlyoutButton();
             return
         end
 
@@ -232,29 +236,6 @@ do
 
         local currentRank = nodeInfo.currentRank or 0;
         local ranksPurchased = nodeInfo.ranksPurchased or 0;
-        local committedEntryID;
-
-        if self.isFlyoutButton then
-            if nodeInfo.entryIDToRanksIncreased then
-                for _entryID, totalIncreased in pairs(nodeInfo.entryIDToRanksIncreased) do
-                    if _entryID == self.entryID then
-                        if currentRank == 0 then
-                            currentRank = totalIncreased;
-                        end
-                        break
-                    end
-                end
-            end
-
-            local isEntryCommitted = false;
-            if nodeInfo.entryIDsWithCommittedRanks then
-                for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
-                    committedEntryID = id;
-                    isEntryCommitted = true;
-                    break
-                end
-            end
-        end
 
         local isActive = (self.trackIndex == ACTIVE_TRACK_INDEX) and ranksPurchased > 0;
         self.isActive = isActive;
@@ -262,60 +243,17 @@ do
         local visualState;
         local rankText;
 
-        if self.entryIDs then
-            --Selection Node
-            local isEntryCommitted = false;
-            if nodeInfo.entryIDsWithCommittedRanks then
-                for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
-                    committedEntryID = id;
-                    isEntryCommitted = true;
-                    break
-                end
-            end
-
-            if not isEntryCommitted then
-                if nodeInfo.entryIDToRanksIncreased then
-                    for _entryID, totalIncreased in pairs(nodeInfo.entryIDToRanksIncreased) do
-                        if _entryID == self.entryID then
-                            if currentRank == 0 then
-                                currentRank = totalIncreased;
-                            end
-                            break
-                        end
-                    end
-                end
-            end
-
-            if committedEntryID then
-                self.selectedEntryID = committedEntryID;
-            else
-                local selectedEntryID, saved = DataProvider:GetLastSelectedEntryID(self.nodeID, self.entryIDs);
-                if saved then
-                    self.selectedEntryID = selectedEntryID;
-                end
-            end
-        end
-
         if not (isActive or currentRank > 0) then
             visualState = 0;
         else
-            if self.isFlyoutButton then
-                isPurchased = committedEntryID == self.entryID;
-                if isPurchased or (currentRank > 0 and not isActive) then
+            if self.entryType == 0 then
+                if self.selectedEntryID then
                     visualState = 1;
                 else
                     visualState = 2;
                 end
             else
-                if self.entryType == 0 then
-                    if self.selectedEntryID then
-                        visualState = 1;
-                    else
-                        visualState = 2;
-                    end
-                else
-                    visualState = 1;
-                end
+                visualState = 1;
             end
         end
 
@@ -333,23 +271,14 @@ do
                     self.GreenGlow:Show();
                 end
             end
-            if self.isFlyoutButton and not isPurchased then
-                rankText = currentRank;
-                if isActive then
-                    self.RankText:SetTextColor(0.098, 1.000, 0.098);
-                elseif currentRank > 0 then
-                    self.RankText:SetTextColor(1, 0.82, 0);
-                end
-            else
-                self.RankText:SetTextColor(1, 0.82, 0);
-            end
+            self.RankText:SetTextColor(1, 0.82, 0);
         else
 
         end
         self.RankText:SetText(rankText);
     end
 
-    function NodeButtonMixin:Refresh_SelectionNode()
+    function NodeButtonMixin:Refresh_SelectionNode(playAnimation)
         local nodeInfo = DataProvider:GetNodeInfo(self.nodeID);
         if not nodeInfo then return end;
 
@@ -390,14 +319,20 @@ do
             end
         end
 
+        local entryChanged;
         local visualState;
-
         if activeEntryID then
+            entryChanged = activeEntryID ~= self.entryID;
             self:SetEntry(activeEntryID);
             visualState = 1;
             rankText = currentRank;
             self.RankText:SetTextColor(1, 0.82, 0);
+            if self.shouldPlaySheen then
+                self.shouldPlaySheen = nil;
+                self:PlaySheen();
+            end
         elseif self.selectedEntryID then
+            entryChanged = activeEntryID ~= self.selectedEntryID;
             self:SetEntry(self.selectedEntryID);
             visualState = 0;
             rankText = "";
@@ -409,8 +344,75 @@ do
                 visualState = 0;
             end
         end
+
+        if visualState ~= 0 and entryChanged then
+            if self.shouldPlaySheen then
+                self.shouldPlaySheen = nil;
+                if playAnimation then
+                    self:PlaySheen();
+                end
+            end
+        end
+
         self:SetVisualState(visualState);
         self.RankText:SetText(rankText);
+    end
+
+    function NodeButtonMixin:Refresh_FlyoutButton()
+        local nodeInfo = DataProvider:GetNodeInfo(self.nodeID);
+        if not nodeInfo then return end;
+
+        local currentRank = nodeInfo.currentRank or 0;
+        local ranksPurchased = nodeInfo.ranksPurchased or 0;
+        local increasedRanks = 0;
+
+        if nodeInfo.entryIDToRanksIncreased then
+            for _entryID, totalIncreased in pairs(nodeInfo.entryIDToRanksIncreased) do
+                if _entryID == self.entryID then
+                    if currentRank == 0 then
+                        currentRank = totalIncreased;
+                    end
+                    increasedRanks = totalIncreased;
+                    break
+                end
+            end
+        end
+
+        local committedEntryID;
+        if nodeInfo.entryIDsWithCommittedRanks then
+            for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+                committedEntryID = id;
+                break
+            end
+        end
+
+        local rankText;
+        local visualState;
+        local isActive = self.trackIndex == ACTIVE_TRACK_INDEX;
+        if isActive then
+            if self.entryID == committedEntryID then
+                visualState = 1;
+                rankText = currentRank;
+            else
+                visualState = 2;
+                rankText = increasedRanks;
+            end
+        else
+            if currentRank > 0 then
+                visualState = 1;
+                rankText = currentRank;
+            else
+                visualState = 0;
+                rankText = "";
+            end
+        end
+        self:SetVisualState(visualState);
+        self.RankText:SetText(rankText);
+        if visualState == 1 then
+            self.RankText:SetTextColor(1, 0.82, 0);
+        elseif visualState == 2 then
+            self.RankText:SetTextColor(0.098, 1.000, 0.098);
+        end
     end
 
     function NodeButtonMixin:SetVisualState(visualState)
@@ -504,13 +506,28 @@ do
         local nodeInfo = DataProvider:GetNodeInfo(self.nodeID) or self:DebugGetNodeInfo();
         local currentRank = nodeInfo.currentRank or 0;
         local ranksPurchased = nodeInfo.ranksPurchased or 0;
-        local description;
-        description = string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, ranksPurchased, nodeInfo.maxRanks);
 
 
         --Bonus Ranks
-        --local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
-        local increasedRanks = nodeInfo.ranksIncreased or 0;
+        local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
+        --local increasedRanks = 0;
+        if self.isFlyoutButton then
+            if nodeInfo.entryIDsWithCommittedRanks then
+                for _, _entryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+                    if _entryID == self.entryID then
+                        increasedRanks = nodeInfo.ranksIncreased or 0;
+                    else
+                        ranksPurchased = 0;
+                    end
+                end
+            end
+        else
+            increasedRanks = nodeInfo.ranksIncreased or 0;
+        end
+
+        local description;
+        description = string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, ranksPurchased, nodeInfo.maxRanks);
+
         if increasedRanks > 0 then
             description = description.." |cff19ff19+"..increasedRanks.."|r";
             --[[
@@ -615,10 +632,6 @@ do
             for _, nodeID in ipairs(self.nodeIDs) do
                 local nodeInfo = DataProvider:GetNodeInfo(nodeID);
                 if nodeInfo.entryIDsWithCommittedRanks and #nodeInfo.entryIDsWithCommittedRanks > 0 then
-                    totalRanks = totalRanks + 1;
-                end
-
-                if DataProvider:IsNodeActive(nodeID) then   --debug
                     totalRanks = totalRanks + 1;
                 end
             end
@@ -908,11 +921,11 @@ do
     end
 
     function TrackCardMixin:Refresh(playAnimation)
+        local isActive = self.trackIndex == ACTIVE_TRACK_INDEX;
         for _, obj in ipairs(self.TraitNodes) do
-            obj:Refresh();
+            obj:Refresh(playAnimation);
         end
 
-        local isActive = self.trackIndex == ACTIVE_TRACK_INDEX;
         self:SetVisualState(isActive and 1 or 0);
 
         if isActive then

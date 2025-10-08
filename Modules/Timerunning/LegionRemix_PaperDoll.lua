@@ -124,6 +124,10 @@ do  --Controller
         self:SetScript("OnEvent", self.OnEvent);
         self:UpdateParent();
         self.isEnabled = true;
+
+        for _, func in ipairs(self.controllerEnabledCallbacks) do
+            func();
+        end
     end
 
     function Controller:Disable()
@@ -243,21 +247,10 @@ do  --Controller
         return slotButton
     end
 
-    Controller.loadingCompleteCallbacks = {};
-    function Controller:AddLoadingCompleteCallback(func)
-        table.insert(self.loadingCompleteCallbacks, func);
+    Controller.controllerEnabledCallbacks = {};
+    function Controller:AddOnEnabledCallbacks(func)
+        table.insert(self.controllerEnabledCallbacks, func);
     end
-
-    Controller:RegisterEvent("PLAYER_ENTERING_WORLD");
-    Controller:SetScript("OnEvent", function(self, event, ...)
-        self:UnregisterEvent(event);
-        self:SetScript("OnEvent", nil);
-        self:Enable();
-        for _, func in ipairs(self.loadingCompleteCallbacks) do
-            func();
-        end
-        self.loadingCompleteCallbacks = nil;
-    end);
 end
 
 
@@ -333,14 +326,13 @@ do
         table.insert(self.updateFuncs, func)
     end
 
-    Controller:AddLoadingCompleteCallback(IconPoolUtil.LoadSettings);
+    Controller:AddOnEnabledCallbacks(IconPoolUtil.LoadSettings);
 end
 
 
 
 local LegionWidget = CreatePaperDollWidget("PlumberLegionRemixPaperDollWidgetTemplate");
 do
-    LegionWidget.enabled = true;
     LegionWidget.Background:SetTexture(TEXTURE_FILE);
     LegionWidget.Background:SetTexCoord(0, 120/512, 0, 96/512);
     LegionWidget.LoopingGlow:SetTexture(TEXTURE_FILE);
@@ -632,12 +624,14 @@ end
 
 
 do  --EquipmentFlyout
+    local moduleEnabled = false;
     local FlyoutIconPool = IconPoolUtil:CreateSubIconPool();
     local EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION = EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION or 0xFFFFFFFD;
     local EquipmentManager_GetItemInfoByLocation = EquipmentManager_GetItemInfoByLocation;
 
     local function UpdateFlyout()
         FlyoutIconPool:Release();
+        if not moduleEnabled then return end;
         local style = IconPoolUtil.traitSubIconStyle;
         if not(style == 2 or style == 3) then return end;
 
@@ -668,7 +662,6 @@ do  --EquipmentFlyout
         end
     end
 
-    hooksecurefunc("EquipmentFlyout_UpdateItems", UpdateFlyout);
 
     IconPoolUtil:AddUpdator(function()
         if EquipmentFlyoutFrame:IsVisible() then
@@ -677,15 +670,33 @@ do  --EquipmentFlyout
     end);
 
 
-    hooksecurefunc("PaperDollItemSlotButton_Update", function(slotButton)
-        if IconPoolUtil.traitSubIconStyle ~= 3 then return end;
-        local slotID = slotButton:GetID();
-        local itemID = slotID and GetInventoryItemID("player", slotID);
-        if itemID then
-            local texture = DataProvider:GetItemTraitTexture(itemID);
-            if texture and slotButton.icon then
-                slotButton.icon:SetTexture(texture);
+    local isHooked = false;
+    local function HookItemButtonFunctions()
+        if isHooked then return end;
+        isHooked = true;
+        hooksecurefunc("EquipmentFlyout_UpdateItems", UpdateFlyout);
+        hooksecurefunc("PaperDollItemSlotButton_Update", function(slotButton)
+            if not moduleEnabled then return end;
+            if IconPoolUtil.traitSubIconStyle ~= 3 then return end;
+            local slotID = slotButton:GetID();
+            local itemID = slotID and GetInventoryItemID("player", slotID);
+            if itemID then
+                local texture = DataProvider:GetItemTraitTexture(itemID);
+                if texture and slotButton.icon then
+                    slotButton.icon:SetTexture(texture);
+                end
             end
+        end);
+    end
+
+    addon.CallbackRegistry:Register("LegionRemix.EnableModule", function(state)
+        LegionWidget.enabled = state;
+        moduleEnabled = state;
+        if state then
+            Controller:Enable();
+            HookItemButtonFunctions();
+        else
+            Controller:Disable();
         end
-    end)
+    end);
 end

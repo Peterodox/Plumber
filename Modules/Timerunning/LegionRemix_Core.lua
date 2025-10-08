@@ -130,14 +130,7 @@ do	--DataProvider
 		1251045,
 	};
 
-	DataProvider.ChoiceNodes = {
-		--Artifact Abilities
-		[108114] = true,
-		[108113] = true,
-		[108111] = true,
-		[108112] = true,
-		[108875] = true,
-
+	DataProvider.SelectionNodes = {
 		--Arcane Shield, Storm
 		[108103] = true,
 		[108104] = true,
@@ -203,8 +196,8 @@ do	--DataProvider
 		table.insert(PlumberDevData.RemixArtifact, line);
 	end
 
-	function DataProvider:IsChoiceNode(nodeID)
-		return self.ChoiceNodes[nodeID]
+	function DataProvider:IsSelectionNode(nodeID)
+		return self.SelectionNodes[nodeID]
 	end
 
 	function DataProvider:GetArtifactNodeInfoByIndex(index)
@@ -332,7 +325,7 @@ do	--DataProvider
 					local nodeID, entryID = v[1], v[2];
 					local nodeInfo = self:GetNodeInfo(nodeID);
 					local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
-					if increasedRanks > 0 then
+					if increasedRanks > 0 and nodeInfo.entryIDsWithCommittedRanks and #nodeInfo.entryIDsWithCommittedRanks > 0 then	--In question
 						return true
 					end
 				end
@@ -945,18 +938,14 @@ do
 				if traitInfo then
 					local traitName = DataProvider:GetTraitName(traitInfo.entryID);
 					if traitInfo.shouldChooseArtifactTrack then
-						print("You can choose an Artifact Ability");
-						CommitUtil:TryPurchaseToNode(traitInfo.nodeID, true);
+						--print("You can choose an Artifact Ability");
+					end
+
+					--print("You can upgrade: "..traitName);
+					if InCombatLockdown() then
+						CommitUtil:TryPurchaseUpgradeAfterCombat();
 					else
-						print("You can upgrade: "..traitName);
-						if (not DataProvider:IsChoiceNode(traitInfo.nodeID)) then
-							if InCombatLockdown() then
-								print("We will purchase "..traitName.." after combat");
-								CommitUtil:TryPurchaseUpgradeAfterCombat();
-							else
-								CommitUtil:TryPurchaseToNode(traitInfo.nodeID, true);
-							end
-						end
+						CommitUtil:TryPurchaseToNode(traitInfo.nodeID, true);
 					end
 				end
 			end
@@ -1166,10 +1155,31 @@ do	--CommitUtil
 		end
 
 		local configID = DataProvider:GetCurrentConfigID();
+
+
 		local success = C_Traits.TryPurchaseToNode(configID, nodeID);
 		if success then
 			self.anySuccessPurchase = true;
 		end
+
+		local nodeTrack = DataProvider:GetNodeArtifactTrack(nodeID);
+		if nodeTrack then
+			local nodeIDs = DataProvider:GetArtifactTrackNodeIDs(nodeTrack);
+			for _, _nodeID in ipairs(nodeIDs) do
+				if DataProvider:IsSelectionNode(_nodeID) then
+					local nodeInfo = DataProvider:GetNodeInfo(nodeID);
+					local entryID = DataProvider:GetLastSelectedEntryID(nodeID, nodeInfo.entryIDs);
+					if C_Traits.SetSelection(configID, _nodeID, entryID) then
+						self.anySuccessPurchase = true;
+					end
+				end
+				if nodeID == _nodeID then
+					break
+				end
+			end
+		end
+
+		--DataProvider:IsSelectionNode(traitInfo.nodeID)
 
 		if self.anySuccessPurchase then
 			self:SetCommitStarted(configID);
@@ -1325,7 +1335,6 @@ do	--CommitUtil
 					return
 				end
 			end
-			--return
 		end
 
 		local configID = DataProvider:GetCurrentConfigID();
@@ -1346,6 +1355,17 @@ do	--CommitUtil
 				local success = C_Traits.TryPurchaseToNode(configID, nodeID);
 				if success then
 					self.anySuccessPurchase = true;
+				end
+
+				local nodeIDs = DataProvider:GetArtifactTrackNodeIDs(index);
+				for _, _nodeID in ipairs(nodeIDs) do
+					if DataProvider:IsSelectionNode(_nodeID) then
+						local nodeInfo = DataProvider:GetNodeInfo(_nodeID);
+						local entryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
+						if C_Traits.SetSelection(configID, _nodeID, entryID) then
+							self.anySuccessPurchase = true;
+						end
+					end
 				end
 			end
 		else
@@ -1377,10 +1397,50 @@ do	--CommitUtil
 	function CommitUtil:TryPurchaseNextUpgrade()
 		local traitInfo = DataProvider:GetNextTraitForUpgrade(true);
 		if traitInfo then
-			local traitName = DataProvider:GetTraitName(traitInfo.entryID);
-			if (not DataProvider:IsChoiceNode(traitInfo.nodeID)) then
-				--print("Purchasing "..traitName);
-				CommitUtil:TryPurchaseToNode(traitInfo.nodeID);
+			--local traitName = DataProvider:GetTraitName(traitInfo.entryID);
+			CommitUtil:TryPurchaseToNode(traitInfo.nodeID);
+		end
+	end
+
+	function CommitUtil:TryPurchaseSelectionNode(nodeID, entryID)
+		--We only use this when the Selection Node has a commited entry
+		if InCombatLockdown() or self:IsCommitingInProcess() then return end;
+
+		local nodeInfo = DataProvider:GetNodeInfo(nodeID);
+		if nodeInfo then
+			local isNewEntryIDValid;
+			if nodeInfo.entryIDs then
+				for _, _entryID in ipairs(nodeInfo.entryIDs) do
+					if _entryID == entryID then
+						isNewEntryIDValid = true;
+						break
+					end
+				end
+			end
+			if not isNewEntryIDValid then return end;
+			local canChangeEntry;
+            if nodeInfo.entryIDsWithCommittedRanks then
+                for _, committedEntryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+                    if committedEntryID ~= entryID then
+						canChangeEntry = true;
+                    	break
+					end
+                end
+            end
+			if canChangeEntry then
+				local configID = DataProvider:GetCurrentConfigID();
+				if C_Traits.ConfigHasStagedChanges(configID) then
+					if not C_Traits.RollbackConfig(configID) then
+						return
+					end
+				end
+				--local success = configID and C_Traits.RefundAllRanks(configID, nodeID);
+				--According to wiki: You should not use the C_Traits.PurchaseRank or C_Traits.RefundRank APIs on selection nodes.
+				--https://warcraft.wiki.gg/wiki/API_C_Traits.SetSelection
+				if C_Traits.SetSelection(configID, nodeID, entryID) then
+					self:SetCommitStarted(configID);
+					return true
+				end
 			end
 		end
 	end
@@ -1420,8 +1480,8 @@ do	--CommitUtil
 	end
 
 
-	YEETPC = function(index)
-		index = index or 1;
+	_G.Plumber_ActivateArtifactTrack = function(index)
+		--Global API
 		CommitUtil:TryPurchaseArtifactTrack(index);
 	end
 end
@@ -1547,6 +1607,7 @@ do	--Module Registry
 		EventListener:Enable(state);
 		CurrencyTooltipModule:SetEnabled(state);
 		CommitUtil:Enable(state);
+		CallbackRegistry:Trigger("LegionRemix.EnableModule", state);
 	end
 
     local moduleData = {

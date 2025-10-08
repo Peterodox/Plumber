@@ -377,11 +377,27 @@ L["SoftTargetName ShowNPC Tooltip"] = "若禁用此选项，我们将只显示�
 L["ModuleName LegionRemix"] = "军团再临：幻境新生";
 L["ModuleDescription LegionRemix"] = "军团再临：幻境新生";
 L["Artifact Weapon"] = "神器武器";
-L["Earn X To Upgrade Y Format"] = "还差 |cffffffff%s|r %s 即可升级%s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Artifact Ability"] = "神器技能";
+L["Earn X To Upgrade Y Format"] = "还差 |cffffffff%s|r %s 即可升级%s";
 L["Until Next Upgrade Format"] = "距下一级还差 %s";
 L["New Trait Available"] = "有新特质可用。";
+L["Rank Format"] = "等级 %s";
 L["Rank Increased"] = "等级已提升";
 L["Infinite Knowledge Tooltip"] = "某些军团再临成就会奖励你永恒知识。";
+L["Stat Bonuses"] = "属性提升";
+L["Bonus Traits"] = "特质加成：";
+L["Instruction Open Artifact UI"] = "左键点击显示神器界面\n右键点击显示设置";
+L["LegionRemix Widget Title"] = "Plumber小部件";
+L["Trait Icon Mode"] = "特质图标样式：";
+L["Trait Icon Mode Hidden"] = "不显示";
+L["Trait Icon Mode Mini"] = "显示小型图标";
+L["Trait Icon Mode Replace"] = "替换装备图标";
+L["Error Drag Spell In Combat"] = "战斗中不可拖拽技能。";
+L["Error Change Trait In Combat"] = "战斗中不能更改特质。";
+L["Amount Required To Unlock Format"] = "%s 后解锁";   --Earn another x amount to unlock (something)
+L["Soon To Unlock"] = "即将解锁";
+L["Artifact Ability Auto Unlock Tooltip"] = "此特质将在你获得足够的永恒能量后自动解锁。";
+L["Require More Bag Slot Alert"] = "你需要腾出一些背包格子才能进行此操作。";
 
 
 --ItemUpgradeUI

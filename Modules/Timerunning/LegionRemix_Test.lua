@@ -605,6 +605,22 @@ function DataProvider:GetItemTraitTexture(itemID)
     return ItemXIcon[itemID]
 end
 
+function DataProvider:GetArtifactTrackNodeIDs(artifactTrackIndex)
+    return TrackNodes[artifactTrackIndex]
+end
+
+function DataProvider:GetNodeArtifactTrack(nodeID)
+    if not self.NodeIDXTrack then
+        self.NodeIDXTrack = {};
+        for artifactTrackIndex, nodes in ipairs(TrackNodes) do
+            for _, _nodeID in ipairs(nodes) do
+                self.NodeIDXTrack[_nodeID] = artifactTrackIndex;
+            end
+        end
+    end
+    return self.NodeIDXTrack[nodeID]
+end
+
 
 --[[
 function CommitUtil:TryPurchaseArtifactTrack(index)
