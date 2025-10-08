@@ -222,35 +222,86 @@ do
     end
 
     function NodeButtonMixin:Refresh()
+        if self.entryIDs then
+            self:Refresh_SelectionNode();
+            return
+        end
+
         local nodeInfo = DataProvider:GetNodeInfo(self.nodeID);
-        local currentRank = nodeInfo and nodeInfo.currentRank or 0;
-        local ranksPurchased = nodeInfo and nodeInfo.ranksPurchased or 0;
+        if not nodeInfo then return end;
+
+        local currentRank = nodeInfo.currentRank or 0;
+        local ranksPurchased = nodeInfo.ranksPurchased or 0;
+        local committedEntryID;
+
+        if self.isFlyoutButton then
+            if nodeInfo.entryIDToRanksIncreased then
+                for _entryID, totalIncreased in pairs(nodeInfo.entryIDToRanksIncreased) do
+                    if _entryID == self.entryID then
+                        if currentRank == 0 then
+                            currentRank = totalIncreased;
+                        end
+                        break
+                    end
+                end
+            end
+
+            local isEntryCommitted = false;
+            if nodeInfo.entryIDsWithCommittedRanks then
+                for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+                    committedEntryID = id;
+                    isEntryCommitted = true;
+                    break
+                end
+            end
+        end
 
         local isActive = (self.trackIndex == ACTIVE_TRACK_INDEX) and ranksPurchased > 0;
         self.isActive = isActive;
         local isPurchased;
         local visualState;
-        local rankText = "";
+        local rankText;
 
         if self.entryIDs then
-            local selectedEntryID, saved = DataProvider:GetLastSelectedEntryID(self.nodeID, self.entryIDs);
-            if saved then
-                self.selectedEntryID = selectedEntryID;
+            --Selection Node
+            local isEntryCommitted = false;
+            if nodeInfo.entryIDsWithCommittedRanks then
+                for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+                    committedEntryID = id;
+                    isEntryCommitted = true;
+                    break
+                end
+            end
+
+            if not isEntryCommitted then
+                if nodeInfo.entryIDToRanksIncreased then
+                    for _entryID, totalIncreased in pairs(nodeInfo.entryIDToRanksIncreased) do
+                        if _entryID == self.entryID then
+                            if currentRank == 0 then
+                                currentRank = totalIncreased;
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+
+            if committedEntryID then
+                self.selectedEntryID = committedEntryID;
+            else
+                local selectedEntryID, saved = DataProvider:GetLastSelectedEntryID(self.nodeID, self.entryIDs);
+                if saved then
+                    self.selectedEntryID = selectedEntryID;
+                end
             end
         end
 
-        if currentRank >= 1 then
-            self.RankText:SetText(tostring(currentRank));
-        else
-            self.RankText:SetText("");
-        end
-
-        if not isActive then
+        if not (isActive or currentRank > 0) then
             visualState = 0;
         else
             if self.isFlyoutButton then
-                isPurchased = self.parentNodeButton.entryID == self.entryID;
-                if isPurchased then
+                isPurchased = committedEntryID == self.entryID;
+                if isPurchased or (currentRank > 0 and not isActive) then
                     visualState = 1;
                 else
                     visualState = 2;
@@ -270,11 +321,11 @@ do
 
         self:SetVisualState(visualState);
 
-        if isActive then
+        if isActive or currentRank > 0 then
             if self.entryType == 1 then
-                rankText = self.maxRanks;   --"1";
+                rankText = currentRank;
             elseif self.entryType == 2 then
-                rankText = self.maxRanks;   --"3";
+                rankText = currentRank;
             elseif self.entryType == 0 then
                 if self.selectedEntryID then
                     self.GreenGlow:Hide();
@@ -283,29 +334,83 @@ do
                 end
             end
             if self.isFlyoutButton and not isPurchased then
-                rankText = "0";
-                self.RankText:SetTextColor(0.098, 1.000, 0.098);
+                rankText = currentRank;
+                if isActive then
+                    self.RankText:SetTextColor(0.098, 1.000, 0.098);
+                elseif currentRank > 0 then
+                    self.RankText:SetTextColor(1, 0.82, 0);
+                end
             else
                 self.RankText:SetTextColor(1, 0.82, 0);
             end
         else
-            
+
         end
         self.RankText:SetText(rankText);
+    end
+
+    function NodeButtonMixin:Refresh_SelectionNode()
+        local nodeInfo = DataProvider:GetNodeInfo(self.nodeID);
+        if not nodeInfo then return end;
+
+        local currentRank = nodeInfo.currentRank or 0;
+        local ranksPurchased = nodeInfo.ranksPurchased or 0;
+        local activeEntryID;
+        local committedEntryID;
+        local rankText;
 
         local isEntryCommitted = false;
-        local committedEntryID;
-
         if nodeInfo.entryIDsWithCommittedRanks then
             for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
                 committedEntryID = id;
+                activeEntryID = id;
                 isEntryCommitted = true;
                 break
             end
         end
 
-        local entryID = committedEntryID or self.entryID;
-        local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
+        if not isEntryCommitted then
+            if nodeInfo.entryIDToRanksIncreased then
+                for _entryID, totalIncreased in pairs(nodeInfo.entryIDToRanksIncreased) do
+                    if totalIncreased > 0 then
+                        activeEntryID = _entryID;
+                        currentRank = totalIncreased;
+                        break
+                    end
+                end
+            end
+        end
+
+        if committedEntryID then
+            self.selectedEntryID = committedEntryID;
+        else
+            local selectedEntryID, saved = DataProvider:GetLastSelectedEntryID(self.nodeID, self.entryIDs);
+            if saved then
+                self.selectedEntryID = selectedEntryID;
+            end
+        end
+
+        local visualState;
+
+        if activeEntryID then
+            self:SetEntry(activeEntryID);
+            visualState = 1;
+            rankText = currentRank;
+            self.RankText:SetTextColor(1, 0.82, 0);
+        elseif self.selectedEntryID then
+            self:SetEntry(self.selectedEntryID);
+            visualState = 0;
+            rankText = "";
+        else
+            rankText = "";
+            if self.trackIndex == ACTIVE_TRACK_INDEX then
+                visualState = 2;
+            else
+                visualState = 0;
+            end
+        end
+        self:SetVisualState(visualState);
+        self.RankText:SetText(rankText);
     end
 
     function NodeButtonMixin:SetVisualState(visualState)
@@ -397,37 +502,39 @@ do
         end
 
         local nodeInfo = DataProvider:GetNodeInfo(self.nodeID) or self:DebugGetNodeInfo();
+        local currentRank = nodeInfo.currentRank or 0;
+        local ranksPurchased = nodeInfo.ranksPurchased or 0;
         local description;
-        description = string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, nodeInfo.currentRank, nodeInfo.maxRanks);
+        description = string.format(TALENT_BUTTON_TOOLTIP_RANK_FORMAT, ranksPurchased, nodeInfo.maxRanks);
 
 
         --Bonus Ranks
-        local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
+        --local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
+        local increasedRanks = nodeInfo.ranksIncreased or 0;
         if increasedRanks > 0 then
+            description = description.." |cff19ff19+"..increasedRanks.."|r";
+            --[[
             local increasedTraitDataList = C_Traits.GetIncreasedTraitData(self.nodeID, self.entryID);
             for	_index, increasedTraitData in ipairs(increasedTraitDataList) do
                 local r, g, b = C_Item.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
                 local qualityColor = CreateColor(r, g, b, 1);
                 local coloredItemName = qualityColor:WrapTextInColorCode(increasedTraitData.itemNameIncreasing);
-                --local wrapText = true;
-                --GameTooltip_AddColoredLine(tooltip, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName), GREEN_FONT_COLOR, wrapText);
                 description = AddLine(description, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName));
             end
+            --]]
         end
 
 
         local activeEntryID = self.entryID;
-        local rank = 1;
         description = AddLine(description, " ");
-        description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", activeEntryID, rank);
+        description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", activeEntryID, currentRank);
 
-        local nextEntryID = (self.maxRanks and self.maxRanks > 1) and self.entryType ~= 1 and self.entryID; --self.nodeInfo.nextEntry;  --debug
-        local ranksPurchased = 1;
-		if nextEntryID and ranksPurchased > 0 then
+        local nextEntryInfo = nodeInfo.nextEntry  --(self.maxRanks and self.maxRanks > 1) and self.entryType ~= 1 and self.entryID; --self.nodeInfo.nextEntry;  --debug
+		if nextEntryInfo and currentRank > 0 then
             description = AddLine(description, " ");
             description = AddLine(description, TALENT_BUTTON_TOOLTIP_NEXT_RANK);
-            local rank = 2;
-            description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", nextEntryID, rank);
+            local nextRank = currentRank + 1;
+            description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", nextEntryInfo.entryID, nextRank);
 		end
 
         if self.isArtifactAbility then
@@ -646,7 +753,7 @@ do
         elseif CommitUtil:IsCommitingInProcess() then
             self:Disable();
             isLoading = true;
-        --elseif not DataProvider:CanActivateArtifactTrack() then
+        --elseif not DataProvider:CanPreActivateArtifactTrack() then
             --You can't purchase any artifact ability at this moment
             --but we'll save the trackIndex and automatically upgrade when eligible
         --    self:Enable();
@@ -835,6 +942,7 @@ do
         self:SetAlpha(0);
         self:SetScript("OnUpdate", nil);
         self.updateTooltipFunc = nil;
+        self.owner = nil;
     end
 
     function TraitTooltipMixin:SetTooltipSpell(spellID)
@@ -940,9 +1048,13 @@ do
         end
     end
 
-    function RemixAPI.GetTraitTooltipFrame(parent)
+    function TraitTooltipMixin:SetOwner(owner)
+        self.owner = owner;
+    end
+
+    function RemixAPI.GetTraitTooltipFrame()
         if not TraitTooltipFrame then
-            local f = CreateFrame("Frame", nil, parent or UIParent, "PlumberLegionRemixTooltipTemplate");
+            local f = CreateFrame("Frame", nil, UIParent, "PlumberLegionRemixTooltipTemplate");
             TraitTooltipFrame = f;
             API.Mixin(f, TraitTooltipMixin);
             f.alpha = 0;
@@ -953,6 +1065,12 @@ do
         end
         return TraitTooltipFrame
     end
+
+    function RemixAPI.HideTraitTooltipFrame(fadeOut)
+        if TraitTooltipFrame then
+            TraitTooltipFrame:HideTooltip(fadeOut);
+        end
+    end
 end
 
 local MainFrameMixin = {};
@@ -961,35 +1079,58 @@ do
         "PLAYER_REGEN_ENABLED",
         "PLAYER_REGEN_DISABLED",
         "CURRENCY_DISPLAY_UPDATE",
+        "TRAIT_TREE_CHANGED",
     };
 
     function MainFrameMixin:OnShow()
         API.RegisterFrameForEvents(self, DynamicEvents);
         CallbackRegistry:Register("LegionRemix.CommitFinished", self.OnCommitFinished, self);
+        CallbackRegistry:Register("LegionRemix.ConfigUpdated", self.RequestUpdate, self);
         self:Refresh();
         self:SetScript("OnEvent", self.OnEvent);
         PlaySound(SOUNDKIT.UI_EXPANSION_LANDING_PAGE_OPEN);
     end
 
-    function MainFrameMixin:UpdateHeader()
-        local HeaderFrame = self.HeaderFrame;
-        if HeaderFrame then
-            local line1, line2 = DataProvider:GetNextUpgradeInfoForUI();
-            HeaderFrame.Text1:SetText(line1);
-            HeaderFrame.Text1:SetTextColor(0.6, 0.6, 0.6);
-            HeaderFrame.Text2:SetText(line2);
-            HeaderFrame.Text2:SetTextColor(177/255, 190/255, 95/255);
-        end
-    end
-
     function MainFrameMixin:OnHide()
         API.UnregisterFrameForEvents(self, DynamicEvents);
-        CallbackRegistry:UnregisterCallback("DEBUG_TRAIT_CONFIG_UPDATED", self.OnCommitFinished, self);
+        CallbackRegistry:UnregisterCallback("LegionRemix.CommitFinished", self.OnCommitFinished, self);
+        CallbackRegistry:UnregisterCallback("LegionRemix.ConfigUpdated", self.RequestUpdate, self);
         self:UpdateCardFocus();
         self:CloseNodeFlyout();
         self:SetScript("OnEvent", nil);
+        self:SetScript("OnUpdate", nil);
         self:OnDraggingSpell(false);
         PlaySound(SOUNDKIT.UI_EXPANSION_LANDING_PAGE_CLOSE);
+    end
+
+    function MainFrameMixin:UpdateHeader()
+        local HeaderFrame = self.HeaderFrame;
+        if HeaderFrame then
+            local nextUpgradeInfo = DataProvider:GetNextUpgradeInfoForUI();
+            if nextUpgradeInfo then
+                HeaderFrame.Text1:SetText(nextUpgradeInfo.line1);
+                HeaderFrame.Text1:SetTextColor(0.6, 0.6, 0.6);
+                HeaderFrame.Text2:SetText(nextUpgradeInfo.line2);
+                HeaderFrame.Text2:SetTextColor(177/255, 190/255, 95/255);
+            else
+                HeaderFrame.Text1:SetText("");
+                HeaderFrame.Text2:SetText("");
+            end
+        end
+    end
+
+    function MainFrameMixin:ShowHeaderTooltip()
+        local nextUpgradeInfo = DataProvider:GetNextUpgradeInfoForUI();
+        if nextUpgradeInfo then
+            local TooltipFrame = RemixAPI.GetTraitTooltipFrame();
+            TooltipFrame:SetTooltipTrait(nextUpgradeInfo.nextEntryID, nextUpgradeInfo.nextRank);
+            TooltipFrame:SetOwner(self);
+            TooltipFrame:SetParent(self);
+            TooltipFrame:ClearAllPoints();
+            TooltipFrame:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, 0);
+            TooltipFrame:SetFrameStrata("TOOLTIP");
+            TooltipFrame:Show();
+        end
     end
 
     function MainFrameMixin:OnEvent(event, ...)
@@ -1008,6 +1149,9 @@ do
                     end);
                 end
             end
+        elseif event == "TRAIT_CONFIG_UPDATED" then
+            local configID = ...
+            self:RequestUpdate();
         elseif event == "CURSOR_CHANGED" then
             if self.isDraggingSpell then
                 if not GetCursorInfo() then
@@ -1026,6 +1170,20 @@ do
         self:UpdateNodeFlyoutFrame();
         self:UpdateHeader();
         --self:DebugSaveAllNodes();
+    end
+
+    function MainFrameMixin:OnUpdate_UpdateAfterDelay(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.2 then
+            self.t = nil;
+            self:SetScript("OnUpdate", nil);
+            self:Refresh();
+        end
+    end
+
+    function MainFrameMixin:RequestUpdate()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate_UpdateAfterDelay);
     end
 
     function MainFrameMixin:DebugSaveAllNodes()
@@ -1055,7 +1213,7 @@ do
 
         self.ActivateButton:Disable();
         if not CommitUtil:TryPurchaseArtifactTrack(trackIndex) then
-            if not DataProvider:CanActivateArtifactTrack() then
+            if DataProvider:CanPreActivateArtifactTrack() then
                 DataProvider:SetLastArtifactTrackIndexForCurrentSpec(trackIndex);
                 self:OnCommitFinished(true);
             end
@@ -1263,6 +1421,7 @@ do
     function MainFrameMixin:SetTooltip(row, icon, header, description, updateTooltipFunc)
         local f = self.TooltipFrame;
         f:SetTooltip(icon, header, description, updateTooltipFunc);
+        f:SetOwner(self);
         f:ClearAllPoints();
         f:SetPoint("TOPLEFT", MainFrame, "TOPRIGHT", 4, (1 - row) * 94.4);
         f:SetFrameStrata("TOOLTIP");
@@ -1434,6 +1593,16 @@ local function CreateMainUI()
     HeaderFrame.Text2 = HeaderFrame:CreateFontString(nil, "OVERLAY", "ObjectiveTrackerHeaderFont");
     HeaderFrame.Text2:SetPoint("TOP", HeaderFrame, "CENTER", 0, 0);
     HeaderFrame.Text2:SetJustifyH("CENTER");
+
+    HeaderFrame.MouseoverFrame = CreateFrame("Frame", nil, HeaderFrame);
+    HeaderFrame.MouseoverFrame:SetPoint("CENTER", HeaderFrame, "CENTER", 0, 2);
+    HeaderFrame.MouseoverFrame:SetSize(4 * buttonSize, buttonSize);
+    HeaderFrame.MouseoverFrame:SetScript("OnEnter", function()
+        MainFrame:ShowHeaderTooltip();
+    end);
+    HeaderFrame.MouseoverFrame:SetScript("OnLeave", function()
+        MainFrame:HideTooltip();
+    end);
 
 
     local function CreateTextBackground(parent, fontString, height, extensionX)

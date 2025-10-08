@@ -394,7 +394,7 @@ L["Trait Icon Mode Mini"] = "Show mini icons";
 L["Trait Icon Mode Replace"] = "Replace item icons";
 L["Error Drag Spell In Combat"] = "You cannot drag a spell while in combat.";
 L["Error Change Trait In Combat"] = "You cannot change traits in combat.";
-L["Amount Required To Unlock Format"] = "%d to unlock";   --Earn another x amount to unlock (something)
+L["Amount Required To Unlock Format"] = "%s to unlock";   --Earn another x amount to unlock (something)
 L["Soon To Unlock"] = "Soon to unlock";
 L["Artifact Ability Auto Unlock Tooltip"] = "This trait will be automatically unlocked once you have enough Infinite Power.";
 

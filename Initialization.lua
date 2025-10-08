@@ -118,6 +118,11 @@ local function GetDBBool(dbKey)
 end
 addon.GetDBBool = GetDBBool;
 
+local function FlipDBBool(dbKey)
+    SetDBValue(dbKey, not GetDBBool(dbKey), true);
+end
+addon.FlipDBBool = FlipDBBool;
+
 
 local function GetPersonalData(dbKey)
     --From SavedVariablesPerCharacter
@@ -269,6 +274,7 @@ local DefaultValues = {
     --LegionRemix
     LegionRemix = true,
         LegionRemix_TraitSubIconStyle = 3,  --1:OFF, 2:Mini Icon, 3:Replace Icon
+        LegionRemix_PaperDollTraitDetail = false,
 
 
     EnableNewByDefault = false,             --Always enable newly added features

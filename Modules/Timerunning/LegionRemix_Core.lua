@@ -22,6 +22,7 @@ local GetDefinitionInfo = C_Traits.GetDefinitionInfo;
 local CanPurchaseRank = C_Traits.CanPurchaseRank;
 local PurchaseRank = C_Traits.PurchaseRank;
 local GetConfigInfo = C_Traits.GetConfigInfo;
+local GetIncreasedTraitData = C_Traits.GetIncreasedTraitData;
 
 
 local GetInventoryItemID = GetInventoryItemID;
@@ -287,15 +288,24 @@ do	--DataProvider
 		end
 	end
 
-	function DataProvider:CanActivateArtifactTrack()
+	function DataProvider:CanPreActivateArtifactTrack()
 		--True if an artifact ability is purchased or can be purchased
-		if (self:GetActiveArtifactTrackIndex() ~= nil) or self:ShouldChooseArtifactTrack() then
-			return true
+		if (self:GetActiveArtifactTrackIndex() ~= nil) then
+			return false
+		else
+			local nodeInfo;
+			for _, _nodeID in ipairs(self.PurchaseRoute_Basic) do
+				nodeInfo = self:GetNodeInfo(_nodeID);
+				if nodeInfo and nodeInfo.canPurchaseRank then
+					return true
+				end
+			end
+			return self:ShouldChooseArtifactTrack();
 		end
 	end
 
 	function DataProvider:GetDefaultArtifactNodeData()
-		local trackIndex = 1;
+		local trackIndex = self:GetLastArtifactTrackIndexForCurrentSpec() or 1;
 		return self:GetArtifactNodeInfoByIndex(trackIndex)
 	end
 
@@ -359,7 +369,7 @@ do	--DataProvider
 				--For choice node, use this
 				local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
 				if increasedRanks > 0 then
-					local increasedTraitDataList = C_Traits.GetIncreasedTraitData(nodeID, entryID);
+					local increasedTraitDataList = GetIncreasedTraitData(nodeID, entryID);
 					for _index, increasedTraitData in ipairs(increasedTraitDataList) do
 						local qualityColor = API.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
 						local itemName = increasedTraitData.itemNameIncreasing or "";
@@ -438,7 +448,7 @@ do	--DataProvider
 								print(string.format("|T%s:16:16|t %s  Rank: %s, EntryID: %s", icon, name, rankText, entryID));
 								if ranksIncreased > 0 then
 									rankText = rankText..string.format("(+%d)", nodeInfo.ranksIncreased);
-									local increasedTraitDataList = C_Traits.GetIncreasedTraitData(nodeID, entryID);
+									local increasedTraitDataList = GetIncreasedTraitData(nodeID, entryID);
 									print(nodeID, entryID);
 									for _index, increasedTraitData in ipairs(increasedTraitDataList) do
 										local r, g, b = C_Item.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
@@ -461,7 +471,7 @@ do	--DataProvider
 
 	--[[
 	function DataProvider:GetIncreasedTraits()
-		local GetIncreasedTraitData = C_Traits.GetIncreasedTraitData;
+		local GetIncreasedTraitData = GetIncreasedTraitData;
 		local isLoaded = true;
 		for _, v in ipairs(self.IncreasableTraits) do
 			local nodeID, entryID, definitionID = v[1], v[2], v[3];
@@ -496,21 +506,26 @@ do	--DataProvider
 	end
 	--]]
 
+	function DataProvider:GetIncreasedTraitRankForNodeEntry(nodeID, entryID)
+		local totalIncreased = 0;
+		local increasedTraitDataList = GetIncreasedTraitData(nodeID, entryID);
+		if increasedTraitDataList and #increasedTraitDataList > 0 then
+			for	_index, increasedTraitData in ipairs(increasedTraitDataList) do
+				totalIncreased = totalIncreased + increasedTraitData.numPointsIncreased;
+			end
+		end
+		return totalIncreased
+	end
+
 	function DataProvider:GetIncreasedTraitSpellsAndRanks()
 		local n = 0;
 		local tbl;
-		local GetIncreasedTraitData = C_Traits.GetIncreasedTraitData;
 		for _, v in ipairs(self.IncreasableTraits) do
 			local nodeID, entryID, definitionID = v[1], v[2], v[3];
-			local increasedTraitDataList = GetIncreasedTraitData(nodeID, entryID);
-			if increasedTraitDataList and #increasedTraitDataList > 0 then
+			local totalIncreased = self:GetIncreasedTraitRankForNodeEntry(nodeID, entryID);
+			if totalIncreased > 0 then
 				local definitionInfo = GetDefinitionInfo(definitionID);
 				local spellID = definitionInfo and definitionInfo.spellID;
-				local totalIncreased = 0;
-				for _index, increasedTraitData in ipairs(increasedTraitDataList) do
-					local numPointsIncreased = increasedTraitData.numPointsIncreased;
-					totalIncreased = totalIncreased + numPointsIncreased;
-				end
 				if not tbl then
 					tbl = {};
 				end
@@ -745,6 +760,9 @@ do	--DataProvider
 				if entryInfo.type == 3 then
 					--SpendSmallCircle: Stat Bonus
 					line2 = C_Spell.GetSpellDescription(nextSpellID);
+					if line2 then
+						line2 = string.gsub(line2, "[%.。]%s*$", "");
+					end
 				else
 					local nodeInfo = DataProvider:GetNodeInfo(traitInfo.nodeID);
 					local maxRanks = entryInfo.maxRanks;
@@ -890,7 +908,6 @@ do
 
 	function EventListener:Enable(state)
 		if state then
-			--self:RegisterEvent("TRAIT_CONFIG_UPDATED");
 			--self:RegisterEvent("TRAIT_TREE_CURRENCY_INFO_UPDATED");
 			API.RegisterFrameForEvents(self, self.dynamicEvents);
 			self:SetScript("OnEvent", self.OnEvent);
@@ -995,6 +1012,11 @@ do
 			elseif event == "PLAYER_REGEN_ENABLED" then
 				self:UnregisterEvent(event);
 				CommitUtil:ReEquipFailedItems();
+			elseif event == "TRAIT_CONFIG_UPDATED" then
+				local configID = ...
+				if configID == DataProvider.configID then
+					CallbackRegistry:Trigger("LegionRemix.ConfigUpdated", configID);
+				end
 			end
 		end
 	end
@@ -1546,7 +1568,7 @@ end
 
 	--HasIncreasedRanks, TalentButtonSpendMixin:AddTooltipInfo
 	do
-		local increasedTraitDataList = C_Traits.GetIncreasedTraitData(self:GetNodeID(), self:GetEntryID());
+		local increasedTraitDataList = GetIncreasedTraitData(self:GetNodeID(), self:GetEntryID());
 		for	_index, increasedTraitData in ipairs(increasedTraitDataList) do
 			local r, g, b = C_Item.GetItemQualityColor(increasedTraitData.itemQualityIncreasing);
 			local qualityColor = CreateColor(r, g, b, 1);

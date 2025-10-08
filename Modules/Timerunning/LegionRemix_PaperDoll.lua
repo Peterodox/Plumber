@@ -367,11 +367,14 @@ do
     function LegionWidget:OnEnter()
         self:PlaySheen();
         self:ShowTooltip(true);
+        self:RegisterEvent("MODIFIER_STATE_CHANGED");
+        self:SetScript("OnEvent", self.OnEvent);
     end
     LegionWidget:SetScript("OnEnter", LegionWidget.OnEnter);
 
     function LegionWidget:OnLeave()
         self.Tooltip:Hide();
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
     end
     LegionWidget:SetScript("OnLeave", LegionWidget.OnLeave);
 
@@ -390,8 +393,20 @@ do
         self.Tooltip:Hide();
         self.t = nil;
         self:SetScript("OnUpdate", nil);
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+        self:SetScript("OnEvent", nil);
     end
     LegionWidget:SetScript("OnHide", LegionWidget.OnHide);
+
+    function LegionWidget:OnEvent(event, ...)
+        if event == "MODIFIER_STATE_CHANGED" then
+            local key, down = ...
+            if (key == "LALT" or key == "RALT") and down == 1 and self:IsMouseMotionFocus() then
+                addon.FlipDBBool("LegionRemix_PaperDollTraitDetail");
+                self:ShowTooltip();
+            end
+        end
+    end
 
     local function SharedFadeIn_OnUpdate(self, elapsed)
         self.t = self.t + elapsed;
@@ -485,14 +500,17 @@ do
         tooltip:SetFrameStrata("TOOLTIP");
         tooltip:SetFixedFrameStrata(true);
 
-        if nextUpgradeInfo and nextUpgradeInfo.nextEntryID then
-            local TraitTooltipFrame = RemixAPI.GetTraitTooltipFrame(self);
+        if addon.GetDBBool("LegionRemix_PaperDollTraitDetail") and nextUpgradeInfo and nextUpgradeInfo.nextEntryID then
+            local TraitTooltipFrame = RemixAPI.GetTraitTooltipFrame();
             --TraitTooltipFrame:SetTooltipSpell(nextSpellID);
             TraitTooltipFrame:SetTooltipTrait(nextUpgradeInfo.nextEntryID, nextUpgradeInfo.nextRank);
+            TraitTooltipFrame:SetOwner(self);
             TraitTooltipFrame:SetParent(tooltip);
             TraitTooltipFrame:ClearAllPoints();
             TraitTooltipFrame:SetPoint("TOPLEFT", tooltip, "TOPRIGHT", 4, 0);
             TraitTooltipFrame:Show();
+        else
+            RemixAPI.HideTraitTooltipFrame();
         end
 
         if not isLoaded then

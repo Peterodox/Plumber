@@ -3053,11 +3053,15 @@ do  -- Tooltip
                     end
                 end
                 lineText = line.rightText;
-                if lineText then
+                if lineText and lineText ~= "" then
                     if line.rightColor then
                         lineText = line.rightColor:WrapTextInColorCode(lineText);
                     end
-                    text = text.."    "..lineText;
+                    if text then
+                        text = text.."\n"..lineText;
+                    else
+                        text = lineText;
+                    end
                 end
             end
         end
