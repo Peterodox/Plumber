@@ -82,10 +82,10 @@ do  --Controller
         --adjustment for serveral addons/WA
         local WidgetContainer = Controller.WidgetContainer;
 
-        if CharacterStatsPaneilvl then
+        if CSPilvl then
             --Chonky Character Sheet    wago.io/bRl2gJIgz
             WidgetContainer:ClearAllPoints();
-            WidgetContainer:SetPoint("CENTER", CharacterStatsPaneilvl, "RIGHT", 22, 0);     --anchor changed after swapping items, IDK why
+            WidgetContainer:SetPoint("CENTER", CSPilvl, "RIGHT", 22, 0);     --anchor changed after swapping items, IDK why
         elseif C_AddOns.IsAddOnLoaded("DejaCharacterStats") then
             WidgetContainer:ClearAllPoints();
             WidgetContainer:SetPoint("CENTER", PaperDollFrame, "TOPRIGHT", -1, -84);

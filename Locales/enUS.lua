@@ -398,6 +398,7 @@ L["Amount Required To Unlock Format"] = "%s to unlock";   --Earn another x amoun
 L["Soon To Unlock"] = "Soon to unlock";
 L["Artifact Ability Auto Unlock Tooltip"] = "This trait will be automatically unlocked once you have enough Infinite Power.";
 L["Require More Bag Slot Alert"] = "You need to free up bag space before performing this action";
+L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Spell not learned";
 
 
 --ItemUpgradeUI

@@ -398,6 +398,7 @@ L["Amount Required To Unlock Format"] = "%s 后解锁";   --Earn another x amoun
 L["Soon To Unlock"] = "即将解锁";
 L["Artifact Ability Auto Unlock Tooltip"] = "此特质将在你获得足够的永恒能量后自动解锁。";
 L["Require More Bag Slot Alert"] = "你需要腾出一些背包格子才能进行此操作。";
+L["Spell Not Known"] = "未找到法术";
 
 
 --ItemUpgradeUI

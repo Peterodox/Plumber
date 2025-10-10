@@ -4101,6 +4101,12 @@ do  --FocusSolver (Run something when being hovered long enough)
     end
 end
 
+do  --Timerunning Remix
+    function API.GetTimerunningSeason()
+        return PlayerGetTimerunningSeasonID and PlayerGetTimerunningSeasonID()
+    end
+end
+
 
 --[[
 local DEBUG = CreateFrame("Frame");

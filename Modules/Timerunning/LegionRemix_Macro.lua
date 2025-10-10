@@ -7,6 +7,7 @@ local GetActiveArtifactAbility = RemixAPI.DataProvider.GetActiveArtifactAbility;
 local GetSpellName = C_Spell.GetSpellName;
 
 local COMMAND_LART = "lart";    --Legion Artifact
+local UNKNOWN = addon.L["Spell Not Known"];
 
 local function WriteFunc_lart(body)
     local header = "#plumber:"..COMMAND_LART;
@@ -19,6 +20,9 @@ local function WriteFunc_lart(body)
             text = "#showtooltip "..spellName.."\n/cast "..spellName;
             return header.."\n"..text, icon
         end
+    else
+        text = "#"..UNKNOWN;
+        return header.."\n"..text, icon
     end
 end
 

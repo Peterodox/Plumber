@@ -347,11 +347,9 @@ EL:SetScript("OnEvent", function(self, event, ...)
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent(event);
-        if PlayerGetTimerunningSeasonID then
-            local seasonID = PlayerGetTimerunningSeasonID();
-            if seasonID and seasonID > 0 then
-                CallbackRegistry:Trigger("TimerunningSeason", seasonID);
-            end
+        local seasonID = API.GetTimerunningSeason();
+        if seasonID and seasonID > 0 then
+            CallbackRegistry:Trigger("TimerunningSeason", seasonID);
         end
     end
 end);

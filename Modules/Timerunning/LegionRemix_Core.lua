@@ -839,24 +839,23 @@ do	--DataProvider
 		self.playerDB.lastSelectedEntryBySpec[specIndex][nodeID] = entryID;
 	end
 
-
-
-
-	--Saved Variables
-	CallbackRegistry:Register("TimerunningSeason", function(seasonID)
-		--This happens after PLAYER_ENTERING_WORLD
+	function DataProvider:OnLoad()
 		if PlumberDB_PC then
 			if not PlumberDB_PC.LegionRemix then
 				PlumberDB_PC.LegionRemix = {};
 			end
-			DataProvider.playerDB = PlumberDB_PC.LegionRemix;
+			self.playerDB = PlumberDB_PC.LegionRemix;
 		else
-			DataProvider.playerDB = {};
+			self.playerDB = {};
 		end
-		DataProvider:UpdateConfigInfo();
-		DataProvider:UpdateClassSpecInfo();
-	end);
+		self:UpdateConfigInfo();
+		self:UpdateClassSpecInfo();
+	end
 
+
+
+
+	--Saved Variables
 	function DataProvider:GetLastArtifactTrackIndexForCurrentSpec()
 		if not self.playerDB then return end;
 
@@ -904,6 +903,13 @@ do
 			--self:RegisterEvent("TRAIT_TREE_CURRENCY_INFO_UPDATED");
 			API.RegisterFrameForEvents(self, self.dynamicEvents);
 			self:SetScript("OnEvent", self.OnEvent);
+
+			if not self.methodHooked then
+				self.methodHooked = true;
+				hooksecurefunc(C_RemixArtifactUI, "ClearRemixArtifactItem", function()
+					DataProvider:UpdateConfigInfo();
+				end);
+			end
 		else
 			API.UnregisterFrameForEvents(self, self.dynamicEvents);
 			self:UnregisterEvent("BAG_UPDATE_DELAYED");
@@ -1604,7 +1610,7 @@ end
 do	--Module Registry
 	local function EnableModule(state)
 		if state and not MASTER_ENABLED then
-			DataProvider:UpdateConfigInfo();
+			DataProvider:OnLoad();
 			--UIParent:UnregisterEvent("REMIX_ARTIFACT_UPDATE");
 		elseif not state and MASTER_ENABLED then
 			--UIParent:RegisterEvent("REMIX_ARTIFACT_UPDATE");

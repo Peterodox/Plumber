@@ -689,8 +689,10 @@ function ControlCenter:InitializeModules()
     local db = PlumberDB;
     local enabled, isForceEnabled;
 
+    local timerunningSeason = API.GetTimerunningSeason();
+
     for _, moduleData in pairs(self.modules) do
-        if moduleData.timerunningSeason and moduleData.timerunningSeason ~= self.timerunningSeason then
+        if moduleData.timerunningSeason and moduleData.timerunningSeason ~= timerunningSeason then
             moduleData.validityCheck = function()
                 return false
             end;
@@ -814,11 +816,6 @@ do
     addon.CallbackRegistry:Register("NewDBKeysAdded", function(newDBKeys)
         ControlCenter.newDBKeys = newDBKeys;
     end);
-
-    addon.CallbackRegistry:Register("TimerunningSeason", function(seasonID)
-        ControlCenter.timerunningSeason = seasonID;
-    end);
-
 
     local function ToggleFunc_EnableNewByDefault(state)
 
