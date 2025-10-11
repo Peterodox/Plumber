@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.5
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.6 b
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -374,14 +374,31 @@ L["SoftTargetName ShowNPC Tooltip"] = "Если отключено, имя бу�
 
 
 --LegionRemix
-L["ModuleName LegionRemix"] = "Legion Remix";
-L["ModuleDescription LegionRemix"] = "Legion Remix";
-L["Artifact Weapon"] = "Артефактное оружие";
-L["Earn X To Upgrade Y Format"] = "Заработайте еще |cffffffff%s|r %s для улучшения %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
-L["Until Next Upgrade Format"] = "%s до следующего улучшения";
-L["New Trait Available"] = "Доступен новый талант.";
-L["Rank Increased"] = "Ранг повышен";
-L["Infinite Knowledge Tooltip"] = "Вы можете получить Бесконечное знание, зарабатывая определенные достижения Legion Remix.";
+L["ModuleName LegionRemix"] = "Legion Remix"
+L["ModuleDescription LegionRemix"] = "- Автоматическое изучение черт.\n\n- Добавление виджета на панель персонажа, предоставляющего различную информацию. Вы можете кликнуть по этому виджету, чтобы открыть новый интерфейс артефакта."
+L["Artifact Weapon"] = "Артефактное оружие"
+L["Artifact Ability"] = "Способность артефакта"
+L["Earn X To Upgrade Y Format"] = "Заработайте еще |cffffffff%s|r %s для улучшения %s" --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Until Next Upgrade Format"] = "%s до следующего улучшения"
+L["New Trait Available"] = "Доступна новая черта"
+L["Rank Format"] = "Ранг %s"
+L["Rank Increased"] = "Ранг повышен"
+L["Infinite Knowledge Tooltip"] = "Вы можете получить Бесконечное знание, зарабатывая определенные достижения Legion Remix."
+L["Stat Bonuses"] = "Бонусы к характеристикам"
+L["Bonus Traits"] = "Бонусные черты:"
+L["Instruction Open Artifact UI"] = "ЛКМ для переключения интерфейса артефакта\nПКМ для отображения настроек"
+L["LegionRemix Widget Title"] = "Виджет Plumber"
+L["Trait Icon Mode"] = "Режим иконок черт:"
+L["Trait Icon Mode Hidden"] = "Не показывать"
+L["Trait Icon Mode Mini"] = "Показывать мини-иконки"
+L["Trait Icon Mode Replace"] = "Заменить иконки предметов"
+L["Error Drag Spell In Combat"] = "Вы не можете перетаскивать заклинание во время боя."
+L["Error Change Trait In Combat"] = "Вы не можете изменять черты во время боя."
+L["Amount Required To Unlock Format"] = "%s для разблокировки" --Earn another x amount to unlock (something)
+L["Soon To Unlock"] = "Скоро будет разблокировано"
+L["Artifact Ability Auto Unlock Tooltip"] = "Эта черта будет автоматически разблокирована, как только у вас будет достаточно Бесконечной силы."
+L["Require More Bag Slot Alert"] = "Вам нужно освободить место в сумках перед выполнением этого действия"
+L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Заклинание не изучено"
 
 
 --ItemUpgradeUI
