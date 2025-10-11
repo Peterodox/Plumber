@@ -378,12 +378,13 @@ L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Automatically learn traits.\n\n- Add a widget to the Paper Doll that provides various types of info. You can click this widget to open a new Artifact UI.";
 L["Artifact Weapon"] = "Artifact Weapon";
 L["Artifact Ability"] = "Artifact Ability";
+L["Artifact Traits"] = "Artifact Traits";
 L["Earn X To Upgrade Y Format"] = "Earn another |cffffffff%s|r %s to upgrade %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
 L["Until Next Upgrade Format"] = "%s until next upgrade";
 L["New Trait Available"] = "New trait available.";
 L["Rank Format"] = "Rank %s";
 L["Rank Increased"] = "Rank Increased";
-L["Infinite Knowledge Tooltip"] = "You can obtain Inifite Knowledge by earning certain Legion Remix achievements.";
+L["Infinite Knowledge Tooltip"] = "You can obtain Infinite Knowledge by earning certain Legion Remix achievements.";
 L["Stat Bonuses"] = "Stat Bonuses";
 L["Bonus Traits"] = "Bonus Traits:";
 L["Instruction Open Artifact UI"] = "Left click to toggle Artifact UI\nRight click to show settings";
@@ -396,9 +397,14 @@ L["Error Drag Spell In Combat"] = "You cannot drag a spell while in combat.";
 L["Error Change Trait In Combat"] = "You cannot change traits in combat.";
 L["Amount Required To Unlock Format"] = "%s to unlock";   --Earn another x amount to unlock (something)
 L["Soon To Unlock"] = "Soon to unlock";
+L["You Can Unlock Title"] = "You can unlock";
 L["Artifact Ability Auto Unlock Tooltip"] = "This trait will be automatically unlocked once you have enough Infinite Power.";
 L["Require More Bag Slot Alert"] = "You need to free up bag space before performing this action";
 L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Spell not learned";
+L["Fully Upgraded"] = AZERITE_EMPOWERED_ITEM_FULLY_UPGRADED or "Fully Upgraded";
+L["Unlock Level Requirement Format"] = "Reach level %d to unlock";
+L["Auto Learn Traits"] = "Auto Learn Traits";
+L["Auto Learn Traits Tooltip"] = "Automatically upgrade artifact traits when you have enough Infinite Power";
 
 
 --ItemUpgradeUI

@@ -616,6 +616,8 @@ do	--DataProvider
 	end
 
 	function DataProvider:GetTraitSpell(entryID)
+		if not entryID then return end;
+
 		if self.traitSpellCache[entryID] then
 			return self.traitSpellCache[entryID]
 		end
@@ -742,7 +744,11 @@ do	--DataProvider
 				--Diff becomes negative when player receives lots of power at once to upgrade more than 1 trait
 				--We will automatically upgrade the second trait after CURRENCY_DISPLAY_UPDATE
 				diff = 0;
-				line1 = L["Soon To Unlock"];
+				if CommitUtil.enableAutoUpgrade then
+					line1 = L["Soon To Unlock"];
+				else
+					line1 = L["You Can Unlock Title"];
+				end
 			else
 				line1 = L["Amount Required To Unlock Format"]:format(BreakUpLargeNumbers(diff));
 			end
@@ -777,7 +783,24 @@ do	--DataProvider
 				nextSpellID = nextSpellID,
 				nextEntryID = nextEntryID,
 				nextRank = nextRank,
-			}
+			};
+		else
+			if self:IsArtifactMaxed() then
+				tbl = {
+					line1 = L["Artifact Traits"],
+					line2 = L["Fully Upgraded"],
+				};
+			elseif self:DoesNextUpgradeRequireMaxPlayerLevel() then
+				local nextEntryID = 134246;	--node:108700
+				local nextSpellID = self:GetTraitSpell(nextEntryID);
+				tbl = {
+					line1 = L["Unlock Level Requirement Format"]:format(80),
+					line2 = self:GetTraitName(nextEntryID),
+					nextSpellID = nextSpellID,
+					nextEntryID = nextEntryID,
+					nextRank = 1,
+				};
+			end
 		end
 		return tbl
 	end
@@ -837,6 +860,26 @@ do	--DataProvider
 			self.playerDB.lastSelectedEntryBySpec[specIndex] = {};
 		end
 		self.playerDB.lastSelectedEntryBySpec[specIndex][nodeID] = entryID;
+	end
+
+	function DataProvider:IsArtifactMaxed()
+		local nodeInfo = self:GetNodeInfo(108700);
+		if nodeInfo and nodeInfo.currentRank >= 999 then
+			return true
+		end
+	end
+
+	function DataProvider:DoesNextUpgradeRequireMaxPlayerLevel()
+		local playerLevel = UnitLevel("player");
+		if playerLevel >= 80 then return end;
+
+		local nodeInfo;
+		for _, v in ipairs(self.ArtifactTracks) do
+			nodeInfo = self:GetNodeInfo(v[5]);
+			if nodeInfo and (nodeInfo.activeRank > 0 or #nodeInfo.entryIDsWithCommittedRanks > 0) then
+				return true
+			end
+		end
 	end
 
 	function DataProvider:OnLoad()
@@ -948,10 +991,12 @@ do
 					end
 
 					--print("You can upgrade: "..traitName);
-					if InCombatLockdown() then
-						CommitUtil:TryPurchaseUpgradeAfterCombat();
-					else
-						CommitUtil:TryPurchaseToNode(traitInfo.nodeID, true);
+					if CommitUtil.enableAutoUpgrade then
+						if InCombatLockdown() then
+							CommitUtil:TryPurchaseUpgradeAfterCombat();
+						else
+							CommitUtil:TryPurchaseToNode(traitInfo.nodeID, true);
+						end
 					end
 				end
 			end
@@ -1022,11 +1067,13 @@ do	--CommitUtil
 	function CommitUtil:Enable(state)
 		if state then
 			self:SetScript("OnEvent", self.OnEvent);
+			self.enableAutoUpgrade = addon.GetDBBool("LegionRemix_AutoUpgrade");
 		else
 			self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
 			self:UnregisterEvent("CONFIG_COMMIT_FAILED");
 			self:UnregisterEvent("PLAYER_REGEN_ENABLED");
 			self:UnregisterEvent("BAG_UPDATE_DELAYED");
+			self.enableAutoUpgrade = false;
 		end
 	end
 
@@ -1625,6 +1672,12 @@ do	--Module Registry
 		CallbackRegistry:Trigger("LegionRemix.EnableModule", state);
 	end
 
+	local function LoadSettings()
+		CommitUtil.enableAutoUpgrade = addon.GetDBBool("LegionRemix_AutoUpgrade");
+	end
+
+	CallbackRegistry:RegisterSettingCallback("LegionRemix_AutoUpgrade", LoadSettings);
+
     local moduleData = {
         name = L["ModuleName LegionRemix"],
         dbKey = "LegionRemix",
@@ -1634,6 +1687,15 @@ do	--Module Registry
         uiOrder = 0,
         moduleAddedTime = 1759900000,
 		timerunningSeason = 2,
+
+        subOptions = {
+            {
+                dbKey = "LegionRemix_AutoUpgrade",
+                name = L["Auto Learn Traits"],
+                description = L["Auto Learn Traits Tooltip"],
+                toggleFunc = LoadSettings,
+            },
+        };
     };
 
     addon.ControlCenter:AddModule(moduleData);

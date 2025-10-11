@@ -785,6 +785,43 @@ do
     local ANIM_OFFSET_H_BUTTON_HOVER = 12;
     local ANIM_DURATION_BUTTON_HOVER = 0.25;
 
+    local InifiteResearchQuests = { --Slain enemies with Artifact Ability active
+        [1] = 90115,
+        [2] = 92439,
+        [3] = 92441,
+        [4] = 92440,
+        [5] = 92442,
+    };
+
+    local function QuestIcon_OnEnter(self)
+        if self.questID and C_QuestLog.IsOnQuest(self.questID) then
+            local tooltip = GameTooltip;
+            local title = API.GetQuestName(self.questID);
+            local progressTexts = API.GetQuestProgressTexts(self.questID);
+            self.UpdateTooltip = QuestIcon_OnEnter;
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            tooltip:SetText(title, 1, 0.82, 0, 1, true);
+            if progressTexts then
+                for _, text in ipairs(progressTexts) do
+                    tooltip:AddLine(text, 1, 1, 1, true);
+                end
+            end
+            tooltip:Show();
+        end
+    end
+
+    local function QuestIcon_OnLeave(self)
+        GameTooltip:Hide();
+    end
+
+    local function QuestIcon_Update(self)
+        if C_QuestLog.IsOnQuest(self.questID) then
+            self:Show();
+        else
+            self:Hide();
+        end
+    end
+
     function TrackCardMixin:OnLoad()
         self.titleCenterX = 104;
         self.Div:ClearAllPoints();
@@ -815,6 +852,16 @@ do
         self.EdgeGlow2:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/EdgeGlow");
         self.EdgeGlow2:SetBlendMode("ADD");
         self.EdgeGlow2:SetVertexColor(205/255, 237/255, 59/255);
+
+        self.QuestIcon.Texture:SetTexture(TEXTURE_FILE);
+        self.QuestIcon.Texture:SetTexCoord(640/1024, 688/1024, 672/1024, 720/1024);
+        self.QuestIcon.HighlightTexture:SetTexture(TEXTURE_FILE);
+        self.QuestIcon.HighlightTexture:SetTexCoord(640/1024, 688/1024, 672/1024, 720/1024);
+        self.QuestIcon.HighlightTexture:SetBlendMode("ADD");
+        self.QuestIcon:SetScript("OnEnter", QuestIcon_OnEnter);
+        self.QuestIcon:SetScript("OnLeave", QuestIcon_OnLeave);
+        self.QuestIcon.Update = QuestIcon_Update;
+        self.QuestIcon.questID = InifiteResearchQuests[self.trackIndex];
 
         --self:SetScript("OnEnter", self.OnEnter);
         --self:SetScript("OnLeave", self.OnLeave);
@@ -942,6 +989,7 @@ do
         end
 
         self.isActive = isActive;
+        self.QuestIcon:Update();
     end
 end
 
@@ -1095,6 +1143,8 @@ do
         "PLAYER_REGEN_DISABLED",
         "CURRENCY_DISPLAY_UPDATE",
         "TRAIT_TREE_CHANGED",
+        "QUEST_ACCEPTED",
+        "QUEST_REMOVED",
     };
 
     function MainFrameMixin:OnShow()
@@ -1173,6 +1223,8 @@ do
                     self:OnDraggingSpell(false);
                 end
             end
+        elseif event == "QUEST_ACCEPTED" or event == "QUEST_REMOVED" then
+            self:UpdateQuests();
         end
     end
 
@@ -1185,6 +1237,12 @@ do
         self:UpdateNodeFlyoutFrame();
         self:UpdateHeader();
         --self:DebugSaveAllNodes();
+    end
+
+    function MainFrameMixin:UpdateQuests()
+        for _, card in ipairs(self.TrackCards) do
+            card.QuestIcon:Update();
+        end
     end
 
     function MainFrameMixin:OnUpdate_UpdateAfterDelay(elapsed)
@@ -1533,11 +1591,11 @@ local function CreateMainUI()
         local card = CreateFrame("Frame", nil, f, "PlumberLegionRemixCardTemplate");
         TrackCards[index] = card;
         API.Mixin(card, TrackCardMixin);
-        card:OnLoad();
         card:SetPoint("TOP", f, "TOP", 0, offsetY);
         card:SetFrameLevel(baseFrameLevel - index);
         card.trackIndex = index;
         card.TraitNodes = {};
+        card:OnLoad();
 
         for i, nodeID in ipairs(trackData) do
             local button = CreateFrame("Button", nil, card, "PlumberLegionRemixNodeTemplate");

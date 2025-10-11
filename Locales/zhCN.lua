@@ -378,6 +378,7 @@ L["ModuleName LegionRemix"] = "军团再临：幻境新生";
 L["ModuleDescription LegionRemix"] = "- 自动解锁神器特质。\n\n- 在角色界面上显示一个提供各种信息的小部件。你可以点击它来打开全新的神器UI。";
 L["Artifact Weapon"] = "神器武器";
 L["Artifact Ability"] = "神器技能";
+L["Artifact Traits"] = "神器特质";
 L["Earn X To Upgrade Y Format"] = "还差 |cffffffff%s|r %s 即可升级%s";
 L["Until Next Upgrade Format"] = "距下一级还差 %s";
 L["New Trait Available"] = "有新特质可用。";
@@ -399,6 +400,10 @@ L["Soon To Unlock"] = "即将解锁";
 L["Artifact Ability Auto Unlock Tooltip"] = "此特质将在你获得足够的永恒能量后自动解锁。";
 L["Require More Bag Slot Alert"] = "你需要腾出一些背包格子才能进行此操作。";
 L["Spell Not Known"] = "未找到法术";
+L["Fully Upgraded"] = "已升至顶级";
+L["Unlock Level Requirement Format"] = "角色升至%d级后解锁";
+L["Auto Learn Traits"] = "自动升级特质";
+L["Auto Learn Traits Tooltip"] = "当你有足够的永恒能量时自动升级神器特质。";
 
 
 --ItemUpgradeUI
