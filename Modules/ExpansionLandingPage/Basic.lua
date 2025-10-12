@@ -1142,8 +1142,8 @@ do  --Red Button
         self.ButtonText:SetText(text);
     end
 
-    function RedButtonMixin:UpdateVisual()
-        local isFocused = self:IsMouseMotionFocus();
+    function RedButtonMixin:UpdateVisual(forceFocus)
+        local isFocused = self:IsMouseMotionFocus() or forceFocus;
         local top;
         if self.buttonState == 1 then
             if isFocused then

@@ -29,6 +29,7 @@ Modules\ScenarioTracker.lua
 #Modules\SuperTrack.xml
 
 #Modules\DevTool.lua
+#Modules\DevTool_HyperlinkEditor.lua
 
 ControlCenter.lua
 

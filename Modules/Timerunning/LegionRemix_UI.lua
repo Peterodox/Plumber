@@ -16,12 +16,14 @@ local Easing_OutQuart = addon.EasingFunctions.outQuart;
 
 local ipairs = ipairs;
 local InCombatLockdown = InCombatLockdown;
+local IsGamePadFreelookEnabled = IsGamePadFreelookEnabled;
 
 
 local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Timerunning/LegionRemixUI.png";
 
 
 local MainFrame;
+local GAMEPAD_MODE = false;
 
 
 local Constants = {
@@ -122,6 +124,7 @@ do
         --Only FlyoutButton is clickable
         if not self.isFlyoutButton then return end;
 
+        MainFrame:SetLastGamePadFocus(self.parentNodeButton);
         MainFrame:CloseNodeFlyout();
 
         local parentNodeButton = self.parentNodeButton;
@@ -905,7 +908,9 @@ do
             self:ShowHoverVisual();
         elseif (not state) and self.activateButtonShown then
             self.activateButtonShown = nil;
-            MainFrame.ActivateButton:SetParentCard();
+            if MainFrame.ActivateButton.parentCard == self then
+                MainFrame.ActivateButton:SetParentCard();
+            end
             self:ResetHoverVisual();
         end
     end
@@ -1166,6 +1171,10 @@ do
         self:SetScript("OnUpdate", nil);
         self:OnDraggingSpell(false);
         PlaySound(SOUNDKIT.UI_EXPANSION_LANDING_PAGE_CLOSE);
+
+        if GAMEPAD_MODE then
+            self:SetLastGamePadFocus(nil);
+        end
     end
 
     function MainFrameMixin:UpdateHeader()
@@ -1339,6 +1348,7 @@ do
             f:EnableMouseMotion(true);
             f:SetSize(80, 80);
 
+            f:SetAttribute("nodeignoremime", true)
             f:SetScript("OnLeave", function()
                 if not(f:IsMouseOver() or (f.owner and f.owner:IsVisible() and f.owner:IsMouseOver())) then
                     MainFrame:CloseNodeFlyout();
@@ -1386,7 +1396,11 @@ do
         local totalWidth = offsetX - gapH;
         local bottomPadding = 6;
         f:SetSize(totalWidth, buttonSize + bottomPadding);
-        f:SetPoint("BOTTOM", nodeButton, "TOP", 0, -10 -bottomPadding);
+        if GAMEPAD_MODE then
+            f:SetPoint("BOTTOMLEFT", nodeButton, "CENTER", -buttonSize * 0.5, 0);
+        else
+            f:SetPoint("BOTTOM", nodeButton, "TOP", 0, -10 -bottomPadding);
+        end
         f:SetFrameStrata("DIALOG");
         f.owner = nodeButton;
 
@@ -1420,7 +1434,7 @@ do
     function MainFrameMixin:CloseNodeFlyout()
         if self.NodeFlyoutFrame then
             self.NodeFlyoutFrame:Hide();
-            self.NodeFlyoutFrame:ClearAllPoints();
+            --self.NodeFlyoutFrame:ClearAllPoints();    --Remove this so ConsolePort cursor can correctly transite
         end
     end
 
@@ -1446,6 +1460,20 @@ do
                     return true
                 end
             end
+
+            if GAMEPAD_MODE then
+                local object = ConsolePort:GetCursorNode();
+                if object then
+                    if nodeButton == object then
+                        return true
+                    end
+                    for _, button in ipairs(self.flyoutButtonPool:GetActiveObjects()) do
+                        if button == object then
+                            return true
+                        end
+                    end
+                end
+            end
         end
         return false
     end
@@ -1466,6 +1494,14 @@ do
                         focusedCard = card;
                         break
                     end
+                end
+            end
+
+            if GAMEPAD_MODE and IsGamePadFreelookEnabled() then
+                focusedCard = nil;
+                local object = ConsolePort:GetCursorNode();
+                if object and object.parentCard then
+                    focusedCard = object.parentCard;
                 end
             end
         end
@@ -1491,6 +1527,18 @@ do
         self:Refresh(playAnimation);
     end
 
+    function MainFrameMixin:SetLastGamePadFocus(object)
+        if GAMEPAD_MODE then
+            if self.lastGamePadFocus then
+                self.lastGamePadFocus:SetAttribute("nodepriority", nil);
+            end
+            self.lastGamePadFocus = object;
+            if object then
+                object:SetAttribute("nodepriority", 1);
+            end
+        end
+    end
+
     function MainFrameMixin:SetTooltip(row, icon, header, description, updateTooltipFunc)
         local f = self.TooltipFrame;
         f:SetTooltip(icon, header, description, updateTooltipFunc);
@@ -1501,8 +1549,6 @@ do
         f:SetParent(self);
         f:Show();
     end
-
-
 
     function MainFrameMixin:HideTooltip()
         self.TooltipFrame:HideTooltip(true);
@@ -1631,6 +1677,7 @@ local function CreateMainUI()
                 arrow:OnLoad();
                 arrow:SetData(nodeID);
                 arrow:SetPoint("LEFT", card, "LEFT", offsetX, 0);
+                arrow.parentCard = card;
                 offsetX = offsetX + Constants.ThreeArrowsSize + gapH;
             end
         end
@@ -1738,6 +1785,64 @@ local function CreateMainUI()
     f:SetSize(cardWidth, height);
     f:SetScript("OnHide", f.OnHide);
     f:SetScript("OnShow", f.OnShow);
+
+
+    --ConsolePort Compatibility
+    if ConsolePort and ConsolePort.AddInterfaceCursorFrame and ConsolePort.GetCursorNode then
+        GAMEPAD_MODE = true;
+        f.NodeFocusSolver:SetGamePadMode(true);
+
+        --Create hidden buttons for cusor snapping
+
+        local function HiddenButton_OnEnter(self)
+            if self.parentCard:IsVisible() then
+                self.parentCard:OnEnter();
+                if ActivateButton:IsShown() and ActivateButton:IsEnabled() then
+                    local forceFocus = true;
+                    ActivateButton:UpdateVisual(forceFocus);
+                end
+            end
+        end
+
+        local function HiddenButton_OnClick(self, button)
+            if button == "RightButton" then
+                MainFrame:Hide();
+                return
+            end
+            if self.parentCard:IsVisible() then
+                ActivateButton:Update();
+                if ActivateButton:IsShown() and ActivateButton:IsEnabled() and button == "LeftButton" then
+                    ActivateButton:OnClick();
+                end
+            end
+        end
+
+        for i, card in ipairs(TrackCards) do
+            local HiddenButton = CreateFrame("Button", nil, card);
+            card.HiddenButton = HiddenButton;
+            HiddenButton.trackIndex = i;
+            HiddenButton.parentCard = card;
+            HiddenButton:SetUsingParentLevel(true);
+            HiddenButton:SetSize(128, 24);
+            HiddenButton:SetPoint("TOP", card, "LEFT", 104, -2);
+            HiddenButton:SetScript("OnEnter", HiddenButton_OnEnter);
+            HiddenButton:SetScript("OnClick", HiddenButton_OnClick);
+        end
+
+        local function SetIgnoreOject(object)
+            object:SetAttribute("nodeignore", true);
+        end
+
+        SetIgnoreOject(HeaderFrame.MouseoverFrame);
+        SetIgnoreOject(ActivateButton);
+
+        ConsolePort:AddInterfaceCursorFrame(CloseButton);
+    end
+
+    --GW2 UI Compatibility
+    if GwDressingRoom then
+        f:SetFrameStrata("HIGH");
+    end
 end
 
 local function ShowArtifactUI()
@@ -1758,3 +1863,4 @@ local function ToggleArtifactUI()
     end
 end
 RemixAPI.ToggleArtifactUI = ToggleArtifactUI;
+_G.Plumber_ToggleArtifactUI = ToggleArtifactUI;

@@ -312,6 +312,8 @@ do	--DataProvider
 	end
 
 	function DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, newTrackIndex)
+		if true then return false end;	--Debug Maybe no longer an issue in live?
+
 		local tbl;
 		if (not activeTrackIndex) or (activeTrackIndex == newTrackIndex) then
 			tbl = {newTrackIndex};
@@ -951,6 +953,7 @@ do
 				self.methodHooked = true;
 				hooksecurefunc(C_RemixArtifactUI, "ClearRemixArtifactItem", function()
 					DataProvider:UpdateConfigInfo();
+					CommitUtil:ClearPendingChanges();
 				end);
 			end
 		else
@@ -1490,20 +1493,23 @@ do	--CommitUtil
                 end
             end
 			if canChangeEntry then
-				local configID = DataProvider:GetCurrentConfigID();
-				if C_Traits.ConfigHasStagedChanges(configID) then
-					if not C_Traits.RollbackConfig(configID) then
-						return
-					end
-				end
+				self:ClearPendingChanges();
 				--local success = configID and C_Traits.RefundAllRanks(configID, nodeID);
 				--According to wiki: You should not use the C_Traits.PurchaseRank or C_Traits.RefundRank APIs on selection nodes.
 				--https://warcraft.wiki.gg/wiki/API_C_Traits.SetSelection
-				if C_Traits.SetSelection(configID, nodeID, entryID) then
+				local configID = DataProvider:GetCurrentConfigID();
+				if configID and C_Traits.SetSelection(configID, nodeID, entryID) then
 					self:SetCommitStarted(configID);
 					return true
 				end
 			end
+		end
+	end
+
+	function CommitUtil:ClearPendingChanges()
+		local configID = DataProvider:GetCurrentConfigID();
+		if configID and C_Traits.ConfigHasStagedChanges(configID) then
+			return C_Traits.RollbackConfig(configID)
 		end
 	end
 

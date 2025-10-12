@@ -4043,7 +4043,7 @@ do  --FocusSolver (Run something when being hovered long enough)
         if self.t > 0.05 then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
-            if self.object and self.object:IsMouseMotionFocus() then
+            if self:IsObjectFocused() then
                 if self.useModifierKeys then
                     self:RegisterEvent("MODIFIER_STATE_CHANGED");
                 end
@@ -4090,6 +4090,28 @@ do  --FocusSolver (Run something when being hovered long enough)
 
     function FocusSolverMixin:OnHide()
         self:Stop();
+    end
+
+    function FocusSolverMixin:IsObjectFocused()
+        if self.object then
+            return self.object:IsMouseMotionFocus() or (self.gamepadMode and self:IsObjectGamePadCursorFocused(self.object))
+        end
+    end
+
+    function FocusSolverMixin:IsObjectGamePadCursorFocused(object)
+        return false
+    end
+
+    function FocusSolverMixin:SetGamePadMode(enabled)
+        self.gamepadMode = enabled;
+
+        if enabled then
+            if ConsolePort and ConsolePort.GetCursorNode then
+                function self:IsObjectGamePadCursorFocused(object)
+                    return ConsolePort:GetCursorNode() == object
+                end
+            end
+        end
     end
 
     function API.CreateFocusSolver(parent)
