@@ -4,6 +4,7 @@
 	<Script file="LegionRemix_Test.lua"/>
 	<Script file="LegionRemix_Macro.lua"/>
 	<Script file="LegionRemix_UI.lua"/>
+	<Script file="LegionRemix_HideWorldTier.lua"/>
 
 
 	<Frame name="PlumberRemixArtifactUITemplate" hidden="true" virtual="true">

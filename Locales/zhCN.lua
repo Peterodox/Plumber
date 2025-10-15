@@ -376,6 +376,8 @@ L["SoftTargetName ShowNPC Tooltip"] = "若禁用此选项，我们将只显示�
 --LegionRemix
 L["ModuleName LegionRemix"] = "军团再临：幻境新生";
 L["ModuleDescription LegionRemix"] = "- 自动解锁神器特质。\n\n- 在角色界面上显示一个提供各种信息的小部件。你可以点击它来打开全新的神器UI。";
+L["ModuleName LegionRemix_HideWorldTier"] = "隐藏世界难度图标";
+L["ModuleDescription LegionRemix_HideWorldTier"] = "隐藏小地图下方的世界难度图标。";
 L["Artifact Weapon"] = "神器武器";
 L["Artifact Ability"] = "神器技能";
 L["Artifact Traits"] = "神器特质";

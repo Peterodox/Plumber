@@ -212,6 +212,35 @@ do	--DataProvider
 		return nodeID, entryID
 	end
 
+	function DataProvider:UpdateConfigInfo()
+		--traitTreeID is always 1161
+		--configID is different for each artifact weawpon
+
+		local traitTreeID = C_RemixArtifactUI.GetCurrTraitTreeID() or 1161;
+		local configID = traitTreeID and GetConfigIDByTreeID(traitTreeID);
+		if not configID then return end;
+
+		self.configID = configID;
+
+		local configInfo = GetConfigInfo(configID);
+		local treeID = configInfo.treeIDs[1] or 1161;
+		self.treeID = treeID;
+	end
+
+	function DataProvider:GetCurrentConfigID()
+		if not self.configID then
+			self:UpdateConfigInfo();
+		end
+		return self.configID
+	end
+
+	function DataProvider:GetCurrentTreeID()
+		if not self.treeID then
+			self:UpdateConfigInfo();
+		end
+		return self.treeID
+	end
+
 	function DataProvider:GetNodeInfo(nodeID)
 		local configID = self:GetCurrentConfigID();
 		if configID then
@@ -543,35 +572,6 @@ do	--DataProvider
 				C_RemixArtifactUI.ClearRemixArtifactItem();
 			end
 		end
-	end
-
-	function DataProvider:UpdateConfigInfo()
-		--traitTreeID is always 1161
-		--configID is different for each artifact weawpon
-
-		local traitTreeID = C_RemixArtifactUI.GetCurrTraitTreeID() or 1161;
-		local configID = traitTreeID and GetConfigIDByTreeID(traitTreeID);
-		if not configID then return end;
-
-		self.configID = configID;
-
-		local configInfo = GetConfigInfo(configID);
-		local treeID = configInfo.treeIDs[1] or 1161;
-		self.treeID = treeID;
-	end
-
-	function DataProvider:GetCurrentConfigID()
-		if not self.configID then
-			self:UpdateConfigInfo();
-		end
-		return self.configID
-	end
-
-	function DataProvider:GetCurrentTreeID()
-		if not self.treeID then
-			self:UpdateConfigInfo();
-		end
-		return self.treeID
 	end
 
 	function DataProvider:GetNumUnspentPower()
@@ -971,7 +971,9 @@ do
 				self.specDirty = nil;
 				DataProvider:UpdateClassSpecInfo();
 				DataProvider:UpdateConfigInfo();
-				CommitUtil:TryPurchaseAllTraits();
+				if CommitUtil.enableAutoUpgrade then
+					CommitUtil:TryPurchaseAllTraits();
+				end
 			end
 		end
 

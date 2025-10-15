@@ -95,7 +95,21 @@ function MainFrame:OnUpdate(elapsed)
         self.y = self.owner:GetTop();
         self.x = self.x - 16;
         self.y = self.y - 104;
-        self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.x, self.y);
+
+        if self.secondaryOwner and self.secondaryOwner:IsShown() then
+            local f = EditModeExpandedWarningFrame;
+            if f and f:IsShown() then
+                self:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 0, -4);
+            else
+                self:SetPoint("TOPLEFT", self.secondaryOwner, "BOTTOMLEFT", 0, -4);
+            end
+        elseif self.owner:IsShown() then
+            self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.x, self.y);
+            self:ShowModules(true);
+        else
+            self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 0, -8);
+            self:ShowModules(false);
+        end
     end
 end
 
@@ -105,6 +119,7 @@ function MainFrame:EnterEditMode()
     end
 
     if UpdateModuleVisibilities() then
+        self.moduleShown = true;
         self.t = 1;
         self:SetScript("OnUpdate", self.OnUpdate);
         self.Checkbox:SetChecked(addon.GetDBBool(DBKEY_MASTER));
@@ -112,16 +127,33 @@ function MainFrame:EnterEditMode()
     else
         self:Hide();
     end
+
+    if EditModeManagerExpandedFrame then
+        --Addon Compatibility: Edit Mode Expanded (https://github.com/teelolws/EditModeExpanded)
+        self.secondaryOwner = EditModeManagerExpandedFrame;
+    end
 end
 
 function MainFrame:ExitEditMode()
     self:Hide();
     self.t = 0;
     self:SetScript("OnUpdate", nil);
-    for _, moduleData in ipairs(ModuleInfo) do
-        moduleData.exitEditMode();
+    self:ShowModules(false);
+end
+
+function MainFrame:ShowModules(state)
+    if state == self.moduleShown then return end;
+    self.moduleShown = state;
+
+    if state then
+        UpdateModuleVisibilities();
+    else
+        for _, moduleData in ipairs(ModuleInfo) do
+            moduleData.exitEditMode();
+        end
     end
 end
+
 
 EventRegistry:RegisterCallback("EditMode.Enter", MainFrame.EnterEditMode, MainFrame);
 EventRegistry:RegisterCallback("EditMode.Exit", MainFrame.ExitEditMode, MainFrame);

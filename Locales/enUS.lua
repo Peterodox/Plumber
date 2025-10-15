@@ -376,6 +376,8 @@ L["SoftTargetName ShowNPC Tooltip"] = "If disabled, the name will only appear on
 --LegionRemix
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Automatically learn traits.\n\n- Add a widget to the Paper Doll that provides various types of info. You can click this widget to open a new Artifact UI.";
+L["ModuleName LegionRemix_HideWorldTier"] = "Hide World Tier Icon";
+L["ModuleDescription LegionRemix_HideWorldTier"] = "Hide the Heroic World Tier icon below the minimap.";
 L["Artifact Weapon"] = "Artifact Weapon";
 L["Artifact Ability"] = "Artifact Ability";
 L["Artifact Traits"] = "Artifact Traits";

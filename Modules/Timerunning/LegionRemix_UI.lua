@@ -1162,6 +1162,8 @@ do
     end
 
     function MainFrameMixin:OnHide()
+        self:Hide();
+
         API.UnregisterFrameForEvents(self, DynamicEvents);
         CallbackRegistry:UnregisterCallback("LegionRemix.CommitFinished", self.OnCommitFinished, self);
         CallbackRegistry:UnregisterCallback("LegionRemix.ConfigUpdated", self.RequestUpdate, self);
@@ -1566,6 +1568,24 @@ do
             self:SetToplevel(true);
         end
     end
+
+    function MainFrameMixin:ResetParent()
+        --For Narcissus
+        if self:GetParent() ~= UIParent then
+            self:SetParent(UIParent);
+            local frameName = self:GetName();
+            local found;
+            for _, name in ipairs(UISpecialFrames) do
+                if name == frameName then
+                    found = true;
+                    break
+                end
+            end
+            if not found then
+                table.insert(UISpecialFrames, frameName);
+            end
+        end
+    end
 end
 
 
@@ -1781,7 +1801,7 @@ local function CreateMainUI()
     end);
 
 
-    local height = 5 * (cardHeight + cardGap) - cardGap + headerHeight;
+    local height = 5 * (cardHeight + cardGap) - cardGap;
     f:SetSize(cardWidth, height);
     f:SetScript("OnHide", f.OnHide);
     f:SetScript("OnShow", f.OnShow);
@@ -1850,17 +1870,32 @@ local function ShowArtifactUI()
         CreateMainUI();
         MainFrame:Hide();
     end
+    MainFrame:ResetParent();
     MainFrame:Show();
 end
 RemixAPI.ShowArtifactUI = ShowArtifactUI;
 
 
 local function ToggleArtifactUI()
-    if MainFrame then
-        MainFrame:SetShown(not MainFrame:IsShown());
-    else
-        ShowArtifactUI();
+    if not MainFrame then
+        CreateMainUI();
+        MainFrame:Hide();
     end
+
+    local state = not MainFrame:IsShown();
+
+    if state then
+        if Narci_Attribute and Narci_Attribute:IsVisible() then
+            MainFrame:SetParent(Narci_Attribute);
+        else
+            MainFrame:ResetParent();
+        end
+    else
+        MainFrame:ResetParent();
+    end
+
+    MainFrame:SetShown(state);
 end
 RemixAPI.ToggleArtifactUI = ToggleArtifactUI;
 _G.Plumber_ToggleArtifactUI = ToggleArtifactUI;
+_G.Plumber_ToggleArtifactUIForNarcissus = ToggleArtifactUI; --For legacy version

@@ -276,6 +276,7 @@ local DefaultValues = {
         LegionRemix_TraitSubIconStyle = 3,  --1:OFF, 2:Mini Icon, 3:Replace Icon
         LegionRemix_AutoUpgrade = true,
         LegionRemix_PaperDollTraitDetail = false,
+    LegionRemix_HideWorldTier = true,
 
 
     EnableNewByDefault = false,             --Always enable newly added features
