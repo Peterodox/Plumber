@@ -46,7 +46,11 @@ do  --ScrollViewListButton
                 if self.selected then
                     self.Name:SetTextColor(1, 1, 1);
                 else
-                    self.Name:SetTextColor(0.922, 0.871, 0.761);
+                    if self.SetDefaultTextColor then
+                        self:SetDefaultTextColor();
+                    else
+                        self.Name:SetTextColor(0.922, 0.871, 0.761);
+                    end
                 end
             end
         end
@@ -170,7 +174,7 @@ do  --Generic Checklist Button
     function ChecklistButtonMixin:UpdateProgress_Quest()
         local data = API.GetQuestData(self.id);
         if data then
-            if  data.completed or (self.data.warband and data.warbandCompleted) then
+            if data.completed or (self.data.warband and data.warbandCompleted) then
                 self.Icon:SetAtlas("checkmark-minimal-disabled");
                 self.completed = true;
             else

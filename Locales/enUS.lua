@@ -579,6 +579,16 @@ L["New Feature Auto Enabled Format"] = "New Module %s has been enabled.";
 L["Click To See Details"] = "Click to see details";
 
 
+--WIP Merchant UI
+L["ItemType Consumables"] = AUCTION_CATEGORY_CONSUMABLES or "Consumables";
+L["ItemType Weapons"] = AUCTION_CATEGORY_WEAPONS or "Weapons";
+L["ItemType Gems"] = AUCTION_CATEGORY_GEMS or "Gems";
+L["ItemType Armor Generic"] = AUCTION_SUBCATEGORY_PROFESSION_ACCESSORIES or "Accessories";  --Trinkets, Rings, Necks
+L["ItemType Mounts"] = MOUNTS or "Mounts";
+L["ItemType Pets"] = PETS or "Pets";
+L["ItemType Toys"] = "Toys";
+L["ItemType TransmogSet"] = PERKS_VENDOR_CATEGORY_TRANSMOG_SET or "Transmog Set";
+L["ItemType Transmog"] = "Transmog";
 
 
 -- !! Do NOT translate the following entries

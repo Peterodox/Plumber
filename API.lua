@@ -1495,6 +1495,8 @@ end
 
 do  -- Currency
     local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
+    local GetCurrencyContainerInfo = C_CurrencyInfo.GetCurrencyContainerInfo or Nop;
+
     local CurrencyDataProvider = CreateFrame("Frame");
     CurrencyDataProvider.names = {};
     CurrencyDataProvider.icons = {};
@@ -1566,6 +1568,52 @@ do  -- Currency
         end
 
         return rawCopper
+    end
+
+    function API.GetCurrencyContainerInfo(currencyID, numItems, name, texture, quality)
+        --Used by Merchant UI
+        local entry = GetCurrencyContainerInfo(currencyID, numItems);
+        if entry then
+            return entry.name, entry.icon, entry.displayAmount, entry.quality
+        end
+        return name, texture, numItems, quality
+    end
+
+
+    CoinUtil.goldTextureFormat = "%s|TInterface\\MoneyFrame\\UI-GoldIcon:%s:%s:2:0|t";
+    CoinUtil.silverTextureFormat = "%s|TInterface\\MoneyFrame\\UI-SilverIcon:%s:%s:2:0|t";
+    CoinUtil.copperTextureFormat = "%s|TInterface\\MoneyFrame\\UI-CopperIcon:%s:%s:2:0|t";
+
+    function API.GenerateCoinTextureString(amount, height)
+        height = height or 14;
+        local gold = floor(amount / 10000);
+        local silver = floor((amount - (10000 * gold)) / 100);
+        local copper = floor((amount - (10000 * gold) - (100 * silver)));
+
+        local BreakUpLargeNumbers = BreakUpLargeNumbers;
+        local moneyString;
+
+        if gold > 0 then
+            moneyString = CoinUtil.goldTextureFormat:format(BreakUpLargeNumbers(gold), height, height);
+        end
+
+        if silver > 0 then
+            if moneyString then
+                moneyString = moneyString.." "..CoinUtil.silverTextureFormat:format(BreakUpLargeNumbers(silver), height, height);
+            else
+                moneyString = CoinUtil.silverTextureFormat:format(BreakUpLargeNumbers(silver), height, height);
+            end
+        end
+
+        if copper > 0 then
+            if moneyString then
+                moneyString = moneyString.." "..CoinUtil.copperTextureFormat:format(BreakUpLargeNumbers(copper), height, height);
+            else
+                moneyString = CoinUtil.copperTextureFormat:format(BreakUpLargeNumbers(copper), height, height);
+            end
+        end
+
+        return moneyString
     end
 end
 
@@ -2212,6 +2260,20 @@ do  -- System
 
         TopBannerManager_BannerFinished();
     end
+
+    function API.CanPlayerQueueLFG()
+        local lfgListDisabled;
+        if ( C_LFGList.HasActiveEntryInfo() ) then
+            lfgListDisabled = CANNOT_DO_THIS_WHILE_LFGLIST_LISTED;
+        elseif(C_PartyInfo.IsCrossFactionParty()) then
+            lfgListDisabled = CROSS_FACTION_RAID_DUNGEON_FINDER_ERROR;
+        end
+        if lfgListDisabled then
+            return false
+        else
+            return true
+        end
+    end
 end
 
 do  -- Player
@@ -2617,6 +2679,58 @@ do  -- Quest
                 end
             end
         end
+
+        function API.GetQuestProgressInfo(questID, hideFinishedObjectives)
+            local tbl = {};
+            local questLogIndex = questID and GetLogIndexForQuestID(questID);
+
+            if questLogIndex and questLogIndex ~= 0 then
+                tbl.isOnQuest = true;
+                tbl.readyForTurnIn = C_QuestLog.ReadyForTurnIn(questID);
+ 
+                if not (tbl.readyForTurnIn and hideFinishedObjectives) then
+                    local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
+                    tbl.numObjectives = numObjectives;
+                    tbl.objectives = {};
+
+                    local text, objectiveType, finished, fulfilled, required;
+
+                    for objectiveIndex = 1, numObjectives do
+                        text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, objectiveIndex, false);
+                        text = text or "";
+                        if (not finished) or not hideFinishedObjectives then
+                            if objectiveType == "progressbar" then
+                                fulfilled = GetQuestProgressBarPercent(questID);
+                                fulfilled = floor(fulfilled);
+                                if finished then
+                                    text = format("%s%% %s", fulfilled, text);
+                                else
+
+                                end
+                                tinsert(tbl.objectives, {
+                                    finished = finished,
+                                    text = text,
+                                });
+                            else
+                                tinsert(tbl.objectives, {
+                                    finished = finished,
+                                    text = text,
+                                });
+                            end
+                        end
+                    end
+                end
+            else
+                if not C_QuestLog.IsOnQuest(questID) then
+                    tbl.isOnQuest = false;
+                    if C_QuestLog.IsQuestFlaggedCompleted(questID) then
+                        tbl.isComplete = true;
+                    end
+                end
+            end
+
+            return tbl
+        end
     end
 
 
@@ -2936,6 +3050,7 @@ do  -- Tooltip
                 SetSpellByID = "GetSpellByID",
                 SetItemByGUID = "GetItemByGUID",
                 SetHyperlink = "GetHyperlink",
+                SetMerchantItem = "GetMerchantItem",
             };
 
             for accessor, getterName in pairs(accessors) do
@@ -2971,8 +3086,14 @@ do  -- Tooltip
         if questID then
             local hyperlink = "|Hquest:"..questID.."|h";
             local data = addon.TooltipAPI.GetHyperlink(hyperlink);
-            if data then
-                return data.lines[3] and data.lines[3].leftText or nil
+            if data then    --line3 is for unaccepeted quest
+                local index;
+                if C_QuestLog.IsOnQuest(questID) then
+                    index = 4;
+                else
+                    index = 3;
+                end
+                return data.lines[index] and data.lines[index].leftText or nil
             end
         end
     end
@@ -2994,10 +3115,14 @@ do  -- Tooltip
             else
                 color = CreateColor(r, g, b);
             end
+            if wrapText == nil then
+                wrapText = true;
+            end
+
             tinsert(self.tooltipData.lines, {
                 leftText = text,
                 leftColor = color,
-                wrapText = true,
+                wrapText = wrapText,
             });
         end
 
@@ -3029,6 +3154,12 @@ do  -- Tooltip
         return info
     end
 
+    function API.DisplayTooltipInfoOnTooltip(tooltip, info)
+        if tooltip.ProcessInfo and tooltip:IsShown() then
+            tooltip:ProcessInfo(info);
+            tooltip:Show();
+        end
+    end
 
     function API.ConvertTooltipInfoToOneString(text, getterName, ...)
         -- where ... are getterArgs

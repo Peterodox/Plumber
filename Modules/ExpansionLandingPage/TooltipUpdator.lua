@@ -4,6 +4,7 @@ local LandingPageUtil = addon.LandingPageUtil;
 
 
 local iparis = ipairs;
+local tinsert = table.insert;
 
 
 local TooltipUpdator = CreateFrame("Frame");
@@ -28,6 +29,7 @@ function TooltipUpdator:StopUpdating()
     self.headerText = nil;
     self.showProgress = nil;
     self.showRewards = nil;
+    self.showQuestDescription = nil;
     self.poiID = nil;
     self.tooltipLines = nil;
     self.tooltipSetter = nil;
@@ -59,6 +61,10 @@ end
 
 function TooltipUpdator:RequestQuestReward()
     self.showRewards = true;
+end
+
+function TooltipUpdator:RequestQuestDescription()
+    self.showQuestDescription = true;
 end
 
 function TooltipUpdator:RequestEventTimer(poiID)
@@ -95,11 +101,25 @@ function TooltipUpdator:OnUpdate(elapsed)
                 self.keepUpdating = true;
             end
 
+            if self.showQuestDescription then
+                local description = API.GetDescriptionFromTooltip(self.questID);
+                if description and description ~= QUEST_TOOLTIP_REQUIREMENTS then
+                    tinsert(tooltipLines, description);
+                    tinsert(tooltipLines, " ");
+                end
+            end
+
             if self.showProgress then
                 local texts = API.GetQuestProgressTexts(self.questID);
                 if texts then
                     anyContent = true;
-                    tooltipLines = texts;
+                    if #tooltipLines == 0 then
+                        tooltipLines = texts;
+                    else
+                        for _, text in iparis(texts) do
+                            tinsert(tooltipLines, text);
+                        end
+                    end
                 end
                 self.keepUpdating = true;
             end
@@ -109,10 +129,10 @@ function TooltipUpdator:OnUpdate(elapsed)
                 if rewards then
                     anyContent = true;
                     if rewards.items then
-                        table.insert(questRewards, rewards.items);
+                        tinsert(questRewards, rewards.items);
                     end
                     if rewards.currencies then
-                        table.insert(questRewards, rewards.currencies);
+                        tinsert(questRewards, rewards.currencies);
                     end
                 end
 

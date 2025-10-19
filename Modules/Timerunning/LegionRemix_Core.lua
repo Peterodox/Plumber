@@ -738,14 +738,17 @@ do	--DataProvider
 		local tbl;
 		local traitInfo = self:GetNextTraitForUpgrade();
 		if traitInfo and traitInfo.cost >= 0 then
-			local line1, line2, nextSpellID, nextEntryID, nextRank;
+			local line1, line2, nextSpellID, nextEntryID, nextRank, traitName;
 			tbl = {};
 			local numUnspent = self:GetNumUnspentPower();
-			local diff = traitInfo.cost - numUnspent;
+			local threshold = traitInfo.cost;
+			local current = numUnspent;
+			local diff = threshold - numUnspent;
 			if diff <= 0 then
 				--Diff becomes negative when player receives lots of power at once to upgrade more than 1 trait
 				--We will automatically upgrade the second trait after CURRENCY_DISPLAY_UPDATE
 				diff = 0;
+				current = threshold;
 				if CommitUtil.enableAutoUpgrade then
 					line1 = L["Soon To Unlock"];
 				else
@@ -764,19 +767,22 @@ do	--DataProvider
 					if line2 then
 						line2 = string.gsub(line2, "[%.。]%s*$", "");
 					end
+					traitName = line2;
 				else
-					local nodeInfo = DataProvider:GetNodeInfo(traitInfo.nodeID);
+					local nodeInfo = self:GetNodeInfo(traitInfo.nodeID);
 					local maxRanks = entryInfo.maxRanks;
 					if maxRanks > 1 then
 						nextRank = (nodeInfo and nodeInfo.ranksPurchased or 0) + 1;
 					end
 				end
 			end
-			if not line2 then
-				line2 = self:GetTraitName(traitInfo.entryID);
+
+			if not traitName then
+				traitName = self:GetTraitName(traitInfo.entryID);
 			end
-			if nextRank and line2 then
-				line2 = string.format("|cffb6b6b6%s|r  %s", L["Rank Format"]:format(nextRank), line2);
+
+			if nextRank and traitName then
+				line2 = string.format("|cffb6b6b6%s|r  %s", L["Rank Format"]:format(nextRank), traitName);
 			end
 
 			tbl = {
@@ -785,12 +791,20 @@ do	--DataProvider
 				nextSpellID = nextSpellID,
 				nextEntryID = nextEntryID,
 				nextRank = nextRank,
+
+				traitName = traitName,
+				threshold = threshold,
+				current = current,
 			};
 		else
 			if self:IsArtifactMaxed() then
 				tbl = {
 					line1 = L["Artifact Traits"],
 					line2 = L["Fully Upgraded"],
+
+					traitName = L["Fully Upgraded"],
+					threshold = 100,
+					current = 100,
 				};
 			elseif self:DoesNextUpgradeRequireMaxPlayerLevel() then
 				local nextEntryID = 134246;	--node:108700
@@ -801,10 +815,18 @@ do	--DataProvider
 					nextSpellID = nextSpellID,
 					nextEntryID = nextEntryID,
 					nextRank = 1,
+
+					traitName = self:GetTraitName(nextEntryID),
+					threshold = 100,
+					current = 0,
+					isLocked = true,
 				};
 			end
 		end
 		return tbl
+	end
+	RemixAPI.GetNextTraitForUpgrade = function()
+		return DataProvider:GetNextUpgradeInfoForUI()
 	end
 
 	function DataProvider:GetLastSelectedEntryID(nodeID, entryIDs)
@@ -1253,7 +1275,7 @@ do	--CommitUtil
 			if autoPurchase then
 				local nodeInfo = DataProvider:GetNodeInfo(nodeID);
 				local entryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID;
-				self:SendRankUpgradeToLootUI(entryID)
+				self:AnnounceAutoLearnedTrait(entryID);
 			end
 		end
 	end
@@ -1520,8 +1542,8 @@ do	--CommitUtil
 		self.processAfterCombat = true;
 	end
 
-	function CommitUtil:SendRankUpgradeToLootUI(entryID)
-		if not (entryID and addon.GetDBBool("LootUI")) then return end;
+	function CommitUtil:AnnounceAutoLearnedTrait(entryID)
+		if not entryID then return end;
 
 		local spellID;
 		local entryInfo = DataProvider:GetEntryInfo(entryID);
@@ -1535,18 +1557,23 @@ do	--CommitUtil
 		local icon = C_Spell.GetSpellTexture(spellID);
 		local name = C_Spell.GetSpellName(spellID);
 
-		if name then
-			name = string.format("%s\n|cff19ff19%s|r", name, L["Rank Increased"]);
-		else
+		if not name then
 			return
 		end
 
-		local data = {
-			spellID = spellID,
-			icon = icon,
-			name = name,
-		};
-		addon.LootWindow:QueueDisplaySpell(data);
+		if addon.GetDBBool("LootUI") then
+			local data = {
+				spellID = spellID,
+				icon = icon,
+				name = string.format("%s\n|cff19ff19%s|r", name, L["Rank Increased"]),
+			};
+			addon.LootWindow:QueueDisplaySpell(data);
+		end
+
+		--local spellLink = string.format("|Hspell:%d:0|h[%s]|h", spellID, name);
+		local spellLink = C_Spell.GetSpellLink(spellID);
+		local msg = string.format("|cffffd100%s:|r %s", L["Rank Increased"], spellLink);
+		API.PrintMessage(msg);
 	end
 
 

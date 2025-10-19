@@ -159,8 +159,7 @@ do
             if self.appendTooltipFunc then
                 local info = API.CreateAppendTooltipInfo();
                 if self.appendTooltipFunc(info) then
-                    tooltip:ProcessInfo(info);
-                    tooltip:Show();
+                    API.DisplayTooltipInfoOnTooltip(tooltip, info);
                 end
             end
         end
@@ -183,8 +182,7 @@ do
             if tooltip.ProcessInfo then
                 local info = API.CreateAppendTooltipInfo();
                 if contextualTooltipFunc(info) then
-                    tooltip:ProcessInfo(info);
-                    tooltip:Show();
+                    API.DisplayTooltipInfoOnTooltip(tooltip, info);
                 end
             end
         end

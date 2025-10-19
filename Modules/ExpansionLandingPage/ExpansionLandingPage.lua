@@ -149,20 +149,16 @@ do
         Divider:SetPoint("LEFT", self.RightSection.Header, "BOTTOMLEFT", 32, 0);
         Divider:SetPoint("RIGHT", self.RightSection.Header, "BOTTOMRIGHT", -32, 0);
 
-        self:InitTabButtons();
         --self:InitLeftSection();
 
         table.insert(UISpecialFrames, self:GetName());
-
-        LandingPageUtil.SelectTabByIndex(1);
 
         self:SetScript("OnShow", self.OnShow);
         self:SetScript("OnHide", self.OnHide);
 
 
         --Events triggerd in ModuleRegistry.lua
-        CallbackRegistry:Register("ParagonRewardReady", self.RequestUpdateTabButtons, self);
-        CallbackRegistry:Register("ParagonRewardQuestTurnedIn", self.RequestUpdateTabButtons, self);
+        CallbackRegistry:Register("LandingPage.UpdateNotification", self.UpdateNotification, self);
     end
 
     addon.CallbackRegistry:Register("DBLoaded", function(db)
@@ -182,6 +178,11 @@ do
             self:InitLeftSection();
         end
 
+        if self.InitTabButtons then
+            self:InitTabButtons();
+            LandingPageUtil.SelectTabByIndex(1);
+        end
+
         self:UpdateTabs();    --The selected tab will be created here
         LandingPageUtil.PlayUISound("LandingPageOpen");
         if not self:IsUserPlaced() then
@@ -195,6 +196,8 @@ do
     end
 
     function PlumberExpansionLandingPageMixin:InitTabButtons()
+        self.InitTabButtons = nil;
+
         if not self.TabButtons then
             self.TabButtons = {};
         end
@@ -247,6 +250,18 @@ do
         end
     end
 
+    function PlumberExpansionLandingPageMixin:UpdateNotification(tabKey)
+        if tabKey then
+            for _, button in ipairs(self.TabButtons) do
+                if button.tabKey == tabKey then
+                    button:UpdateNotification();
+                end
+            end
+        else
+            self:RequestUpdateTabButtons();
+        end
+    end
+
     function PlumberExpansionLandingPageMixin:UpdateTabs()
         self:UpdateTabButtons();
 
@@ -278,6 +293,11 @@ do
         if self.isLegionRemix then
             table.remove(categories, 1);
             table.remove(categories, 1);
+
+            table.insert(categories, 1, {
+                name = L["Artifact Traits"],
+                frameGetter = LandingPageUtil.LegionRemixCreateNextTraitFrame,
+            });
         end
 
         local numCategories = #categories;

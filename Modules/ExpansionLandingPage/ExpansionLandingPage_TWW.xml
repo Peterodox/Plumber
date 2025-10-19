@@ -4,6 +4,7 @@
 	<Script file="EditBox.lua"/>
 	<Script file="ScrollView.lua"/>
 	<Script file="StatusBar.lua"/>
+	<Script file="WidgetDisplay.lua"/>
 	<Script file="SharedListButton.lua"/>
 	<Script file="API_Quest.lua"/>
 	<Script file="API_Encounter.lua"/>
@@ -15,13 +16,13 @@
 	<Script file="TWW/ItemUpgradeFrame.lua"/>
 	<Script file="TWW/ActivityData.lua"/>
 	<Script file="TWW/ResourceList.lua"/>
-	<Script file="TWW/ResourceList_LegionRemix.lua"/>
+
+	<Include file="LegionRemix/LegionRemix.xml"/>
 
 	<Script file="Currency.lua"/>
 	<Script file="FactionUtil.lua"/>
 	<Script file="FactionTab.lua"/>
 	<Script file="ActivityTab.lua"/>
-	<Script file="MajorFactionRenown.lua"/>
 	<Script file="EncounterData.lua"/>
 	<Script file="EncounterJournal.lua"/>
 	<!--Script file="TrackerTab.lua"/-->

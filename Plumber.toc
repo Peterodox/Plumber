@@ -76,6 +76,8 @@ Modules\ExpansionLandingPage\ExpansionLandingPage_TWW.xml
 Modules\BlizzFix_ModelLoading.lua
 Modules\Timerunning\LegionRemix.xml
 
+#Modules\MerchantUI\MerchantUI.xml
+
 #Modules\DruidModelFix.lua
 #Modules\MovieSubtitle.lua
 #Modules\QuestSpecialItemCooldown.lua

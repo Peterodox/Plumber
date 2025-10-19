@@ -79,11 +79,13 @@ EL:SetScript("OnEvent", function(self, event, ...)
         if factionID then
             API.TriggerExpansionMinimapButtonAlert(L["Paragon Reward Available"]);
             CallbackRegistry:Trigger("ParagonRewardReady", factionID);
+            CallbackRegistry:Trigger("LandingPage.UpdateNotification");
         end
     elseif event == "QUEST_TURNED_IN" then
         local questID = ...
         if FactionUtil:IsParagonRewardQuest(questID) then
             CallbackRegistry:Trigger("ParagonRewardQuestTurnedIn", questID);
+            CallbackRegistry:Trigger("LandingPage.UpdateNotification");
         end
     end
 end);

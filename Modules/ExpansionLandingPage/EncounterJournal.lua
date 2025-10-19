@@ -11,14 +11,17 @@ local EJ_GetInstanceInfo = EJ_GetInstanceInfo;
 local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
 
 
+local SHOW_LOOT = true;    --Boss achievements and loot
+
 local JournalInstanceIDs = {
+    1302,   --Manaforge Omega
     1296,   --Liberation of Undermine
     1273,   --Nerub-ar Palace
     --1190,   --Debug Castle Nathria
 };
 
 if addon.IsToCVersionEqualOrNewerThan(110200) then
-    tinsert(JournalInstanceIDs, 1, 1302);   --Manaforge Omega   --debug
+    --For PTR
 end
 
 if addon.IS_MOP then
@@ -33,6 +36,22 @@ end
 local RaidTab, LootContainer;
 local EncounterList = {};
 
+
+addon.CallbackRegistry:Register("LandingPage.SetEncounterTabInfo", function(tabInfo)
+    if tabInfo.JournalInstanceIDs then
+        JournalInstanceIDs = tabInfo.JournalInstanceIDs;
+        if RaidTab and RaidTab:IsShown() then
+            RaidTab:FullUpdate();
+        end
+    end
+
+    if tabInfo.showLoot ~= nil then
+        SHOW_LOOT = tabInfo.showLoot;
+        if RaidTab and RaidTab.LeftFrame then
+            RaidTab.LeftFrame:SetShown(SHOW_LOOT);
+        end
+    end
+end);
 
 
 local function GetPlayerClassName(playerClassID, markYourClass)
@@ -81,6 +100,7 @@ do
                 LandingPageUtil.PlayUISound("CheckboxOn");
             end
         else
+            if not SHOW_LOOT then return end;
             RaidTab:SelectEncounterByDataIndex(self.dataIndex);
             RaidTab.AchievementContainer:SetAchievements(LandingPageUtil.GetEncounterAchievements(self.journalEncounterID));
             RaidTab.LootContainer:ShowLoot(self.journalInstanceID, self.journalEncounterID);
@@ -933,7 +953,7 @@ do
 
     function RaidTabMixin:OnShow()
         API.RegisterFrameForEvents(self, DynamicEvents);
-        LandingPageUtil.ShowLeftFrame(false);
+        LandingPageUtil.ShowLeftFrame(not SHOW_LOOT);
         self:FullUpdate();
     end
 
@@ -1123,14 +1143,19 @@ do
         ScrollView:AddTemplate("ListButton", ListButton_Create, ListButton_OnAcquired, ListButton_OnRemoved);
 
 
-        --Init LeftSection
+        --Init LeftSection (This section, achievements and loot, will be disabled on Timerunning characters)
         local offsetY = 16;
         local categoryButtonHeight = 32;
         local lineGap = 8;
         local paragraphGap = 8;
 
-        local LeftFrame = PlumberExpansionLandingPage.LeftSection;
-        local Header1 = LandingPageUtil.CreateListCategoryButton(self, ACHIEVEMENTS);
+        local LeftFrame = CreateFrame("Frame", nil, self);
+        self.LeftFrame = LeftFrame;
+        local LeftRef = PlumberExpansionLandingPage.LeftSection;
+        LeftFrame:SetPoint("TOPLEFT", LeftRef, "TOPLEFT", 0, 0);
+        LeftFrame:SetPoint("BOTTOMRIGHT", LeftRef, "BOTTOMRIGHT", 0, 0);
+
+        local Header1 = LandingPageUtil.CreateListCategoryButton(LeftFrame, ACHIEVEMENTS);
         Header1:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY);
         offsetY = offsetY + categoryButtonHeight + lineGap;
         Header1:SetCollapsible(true);
@@ -1138,7 +1163,7 @@ do
         local header1Bottom = offsetY;
         local achvContainerHeight = 48;
 
-        local AchievementContainer = CreateAchievementContainer(self);
+        local AchievementContainer = CreateAchievementContainer(LeftFrame);
         self.AchievementContainer = AchievementContainer;
         AchievementContainer:SetSize(192, achvContainerHeight);
         AchievementContainer:SetPoint("TOP", LeftFrame, "TOP", 0, -offsetY);
@@ -1146,11 +1171,11 @@ do
 
         local header2Top = offsetY;
 
-        local Header2 = LandingPageUtil.CreateListCategoryButton(self, LOOT_NOUN);
+        local Header2 = LandingPageUtil.CreateListCategoryButton(LeftFrame, LOOT_NOUN);
         Header2:SetPoint("TOP", LeftFrame, "TOP", 0, -header2Top);
         offsetY = offsetY + categoryButtonHeight + lineGap;
 
-        LootContainer = CreateLootContainer(self);
+        LootContainer = CreateLootContainer(LeftFrame);
         self.LootContainer = LootContainer;
         LootContainer:SetPoint("TOP", Header2, "BOTTOM", 0, - lineGap + 8);
         LootContainer:SetPoint("BOTTOM", LeftFrame, "BOTTOM", 0, 12);
@@ -1171,7 +1196,11 @@ do
         end
 
         local isAchievementCollapsed = addon.GetDBBool("LandingPage_Raid_CollapsedAchievement");
-        Header1:SetCollapsed(isAchievementCollapsed, true)
+        Header1:SetCollapsed(isAchievementCollapsed, true);
+
+        if not SHOW_LOOT then
+            LeftFrame:Hide();
+        end
     end
 
     --Frame Update

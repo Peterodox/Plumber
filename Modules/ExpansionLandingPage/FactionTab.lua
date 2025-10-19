@@ -562,6 +562,7 @@ local function CreateFactionButton(parent, clickable)
 
     return f
 end
+LandingPageUtil.CreateFactionButton = CreateFactionButton;
 
 
 local CreateRenownItemButton;
