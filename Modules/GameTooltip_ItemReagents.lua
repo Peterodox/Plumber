@@ -19,6 +19,10 @@ local ItemReagentCache = {};
 local ItemRecipeIDCache = {};   --Debug
 local QuantityOverride = {};
 
+local IgnoredItems = {
+    [254267] = true,    --Fragmented Memento of Epoch Challenges
+};
+
 
 local ItemSubModule = {};
 
@@ -73,7 +77,7 @@ function ItemSubModule:ProcessData(tooltip, itemID)
             end
         end
 
-        if ItemReagentCache[itemID] then
+        if ItemReagentCache[itemID] and not IgnoredItems[itemID] then
             tooltip:AddLine(" ");
             local info = ItemReagentCache[itemID];
             local name, count, quantityText, icon, maxOutput, numOuput;

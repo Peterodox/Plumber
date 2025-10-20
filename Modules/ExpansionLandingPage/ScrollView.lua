@@ -886,6 +886,10 @@ do  --ScrollView Content Update
     function ScrollViewMixin:ProcessActiveObjects(templateKey, processFunc)
         self.pools[templateKey]:ProcessActiveObjects(processFunc)
     end
+
+    function ScrollViewMixin:ReRenderContent()
+        self:SetContent(self.content);
+    end
 end
 
 do  --Create ScrollView in Tab

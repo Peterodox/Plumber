@@ -323,6 +323,9 @@ do
                         frame:SetPoint("BOTTOM", relativeTo, "BOTTOM", 0, 16);
                     end
                     frame:Refresh();
+                    if frame.OnShow and frame:IsVisible() then
+                        frame:OnShow();
+                    end
                 end
                 offsetY = offsetY + paragraphGap;
             end

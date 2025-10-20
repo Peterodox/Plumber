@@ -8,6 +8,7 @@
 	<Script file="SharedListButton.lua"/>
 	<Script file="API_Quest.lua"/>
 	<Script file="API_Encounter.lua"/>
+	<Script file="API_GroupFinder.lua"/>
 	<Script file="TooltipUpdator.lua"/>
 	<Script file="Search.lua"/>
 	<Script file="GreatVault.lua"/>

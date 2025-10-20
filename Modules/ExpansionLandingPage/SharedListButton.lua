@@ -21,8 +21,13 @@ do  --ScrollViewListButton
         self.Center:SetVertexColor(r, g, b);
     end
 
+    function SharedListButtonMixin:ShouldShowHighlight()
+        --Override when there is a child button
+        return self:IsMouseMotionFocus()
+    end
+
     function SharedListButtonMixin:UpdateVisual()
-        if self:IsMouseMotionFocus() then
+        if self:ShouldShowHighlight() then
             self.Left:SetTexCoord(0/512, 64/512, 128/512, 192/512);
             self.Right:SetTexCoord(448/512, 512/512, 128/512, 192/512);
             self.Center:SetTexCoord(64/512, 448/512, 128/512, 192/512);

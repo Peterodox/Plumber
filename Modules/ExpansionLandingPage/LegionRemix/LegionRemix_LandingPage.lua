@@ -25,19 +25,65 @@ local QUESTLINE_ID = 5902;  --Infinite Research
 
 local QuestInfoExtra = {
     --Artifact Ability related, show a button for quick switch
-    [90115] = {artifactTrackIndex = 1},
-    [92439] = {artifactTrackIndex = 2},
-    [92441] = {artifactTrackIndex = 3},
-    [92440] = {artifactTrackIndex = 4},
-    [92442] = {artifactTrackIndex = 5},
+    [90115] = {artifactTrackIndex = 1, actionIcon = 4667415},
+    [92439] = {artifactTrackIndex = 2, actionIcon = 1413862},
+    [92441] = {artifactTrackIndex = 3, actionIcon = 6891023},
+    [92440] = {artifactTrackIndex = 4, actionIcon = 839979},
+    [92442] = {artifactTrackIndex = 5, actionIcon = 1360764},
 
+
+    --Emerald Nightmare
     [89644] = {lfgDungeonID = 2844},   --Darkbough, Il'gynoth
     [89665] = {lfgDungeonID = 2845},   --Tormented Guardians, Cenarius
+    [89676] = {lfgDungeonID = 2846},   --Rift of Aln
+    [89680] = {openGroupFinder = true}, --The Emerald Nightmare, Mythic
+    [89679] = {openGroupFinder = true}, --The Emerald Nightmare, Heroic
+    [89677] = {openGroupFinder = true}, --The Emerald Nightmare, Normal
+
+
+    --Trial of Valor
+    [89681] = {lfgDungeonID = 2851},   --Trial of Valor
+    [89597] = {openGroupFinder = true}, --Trial of Valor, Mythic
+    [89596] = {openGroupFinder = true}, --Trial of Valor, Heroic
+    [89682] = {openGroupFinder = true}, --Trial of Valor, Normal
+
+
+    --Nighthold
+    [89678] = {lfgDungeonID = 2847},   --Arcing Aqueducts
+    [89683] = {lfgDungeonID = 2848},   --Royal Athenaeum
+    [89693] = {lfgDungeonID = 2849},   --Nightspire
+    [89594] = {lfgDungeonID = 2850},   --Betrayer's Rise
+    [89600] = {openGroupFinder = true}, --Nighthold, Mythic
+    [89599] = {openGroupFinder = true}, --Nighthold, Heroic
+    [89598] = {openGroupFinder = true}, --Nighthold, Normal
+
+
+    --Tomb
+    [89604] = {lfgDungeonID = 2835},   --The Gates of Hell
+    [89605] = {lfgDungeonID = 2836},   --Wailing Halls
+    [89606] = {lfgDungeonID = 2837},   --Chamber of the Avatar
+    [89607] = {lfgDungeonID = 2838},   --Deceiver's Fall
+    [89603] = {openGroupFinder = true}, --Tomb of Sargeras, Mythic
+    [89602] = {openGroupFinder = true}, --Tomb of Sargeras, Heroic
+    [89622] = {openGroupFinder = true}, --Tomb of Sargeras, Normal
+
+
+    --Antorus
+    [89466] = {lfgDungeonID = 2821},   --Light's Breach
+    [89467] = {lfgDungeonID = 2822},   --Forbidden Descent
+    [89590] = {lfgDungeonID = 2823},   --Hope's End
+    [89591] = {lfgDungeonID = 2823},   --Seat of the Pantheon
+    [89601] = {openGroupFinder = true}, --Antorus, the Burning Throne, Mythic
+    [89595] = {openGroupFinder = true}, --Antorus, the Burning Throne, Heroic
+    [89592] = {openGroupFinder = true}, --Antorus, the Burning Throne, Normal
 };
 
 local SpecialAssignments = {
     --Not part of the meta quest line. One-off?
     93112, 93113, 93114, 93116, 93117, 93118, 93120,
+
+    --Artifact Ability too?
+    90115, 92439, 92440, 92441, 92442,
 };
 
 local IgnoredQuests = {
@@ -100,10 +146,13 @@ do  --LeftFrame: NextTraitFrame
 
     function NextTraitFrameMixin:OnShow()
         self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+        self:RegisterEvent("TRAIT_CONFIG_UPDATED");
+        self:Refresh();
     end
 
     function NextTraitFrameMixin:OnHide()
         self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+        self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
     end
 
     function NextTraitFrameMixin:OnEvent(event, ...)
@@ -112,6 +161,8 @@ do  --LeftFrame: NextTraitFrame
             if currencyID == 3268 then
                 self:RequestUpdate();
             end
+        elseif event == "TRAIT_CONFIG_UPDATED" then
+            self:RequestUpdate();
         end
     end
 
@@ -146,12 +197,18 @@ do  --LeftFrame: NextTraitFrame
         ProgressDisplay:SetPoint("TOP", f, "TOP", 0, -paddingV);
         ProgressDisplay:SetScale(1.25);
         ProgressDisplay.ProgressBar:SetSwipeColor(244/255, 186/255, 130/255);
+        ProgressDisplay:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 
         function ProgressDisplay:ShowTooltip()
 
         end
 
-        function ProgressDisplay.onClickFunc(button)
+        function ProgressDisplay.onClickFunc(self, button)
+            if button == "RightButton" and IsShiftKeyDown() and (not InCombatLockdown()) then
+                SocketInventoryItem(16);
+                return
+            end
+
             if addon.RemixAPI then
                 addon.RemixAPI.ToggleArtifactUI();
             end
@@ -236,35 +293,215 @@ do  --LeftFrame: NextTraitFrame
 end
 
 
+local ExecuteButtonMode = {
+    Artifact = 1,
+    QueueLFG = 2,
+    GroupFinder = 3,
+};
 
-local RightButtonMixin = {};
+local ExecuteButtonMixin = {};
 do  --A button on the right of the ListButton. Perform actions like like changing artifact ability or queue LFR
-    function RightButtonMixin:OnEnter()
+    local InCombatLockdown = InCombatLockdown;
+
+
+    function ExecuteButtonMixin:OnEnter()
+        self:UpdateVisual();
         self:GetParent():HideTooltip();
+        self:GetParent():UpdateVisual();
         self:ShowTooltip();
     end
 
-    function RightButtonMixin:OnLeave()
+    function ExecuteButtonMixin:OnLeave()
+        self:UpdateVisual();
         GameTooltip:Hide();
         if self:IsVisible() and self:GetParent():IsMouseMotionFocus() then
             self:GetParent():OnEnter();
+        else
+            self:GetParent():UpdateVisual();
         end
     end
 
-    function RightButtonMixin:ShowTooltip()
-        local tooltip = GameTooltip;
-        tooltip:SetOwner(self, "ANCHOR_RIGHT");
-        tooltip:SetText("Click to queue Darkbough", 1, 0.82, 0, 1, true);
-        tooltip:Show();
+    function ExecuteButtonMixin:UpdateVisual()
+        if self.enabled then
+            if self:IsMouseMotionFocus() then
+                self.Highlight:Show();
+                self.Text:SetTextColor(1, 1, 1);
+            else
+                self.Highlight:Hide();
+                self.Text:SetTextColor(1, 0.82, 0);
+            end
+        else
+            self.Highlight:Hide();
+            self.Text:SetTextColor(0.5, 0.5, 0.5);
+        end
     end
 
-    function RightButtonMixin:OnMouseDown()
-        PlumberExpansionLandingPage:Lower();
+    function ExecuteButtonMixin:ShowTooltip()
+        if self.tooltip then
+            local tooltip = GameTooltip;
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            tooltip:SetText(self.tooltip, 1, 0.82, 0, 1, true);
+            tooltip:Show();
+        elseif self.mode == ExecuteButtonMode.QueueLFG then
+            LandingPageUtil.GetQueueStatus();
+        else
+            GameTooltip:Hide();
+        end
     end
 
-    function RightButtonMixin:OnClick()
+    function ExecuteButtonMixin:OnMouseDown()
+        if self.enabled then
+            PlumberExpansionLandingPage:Lower();
+            self.Text:SetPoint("CENTER", self, "CENTER", 0, -1);
+        end
+    end
+
+    function ExecuteButtonMixin:OnMouseUp()
+        self.Text:SetPoint("CENTER", self, "CENTER", 0, 0);
+    end
+
+    function ExecuteButtonMixin:OnClick()
         if self.onClickFunc then
             self.onClickFunc();
+        end
+    end
+
+    function ExecuteButtonMixin:OnDoubleClick()
+
+    end
+
+    function ExecuteButtonMixin:Update()
+
+    end
+
+    function ExecuteButtonMixin:OnHide()
+        self:SetScript("OnUpdate", nil);
+        self.t = 0;
+    end
+
+    function ExecuteButtonMixin:ListenEvents(state)
+        if not state then
+            if self.hasEvents then
+                self.hasEvents = nil;
+                self:UnregisterAllEvents();
+            end
+        end
+    end
+
+    function ExecuteButtonMixin:OnEvent(event, ...)
+        self:RequestUpdate();
+    end
+
+    function ExecuteButtonMixin:RequestUpdate()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function ExecuteButtonMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.2 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            self:Update();
+            if self:IsMouseMotionFocus() then
+                self:ShowTooltip();
+            end
+        end
+    end
+
+    do  --Actions
+        function ExecuteButtonMixin:SetArtifactTrack(artifactTrackIndex)
+            self.mode = ExecuteButtonMode.Artifact;
+            self.artifactTrackIndex = artifactTrackIndex;
+            self:RegisterEvent("TRAIT_CONFIG_UPDATED");
+            self.hasEvents = true;
+            self.Update = self.UpdateArtifactTrack;
+            self:Update();
+            self.onClickFunc = function()
+                addon.RemixAPI.ActivateArtifactTrack(artifactTrackIndex);
+            end
+        end
+
+        function ExecuteButtonMixin:UpdateArtifactTrack()
+            local index = addon.RemixAPI.GetActiveArtifactTrackIndex();
+            if self.artifactTrackIndex and self.artifactTrackIndex ~= index then
+                self.enabled = true;
+                self.Text:SetText(SWITCH);
+                local spellName = addon.RemixAPI.GetArtifactTrackName(self.artifactTrackIndex);
+                self.tooltip = L["Click To Switch"]:format(spellName);
+            else
+                self.enabled = false;
+                self.Text:SetText(SPEC_ACTIVE);
+                self.tooltip = nil;
+            end
+            self:UpdateVisual();
+        end
+
+        function ExecuteButtonMixin:SetQueueLFG(lfgDungeonID)
+            self.mode = ExecuteButtonMode.QueueLFG;
+            self.lfgDungeonID = lfgDungeonID;
+            self:RegisterEvent("LFG_UPDATE");
+            self:RegisterEvent("LFG_QUEUE_STATUS_UPDATE");
+            self.hasEvents = true;
+            self.Update = self.UpdateQueueLFG;
+            self:Update();
+            self.onClickFunc = function()
+                LandingPageUtil.TryJoinLFG(lfgDungeonID);
+
+                --[[
+                    if not RaidFinderFrame:IsVisible() then
+                        PVEFrame_ShowFrame("GroupFinderFrame", RaidFinderFrame);
+                    end
+                    RaidFinderQueueFrame_SetRaid(lfgDungeonID);
+                    PlumberExpansionLandingPage:Lower();
+                    --]]
+                --]]
+            end
+        end
+
+        function ExecuteButtonMixin:UpdateQueueLFG()
+            self.Text:SetText(L["Join Queue"]);
+            local disabledReason = LandingPageUtil.GetLFGDisabledReason();
+            if disabledReason then
+                self.enabled = false;
+                self.tooltip = disabledReason;
+            elseif LandingPageUtil.IsQueuingDungeon(self.lfgDungeonID) then
+                self.enabled = false;
+                self.tooltip = nil;
+                self.Text:SetText(L["In Queue"]);
+            else
+                self.enabled = true;
+                local raidName = GetLFGDungeonInfo(self.lfgDungeonID);
+                self.tooltip = L["Click To Queue"]:format(raidName or RAID);
+            end
+            self:UpdateVisual();
+        end
+
+        function ExecuteButtonMixin:SetGroupFinder()
+            self.mode = ExecuteButtonMode.GroupFinder;
+            self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED");
+            self.hasEvents = true;
+            self.Update = self.UpdateGroupFinder;
+            self:Update();
+            self.onClickFunc = function()
+                if not LFGListPVEStub:IsVisible() then
+                    if not InCombatLockdown() then
+                        PVEFrame_ShowFrame("GroupFinderFrame", LFGListPVEStub);
+                    end
+                end
+            end
+        end
+
+        function ExecuteButtonMixin:UpdateGroupFinder()
+            self.Text:SetText(DUNGEONS_BUTTON);
+            if InCombatLockdown() then
+                self.enabled = false;
+                self.tooltip = nil;
+            else
+                self.enabled = true;
+                self.tooltip = L["Click to Open Format"]:format(DUNGEONS_BUTTON);
+            end
+            self:UpdateVisual();
         end
     end
 end
@@ -281,7 +518,7 @@ do  --List Button
     function ListButtonMixin:OnEnter()
         self:UpdateVisual();
 
-        if not self.RightButton:IsMouseMotionFocus() then
+        if not self.ExecuteButton:IsMouseMotionFocus() then
             self:ShowTooltip();
         end
     end
@@ -302,8 +539,16 @@ do  --List Button
         self.Icon:SetTexCoord(0, 1, 0, 1);
         self.completed = nil;
         self.readyForTurnIn = nil;
-        self.artifactTrackIndex = nil;
-        self.RightButton:Hide();
+        self.ExecuteButton:Hide();
+        self.ExecuteButton:UnregisterAllEvents();
+    end
+
+    function ListButtonMixin:MuteExecuteButton()
+        self.ExecuteButton:ListenEvents(false);
+    end
+
+    function ListButtonMixin:ShouldShowHighlight()
+        return self:IsMouseMotionFocus() or self.ExecuteButton:IsMouseMotionFocus()
     end
 
     function ListButtonMixin:SetQuestHeader(questID)
@@ -325,56 +570,45 @@ do  --List Button
         self:Layout();
         self:UpdateVisual();
 
+        local checkExecuteButton;
+
         if self.completed then
             self.Icon:SetAtlas("checkmark-minimal-disabled");
         elseif self.readyForTurnIn then
             self.Icon:SetAtlas("QuestTurnin");
         else
+            checkExecuteButton = true;
             self.Icon:SetTexture(QuestIcons.InProgress);
         end
 
-        local rightButtonType;
+        local buttonMode;
         local extraInfo = QuestInfoExtra[questID];
-        if extraInfo then
-            self.artifactTrackIndex = extraInfo.artifactTrackIndex;
+
+        if checkExecuteButton and extraInfo then
             if extraInfo.artifactTrackIndex then
                 if not (self.completed or self.readyForTurnIn) then
-                    rightButtonType = 1;
+                    buttonMode = ExecuteButtonMode.Artifact;
                 end
             elseif extraInfo.lfgDungeonID then
-                rightButtonType = 2;
-            elseif extraInfo.premadeGroup then
-                rightButtonType = 3;
+                buttonMode = ExecuteButtonMode.QueueLFG;
+            elseif extraInfo.openGroupFinder then
+                buttonMode = ExecuteButtonMode.GroupFinder;
             end
         end
 
-        self.RightButton.onClickFunc = nil;
-        if rightButtonType then
-            self.RightButton:Show();
-            if rightButtonType == 1 then
-                self.RightButton.Text:SetText("Switch");
-            elseif rightButtonType == 2 then
-                self.RightButton.Text:SetText("Queue");
+        self.ExecuteButton.onClickFunc = nil;
+        if buttonMode then
+            if buttonMode == ExecuteButtonMode.Artifact then
+                self.ExecuteButton:SetArtifactTrack(extraInfo.artifactTrackIndex);
+            elseif buttonMode == ExecuteButtonMode.QueueLFG then
                 local lfgDungeonID = QuestInfoExtra[questID].lfgDungeonID;
-                self.RightButton.onClickFunc = function()
-                    --[[
-                    if not RaidFinderFrame:IsVisible() then
-                        PVEFrame_ShowFrame("GroupFinderFrame", RaidFinderFrame);
-                    end
-                    RaidFinderQueueFrame_SetRaid(lfgDungeonID);
-                    PlumberExpansionLandingPage:Lower();
-                    --]]
-
-                    if API.CanPlayerQueueLFG() then
-                        JoinSingleLFG(LE_LFG_CATEGORY_RF or 3, lfgDungeonID); --Direct approach
-                    end
-                end
-                --RaidFinderQueueFrame_SetRaid
-            elseif rightButtonType == 3 then
-                self.RightButton.Text:SetText("Group Finder");
+                self.ExecuteButton:SetQueueLFG(lfgDungeonID);
+            elseif buttonMode == ExecuteButtonMode.GroupFinder then
+                self.ExecuteButton:SetGroupFinder();
             end
+            self.ExecuteButton:Show();
         else
-            self.RightButton:Hide();
+            self.ExecuteButton:Hide();
         end
     end
 
@@ -417,24 +651,54 @@ do  --List Button
         f:SetScript("OnClick", f.OnClick);
 
 
-        local RightButton = CreateFrame("Button", nil, f);
-        RightButton:Hide();
-        f.RightButton = RightButton;
-        API.Mixin(RightButton, RightButtonMixin);
-        RightButton:SetSize(64, 25);
-        RightButton:SetPoint("RIGHT", f, "RIGHT", 0, 0);
+        local buttonWidth = 120;
+        local eb = CreateFrame("Button", nil, f);
+        f.ExecuteButton = eb;
+        eb:Hide();
+        API.Mixin(eb, ExecuteButtonMixin);
+        eb:SetSize(buttonWidth, 25);
+        eb:SetPoint("RIGHT", f, "RIGHT", 0, 0);
 
-        RightButton.Text = RightButton:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        RightButton.Text:SetPoint("CENTER", RightButton, "CENTER", 0, 0);
-        RightButton.Text:SetText("Switch");
-        RightButton.Text:SetTextColor(1, 0.82, 0);
+        local bg1 = eb:CreateTexture(nil,  "BACKGROUND");
+        bg1:SetSize(32, 32);
+        bg1:SetPoint("LEFT", eb, "LEFT", -24, 0);
+        local bg2 = eb:CreateTexture(nil,  "BACKGROUND");
+        bg2:SetHeight(32);
+        bg2:SetPoint("LEFT", bg1, "RIGHT", 0, 0);
+        bg2:SetPoint("RIGHT", f, "RIGHT", 0, 0);
+        local file = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga";
+        bg1:SetTexture(file);
+        bg2:SetTexture(file);
+        bg1:SetTexCoord(0, 64/512, 416/512, 480/512);
+        bg2:SetTexCoord(64/512, 192/512, 416/512, 480/512);
 
-        RightButton:SetScript("OnEnter", RightButton.OnEnter);
-        RightButton:SetScript("OnLeave", RightButton.OnLeave);
-        RightButton:SetScript("OnClick", RightButton.OnClick);
-        RightButton:SetScript("OnMouseDown", RightButton.OnMouseDown);
+        eb.Highlight = eb:CreateTexture(nil,  "ARTWORK");
+        eb.Highlight:Hide();
+        eb.Highlight:SetSize(96, 32);
+        eb.Highlight:SetTexture(file);
+        eb.Highlight:SetBlendMode("ADD");
+        eb.Highlight:SetAlpha(0.1);
+        eb.Highlight:SetTexCoord(232/512, 424/512, 416/512, 480/512);
+        eb.Highlight:SetPoint("LEFT", eb, "LEFT", -24, 0);
 
-        RightButton:SetPropagateMouseMotion(true);
+        eb.Text = eb:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        eb.Text:SetWidth(buttonWidth - 12);
+        eb.Text:SetMaxLines(1);
+        eb.Text:SetPoint("CENTER", eb, "CENTER", 0, 0);
+        eb.Text:SetTextColor(1, 0.82, 0);
+
+        --eb.Icon = eb:CreateTexture(nil, "OVERLAY");
+        --eb.Icon:SetSize(18, 18);
+        --eb.Icon:SetPoint("CENTER", eb, "CENTER", 0, 0);
+
+        eb:SetScript("OnEnter", eb.OnEnter);
+        eb:SetScript("OnLeave", eb.OnLeave);
+        eb:SetScript("OnClick", eb.OnClick);
+        eb:SetScript("OnDoubleClick", eb.OnDoubleClick);
+        eb:SetScript("OnMouseDown", eb.OnMouseDown);
+        eb:SetScript("OnMouseUp", eb.OnMouseUp);
+        eb:SetScript("OnHide", eb.OnHide);
+        eb:SetScript("OnEvent", eb.OnEvent);
 
         return f
     end
@@ -463,6 +727,11 @@ do
         self:SetScript("OnUpdate", nil);
         self:SetScript("OnEvent", nil);
         API.UnregisterFrameForEvents(self, DynamicEvents);
+        self.ScrollView:CallObjectMethod("ListButton", "MuteExecuteButton");
+    end
+
+    function ActivityTabMixin:OnEvent(event, ...)
+        self:RequestUpdate();
     end
 
     local function SortFunc_PrioritizeNotFinished(a, b)
@@ -484,7 +753,7 @@ do
 
         local showCompleted = not addon.GetDBBool("LandingPage_Activity_HideCompleted");
         local showActivity = true;
-        local hideFinishedObjectives = true;   --debug
+        local hideFinishedObjectives = true;
 
         local buttonHeight = 24;
         local gap = 4;
@@ -575,7 +844,14 @@ do
             --Nothing to show
         end
 
-        local retainPosition = false;
+        local retainPosition;
+        if showCompleted ~= self.showCompleted then
+            self.showCompleted = showCompleted;
+            retainPosition = false;
+        else
+            retainPosition = true;
+        end
+
         self.ScrollView:Show();
         self.ScrollView:SetContent(content, retainPosition);
 
@@ -646,9 +922,13 @@ do
         QuestIDList = C_QuestLine.GetQuestLineQuests(QUESTLINE_ID) or {};
         for _, questID in ipairs(SpecialAssignments) do
             table.insert(QuestIDList, questID);
-            QuestInfoExtra[questID] = {
-                shownIfOnQuest = true,
-            };
+            if QuestInfoExtra[questID] then
+                QuestInfoExtra[questID].shownIfOnQuest = true;
+            else
+                QuestInfoExtra[questID] = {
+                    shownIfOnQuest = true,
+                };
+            end
         end
     end
 end
@@ -670,6 +950,9 @@ local EncounterTabInfo = {  --Encounter / Raids
     JournalInstanceIDs = {
         768,    --Emerald Nightmare
         861,    --Trial of Valor
+        786,    --Nighthold
+        875,    --Tomb
+        946,    --Antorus
     },
 };
 

@@ -407,6 +407,9 @@ L["Fully Upgraded"] = AZERITE_EMPOWERED_ITEM_FULLY_UPGRADED or "Fully Upgraded";
 L["Unlock Level Requirement Format"] = "Reach level %d to unlock";
 L["Auto Learn Traits"] = "Auto Learn Traits";
 L["Auto Learn Traits Tooltip"] = "Automatically upgrade artifact traits when you have enough Infinite Power";
+L["Infinite Power Yield Format"] = "Grant |cffffffff%s|r Power at your current Knowledge level.";
+L["Infinite Knowledge Bonus Format"] = "Current Bonus: |cffffffff%s|r";
+L["Infinite Knowledge Bonus Next Format"] = "Next Rank: %s";
 
 
 --ItemUpgradeUI
@@ -554,6 +557,11 @@ L["Weekly Coffer Key Shards Tooltip"] = "The first four weekly caches you earn e
 L["Weekly Cap"] = "Weekly Cap";
 L["Weekly Cap Reached"] = "Weekly cap reached.";
 L["Instruction Right Click To Use"] = "<Right Click to Use>";
+L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Join Queue";
+L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "In Queue";
+L["Click To Switch"] = "Click to switch to |cffffffff%s|r";
+L["Click To Queue"] = "Click to queue for |cffffffff%s|r";
+L["Click to Open Format"] = "Click to open %s";
 
 
 --Generic
