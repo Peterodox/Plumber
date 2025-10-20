@@ -151,9 +151,10 @@ do  --"Public" Method
 
         if not activeID then return end;
 
+        --TO-DO: Show queue progress
         local hasData, leaderNeeds, tankNeeds, healerNeeds, dpsNeeds, totalTanks, totalHealers, totalDPS, instanceType, instanceSubType, instanceName, averageWait, tankWait, healerWait, damageWait, myWait, queuedTime = GetLFGQueueStats(category, activeID);
-        print(instanceName, averageWait, queuedTime);
-        print(tankNeeds, healerNeeds, dpsNeeds, totalTanks, totalHealers, totalDPS);
+        --print(instanceName, averageWait, queuedTime);
+        --print(tankNeeds, healerNeeds, dpsNeeds, totalTanks, totalHealers, totalDPS);
 
         --tankNeeds: remaining number
     end
