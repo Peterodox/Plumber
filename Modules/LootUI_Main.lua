@@ -17,7 +17,6 @@ local GetItemCount = C_Item.GetItemCount;
 local GetCursorPosition = GetCursorPosition;
 local IsDressableItemByID = C_Item.IsDressableItemByID or API.Nop;
 local QualityColorGetter = API.GetItemQualityColor;
-local IsInteractingWithNpcOfType = C_PlayerInteractionManager.IsInteractingWithNpcOfType;
 
 
 -- User Settings
@@ -1622,6 +1621,16 @@ do  --UI Basic
         self:SetBackgroundSize(backgroundWidth * scale, (frameHeight + Formatter.ICON_BUTTON_HEIGHT) * scale);
     end
 
+    function MainFrame:GetFocusedItemFrame()
+        if self.activeFrames then
+            for i, itemFrame in ipairs(self.activeFrames) do
+                if itemFrame:IsMouseOver() then
+                    return itemFrame
+                end
+            end
+        end
+    end
+
     function MainFrame:EnableHeaderWidgets(state)
         for _, widget in ipairs(self.HeaderWidgets) do
             widget:SetEnabled(state);
@@ -1791,16 +1800,7 @@ do  --UI Basic
     end
 
     function MainFrame:OnShow()
-        if IsInteractingWithNpcOfType(40) then
-            --Lower frame strata when using Scrapping Machine
-            self:SetFrameStrata("LOW");
-        else
-            if self.inEditMode then
-                self:SetFrameStrata("HIGH");
-            else
-                self:SetFrameStrata("DIALOG");
-            end
-        end
+        self:UpdateFrameStrata();
     end
     MainFrame:SetScript("OnShow", MainFrame.OnShow);
 
@@ -1819,10 +1819,17 @@ do  --UI Basic
 
     function MainFrame:OnEvent(event, ...)
         if event == "GLOBAL_MOUSE_UP" then
-            local button = ...
-            if button == "RightButton" and self:IsMouseOver() then
-                CloseLoot();
-                self:TryHide(true);
+            if self:IsMouseOver() then
+                local button = ...
+                if button == "RightButton" then
+                    CloseLoot();
+                    self:TryHide(true);
+                elseif (not (self.manualMode or self.inEditMode)) and button == "LeftButton" and not InCombatLockdown() then
+                    local itemFrame = self:GetFocusedItemFrame();
+                    if itemFrame then
+                        itemFrame:OnClick("LeftButton");
+                    end
+                end
             end
         end
     end

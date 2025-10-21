@@ -1897,5 +1897,5 @@ local function ToggleArtifactUI()
     MainFrame:SetShown(state);
 end
 RemixAPI.ToggleArtifactUI = ToggleArtifactUI;
-_G.Plumber_ToggleArtifactUI = ToggleArtifactUI;
+_G.Plumber_ToggleArtifactUI = ToggleArtifactUI; --Globals
 _G.Plumber_ToggleArtifactUIForNarcissus = ToggleArtifactUI; --For legacy version

@@ -354,6 +354,15 @@ local function CreateScrollView(parent)
     f.ScrollBar:SetFrameLevel(f:GetFrameLevel() + 10);
     f.ScrollBar:UpdateThumbRange();
 
+    f.NoContentAlert = f:CreateFontString(nil, "ARTWORK", "PlumberFont_16");
+    f.NoContentAlert:Hide();
+    f.NoContentAlert:SetPoint("LEFT", f, "LEFT", 16, 16);
+    f.NoContentAlert:SetPoint("RIGHT", f, "RIGHT", -16, 16);
+    f.NoContentAlert:SetSpacing(2);
+    f.NoContentAlert:SetJustifyH("CENTER");
+    f.NoContentAlert:SetText(addon.L["List Is Empty"]);
+    f.NoContentAlert:SetTextColor(0.5, 0.5, 0.5);
+
     return f
 end
 API.CreateScrollView = CreateScrollView;
@@ -507,9 +516,16 @@ do  --ScrollView Basic Content Render
                 range = range + self.bottomOvershoot;
             end
             self:SetScrollRange(range);
+            self.NoContentAlert:Hide();
         else
             self:SetScrollRange(0);
+            if self.showNoContentAlert then
+                self.NoContentAlert:Show();
+            else
+                self.NoContentAlert:Hide();
+            end
         end
+
         self:ReleaseAllObjects();
 
         if retainPosition then
@@ -824,6 +840,10 @@ do  --ScrollView Scroll Behavior
         if self.BottomGradient then
             self.BottomGradient:SetHeight(size);
         end
+    end
+
+    function ScrollViewMixin:SetShowNoContentAlert(showNoContentAlert)
+        self.showNoContentAlert = showNoContentAlert;
     end
 end
 

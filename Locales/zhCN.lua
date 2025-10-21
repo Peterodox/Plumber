@@ -454,6 +454,8 @@ L["LootUI Option Grow Direction Tooltip 2"] = "未勾选时：窗口左上角位
 L["Junk Items"] = "垃圾物品";
 L["LootUI Option Combine Items"] = "合并相似物品";
 L["LootUI Option Combine Items Tooltip"] = "在同一行显示相似物品。目前支持的分类为：\n\n- 垃圾物品\n- 纪元纪念品（军团再临：幻境新生）";
+L["LootUI Option Low Frame Strata"] = "置于底层";
+L["LootUI Option Low Frame Strata Tooltip"] = "在处于通知模式时，将拾取窗口置于其他界面的后方。\n\n此选项不影响手动拾取模式。";
 
 
 --Quick Slot For Third-party Dev
@@ -529,6 +531,7 @@ L["In Queue"] = "在队列中";
 L["Click To Switch"] = "点击以切换为|cffffffff%s|r";
 L["Click To Queue"] = "点击以加入|cffffffff%s|r";
 L["Click to Open Format"] = "点击以打开%s";
+L["List Is Empty"] = "暂无可显示内容";
 
 
 --Generic

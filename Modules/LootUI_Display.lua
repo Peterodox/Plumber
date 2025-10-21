@@ -65,6 +65,7 @@ local REPLACE_LOOT_ALERT = true;
 local LOOT_UNDER_MOUSE = false;
 local USE_STOCK_UI = false;
 local MERGE_SIMILAR_ITEMS = true;
+local LOW_FRAME_STRATA = false;
 ------------------
 
 local CLASS_SORT_ORDER = {
@@ -1519,12 +1520,12 @@ do  --Edit Mode
     end
 
     function MainFrame:EnterEditMode()
-        self:SetFrameStrata("HIGH");
         EL:ListenStaticEvent(false);
         EL.overflowCurrencies = nil;
 
         self.errorMode = nil;
         self.inEditMode = true;
+        self:UpdateFrameStrata();
         self:ShowSampleItems();
 
         if not self.Selection then
@@ -1542,8 +1543,6 @@ do  --Edit Mode
     end
 
     function MainFrame:ExitEditMode()
-        self:SetFrameStrata("DIALOG");
-
         if ENABLE_MODULE then
             EL:ListenStaticEvent(true);
         end
@@ -1552,7 +1551,7 @@ do  --Edit Mode
         self:Disable();
         self:SetAlpha(0);
         self:Hide();
-
+        self:UpdateFrameStrata();
         self:EnableHeaderWidgets(true);
 
         if self.Selection then
@@ -1691,6 +1690,7 @@ do  --Edit Mode
             {type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return C_ColorOverrides and ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
             {type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
             {type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItems"},
+            {type = "Checkbox", label = L["LootUI Option Low Frame Strata"], tooltip = L["LootUI Option Low Frame Strata Tooltip"], onClickFunc = nil, dbKey = "LootUI_LowFrameStrata"},
             {type = "Divider"},
             {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
             {type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
@@ -1814,6 +1814,32 @@ do  --Edit Mode
         MERGE_SIMILAR_ITEMS = state;
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItems", SettingChanged_CombineItems);
+
+    local function SettingChanged_LowFrameStrata(state, userInput)
+        LOW_FRAME_STRATA = state;
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_LowFrameStrata", SettingChanged_LowFrameStrata);
+end
+
+
+do  --Dynamic Frame Strata
+    local IsInteractingWithNpcOfType = C_PlayerInteractionManager.IsInteractingWithNpcOfType;
+
+    function MainFrame:UpdateFrameStrata()
+        if IsInteractingWithNpcOfType(40) then
+            --Lower frame strata when using Scrapping Machine so our window appear behind bag UI
+            self:SetFrameStrata("LOW");
+        else
+            if self.inEditMode then
+                self:SetFrameStrata("HIGH");
+            elseif LOW_FRAME_STRATA and not self.manualMode then
+                self:SetFrameStrata("MEDIUM");
+                self:Lower();
+            else
+                self:SetFrameStrata("DIALOG");
+            end
+        end
+    end
 end
 
 
@@ -1937,7 +1963,7 @@ do  --Module Registry
         description = addon.L["ModuleDescription LootUI"],
         toggleFunc = EnableModule,
         categoryID = 1,
-        uiOrder = 1115,
+        uiOrder = 0,
         moduleAddedTime = 1727793830,
         optionToggleFunc = OptionToggle_OnClick,
 

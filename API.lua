@@ -7,6 +7,7 @@ local tonumber = tonumber;
 local match = string.match;
 local format = string.format;
 local gsub = string.gsub;
+local find = string.find;
 local tinsert = table.insert;
 local tremove = table.remove;
 local floor = math.floor;
@@ -4034,6 +4035,30 @@ do  --Locale-dependent API
             else
                 return 1
             end
+        end
+    end
+
+    if locale == "zhCN" or locale == "zhTW" then
+        function API.RemoveTextBeforeColon(text)
+            if find(text, ": ") then
+                return match(text, ": (.+)");
+            elseif find(text, "：") then
+                return match(text, "：(.+)");
+            else
+                return text
+            end
+        end
+    else
+        function API.RemoveTextBeforeColon(text)
+            if find(text, ":") then
+                text = match(text, ":%s*(.+)");
+            end
+
+            if find(text, "- ") then
+                text = match(text, "- (.+)");
+            end
+
+            return text
         end
     end
 end

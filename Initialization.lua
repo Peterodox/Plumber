@@ -231,6 +231,7 @@ local DefaultValues = {
         LootUI_ReplaceDefaultAlert = false,
         LootUI_UseStockUI = false,
         LootUI_CombineItems = false,
+        LootUI_LowFrameStrata = false,
 
 
     --Unified Map Pin System

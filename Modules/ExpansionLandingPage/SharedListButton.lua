@@ -108,6 +108,9 @@ do  --ScrollViewListButton
         self.Name:SetPoint("LEFT", self, "LEFT", textOffset, 0);
     end
 
+    function SharedListButtonMixin:ShowGlow(showGlow)
+        self.Glow:SetShown(showGlow);
+    end
 
     function CreateSharedListButton(parent)
         local f = CreateFrame("Button", nil, parent);
@@ -318,10 +321,6 @@ do  --Generic Checklist Button
 
     function ChecklistButtonMixin:DisplayTooltip()
 
-    end
-
-    function ChecklistButtonMixin:ShowGlow(showGlow)
-        self.Glow:SetShown(showGlow);
     end
 
     local function CreateChecklistButton(parent)

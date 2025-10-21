@@ -118,7 +118,7 @@ do
         description = L["ModuleDescription NewExpansionLandingPage"],
         toggleFunc = EL.EnableModule,
         categoryID = 1,
-        uiOrder = 0,
+        uiOrder = -10,
         moduleAddedTime = 1750160000,
     };
 

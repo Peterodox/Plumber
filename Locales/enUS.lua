@@ -455,6 +455,8 @@ L["LootUI Option Grow Direction Tooltip 2"] = "When disabled: the top left of th
 L["Junk Items"] = "Junk Items";
 L["LootUI Option Combine Items"] = "Combine Similar Items";
 L["LootUI Option Combine Items Tooltip"] = "Display similar items on a single row. Supported Categories:\n\n- Junk Items\n- Epoch Mementos (Legion Remix)";
+L["LootUI Option Low Frame Strata"] = "Send to Back";
+L["LootUI Option Low Frame Strata Tooltip"] = "While in Loot Notification Mode, place the loot window behind other UI.\n\nThis option doesn't affect Manual Loot Mode.";
 
 
 --Quick Slot For Third-party Dev
@@ -562,6 +564,7 @@ L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "In Queue";
 L["Click To Switch"] = "Click to switch to |cffffffff%s|r";
 L["Click To Queue"] = "Click to queue for |cffffffff%s|r";
 L["Click to Open Format"] = "Click to open %s";
+L["List Is Empty"] = "The list is empty.";
 
 
 --Generic

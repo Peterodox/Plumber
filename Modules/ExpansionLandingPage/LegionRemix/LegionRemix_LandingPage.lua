@@ -5,6 +5,9 @@ local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil;
 local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 local GetQuestProgressInfo = API.GetQuestProgressInfo;
+local RemoveTextBeforeColon = API.RemoveTextBeforeColon;
+local GetAchievementInfo = GetAchievementInfo;
+local C_TaskQuest_IsActive = C_TaskQuest.IsActive;
 
 
 local ActivityTab;
@@ -86,6 +89,30 @@ local SpecialAssignments = {
     90115, 92439, 92440, 92441, 92442,
 };
 
+local WorldBosses = {
+    --[QuestID] = {Info},   --We get the creature name from achievement
+
+    [43513] = {uiMapID = 680, achievementID = 42637},   --Na'zak the Fiend, Suramar
+    [43512] = {uiMapID = 680, achievementID = 42559},   --Ana-Mouz, Suramar
+
+    [43192] = {uiMapID = 630, achievementID = 42527},   --Levantus, Terror of the Deep, Azsuna
+    [44287] = {uiMapID = 630, achievementID = 42669},   --Withered J'im, DEADLY: Withered J'im, Azsuna
+    [43193] = {uiMapID = 630, achievementID = 42526},   --Calamir, Calamitous Intent, Azsuna
+
+    [43448] = {uiMapID = 650, achievementID = 42542},   --Drugon the Frostblood, The Frozen King, Highmountain
+
+    [42779] = {uiMapID = 641, achievementID = 42659},   --Shar'thos, The Sleeping Corruption, Val'sharah
+    [42819] = {uiMapID = 641, achievementID = 42529},   --Humongris, Pocket Wizard, Val'sharah
+
+    [42269] = {uiMapID = 634, achievementID = 42610},   --The Soultakers, Stormheim
+    [42270] = {uiMapID = 634, achievementID = 42536},   --Nithogg, Scourge of the Skies, Stormheim
+
+    [46947] = {uiMapID = 646, achievementID = 42643},   --Brutallus, Broken Shore
+    [46948] = {uiMapID = 646, achievementID = 42629},   --Malificus, Broken Shore
+    [46945] = {uiMapID = 646, achievementID = 42530},   --Si'vash, Broken Shore
+    [47061] = {uiMapID = 646, achievementID = 42662},   --Apocron, Broken Shore
+};
+
 local IgnoredQuests = {
     --There are a few intro quests in the Infinite Research quest line
     [89476] = true,
@@ -97,6 +124,12 @@ local IgnoredQuests = {
     [91612] = true,
     [92430] = true,
 };
+
+
+local function GetInfoFromAchievement(achievementID)
+    local _, name, _, completed = GetAchievementInfo(achievementID);
+    return name, completed
+end
 
 
 do  --LeftFrame: NextTraitFrame
@@ -297,6 +330,7 @@ local ExecuteButtonMode = {
     Artifact = 1,
     QueueLFG = 2,
     GroupFinder = 3,
+    OpenMap = 4,
 };
 
 local ExecuteButtonMixin = {};
@@ -503,6 +537,30 @@ do  --A button on the right of the ListButton. Perform actions like like changin
             end
             self:UpdateVisual();
         end
+
+        function ExecuteButtonMixin:SetOpenMap(uiMapID)
+            self.mode = ExecuteButtonMode.OpenMap;
+            self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED");
+            self.hasEvents = true;
+            self.Update = self.UpdateOpenMap;
+            self:Update();
+            self.onClickFunc = function()
+                if not InCombatLockdown() then
+                    C_Map.OpenWorldMap(uiMapID);
+                end
+            end
+        end
+
+        function ExecuteButtonMixin:UpdateOpenMap()
+            self.Text:SetText(SHOW_MAP);
+            self.tooltip = nil;
+            if InCombatLockdown() then
+                self.enabled = false;
+            else
+                self.enabled = true;
+            end
+            self:UpdateVisual();
+        end
     end
 end
 
@@ -511,6 +569,7 @@ local CreateQuestListButton;
 do  --List Button
     local QuestIcons = {
         InProgress = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+        Boss = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/TrackerType-Boss.png",
     };
 
     local ListButtonMixin = {};
@@ -554,9 +613,32 @@ do  --List Button
     function ListButtonMixin:SetQuestHeader(questID)
         self:SetWidth(606);
         self.questID = questID;
-        local questName = API.GetQuestName(questID);
+
+        local overrideName, achievementID;
+        local extraInfo = QuestInfoExtra[questID];
+        if extraInfo then
+            achievementID = extraInfo.achievementID;
+        end
+        self.achievementID = achievementID;
+
+        local highPriority;
+        if achievementID then
+            local name, completed = GetInfoFromAchievement(achievementID);
+            overrideName = name;
+            if not completed then
+                highPriority = true;
+            end
+            if extraInfo.uiMapID then
+                local mapName = API.GetMapName(extraInfo.uiMapID);
+                if overrideName and mapName then
+                    overrideName = overrideName..", "..mapName;
+                end
+            end
+        end
+
+        local questName = overrideName or API.GetQuestName(questID);
         if questName then
-            local abbrName = string.gsub(questName, ".+[:：]%s*", "");
+            local abbrName = RemoveTextBeforeColon(questName) or questName;
             if abbrName and abbrName ~= "" then
                 questName = abbrName;
             end
@@ -578,25 +660,28 @@ do  --List Button
             self.Icon:SetAtlas("QuestTurnin");
         else
             checkExecuteButton = true;
-            self.Icon:SetTexture(QuestIcons.InProgress);
+            if extraInfo and extraInfo.isBoss then
+                self.Icon:SetTexture(QuestIcons.Boss);
+            else
+                self.Icon:SetTexture(QuestIcons.InProgress);
+            end
         end
 
         local buttonMode;
-        local extraInfo = QuestInfoExtra[questID];
+        self.ExecuteButton.onClickFunc = nil;
 
-        if checkExecuteButton and extraInfo then
+        if checkExecuteButton and extraInfo and not (self.completed or self.readyForTurnIn) then
             if extraInfo.artifactTrackIndex then
-                if not (self.completed or self.readyForTurnIn) then
-                    buttonMode = ExecuteButtonMode.Artifact;
-                end
+                buttonMode = ExecuteButtonMode.Artifact;
             elseif extraInfo.lfgDungeonID then
                 buttonMode = ExecuteButtonMode.QueueLFG;
             elseif extraInfo.openGroupFinder then
                 buttonMode = ExecuteButtonMode.GroupFinder;
+            elseif extraInfo.openMap and extraInfo.uiMapID then
+                buttonMode = ExecuteButtonMode.OpenMap;
             end
         end
 
-        self.ExecuteButton.onClickFunc = nil;
         if buttonMode then
             if buttonMode == ExecuteButtonMode.Artifact then
                 self.ExecuteButton:SetArtifactTrack(extraInfo.artifactTrackIndex);
@@ -605,15 +690,20 @@ do  --List Button
                 self.ExecuteButton:SetQueueLFG(lfgDungeonID);
             elseif buttonMode == ExecuteButtonMode.GroupFinder then
                 self.ExecuteButton:SetGroupFinder();
+            elseif buttonMode == ExecuteButtonMode.OpenMap then
+                self.ExecuteButton:SetOpenMap(extraInfo.uiMapID);
             end
             self.ExecuteButton:Show();
         else
             self.ExecuteButton:Hide();
         end
+
+        self:ShowGlow(highPriority);
     end
 
     function ListButtonMixin:SetObjective(objectiveText)
         self.questID = nil;
+        self.achievementID = nil;
         self:SetWidth(606 - 44);  --60
         self.Icon:Hide();
         self.SetDefaultTextColor = ListButtonMixin.SetDefaultTextColor;
@@ -623,6 +713,7 @@ do  --List Button
         self.Name:SetText(objectiveText);
         self:Layout();
         self:UpdateVisual();
+        self:ShowGlow(false);
     end
 
     function ListButtonMixin:ShowTooltip()
@@ -631,6 +722,7 @@ do  --List Button
         TooltipUpdator:SetQuestID(self.questID);
         TooltipUpdator:RequestQuestProgress();
         TooltipUpdator:RequestQuestDescription();
+        TooltipUpdator:RequestAchievementID(self.achievementID);
         if not self.completed then
             TooltipUpdator:RequestQuestReward();
         end
@@ -760,18 +852,29 @@ do
         local offsetY = 2;
         local top, bottom;
 
+        local index = 0;
         local m = 0;
         local numCompleted = 0;
         local numReadyForTurnIn = 0;
+        local extraInfo;
 
-        for index, questID in ipairs(QuestIDList) do
+        local highPriorityIndexOffset = -1000;
+
+        for i, questID in ipairs(QuestIDList) do
             if not IgnoredQuests[questID] then
+                index = i;
+                extraInfo = QuestInfoExtra[questID];
                 local progressInfo = GetQuestProgressInfo(questID, hideFinishedObjectives);
 
 
                 showActivity = progressInfo.isOnQuest or (progressInfo.isComplete and showCompleted);
 
-                if QuestInfoExtra[questID] and QuestInfoExtra[questID].shownIfOnQuest and not progressInfo.isOnQuest then
+                if extraInfo and extraInfo.isTaskQuest and (not progressInfo.isComplete) and C_TaskQuest_IsActive(questID)  then
+                    showActivity = true;
+                    index = i + highPriorityIndexOffset;
+                end
+
+                if extraInfo and extraInfo.shownIfOnQuest and not progressInfo.isOnQuest then
                     --Hide one-off quests
                     showActivity = false;
                 else
@@ -821,8 +924,9 @@ do
                     bottom = bottom,
                 };
 
-                if progressInfo.numObjectives and progressInfo.numObjectives > 0 then
-                    for i = 1, progressInfo.numObjectives do
+                local objectives = progressInfo.objectives;
+                if objectives and #objectives > 0 then
+                    for i = 1, #objectives do
                         n = n + 1;
                         local isOdd = n % 2 == 0;
                         top = offsetY;
@@ -832,7 +936,7 @@ do
                             templateKey = "ListButton",
                             setupFunc = function(obj)
                                 obj.isOdd = isOdd;
-                                obj:SetObjective(progressInfo.objectives[i].text);
+                                obj:SetObjective(objectives[i].text);
                             end,
                             top = top,
                             bottom = bottom,
@@ -904,6 +1008,7 @@ do
         local ScrollView = LandingPageUtil.CreateScrollViewForTab(self, -32);
         self.ScrollView = ScrollView;
         ScrollView:SetScrollBarOffsetY(-4);
+        ScrollView:SetShowNoContentAlert(true);
 
         local function ListButton_Create()
             return CreateQuestListButton(ScrollView)
@@ -920,6 +1025,7 @@ do
 
 
         QuestIDList = C_QuestLine.GetQuestLineQuests(QUESTLINE_ID) or {};
+
         for _, questID in ipairs(SpecialAssignments) do
             table.insert(QuestIDList, questID);
             if QuestInfoExtra[questID] then
@@ -929,6 +1035,14 @@ do
                     shownIfOnQuest = true,
                 };
             end
+        end
+
+        for questID, info in pairs(WorldBosses) do
+            table.insert(QuestIDList, questID);
+            info.openMap = true;
+            info.isTaskQuest = true;
+            info.isBoss = true;
+            QuestInfoExtra[questID] = info;
         end
     end
 end
