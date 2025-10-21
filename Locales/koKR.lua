@@ -1,6 +1,7 @@
 if not (GetLocale() == "koKR") then return end;
 
 
+
 local _, addon = ...
 local L = addon.L;
 
@@ -23,7 +24,6 @@ L["Map Pin Change Size Method"] = "\n\n*세계 지도 > 지도 필터 > Plumber�
 L["Toggle Plumber UI"] = "Plumber UI 전환";
 L["Toggle Plumber UI Tooltip"] = "편집 모드에서 다음 Plumber UI를 표시합니다:\n%s\n\n이 체크박스는 편집 모드에서의 UI 표시 여부만 제어합니다.\n이 모듈들을 활성화하거나 비활성화하지는 않습니다.";
 
-
 --Module Categories
 --- order: 0
 L["Module Category Unknown"] = "Unknown";    --Don't need to translate
@@ -40,14 +40,12 @@ L["Module Category Reduction"] = "UI 단순화";
 --- order: -1
 L["Module Category Timerunning"] = "군단 리믹스";
 
-
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
 L["Module Category Plumber"] = "Plumber";   --This addon's name
 
 --Deprecated
 L["Module Category Dreamseeds"] = "꿈의 씨앗";     --Added in patch 10.2.0
 L["Module Category AzerothianArchives"] = "아제로스 기록보관소";     --Added in patch 10.2.5
-
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "이벤트 자동 참여";
@@ -83,6 +81,7 @@ L["ModuleDescription GossipFrameMedal Format"] = "기본 아이콘 %s을(를) �
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "드루이드 모델 수정";
 L["ModuleDescription DruidModelFix"] = "별의 문양(Glyph of Stars) 사용 시 발생하는 캐릭터 UI 모델 표시 문제를 수정합니다.\n\n이 버그는 블리자드가 10.2.0 패치에서 수정할 예정이며, 해당 모듈은 이후 제거됩니다.";
+								   
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
 L["ModuleName PlayerChoiceFrameToken"] = "선택 UI: 아이템 비용";
@@ -174,11 +173,11 @@ L["Color Applied"] = "현재 적용된 색상입니다.";
 L["ModuleName TooltipItemReagents"] = "재료";
 L["ModuleDescription TooltipItemReagents"] = "아이템이 다른 것으로 조합될 수 있다면, 관련된 모든 조합 정보를 표시 \"재료\" 조합/제작에 사용.\n\nShift 키를 길게 누르면 제작 결과 아이템이 표시.";
 L["Can Create Multiple Item Format"] = "|cffffffff%d|r개의 항목을 생성할 수 있는 재료가 있습니다..";
+
 --Tooltip DelvesItem
 L["ModuleName TooltipDelvesItem"] = "구렁 아이템";
 L["ModuleDescription TooltipDelvesItem"] = "주간 보상 상자에서 획득한 보관함 열쇠와 파편 수량을 표시합니다.";
 L["You Have Received Weekly Item Format"] = "이번 주에 %s을(를) 획득했습니다.";
-
 
 --Plunderstore
 L["ModuleName Plunderstore"] = "약탈 상점";
@@ -193,7 +192,7 @@ L["Num Items In Bank Format"] = (BANK or "Bank") ..": |cffffffff%d|r";
 L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Bags") ..": |cffffffff%d|r";
 L["Number Thousands"] = "K";    --15K  15,000
 L["Number Millions"] = "M";     --1.5M 1,500,000
-
+																								   
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Khaz Algar Summary";
 L["ModuleDescription ExpansionLandingPage"] = "시작 화면에 부가 정보를 표시:\n\n- 최고 명성 이후 진행 상황\n\n- 서약 레벨\n\n- 언더마인 카르텔 평판";
@@ -300,6 +299,7 @@ L["Available Knowledge Format"] = "Available Knowledge: |cffffffff%s|r";
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "미니맵 대상 표시";
 L["ModuleDescription MinimapMouseover"] = "미니맵에서 생물을 Alt 클릭하면 해당 대상을 타겟으로 설정합니다.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+
 --BossBanner
 L["ModuleName BossBanner"] = "보스 전리품 배너";
 L["ModuleDescription BossBanner"] = "파티원이 전리품을 획득했을 때 화면 상단에 표시되는 배너를 변경합니다.\n\n- 솔로 플레이 시 숨기기\n\n- 가치 있는 아이템만 표시";
@@ -329,12 +329,40 @@ L["SoftTargetName ShowNPC Tooltip"] = "비활성화하면 이름은 상호작용
 --LegionRemix
 L["ModuleName LegionRemix"] = "군단 리믹스";
 L["ModuleDescription LegionRemix"] = "군단 리믹스";
+L["ModuleName LegionRemix_HideWorldTier"] = "월드 티어 아이콘 숨기기";
+L["ModuleDescription LegionRemix_HideWorldTier"] = "미니맵 아래에 표시되는 영웅 월드 티어 아이콘을 숨깁니다.";																   																								
 L["Artifact Weapon"] = "유물 무기";
+L["Artifact Ability"] = "유물 능력";
+L["Artifact Traits"] = "유물 특성";								 
 L["Earn X To Upgrade Y Format"] = "|cffffffff%s|r %s을(를) 추가로 획득하여 %s을(를) 업그레이드하세요";
 L["Until Next Upgrade Format"] = "다음 업그레이드까지 %s";
 L["New Trait Available"] = "새로운 특성이 사용 가능합니다.";
 L["Rank Increased"] = "등급이 상승했습니다.";
 L["Infinite Knowledge Tooltip"] = "특정 군단 리믹스 업적을 달성하면 무한한 지식을 획득할 수 있습니다.";
+L["Infinite Knowledge Tooltip"] = "특정 군단 리믹스 업적을 달성하면 무한한 지식을 얻을 수 있습니다.";
+L["Stat Bonuses"] = "능력치 보너스";
+L["Bonus Traits"] = "추가 특성:";
+L["Instruction Open Artifact UI"] = "좌클릭: 유물 UI 열기/닫기\n우클릭: 설정 보기";
+L["LegionRemix Widget Title"] = "Plumber 위젯";
+L["Trait Icon Mode"] = "특성 아이콘 모드:";
+L["Trait Icon Mode Hidden"] = "표시 안 함";
+L["Trait Icon Mode Mini"] = "미니 아이콘 표시";
+L["Trait Icon Mode Replace"] = "아이템 아이콘 대체";
+L["Error Drag Spell In Combat"] = "전투 중에는 주문을 드래그할 수 없습니다.";
+L["Error Change Trait In Combat"] = "전투 중에는 특성을 변경할 수 없습니다.";
+L["Amount Required To Unlock Format"] = "%s 필요";  --Earn another x amount to unlock (something)
+L["Soon To Unlock"] = "곧 잠금 해제 가능";
+L["You Can Unlock Title"] = "잠금 해제 가능";
+L["Artifact Ability Auto Unlock Tooltip"] = "충분한 무한의 힘을 모으면 이 특성이 자동으로 잠금 해제됩니다.";
+L["Require More Bag Slot Alert"] = "이 작업을 수행하려면 가방 공간을 비워야 합니다.";
+L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Spell not learned";
+L["Fully Upgraded"] = AZERITE_EMPOWERED_ITEM_FULLY_UPGRADED or "Fully Upgraded";
+L["Unlock Level Requirement Format"] = "레벨 %d 달성 시 잠금 해제";
+L["Auto Learn Traits"] = "특성 자동 학습";
+L["Auto Learn Traits Tooltip"] = "충분한 무한의 힘을 보유하면 유물 특성이 자동으로 업그레이드됩니다.";
+L["Infinite Power Yield Format"] = "현재 지식 레벨에서 |cffffffff%s|r의 힘을 획득합니다.";
+L["Infinite Knowledge Bonus Format"] = "현재 보너스: |cffffffff%s|r";
+L["Infinite Knowledge Bonus Next Format"] = "다음 단계: %s";
 
 --ItemUpgradeUI
 L["ModuleName ItemUpgradeUI"] = "아이템 업그레이드: 캐릭터 창 표시"
@@ -377,6 +405,7 @@ L["LootUI Option Grow Direction Tooltip 1"] = "활성화 시: 창의 왼쪽 하�
 L["LootUI Option Grow Direction Tooltip 2"] = "비활성화 시: 창의 왼쪽 상단이 고정되며, 새로운 알림이 기존 알림 아래에 표시됩니다.";
 L["LootUI Option Combine Items"] = "유사 아이템 묶어서 표시"
 L["Junk Items"] = "잡동사니 아이템";
+L["LootUI Option Combine Items"] = "유사 아이템 통합 표시";
 L["LootUI Option Combine Items Tooltip"] = "유사한 아이템을 하나의 행에 묶어 표시합니다.\n\n지원되는 분류:\n\n- 잡템\n- 시대의 기념품 (리전 리믹스)"
 
 --Quick Slot For Third-party Dev
@@ -412,7 +441,7 @@ L["Drawer Option Hide Unusable Tooltip"] = "미보유 아이템 및 미습득 �
 L["Drawer Option Hide Unusable Tooltip 2"] = "포션과 같은 소비 아이템은 항상 표시됩니다.";
 L["Drawer Option Update Frequently"] = "“항상 최신 상태 유지";
 L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경이 있을 때마다 버튼 상태를 갱신합니다. 이 옵션을 켜면 시스템 자원을 약간 더 사용할 수 있습니다";
-
+			
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "확장팩 개요";
 L["ModuleDescription NewExpansionLandingPage"] = "세력, 주간 활동, 공격대 귀속 정보를 표시하는 UI입니다. 다음 방법으로 열 수 있습니다:\n\n- 미니맵에 있는 ‘카즈 알가르 요약’ 버튼을 클릭하세요.\n\n- 게임 설정의 키 바인딩 메뉴에서 단축키를 설정할 수 있습니다.";
@@ -439,13 +468,16 @@ L["Warband Weekly Reward Tooltip"] = "이 보상은 전투부대 기준으로 �
 L["Completed"] = CRITERIA_COMPLETED or "Completed";
 L["Filter Hide Completed Format"] = "완료한 항목 숨기기 (%d)";
 L["Weeky Reset Format"] = "주간 초기화: %s";
+L["Daily Reset Format"] = "일일 초기화: %s";										
 L["Ready To Turn In Tooltip"] = "“퀘스트 완료 상태.";
 L["Trackers"] = "추적기";
-L["New Tracker Title"] = "추적기 추가 [ + ]";     --Create a new Tracker
+L["New Tracker Title"] = "추적기 추가";     --Create a new Tracker
+L["Edit Tracker Title"] = "추적기 제목 편집";		   
 L["Type"] = "유형";
 L["Select Instruction"] = LFG_LIST_SELECT or "Select";
 L["Name"] = "이름";
 L["Difficulty"] = LFG_LIST_DIFFICULTY or "Difficulty";
+L["All Difficulties"] = "모든 난이도";					   
 L["TrackerType Boss"] = "보스";
 L["TrackerType Instance"] = "인스턴스";
 L["TrackerType Quest"] = "퀘스트";
@@ -454,9 +486,8 @@ L["TrackerTypePlural Boss"] = "우두머리"
 L["TrackerTypePlural Instance"] = "인스턴스 던전"
 L["TrackerTypePlural Quest"] = "퀘스트"
 L["TrackerTypePlural Rare"] = "희귀 몬스터"
-
 L["Accountwide"] = "계정 전체 적용";
-L["Quest Flag"] = "퀘스트 속성";
+L["Flag Quest"] = "퀘스트 표시";
 L["Boss Name"] = "보스 이름";
 L["Instance Or Boss Name"] = "인스턴스/보스 이름";
 L["Name EditBox Disabled Reason Format"] = "%s를 입력하면 자동으로 완성됩니다";
@@ -475,6 +506,11 @@ L["Weekly Coffer Key Shards Tooltip"] = "매주 획득하는 첫 4개의 보;상
 L["Weekly Cap"] = "주간 제한";
 L["Weekly Cap Reached"] = "주간 제한에 도달했습니다.";
 L["Instruction Right Click To Use"] = "<우클릭하여 사용>";
+L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Join Queue";
+L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "In Queue";
+L["Click To Switch"] = "전환하려면 클릭 |cffffffff%s|r";
+L["Click To Queue"] = "대기열에 참여하려면 클릭 |cffffffff%s|r";
+L["Click to Open Format"] = "열기 클릭 %s";													   
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
@@ -482,18 +518,31 @@ L["Reposition Button Horizontal"] = "수평 이동";   --Move the window horizon
 L["Reposition Button Vertical"] = "수직 이동";
 L["Reposition Button Tooltip"] = "창을 이동하려면 왼쪽 클릭 후 드래그하세요";
 L["Font Size"] = FONT_SIZE or "Font Size";
+L["Icon Size"] = "아이콘 크기";							 
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Reset To Default Position";
 L["Renown Level Label"] = "영예 ";  --There is a space
 L["Paragon Reputation"] = "영예";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
-
+L["Uncollected Set Counter Format"] = "아직 수집하지 않은 형상변환 세트: |cffffffff%d|r개"
+					
 --Plumber AddOn Settings
 L["ModuleName EnableNewByDefault"] = "항상 신규 기능 활성화";
 L["ModuleDescription EnableNewByDefault"] = "신규 기능 항상 켜기.\n\n*활성화 시 채팅창에 알림 표시.";
 L["New Feature Auto Enabled Format"] = "신규 모듈 %s이 활성화.";
 L["Click To See Details"] = "자세히 보기";
+
+--WIP Merchant UI
+L["ItemType Consumables"] = AUCTION_CATEGORY_CONSUMABLES or "Consumables";
+L["ItemType Weapons"] = AUCTION_CATEGORY_WEAPONS or "Weapons";
+L["ItemType Gems"] = AUCTION_CATEGORY_GEMS or "Gems";
+L["ItemType Armor Generic"] = AUCTION_SUBCATEGORY_PROFESSION_ACCESSORIES or "Accessories";  --Trinkets, Rings, Necks
+L["ItemType Mounts"] = MOUNTS or "Mounts";
+L["ItemType Pets"] = PETS or "Pets";
+L["ItemType Toys"] = "장난감";
+L["ItemType TransmogSet"] = PERKS_VENDOR_CATEGORY_TRANSMOG_SET or "Transmog Set";
+L["ItemType Transmog"] = "형상변환";
 
 -- !! Do NOT translate the following entries
 L["currency-2706"] = "새끼용의";
@@ -518,7 +567,6 @@ L["Restored Coffer Key"] = "복원된 보관함 열쇠"
 L["Coffer Key Shard"] = "보관함 열쇠 파편"
 L["Epoch Mementos"] = "시대의 기념품";
 
-
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "풍요로운 구렁";
 L["Special Assignment"] = "특별 과제";
@@ -529,7 +577,7 @@ L["Match Pattern Copper"] = "([%d]+) 코퍼";
 
 L["Match Pattern Rep 1"] = "(.+)에 대한 전투부대의 평판이 ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "(.+)에 대한 평판이 ([%d%,]+)";   --FACTION_STANDING_INCREASED
-
+											 
 L["Match Pattern Item Level"] = "^아이템 레벨 (%d+)";
 L["Match Pattern Item Upgrade Tooltip"] = "^업그레이드 단계: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
 L["Upgrade Track 1"] = "모험가";
@@ -537,4 +585,5 @@ L["Upgrade Track 2"] = "탐험가";
 L["Upgrade Track 3"] = "노련가";
 L["Upgrade Track 4"] = "챔피언";
 L["Upgrade Track 5"] = "영웅";
-L["Upgrade Track 6"] = "신화";
+L["Upgrade Track 6"] = "신화";							  
+							  
