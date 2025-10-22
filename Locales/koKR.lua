@@ -407,6 +407,9 @@ L["LootUI Option Combine Items"] = "유사 아이템 묶어서 표시"
 L["Junk Items"] = "잡동사니 아이템";
 L["LootUI Option Combine Items"] = "유사 아이템 통합 표시";
 L["LootUI Option Combine Items Tooltip"] = "유사한 아이템을 하나의 행에 묶어 표시합니다.\n\n지원되는 분류:\n\n- 잡템\n- 시대의 기념품 (리전 리믹스)"
+L["LootUI Option Low Frame Strata"] = "뒤로 보내기";
+L["LootUI Option Low Frame Strata Tooltip"] = "전리품 알림 모드에서 전리품 창을 다른 UI 뒤로 배치합니다.\n\n이 옵션은 수동 전리품 모드에는 영향을 주지 않습니다.";
+
 
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "모듈 정보";
@@ -510,7 +513,9 @@ L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Join Queue";
 L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "In Queue";
 L["Click To Switch"] = "전환하려면 클릭 |cffffffff%s|r";
 L["Click To Queue"] = "대기열에 참여하려면 클릭 |cffffffff%s|r";
-L["Click to Open Format"] = "열기 클릭 %s";													   
+L["Click to Open Format"] = "열기 클릭 %s";
+L["List Is Empty"] = "목록이 비어 있습니다.";
+												   
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
@@ -556,7 +561,7 @@ L["currency-2916"] = "룬새김";
 L["currency-2917"] = "금빛";
 
 L["Scenario Delves"] = "구렁";
-L["GameObject Door"] = "Door";
+L["GameObject Door"] = "문";
 L["Delve Chest 1 Rare"] = "풍요의 금고";   --We'll use the GameObjectID once it shows up in the database
 
 L["Season Maximum Colon"] = "시즌 상한선:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
@@ -585,5 +590,4 @@ L["Upgrade Track 2"] = "탐험가";
 L["Upgrade Track 3"] = "노련가";
 L["Upgrade Track 4"] = "챔피언";
 L["Upgrade Track 5"] = "영웅";
-L["Upgrade Track 6"] = "신화";							  
-							  
+L["Upgrade Track 6"] = "신화";
