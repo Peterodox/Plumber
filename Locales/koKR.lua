@@ -80,8 +80,7 @@ L["ModuleDescription GossipFrameMedal Format"] = "기본 아이콘 %s을(를) �
 
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "드루이드 모델 수정";
-L["ModuleDescription DruidModelFix"] = "별의 문양(Glyph of Stars) 사용 시 발생하는 캐릭터 UI 모델 표시 문제를 수정합니다.\n\n이 버그는 블리자드가 10.2.0 패치에서 수정할 예정이며, 해당 모듈은 이후 제거됩니다.";
-								   
+L["ModuleDescription DruidModelFix"] = "별의 문양(Glyph of Stars) 사용 시 발생하는 캐릭터 UI 모델 표시 문제를 수정합니다.\n\n이 버그는 블리자드가 10.2.0 패치에서 수정할 예정이며, 해당 모듈은 이후 제거됩니다.";								   
 
 --PlayerChoiceFrameToken (PlayerChoiceFrame)
 L["ModuleName PlayerChoiceFrameToken"] = "선택 UI: 아이템 비용";
@@ -410,7 +409,6 @@ L["LootUI Option Combine Items Tooltip"] = "유사한 아이템을 하나의 행
 L["LootUI Option Low Frame Strata"] = "뒤로 보내기";
 L["LootUI Option Low Frame Strata Tooltip"] = "전리품 알림 모드에서 전리품 창을 다른 UI 뒤로 배치합니다.\n\n이 옵션은 수동 전리품 모드에는 영향을 주지 않습니다.";
 
-
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "모듈 정보";
 L["QuickSlot Error 1"] = "퀵 슬롯: 이 컨트롤러는 이미 추가되었습니다.";
@@ -515,7 +513,6 @@ L["Click To Switch"] = "전환하려면 클릭 |cffffffff%s|r";
 L["Click To Queue"] = "대기열에 참여하려면 클릭 |cffffffff%s|r";
 L["Click to Open Format"] = "열기 클릭 %s";
 L["List Is Empty"] = "목록이 비어 있습니다.";
-												   
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
