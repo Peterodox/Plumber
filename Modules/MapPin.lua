@@ -15,6 +15,7 @@ local PIN_TEMPLATE_NAME = "PlumberWorldMapPinTemplate";
 local PinController = CreateFrame("Frame");     --Events driven, updates Pin
 addon.MapPinController = PinController;
 local MapTracker = CreateFrame("Frame");        --Attach to WorldMapFrame to monitor changes to map, scale...
+MapTracker:Hide();
 local WorldMapDataProvider = CreateFromMixins(MapCanvasDataProviderMixin);
 local BlizzardUIUtil = {};
 
@@ -38,7 +39,7 @@ do  --BlizzardUIUtil
 
         if Menu and Menu.ModifyMenu then
             Menu.ModifyMenu("MENU_WORLD_MAP_TRACKING", function(owner, rootDescription, contextData)
-                if not PinController.isEnabled then return end;
+                if not (PinController.isEnabled and PinController.pinEnabled) then return end;
 
                 local options = PinController:GetFilterOptionsForCurrentMap();
                 if options then
@@ -122,13 +123,39 @@ do  --PinController
         end
     end
 
-    function PinController:InitializeMapDataProvider()
+    function PinController:InitializeSubModules()
+        local anyEnabled;
+
         if self.mapDataProviders then
+            local masterState = GetDBValue("WorldMapPin_TWW");
+            self.pinEnabled = masterState;
             for mapID, dataProviders in pairs(self.mapDataProviders) do
                 for _, dataProvider in ipairs(dataProviders) do
-                    dataProvider.enabled = GetDBValue(dataProvider.OptionData.dbKey);
+                    dataProvider.enabled = masterState and GetDBValue(dataProvider.OptionData.dbKey);
+                    if dataProvider.enabled then
+                        anyEnabled = true;
+                    end
                 end
             end
+        end
+
+        if self.mapProcessors then
+            for processors in pairs(self.mapProcessors) do
+                processors.enabled = GetDBValue(processors.dbKey);
+                if processors.enabled then
+                    anyEnabled = true;
+                end
+            end
+        end
+
+        if anyEnabled then
+            MapTracker:Attach();
+            self.isEnabled = true;
+            BlizzardUIUtil:HookIntoMenu();
+        else
+            MapTracker:Detach();
+            self.isEnabled = false;
+            self:ListenEvents(false);
         end
     end
 
@@ -262,6 +289,53 @@ do  --PinController
         end
     end
     addon.CallbackRegistry:Register("SettingChanged.WorldMapPin_Size", PinController.SetPinSizeIndex, PinController);
+
+
+    --Generic Map Triggers
+    function PinController:AddMapProcessor(processor)
+        if not self.mapProcessors then
+            self.mapProcessors = {};
+        end
+        self.mapProcessors[processor] = true;
+    end
+
+    function PinController:TriggerMapProcessor(uiMapID)
+        if self.mapProcessors then
+            for processor in pairs(self.mapProcessors) do
+                processor:OnMapChanged(uiMapID, MapTracker.mapScale);
+            end
+        end
+    end
+
+    function PinController:TriggerModifierStateChanged()
+        if self.mapProcessors then
+            for processor in pairs(self.mapProcessors) do
+                if processor.OnModifiderStateChanged then
+                    processor:OnModifiderStateChanged();
+                end
+            end
+        end
+    end
+
+    function PinController:TriggerCanvasScaleChanged(scale)
+        if self.mapProcessors then
+            for processor in pairs(self.mapProcessors) do
+                if processor.OnCanvasScaleChanged then
+                    processor:OnCanvasScaleChanged(scale);
+                end
+            end
+        end
+    end
+
+    function PinController:RequestLoadSettings()
+        if not self.pauseUpdate then
+            self.pauseUpdate = true;
+            C_Timer.After(0, function()
+                self.pauseUpdate = nil;
+                self:InitializeSubModules();
+            end);
+        end
+    end
 end
 
 
@@ -353,12 +427,19 @@ do
             if self.newMapID ~= self.mapID then
                 self.mapID = self.newMapID;
                 self:OnMapChanged(self.mapID);
+                self.anyChange = true;
             end
 
             self.newScale = MapScrollContainer.targetScale;
             if self.newScale ~= self.mapScale then
                 self.mapScale = self.newScale;
-                self:OnCanvasScaleChanged();
+                self:OnCanvasScaleChanged(self.mapScale);
+            end
+
+            self.newMaximized = MapFrame.isMaximized;
+            if self.newMaximized ~= self.maximized then
+                self.maximized = self.newMaximized;
+                self.anyChange = true;
             end
         end
 
@@ -370,6 +451,11 @@ do
                 self:OnViewingQuestDetailsChanged();
             end
         end
+
+        if self.anyChange then
+            self.anyChange = nil;
+            PinController:TriggerMapProcessor(self.mapID);
+        end
     end
 
     function MapTracker:OnShow()
@@ -377,10 +463,21 @@ do
         self.mapScale = nil;
         self.isViewingDetails = BlizzardUIUtil:IsViewingQuestDetails();
         self.t1 = 1;
+        self:RegisterEvent("MODIFIER_STATE_CHANGED");
     end
 
     function MapTracker:OnHide()
         WorldMapDataProvider:OnHide();
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+    end
+
+    function MapTracker:OnEvent(event, ...)
+        if event == "MODIFIER_STATE_CHANGED" then
+            local key, down = ...
+            if down == 1 and (key == "LALT" or key == "RALT") then
+                PinController:TriggerModifierStateChanged();
+            end
+        end
     end
 
     function MapTracker:EnableScripts()
@@ -389,12 +486,15 @@ do
         self:SetScript("OnShow", self.OnShow);
         self:SetScript("OnHide", self.OnHide);
         self:SetScript("OnUpdate", self.OnUpdate);
+        self:SetScript("OnEvent", self.OnEvent);
     end
 
     function MapTracker:DisableScripts()
         self:SetScript("OnShow", nil);
         self:SetScript("OnHide", nil);
         self:SetScript("OnUpdate", nil);
+        self:SetScript("OnEvent", nil);
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
     end
 
     function MapTracker:GetMapID()
@@ -405,7 +505,7 @@ do
         if not mapID then
             mapID = self:GetMapID();
         end
-    
+
         if not mapID then return end;
 
         if PinController:DoesMapHaveData(mapID) then
@@ -417,8 +517,9 @@ do
         end
     end
 
-    function MapTracker:OnCanvasScaleChanged()
+    function MapTracker:OnCanvasScaleChanged(scale)
         WorldMapDataProvider:OnCanvasScaleChanged();
+        PinController:TriggerCanvasScaleChanged(scale);
     end
 
     function MapTracker:OnViewingQuestDetailsChanged()
@@ -590,16 +691,7 @@ end
 
 do  --Master Switch
     local function EnableMapPinSystem(state)
-        if state then
-            MapTracker:Attach();
-            PinController:InitializeMapDataProvider();
-            PinController.isEnabled = true;
-            BlizzardUIUtil:HookIntoMenu();
-        else
-            MapTracker:Detach();
-            PinController.isEnabled = false;
-            PinController:ListenEvents(false);
-        end
+        PinController:RequestLoadSettings();
     end
 
     local moduleData = {

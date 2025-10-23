@@ -1538,6 +1538,7 @@ do  --Edit Mode
 
         self:LoadPosition();
         self:UnregisterEvent("GLOBAL_MOUSE_UP");
+        self:UnregisterEvent("BAG_UPDATE_DELAYED");
 
         EventGenerator:Stop();
     end

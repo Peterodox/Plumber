@@ -417,6 +417,16 @@ L["ModuleName ItemUpgradeUI"] = "Item Upgrades: Show Character Pane";
 L["ModuleDescription ItemUpgradeUI"] = "Automatically open Character Pane when you interact with an Item Upgrades NPC.";
 
 
+--HolidayDungeon
+L["ModuleName HolidayDungeon"] = "Auto Select Holiday Dungeon";
+L["ModuleDescription HolidayDungeon"] = "Automatically select holiday and timewalking dungeons when you open Dungeon Finder for the first time.";
+
+
+--PlayerPing
+L["ModuleName PlayerPing"] = "Map Pin: Player Ping";
+L["ModuleDescription PlayerPing"] = "Highlight the player's location with a ping effect when you:\n\n- Open World Map.\n\n- Press the ALT key.\n\n- Click the Maximize button.\n\n|cffd4641cBy default, WoW only shows the player ping when you change maps.|r";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";

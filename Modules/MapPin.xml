@@ -6,6 +6,8 @@
 	<Script file="MapPin_Dreamseed.lua"/>
 	<!--Script file="MapPin_TargetHealth.lua"/-->	<!--API isn't functioning-->
 
+	<Script file="MapPin_PlayerPing.lua"/>	<!--Ping player arrow-->
+
 
 	<Frame name="PlumberWorldMapPinTemplate" enableMouseMotion="true" enableMouse="false" mixin="PlumberWorldMapPinMixin" virtual="true">
 		<Size x="20" y="20"/>

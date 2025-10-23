@@ -190,6 +190,7 @@ local DefaultValues = {
     AppearanceTab = false,              --Adjust Appearance Tab models to reduce GPU usage spike
         AppearanceTab_ModelCount = 1,
     ItemUpgradeUI = true,
+    HolidayDungeon = true,              --Auto select holiday dungeons once
 
 
     --Tooltip
@@ -239,6 +240,7 @@ local DefaultValues = {
         WorldMapPin_Size = 1,           --1: Default
         WorldMapPin_TWW_Delve = true,   --Show Bountiful Delves on continent map
         WorldMapPin_TWW_Quest = true,   --Show Special Assignment on continent map
+        WorldMapPin_PlayerPing = true,
 
 
     --Modify default interface behavior:

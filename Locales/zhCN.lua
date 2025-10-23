@@ -416,6 +416,16 @@ L["ModuleName ItemUpgradeUI"] = "物品升级：自动打开装备栏";
 L["ModuleDescription ItemUpgradeUI"] = "当你与物品升级NPC交互时自动打开角色面板。";
 
 
+--HolidayDungeon
+L["ModuleName HolidayDungeon"] = "自动选择节日地下城";
+L["ModuleDescription HolidayDungeon"] = "当你第一次打开队伍查找器时自动选择节日或时空漫游地下城。";
+
+
+--PlayerPing
+L["ModuleName PlayerPing"] = "地图标记：玩家高亮";
+L["ModuleDescription PlayerPing"] = "在以下情形时高亮你在世界地图上的位置:\n\n- 打开世界地图\n\n- 按下Alt键\n\n- 点击最大化按钮\n\n|cffd4641c默认情况下游戏只会在你改变地图后高亮你的位置。|r";
+
+
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
 L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";

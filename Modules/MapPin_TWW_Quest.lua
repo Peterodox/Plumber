@@ -120,12 +120,8 @@ end
 
 local SpecialQuestPinDataProvider = {};
 do
-    local function onCoordReceivedFunc(positionData)
-        POILocation[positionData.poiID] = positionData;
-    end
-
-    local function onConvertFinishedFunc()
-        PinController:RequestUpdate();
+    function SpecialQuestPinDataProvider:GetDBKey()
+        return "WorldMapPin_TWW_Quest"
     end
 
     function SpecialQuestPinDataProvider:GetPinDataForMap(uiMapID)

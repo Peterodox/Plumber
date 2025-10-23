@@ -140,14 +140,6 @@ local DelvesPinDataProvider = {};
 do
     local POIxDelveIndex;
 
-    local function onCoordReceivedFunc(positionData)
-        POILocation[positionData.poiID] = positionData;
-    end
-
-    local function onConvertFinishedFunc()
-        PinController:RequestUpdate();
-    end
-
     function DelvesPinDataProvider:GetPinDataForMap(uiMapID)
         --Bountiful Delves won't appear in GetDelvesForMap() table, that's how we identify them
         --The method above no longer works

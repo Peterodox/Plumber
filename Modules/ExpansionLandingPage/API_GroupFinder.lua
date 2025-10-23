@@ -90,6 +90,19 @@ function EL:FullUpdate()
     self:ListenEvents(true);
 end
 
+do  --Dungeon Finder
+    --[[
+    function YeetJoinableDungeons()
+        for i = 1, GetNumRandomDungeons() do
+            local id, name = GetLFGRandomDungeonInfo(i);
+            local isAvailableForAll, isAvailableForPlayer, hideIfNotJoinable = IsLFGDungeonJoinable(id);
+            if isAvailableForAll then
+                print(id, name);
+            end
+        end
+    end
+    --]]
+end
 
 do  --"Public" Method
     function LandingPageUtil.IsQueuingDungeon(lfgDungeonID)
