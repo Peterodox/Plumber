@@ -613,45 +613,45 @@ L["ItemType Transmog"] = "Transmogrification";
 
 
 -- !! Do NOT translate the following entries
-L["currency-2706"] = "Whelpling";
+L["currency-2706"] = "Dragonnet";
 L["currency-2707"] = "Drake";
 L["currency-2708"] = "Wyrm";
 L["currency-2709"] = "Aspect";
 
-L["currency-2914"] = "Weathered";
-L["currency-2915"] = "Carved";
-L["currency-2916"] = "Runed";
-L["currency-2917"] = "Gilded";
+L["currency-2914"] = "Abîmé";
+L["currency-2915"] = "Gravé";
+L["currency-2916"] = "Runique";
+L["currency-2917"] = "Doré";
 
-L["Scenario Delves"] = "Delves";
-L["GameObject Door"] = "Door";
-L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
+L["Scenario Delves"] = "Gouffres";
+L["GameObject Door"] = "Porte";
+L["Delve Chest 1 Rare"] = "Coffre abondant";   --We'll use the GameObjectID once it shows up in the database
 
-L["Season Maximum Colon"] = "Season Maximum:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
-L["Item Changed"] = "was changed to";   --CHANGED_OWN_ITEM
-L["Completed CHETT List"] = "Completed C.H.E.T.T. List";
-L["Devourer Attack"] = "Devourer Attack";
-L["Restored Coffer Key"] = "Restored Coffer Key";
-L["Coffer Key Shard"] = "Coffer Key Shard";
-L["Epoch Mementos"] = "Epoch Mementos";     --See currency:3293
+L["Season Maximum Colon"] = "Maximum cette saison :";  --CURRENCY_SEASON_TOTAL_MAXIMUM
+L["Item Changed"] = "a été changé en";   --CHANGED_OWN_ITEM
+L["Completed CHETT List"] = "Liste C.H.E.T.T. terminée";
+L["Devourer Attack"] = "Attaque de dévoreur";
+L["Restored Coffer Key"] = "Clé de coffret réparée";
+L["Coffer Key Shard"] = "Fragment de clé de coffre";
+L["Epoch Mementos"] = "Souvenir d’époque";     --See currency:3293
 
 
 --Map Pin Filter Name (name should be plural)
-L["Bountiful Delve"] =  "Gouffre abibd";
-L["Special Assignment"] = "Special Assignments";
+L["Bountiful Delve"] =  "Gouffre abondant";
+L["Special Assignment"] = "Missions spéciales";
 
-L["Match Pattern Gold"] = "([%d%,]+) Gold";
-L["Match Pattern Silver"] = "([%d]+) Silver";
-L["Match Pattern Copper"] = "([%d]+) Copper";
+L["Match Pattern Gold"] = "([%d%,]+) Or";
+L["Match Pattern Silver"] = "([%d]+) Argent";
+L["Match Pattern Copper"] = "([%d]+) Cuivre";
 
-L["Match Pattern Rep 1"] = "Your Warband's reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
-L["Match Pattern Rep 2"] = "Reputation with (.+) increased by ([%d%,]+)";   --FACTION_STANDING_INCREASED
+L["Match Pattern Rep 1"] = "Réputation de votre bataillon auprès de la faction (.+) augmentée de ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Pattern Rep 2"] = "Réputation auprès de la faction (.+) augmentée de ([%d%,]+) points";   --FACTION_STANDING_INCREASED
 
-L["Match Pattern Item Level"] = "^Item Level (%d+)";
+L["Match Pattern Item Level"] = "^Niveau d'objet (%d+)";
 L["Match Pattern Item Upgrade Tooltip"] = "^Upgrade Level: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
-L["Upgrade Track 1"] = "Adventurer";
-L["Upgrade Track 2"] = "Explorer";
-L["Upgrade Track 3"] = "Veteran";
+L["Upgrade Track 1"] = "Aventurier";
+L["Upgrade Track 2"] = "Explorateur";
+L["Upgrade Track 3"] = "Vétéran";
 L["Upgrade Track 4"] = "Champion";
-L["Upgrade Track 5"] = "Hero";
-L["Upgrade Track 6"] = "Myth";
+L["Upgrade Track 5"] = "Héroïque";
+L["Upgrade Track 6"] = "Mythique";
