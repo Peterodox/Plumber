@@ -405,9 +405,9 @@ L["Require More Bag Slot Alert"] = "Vous devez libérer de l'espace dans le sac 
 L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Sort non appris";
 L["Fully Upgraded"] = AZERITE_EMPOWERED_ITEM_FULLY_UPGRADED or "Entièrement mis à niveau";
 L["Unlock Level Requirement Format"] = "Atteignez le niveau %d pour débloquer";
--- L["Auto Learn Traits"] = "Auto Learn Traits";
--- L["Auto Learn Traits Tooltip"] = "Automatically upgrade artifact traits when you have enough Infinite Power";
--- L["Infinite Power Yield Format"] = "Grant |cffffffff%s|r Power at your current Knowledge level.";
+L["Auto Learn Traits"] = "Apprendre automatiquement les Traits";
+L["Auto Learn Traits Tooltip"] = "Améliorer automatiquement les traits d'artefact lorsque vous avez suffisamment de Pouvoir infini";
+L["Infinite Power Yield Format"] = "Accorder |cffffffff%s|r Puissance à votre niveau de connaissances actuel.";
 L["Infinite Knowledge Bonus Format"] = "Bonus actuel : |cffffffff%s|r";
 L["Infinite Knowledge Bonus Next Format"] = "Prochain rang : %s";
 
