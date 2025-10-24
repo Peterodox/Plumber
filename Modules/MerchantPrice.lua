@@ -500,13 +500,30 @@ function Controller:EnableModule(state)
                 end
             end
 
-            local noChangeItemPrice = C_AddOns.IsAddOnLoaded("Krowi_ExtendedVendorUI") or C_AddOns.IsAddOnLoaded("ElvUI_WindTools");
+
+            --Disable our PriceFrame when detecting addons that show more items per page
+            local noChangeItemPrice;
+
+            local conflictAddons = {
+                "Krowi_ExtendedVendorUI",
+                "ElvUI_WindTools",
+                "EnhanceQoL",
+            };
+
+            for _, name in ipairs(conflictAddons) do
+                if C_AddOns.IsAddOnLoaded(name) then
+                    noChangeItemPrice = true;
+                    break
+                end
+            end
+
             if noChangeItemPrice then
                 Controller.UpdateMerchantInfo = Controller._UpdateMerchantInfo;
                 Controller.UpdateBuybackInfo = Controller._UpdateBuybackInfo;
             end
 
             InvisibleContainer:HideObjects(noChangeItemPrice);
+
 
             self:SetScript("OnShow", self.OnShow);
             self:SetScript("OnHide", self.OnHide);
