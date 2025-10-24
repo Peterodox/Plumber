@@ -648,7 +648,7 @@ L["Match Pattern Rep 1"] = "Réputation de votre bataillon auprès de la faction
 L["Match Pattern Rep 2"] = "Réputation auprès de la faction (.+) augmentée de ([%d%,]+) points";   --FACTION_STANDING_INCREASED
 
 L["Match Pattern Item Level"] = "^Niveau d'objet (%d+)";
-L["Match Pattern Item Upgrade Tooltip"] = "^Upgrade Level: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Match Pattern Item Upgrade Tooltip"] = "^Niveau d'amélioration : (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
 L["Upgrade Track 1"] = "Aventurier";
 L["Upgrade Track 2"] = "Explorateur";
 L["Upgrade Track 3"] = "Vétéran";
