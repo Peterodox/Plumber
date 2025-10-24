@@ -119,8 +119,8 @@ L["Instruction Pick Lock"] = "<Clic droit pour crocheter>";
 
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
-L["ModuleName BlizzFixEventToast"] = "Correction de Blizzard : Toast d'événement";
-L["ModuleDescription BlizzFixEventToast"] = "Modifie le comportement des toasts d'événement pour qu'ils ne bloquent pas vos clics de souris. Permet également de cliquer droit sur le toast pour le fermer immédiatement.\n\n*Les toasts d'événement sont des bannières qui apparaissent en haut de l'écran lorsque vous complétez certaines activités.";
+L["ModuleName BlizzFixEventToast"] = "Correction de Blizzard : Notifications d'événement";
+L["ModuleDescription BlizzFixEventToast"] = "Modifie le comportement des notifications d’événement afin qu’elles n’interceptent plus vos clics de souris. Permet également de cliquer avec le bouton droit sur la notification pour la fermer immédiatement.\n\n*Les notifications d’événement sont des bannières qui apparaissent en haut de l’écran lorsque vous terminez certaines activités.";
 
 
 --Talking Head
@@ -323,13 +323,13 @@ L["Unearned Filter Tooltip"] = "Vous pouvez voir des Titres en double qui ne son
 
 
 --BlizzardSuperTrack
-L["ModuleName BlizzardSuperTrack"] = "Point de passge : minuteur d'événement";
+L["ModuleName BlizzardSuperTrack"] = "Point de passge : Minuteur d'événement";
 L["ModuleDescription BlizzardSuperTrack"] = "Ajouter un minuteur sur votre point de passage actif si son infobulle de carte en possède un.";
 
 
 --ProfessionsBook
 L["ModuleName ProfessionsBook"] = PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS or "Connaissances non dépensées";
-L["ModuleDescription ProfessionsBook"] = "Afficher le nombre de Connaissances de spécialisation de profession non dépensées dans les métiers.";
+L["ModuleDescription ProfessionsBook"] = "Afficher le nombre de points de connaissance de spécialisation de profession non utilisés dans l’interface des métiers.";
 L["Unspent Knowledge Tooltip Format"] = "Vous avez |cffffffff%s|r Connaissances de spécialisation de profession non dépensées."  --see PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
 
 
