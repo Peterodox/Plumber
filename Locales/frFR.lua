@@ -250,9 +250,9 @@ L["ModuleName Delves_SeasonProgress"] = "Gouffres : Périple du gouffre";
 L["ModuleDescription Delves_SeasonProgress"] = "Afficher une barre de progression en haut de l'écran lorsque vous progressez dans le périple du Gouffre.";
 L["ModuleName Delves_Dashboard"] = "Gouffres : Récompense hebdomadaire";
 L["ModuleDescription Delves_Dashboard"] = "Afficher la progression de votre Grande chambre forte et de votre réserve d'Écu doré sur le tableau de bord des Gouffres.";
-L["ModuleName Delves_Automation"] = "Gouffres : Choix automatique des pouvoirs";
-L["ModuleDescription Delves_Automation"] = "Sélectionner automatiquement le Pouvoir lâchée par les trésors et les rares.";
-L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
+L["ModuleName Delves_Automation"] = "Gouffres : Sélection auto. du pouvoir";
+L["ModuleDescription Delves_Automation"] = "Sélectionner automatiquement le Pouvoir obtenu par les trésors et les rares.";
+L["Delve Crest Stash No Info"] = "Ces informations ne sont pas disponibles dans votre emplacement actuel.";
 L["Delve Crest Stash Requirement"] = "Apparaît dans les Gouffres abondants de niveau 11.";
 L["Overcharged Delve"] = "Gouffre surchargé";
 L["Delves History Requires AddOn"] = "L'historique des Gouffres est stocké localement par l'addon Plumber.";
@@ -262,7 +262,7 @@ L["Power Borrowed"] = "Pouvoir emprunté";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "Anniversaire de WoW";
-L["ModuleDescription WoWAnniversary"] = "– Invoquez facilement la monture correspondante pendant l'événement Maniaque des montures.\n\n– Affichez les résultats des votes pendant l'événement Frénésie de mode.";
+L["ModuleDescription WoWAnniversary"] = "– Invoquer facilement la monture correspondante pendant l'événement Maniaque des montures.\n\n– Affichez les résultats des votes pendant l'événement Frénésie de mode.";
 L["Voting Result Header"] = "Résultats";
 L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "Vous n'avez pas récupéré cette monture.";
 
@@ -413,7 +413,7 @@ L["Infinite Knowledge Bonus Next Format"] = "Prochain rang : %s";
 
 
 --ItemUpgradeUI
-L["ModuleName ItemUpgradeUI"] = "Améliorations des objets : Afficher le panneau des personnages";
+L["ModuleName ItemUpgradeUI"] = "Améliorations d'objets : Afficher la du personnage";
 L["ModuleDescription ItemUpgradeUI"] = "Ouvrir automatiquement le volet Personnage lorsque vous interagissez avec un PNJ d'améliorations d'objets.";
 
 
