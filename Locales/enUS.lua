@@ -435,7 +435,7 @@ L["ModuleDescription PlayerPing"] = "Highlight the player's location with a ping
 
 --StaticPopup_Confirm
 L["ModuleName StaticPopup_Confirm"] = "Non-refundable Purchase Alert";
-L["ModuleDescription StaticPopup_Confirm"] = "Adjust the confirmation dialog that appears when you attempt to buy a non-refundable item, adding a brief lockdown to the \'Yes\' button and highlighting the keywords in red.\n\nThis module also reduces the class set conversion delay by half.";
+L["ModuleDescription StaticPopup_Confirm"] = "Adjust the confirmation dialog that appears when buying a non-refundable item, adding a brief lockdown to the \'Yes\' button and highlighting the keywords in red.\n\nThis module also reduces the class set conversion delay by half.";
 
 
 --Loot UI
@@ -609,6 +609,7 @@ L["ModuleName EnableNewByDefault"] = "Always Enable New Features";
 L["ModuleDescription EnableNewByDefault"] = "Always enable newly added features.\n\n*You will see a notification in the chat window when a new module is enabled this way.";
 L["New Feature Auto Enabled Format"] = "New Module %s has been enabled.";
 L["Click To See Details"] = "Click to see details";
+L["Click To Show Settings"] = "Click to toggle settings.";
 
 
 --WIP Merchant UI

@@ -102,7 +102,7 @@ do
         if not noChangeItemPrice then
             local merchantMoney, merchantAltCurrency;
 
-            for i = 1, 50 do
+            for i = 1, 100 do
                 if not _G["MerchantItem"..i] then
                     break
                 end
@@ -131,7 +131,7 @@ do
 
         local merchantButton, merchantMoney, merchantAltCurrency;
 
-        for i = 1, 50 do
+        for i = 1, 100 do
             merchantButton = _G["MerchantItem"..i];
             merchantMoney = _G["MerchantItem"..i.."MoneyFrame"];
             merchantAltCurrency = _G["MerchantItem"..i.."AltCurrencyFrame"];
@@ -226,6 +226,11 @@ function Controller:SetupTokenDisplay()
 end
 
 function Controller:UpdateMerchantInfo()
+    local itemsPerPage = self:GetMaxItemsPerPage();
+    if itemsPerPage ~= self.lastItemsPerPage then
+        self.lastItemsPerPage = itemsPerPage;
+        InvisibleContainer:HideObjects();
+    end
     InvisibleContainer:HideBlizzardMerchantTokens();
 
     local page = ShopUI.page;
@@ -236,7 +241,6 @@ function Controller:UpdateMerchantInfo()
     local id, currencyType;
     local priceFrame;
 
-    local itemsPerPage = self:GetMaxItemsPerPage();
     local numMerchantItems = GetMerchantNumItems();
     local fromIndex = (page - 1) * itemsPerPage;
     local merchantButton;
@@ -511,8 +515,8 @@ function Controller:EnableModule(state)
             local noChangeItemPrice;
 
             local conflictAddons = {
-                "Krowi_ExtendedVendorUI",
-                "ElvUI_WindTools",
+                --"Krowi_ExtendedVendorUI",
+                --"ElvUI_WindTools",
                 --"EnhanceQoL",
             };
 
@@ -521,11 +525,6 @@ function Controller:EnableModule(state)
                     noChangeItemPrice = true;
                     break
                 end
-            end
-
-            if noChangeItemPrice then
-                Controller.UpdateMerchantInfo = Controller._UpdateMerchantInfo;
-                Controller.UpdateBuybackInfo = Controller._UpdateBuybackInfo;
             end
 
             InvisibleContainer:HideObjects(noChangeItemPrice);
@@ -560,133 +559,6 @@ do  --For some Merchant UI addon users we only update the token frame
     function Controller:GetMaxItemsPerPage()
         --Some addons may change this global
         return _G.MERCHANT_ITEMS_PER_PAGE or MERCHANT_ITEMS_PER_PAGE;
-    end
-
-    function Controller:_UpdateMerchantInfo()
-        InvisibleContainer:HideBlizzardMerchantTokens();
-
-        local page = self:GetShopPage();
-
-        local name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID;
-        local numCost;
-        local itemTexture, itemValue, itemLink;
-        local id, currencyType;
-        local itemPerPage = self:GetMaxItemsPerPage();
-        local numMerchantItems = GetMerchantNumItems();
-        local fromIndex = (page - 1) * itemPerPage;
-        local anyGold;
-        local altCurreny;
-        local hasAnyContextToken = false;
-        local slotIndexList = {};
-
-        local buttonIndex = 0;
-        local numPages = ceil(numMerchantItems / itemPerPage);
-
-        local numItemsThisPage;
-
-        if page < numPages then
-            numItemsThisPage = itemPerPage;
-        else
-            numItemsThisPage = numMerchantItems - (numPages - 1) * itemPerPage;
-        end
-
-        for i = fromIndex + 1, fromIndex + numItemsThisPage do
-            price, extendedCost = GetMerchantItemPrice(i);
-
-            buttonIndex = buttonIndex + 1;
-
-            if price and price > 0 then
-                anyGold = true;
-            end
-
-            local requiredCurrency;
-
-            if extendedCost then
-                numCost = GetMerchantItemCostInfo(i);
-                requiredCurrency = {};
-
-                for n = 1, numCost do
-                    itemTexture, itemValue, itemLink = GetMerchantItemCostItem(i, n);
-                    --uncached item's link may be nil
-
-                    if itemLink then
-                        id = match(itemLink, "currency:(%d+)");
-                        if id then
-                            currencyType = 0;
-                        else
-                            id = match(itemLink, "item:(%d+)");
-                            if id then
-                                currencyType = 1;
-                            end
-                        end
-
-                        if id and currencyType then
-                            id = tonumber(id);
-
-                            if not altCurreny then
-                                altCurreny = {};
-                            end
-
-                            if id and not altCurreny[id] then
-                                --assume itemID and currencyID don't accidently overlap
-                                altCurreny[id] = currencyType;
-
-                                if (not hasAnyContextToken) and IsItemContextToken(id) then
-                                    hasAnyContextToken = true;
-                                end
-                            end
-
-                            requiredCurrency[n] = {currencyType, id, itemValue, itemTexture};
-                        end
-                    else
-                        self:RequestUpdate(0.2);
-                    end
-                end
-            else
-                numCost = 0;
-            end
-
-            slotIndexList[buttonIndex] = {i, numCost};
-        end
-
-        self:SetupTokenDisplay();
-
-        if anyGold or not altCurreny then
-            TokenDisplay:ShowMoneyFrame(true);
-        else
-            TokenDisplay:ShowMoneyFrame(false);
-        end
-
-        local tokens = {};
-        if altCurreny then
-            TokenDisplay.MoneyFrame:SetSimplified(true);
-
-            local n = 0;
-
-            for id, currencyType in pairs(altCurreny) do
-                n = n + 1;
-                tokens[n] = {currencyType, id};
-            end
-
-            tsort(tokens, SortFunc_CurrencyType);
-        else
-            TokenDisplay.MoneyFrame:SetSimplified(false);
-        end
-
-        if not self.otherTabShown then
-            if not TokenDisplay:DisplayMerchantPriceOnFrame(tokens, ShopUI, -5, 6, hasAnyContextToken and slotIndexList or nil) then
-                self:RequestUpdate(0.2);
-            end
-        end
-    end
-
-    function Controller:_UpdateBuybackInfo()
-        self:SetupTokenDisplay();
-        TokenDisplay:ShowMoneyFrame(true);
-        TokenDisplay.MoneyFrame:SetSimplified(false);
-        if not self.otherTabShown then
-            TokenDisplay:DisplayCurrencyOnFrame(nil, ShopUI, "BOTTOMRIGHT", -5, 6);
-        end
     end
 end
 

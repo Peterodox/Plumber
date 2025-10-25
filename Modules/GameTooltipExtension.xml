@@ -7,8 +7,11 @@
     <!--Item Modules-->
     <Script file="GameTooltip_ReputationItem_Data.lua"/>
 	<Script file="GameTooltip_ReputationItem.lua"/>
-    <Script file="GameTooltip_MountRecolor.lua"/>
     <Script file="GameTooltip_ItemReagents.lua"/>
     <Script file="GameTooltip_ItemQuest.lua"/>
     <Script file="GameTooltip_DelvesItem.lua"/>
+
+
+    <!--No Longer Relevant-->
+    <!--Script file="GameTooltip_MountRecolor.lua"/-->
 </Ui>

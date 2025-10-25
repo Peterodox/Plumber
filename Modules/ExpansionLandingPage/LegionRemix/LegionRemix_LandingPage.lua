@@ -1109,6 +1109,13 @@ do
 
                 C_QuestLine.GetQuestLineQuests(QUESTLINE_ID);
                 CallbackRegistry:Trigger("LandingPage.SetEncounterTabInfo", EncounterTabInfo);
+
+
+                --Set EncounterJournal epansion to Legion
+                hooksecurefunc(C_EncounterJournal, "InitalizeSelectedTier", function()
+                    --This API reset selected tier to Current Season, see EncounterJournal_OnShow
+                    EJ_SelectTier(7)
+                end);
             end
         end
     end);
