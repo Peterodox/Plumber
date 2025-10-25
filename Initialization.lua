@@ -191,6 +191,7 @@ local DefaultValues = {
         AppearanceTab_ModelCount = 1,
     ItemUpgradeUI = true,
     HolidayDungeon = true,              --Auto select holiday dungeons once
+    StaticPopup_Confirm = true,         --Add a brief delay to purchase non-refundable items / Reduce item conversion confirm delay
 
 
     --Tooltip
@@ -200,6 +201,7 @@ local DefaultValues = {
     TooltipItemReagents = false,        --For items with "use to combine": show the reagent count
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
     TooltipDelvesItem = true,           --Show weekly Coffer Key cap on chest tooltip
+    TooltipItemQuest = true,            --Show the quest of quest starting items in bags
 
 
     --Reduction

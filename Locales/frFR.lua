@@ -635,6 +635,8 @@ L["Restored Coffer Key"] = "Clé de coffret réparée";
 L["Coffer Key Shard"] = "Fragment de clé de coffre";
 L["Epoch Mementos"] = "Souvenir d’époque";     --See currency:3293
 
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Voulez-vous vraiment échanger %s contre l’objet suivant ?\n\n|cffff2020Votre achat ne pourra pas être remboursé.|r\n %s";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Gouffre abondant";

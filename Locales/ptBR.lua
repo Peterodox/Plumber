@@ -461,6 +461,8 @@ L["Restored Coffer Key"] = "Chave de Cofre Restaurada";
 L["Coffer Key Shard"] = "Estilhaço de Chave de Cofre";
 L["Epoch Mementos"] = "Lembrança das Eras";
 
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Tem certeza de que deseja trocar %s pelo item a seguir?\n\n|cffff2020Esta compra não é reembolsável.|r\n %s";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Imersão abundante";

@@ -204,6 +204,12 @@ L["ModuleDescription TooltipDelvesItem"] = "Show how many Coffer Keys and Shards
 L["You Have Received Weekly Item Format"] = "You have received %s this week.";
 
 
+--Tooltip ItemQuest
+L["ModuleName TooltipItemQuest"] = "Quest Starting Items";
+L["ModuleDescription TooltipItemQuest"] = "If an item in your bag starts a quest, show the quest details.\n\nYou can Ctrl Left Click the item to view it in the quest log if you are already on the quest.";
+L["Instruction Show In Quest Log"] = "<Ctrl Left Click to View in Quest Log>";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
 L["ModuleDescription Plunderstore"] = "Modify the store opened via Group Finder:\n\n- Added a checkbox to hide collected items.\n\n- Display the number of uncollected items on the category buttons.\n\n- Added weapon and armor equip location to their tooltips.\n\n- Allow you to view equippable items in the Dressing Room.";
@@ -427,6 +433,11 @@ L["ModuleName PlayerPing"] = "Map Pin: Player Ping";
 L["ModuleDescription PlayerPing"] = "Highlight the player's location with a ping effect when you:\n\n- Open World Map.\n\n- Press the ALT key.\n\n- Click the Maximize button.\n\n|cffd4641cBy default, WoW only shows the player ping when you change maps.|r";
 
 
+--StaticPopup_Confirm
+L["ModuleName StaticPopup_Confirm"] = "Non-refundable Purchase Alert";
+L["ModuleDescription StaticPopup_Confirm"] = "Adjust the confirmation dialog that appears when you attempt to buy a non-refundable item, adding a brief lockdown to the \'Yes\' button and highlighting the keywords in red.\n\nThis module also reduces the class set conversion delay by half.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
 L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
@@ -634,6 +645,8 @@ L["Devourer Attack"] = "Devourer Attack";
 L["Restored Coffer Key"] = "Restored Coffer Key";
 L["Coffer Key Shard"] = "Coffer Key Shard";
 L["Epoch Mementos"] = "Epoch Mementos";     --See currency:3293
+
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Are you sure you wish to exchange %s for the following item?\n\n|cffff2020Your purchase is not refundable.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 
 
 --Map Pin Filter Name (name should be plural)

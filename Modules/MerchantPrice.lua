@@ -102,7 +102,10 @@ do
         if not noChangeItemPrice then
             local merchantMoney, merchantAltCurrency;
 
-            for i = 1, BUYBACK_ITEMS_PER_PAGE do
+            for i = 1, 50 do
+                if not _G["MerchantItem"..i] then
+                    break
+                end
                 merchantMoney = _G["MerchantItem"..i.."MoneyFrame"];
                 merchantAltCurrency = _G["MerchantItem"..i.."AltCurrencyFrame"];
                 if merchantMoney then
@@ -128,7 +131,7 @@ do
 
         local merchantButton, merchantMoney, merchantAltCurrency;
 
-        for i = 1, BUYBACK_ITEMS_PER_PAGE do
+        for i = 1, 50 do
             merchantButton = _G["MerchantItem"..i];
             merchantMoney = _G["MerchantItem"..i.."MoneyFrame"];
             merchantAltCurrency = _G["MerchantItem"..i.."AltCurrencyFrame"];
@@ -233,8 +236,9 @@ function Controller:UpdateMerchantInfo()
     local id, currencyType;
     local priceFrame;
 
+    local itemsPerPage = self:GetMaxItemsPerPage();
     local numMerchantItems = GetMerchantNumItems();
-    local fromIndex = (page - 1) * MERCHANT_ITEMS_PER_PAGE;
+    local fromIndex = (page - 1) * itemsPerPage;
     local merchantButton;
     local anyGold;
     local altCurreny;
@@ -244,17 +248,17 @@ function Controller:UpdateMerchantInfo()
     local playerMoney = GetMoney();
 
     local buttonIndex = 0;
-    local numPages = ceil(numMerchantItems / MERCHANT_ITEMS_PER_PAGE);
+    local numPages = ceil(numMerchantItems / itemsPerPage);
 
     local numItemsThisPage;
 
     if page < numPages then
-        numItemsThisPage = MERCHANT_ITEMS_PER_PAGE;
+        numItemsThisPage = itemsPerPage;
     else
-        numItemsThisPage = numMerchantItems - (numPages - 1) * MERCHANT_ITEMS_PER_PAGE;
+        numItemsThisPage = numMerchantItems - (numPages - 1) * itemsPerPage;
     end
 
-    for buttonIndex = numItemsThisPage + 1, MERCHANT_ITEMS_PER_PAGE do
+    for buttonIndex = numItemsThisPage + 1, itemsPerPage do
         priceFrame = VendorItemPriceFrame[buttonIndex];
         if priceFrame then
             priceFrame:Hide();
@@ -262,74 +266,76 @@ function Controller:UpdateMerchantInfo()
     end
 
     for i = fromIndex + 1, fromIndex + numItemsThisPage do
-        price, extendedCost = GetMerchantItemPrice(i);
-
         buttonIndex = buttonIndex + 1;
         merchantButton = _G["MerchantItem"..buttonIndex];
 
-        priceFrame = VendorItemPriceFrame[buttonIndex];
-        if not priceFrame then
-            priceFrame = addon.CreatePriceDisplay(merchantButton);
-            VendorItemPriceFrame[buttonIndex] = priceFrame;
-            priceFrame:SetPoint("BOTTOMLEFT", merchantButton, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0);
-        end
+        if merchantButton then
+            price, extendedCost = GetMerchantItemPrice(i);
 
-        if price and price > 0 then
-            anyGold = true;
-        end
+            priceFrame = VendorItemPriceFrame[buttonIndex];
+            if not priceFrame then
+                priceFrame = addon.CreatePriceDisplay(merchantButton);
+                VendorItemPriceFrame[buttonIndex] = priceFrame;
+                priceFrame:SetPoint("BOTTOMLEFT", merchantButton, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0);
+            end
 
-        local requiredCurrency;
+            if price and price > 0 then
+                anyGold = true;
+            end
 
-        if extendedCost then
-            numCost = GetMerchantItemCostInfo(i);
-            requiredCurrency = {};
+            local requiredCurrency;
 
-            for n = 1, numCost do
-                itemTexture, itemValue, itemLink = GetMerchantItemCostItem(i, n);
-                --uncached item's link may be nil
+            if extendedCost then
+                numCost = GetMerchantItemCostInfo(i);
+                requiredCurrency = {};
 
-                if itemLink then
-                    id = match(itemLink, "currency:(%d+)");
-                    if id then
-                        currencyType = 0;
-                    else
-                        id = match(itemLink, "item:(%d+)");
+                for n = 1, numCost do
+                    itemTexture, itemValue, itemLink = GetMerchantItemCostItem(i, n);
+                    --uncached item's link may be nil
+
+                    if itemLink then
+                        id = match(itemLink, "currency:(%d+)");
                         if id then
-                            currencyType = 1;
-                        end
-                    end
-
-                    if id and currencyType then
-                        id = tonumber(id);
-
-                        if not altCurreny then
-                            altCurreny = {};
-                        end
-
-                        if id and not altCurreny[id] then
-                            --assume itemID and currencyID don't accidently overlap
-                            altCurreny[id] = currencyType;
-
-                            if (not hasAnyContextToken) and IsItemContextToken(id) then
-                                hasAnyContextToken = true;
+                            currencyType = 0;
+                        else
+                            id = match(itemLink, "item:(%d+)");
+                            if id then
+                                currencyType = 1;
                             end
                         end
 
-                        requiredCurrency[n] = {currencyType, id, itemValue, itemTexture, itemLink, i, n};
+                        if id and currencyType then
+                            id = tonumber(id);
+
+                            if not altCurreny then
+                                altCurreny = {};
+                            end
+
+                            if id and not altCurreny[id] then
+                                --assume itemID and currencyID don't accidently overlap
+                                altCurreny[id] = currencyType;
+
+                                if (not hasAnyContextToken) and IsItemContextToken(id) then
+                                    hasAnyContextToken = true;
+                                end
+                            end
+
+                            requiredCurrency[n] = {currencyType, id, itemValue, itemTexture, itemLink, i, n};
+                        end
+                    else
+                        self:RequestUpdate(0.2);
                     end
-                else
-                    self:RequestUpdate(0.2);
                 end
+            else
+                numCost = 0;
             end
-        else
-            numCost = 0;
+
+            slotIndexList[buttonIndex] = {i, numCost};
+
+            priceFrame:SetFrameOwner(merchantButton, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0, "MEDIUM");
+            priceFrame:SetMoneyAndAltCurrency(price, requiredCurrency, playerMoney);
+            priceFrame:Show();
         end
-
-        slotIndexList[buttonIndex] = {i, numCost};
-
-        priceFrame:SetFrameOwner(merchantButton, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0, "MEDIUM");
-        priceFrame:SetMoneyAndAltCurrency(price, requiredCurrency, playerMoney);
-        priceFrame:Show();
     end
 
     self:SetupTokenDisplay();
@@ -507,7 +513,7 @@ function Controller:EnableModule(state)
             local conflictAddons = {
                 "Krowi_ExtendedVendorUI",
                 "ElvUI_WindTools",
-                "EnhanceQoL",
+                --"EnhanceQoL",
             };
 
             for _, name in ipairs(conflictAddons) do

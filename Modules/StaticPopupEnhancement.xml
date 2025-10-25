@@ -2,4 +2,5 @@
     <Script file="StaticPopup_Basic.lua"/>
     <Script file="StaticPopup_QuestItemDestroyAlert.lua"/>
     <Script file="StaticPopup_PartyInvite.lua"/>
+    <Script file="StaticPopup_Confirm.lua"/>
 </Ui>

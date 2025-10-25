@@ -465,6 +465,8 @@ L["Restored Coffer Key"] = "Restaurierter Kastenschlüssel";
 L["Coffer Key Shard"] = "Kastenschlüsselsplitter";
 L["Epoch Mementos"] = "Epochenandenken";
 
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Seid Ihr sicher, dass Ihr %s gegen den folgenden Gegenstand eintauschen möchtet?\n\n|cffff2020Dieser Tausch kann nicht rückgängig gemacht werden.|r\n %s";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "Großzügige Tiefe";

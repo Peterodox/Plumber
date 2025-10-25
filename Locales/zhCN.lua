@@ -592,6 +592,8 @@ L["Restored Coffer Key"] = "修复的宝匣钥匙";
 L["Coffer Key Shard"] = "宝匣钥匙碎片";
 L["Epoch Mementos"] = "纪元纪念品";
 
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "你确定要将%s兑换为下列物品吗？\n\n|cffff2020本次购买将无法退还。|r\n %s";
+
 
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "丰裕地下堡";

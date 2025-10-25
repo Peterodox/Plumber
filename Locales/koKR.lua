@@ -577,6 +577,9 @@ L["Restored Coffer Key"] = "복원된 보관함 열쇠"
 L["Coffer Key Shard"] = "보관함 열쇠 파편"
 L["Epoch Mementos"] = "시대의 기념품";
 
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "%s : 정말로 다음 아이템으로 교환하시겠습니까?\n\n|cffff2020아이템은 환불받을 수 없습니다.|r\n %s";
+
+
 --Map Pin Filter Name (name should be plural)
 L["Bountiful Delve"] =  "풍요로운 구렁";
 L["Special Assignment"] = "특별 과제";

@@ -1277,9 +1277,9 @@ do  -- TokenFrame   -- Money   -- Coin
         if quantity then
             tokenButton.Icon:SetTexture(icon);
             if numRequired then
-                tokenButton.Count:SetText(numRequired);
+                tokenButton.Count:SetText(BreakUpLargeNumbers(numRequired));
             else
-                tokenButton.Count:SetText(quantity);
+                tokenButton.Count:SetText(BreakUpLargeNumbers(quantity));
             end
             if numRequired and numRequired > quantity then
                 grayColor = true;
