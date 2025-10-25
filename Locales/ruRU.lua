@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.6 b
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.8
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -376,8 +376,11 @@ L["SoftTargetName ShowNPC Tooltip"] = "Если отключено, имя бу�
 --LegionRemix
 L["ModuleName LegionRemix"] = "Legion Remix"
 L["ModuleDescription LegionRemix"] = "- Автоматическое изучение черт.\n\n- Добавление виджета на панель персонажа, предоставляющего различную информацию. Вы можете кликнуть по этому виджету, чтобы открыть новый интерфейс артефакта."
+L["ModuleName LegionRemix_HideWorldTier"] = "Скрыть значок сложности мира";
+L["ModuleDescription LegionRemix_HideWorldTier"] = "Скрыть значок Героического мира на мини-карте.";
 L["Artifact Weapon"] = "Артефактное оружие"
 L["Artifact Ability"] = "Способность артефакта"
+L["Artifact Traits"] = "Черты артефакта";
 L["Earn X To Upgrade Y Format"] = "Заработайте еще |cffffffff%s|r %s для улучшения %s" --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
 L["Until Next Upgrade Format"] = "%s до следующего улучшения"
 L["New Trait Available"] = "Доступна новая черта"
@@ -396,14 +399,32 @@ L["Error Drag Spell In Combat"] = "Вы не можете перетаскива
 L["Error Change Trait In Combat"] = "Вы не можете изменять черты во время боя."
 L["Amount Required To Unlock Format"] = "%s для разблокировки" --Earn another x amount to unlock (something)
 L["Soon To Unlock"] = "Скоро будет разблокировано"
+L["You Can Unlock Title"] = "Вы можете разблокировать";
 L["Artifact Ability Auto Unlock Tooltip"] = "Эта черта будет автоматически разблокирована, как только у вас будет достаточно Бесконечной силы."
 L["Require More Bag Slot Alert"] = "Вам нужно освободить место в сумках перед выполнением этого действия"
 L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Заклинание не изучено"
+L["Fully Upgraded"] = AZERITE_EMPOWERED_ITEM_FULLY_UPGRADED or "Полностью улучшен";
+L["Unlock Level Requirement Format"] = "Достигните %d уровня, чтобы разблокировать";
+L["Auto Learn Traits"] = "Авто обучение чертам";
+L["Auto Learn Traits Tooltip"] = "Автоматически улучшайте характеристики артефакта, когда у вас достаточно Бесконечной силы.";
+L["Infinite Power Yield Format"] = "Показывает |cffffffff%s|r Силу на вашем текущем уровне Знаний.";
+L["Infinite Knowledge Bonus Format"] = "Текущий бонус: |cffffffff%s|r";
+L["Infinite Knowledge Bonus Next Format"] = "Следующий Ранг: %s";
 
 
 --ItemUpgradeUI
 L["ModuleName ItemUpgradeUI"] = "Улучшение предметов: Показывать панель персонажа";
 L["ModuleDescription ItemUpgradeUI"] = "Автоматически открывать панель персонажа при взаимодействии с НПС для улучшения предметов.";
+
+
+--HolidayDungeon
+L["ModuleName HolidayDungeon"] = "Авто выбор праздничного подземелья";
+L["ModuleDescription HolidayDungeon"] = "Автоматически выбирает праздничные и вневременные подземелья при первом открытии Поиска Подземелий.";
+
+
+--PlayerPing
+L["ModuleName PlayerPing"] = "Значок карты: пинг игрока";
+L["ModuleDescription PlayerPing"] = "Выделите местоположение игрока с помощью эффекта пинга, когда вы:\n\n- На карте открытого мира.\n\n- Нажмите клавишу ALT.\n\n- Нажмите кнопку Развернуть.\n\n|cffd4641cПо умолчанию WoW показывает пинг игрока только при смене карты.|r";
 
 
 --Loot UI
@@ -444,6 +465,8 @@ L["LootUI Option Grow Direction Tooltip 2"] = "Когда отключено: в
 L["Junk Items"] = "Мусорные предметы";
 L["LootUI Option Combine Items"] = "Объединять похожие предметы";
 L["LootUI Option Combine Items Tooltip"] = "Отображать похожие предметы в одной строке. Поддерживаемые категории:\n\n- Мусорные предметы\n- Осколки времени (Legion Remix)";
+L["LootUI Option Low Frame Strata"] = "Отправить на задний план";
+L["LootUI Option Low Frame Strata Tooltip"] = "В режиме уведомления о добыче поместите окно добычи за другим элементом пользовательского интерфейса.\n\nЭта опция не влияет на режим ручной добычи.";
 
 
 --Quick Slot For Third-party Dev
@@ -546,6 +569,12 @@ L["Weekly Coffer Key Shards Tooltip"] = "Первые четыре еженед�
 L["Weekly Cap"] = "Еженедельный лимит";
 L["Weekly Cap Reached"] = "Достигнут недельный лимит.";
 L["Instruction Right Click To Use"] = "<ПКМ, чтобы использовать>";
+L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Присоединиться к очереди";
+L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "В очереди";
+L["Click To Switch"] = "Нажмите, чтобы переключиться на |cffffffff%s|r";
+L["Click To Queue"] = "Нажмите, чтобы встать в очередь в |cffffffff%s|r";
+L["Click to Open Format"] = "Нажмите, чтобы открыть %s";
+L["List Is Empty"] = "Список пуст.";
 
 
 --Generic
@@ -571,6 +600,16 @@ L["New Feature Auto Enabled Format"] = "Новый модуль %s был вкл
 L["Click To See Details"] = "Нажмите, чтобы увидеть подробности";
 
 
+--WIP Merchant UI
+L["ItemType Consumables"] = AUCTION_CATEGORY_CONSUMABLES or "Материалы";
+L["ItemType Weapons"] = AUCTION_CATEGORY_WEAPONS or "Оружие";
+L["ItemType Gems"] = AUCTION_CATEGORY_GEMS or "Камни";
+L["ItemType Armor Generic"] = AUCTION_SUBCATEGORY_PROFESSION_ACCESSORIES or "Аксессуары";  --Trinkets, Rings, Necks
+L["ItemType Mounts"] = MOUNTS or "Маунты";
+L["ItemType Pets"] = PETS or "Питомцы";
+L["ItemType Toys"] = "Игрушки";
+L["ItemType TransmogSet"] = PERKS_VENDOR_CATEGORY_TRANSMOG_SET or "Набор трансмогрификации";
+L["ItemType Transmog"] = "Трансмогрификация";
 
 
 -- !! Do NOT translate the following entries
@@ -595,8 +634,6 @@ L["Devourer Attack"] = "Атака Пожирателей";
 L["Restored Coffer Key"] = "Отреставрированный ключ от сундука";
 L["Coffer Key Shard"] = "Осколок ключа от сундука";
 L["Epoch Mementos"] = "Сокровище эпох";
-
-L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Вы уверены что хотите обменять %s на данный предмет?\n\n|cffff2020Возврат будет невозможен.|r\n %s";
 
 
 --Map Pin Filter Name (name should be plural)
