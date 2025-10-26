@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.8
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.9
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -202,6 +202,12 @@ L["Can Create Multiple Item Format"] = "У вас есть ресурсы для
 L["ModuleName TooltipDelvesItem"] = "Предметы из Вылазок";
 L["ModuleDescription TooltipDelvesItem"] = "Показать, сколько ключей и осколков вы заработали из еженедельных сундуков.";
 L["You Have Received Weekly Item Format"] = "На этой неделе вы получили %s.";
+
+
+--Tooltip ItemQuest
+L["ModuleName TooltipItemQuest"] = "Начальные предметы заданий";
+L["ModuleDescription TooltipItemQuest"] = "Если предмет в вашей сумке начинает задание, показывать детали задания.\n\nЕсли вы уже выполняете задание, вы можете щелкнуть ЛКМ по предмету, удерживая клавишу Ctrl, чтобы просмотреть его в журнале заданий.";
+L["Instruction Show In Quest Log"] = "<ЛКМ по предмету, удерживая клавишу Ctrl, чтобы просмотреть журнал заданий>";
 
 
 --Plunderstore
@@ -427,6 +433,11 @@ L["ModuleName PlayerPing"] = "Значок карты: пинг игрока";
 L["ModuleDescription PlayerPing"] = "Выделите местоположение игрока с помощью эффекта пинга, когда вы:\n\n- На карте открытого мира.\n\n- Нажмите клавишу ALT.\n\n- Нажмите кнопку Развернуть.\n\n|cffd4641cПо умолчанию WoW показывает пинг игрока только при смене карты.|r";
 
 
+--StaticPopup_Confirm
+L["ModuleName StaticPopup_Confirm"] = "Оповещение о невозвратной покупке";
+L["ModuleDescription StaticPopup_Confirm"] = "Настройте диалоговое окно подтверждения, которое появляется при покупке невозвратного товара, добавив кратковременную блокировку кнопки \'Да\' и выделив ключевые слова красным цветом.\n\nЭтот модуль также вдвое сокращает задержку преобразования набора классов.";
+
+
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Окно добычи";
 L["ModuleDescription LootUI"] = "Заменить стандартное окно добычи и предоставить некоторые дополнительные функции:\n\n- Быстрый сбор предметов.\n\n- Исправлена ​​ошибка сбоя автоматического сбора добычи.\n\n- Показывать кнопку взять все при ручном сборе.";
@@ -598,6 +609,7 @@ L["ModuleName EnableNewByDefault"] = "Всегда включайте новые
 L["ModuleDescription EnableNewByDefault"] = "Всегда включайте новые добавленные функции.\n\n*При включении нового модуля таким образом вы увидите уведомление в окне чата.";
 L["New Feature Auto Enabled Format"] = "Новый модуль %s был включен.";
 L["Click To See Details"] = "Нажмите, чтобы увидеть подробности";
+L["Click To Show Settings"] = "Нажмите, чтобы переключить настройки.";
 
 
 --WIP Merchant UI
@@ -634,6 +646,8 @@ L["Devourer Attack"] = "Атака Пожирателей";
 L["Restored Coffer Key"] = "Отреставрированный ключ от сундука";
 L["Coffer Key Shard"] = "Осколок ключа от сундука";
 L["Epoch Mementos"] = "Сокровище эпох";
+
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Вы уверены, что хотите обменять %s на следующий товар?\n\n|cffff2020Ваша покупка не подлежит возврату.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 
 
 --Map Pin Filter Name (name should be plural)
