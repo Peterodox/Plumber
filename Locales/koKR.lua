@@ -183,7 +183,6 @@ L["ModuleName TooltipItemQuest"] = "퀘스트 시작 아이템"
 L["ModuleDescription TooltipItemQuest"] = "가방에 있는 아이템이 퀘스트를 시작할 수 있는 경우, 툴팁에 해당 퀘스트 정보를 표시합니다.\n\n이미 퀘스트를 진행 중이라면 Ctrl+왼쪽 클릭으로 퀘스트 로그에서 확인할 수 있습니다."
 L["Instruction Show In Quest Log"] = "<Ctrl+왼쪽 클릭으로 퀘스트 로그 열기>"
 
-
 --Plunderstore
 L["ModuleName Plunderstore"] = "약탈 상점";
 L["ModuleDescription Plunderstore"] = "파티 찾기를 통해 열리는 상점을 다음과 같이 변경합니다:\n\n- 수집한 아이템 숨기기 체크박스 추가\n\n- 카테고리 버튼에 미수집 아이템 수 표시\n\n- 무기 및 방어구의 착용 위치를 툴팁에 표시\n\n- 착용 가능한 아이템을 외형 미리보기에서 확인 가능";
