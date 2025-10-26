@@ -178,6 +178,11 @@ L["ModuleName TooltipDelvesItem"] = "구렁 아이템";
 L["ModuleDescription TooltipDelvesItem"] = "주간 보상 상자에서 획득한 보관함 열쇠와 파편 수량을 표시합니다.";
 L["You Have Received Weekly Item Format"] = "이번 주에 %s을(를) 획득했습니다.";
 
+--Tooltip ItemQuest
+L["ModuleName TooltipItemQuest"] = "퀘스트 시작 아이템"
+L["ModuleDescription TooltipItemQuest"] = "가방에 있는 아이템이 퀘스트를 시작할 수 있는 경우, 툴팁에 해당 퀘스트 정보를 표시합니다.\n\n이미 퀘스트를 진행 중이라면 Ctrl+왼쪽 클릭으로 퀘스트 로그에서 확인할 수 있습니다."
+L["Instruction Show In Quest Log"] = "<Ctrl+왼쪽 클릭으로 퀘스트 로그 열기>"
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "약탈 상점";
 L["ModuleDescription Plunderstore"] = "파티 찾기를 통해 열리는 상점을 다음과 같이 변경합니다:\n\n- 수집한 아이템 숨기기 체크박스 추가\n\n- 카테고리 버튼에 미수집 아이템 수 표시\n\n- 무기 및 방어구의 착용 위치를 툴팁에 표시\n\n- 착용 가능한 아이템을 외형 미리보기에서 확인 가능";
@@ -374,6 +379,10 @@ L["ModuleDescription HolidayDungeon"] = "던전 찾기를 처음 열 때 이벤�
 --PlayerPing
 L["ModuleName PlayerPing"] = "지도 핀: 플레이어 위치 강조";
 L["ModuleDescription PlayerPing"] = "다음 상황에서 플레이어의 위치를 시각적으로 강조합니다:\n\n- 월드 지도를 열 때\n- ALT 키를 누를 때\n- 최대화 버튼을 클릭할 때\n\n|cffd4641c기본적으로 WoW는 지도를 전환할 때만 플레이어 위치를 표시합니다.|r";
+
+--StaticPopup_Confirm
+L["ModuleName StaticPopup_Confirm"] = "환불 불가 구매 경고";
+L["ModuleDescription StaticPopup_Confirm"] = "환불이 불가능한 아이템을 구매할 때 표시되는 확인 창을 조정합니다. '예' 버튼에 짧은 잠금 시간을 추가하고, 핵심 키워드를 빨간색으로 강조합니다.\n\n또한 클래스 세트 전환 지연 시간을 절반으로 줄여줍니다.";
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
