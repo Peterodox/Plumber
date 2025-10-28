@@ -8,7 +8,7 @@ local L = addon.L;
 
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber";
-BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Окно Резюме расширения";   --Show/hide Expansion Summary UI
+BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Окно Резюме дополнения";   --Show/hide Expansion Summary UI
 
 
 --Module Control Panel
@@ -517,7 +517,7 @@ L["Drawer Option Update Frequently Tooltip"] = "Попробуйте обнов�
 
 
 --New Expansion Landing Page
-L["ModuleName NewExpansionLandingPage"] = "Резюме расширения";
+L["ModuleName NewExpansionLandingPage"] = "Резюме дополнения";
 L["ModuleDescription NewExpansionLandingPage"] = "Интерфейс, который отображает фракции, еженедельные мероприятия и рейдовые кд. Вы можете открыть его:\n\n- Нажав на кнопку Обзор Каз Алгара на мини-карте..\n\n- Установить горячую клавишу в настройках игры - Сочетания клавиш.";
 L["Reward Available"] = "Доступная награда";
 L["Paragon Reward Available"] = "Доступна награда Парагона";
