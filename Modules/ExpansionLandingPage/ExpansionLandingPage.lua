@@ -34,7 +34,7 @@ do  --TabButtonMixin
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -8, -4);
                 for i, line in ipairs(tooltipLines) do
                     if i == 1 then
-                        tooltip:SetText(line, 1, 1, 1, true);
+                        tooltip:SetText(line, 1, 1, 1, 1, true);
                     else
                         tooltip:AddLine(line, 1, 0.82, 0, true);
                     end
@@ -180,7 +180,6 @@ do
 
         if self.InitTabButtons then
             self:InitTabButtons();
-            LandingPageUtil.SelectTabByIndex(1);
         end
 
         self:UpdateTabs();    --The selected tab will be created here

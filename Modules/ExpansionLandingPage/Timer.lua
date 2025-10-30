@@ -165,7 +165,7 @@ do  --TimerFrame
         if self.tooltipTitle then
             local tooltip = GameTooltip;
             tooltip:SetOwner(self, "ANCHOR_RIGHT");
-            tooltip:SetText(self.tooltipTitle, 1, 1, 1, true);
+            tooltip:SetText(self.tooltipTitle, 1, 1, 1, 1, true);
             if self.tooltipText then
                 tooltip:AddLine(self.tooltipText, 1, 0.82, 0, true);
             end

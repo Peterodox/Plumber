@@ -462,6 +462,7 @@ L["Completed CHETT List"] = "完成的C.H.E.T.T.清單";
 L["Restored Coffer Key"] = "復原的寶庫鑰匙";
 L["Coffer Key Shard"] = "寶庫鑰匙裂片";
 L["Epoch Mementos"] = "時代紀念物";
+L["Timeless Scrolls"] = "永恆卷軸";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "你確定要用%s來兌換下列物品嗎？\n\n|cffff2020這筆交易無法退款。|r\n %s";
 

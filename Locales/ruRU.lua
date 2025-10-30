@@ -646,6 +646,9 @@ L["Devourer Attack"] = "Атака Пожирателей";
 L["Restored Coffer Key"] = "Отреставрированный ключ от сундука";
 L["Coffer Key Shard"] = "Осколок ключа от сундука";
 L["Epoch Mementos"] = "Сокровище эпох";
+L["Timeless Scrolls"] = "Вневременный свиток"; --item: 217605
+
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Вы уверены что хотите обменять %s на данный предмет?\n\n|cffff2020Возврат будет невозможен.|r\n %s";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Вы уверены, что хотите обменять %s на следующий товар?\n\n|cffff2020Ваша покупка не подлежит возврату.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 

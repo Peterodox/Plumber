@@ -264,7 +264,7 @@ do
         --tooltip:SetAchievementByID(self.achievementID);
 
         local id, name, points, completed, month, day, year, description, flags, icon, rewardText, isGuild, wasEarnedByMe = GetAchievementInfo(self.achievementID);
-        tooltip:SetText(name, 1, 0.82, 0, true);
+        tooltip:SetText(name, 1, 0.82, 0, 1, true);
 
         if completed then
             tooltip:AddLine(ACHIEVEMENTFRAME_FILTER_COMPLETED, 0.098, 1.000, 0.098, true);

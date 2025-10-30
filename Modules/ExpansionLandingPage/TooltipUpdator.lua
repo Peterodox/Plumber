@@ -162,7 +162,7 @@ function TooltipUpdator:OnUpdate(elapsed)
                 tooltip:SetOwner(self.obj, "ANCHOR_NONE");
                 tooltip:SetPoint("TOPLEFT", self.obj, "TOPRIGHT", 4, 12);
 
-                tooltip:SetText(self.headerText, 1, 0.82, 0, true);
+                tooltip:SetText(self.headerText, 1, 0.82, 0, 1, true);
 
                 if self.entryChildren then
                     for k, v in iparis(self.entryChildren) do

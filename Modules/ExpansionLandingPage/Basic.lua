@@ -1034,7 +1034,7 @@ do  --Dropdown Button
         if textTruncated or self.tooltip then
             local tooltip = GameTooltip;
             tooltip:SetOwner(self, "ANCHOR_RIGHT");
-            tooltip:SetText(self.Text:GetText(), 1, 1, 1, true);
+            tooltip:SetText(self.Text:GetText(), 1, 1, 1, 1, true);
             if self.tooltip then
                 tooltip:AddLine(self.tooltip, 1, 0.82, 0, true);
             end

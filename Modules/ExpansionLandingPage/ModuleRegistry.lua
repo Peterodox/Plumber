@@ -50,7 +50,7 @@ local function AddonCompartment_OnEnter(menuButton, data)
         local bindingText = GetBindingText(hotkey) or hotkey;
         title = title .. string.format(" |cffffd100(%s)|r", bindingText);
     end
-    tooltip:SetText(title, 1, 1, 1, true);
+    tooltip:SetText(title, 1, 1, 1, 1, true);
     tooltip:AddLine(L["Plumber Experimental Feature Tooltip"], 1, 0.82, 0, true);
     tooltip:Show();
 end

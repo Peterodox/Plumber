@@ -646,6 +646,7 @@ L["Devourer Attack"] = "Devourer Attack";
 L["Restored Coffer Key"] = "Restored Coffer Key";
 L["Coffer Key Shard"] = "Coffer Key Shard";
 L["Epoch Mementos"] = "Epoch Mementos";     --See currency:3293
+L["Timeless Scrolls"] = "Timeless Scrolls"; --item: 217605
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Are you sure you wish to exchange %s for the following item?\n\n|cffff2020Your purchase is not refundable.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 

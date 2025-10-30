@@ -573,7 +573,7 @@ local function OptionButton_TrackItemUpgradeCurrency_OnEnter(self)
     local tooltip = GameTooltip;
     tooltip:Hide();
     tooltip:SetOwner(self, "ANCHOR_RIGHT");
-    tooltip:SetText(L["Track Upgrade Currency"], 1, 1, 1, true);
+    tooltip:SetText(L["Track Upgrade Currency"], 1, 1, 1, 1, true);
     tooltip:AddLine(L["Track Upgrade Currency Tooltip"], 1, 0.82, 0, true);
 
     local currencyName = CrestUtil:GetBestCrestName(true);

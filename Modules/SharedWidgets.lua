@@ -264,7 +264,7 @@ do  -- Checkbox
             local f = GameTooltip;
             f:Hide();
             f:SetOwner(self, "ANCHOR_RIGHT");
-            f:SetText(self.Label:GetText(), 1, 1, 1, true);
+            f:SetText(self.Label:GetText(), 1, 1, 1, 1, true);
             if type(self.tooltip) == "function" then
                 f:AddLine(self.tooltip(), 1, 0.82, 0, true);
             else
@@ -3801,7 +3801,7 @@ do  --Shared Context Menu
                 tooltip:SetPoint("TOPLEFT", self.focusedButton, "TOPRIGHT", 4, 6);
             end
 
-            tooltip:SetText(self.focusedButton.Text:GetText(), 1, 1, 1, true);
+            tooltip:SetText(self.focusedButton.Text:GetText(), 1, 1, 1, 1, true);
             tooltip:AddLine(self.focusedButton.tooltip, 1, 0.82, 0, true);
             tooltip:Show();
         end
@@ -4325,7 +4325,7 @@ do  --Slider
             local f = GameTooltip;
             f:Hide();
             f:SetOwner(self, "ANCHOR_RIGHT");
-            f:SetText(self.Label:GetText(), 1, 1, 1, true);
+            f:SetText(self.Label:GetText(), 1, 1, 1, 1, true);
             f:AddLine(self.tooltip, 1, 0.82, 0, true);
             if self.tooltip2 then
                 local tooltip2;
@@ -4573,7 +4573,7 @@ do  --KeybindButton
             local f = GameTooltip;
             f:Hide();
             f:SetOwner(self, "ANCHOR_RIGHT");
-            f:SetText(self.Label:GetText(), 1, 1, 1, true);
+            f:SetText(self.Label:GetText(), 1, 1, 1, 1, true);
             f:AddLine(self.tooltip, 1, 0.82, 0, true);
             f:Show();
         end

@@ -153,7 +153,7 @@ do
         if not (self.points and self.points > 0) then return end;
         local tooltip = GameTooltip;
         tooltip:SetOwner(self, "ANCHOR_RIGHT");
-        tooltip:SetText(PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS, 1, 1, 1, true);
+        tooltip:SetText(PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS, 1, 1, 1, 1, true);
         tooltip:AddLine(L["Unspent Knowledge Tooltip Format"]:format(self.points), 1, 0.82, 0, true);
         tooltip:Show();
     end

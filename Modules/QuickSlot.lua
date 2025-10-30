@@ -388,9 +388,9 @@ local function ItemButton_OnEnter(self)
         tooltip:SetOwner(self, "ANCHOR_RIGHT");
         for i, text in ipairs(self.tooltipLines) do
             if i == 1 then
-                tooltip:SetText(text, 1, 1, 1, true);
+                tooltip:SetText(text, 1, 1, 1, 1, true);
             else
-                tooltip:AddLine(text, 1, 1, 1, true);
+                tooltip:AddLine(text, 1, 1, 1, 1, true);
             end
         end
         tooltip:Show();

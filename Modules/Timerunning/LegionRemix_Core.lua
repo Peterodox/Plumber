@@ -571,6 +571,10 @@ do	--DataProvider
 			if C_RemixArtifactUI then
 				C_RemixArtifactUI.ClearRemixArtifactItem();
 			end
+
+			if specIndex then
+				C_CVar.SetCVarBitfield("closedRemixArtifactTutorialFrames", specIndex, true);
+			end
 		end
 	end
 
@@ -779,6 +783,7 @@ do	--DataProvider
 
 			if not traitName then
 				traitName = self:GetTraitName(traitInfo.entryID);
+				line2 = traitName;
 			end
 
 			if nextRank and traitName then

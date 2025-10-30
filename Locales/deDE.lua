@@ -464,6 +464,7 @@ L["Completed CHETT List"] = "Abgeschlossene C.H.E.T.T.-Liste";
 L["Restored Coffer Key"] = "Restaurierter Kastenschlüssel";
 L["Coffer Key Shard"] = "Kastenschlüsselsplitter";
 L["Epoch Mementos"] = "Epochenandenken";
+L["Timeless Scrolls"] = "Zeitlose Schriftrolle";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Seid Ihr sicher, dass Ihr %s gegen den folgenden Gegenstand eintauschen möchtet?\n\n|cffff2020Dieser Tausch kann nicht rückgängig gemacht werden.|r\n %s";
 

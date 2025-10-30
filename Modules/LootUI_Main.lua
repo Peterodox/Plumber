@@ -165,13 +165,16 @@ end
 local SimilarItemGroups = {};
 local MergedSimilarItemNames = {};
 do  --Merge Similar Items
-    local tinsert = table.insert;
-
     local SimilarItemData = {
         {
             items = {242516, 246937, 242515, 242513, 242508, 242501,242510, 242503, 242505, 242502, 242514, 242512, 242506, 242507, 242504, 242509, 242511},    --Epoch
             name = L["Epoch Mementos"],
-        };
+        },
+
+        {
+            items = {217605, 217606, 217607, 217608, 217730, 217731, 217901, 217928, 217929, 217956},    --Timeless Scroll
+            name = L["Timeless Scrolls"],
+        },
     };
 
     for groupID, v in ipairs(SimilarItemData) do
@@ -1822,20 +1825,6 @@ do  --UI Basic
         end
     end
     MainFrame:SetScript("OnShow", MainFrame.OnShow);
-
-    function MainFrame:OnHide()
-        if self.manualMode then
-            CloseLoot();
-        end
-        if self:IsShown() then return end;  --Due to hiding UIParent
-        self:ReleaseAll();
-        self.isFocused = false;
-        self.manualMode = nil;
-        self:StopQueue();
-        self:UnregisterEvent("GLOBAL_MOUSE_UP");
-        self:UnregisterEvent("BAG_UPDATE_DELAYED");
-    end
-    MainFrame:SetScript("OnHide", MainFrame.OnHide);
 
     function MainFrame:OnEvent(event, ...)
         if event == "GLOBAL_MOUSE_UP" then

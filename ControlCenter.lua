@@ -341,7 +341,13 @@ local function CreateUI()
 
     local db = PlumberDB;
     DB = db;
-    local settingsOpenTime = db.settingsOpenTime or 0;
+
+    local settingsOpenTime = db.settingsOpenTime;
+    local isFirstMet;
+    if not settingsOpenTime then
+        settingsOpenTime = 0;
+        isFirstMet = true;
+    end
 
     local parent = ControlCenter;
     local showCloseButton = true;
@@ -583,7 +589,7 @@ local function CreateUI()
         checkbox:SetFixedWidth(CHECKBOX_WIDTH);
         SetupCheckboxFromData(checkbox, data);
 
-        if data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
+        if (not isFirstMet) and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
             CreateNewFeatureMark(checkbox);
         end
 

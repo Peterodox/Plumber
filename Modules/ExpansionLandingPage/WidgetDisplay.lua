@@ -53,6 +53,11 @@ do
     end
 
     function WidgetDisplayMixin:Update()
+        if self.widgetSetID and (not self.visualInfoGetter) then
+            self:SetWidgetSetID(self.widgetSetID);
+            return
+        end
+
         if not self.visualInfoGetter then return end;
 
         local info = self.visualInfoGetter(self.widgetID);
@@ -150,14 +155,4 @@ function LandingPageUtil.CreateWidgetDisplay(parent, widgetSetID)
     end
 
     return f
-end
-
-
-function YeetWidgets()
-    for i = 7230, 7600 do
-     	local info = C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(i);
-        if info then
-            print(i)
-        end
-    end
 end

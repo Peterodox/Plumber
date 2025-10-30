@@ -1005,6 +1005,7 @@ do  --UI Notification Mode
 
     function MainFrame:DisplayLootResult()
         local overflowWarning;
+        local anyNotification;  --Other Plumber module may use this as notification (e.g. auto-selected trait)
 
         if self.lootQueue then
             overflowWarning = false;
@@ -1124,6 +1125,10 @@ do  --UI Notification Mode
                 itemFrame:EnableMouseScript(enableState);
                 itemFrame.hasItem = true;
             end
+
+            if data.isNotification then
+                anyNotification = true;
+            end
         end
 
         local numFrames = (self.activeFrames and #self.activeFrames) or 0;
@@ -1134,6 +1139,9 @@ do  --UI Notification Mode
                 self.Header:SetText(L["Reach Currency Cap"]);
             else
                 AUTO_HIDE_DELAY = 2.0 + numFrames * FADE_DELAY_PER_ITEM;
+                if anyNotification then
+                    AUTO_HIDE_DELAY = AUTO_HIDE_DELAY + 2.0;
+                end
                 self.Header:SetText(L["You Received"]);
             end
 
@@ -1191,6 +1199,21 @@ do  --UI Notification Mode
             return false
         end
     end
+
+    function MainFrame:OnHide()
+        if self.manualMode then
+            CloseLoot();
+        end
+        if self:IsShown() then return end;  --Due to hiding UIParent
+        self:ReleaseAll();
+        self.isFocused = false;
+        self.manualMode = nil;
+        self:StopQueue();
+        self:UnregisterEvent("GLOBAL_MOUSE_UP");
+        self:UnregisterEvent("BAG_UPDATE_DELAYED");
+        EL.playerMoney = nil;
+    end
+    MainFrame:SetScript("OnHide", MainFrame.OnHide);
 end
 
 
@@ -2006,6 +2029,7 @@ do  --Use Loot UI as Notification Center
 			hideCount = true,
 			showGlow = true,
 			tooltipMethod = "SetSpellByID",
+            isNotification = true,
 		};
 
 		self:QueueDisplayLoot(data);

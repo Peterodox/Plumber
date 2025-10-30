@@ -445,7 +445,7 @@ do  --FlyoutButtonMixin
         elseif self.tooltipText then
             local tooltip = GameTooltip;
             tooltip:SetOwner(self, "ANCHOR_RIGHT");
-            tooltip:SetText(self.tooltipText, 1, 1, 1, true);
+            tooltip:SetText(self.tooltipText, 1, 1, 1, 1, true);
             tooltip:Show();
             self.UpdateTooltip = nil;
         else

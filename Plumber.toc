@@ -90,3 +90,5 @@ Modules\HolidayDungeon.lua
 #Modules\AccountStore.lua
 #Modules\MinimapMouseover.lua
 #Modules\ObjectiveTrackerModule.xml
+
+Modules\Beta\Beta.lua [AllowLoadGameType Mainline Beta]
