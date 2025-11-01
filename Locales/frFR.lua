@@ -204,6 +204,12 @@ L["ModuleDescription TooltipDelvesItem"] = "Afficher le nombre de Clés de coffr
 L["You Have Received Weekly Item Format"] = "Vous avez reçu %s cette semaine.";
 
 
+--Tooltip ItemQuest
+L["ModuleName TooltipItemQuest"] = "Cet objet permet de lancer une quête";
+L["ModuleDescription TooltipItemQuest"] = "Si un objet dans votre sac permet de lancer une quête, alors afficher les détails de la quête.\n\nSi vous avez déjà accepté la quête, vous pouvez faire Ctrl + clic gauche sur l'objet pour afficher le journal des quêtes.";
+L["Instruction Show In Quest Log"] = "<Ctrl + clic gauche pour afficher le journal des quêtes>";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
 L["ModuleDescription Plunderstore"] = "Modification de la boutique accessible via la Recherche de groupe :\n\n– Ajout d'une case à cocher pour masquer les objets déjà collectés.\n\n– Affichage du nombre d'objets non collectés sur les boutons de catégorie.\n\n– Ajout de l'emplacement d'équipement (arme ou armure) dans les infobulles.\n\n– Possibilité de visualiser les objets équipables dans la salle d'essayage."
@@ -413,8 +419,8 @@ L["Infinite Knowledge Bonus Next Format"] = "Prochain rang : %s";
 
 
 --ItemUpgradeUI
-L["ModuleName ItemUpgradeUI"] = "Améliorations d'objets : Afficher la du personnage";
-L["ModuleDescription ItemUpgradeUI"] = "Ouvrir automatiquement le volet Personnage lorsque vous interagissez avec un PNJ d'améliorations d'objets.";
+L["ModuleName ItemUpgradeUI"] = "Améliorations d'objets : Afficher la fiche du personnage";
+L["ModuleDescription ItemUpgradeUI"] = "Ouvrir automatiquement la fiche de votre personnage lorsque vous interagissez avec un PNJ d'améliorations d'objets.";
 
 
 --HolidayDungeon
@@ -425,6 +431,11 @@ L["ModuleDescription HolidayDungeon"] = "Sélectionner automatiquement les donjo
 --PlayerPing
 L["ModuleName PlayerPing"] = "Pin sur la carte : Ping du joueur";
 L["ModuleDescription PlayerPing"] = "Mettre en surbrillance l'emplacement du joueur avec un effet de ping lorsque vous :\n\n- Ouvrez la carte du monde.\n\n- Appuyez sur la touche ALT.\n\n- Cliquez sur le bouton Agrandir.\n\n|cffd4641cPar défaut, WoW n'affiche le ping du joueur que lorsque vous changez de carte.|r";
+
+
+--StaticPopup_Confirm
+L["ModuleName StaticPopup_Confirm"] = "Alerte achat non remboursable";
+L["ModuleDescription StaticPopup_Confirm"] = "Ajustez la boîte de dialogue de confirmation qui apparaît lors de l'achat d'un objet non remboursable, en ajoutant un bref verrouillage au bouton « Oui » et en mettant en évidence les mots clés en rouge.\n\nCe module réduit également de moitié le délai de conversion des ensembles de classes.";
 
 
 --Loot UI
@@ -598,6 +609,7 @@ L["ModuleName EnableNewByDefault"] = "Toujours activer les nouvelles fonctionnal
 L["ModuleDescription EnableNewByDefault"] = "Activez toujours les fonctionnalités nouvellement ajoutées.\n\n*Vous verrez une notification dans la fenêtre de discussion lorsqu'un nouveau module est activé de cette manière.";
 L["New Feature Auto Enabled Format"] = "Nouveau module %s activé.";
 L["Click To See Details"] = "Cliquez pour voir les détails";
+L["Click To Show Settings"] = "Cliquez pour afficher / masquer les paramètres.";
 
 
 --WIP Merchant UI
