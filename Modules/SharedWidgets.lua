@@ -337,7 +337,11 @@ do  -- Checkbox
     function CheckboxMixin:OnEnable()
         self.CheckedTexture:SetDesaturated(false);
         self.CheckedTexture:SetVertexColor(1, 1, 1);
-        self.Label:SetTextColor(1, 0.82, 0);
+        if self.useWhiteLabel then
+            self.Label:SetTextColor(1, 1, 1);
+        else
+            self.Label:SetTextColor(1, 0.82, 0);
+        end
     end
 
     function CheckboxMixin:OnDisable()
@@ -4357,6 +4361,14 @@ do  --Slider
         return self.isDraggingThumb
     end
 
+    function SliderFrameMixin:SetEnabled(enabled)
+        if enabled then
+            self:Enable();
+        else
+            self:Disable();
+        end
+    end
+
     local function CreateSlider(parent)
         local f = CreateFrame("Frame", nil, parent, "PlumberMinimalSliderWithControllerTemplate");
         Mixin(f, SliderFrameMixin);
@@ -4881,6 +4893,7 @@ do  --EditMode
 
         checkbox.Label:SetFontObject("GameFontHighlightMedium");    --Fonts in EditMode and Options are different
         checkbox.Label:SetTextColor(1, 1, 1);
+        checkbox.useWhiteLabel = true;
 
         checkbox:SetData(widgetData);
         checkbox:SetChecked(addon.GetDBValue(checkbox.dbKey));
@@ -4976,6 +4989,7 @@ do  --EditMode
             for order, widgetData in ipairs(schematic.widgets) do
                 local widget;
                 if (not widgetData.validityCheckFunc) or (widgetData.validityCheckFunc()) then
+                    
                     if widgetData.type == "Checkbox" then
                         widget = self:CreateCheckbox(widgetData);
                     elseif widgetData.type == "RadioGroup" then
@@ -5005,6 +5019,10 @@ do  --EditMode
                         tinsert(self.activeWidgets, widget);
                         widget.widgetKey = widgetData.widgetKey;
                         widget.widgetType = widgetData.type;
+                        if widget.SetEnabled then
+                            local enabled = (widgetData.shouldEnableOption == nil) or (widgetData.shouldEnableOption and widgetData.shouldEnableOption());
+                            widget:SetEnabled(enabled);
+                        end
                     end
                 end
             end

@@ -658,7 +658,7 @@ function SettingsFrame:Init()
         end
     end
 
-    local contentSpan = math.floor( math.max(checkboxWidth, FRAME_MIN_WIDTH - 2*PADDING) + 0.5);
+    local contentSpan = math.floor( math.max(maxButtonWidth, FRAME_MIN_WIDTH - 2*PADDING) + 0.5);
     local frameWidth = contentSpan + 2*PADDING;
 
     --List of tracked items
@@ -840,6 +840,8 @@ function SettingsFrame:Init()
     f:SetPoint("BOTTOMLEFT", TrackerFrame, "TOPLEFT", 0, 4);
 
     f:SetClampedToScreen(true);
+    local d = 2;
+    f:SetClampRectInsets(-d, d, d, -d);
     f:SetFrameStrata("DIALOG");
     f:SetFixedFrameStrata(true);
 

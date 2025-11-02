@@ -19,6 +19,7 @@ local GetUnitIDGeneral = API.GetUnitIDGeneral;
 local SetUnitCursorTexture = SetUnitCursorTexture;
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
+local Secret_CanAccess = API.Secret_CanAccess;
 
 
 local Display = CreateFrame("Frame");
@@ -35,10 +36,11 @@ local Settings = {
     titleHeight = 15,
     subtextHeight = 13,
     iconSize = 16,
-    showCastBar = true,
+    showCastBar = false,
     fontObject = "GameFontNormal",
     textOutline = false,
     showObjectives = false,
+    IS_MIDNIGHT = addon.IS_MIDNIGHT,
 };
 
 
@@ -280,6 +282,12 @@ do  --Display
         end
     end
 
+    if Settings.IS_MIDNIGHT then
+        function Display:UpdateCastingIndicator()
+
+        end
+    end
+
     local function SuccessVisual_OnUpdate(self, elapsed)
         self.alpha = self.alpha - 2 * elapsed;
         if self.alpha <= 0 then
@@ -377,12 +385,14 @@ do  --Display
     end
 
     function Display:UpdateTooltip()
+        if not Secret_CanAccess(self.objectName) then return end;
+
         local tooltipInfo = GetWorldCursor();
         if tooltipInfo and tooltipInfo.lines then
             local numLines = #tooltipInfo.lines;
             for index, line in ipairs(tooltipInfo.lines) do
                 if index == 1 then
-                    if not (self.objectName and self.objectName == line.leftText) then
+                    if not (Secret_CanAccess(line.leftText) and self.objectName == line.leftText) then
                         break
                     end
                 else
@@ -399,7 +409,7 @@ do  --Display
 
         Settings.titleHeight, Settings.subtextHeight = unpack(addon.GetValidOptionChoice(Settings.FontSizes, "SoftTarget_FontSize"));
         Settings.iconSize = addon.GetValidOptionChoice(Settings.IconSizes, "SoftTarget_IconSize")
-        Settings.showCastBar = GetDBBool("SoftTarget_CastBar");
+        Settings.showCastBar = GetDBBool("SoftTarget_CastBar") and not Settings.IS_MIDNIGHT;
         Settings.showObjectives = GetDBBool("SoftTarget_Objectives");
         Settings.textOutline = GetDBBool("SoftTarget_TextOutline");
         Settings.includeNPC = GetDBBool("SoftTarget_ShowNPC");
@@ -467,7 +477,7 @@ do  --EL
                 end
 
                 local objectName = UnitName(unit);
-                if objectName then
+                if Secret_CanAccess(objectName) then
                     objectName = StripHyperlinks(objectName);
                 end
                 Display:ClearAllPoints();
@@ -626,7 +636,7 @@ do  --Options, Settings
             {type = "Slider", label = L["Font Size"], minValue = 1, maxValue = #Settings.FontSizes, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
 
             {type = "Divider"},
-            {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"},
+            --{dbKey = "SoftTarget_CastBar"}
             {type = "Checkbox", label = L["SoftTargetName QuestObjective"], tooltip = Options_ShowObjectives_Tooltip, onClickFunc = Options_ShowObjectives_OnClick, dbKey = "SoftTarget_Objectives"},
 
             {type = "Divider"},
@@ -634,6 +644,12 @@ do  --Options, Settings
             {type = "Checkbox", label = L["SoftTargetName ShowNPC"], tooltip = L["SoftTargetName ShowNPC Tooltip"], onClickFunc = Options_ShowNPC_OnClick, dbKey = "SoftTarget_ShowNPC"},
         },
     };
+
+    if not Settings.IS_MIDNIGHT then
+        table.insert(OPTIONS_SCHEMATIC, 5,
+            {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"}
+        );
+    end
 
     function OptionToggle_OnClick(self, button)
         OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);

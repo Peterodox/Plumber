@@ -202,6 +202,7 @@ local DefaultValues = {
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
     TooltipDelvesItem = true,           --Show weekly Coffer Key cap on chest tooltip
     TooltipItemQuest = true,            --Show the quest of quest starting items in bags
+    TooltipHousing = true,              --TEMP Midnight BETA PTR
 
 
     --Reduction
@@ -370,6 +371,8 @@ do
         return tocVersion >= targetVersion
     end
     addon.IsToCVersionEqualOrNewerThan = IsToCVersionEqualOrNewerThan;
+
+    addon.IS_MIDNIGHT = IsToCVersionEqualOrNewerThan(120000);
 
     addon.IS_CLASSIC = C_AddOns.GetAddOnMetadata(addonName, "X-Flavor") ~= "retail";
 

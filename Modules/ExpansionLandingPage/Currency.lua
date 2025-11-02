@@ -3,6 +3,7 @@ local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil;
+local IS_MIDNIGHT = addon.IS_MIDNIGHT;
 
 
 local ipairs = ipairs;
@@ -123,6 +124,7 @@ do
 
     function CurrencyButtonMixin:SetupActionButton()
         if not self.itemID then return end;
+        if IS_MIDNIGHT then return end;
 
         local propagateMouseMotion = true;
         local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion);

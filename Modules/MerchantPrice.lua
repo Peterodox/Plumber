@@ -225,6 +225,7 @@ function Controller:SetupTokenDisplay()
     end
 end
 
+--[[    --Old Method: gets index from Blizzard API but doesn't work well with other vendor filter addons
 function Controller:UpdateMerchantInfo()
     local itemsPerPage = self:GetMaxItemsPerPage();
     if itemsPerPage ~= self.lastItemsPerPage then
@@ -295,7 +296,6 @@ function Controller:UpdateMerchantInfo()
 
                 for n = 1, numCost do
                     itemTexture, itemValue, itemLink = GetMerchantItemCostItem(i, n);
-                    --uncached item's link may be nil
 
                     if itemLink then
                         id = match(itemLink, "currency:(%d+)");
@@ -316,7 +316,6 @@ function Controller:UpdateMerchantInfo()
                             end
 
                             if id and not altCurreny[id] then
-                                --assume itemID and currencyID don't accidently overlap
                                 altCurreny[id] = currencyType;
 
                                 if (not hasAnyContextToken) and IsItemContextToken(id) then
@@ -339,6 +338,139 @@ function Controller:UpdateMerchantInfo()
             priceFrame:SetFrameOwner(merchantButton, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0, "MEDIUM");
             priceFrame:SetMoneyAndAltCurrency(price, requiredCurrency, playerMoney);
             priceFrame:Show();
+        end
+    end
+
+    self:SetupTokenDisplay();
+
+    if anyGold or not altCurreny then
+        TokenDisplay:ShowMoneyFrame(true);
+    else
+        TokenDisplay:ShowMoneyFrame(false);
+    end
+
+    local tokens = {};
+    if altCurreny then
+        TokenDisplay.MoneyFrame:SetSimplified(true);
+
+        local n = 0;
+
+        for id, currencyType in pairs(altCurreny) do
+            n = n + 1;
+            tokens[n] = {currencyType, id};
+        end
+
+        tsort(tokens, SortFunc_CurrencyType);
+    else
+        TokenDisplay.MoneyFrame:SetSimplified(false);
+    end
+
+    if not self.otherTabShown then
+        if not TokenDisplay:DisplayMerchantPriceOnFrame(tokens, ShopUI, -5, 6, hasAnyContextToken and slotIndexList or nil) then
+            self:RequestUpdate(0.2);
+        end
+    end
+end
+--]]
+
+function Controller:UpdateMerchantInfo()
+    local itemsPerPage = self:GetMaxItemsPerPage();
+    if itemsPerPage ~= self.lastItemsPerPage then
+        self.lastItemsPerPage = itemsPerPage;
+        InvisibleContainer:HideObjects();
+    end
+    InvisibleContainer:HideBlizzardMerchantTokens();
+
+    local name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID;
+    local numCost;
+    local itemTexture, itemValue, itemLink;
+    local id, currencyType;
+    local priceFrame;
+
+    local itemFrame;
+    local anyGold;
+    local altCurreny;
+    local hasAnyContextToken = false;
+    local slotIndexList = {};
+
+    local playerMoney = GetMoney();
+    local itemIndex;
+
+    for _, priceFrame in pairs(VendorItemPriceFrame) do
+        priceFrame:Hide();
+    end
+
+    for buttonIndex = 1, itemsPerPage do
+        itemFrame = _G["MerchantItem"..buttonIndex];
+        priceFrame = VendorItemPriceFrame[buttonIndex];
+        if itemFrame and itemFrame.ItemButton then
+            itemIndex = itemFrame.ItemButton:GetID();
+            if itemFrame:IsShown() and itemFrame.ItemButton:IsShown() then
+                price, extendedCost = GetMerchantItemPrice(itemIndex);
+
+                if not priceFrame then
+                    priceFrame = addon.CreatePriceDisplay(itemFrame);
+                    VendorItemPriceFrame[buttonIndex] = priceFrame;
+                    priceFrame:SetPoint("BOTTOMLEFT", itemFrame, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0);
+                end
+
+                if price and price > 0 then
+                    anyGold = true;
+                end
+
+                local requiredCurrency;
+
+                if extendedCost then
+                    numCost = GetMerchantItemCostInfo(itemIndex);
+                    requiredCurrency = {};
+
+                    for n = 1, numCost do
+                        itemTexture, itemValue, itemLink = GetMerchantItemCostItem(itemIndex, n);
+                        --uncached item's link may be nil
+
+                        if itemLink then
+                            id = match(itemLink, "currency:(%d+)");
+                            if id then
+                                currencyType = 0;
+                            else
+                                id = match(itemLink, "item:(%d+)");
+                                if id then
+                                    currencyType = 1;
+                                end
+                            end
+
+                            if id and currencyType then
+                                id = tonumber(id);
+
+                                if not altCurreny then
+                                    altCurreny = {};
+                                end
+
+                                if id and not altCurreny[id] then
+                                    --assume itemID and currencyID don't accidently overlap
+                                    altCurreny[id] = currencyType;
+
+                                    if (not hasAnyContextToken) and IsItemContextToken(id) then
+                                        hasAnyContextToken = true;
+                                    end
+                                end
+
+                                requiredCurrency[n] = {currencyType, id, itemValue, itemTexture, itemLink, itemIndex, n};
+                            end
+                        else
+                            self:RequestUpdate(0.2);
+                        end
+                    end
+                else
+                    numCost = 0;
+                end
+
+                slotIndexList[buttonIndex] = {itemIndex, numCost};
+
+                priceFrame:SetFrameOwner(itemFrame, "BOTTOMLEFT", PRICE_FRAME_OFFSET_X, 0, "MEDIUM");
+                priceFrame:SetMoneyAndAltCurrency(price, requiredCurrency, playerMoney);
+                priceFrame:Show();
+            end
         end
     end
 

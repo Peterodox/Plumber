@@ -24,10 +24,13 @@ API.Nop = Nop;
 
 
 --Midnight
-local issecretvalue = issecretvalue or function() return false end;
-local canaccessvalue = canaccessvalue or function() return true end;
+local issecretvalue = issecretvalue or function(_) return false end;
+local canaccessvalue = canaccessvalue or function(_) return true end;
 API.Secret_IsSecret = issecretvalue;
-API.Secret_CanAccess = canaccessvalue;
+
+function API.Secret_CanAccess(v)
+    return canaccessvalue(v) and v
+end
 
 
 do  -- Table
@@ -132,7 +135,7 @@ do  -- String
 
     local function GetUnitIDGeneral(unit)
         local guid = UnitGUID(unit);
-        if guid then
+        if API.Secret_CanAccess(guid) then
             local unitType, id = match(guid, "(%a+)%-0%-%d*%-%d*%-%d*%-(%d*)");
             if id and unitType and ValidUnitTypes[unitType] then
                 return tonumber(id)
@@ -173,6 +176,15 @@ do  -- String
             if text ~= "" then
                 return text
             end
+        end
+    end
+
+    local UnitName = UnitName;
+
+    function API.Secret_GetUnitName(unit)
+        local name = UnitName(unit);
+        if canaccessvalue(name) and name and name ~= "" then
+            return name
         end
     end
 end

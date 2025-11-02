@@ -662,4 +662,6 @@
             </OnHide>
         </Scripts>
     </Frame>
+
+    <Frame name="PlumberPropagateMouseTemplate" propagateMouseInput="Both" virtual="true"/>
 </Ui>

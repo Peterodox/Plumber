@@ -19,7 +19,7 @@ local ModifiedStaticPopupInfo = {
             dialog:GetButton1():SetText(YES);
         end,
 
-        acceptDelay = 1.4,
+        acceptDelay = 1.2,
     },
 
 

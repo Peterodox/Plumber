@@ -1,6 +1,6 @@
 ## X-Flavor: retail
 ## X-Expansion: TWW
-## Interface: 110205
+## Interface: 110205, 110207, 120000
 ## Version: 1.7.9
 
 ## Title: Plumber
@@ -54,6 +54,10 @@ Modules\MerchantPrice.lua
 Modules\BossBanner.lua
 Modules\SoftTargetName.lua
 
+
+Modules\Beta\Beta.xml [AllowLoadGameType Mainline Beta]
+
+
 #TWW
 Modules\DelvesScenario.lua
 Modules\DelvesDashboard.lua
@@ -90,5 +94,3 @@ Modules\HolidayDungeon.lua
 #Modules\AccountStore.lua
 #Modules\MinimapMouseover.lua
 #Modules\ObjectiveTrackerModule.xml
-
-Modules\Beta\Beta.lua [AllowLoadGameType Mainline Beta]

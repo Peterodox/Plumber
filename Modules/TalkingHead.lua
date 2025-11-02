@@ -379,7 +379,7 @@ function NewTalkingHead:OnTalkingHeadRequested()
             return
         end
 
-        if self.hideInInstance and self.inInstance then
+        if (self.hideEverything) or (self.hideInInstance and self.inInstance) then
             return
         end
 
@@ -451,10 +451,17 @@ function NewTalkingHead:OnSettingsChanged()
     if not DB then DB = PlumberDB; end;
     if not DB then return end;
 
+
     if DB.TalkingHead_InstantText then
         self.instantText = true;
     else
         self.instantText = false;
+    end
+
+    if DB.TalkingHead_HideEverything then
+        self.hideEverything = true;
+    else
+        self.hideEverything = false;
     end
 
     if DB.TalkingHead_HideInInstance then
@@ -563,8 +570,12 @@ local function Options_FontSizeSlider_FormatValue(value)
     return format("%.0f%%", value);
 end
 
-local function Options_InstantText_OnClick(self, state)
+local function Options_OnSettingsChanged()
     NewTalkingHead:OnSettingsChanged();
+end
+
+local function Options_InstantText_OnClick(self, state)
+    Options_OnSettingsChanged();
     NewTalkingHead:ShowExampleText(true);
 end
 
@@ -572,13 +583,6 @@ local function Options_TextOutline_OnClick(self, state)
     NewTalkingHead:SetFontHeightByPercentage(DB.TalkingHead_FontSize);
 end
 
-local function Options_HideInInstance_OnClick(self, state)
-    NewTalkingHead:OnSettingsChanged();
-end
-
-local function Options_HideWorldQuest_OnClick(self, state)
-    NewTalkingHead:OnSettingsChanged();
-end
 
 local function Options_BelowWorldMap_OnClick(self, state)
     NewTalkingHead:OnSettingsChanged();
@@ -587,6 +591,15 @@ local function Options_BelowWorldMap_OnClick(self, state)
     else
         NewTalkingHead:SetFrameStrata("FULLSCREEN");
     end
+end
+
+local function Options_HideEverything_OnClick(self, state)
+    Options_OnSettingsChanged();
+    NewTalkingHead:ShowOptions(true, true);
+end
+
+local function Options_IsHideTextCheckboxEnabled()
+    return not addon.GetDBBool("TalkingHead_HideEverything")
 end
 
 local function Options_ResetPosition_ShouldEnable(self)
@@ -613,8 +626,9 @@ local OPTIONS_SCHEMATIC = {
 
         {type = "Divider"},
         {type = "Header", label = L["TalkingHead Option Condition Header"]};
-        {type = "Checkbox", label = L["TalkingHead Option Condition Instance"] , onClickFunc = Options_HideInInstance_OnClick, dbKey = "TalkingHead_HideInInstance", tooltip = L["TalkingHead Option Condition Instance Tooltip"]},
-        {type = "Checkbox", label = L["TalkingHead Option Condition WorldQuest"], onClickFunc = Options_HideWorldQuest_OnClick, dbKey = "TalkingHead_HideWorldQuest", tooltip = L["TalkingHead Option Condition WorldQuest Tooltip"]},
+        {type = "Checkbox", label = L["TalkingHead Option Hide Everything"] , onClickFunc = Options_HideEverything_OnClick, dbKey = "TalkingHead_HideEverything", tooltip = L["TalkingHead Option Hide Everything Tooltip"]},
+        {type = "Checkbox", label = L["TalkingHead Option Condition Instance"] , onClickFunc = Options_OnSettingsChanged, dbKey = "TalkingHead_HideInInstance", tooltip = L["TalkingHead Option Condition Instance Tooltip"], shouldEnableOption = Options_IsHideTextCheckboxEnabled},
+        {type = "Checkbox", label = L["TalkingHead Option Condition WorldQuest"], onClickFunc = Options_OnSettingsChanged, dbKey = "TalkingHead_HideWorldQuest", tooltip = L["TalkingHead Option Condition WorldQuest Tooltip"], shouldEnableOption = Options_IsHideTextCheckboxEnabled},
 
         {type = "Divider"},
         {type = "Checkbox", label = L["TalkingHead Option Below WorldMap"], onClickFunc = Options_BelowWorldMap_OnClick, dbKey = "TalkingHead_BelowWorldMap", tooltip = L["TalkingHead Option Below WorldMap Tooltip"]},
@@ -624,13 +638,13 @@ local OPTIONS_SCHEMATIC = {
     }
 };
 
-function NewTalkingHead:CreateOptions()
-    self.OptionFrame = addon.SetupSettingsDialog(self, OPTIONS_SCHEMATIC);
+function NewTalkingHead:CreateOptions(forceUpdate)
+    self.OptionFrame = addon.SetupSettingsDialog(self, OPTIONS_SCHEMATIC, forceUpdate);
 end
 
-function NewTalkingHead:ShowOptions(state)
+function NewTalkingHead:ShowOptions(state, forceUpdate)
     if state then
-        self:CreateOptions();
+        self:CreateOptions(forceUpdate);
         self.OptionFrame:Show();
         if self.OptionFrame.requireResetPosition then
             self.OptionFrame.requireResetPosition = false;

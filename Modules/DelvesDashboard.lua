@@ -1,4 +1,6 @@
 local _, addon = ...
+if addon.IS_MIDNIGHT then return end;
+
 local L = addon.L;
 local API = addon.API;
 local InCombatLockdown = InCombatLockdown;

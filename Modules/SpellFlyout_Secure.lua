@@ -503,12 +503,12 @@ end
 
 
 ---- Secure Objects ----
-local SecureRootContainer = CreateFrame("Frame", "PlumberSecureFlyoutContainer", UIParent, "SecureHandlerMouseUpDownTemplate, SecureHandlerShowHideTemplate", "SecureHandlerClickTemplate");    --Name is need for OverrideBindingClick
+local SecureRootContainer = CreateFrame("Frame", "PlumberSecureFlyoutContainer", UIParent, "SecureHandlerMouseUpDownTemplate, SecureHandlerShowHideTemplate", "SecureHandlerClickTemplate", "PlumberPropagateMouseTemplate");    --Name is need for OverrideBindingClick
 SecureRootContainer:Hide();
 SecureRootContainer:SetAllPoints(true);
 SecureRootContainer:SetFrameStrata("BACKGROUND");
-SecureRootContainer:SetPropagateMouseMotion(true);
-SecureRootContainer:SetPropagateMouseClicks(true);
+--SecureRootContainer:SetPropagateMouseMotion(true);
+--SecureRootContainer:SetPropagateMouseClicks(true);
 
 SecureRootContainer:SetAttribute("_onmousedown", [=[
     self:Hide();

@@ -29,6 +29,7 @@ local IsModifiedClick = IsModifiedClick;
 local GetCVarBool = C_CVar.GetCVarBool;
 local GetCurrencyIDFromLink = C_CurrencyInfo.GetCurrencyIDFromLink;
 local GetCurrencyInfoFromLink = C_CurrencyInfo.GetCurrencyInfoFromLink;
+local Secret_CanAccess = API.Secret_CanAccess;
 
 
 local tsort = table.sort;
@@ -391,6 +392,7 @@ do  --Process Loot Message
     end
 
     function EL:ProcessMessageFaction(text)
+        if not Secret_CanAccess(text) then return end;
         local factionName, amount = GetReputationChangeFromText(text);
         if factionName then
             if not self.repDummyIndex then

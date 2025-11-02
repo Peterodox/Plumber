@@ -4,7 +4,7 @@ local _, addon = ...
 local EL = CreateFrame("Frame");
 
 local match = string.match;
-local UnitName = UnitName;
+local UnitName = addon.API.Secret_GetUnitName;
 
 local RACE_TIMES = "^Race Times";
 local Timekeepers = {};

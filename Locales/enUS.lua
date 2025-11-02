@@ -130,10 +130,12 @@ L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Instant Text";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Text Outline";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "Hide Texts From Source:";
+L["TalkingHead Option Hide Everything"] = "Hide Everything";
+L["TalkingHead Option Hide Everything Tooltip"] = "|cffff4800The subtitle will not appear anymore.|r\n\nThe voiceover will continue to play, and the transcription will be shown in the chat window.";
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "World Quests";
-L["TalkingHead Option Condition WorldQuest Tooltip"] = "Hide the transcription if it's from a World Quest.\nSometimes Talking Head is triggered before accepting the World Quest, and we won't be able to hide it.";
+L["TalkingHead Option Condition WorldQuest Tooltip"] = "Hide the subtitle if it's from a World Quest.\nSometimes Talking Head is triggered before accepting the World Quest, and we won't be able to hide it.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
-L["TalkingHead Option Condition Instance Tooltip"] = "Hide the transcription when you are in an instance.";
+L["TalkingHead Option Condition Instance Tooltip"] = "Hide the subtitle when you are in an instance.";
 L["TalkingHead Option Below WorldMap"] = "Send To Back When Map Opened";
 L["TalkingHead Option Below WorldMap Tooltip"] = "Send the Talking Head to the back when you open the World Map so it doesn't block it.";
 
@@ -207,7 +209,14 @@ L["You Have Received Weekly Item Format"] = "You have received %s this week.";
 --Tooltip ItemQuest
 L["ModuleName TooltipItemQuest"] = "Quest Starting Items";
 L["ModuleDescription TooltipItemQuest"] = "If an item in your bag starts a quest, show the quest details.\n\nYou can Ctrl Left Click the item to view it in the quest log if you are already on the quest.";
-L["Instruction Show In Quest Log"] = "<Ctrl Left Click to View in Quest Log>";
+L["Instruction Show In Quest Log"] = "<Ctrl Click to View in Quest Log>";
+
+
+--Tooltip Housing
+L["ModuleName TooltipHousing"] = "Housing";
+L["ModuleDescription TooltipHousing"] = "Housing";
+L["Instruction View In Dressing Room"] = "<Ctrl Click to View in Dressing Room>";  --VIEW_IN_DRESSUP_FRAME
+L["Data Loading In Progress"] = "Plumber is loading data";
 
 
 --Plunderstore

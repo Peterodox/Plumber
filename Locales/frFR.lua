@@ -14,7 +14,7 @@ BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Activer / désactiver le résumé de 
 --Module Control Panel
 L["Module Control"] = "Contrôle du module";
 L["Quick Slot Generic Description"] = "\n\n*L'emplacement rapide est un ensemble de boutons cliquables qui apparaissent sous certaines conditions.";
-L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Mode d'édition";
+L["Quick Slot Edit Mode"] = "Mode d'édition";
 L["Quick Slot High Contrast Mode"] = "Activer / désactiver le mode contraste élevé";
 L["Quick Slot Reposition"] = "Changer de position";
 L["Quick Slot Layout"] = "Mise en page";
@@ -124,13 +124,13 @@ L["ModuleDescription BlizzFixEventToast"] = "Modifie le comportement des notific
 
 
 --Talking Head
-L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Tête parlante";
+L["ModuleName TalkingHead"] = "Tête parlante";
 L["ModuleDescription TalkingHead"] = "Remplace l'interface par défaut de la Tête parlante par une interface propre, sans tête.";
 L["EditMode TalkingHead"] = "Plumber : "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Texte instantané";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Contour du texte";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "Masquer les textes provenant de la source :";
-L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Quêtes mondiales";
+L["TalkingHead Option Condition WorldQuest"] = "Quêtes mondiales";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Masquer la transcription si elle provient d'une quête mondiale.\nParfois, la Tête parlante est déclenchée avant d'accepter la quête mondiale, et nous ne pourrons pas la masquer.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
 L["TalkingHead Option Condition Instance Tooltip"] = "Masquer la transcription lorsque vous êtes dans une instance.";
@@ -171,9 +171,9 @@ L["Announce Forbidden Reason In Cooldown"] = "Vous avez partagé un emplacement 
 L["Announce Forbidden Reason Duplicate Message"] = "Cet emplacement a été partagé récemment par un autre joueur.";
 L["Announce Forbidden Reason Soon Despawn"] = "Vous ne pouvez pas partager cet emplacement car il va bientôt disparaître.";
 L["Available In Format"] = "Disponible dans : |cffffffff%s|r";
-L["Seed Color Epic"] = ICON_TAG_RAID_TARGET_DIAMOND3 or "Violet";   --Using GlobalStrings as defaults
-L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Bleu";
-L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Vert";
+L["Seed Color Epic"] = "Violet";   --Using GlobalStrings as defaults
+L["Seed Color Rare"] = "Bleu";
+L["Seed Color Uncommon"] = "Vert";
 
 
 --Tooltip Chest Keys
@@ -220,18 +220,18 @@ L["Store Item Fully Collected"] = "Vous avez tout récupéré dans la boutique !
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Prix du marchand";
 L["ModuleDescription MerchantPrice"] = "Modification du comportement de l'interface du marchand :\n\n– Griser uniquement les monnaies insuffisantes.\n\n– Afficher tous les objets requis dans la zone des Monnaies."
-L["Num Items In Bank Format"] = (BANK or "Banque") ..": |cffffffff%d|r";
-L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Sacs") ..": |cffffffff%d|r";
+L["Num Items In Bank Format"] = "Banque : |cffffffff%d|r";
+L["Num Items In Bag Format"] = "Sacs : |cffffffff%d|r";
 L["Number Thousands"] = "K";    --15K  15,000
 L["Number Millions"] = "M";     --1.5M 1,500,000
 L["Questionable Item Count Tooltip"] = "Le nombre d'objet peut être incorrect en raison des limitations de l'addon.";
 
 
 --Landing Page (Expansion Summary Minimap)
-L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Résumé de Khaz Algar";
+L["ModuleName ExpansionLandingPage"] = "Résumé de Khaz Algar";
 L["ModuleDescription ExpansionLandingPage"] = "Afficher des informations supplémentaires sur la page de destination :\n\n- Niveau du Pacte des Fils tranchés\n\n- Classement des Cartels de Terremine";
 L["Instruction Track Reputation"] = "<Maj + clic pour suivre cette réputation>";
-L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Maj + clic pour arrêter le suivi>";
+L["Instruction Untrack Reputation"] = "<Maj + clic pour arrêter le suivi>";
 L["Error Show UI In Combat"] = "Vous ne pouvez pas afficher / masquer ceci en combat.";
 
 
@@ -249,7 +249,7 @@ L["ModuleDescription WorldMapPin_TWW"] = "Afficher des marqueurs supplémentaire
 
 --Delves
 L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Tier %s";
-L["Item Level Format"] = ITEM_LEVEL or "Niveau d'objet %d";
+L["Item Level Format"] = "Niveau d'objet %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
 L["Delves Reputation Name"] = "Périple du gouffre";
 L["ModuleName Delves_SeasonProgress"] = "Gouffres : Périple du gouffre";
@@ -270,7 +270,7 @@ L["Power Borrowed"] = "Pouvoir emprunté";
 L["ModuleName WoWAnniversary"] = "Anniversaire de WoW";
 L["ModuleDescription WoWAnniversary"] = "– Invoquer facilement la monture correspondante pendant l'événement Maniaque des montures.\n\n– Affichez les résultats des votes pendant l'événement Frénésie de mode.";
 L["Voting Result Header"] = "Résultats";
-L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "Vous n'avez pas récupéré cette monture.";
+L["Mount Not Collected"] = "Vous n'avez pas récupéré cette monture.";
 
 
 --BlizzFixFishingArtifact
@@ -286,7 +286,7 @@ L["ModuleDescription QuestItemDestroyAlert"] = "Afficher les informations de qu�
 --SpellcastingInfo
 L["ModuleName SpellcastingInfo"] = "Informations sur les sorts de la cible";
 L["ModuleDescription SpellcastingInfo"] = "– Affiche l'infobulle du sort lorsque vous survolez la barre d'incantation sur le cadre de la cible.\n\n– Enregistre les capacités des monstres, consultables ultérieurement par un clic droit sur le cadre de la cible.";
-L["Abilities"] = ABILITIES or "Capacités";
+L["Abilities"] = "Capacités";
 L["Spell Colon"] = "Sort : ";   --Display SpellID
 L["Icon Colon"] = "Icône : ";     --Display IconFileID
 
@@ -294,7 +294,7 @@ L["Icon Colon"] = "Icône : ";     --Display IconFileID
 --Chat Options
 L["ModuleName ChatOptions"] = "Options du canal de discussion";
 L["ModuleDescription ChatOptions"] = "Ajouter un bouton Quitter sur le menu Add Leave buttons to the menu qui apparaît lorsque vous faites un clic droit sur le nom du canal dans la fenêtre de discussion.";
-L["Chat Leave"] = CHAT_LEAVE or "Quitter";
+L["Chat Leave"] = "Quitter";
 L["Chat Leave All Characters"] = "Quitter sur tous les personnages";
 L["Chat Leave All Characters Tooltip"] = "Vous quitterez automatiquement ce canal lorsque vous vous connecterez sur un personnage.";
 L["Chat Auto Leave Alert Format"] = "Souhaitez-vous quitter automatiquement |cffffc0c0[%s]|r sur tous vos personnages ?";
@@ -315,15 +315,15 @@ L["Additional Info"] = "Informations complémentaires";
 L["Race"] = RACE or "Race";
 L["Faction"] = FACTION or "Faction";
 L["Click To Search Player"] = "Rechercher ce joueur";
-L["Searching Player In Progress"] = FRIENDS_FRIENDS_WAITING or "Recherche…";
-L["Player Not Found"] = ERR_FRIEND_NOT_FOUND or "Joueur introuvable.";
+L["Searching Player In Progress"] = "Recherche…";
+L["Player Not Found"] = "Joueur introuvable.";
 
 
 --PlayerTitleUI
 L["ModuleName PlayerTitleUI"] = "Gestionnaire de Titres";
 L["ModuleDescription PlayerTitleUI"] = "Ajouter une zone de recherche et un filtre au volet de caractères par défaut.";
 L["Right Click To Reset Filter"] = "Clic droit pour réinitialiser.";
-L["Earned"] = ACHIEVEMENTFRAME_FILTER_COMPLETED or "Gagné";
+L["Earned"] = "Gagné";
 L["Unearned"] = "Non gagné";
 L["Unearned Filter Tooltip"] = "Vous pouvez voir des Titres en double qui ne sont pas disponibles pour votre faction.";
 
@@ -334,7 +334,7 @@ L["ModuleDescription BlizzardSuperTrack"] = "Ajouter un minuteur sur votre point
 
 
 --ProfessionsBook
-L["ModuleName ProfessionsBook"] = PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS or "Connaissances non dépensées";
+L["ModuleName ProfessionsBook"] = "Connaissances non dépensées";
 L["ModuleDescription ProfessionsBook"] = "Afficher le nombre de points de connaissance de spécialisation de profession non utilisés dans l’interface des métiers.";
 L["Unspent Knowledge Tooltip Format"] = "Vous avez |cffffffff%s|r Connaissances de spécialisation de profession non dépensées."  --see PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
 
@@ -372,7 +372,7 @@ L["SoftTargetName Req 1"] = "|cffffd100Activer la commande d'interaction|r dans 
 L["SoftTargetName Req 2"] = "Définissez la variable CVar |cffffd100SoftTargetIconGameObject|r sur |cffffffff1|r.";
 L["SoftTargetName CastBar"] = "Afficher la barre d'incantation";
 L["SoftTargetName CastBar Tooltip"] = "Affiche une barre d'incantation circulaire sur la barre de nom.\n\n|cffff4800L'addon ne pourra pas déterminer quel objet est la cible de votre sort.|r";
-L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "Afficher les objectifs de quête";
+L["SoftTargetName QuestObjective"] = "Afficher les objectifs de quête";
 L["SoftTargetName QuestObjective Tooltip"] = "Affiche les objectifs de quête (le cas échéant) sous le nom.";
 L["SoftTargetName QuestObjective Alert"] = "Cette fonctionnalité nécessite d'activer |cffffffffAfficher la bulle d'aide de la cible|r dans Options du jeu > Accessibilité > Général.";
 L["SoftTargetName ShowNPC"] = "Inclure les PNJ";
@@ -408,8 +408,8 @@ L["Soon To Unlock"] = "Bientôt débloqué";
 L["You Can Unlock Title"] = "Vous pouvez le débloquer";
 L["Artifact Ability Auto Unlock Tooltip"] = "Ce trait sera automatiquement débloqué une fois que vous aurez suffisamment de Pouvoir infini.";
 L["Require More Bag Slot Alert"] = "Vous devez libérer de l'espace dans le sac avant d'effectuer cette action";
-L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Sort non appris";
-L["Fully Upgraded"] = AZERITE_EMPOWERED_ITEM_FULLY_UPGRADED or "Entièrement mis à niveau";
+L["Spell Not Known"] = "Sort non appris";
+L["Fully Upgraded"] = "Entièrement mis à niveau";
 L["Unlock Level Requirement Format"] = "Atteignez le niveau %d pour débloquer";
 L["Auto Learn Traits"] = "Apprendre automatiquement les Traits";
 L["Auto Learn Traits Tooltip"] = "Améliorer automatiquement les traits d'artefact lorsque vous avez suffisamment de Pouvoir infini";
@@ -439,16 +439,16 @@ L["ModuleDescription StaticPopup_Confirm"] = "Ajustez la boîte de dialogue de c
 
 
 --Loot UI
-L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Fenêtre de butin";
+L["ModuleName LootUI"] = "Fenêtre de butin";
 L["ModuleDescription LootUI"] = "Remplace la fenêtre de butin par défaut et offre des fonctionnalités optionnelles :\n\n- Récupérer les objets rapidement.\n\n- Corriger le bug d'échec du butin automatique.\n\n- Afficher un bouton Tout prendre lors du pillage manuel.";
 L["Take All"] = "Tout prendre";     --Take all items from a loot window
-L["You Received"] = YOU_RECEIVED_LABEL or "Vous avez reçu";
+L["You Received"] = "Vous avez reçu";
 L["Reach Currency Cap"] = "Plafond de devise atteint";
 L["Sample Item 4"] = "Objet épique génial";
 L["Sample Item 3"] = "Objet rare génial";
 L["Sample Item 2"] = "Objet peu commun génial";
 L["Sample Item 1"] = "Objet commun";
-L["EditMode LootUI"] =  "Plumber : "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Fenêtre de butin");
+L["EditMode LootUI"] =  "Plumber : Fenêtre de butin";
 L["Manual Loot Instruction Format"] = "Pour annuler temporairement le butin automatique sur un objet spécifique, maintenez la touche |cffffffff%s|r jusqu'à ce que la fenêtre de butin apparaisse.";
 L["LootUI Option Force Auto Loot"] = "Forcer le butin automatique";
 L["LootUI Option Force Auto Loot Tooltip"] = "Toujours activer le butin automatique pour contrer les échecs occasionnels.";
@@ -462,7 +462,7 @@ L["LootUI Option Items Per Page"] = "Objets par page";
 L["LootUI Option Items Per Page Tooltip"] = "Ajuster la quantité d'objets pouvant être affichés sur une page lors de la récupération de butins.\n\nCette option n'affecte pas le mode de butin manuel ou le mode d'édition.";
 L["LootUI Option Replace Default"] = "Remplacer l'alerte de butin par défaut";
 L["LootUI Option Replace Default Tooltip"] = "Remplace les alertes de butin par défaut qui apparaissent généralement au-dessus des barres d'action.";
-L["LootUI Option Loot Under Mouse"] = LOOT_UNDER_MOUSE_TEXT or "Ouvrir la fenêtre de butin à la souris";
+L["LootUI Option Loot Under Mouse"] = "Ouvrir la fenêtre de butin à la souris";
 L["LootUI Option Loot Under Mouse Tooltip"] = "En mode |cffffffffButin manuel|r, la fenêtre apparaîtra sous la position actuelle de la souris";
 L["LootUI Option Use Default UI"] = "Utiliser la fenêtre de butin par défaut";
 L["LootUI Option Use Default UI Tooltip"] = "Utiliser la fenêtre de butin par défaut de WoW.\n\n|cffff4800Activer cette option annule tous les réglage|r";
@@ -523,23 +523,23 @@ L["Reward Available"] = "Récompense disponible";  --As brief as possible
 L["Paragon Reward Available"] = "Récompense de Paragon disponible";
 L["Until Next Level Format"] = "%d jusqu'au prochain niveau";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d jusqu'à la récompense Paragon";
-L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Cliquez pour voir le Renom>";
+L["Instruction Click To View Renown"] = "<Cliquez pour voir le Renom>";
 L["Not On Quest"] = "Vous n'êtes pas sur cette quête";
 L["Factions"] = "Factions";
-L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Activités";
+L["Activities"] = "Activités";
 L["Raids"] = RAIDS or "Raids";
 L["Instruction Track Achievement"] = "<Clic + Maj pour suivre ce haut fait>";
-L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Clic + Maj pour ne plus suivre ce haut fait>";
+L["Instruction Untrack Achievement"] = "<Clic + Maj pour ne plus suivre ce haut fait>";
 L["No Data"] = "Aucune donnée";
 L["No Raid Boss Selected"] = "Aucun boss sélectionné";
 L["Your Class"] = "(Votre classe)";
-L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Grande chambre forte";
-L["Item Upgrade"] = ITEM_UPGRADE or "Amélioration d'objet";
+L["Great Vault"] = "Grande chambre forte";
+L["Item Upgrade"] = "Amélioration d'objet";
 L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Ressources";
 L["Plumber Experimental Feature Tooltip"] = "Une fonctionnalité expérimentale dans l'addon Plumber.";
 L["Bountiful Delves Rep Tooltip"] = "Ouvrir un coffre abondant a une chance d'augmenter votre réputation auprès de cette faction.";
 L["Warband Weekly Reward Tooltip"] = "Votre bataillon ne peut recevoir cette récompense qu'une fois par semaine.";
-L["Completed"] = CRITERIA_COMPLETED or "Complété";
+L["Completed"] = "Complété";
 L["Filter Hide Completed Format"] = "Masquer complété (%d)";
 L["Weeky Reset Format"] = "Réinitialisation hebdomadaire : %s";
 L["Daily Reset Format"] = "Réinitialisation quotidienne : %s";
@@ -548,9 +548,9 @@ L["Trackers"] = "Traqueurs";
 L["New Tracker Title"] = "Nouveau traqueur";     --Create a new Tracker
 L["Edit Tracker Title"] = "Modifier traqueur";
 L["Type"] = "Type";
-L["Select Instruction"] = LFG_LIST_SELECT or "Sélectionner";
+L["Select Instruction"] = "Sélectionner";
 L["Name"] = "Nom";
-L["Difficulty"] = LFG_LIST_DIFFICULTY or "Difficulté";
+L["Difficulty"] = "Difficulté";
 L["All Difficulties"] = "Toutes les difficultés";
 L["TrackerType Boss"] = "Boss";
 L["TrackerType Instance"] = "Instance";
@@ -565,13 +565,13 @@ L["Flag Quest"] = "Drapeau de quête";
 L["Boss Name"] = "Nom du boss";
 L["Instance Or Boss Name"] = "Instance ou nom du boss";
 L["Name EditBox Disabled Reason Format"] = "Cette case sera remplie automatiquement lorsque vous saisirez un %s valide.";
-L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "Aucune correspondance";
+L["Search No Matches"] = "Aucune correspondance";
 L["Create New Tracker"] = "Nouveau traqueur";
 L["FailureReason Already Exist"] = "Cette entrée existe déjà.";
 L["Quest ID"] = "ID de quête";
 L["Creature ID"] = "ID de créature";
-L["Edit"] = EDIT or "Modifier";
-L["Delete"] = DELETE or "Supprimer";
+L["Edit"] = "Modifier";
+L["Delete"] = "Supprimer";
 L["Visit Quest Hub To Log Quests"] = "Rendez-vous au centre de quêtes et interagissez avec les donneurs de quêtes pour enregistrer les quêtes du jour.";
 L["Quest Hub Instruction Celestials"] = "Rendez visite à l’intendant des Astres vénérables dans le Val de l’Éternel printemps pour savoir quel temple requiert votre aide.";
 L["Unavailable Klaxxi Paragons"] = "Parangons Klaxxi indisponibles :";
@@ -580,8 +580,8 @@ L["Weekly Coffer Key Shards Tooltip"] = "Les quatre premières caches hebdomadai
 L["Weekly Cap"] = "Limite hebdomadaire";
 L["Weekly Cap Reached"] = "Limite hebdomadaire atteinte.";
 L["Instruction Right Click To Use"] = "<Clic droit pour utiliser>";
-L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Rejoindre la file";
-L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "En file d’attente";
+L["Join Queue"] = "Rejoindre la file";
+L["In Queue"] = "En file d’attente";
 L["Click To Switch"] = "Cliquer pour passer à |cffffffff%s|r";
 L["Click To Queue"] = "Cliquer pour rejoindre la file de |cffffffff%s|r";
 L["Click to Open Format"] = "Cliquer pour ouvrir %s";
@@ -593,14 +593,14 @@ L["Total Colon"] = FROM_TOTAL or "Total :";
 L["Reposition Button Horizontal"] = "Déplacer horizontalement";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Déplacer verticalement";
 L["Reposition Button Tooltip"] = "Clic gauche et faites glisser pour déplacer la fenêtre.";
-L["Font Size"] = FONT_SIZE or "Taille de la police";
+L["Font Size"] = "Taille de la police";
 L["Icon Size"] = "Taille de l'icône";
-L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Réinitialiser à la position par défaut";
+L["Reset To Default Position"] = "Réinitialiser à la position par défaut";
 L["Renown Level Label"] = "Renom ";  --There is a space
 L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maximum)";   --Reached max level
-L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Actuel :";
-L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Vous avez des récompenses non réclamées";
+L["Current Colon"] = "Actuel :";
+L["Unclaimed Reward Alert"] = "Vous avez des récompenses non réclamées";
 L["Uncollected Set Counter Format"] = "Vous avez |cffffffff%d|r transmogrification non collectée |4set:sets;.";
 
 
@@ -613,14 +613,14 @@ L["Click To Show Settings"] = "Cliquez pour afficher / masquer les paramètres."
 
 
 --WIP Merchant UI
-L["ItemType Consumables"] = AUCTION_CATEGORY_CONSUMABLES or "Consommables";
-L["ItemType Weapons"] = AUCTION_CATEGORY_WEAPONS or "Armes";
-L["ItemType Gems"] = AUCTION_CATEGORY_GEMS or "Gemmes";
-L["ItemType Armor Generic"] = AUCTION_SUBCATEGORY_PROFESSION_ACCESSORIES or "Accessoires";  --Trinkets, Rings, Necks
-L["ItemType Mounts"] = MOUNTS or "Montures";
-L["ItemType Pets"] = PETS or "Mascottes";
+L["ItemType Consumables"] = "Consommables";
+L["ItemType Weapons"] = "Armes";
+L["ItemType Gems"] = "Gemmes";
+L["ItemType Armor Generic"] = "Accessoires";  --Trinkets, Rings, Necks
+L["ItemType Mounts"] = "Montures";
+L["ItemType Pets"] = "Mascottes";
 L["ItemType Toys"] = "Jouets";
-L["ItemType TransmogSet"] = PERKS_VENDOR_CATEGORY_TRANSMOG_SET or "Ensemble de transmogrification";
+L["ItemType TransmogSet"] = "Ensemble de transmogrification";
 L["ItemType Transmog"] = "Transmogrification";
 
 

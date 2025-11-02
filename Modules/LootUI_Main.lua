@@ -17,6 +17,7 @@ local GetItemCount = C_Item.GetItemCount;
 local GetCursorPosition = GetCursorPosition;
 local IsDressableItemByID = C_Item.IsDressableItemByID or API.Nop;
 local QualityColorGetter = API.GetItemQualityColor;
+local HousingDataProvider = addon.HousingDataProvider;
 
 
 -- User Settings
@@ -840,13 +841,24 @@ do  --UI ItemButton
     end
 
     function ItemFrameMixin:OnClick(button)
-        if button == "LeftButton" then
+        if button == "LeftButton" or button == "EmulateLeftButton" then
             if IsModifiedClick("DRESSUP") and not InCombatLockdown() then
                 local itemID = self.data.slotType == Defination.SLOT_TYPE_ITEM and self.data.id;
-                if itemID and DressUpVisual and IsDressableItemByID(itemID) then
-                    DressUpVisual(self.data.link);
-                    return
+                if itemID then
+                    if DressUpVisual and IsDressableItemByID(itemID) then
+                        DressUpVisual(self.data.link);
+                        return
+                    end
+
+                    if C_Item.IsDecorItem and C_Item.IsDecorItem(itemID) and HousingDataProvider then
+                        if HousingDataProvider:GetDecorModelFileIDByItem(itemID) then
+                            DressUpLink(self.data.link);
+                        end
+                    end
                 end
+            end
+            if button == "EmulateLeftButton" then
+                return
             end
             LootSlot(self.data.slotIndex);
             MainFrame:SetClickedFrameIndex(self.index);
@@ -1836,7 +1848,7 @@ do  --UI Basic
                 elseif (not (self.manualMode or self.inEditMode)) and button == "LeftButton" and not InCombatLockdown() then
                     local itemFrame = self:GetFocusedItemFrame();
                     if itemFrame then
-                        itemFrame:OnClick("LeftButton");
+                        itemFrame:OnClick("EmulateLeftButton");
                     end
                 end
             end

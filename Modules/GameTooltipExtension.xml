@@ -10,6 +10,7 @@
     <Script file="GameTooltip_ItemReagents.lua"/>
     <Script file="GameTooltip_ItemQuest.lua"/>
     <Script file="GameTooltip_DelvesItem.lua"/>
+    <Script file="GameTooltip_Housing.lua"/>
 
 
     <!--No Longer Relevant-->

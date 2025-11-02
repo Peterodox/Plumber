@@ -1,6 +1,8 @@
 -- Show the info of your target's spell that's being cast
 
 local _, addon = ...
+if addon.IS_MIDNIGHT then return end;
+
 local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
