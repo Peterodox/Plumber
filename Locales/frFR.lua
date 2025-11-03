@@ -58,7 +58,7 @@ L["ModuleDescription AutoJoinEvents"] = "Rejoint automatiquement l'évènement l
 
 --BackpackItemTracker
 L["ModuleName BackpackItemTracker"] = "Traqueur d'objets dans le sac";
-L["ModuleDescription BackpackItemTracker"] = "Suivez les objets empilables dans l'interface du sac comme s'ils étaient des devises.\n\nLes jetons des événements saisonniers sont automatiquement suivis et épinglés à gauche.";
+L["ModuleDescription BackpackItemTracker"] = "Suivre les objets empilables dans l'interface du sac comme s'ils étaient des devises.\n\nLes jetons des événements saisonniers sont automatiquement suivis et épinglés à gauche.";
 L["Instruction Track Item"] = "Suivre l'objet";
 L["Hide Not Owned Items"] = "Masquer les objets non possédés";
 L["Hide Not Owned Items Tooltip"] = "Si vous ne possédez plus un objet que vous suiviez, il sera déplacé vers un menu caché.";
@@ -68,15 +68,15 @@ L["Item Track Too Many"] = "Vous pouvez suivre seulement %d objets à la fois."
 L["Tracking List Empty"] = "Votre liste de suivi personnalisée est vide.";
 L["Holiday Ends Format"] = "Se termine : %s";
 L["Not Found"] = "Non trouvé";   --Item not found
-L["Own"] = "Possède";   --Something that the player has/owns
-L["Numbers To Earn"] = "# À gagner";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
-L["Numbers Of Earned"] = "# Gagné";    --The number of stuff the player has earned
+L["Own"] = "Possèder";   --Something that the player has/owns
+L["Numbers To Earn"] = "À recevoir";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
+L["Numbers Of Earned"] = "Reçu";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Suivre les Écus";       --Crest: e.g. Drake's Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "Épinglez sur la barre le type d'Écu de niveau supérieur que vous avez gagné.";
 L["Track Holiday Item"] = "Suivre la monnaie des événements saisonniers";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Actuellement épinglé :";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Barre à l'intérieur du sac";     --Put the bar inside the bag UI (below money/currency)
-L["Bar Inside The Bag Tooltip"] = "Place la barre à l'intérieur de l'interface du sac.\n\nCela ne fonctionne que dans le mode Sacs Séparés de Blizzard.";
+L["Bar Inside The Bag Tooltip"] = "Place la barre à l'intérieur de l'interface du sac.\n\nCela ne fonctionne que dans le mode Sacs séparés de Blizzard.";
 L["Catalyst Charges"] = "Charges du Catalyseur";
 
 
@@ -124,13 +124,15 @@ L["ModuleDescription BlizzFixEventToast"] = "Modifie le comportement des notific
 
 
 --Talking Head
-L["ModuleName TalkingHead"] = "Tête parlante";
+L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Tête parlante";
 L["ModuleDescription TalkingHead"] = "Remplace l'interface par défaut de la Tête parlante par une interface propre, sans tête.";
 L["EditMode TalkingHead"] = "Plumber : "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Texte instantané";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Contour du texte";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "Masquer les textes provenant de la source :";
-L["TalkingHead Option Condition WorldQuest"] = "Quêtes mondiales";
+L["TalkingHead Option Hide Everything"] = "Tout masquer";
+L["TalkingHead Option Hide Everything Tooltip"] = "|cffff4800Les sous-titres n'apparaîtront plus.|r\n\nLa voix off continuera à être jouée et la transcription sera affichée dans la fenêtre de chat.";
+L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Quêtes mondiales";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Masquer la transcription si elle provient d'une quête mondiale.\nParfois, la Tête parlante est déclenchée avant d'accepter la quête mondiale, et nous ne pourrons pas la masquer.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
 L["TalkingHead Option Condition Instance Tooltip"] = "Masquer la transcription lorsque vous êtes dans une instance.";
@@ -171,9 +173,9 @@ L["Announce Forbidden Reason In Cooldown"] = "Vous avez partagé un emplacement 
 L["Announce Forbidden Reason Duplicate Message"] = "Cet emplacement a été partagé récemment par un autre joueur.";
 L["Announce Forbidden Reason Soon Despawn"] = "Vous ne pouvez pas partager cet emplacement car il va bientôt disparaître.";
 L["Available In Format"] = "Disponible dans : |cffffffff%s|r";
-L["Seed Color Epic"] = "Violet";   --Using GlobalStrings as defaults
-L["Seed Color Rare"] = "Bleu";
-L["Seed Color Uncommon"] = "Vert";
+L["Seed Color Epic"] = ICON_TAG_RAID_TARGET_DIAMOND3 or "Violet";   --Using GlobalStrings as defaults
+L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Bleu";
+L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Vert";
 
 
 --Tooltip Chest Keys
@@ -200,7 +202,7 @@ L["Can Create Multiple Item Format"] = "Vous disposez des ressources pour créer
 
 --Tooltip DelvesItem
 L["ModuleName TooltipDelvesItem"] = "Objets de Gouffres";
-L["ModuleDescription TooltipDelvesItem"] = "Afficher le nombre de Clés de coffre et d'Éclats que vous avez gagnés grâce aux caches hebdomadaires.";
+L["ModuleDescription TooltipDelvesItem"] = "Afficher le nombre de Clés de coffre et Fragment de clé de coffre que vous avez gagnés grâce aux caches hebdomadaires.";
 L["You Have Received Weekly Item Format"] = "Vous avez reçu %s cette semaine.";
 
 
@@ -208,6 +210,13 @@ L["You Have Received Weekly Item Format"] = "Vous avez reçu %s cette semaine.";
 L["ModuleName TooltipItemQuest"] = "Cet objet permet de lancer une quête";
 L["ModuleDescription TooltipItemQuest"] = "Si un objet dans votre sac permet de lancer une quête, alors afficher les détails de la quête.\n\nSi vous avez déjà accepté la quête, vous pouvez faire Ctrl + clic gauche sur l'objet pour afficher le journal des quêtes.";
 L["Instruction Show In Quest Log"] = "<Ctrl + clic gauche pour afficher le journal des quêtes>";
+
+
+--Tooltip Housing
+L["ModuleName TooltipHousing"] = "Housing"; -- note fr : à traduire, peut être plus tard
+L["ModuleDescription TooltipHousing"] = "Housing"; -- note fr : à traduire, peut être plus tard
+L["Instruction View In Dressing Room"] = "<Ctrl + clic pour afficher dans la cabine d'essayage>";  --VIEW_IN_DRESSUP_FRAME
+L["Data Loading In Progress"] = "Plumber charge les données";
 
 
 --Plunderstore
@@ -256,7 +265,7 @@ L["ModuleName Delves_SeasonProgress"] = "Gouffres : Périple du gouffre";
 L["ModuleDescription Delves_SeasonProgress"] = "Afficher une barre de progression en haut de l'écran lorsque vous progressez dans le périple du Gouffre.";
 L["ModuleName Delves_Dashboard"] = "Gouffres : Récompense hebdomadaire";
 L["ModuleDescription Delves_Dashboard"] = "Afficher la progression de votre Grande chambre forte et de votre réserve d'Écu doré sur le tableau de bord des Gouffres.";
-L["ModuleName Delves_Automation"] = "Gouffres : Sélection auto. du pouvoir";
+L["ModuleName Delves_Automation"] = "Gouffres : Sélection automatique du pouvoir";
 L["ModuleDescription Delves_Automation"] = "Sélectionner automatiquement le Pouvoir obtenu par les trésors et les rares.";
 L["Delve Crest Stash No Info"] = "Ces informations ne sont pas disponibles dans votre emplacement actuel.";
 L["Delve Crest Stash Requirement"] = "Apparaît dans les Gouffres abondants de niveau 11.";
