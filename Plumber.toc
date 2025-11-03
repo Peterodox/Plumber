@@ -80,6 +80,7 @@ Modules\ExpansionLandingPage\ExpansionLandingPage_TWW.xml
 Modules\BlizzFix_ModelLoading.lua
 Modules\Timerunning\LegionRemix.xml
 Modules\HolidayDungeon.lua
+Modules\QueueStatus.lua
 
 #Modules\MerchantUI\MerchantUI.xml
 

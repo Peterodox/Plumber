@@ -196,21 +196,34 @@ do
     function CreateFactionProgress(parent)
         local f = CreateFrame("Frame", nil, parent);
         f:SetSize(FACTION_FRAME_WIDTH, FACTION_FRAME_WIDTH);
+        API.Mixin(f, FactionProgressMixin);
 
-        local ProgressBar = addon.CreateRadialProgressBar(f);
+        local ProgressBar = CreateFrame("Cooldown", nil, f, "PlumberLegacyRadialProgressBarTemplate");
         ProgressBar:SetPoint("CENTER", f, "CENTER", 0, 0);
         f.ProgressBar = ProgressBar;
+        API.Mixin(ProgressBar, addon.RadialProgressBarMixin);
+
+        local tex = "Interface/AddOns/Plumber/Art/Frame/ProgressBar-Radial-WarWithin";
+
+        ProgressBar.Border:SetTexture(tex);
+        ProgressBar.BorderHighlight:SetTexture(tex);
+        ProgressBar:SetSwipeTexture(tex);
+
+        ProgressBar.ValueText = f:CreateFontString("OVERLAY", nil, "GameFontNormalLargeOutline");
+        ProgressBar.ValueText:SetJustifyH("CENTER");
+        ProgressBar.ValueText:SetPoint("CENTER", f, "BOTTOM", 2, 14);
+        ProgressBar.ValueText:SetTextColor(1, 0.82, 0);
 
         local Icon = f:CreateTexture(nil, "BACKGROUND");
         Icon:SetPoint("CENTER", f, "CENTER", 0, 0);
         Icon:SetSize(38, 38);
         f.Icon = Icon;
 
-        API.Mixin(f, FactionProgressMixin);
-
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
         f:SetScript("OnMouseDown", f.OnMouseDown);
+
+        ProgressBar:ShowNumber(true);
 
         return f
     end

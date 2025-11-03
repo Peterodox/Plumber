@@ -5209,7 +5209,9 @@ do  --Radial Progress Bar
         if showNumber then
             if self.showNumber ~= true then
                 self.showNumber = true;
-                self.ValueText:Show();
+                if self.ValueText then
+                    self.ValueText:Show();
+                end
                 self.visualOffset = 0.07;
                 self.Border:SetTexCoord(0, 80/256, 80/256, 160/256);
                 self.BorderHighlight:SetTexCoord(0, 80/256, 80/256, 160/256);
@@ -5228,7 +5230,9 @@ do  --Radial Progress Bar
         else
             if self.showNumber ~= false then
                 self.showNumber = false;
-                self.ValueText:Hide();
+                if self.ValueText then
+                    self.ValueText:Hide();
+                end
                 self.visualOffset = 0.01;
                 self.Border:SetTexCoord(0, 80/256, 0/256, 80/256);
                 self.BorderHighlight:SetTexCoord(0, 80/256, 0/256, 80/256);
@@ -5247,7 +5251,21 @@ do  --Radial Progress Bar
         end
     end
 
-    local function CreateRadialProgressBar(parent)
+    function RadialProgressBarMixin:SetSwipeTexCoord(l, r, t, b)
+        local lowTexCoords =
+        {
+            x = l,
+            y = t,
+        };
+        local highTexCoords =
+        {
+            x = r,
+            y = b,
+        };
+        self:SetTexCoordRange(lowTexCoords, highTexCoords);
+    end
+
+    local function CreateRadialProgressBar(parent, createValueText)
         local f = CreateFrame("Cooldown", nil, parent, "PlumberRadialProgressBarTemplate");
         Mixin(f, RadialProgressBarMixin);
 
@@ -5257,10 +5275,12 @@ do  --Radial Progress Bar
         f.BorderHighlight:SetTexture(tex);
         f:SetSwipeTexture(tex);
 
-        f.ValueText = f:CreateFontString("OVERLAY", nil, "GameFontNormalLargeOutline");
-        f.ValueText:SetJustifyH("CENTER");
-        f.ValueText:SetPoint("CENTER", f, "BOTTOM", 2, 14);
-        f.ValueText:SetTextColor(1, 0.82, 0);
+        if createValueText then
+            f.ValueText = f:CreateFontString("OVERLAY", nil, "GameFontNormalLargeOutline");
+            f.ValueText:SetJustifyH("CENTER");
+            f.ValueText:SetPoint("CENTER", f, "BOTTOM", 2, 14);
+            f.ValueText:SetTextColor(1, 0.82, 0);
+        end
 
         f:ShowNumber(true);
 

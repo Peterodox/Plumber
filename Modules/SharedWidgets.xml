@@ -199,17 +199,21 @@
         </Layers>
     </Frame>
 
-	<Cooldown name="PlumberRadialProgressBarTemplate" reverse="true" hideCountdownNumbers="true" rotation="180" useParentLevel="true" virtual="true">
+	<Cooldown name="PlumberRadialProgressBarTemplate" reverse="true" hideCountdownNumbers="true" rotation="180" virtual="true">
 		<Size x="68" y="68"/>
 		<Layers>
-			<Layer level="BORDER">
+			<Layer level="OVERLAY" textureSubLevel="1">
 				<Texture parentKey="Border" setAllPoints="true"/>
 			</Layer>
-			<Layer level="BORDER" textureSubLevel="1">
+			<Layer level="OVERLAY" textureSubLevel="2">
 				<Texture parentKey="BorderHighlight" setAllPoints="true" hidden="true" alphaMode="ADD" alpha="0.5"/>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" setAllPoints="true"/>
 			</Layer>
 		</Layers>
 		<SwipeTexture file="Interface\PVPFrame\pvpqueue-sidebar-honorbar-fill"/>
+        <EdgeTexture file="Interface\AddOns\Plumber\Art\ExpansionLandingPage\ExpansionLandingPage-ProgressBarEdge"/>
         <KeyValues>
             <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
         </KeyValues>

@@ -161,11 +161,6 @@ do
         CallbackRegistry:Register("LandingPage.UpdateNotification", self.UpdateNotification, self);
     end
 
-    addon.CallbackRegistry:Register("DBLoaded", function(db)
-        local tabKey = addon.GetDBValue("LandingPage_DefaultTab");
-        LandingPageUtil.SelectTab(tabKey);
-    end);
-
     addon.CallbackRegistry:Register("TimerunningSeason", function(seasonID)
         if seasonID == 2 then
             MainFrame.isLegionRemix = true;
@@ -180,6 +175,12 @@ do
 
         if self.InitTabButtons then
             self:InitTabButtons();
+        end
+
+        if not self.loaded then
+            self.loaded = true;
+            local tabKey = addon.GetDBValue("LandingPage_DefaultTab");
+            LandingPageUtil.SelectTab(tabKey);
         end
 
         self:UpdateTabs();    --The selected tab will be created here
