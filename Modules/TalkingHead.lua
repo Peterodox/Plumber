@@ -752,7 +752,8 @@ do
     end
 
     local function OptionToggle_OnClick(self, button)
-        if NewTalkingHead.OptionFrame and NewTalkingHead.OptionFrame:IsShown() then
+        local OptionFrame = NewTalkingHead.OptionFrame;
+        if OptionFrame and OptionFrame:IsShown() and OptionFrame:IsFromSchematic(OPTIONS_SCHEMATIC) then
             NewTalkingHead:ShowOptions(false);
             NewTalkingHead:ExitEditMode();
         else

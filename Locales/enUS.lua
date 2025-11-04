@@ -236,6 +236,13 @@ L["Number Millions"] = "M";     --1.5M 1,500,000
 L["Questionable Item Count Tooltip"] = "The item count may be incorrect due to addon limitations.";
 
 
+--QueueStatus
+L["ModuleName QueueStatus"] = "Queue Status";
+L["ModuleDescription QueueStatus"] = "Add a progress bar to the Group Finder Eye that shows the percentage of teammates found. Tanks and Healers weigh more.\n\n(Optional) Show the delta between Average Wait Time and your Time In Queue.";
+L["QueueStatus Show Time"] = "Show Time";
+L["QueueStatus Show Time Tooltip"] = "Show the delta between Average Wait Time and your Time In Queue.";
+
+
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Khaz Algar Summary";
 L["ModuleDescription ExpansionLandingPage"] = "Display extra info on the landing page:\n\n- Paragon Progress\n\n- Severed Threads Pact Level\n\n- Undermine Cartel Standings";
@@ -393,6 +400,8 @@ L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Automatically learn traits.\n\n- Add a widget to the Paper Doll that provides various types of info. You can click this widget to open a new Artifact UI.";
 L["ModuleName LegionRemix_HideWorldTier"] = "Hide World Tier Icon";
 L["ModuleDescription LegionRemix_HideWorldTier"] = "Hide the Heroic World Tier icon below the minimap.";
+L["ModuleName LegionRemix_LFGSpam"] = "Raid Finder Spam";
+L["ModuleDescription LegionRemix_LFGSpam"] = "Suppress the following spam message:\n\n"..ERR_LFG_PROPOSAL_FAILED;
 L["Artifact Weapon"] = "Artifact Weapon";
 L["Artifact Ability"] = "Artifact Ability";
 L["Artifact Traits"] = "Artifact Traits";

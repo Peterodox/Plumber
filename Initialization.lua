@@ -1,5 +1,5 @@
 local VERSION_TEXT = "v1.7.9";
-local VERSION_DATE = 1761400000;
+local VERSION_DATE = 1762300000;
 
 
 local addonName, addon = ...
@@ -192,6 +192,8 @@ local DefaultValues = {
     ItemUpgradeUI = true,
     HolidayDungeon = true,              --Auto select holiday dungeons once
     StaticPopup_Confirm = true,         --Add a brief delay to purchase non-refundable items / Reduce item conversion confirm delay
+    QueueStatus = false,                --Add a progress bar to LFG Eye
+        QueueStatus_ShowTime = false,   --Relative Queue Time
 
 
     --Tooltip
@@ -283,6 +285,7 @@ local DefaultValues = {
         LegionRemix_AutoUpgrade = true,
         LegionRemix_PaperDollTraitDetail = false,
     LegionRemix_HideWorldTier = true,
+    LegionRemix_LFGSpam = true,
 
 
     EnableNewByDefault = false,             --Always enable newly added features

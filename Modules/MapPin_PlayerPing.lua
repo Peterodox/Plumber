@@ -68,7 +68,7 @@ do
         description = addon.L["ModuleDescription PlayerPing"],
         toggleFunc = EnableModule,
         categoryID = 1,
-        uiOrder = 1101,
+        uiOrder = 1102,
         moduleAddedTime = 1761240000,
     };
 

@@ -142,7 +142,7 @@ do
         description = addon.L["ModuleDescription TooltipItemQuest"],
         toggleFunc = EnableModule,
         categoryID = 3,
-        uiOrder = 1200,
+        uiOrder = 1202,
         moduleAddedTime = 1755200000,
     };
 

@@ -212,6 +212,13 @@ L["ModuleDescription TooltipItemQuest"] = "在任务起始物品的鼠标提示�
 L["Instruction Show In Quest Log"] = "<按住Ctrl点击浏览任务日志>";
 
 
+--Tooltip Housing
+L["ModuleName TooltipHousing"] = "房屋";
+L["ModuleDescription TooltipHousing"] = "房屋";
+L["Instruction View In Dressing Room"] = "<按住Ctrl点击在试衣间中查看>";
+L["Data Loading In Progress"] = "Plumber正在加载数据";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "霸业风暴：珍宝商店";
 L["ModuleDescription Plunderstore"] = "调整从队伍查找器界面打开的珍宝商店：\n\n- 允许仅显示未收集物品。\n\n- 在类别按钮上显示未收集物品的数量。\n\n- 在武器和护甲的鼠标提示上显示其穿戴位置。\n\n- 允许你在试衣间里显示可穿戴的物品。";
@@ -227,6 +234,13 @@ L["Num Items In Bag Format"] = "背包: |cffffffff%d|r";
 L["Number Thousands"] = "K";
 L["Number Millions"] = "M";
 L["Questionable Item Count Tooltip"] = "受技术所限该物品数量可能不准确。";
+
+
+--QueueStatus
+L["ModuleName QueueStatus"] = "随机本队列信息";
+L["ModuleDescription QueueStatus"] = "在队伍查找器眼睛上添加一个进度条，显示有多少百分比的队友已被找到。坦克和治疗有更高的权重。\n\n（可选）显示平均等待时间和你在队列中的时间的差值。";
+L["QueueStatus Show Time"] = "显示时间";
+L["QueueStatus Show Time Tooltip"] = "显示平均等待时间和你在队列中的时间的差值。";
 
 
 --Landing Page (Expansion Summary Minimap)
@@ -386,6 +400,8 @@ L["ModuleName LegionRemix"] = "军团再临：幻境新生";
 L["ModuleDescription LegionRemix"] = "- 自动解锁神器特质。\n\n- 在角色界面上显示一个提供各种信息的小部件。你可以点击它来打开全新的神器UI。";
 L["ModuleName LegionRemix_HideWorldTier"] = "隐藏世界难度图标";
 L["ModuleDescription LegionRemix_HideWorldTier"] = "隐藏小地图下方的世界难度图标。";
+L["ModuleName LegionRemix_LFGSpam"] = "随机团本拒绝邀请通知";
+L["ModuleDescription LegionRemix_LFGSpam"] = "阻止以下信息在短时间内反复出现：\n\n有人拒绝了你的组队邀请。你已被添加到队列的前端。";
 L["Artifact Weapon"] = "神器武器";
 L["Artifact Ability"] = "神器技能";
 L["Artifact Traits"] = "神器特质";

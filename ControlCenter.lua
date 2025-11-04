@@ -5,6 +5,8 @@ local GetDBBool = addon.GetDBBool;
 local tinsert = table.insert;
 local CreateFrame = CreateFrame;
 
+local DEV_MODE = false;
+
 local RATIO = 0.85; --h/w
 local FRAME_WIDTH = 680;
 local HEADER_HEIGHT = 18;
@@ -59,7 +61,7 @@ local BlizzardPanel = CreateFrame("Frame", nil, UIParent);
 BlizzardPanel:Hide();
 
 
-do
+do  --MainFrame Scroll
     local OFFSET_PER_SCROLL = (BUTTON_HEIGHT + OPTION_GAP_Y) * 2;
 
     local function ScrollFrame_OnMouseWheel(self, delta)
@@ -154,107 +156,117 @@ local function CreateNewFeatureMark(button)
     newTag:Show();
 end
 
+local function GetCategoryName(categoryID)
+    local categoryKey = CATEGORY_ORDER[categoryID];
+    if categoryKey then
+        return L["Module Category "..categoryKey]
+    else
+        return "Unknown Category"
+    end
+end
+
 
 local CategoryButtonMixin = {};
+do
+    function CategoryButtonMixin:SetCategory(categoryID)
+        self.categoryID = categoryID;
+        self.categoryKey = CATEGORY_ORDER[categoryID];
 
-function CategoryButtonMixin:SetCategory(categoryID)
-    self.categoryID = categoryID;
-    self.categoryKey = CATEGORY_ORDER[categoryID];
-
-    if self.categoryKey then
-        self.Label:SetText(L["Module Category ".. self.categoryKey]);
-    else
-        self.Label:SetText("Unknown Category");
-        self.categoryKey = "Unknown";
-    end
-end
-
-function CategoryButtonMixin:OnLoad()
-    self.collapsed = false;
-    self.childOptions = {};
-    self:UpdateArrow();
-end
-
-function CategoryButtonMixin:UpdateArrow()
-    if self.collapsed then
-        self.Arrow:SetTexCoord(0, 0.5, 0, 1);
-    else
-        self.Arrow:SetTexCoord(0.5, 1, 0, 1);
-    end
-end
-
-function CategoryButtonMixin:Expand()
-    if self.collapsed then
-        self.collapsed = false;
-        self.Drawer:SetHeight(self.drawerHeight);
-        self.Drawer:Show();
-        self:UpdateArrow();
-        ControlCenter:UpdateScrollRange();
-    end
-end
-
-function CategoryButtonMixin:Collapse()
-    if not self.collapsed then
-        self.collapsed = true;
-        self.Drawer:SetHeight(DIFFERENT_CATEGORY_OFFSET);
-        self.Drawer:Hide();
-        self:UpdateArrow();
-        ControlCenter:UpdateScrollRange();
-    end
-end
-
-function CategoryButtonMixin:ToggleCollapse()
-    if self.collapsed then
-        self:Expand();
-    else
-        self:Collapse();
-    end
-end
-
-function CategoryButtonMixin:OnClick()
-    self:ToggleCollapse();
-end
-
-function CategoryButtonMixin:OnEnter()
-    --ControlCenter.Preview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/CategoryPreview_"..self.categoryKey);
-end
-
-function CategoryButtonMixin:InitializeDrawer()
-    self.drawerHeight = self.numOptions * (OPTION_GAP_Y + BUTTON_HEIGHT) + OPTION_GAP_Y + DIFFERENT_CATEGORY_OFFSET;
-    self.Drawer:SetHeight(self.drawerHeight);
-end
-
-function CategoryButtonMixin:UpdateModuleCount()
-    if self.childOptions then
-        local total = #self.childOptions;
-        local numEnabled = 0;
-        for i, checkbox in ipairs(self.childOptions) do
-            if checkbox:GetChecked() then
-                numEnabled = numEnabled + 1;
-            end
+        if self.categoryKey then
+            self.Label:SetText(L["Module Category ".. self.categoryKey]);
+        else
+            self.Label:SetText("Unknown Category");
+            self.categoryKey = "Unknown";
         end
-        self.Count:SetText(string.format("%d/%d", numEnabled, total));
-    else
-        self.Count:SetText(nil);
     end
-end
 
-function CategoryButtonMixin:AddChildOption(checkbox)
-    if not self.numOptions then
-        self.numOptions = 0;
+    function CategoryButtonMixin:OnLoad()
+        self.collapsed = false;
+        self.childOptions = {};
+        self:UpdateArrow();
     end
-    self.numOptions = self.numOptions + 1;
-    if not checkbox.parentDBKey then
-        tinsert(self.childOptions, checkbox);
-    end
-end
 
-function CategoryButtonMixin:UpdateNineSlice(offset)
-    --Texture Slice don't follow its parent scale
-    --This texture has 4px gap in each direction
-    --Unused
-    self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
-    self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);
+    function CategoryButtonMixin:UpdateArrow()
+        if self.collapsed then
+            self.Arrow:SetTexCoord(0, 0.5, 0, 1);
+        else
+            self.Arrow:SetTexCoord(0.5, 1, 0, 1);
+        end
+    end
+
+    function CategoryButtonMixin:Expand()
+        if self.collapsed then
+            self.collapsed = false;
+            self.Drawer:SetHeight(self.drawerHeight);
+            self.Drawer:Show();
+            self:UpdateArrow();
+            ControlCenter:UpdateScrollRange();
+        end
+    end
+
+    function CategoryButtonMixin:Collapse()
+        if not self.collapsed then
+            self.collapsed = true;
+            self.Drawer:SetHeight(DIFFERENT_CATEGORY_OFFSET);
+            self.Drawer:Hide();
+            self:UpdateArrow();
+            ControlCenter:UpdateScrollRange();
+        end
+    end
+
+    function CategoryButtonMixin:ToggleCollapse()
+        if self.collapsed then
+            self:Expand();
+        else
+            self:Collapse();
+        end
+    end
+
+    function CategoryButtonMixin:OnClick()
+        self:ToggleCollapse();
+    end
+
+    function CategoryButtonMixin:OnEnter()
+        --ControlCenter.Preview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/CategoryPreview_"..self.categoryKey);
+    end
+
+    function CategoryButtonMixin:InitializeDrawer()
+        self.drawerHeight = self.numOptions * (OPTION_GAP_Y + BUTTON_HEIGHT) + OPTION_GAP_Y + DIFFERENT_CATEGORY_OFFSET;
+        self.Drawer:SetHeight(self.drawerHeight);
+    end
+
+    function CategoryButtonMixin:UpdateModuleCount()
+        if self.childOptions then
+            local total = #self.childOptions;
+            local numEnabled = 0;
+            for i, checkbox in ipairs(self.childOptions) do
+                if checkbox:GetChecked() then
+                    numEnabled = numEnabled + 1;
+                end
+            end
+            self.Count:SetText(string.format("%d/%d", numEnabled, total));
+        else
+            self.Count:SetText(nil);
+        end
+    end
+
+    function CategoryButtonMixin:AddChildOption(checkbox)
+        if not self.numOptions then
+            self.numOptions = 0;
+        end
+        self.numOptions = self.numOptions + 1;
+        if not checkbox.parentDBKey then
+            tinsert(self.childOptions, checkbox);
+        end
+    end
+
+    function CategoryButtonMixin:UpdateNineSlice(offset)
+        --Texture Slice don't follow its parent scale
+        --This texture has 4px gap in each direction
+        --Unused
+        self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
+        self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);
+    end
 end
 
 
@@ -320,12 +332,12 @@ local function CreateOptionToggle(checkbox, onClickFunc)
     if not checkbox.OptionToggle then
         local b = CreateFrame("Button", nil, checkbox);
         checkbox.OptionToggle = b;
-        b:SetSize(24, 24);
+        b:SetSize(48, 24);
         b:SetPoint("RIGHT", checkbox, "RIGHT", 0, 0);
         b.Texture = b:CreateTexture(nil, "OVERLAY");
         b.Texture:SetTexture("Interface/AddOns/Plumber/Art/Button/OptionToggle");
         b.Texture:SetSize(16, 16);
-        b.Texture:SetPoint("CENTER", b, "CENTER", 0, 0);
+        b.Texture:SetPoint("RIGHT", b, "RIGHT", -4, 0);
         b.Texture:SetVertexColor(0.6, 0.6, 0.6);
         API.DisableSharpening(b.Texture);
         b:SetScript("OnClick", onClickFunc);
@@ -470,6 +482,10 @@ local function CreateUI()
         if self.OptionToggle then
             OptionToggle_SetFocused(self.OptionToggle, true);
         end
+
+        if DEV_MODE then
+            print(self.data.uiOrder);
+        end
     end
 
     local function Checkbox_OnLeave(self)
@@ -503,11 +519,16 @@ local function CreateUI()
     local function OptionToggle_OnEnter(self)
         Checkbox_OnEnter(self:GetParent());
         self.Texture:SetVertexColor(1, 1, 1);
+        local tooltip = GameTooltip;
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+        tooltip:SetText(SETTINGS, 1, 1, 1, 1);
+        tooltip:Show();
     end
 
     local function OptionToggle_OnLeave(self)
         Checkbox_OnLeave(self:GetParent());
         self.Texture:SetVertexColor(0.6, 0.6, 0.6);
+        GameTooltip:Hide();
     end
 
     local newCategoryPosition = {};
@@ -580,6 +601,14 @@ local function CreateUI()
 
             lastCategoryButton = categoryButton;
             positionInCategory = 0;
+
+
+            if DEV_MODE then
+                if parent.modules[i - 1] then
+                    print("uiOrder:", parent.modules[i - 1].uiOrder);
+                end
+                print("category:", data.categoryID, GetCategoryName(data.categoryID));
+            end
         end
 
         numButton = numButton + 1;

@@ -213,7 +213,7 @@
 			</Layer>
 		</Layers>
 		<SwipeTexture file="Interface\PVPFrame\pvpqueue-sidebar-honorbar-fill"/>
-        <EdgeTexture file="Interface\AddOns\Plumber\Art\ExpansionLandingPage\ExpansionLandingPage-ProgressBarEdge"/>
+        <EdgeTexture file="Interface\AddOns\Plumber\Art\Cooldown\QueueStatusProgress-Edge"/>
         <KeyValues>
             <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
         </KeyValues>
