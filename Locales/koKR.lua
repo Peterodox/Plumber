@@ -233,7 +233,13 @@ L["Num Items In Bank Format"] = (BANK or "Bank") ..": |cffffffff%d|r";
 L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Bags") ..": |cffffffff%d|r";
 L["Number Thousands"] = "K";    --15K  15,000
 L["Number Millions"] = "M";     --1.5M 1,500,000
-																								   
+
+
+--QueueStatus
+L["ModuleName QueueStatus"] = "대기열 상태";
+L["ModuleDescription QueueStatus"] = "파티 찾기 아이콘에 진행률 바를 추가하여 현재까지 찾은 팀원의 비율을 표시합니다. 탱커와 힐러는 더 높은 가중치를 가집니다.\n\n(선택 사항) 평균 대기 시간과 현재 대기 시간의 차이를 표시합니다.";
+L["QueueStatus Show Time"] = "시간 표시";
+L["QueueStatus Show Time Tooltip"] = "평균 대기 시간과 현재 대기 시간의 차이를 표시합니다.";
 
 
 --Landing Page (Expansion Summary Minimap)
