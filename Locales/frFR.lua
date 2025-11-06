@@ -120,7 +120,7 @@ L["Instruction Pick Lock"] = "<Clic droit pour crocheter>";
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
 L["ModuleName BlizzFixEventToast"] = "Correction de Blizzard : Notifications d'événement";
-L["ModuleDescription BlizzFixEventToast"] = "Modifie le comportement des notifications d’événement afin qu’elles n’interceptent plus vos clics de souris. Permet également de cliquer avec le bouton droit sur la notification pour la fermer immédiatement.\n\n*Les notifications d’événement sont des bannières qui apparaissent en haut de l’écran lorsque vous terminez certaines activités.";
+L["ModuleDescription BlizzFixEventToast"] = "Modifie le comportement des notifications d'événement afin qu'elles n'interceptent plus vos clics de souris. Permet également de cliquer avec le bouton droit sur la notification pour la fermer immédiatement.\n\n*Les notifications d'événement sont des bannières qui apparaissent en haut de l'écran lorsque vous terminez certaines activités.";
 
 
 --Talking Head
@@ -236,6 +236,13 @@ L["Number Millions"] = "M";     --1.5M 1,500,000
 L["Questionable Item Count Tooltip"] = "Le nombre d'objet peut être incorrect en raison des limitations de l'addon.";
 
 
+--QueueStatus
+L["ModuleName QueueStatus"] = "Statut de la file d'attente";
+L["ModuleDescription QueueStatus"] = "Ajoute une barre de progression à l'icône de Recherche de groupe indiquant le pourcentage de coéquipiers trouvés. Les tanks et les soigneurs comptent davantage.\n\n(Facultatif) Affiche la différence entre le temps d'attente moyen et votre temps passé en file d'attente.";
+L["QueueStatus Show Time"] = "Afficher le temps";
+L["QueueStatus Show Time Tooltip"] = "Affiche la différence entre le temps d'attente moyen et votre temps passé en file d'attente.";
+
+
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = "Résumé de Khaz Algar";
 L["ModuleDescription ExpansionLandingPage"] = "Afficher des informations supplémentaires sur la page de destination :\n\n- Niveau du Pacte des Fils tranchés\n\n- Classement des Cartels de Terremine";
@@ -344,7 +351,7 @@ L["ModuleDescription BlizzardSuperTrack"] = "Ajouter un minuteur sur votre point
 
 --ProfessionsBook
 L["ModuleName ProfessionsBook"] = "Connaissances non dépensées";
-L["ModuleDescription ProfessionsBook"] = "Afficher le nombre de points de connaissance de spécialisation de profession non utilisés dans l’interface des métiers.";
+L["ModuleDescription ProfessionsBook"] = "Afficher le nombre de points de connaissance de spécialisation de profession non utilisés dans l'interface des métiers.";
 L["Unspent Knowledge Tooltip Format"] = "Vous avez |cffffffff%s|r Connaissances de spécialisation de profession non dépensées."  --see PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
 
 
@@ -393,6 +400,8 @@ L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Apprend automatiquement les traits.\n\n- Ajoute un widget à la feuille de personnage affichant diverses informations. Vous pouvez cliquer sur ce widget pour ouvrir une nouvelle interface d'artefact.";
 L["ModuleName LegionRemix_HideWorldTier"] = "Masquer l'icône de palier mondial";
 L["ModuleDescription LegionRemix_HideWorldTier"] = "Masque l'icône du palier mondial héroïque située sous la minicarte.";
+L["ModuleName LegionRemix_LFGSpam"] = "Spam de la Recherche de raid";
+L["ModuleDescription LegionRemix_LFGSpam"] = "Supprimer le message indésirable suivant :\n\n"..ERR_LFG_PROPOSAL_FAILED;
 L["Artifact Weapon"] = "Arme prodigieuse";
 L["Artifact Ability"] = "Pouvoir prodigieux";
 L["Artifact Traits"] = "Traits prodigieux";
@@ -582,7 +591,7 @@ L["Creature ID"] = "ID de créature";
 L["Edit"] = "Modifier";
 L["Delete"] = "Supprimer";
 L["Visit Quest Hub To Log Quests"] = "Rendez-vous au centre de quêtes et interagissez avec les donneurs de quêtes pour enregistrer les quêtes du jour.";
-L["Quest Hub Instruction Celestials"] = "Rendez visite à l’intendant des Astres vénérables dans le Val de l’Éternel printemps pour savoir quel temple requiert votre aide.";
+L["Quest Hub Instruction Celestials"] = "Rendez visite à l'intendant des Astres vénérables dans le Val de l'Éternel printemps pour savoir quel temple requiert votre aide.";
 L["Unavailable Klaxxi Paragons"] = "Parangons Klaxxi indisponibles :";
 L["Weekly Coffer Key Tooltip"] = "Les quatre premières caches hebdomadaires obtenues chaque semaine contiennent une Clé de coffret réparée";
 L["Weekly Coffer Key Shards Tooltip"] = "Les quatre premières caches hebdomadaires obtenues chaque semaine contiennent un Fragment de clé de coffre";
@@ -590,7 +599,7 @@ L["Weekly Cap"] = "Limite hebdomadaire";
 L["Weekly Cap Reached"] = "Limite hebdomadaire atteinte.";
 L["Instruction Right Click To Use"] = "<Clic droit pour utiliser>";
 L["Join Queue"] = "Rejoindre la file";
-L["In Queue"] = "En file d’attente";
+L["In Queue"] = "En file d'attente";
 L["Click To Switch"] = "Cliquer pour passer à |cffffffff%s|r";
 L["Click To Queue"] = "Cliquer pour rejoindre la file de |cffffffff%s|r";
 L["Click to Open Format"] = "Cliquer pour ouvrir %s";
@@ -657,7 +666,7 @@ L["Coffer Key Shard"] = "Fragment de clé de coffre";
 L["Epoch Mementos"] = "Souvenir d’époque";     --See currency:3293
 L["Timeless Scrolls"] = "Parchemin intemporel";
 
-L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Voulez-vous vraiment échanger %s contre l’objet suivant ?\n\n|cffff2020Votre achat ne pourra pas être remboursé.|r\n %s";
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Souhaitez-vous vraiment échanger %s contre l'objet suivant ?\n\n|cffff2020Votre achat ne pourra pas être remboursé.|r\n %s";
 
 
 --Map Pin Filter Name (name should be plural)
