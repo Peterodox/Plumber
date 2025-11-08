@@ -512,3 +512,20 @@ LandingPageUtil.AddTab(
         dimBackground = true,
     }
 );
+
+
+do  --Debug
+    local function Plumber_PrintWorldQuestsForMap(uiMapID)
+        if not uiMapID and WorldMapFrame:IsShown() then
+            uiMapID = WorldMapFrame:GetMapID();
+        end
+        if not uiMapID then
+            uiMapID = C_Map.GetBestMapForUnit("player");
+        end
+        local quests = C_TaskQuest.GetQuestsOnMap(uiMapID);
+        for _, v in ipairs(quests) do
+            local name = C_TaskQuest.GetQuestInfoByQuestID(v.questID);
+            print(v.questID, name);
+        end
+    end
+end

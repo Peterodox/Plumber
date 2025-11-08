@@ -194,6 +194,7 @@ local DefaultValues = {
     StaticPopup_Confirm = true,         --Add a brief delay to purchase non-refundable items / Reduce item conversion confirm delay
     QueueStatus = false,                --Add a progress bar to LFG Eye
         QueueStatus_ShowTime = false,   --Relative Queue Time
+        QueueStatus_TextPosition = 1,   --0:Center, 1-4:Clockwise
 
 
     --Tooltip

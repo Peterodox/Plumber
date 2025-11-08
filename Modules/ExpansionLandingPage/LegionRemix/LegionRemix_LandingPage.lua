@@ -107,10 +107,11 @@ local WorldBosses = {
     [42269] = {uiMapID = 634, achievementID = 42610},   --The Soultakers, Stormheim
     [42270] = {uiMapID = 634, achievementID = 42536},   --Nithogg, Scourge of the Skies, Stormheim
 
-    [46947] = {uiMapID = 646, achievementID = 42643},   --Brutallus, Broken Shore
-    [46948] = {uiMapID = 646, achievementID = 42629},   --Malificus, Broken Shore
-    [46945] = {uiMapID = 646, achievementID = 42530},   --Si'vash, Broken Shore
-    [47061] = {uiMapID = 646, achievementID = 42662},   --Apocron, Broken Shore
+    --Broken Shore bosses use new questIDs
+    [91790] = {uiMapID = 646, achievementID = 42643},   --Brutallus, Broken Shore
+    [91791] = {uiMapID = 646, achievementID = 42629},   --Malificus, Broken Shore
+    [91792] = {uiMapID = 646, achievementID = 42530},   --Si'vash, Broken Shore
+    [91789] = {uiMapID = 646, achievementID = 42662},   --Apocron, Broken Shore
 };
 
 local IgnoredQuests = {

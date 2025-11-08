@@ -6,7 +6,8 @@
 
 
 local _, addon = ...
-if addon.IS_MIDNIGHT then return end;
+--if addon.IS_MIDNIGHT then return end;     --DEBUG Functioning again in 64228, praise the Absolute!
+
 
 -- User Settings
 local HIDE_UNUSABLE = false;        --Hide unusable spells

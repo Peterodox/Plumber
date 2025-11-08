@@ -9,6 +9,7 @@ local ResourceList = {
 
     {currencyID = 1155},    --Ancient Mana
     {currencyID = 1149, shownIfOwned = true},   --Sightless Eye
+    --{currencyID = 1226},   --Nethershard
 
     {itemID = 254267, shownIfOwned = true, useActionButton = true},   --Fragmented Memento of Epoch Challenges
 };

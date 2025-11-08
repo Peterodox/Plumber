@@ -208,6 +208,9 @@
 			<Layer level="OVERLAY" textureSubLevel="2">
 				<Texture parentKey="BorderHighlight" setAllPoints="true" hidden="true" alphaMode="ADD" alpha="0.5"/>
 			</Layer>
+			<Layer level="ARTWORK" textureSubLevel="1">
+				<Texture parentKey="Spinner" setAllPoints="true" hidden="true"/>
+			</Layer>
 			<Layer level="BACKGROUND">
 				<Texture parentKey="Background" setAllPoints="true"/>
 			</Layer>
@@ -217,6 +220,11 @@
         <KeyValues>
             <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
         </KeyValues>
+        <Animations>
+            <AnimationGroup parentKey="AnimSpin" looping="REPEAT">
+                <Rotation degrees="-360" duration="4" order="1" childKey="Spinner"/>
+            </AnimationGroup>
+        </Animations>
 	</Cooldown>
 
     <Frame name="PlumberWoWProgressBarTemplate" virtual="true">
