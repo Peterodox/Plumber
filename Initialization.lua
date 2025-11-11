@@ -237,6 +237,7 @@ local DefaultValues = {
         LootUI_HotkeyName = "E",
         LootUI_ReplaceDefaultAlert = false,
         LootUI_UseStockUI = false,
+        LootUI_WindowHide = false,
         LootUI_CombineItems = false,
         LootUI_LowFrameStrata = false,
 
