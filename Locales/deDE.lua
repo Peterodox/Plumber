@@ -679,7 +679,6 @@ L["Match Pattern Gold"] = "([%d%,]+) Gold";
 L["Match Pattern Silver"] = "([%d]+) Silber";
 L["Match Pattern Copper"] = "([%d]+) Kupfer";
 
-<<<<<<< Updated upstream
 L["Match Pattern Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --See globalstring: FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "Euer Ruf bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --See globalstring: FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 
@@ -691,9 +690,5 @@ L["Upgrade Track 3"] = "Veteran";
 L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Held";
 L["Upgrade Track 6"] = "Mythos";
-=======
-L["Match Pattern Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
-L["Match Pattern Rep 2"] = "Euer Ruf bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --FACTION_STANDING_INCREASED
 
 L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
->>>>>>> Stashed changes

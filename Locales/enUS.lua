@@ -696,8 +696,5 @@ L["Upgrade Track 3"] = "Veteran";
 L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Hero";
 L["Upgrade Track 6"] = "Myth";
-<<<<<<< Updated upstream
-=======
 
 L["Match Pattern Transmog Set Partially Known"] = "^Contains (%d+) uncollected";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
->>>>>>> Stashed changes
