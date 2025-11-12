@@ -965,7 +965,8 @@ do  --UI Notification Mode
     end
 
     function MainFrame:QueueDisplayLoot(lootData)
-        if not (lootData and lootData.quantity) then return end;
+        if LootUI_WindowHide == true then return end;
+		if not (lootData and lootData.quantity) then return end;
         if self.manualMode then return end;
 
         if not self.timerFrame then
@@ -1726,12 +1727,12 @@ do  --Edit Mode
 
             {type = "Divider"},
             {type = "Checkbox", label = L["LootUI Option Use Default UI"], onClickFunc = nil, dbKey = "LootUI_UseStockUI", tooltip = L["LootUI Option Use Default UI Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
+            {type = "Checkbox", label = L["LootUI Option Hide"], onClickFunc = nil, dbKey = "LootUI_WindowHide", tooltip = L["LootUI Option Hide Tooltip"]},
 
             {type = "Divider"},
             {type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = Options_ResetPosition_OnClick, stateCheckFunc = Options_ResetPosition_ShouldEnable, widgetKey = "ResetButton"},
         }
     };
-
 
     function MainFrame:ShowOptions(state)
         if state then
@@ -1845,6 +1846,11 @@ do  --Edit Mode
         LOW_FRAME_STRATA = state;
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_LowFrameStrata", SettingChanged_LowFrameStrata);
+	
+	local function SettingChanged_WindowDisabled(state, userInput)
+    LootUI_WindowHide = state;
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_WindowHide", SettingChanged_WindowDisabled);
 end
 
 
