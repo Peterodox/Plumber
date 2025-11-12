@@ -1703,6 +1703,12 @@ do  --Edit Mode
         return addon.IsToCVersionEqualOrNewerThan(110000)
     end
 
+    local function Tooltip_HideWindow()
+        if addon.GetDBBool("LootUI_UseStockUI") then
+            return "|cffff4800"..L["LootUI Option Hide Window Tooltip 2"].."|r";
+        end
+    end
+
     local OPTIONS_SCHEMATIC = {
         title = L["EditMode LootUI"],
         widgets = {
@@ -1727,7 +1733,7 @@ do  --Edit Mode
 
             {type = "Divider"},
             {type = "Checkbox", label = L["LootUI Option Use Default UI"], onClickFunc = nil, dbKey = "LootUI_UseStockUI", tooltip = L["LootUI Option Use Default UI Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
-            {type = "Checkbox", label = L["LootUI Option Hide"], onClickFunc = nil, dbKey = "LootUI_WindowHide", tooltip = L["LootUI Option Hide Tooltip"]},
+            {type = "Checkbox", label = L["LootUI Option Hide Window"], onClickFunc = nil, dbKey = "LootUI_WindowHide", tooltip = L["LootUI Option Hide Window Tooltip"], tooltip2 = Tooltip_HideWindow},
 
             {type = "Divider"},
             {type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = Options_ResetPosition_OnClick, stateCheckFunc = Options_ResetPosition_ShouldEnable, widgetKey = "ResetButton"},

@@ -55,7 +55,7 @@ Modules\BossBanner.lua
 Modules\SoftTargetName.lua
 
 
-Modules\Beta\Beta.xml [AllowLoadGameType Mainline Beta]
+Modules\Beta\Beta.xml
 
 
 #TWW

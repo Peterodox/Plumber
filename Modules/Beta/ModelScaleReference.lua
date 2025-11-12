@@ -1,5 +1,7 @@
 --Track: Blizzard_HousingTemplates/Blizzard_HousingCatalogFilters.lua
 
+if not (C_HousingCatalog) then return end;
+
 
 local _, addon = ...
 local API = addon.API;
