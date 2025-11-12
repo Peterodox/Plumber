@@ -212,6 +212,10 @@ L["ModuleDescription TooltipItemQuest"] = "在任务起始物品的鼠标提示�
 L["Instruction Show In Quest Log"] = "<按住Ctrl点击浏览任务日志>";
 
 
+L["ModuleName TooltipTransmogEnsemble"] = "Raid Ensembles";
+L["ModuleDescription TooltipTransmogEnsemble"] = "The class ensembles sold by the Raid Apparel vendor unlock all difficulty variants. Show in the tooltip which one has yet to be collected.";
+
+
 --Tooltip Housing
 L["ModuleName TooltipHousing"] = "房屋";
 L["ModuleDescription TooltipHousing"] = "房屋";
@@ -636,3 +640,5 @@ L["Match Pattern Copper"] = "([%d]+) 铜";
 
 L["Match Pattern Rep 1"] = "你的战团在(.+)中的声望值提高了([%d%,]+)点";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "你在(.+)中的声望值提高了([%d%,]+)点";   --FACTION_STANDING_INCREASED
+
+L["Match Pattern Transmog Set Partially Known"] = "^包含(%d)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS

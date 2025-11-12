@@ -530,7 +530,7 @@ L["Drawer Option Hide Unusable Tooltip"] = "미보유 아이템 및 미습득 �
 L["Drawer Option Hide Unusable Tooltip 2"] = "포션과 같은 소비 아이템은 항상 표시됩니다.";
 L["Drawer Option Update Frequently"] = "“항상 최신 상태 유지";
 L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경이 있을 때마다 버튼 상태를 갱신합니다. 이 옵션을 켜면 시스템 자원을 약간 더 사용할 수 있습니다";
-			
+
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "확장팩 개요";
@@ -676,7 +676,7 @@ L["Match Pattern Copper"] = "([%d]+) 코퍼";
 
 L["Match Pattern Rep 1"] = "(.+)에 대한 전투부대의 평판이 ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "(.+)에 대한 평판이 ([%d%,]+)";   --FACTION_STANDING_INCREASED
-											 
+
 L["Match Pattern Item Level"] = "^아이템 레벨 (%d+)";
 L["Match Pattern Item Upgrade Tooltip"] = "^업그레이드 단계: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
 L["Upgrade Track 1"] = "모험가";
@@ -686,4 +686,4 @@ L["Upgrade Track 4"] = "챔피언";
 L["Upgrade Track 5"] = "영웅";
 L["Upgrade Track 6"] = "신화";
 
-							  
+L["Match Pattern Transmog Set Partially Known"] = "^미획득 형상 (%d)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS

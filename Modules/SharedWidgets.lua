@@ -45,7 +45,7 @@ do  -- Slice Frame
         NineSlice_GenericBox = true,            --used by BackpackItemTracker
         NineSlice_GenericBox_Border = true,     --used by BackpackItemTracker
         NineSlice_GenericBox_Black = true,
-        NineSlice_GenericBox_Black_Shadowed = true,
+        NineSlice_GenericBox_Black_Shadowed = true, --CustomSpellFlyout
     };
 
     local ThreeSliceLayouts = {
@@ -618,8 +618,19 @@ do  -- Common Frame with Header (and close button)
 
         return f
     end
-
     addon.CreateHeaderFrame = CreateHeaderFrame;
+
+
+    local function CreateCommonFrame(parent)
+        local showCloseButton = false;
+        local f = CreateHeaderFrame(parent, showCloseButton);
+        local texture = "Interface/AddOns/Plumber/Art/Frame/CommonFrameNoHeader";
+        for _, p in ipairs(f.pieces) do
+            p:SetTexture(texture);
+        end
+        return f
+    end
+    addon.CreateCommonFrame = CreateCommonFrame;
 
 
     local ExpandCollapseButtonMixin = {};

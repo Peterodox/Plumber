@@ -17,7 +17,7 @@ local JournalInstanceIDs = {
     1302,   --Manaforge Omega
     1296,   --Liberation of Undermine
     1273,   --Nerub-ar Palace
-    --1190,   --Debug Castle Nathria
+    --768,   --Debug Emerald Nightmare
 };
 
 if addon.IsToCVersionEqualOrNewerThan(110200) then
@@ -35,6 +35,7 @@ end
 
 local RaidTab, LootContainer;
 local EncounterList = {};
+local InstanceXDungeonEncounters = {};
 
 
 addon.CallbackRegistry:Register("LandingPage.SetEncounterTabInfo", function(tabInfo)
@@ -123,7 +124,8 @@ do
         self.journalInstanceID = journalInstanceID;
         self:SetHeader();
         self.Name:SetText(name);
-        self:HideProgress();
+
+        self:UpdateProgress();
     end
 
     function ListButtonMixin:SetEncounter(mapID, journalInstanceID, journalEncounterID, dungeonEncounterID, name)
@@ -150,24 +152,77 @@ do
 
     function ListButtonMixin:UpdateProgress()
         self:HideProgress();
-        if (not self.isHeader) and self.mapID and self.dungeonEncounterID then
-            local progress = GetEncounterProgress(self.mapID, self.dungeonEncounterID);
-            local texture;
-            for i, completed in ipairs(progress) do
-                texture = self["Light"..i];
-                if texture then
-                    texture:Show();
-                    texture:SetTexture(nil);
-                    local filter;
-                    if completed then
-                        texture:SetTexCoord(48/512, 96/512, 208/512, 256/512);
-                        filter = "LINEAR";
-                    else
-                        texture:SetTexCoord(96/512, 144/512, 208/512, 256/512);
-                        filter = "TRILINEAR";
-                    end
-                    texture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga", nil, nil, filter);
+        if self.mapID then
+            if self.isHeader then
+                if self.isCollapsed and InstanceXDungeonEncounters[self.mapID] then
+                    self:UpdateConsolidatedProgress();
                 end
+            elseif self.dungeonEncounterID then
+                self:UpdateEncounterProgress();
+            end
+        end
+    end
+
+    function ListButtonMixin:UpdateEncounterProgress()
+        local progress = GetEncounterProgress(self.mapID, self.dungeonEncounterID);
+        local texture;
+        for i, completed in ipairs(progress) do
+            texture = self["Light"..i];
+            if texture then
+                texture:Show();
+                texture:SetTexture(nil);
+                local filter;
+                if completed then
+                    texture:SetTexCoord(48/512, 96/512, 208/512, 256/512);
+                    filter = "LINEAR";
+                else
+                    texture:SetTexCoord(96/512, 144/512, 208/512, 256/512);
+                    filter = "TRILINEAR";
+                end
+                texture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga", nil, nil, filter);
+                texture:SetPoint("LEFT", self, "RIGHT", -184 + (i - 1) * 24, 0);
+            end
+        end
+    end
+
+    function ListButtonMixin:UpdateConsolidatedProgress()
+        local consolidatedProgress = LandingPageUtil.GetInstanceProgress(self.mapID, InstanceXDungeonEncounters[self.mapID]);
+        local texture;
+        local total = #InstanceXDungeonEncounters[self.mapID];
+        if total < 1 then return end;
+        local anyComplete
+        for i, numComplete in ipairs(consolidatedProgress) do
+            if numComplete > 0 then
+                anyComplete = true;
+                break
+            end
+        end
+        if not anyComplete then return end;
+        for i, numComplete in ipairs(consolidatedProgress) do
+            texture = self["Light"..i];
+            if texture then
+                texture:Show();
+                texture:SetTexture(nil);
+                local filter;
+                local ratio = numComplete / total;
+                if ratio > 0.99 then
+                    texture:SetTexCoord(48/512, 96/512, 208/512, 256/512);
+                    filter = "LINEAR";
+                elseif ratio > 0.66 then
+                    texture:SetTexCoord(288/512, 336/512, 208/512, 256/512);
+                    filter = "LINEAR";
+                elseif ratio > 0.32 then
+                    texture:SetTexCoord(240/512, 288/512, 208/512, 256/512);
+                    filter = "LINEAR";
+                elseif ratio > 0.01 then
+                    texture:SetTexCoord(192/512, 240/512, 208/512, 256/512);
+                    filter = "LINEAR";
+                else
+                    texture:SetTexCoord(96/512, 144/512, 208/512, 256/512);
+                    filter = "TRILINEAR";
+                end
+                texture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga", nil, nil, filter);
+                texture:SetPoint("LEFT", self, "RIGHT", -180 + (i - 1) * 24, 0);
             end
         end
     end
@@ -1024,15 +1079,21 @@ do
             local data = self:GetInstanceData(journalInstanceID);
             if data then
                 local mapID = data.mapID;
+                local dungeonEncounterIDs = {};
+
                 n = n + 1;
                 EncounterList[n] = {dataIndex = n, name = data.name, isCollapsed = IsRaidCollapsed(mapID), isHeader = true, journalInstanceID = journalInstanceID, mapID = mapID};
-                for _, encounterInfo in ipairs(data.encounters) do
+
+                for i, encounterInfo in ipairs(data.encounters) do
                     n = n + 1;
                     EncounterList[n] = {dataIndex = n, name = encounterInfo.name, journalEncounterID = encounterInfo.id, dungeonEncounterID = encounterInfo.dungeonEncounterID, mapID = mapID, journalInstanceID = journalInstanceID, };
                     if encounterInfo.id == selectedJournalEncounterID then
                         EncounterList[n].selected = true;
                     end
+                    dungeonEncounterIDs[i] =  encounterInfo.dungeonEncounterID;
                 end
+
+                InstanceXDungeonEncounters[mapID] = dungeonEncounterIDs;
             end
         end
 

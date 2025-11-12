@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.7.9";
-local VERSION_DATE = 1762300000;
+local VERSION_TEXT = "v1.7.10";
+local VERSION_DATE = 1762900000;
 
 
 local addonName, addon = ...
@@ -205,6 +205,7 @@ local DefaultValues = {
     TooltipProfessionKnowledge = true,  --Show unspent points on GameTooltip
     TooltipDelvesItem = true,           --Show weekly Coffer Key cap on chest tooltip
     TooltipItemQuest = true,            --Show the quest of quest starting items in bags
+    TooltipTransmogEnsemble = true,     --A Raid Ensemble now unlocks outfits (tints) from 4 difficulties, but the default UI only gives one
     TooltipHousing = true,              --TEMP Midnight BETA PTR
 
 
@@ -291,6 +292,11 @@ local DefaultValues = {
 
 
     EnableNewByDefault = false,             --Always enable newly added features
+
+
+    --Test Server
+    Test_ModuleScaleRef = true,
+        Test_ModuleScaleRef_ShowBanana = false,
 
 
     --Declared elsewhere:

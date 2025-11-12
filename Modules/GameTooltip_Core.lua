@@ -6,6 +6,7 @@ local After = C_Timer.After;
 local C_TooltipInfo = C_TooltipInfo;
 local GetItemIconByID = C_Item.GetItemIconByID;
 local gsub = string.gsub;
+local match = string.match;
 
 
 local ItemIconInfoTable = {
@@ -30,9 +31,9 @@ do
         table.insert(self.modules, module);
     end
 
-    function HandlerMixin:CallSubModules(tooltip, itemID)
+    function HandlerMixin:CallSubModules(tooltip, itemID, hyperlink)
         for _, m in ipairs(self.modules) do
-            if m:ProcessData(tooltip, itemID) then
+            if m:ProcessData(tooltip, itemID, hyperlink) then
                 self.anyChange = true;
             end
         end
@@ -174,7 +175,7 @@ do  --GameTooltipManager
                     if tooltipData and tooltipData.type == tooltipDataType then
                         local arg1 = tooltipData.id;
                         if arg1 then
-                            handler:CallSubModules(tooltip, arg1);
+                            handler:CallSubModules(tooltip, arg1, tooltipData.hyperlink);
                         end
                     end
                 end
@@ -227,4 +228,53 @@ do  --SubModuleMixin
         return self.enabled == true
     end
 --]]
+end
+
+
+do  --APIs
+    local _G = _G;
+
+    function GameTooltipManager.ReplaceTooltipLine(tooltip, searchText, newText, r, g, b)
+        local found;
+        local fs;
+        local name = tooltip:GetName();
+
+        for i = tooltip:NumLines(), 2, -1 do
+            fs = _G[name.."TextLeft"..i];
+            if fs then
+                if fs:GetText() == searchText then
+                    found = true;
+                    if newText then
+                        fs:SetText(newText);
+                        if r then
+                            fs:SetTextColor(r, g, b);
+                        end
+                    else
+                        fs:SetText(nil);
+                    end
+                    break
+                end
+            end
+        end
+        return found
+    end
+
+    function GameTooltipManager.DeleteLineByMatching(tooltip, pattern)
+        local found;
+        local fs, text;
+        local name = tooltip:GetName();
+
+        for i = tooltip:NumLines(), 2, -1 do
+            fs = _G[name.."TextLeft"..i];
+            if fs then
+                text = fs:GetText();
+                if text and match(text, pattern) then
+                    found = true;
+                    fs:SetText(nil);
+                    break
+                end
+            end
+        end
+        return found
+    end
 end

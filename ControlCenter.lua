@@ -20,6 +20,8 @@ local LEFT_SECTOR_WIDTH = math.floor(0.618*FRAME_WIDTH + 0.5);
 
 local CATEGORY_ORDER = {
     --Must match the keys in the localization
+    [-2] = "Beta",
+
     [-1] = "Timerunning",
 
     [0] = "Unknown",    --Used during development

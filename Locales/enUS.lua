@@ -41,6 +41,8 @@ L["Module Category Class"] = "Class";   --Player Class (rogue, paladin...)
 L["Module Category Reduction"] = "Reduction";   --Reduce UI elements
 --- order: -1
 L["Module Category Timerunning"] = "Legion Remix";   --Change this based on timerunning season
+--- order: -2
+L["Module Category Beta"] = "Test Server";
 
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this
@@ -210,6 +212,10 @@ L["You Have Received Weekly Item Format"] = "You have received %s this week.";
 L["ModuleName TooltipItemQuest"] = "Quest Starting Items";
 L["ModuleDescription TooltipItemQuest"] = "If an item in your bag starts a quest, show the quest details.\n\nYou can Ctrl Left Click the item to view it in the quest log if you are already on the quest.";
 L["Instruction Show In Quest Log"] = "<Ctrl Click to View in Quest Log>";
+
+
+L["ModuleName TooltipTransmogEnsemble"] = "Raid Ensembles";
+L["ModuleDescription TooltipTransmogEnsemble"] = "The class ensembles sold by the Raid Apparel vendor unlock all difficulty variants. Show in the tooltip which one has yet to be collected.";
 
 
 --Tooltip Housing
@@ -690,3 +696,8 @@ L["Upgrade Track 3"] = "Veteran";
 L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Hero";
 L["Upgrade Track 6"] = "Myth";
+<<<<<<< Updated upstream
+=======
+
+L["Match Pattern Transmog Set Partially Known"] = "^Contains (%d+) uncollected";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+>>>>>>> Stashed changes

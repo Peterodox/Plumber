@@ -175,13 +175,29 @@ end
 function LandingPageUtil.GetEncounterProgress(instanceID, dungeonEncounterID)
     --instanceID = mapID
 
-    local progress = {};
+    local progress = {};    --{boolean1, boolean2, ...}
 
     for i, difficultyID in ipairs(Difficulties) do
         progress[i] = IsEncounterComplete(instanceID, dungeonEncounterID, difficultyID);
     end
 
     return progress
+end
+
+function LandingPageUtil.GetInstanceProgress(instanceID, dungeonEncounterIDs)
+    local consolidatedProgress = {};    --{numComplete1, numComplete2, ...}
+
+    for i, difficultyID in ipairs(Difficulties) do
+        local numComplete = 0;
+        for _, dungeonEncounterID in ipairs(dungeonEncounterIDs) do
+            if IsEncounterComplete(instanceID, dungeonEncounterID, difficultyID) then
+                numComplete = numComplete + 1;
+            end
+        end
+        consolidatedProgress[i] = numComplete;
+    end
+
+    return consolidatedProgress
 end
 
 function LandingPageUtil.GetDefaultRaidDifficulty()

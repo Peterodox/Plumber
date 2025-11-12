@@ -35,3 +35,5 @@ L["Special Assignment"] = "Incarico speciale";
 
 L["Match Pattern Rep 1"] = "La reputazione della Brigata con \"(.+)\" è aumentata di ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "La reputazione con \"(.+)\" è aumentata di ([%d%,]+)";   --FACTION_STANDING_INCREASED
+
+L["Match Pattern Transmog Set Partially Known"] = "^Contiene (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS

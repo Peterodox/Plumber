@@ -4223,8 +4223,8 @@ do  --FocusSolver (Run something when being hovered long enough)
     end
 
     function FocusSolverMixin:Stop()
-        self.t = 0;
-        self:SetScript("OnUpdate", self.OnUpdate);
+        self.t = nil;
+        self:SetScript("OnUpdate", nil);
         self:UnregisterEvent("MODIFIER_STATE_CHANGED");
     end
 

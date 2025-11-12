@@ -45,3 +45,9 @@ do  --Decore API
         BaseHousingCatalogEntryTemplate
     --]]
 end
+
+
+do  --Transmog API
+    --Interface/AddOns/Blizzard_APIDocumentationGenerated/TransmogItemsDocumentation.lua
+    --https://sourcegraph.com/github.com/Gethe/wow-ui-source@beta/-/blob/Interface/AddOns/Blizzard_APIDocumentationGenerated/TransmogItemsDocumentation.lua
+end
