@@ -404,7 +404,7 @@ do
             WeeklyResetTimer:SetLowThresholdAndColor(2*3600, "ffe24c45");
         else
             WeeklyResetTimer:SetTimeGetter(C_DateAndTime.GetSecondsUntilWeeklyReset);
-            WeeklyResetTimer:SetTimeTextFormat(L["Weeky Reset Format"]);
+            WeeklyResetTimer:SetTimeTextFormat(L["Weekly Reset Format"]);
             WeeklyResetTimer:SetLowThresholdAndColor(6*3600, "ffe24c45");
         end
         WeeklyResetTimer:SetDisplayStyle("FormattedText");

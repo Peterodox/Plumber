@@ -419,7 +419,7 @@ L["Bountiful Delves Rep Tooltip"] = "打開豐裕寶匣有幾率獎勵此陣營�
 L["Warband Weekly Reward Tooltip"] = "你的戰團每週只能獲取一次此獎勵。";
 L["Completed"] = "已完成";
 L["Filter Hide Completed Format"] = "隱藏已完成的條目 (%d)";
-L["Weeky Reset Format"] = "每週重置：%s";
+L["Weekly Reset Format"] = "每週重置：%s";
 
 
 --Generic
