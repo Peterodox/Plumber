@@ -417,7 +417,7 @@ L["Bountiful Delves Rep Tooltip"] = "Abrir um Baú Abundante tem uma chance de a
 L["Warband Weekly Reward Tooltip"] = "Sua Warband só pode receber esta recompensa uma vez por semana.";
 L["Completed"] = CRITERIA_COMPLETED or "Concluído";
 L["Filter Hide Completed Format"] = "Ocultar Concluídos (%d)";
-L["Weeky Reset Format"] = "Reset semanal: %s";
+L["Weekly Reset Format"] = "Reset semanal: %s";
 
 
 --Generic
