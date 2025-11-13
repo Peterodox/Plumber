@@ -87,7 +87,8 @@ L["ModuleDescription GossipFrameMedal Format"] = "기본 아이콘 %s을(를) �
 
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "드루이드 모델 수정";
-L["ModuleDescription DruidModelFix"] = "별의 문양(Glyph of Stars) 사용 시 발생하는 캐릭터 UI 모델 표시 문제를 수정합니다.\n\n이 버그는 블리자드가 10.2.0 패치에서 수정할 예정이며, 해당 모듈은 이후 제거됩니다.";								   
+L["ModuleDescription DruidModelFix"] = "별의 문양(Glyph of Stars) 사용 시 발생하는 캐릭터 UI 모델 표시 문제를 수정합니다.\n\n이 버그는 블리자드가 10.2.0 패치에서 수정할 예정이며, 해당 모듈은 이후 제거됩니다.";
+L["Model Layout"] = "모델 배치";
 								   
 
 
@@ -211,6 +212,10 @@ L["ModuleName TooltipItemQuest"] = "퀘스트 시작 아이템"
 L["ModuleDescription TooltipItemQuest"] = "가방에 있는 아이템이 퀘스트를 시작할 수 있는 경우, 툴팁에 해당 퀘스트 정보를 표시합니다.\n\n이미 퀘스트를 진행 중이라면 Ctrl+왼쪽 클릭으로 퀘스트 로그에서 확인할 수 있습니다."
 L["Instruction Show In Quest Log"] = "<Ctrl+왼쪽 클릭으로 퀘스트 로그 열기>"
 
+L["ModuleName TooltipTransmogEnsemble"] = "레이드 앙상블";
+L["ModuleDescription TooltipTransmogEnsemble"] = "군단 리믹스 레이드 의상 상인이 판매하는 직업 앙상블은 모든 난이도 변형을 잠금 해제합니다. 툴팁에 아직 수집하지 않은 항목을 표시합니다.";
+
+
 
 --Tooltip Housing
 L["ModuleName TooltipHousing"] = "하우징";
@@ -233,6 +238,8 @@ L["Num Items In Bank Format"] = (BANK or "Bank") ..": |cffffffff%d|r";
 L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Bags") ..": |cffffffff%d|r";
 L["Number Thousands"] = "K";    --15K  15,000
 L["Number Millions"] = "M";     --1.5M 1,500,000
+L["Questionable Item Count Tooltip"] = "애드온 제한으로 아이템 개수가 잘못 표시될 수 있습니다.";
+
 
 
 --QueueStatus
@@ -405,9 +412,10 @@ L["Artifact Traits"] = "유물 특성";
 L["Earn X To Upgrade Y Format"] = "|cffffffff%s|r %s을(를) 추가로 획득하여 %s을(를) 업그레이드하세요";
 L["Until Next Upgrade Format"] = "다음 업그레이드까지 %s";
 L["New Trait Available"] = "새로운 특성이 사용 가능합니다.";
+L["Rank Format"] = "등급 %s";
 L["Rank Increased"] = "등급이 상승했습니다.";
 L["Infinite Knowledge Tooltip"] = "특정 군단 리믹스 업적을 달성하면 무한한 지식을 획득할 수 있습니다.";
-L["Infinite Knowledge Tooltip"] = "특정 군단 리믹스 업적을 달성하면 무한한 지식을 얻을 수 있습니다.";
+
 L["Stat Bonuses"] = "능력치 보너스";
 L["Bonus Traits"] = "추가 특성:";
 L["Instruction Open Artifact UI"] = "좌클릭: 유물 UI 열기/닫기\n우클릭: 설정 보기";
@@ -465,6 +473,8 @@ L["Sample Item 2"] = "고급 아이템";
 L["Sample Item 1"] = "일반 아이템";
 L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
 L["Manual Loot Instruction Format"] = "특정 아이템을 획득할 때 자동 전리품을 일시적으로 취소하려면 전리품 창이 나타날 때까지 |cffffffff%s|r 키를 길게 누르세요.";
+L["LootUI Option Hide Window"] = "전리품 창 숨기기";
+L["LootUI Option Hide Window Tooltip"] = "전리품 알림 창을 숨기되, 강제 자동 획득 등 기능은 계속 작동합니다.";
 L["LootUI Option Force Auto Loot"] = "자동 전리품 획득을 강제 적용";
 L["LootUI Option Force Auto Loot Tooltip"] = "자동 전리품 기능을 항상 켜 두어 간헐적인 오류를 방지.";
 L["LootUI Option Owned Count"] = "보유 중인 아이템 수 표시";
@@ -625,6 +635,7 @@ L["ModuleName EnableNewByDefault"] = "항상 신규 기능 활성화";
 L["ModuleDescription EnableNewByDefault"] = "신규 기능 항상 켜기.\n\n*활성화 시 채팅창에 알림 표시.";
 L["New Feature Auto Enabled Format"] = "신규 모듈 %s이 활성화.";
 L["Click To See Details"] = "자세히 보기";
+L["Click To Show Settings"] = "클릭하면 설정을 열거나 닫습니다";
 
 
 --WIP Merchant UI
