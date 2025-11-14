@@ -2,22 +2,30 @@ local _, addon = ...
 local L = addon.L;
 local GameTooltipItemManager = addon.GameTooltipManager:GetItemManager();
 local ReplaceTooltipLine = addon.GameTooltipManager.ReplaceTooltipLine;
+local ReplaceLineByMatching = addon.GameTooltipManager.ReplaceLineByMatching;
 local DeleteLineByMatching = addon.GameTooltipManager.DeleteLineByMatching;
 
 
 local ALREADY_KNOWN = ITEM_SPELL_KNOWN; --ERR_COSMETIC_KNOWN, Already known, with lowercase k
 local PATTERN_PARTIALLY_KNOWN = L["Match Pattern Transmog Set Partially Known"];
+local GREY_CHECKMARK = "|TInterface\\AddOns\\Plumber\\Art\\ExpansionLandingPage\\Icons\\CheckmarkGrey:0:0|t";
 
 
+local ipairs = ipairs;
 local GetItemLearnTransmogSet = C_Item.GetItemLearnTransmogSet;
 local GetBaseSetID = C_TransmogSets.GetBaseSetID;
 local GetVariantSets = C_TransmogSets.GetVariantSets;
 local GetSetInfo = C_TransmogSets.GetSetInfo;
 local GetSetPrimaryAppearances = C_TransmogSets.GetSetPrimaryAppearances;
+local GetAllSetAppearancesByID = C_Transmog.GetAllSetAppearancesByID;
+local GetSourceInfo = C_TransmogCollection.GetSourceInfo;
+local IsAppearanceCollected = addon.API.IsAppearanceCollected;
+--local GetNumCollectedAppearanceSources = addon.API.GetNumCollectedAppearanceSources;
 
 
-local EnsembleItem = {};
+local LegionRaidEnsemble = {};
 local ItemXSets = {};
+
 
 local DifficultyNames = {
     PLAYER_DIFFICULTY3,
@@ -25,6 +33,73 @@ local DifficultyNames = {
     PLAYER_DIFFICULTY2,
     PLAYER_DIFFICULTY6,
 };
+
+
+local CollectionCache = CreateFrame("Frame");
+do
+    CollectionCache.cache = {};
+
+    function CollectionCache:ListenEvents(state)
+        if state then
+            if not self.listend then
+                self.listend = true;
+                self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED");
+                self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED");
+                self:RegisterEvent("TRANSMOG_COSMETIC_COLLECTION_SOURCE_ADDED");
+            end
+
+        else
+            if self.listend then
+                self.listend = nil;
+                self:UnregisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED");
+                self:UnregisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED");
+                self:UnregisterEvent("TRANSMOG_COSMETIC_COLLECTION_SOURCE_ADDED");
+            end
+        end
+    end
+
+    function CollectionCache:GetData(setID)
+        if not self.cache[setID] then
+            local setItems = GetAllSetAppearancesByID(setID);
+            if setItems then
+                local appCol, appTotal = 0, 0;
+                local sourceCol, sourceTotal = 0, 0;
+                local appearanceIDs = {};
+                local sourceInfo;
+                for _, v in ipairs(setItems) do
+                    sourceInfo = GetSourceInfo(v.itemModifiedAppearanceID);
+                    if sourceInfo and sourceInfo.visualID then
+                        appearanceIDs[sourceInfo.visualID] = true;
+                        sourceTotal = sourceTotal + 1;
+                        if sourceInfo.isCollected then
+                            sourceCol = sourceCol + 1;
+                        end
+                    end
+                end
+
+                for appearanceID in pairs(appearanceIDs) do
+                    appTotal = appTotal + 1;
+                    if IsAppearanceCollected(appearanceID) then
+                        appCol = appCol + 1;
+                    end
+                end
+
+                self.cache[setID] = {appCol, appTotal, sourceCol, sourceTotal};
+                self:ListenEvents(true);
+            end
+        end
+
+        local v = self.cache[setID];
+        if v then
+            return v[1], v[2], v[3], v[4]
+        end
+    end
+
+    CollectionCache:SetScript("OnEvent", function(self)
+        self:ListenEvents(false);
+        self.cache = {};
+    end);
+end
 
 
 local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
@@ -48,70 +123,97 @@ local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
 
     if not hyperlink then return end;
 
-    if EnsembleItem[itemID] then
-        --Cache set info
-        if not ItemXSets[itemID] then
-            local setID = GetItemLearnTransmogSet(hyperlink);
-            local baseSetID = GetBaseSetID(setID);
-            local baseSetInfo = GetSetInfo(baseSetID);
-            local allSetInfo = GetVariantSets(baseSetID);
-            local insertBaseSet = true;
-            for _, info in ipairs(allSetInfo) do
-                if info.setID == baseSetID then
-                    insertBaseSet = false;
-                    break
+    local setID = GetItemLearnTransmogSet(hyperlink);
+    if setID then
+        if LegionRaidEnsemble[itemID] then
+            if not ItemXSets[itemID] then
+                local baseSetID = GetBaseSetID(setID);
+                local baseSetInfo = GetSetInfo(baseSetID);
+                local allSetInfo = GetVariantSets(baseSetID);
+                local insertBaseSet = true;
+                for _, info in ipairs(allSetInfo) do
+                    if info.setID == baseSetID then
+                        insertBaseSet = false;
+                        break
+                    end
                 end
-            end
 
-            if insertBaseSet then
-                table.insert(allSetInfo, baseSetInfo);
-            end
-
-            table.sort(allSetInfo, function(a, b)
-                if a.uiOrder ~= b.uiOrder then
-                    return a.uiOrder < b.uiOrder
+                if insertBaseSet then
+                    table.insert(allSetInfo, baseSetInfo);
                 end
-                return a.setID < b.setID
-            end);
 
-            local tbl = {};
-            for i = 1, 4 do
-                tbl[i] = allSetInfo[i].setID;
-            end
-            ItemXSets[itemID] = tbl;
-        end
+                table.sort(allSetInfo, function(a, b)
+                    if a.uiOrder ~= b.uiOrder then
+                        return a.uiOrder < b.uiOrder
+                    end
+                    return a.setID < b.setID
+                end);
 
-        tooltip:AddLine(" ");
-
-        local allCollected = true;
-
-        for i, setID in ipairs(ItemXSets[itemID]) do
-            local appearances = GetSetPrimaryAppearances(setID);
-            local numCollected = 0;
-            local numTotal = 0;
-            for _, v in ipairs(appearances) do
-                if v.collected then
-                    numCollected = numCollected + 1;
+                local tbl = {};
+                for i = 1, 4 do
+                    tbl[i] = allSetInfo[i].setID;
                 end
-                numTotal = numTotal + 1;
+                ItemXSets[itemID] = tbl;
             end
-            if numCollected >= numTotal then
-                tooltip:AddDoubleLine(DifficultyNames[i], "|TInterface\\AddOns\\Plumber\\Art\\ExpansionLandingPage\\Icons\\CheckmarkGrey:0:0|t", 0.5, 0.5, 0.5, 1, 1, 1);
-            else
-                allCollected = false;
-                tooltip:AddDoubleLine(DifficultyNames[i], numCollected.."/"..numTotal, 1, 1, 1, 1, 1, 1);
-            end
-        end
 
-        ReplaceTooltipLine(tooltip, ALREADY_KNOWN, nil);
-        DeleteLineByMatching(tooltip, PATTERN_PARTIALLY_KNOWN);
-
-        if allCollected then
             tooltip:AddLine(" ");
-            tooltip:AddLine(ALREADY_KNOWN, 1, 0.125, 0.125, true);
-        end
 
-        return true
+            local allCollected = true;
+
+            for i, setID in ipairs(ItemXSets[itemID]) do
+                local appearances = GetSetPrimaryAppearances(setID);
+                local numCollected = 0;
+                local numTotal = 0;
+                for _, v in ipairs(appearances) do
+                    if v.collected then
+                        numCollected = numCollected + 1;
+                    end
+                    numTotal = numTotal + 1;
+                end
+                if numCollected >= numTotal then
+                    tooltip:AddDoubleLine(DifficultyNames[i], GREY_CHECKMARK, 0.5, 0.5, 0.5, 1, 1, 1);
+                else
+                    allCollected = false;
+                    tooltip:AddDoubleLine(DifficultyNames[i], numCollected.."/"..numTotal, 1, 1, 1, 1, 1, 1);
+                end
+            end
+
+            ReplaceTooltipLine(tooltip, ALREADY_KNOWN, nil);
+            DeleteLineByMatching(tooltip, PATTERN_PARTIALLY_KNOWN);
+
+            if allCollected then
+                tooltip:AddLine(" ");
+                tooltip:AddLine(ALREADY_KNOWN, 1, 0.125, 0.125, true);
+            end
+
+            return true
+        else
+            --Generic Ensembles
+            local appCol, appTotal, sourceCol, sourceTotal = CollectionCache:GetData(setID);
+            local showItems = C_CVar.GetCVarBool("missingTransmogSourceInItemTooltips");
+            if appCol and ((appCol < appTotal) or (showItems and sourceCol < sourceTotal)) then
+                local found1, isLastLine1 = ReplaceTooltipLine(tooltip, ALREADY_KNOWN, " ");
+                local found2, isLastLine2 = ReplaceLineByMatching(tooltip, PATTERN_PARTIALLY_KNOWN, " ");
+
+                if not (isLastLine1 or isLastLine2) then
+                    tooltip:AddLine(" ");
+                end
+
+                if appCol < appTotal then
+                    tooltip:AddDoubleLine(L["Collected Appearances"], appCol.."/"..appTotal, 1, 1, 1, 1, 1, 1);
+                elseif showItems then
+                    tooltip:AddDoubleLine(L["Collected Appearances"], appCol.."/"..appTotal, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5); --Show numbers instead of checkmark
+                end
+
+                if showItems then
+                    if sourceCol < sourceTotal and sourceTotal > appTotal then
+                        tooltip:AddDoubleLine(L["Collected Items"], sourceCol.."/"..sourceTotal, 1, 1, 1, 1, 1, 1);
+                    end
+                end
+
+                return true
+            end
+        end
     end
     return false
 end
@@ -167,14 +269,13 @@ do
         categoryID = 3,
         uiOrder = 1205,
         moduleAddedTime = 1755200000,
-        timerunningSeason = 2,
     };
 
     addon.ControlCenter:AddModule(moduleData);
 end
 
 
-EnsembleItem = {
+LegionRaidEnsemble = {
 --Pattern?: {n+1, n-2, n-1, n}
 
 [241558] = true,     --Ensemble: Eagletalon Battlegear

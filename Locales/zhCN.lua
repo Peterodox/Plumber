@@ -213,7 +213,9 @@ L["Instruction Show In Quest Log"] = "<按住Ctrl点击浏览任务日志>";
 
 
 L["ModuleName TooltipTransmogEnsemble"] = "团本外观套装";
-L["ModuleDescription TooltipTransmogEnsemble"] = "军团再临团本外观商人出售的大多数物品可以解锁所有难度的配色。在这些物品的鼠标提示上显示你的收藏进度。";
+L["ModuleDescription TooltipTransmogEnsemble"] = "- 显示套装内可收集外观的数量。\n\n- 军团再临团本外观商人出售的大多数物品可以解锁所有难度的配色。在这些物品的鼠标提示上显示你的收藏进度。";
+L["Collected Appearances"] = "已收集外观";
+L["Collected Items"] = "已收集物品";
 
 
 --Tooltip Housing
@@ -578,6 +580,12 @@ L["Click To Switch"] = "点击以切换为|cffffffff%s|r";
 L["Click To Queue"] = "点击以加入|cffffffff%s|r";
 L["Click to Open Format"] = "点击以打开%s";
 L["List Is Empty"] = "暂无可显示内容";
+
+
+--RaidCheck
+L["ModuleName InstanceDifficulty"] = "副本难度";
+L["ModuleDescription InstanceDifficulty"] = "- 在副本门口外显示难度选择界面\n\n- 当你进入副本时，在屏幕上方显示当前副本难度和进度。";
+L["Cannot Change Difficulty"] = "你暂时无法更改副本难度。";
 
 
 --Generic

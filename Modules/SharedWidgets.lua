@@ -85,6 +85,36 @@ do  -- Slice Frame
         frame.NineSlice:SetTexture(texture);
     end
 
+    function API.CreateThreeSliceTextures(parent, layer, sideWidth, sideHeight, sideOffset, file, disableSharpenging)
+        local slices = {};
+        slices[1] = parent:CreateTexture(nil, layer);
+        slices[2] = parent:CreateTexture(nil, layer);
+        slices[3] = parent:CreateTexture(nil, layer);
+        slices[1]:SetPoint("LEFT", parent, "LEFT", -sideOffset, 0);
+        slices[3]:SetPoint("RIGHT", parent, "RIGHT", sideOffset, 0);
+        slices[2]:SetPoint("TOPLEFT", slices[1], "TOPRIGHT", 0, 0);
+        slices[2]:SetPoint("BOTTOMRIGHT", slices[3], "BOTTOMLEFT", 0, 0);
+
+        if sideWidth and sideHeight then
+            slices[1]:SetSize(sideWidth, sideHeight);
+            slices[3]:SetSize(sideWidth, sideHeight);
+        end
+
+        if file then
+            slices[1]:SetTexture(file);
+            slices[2]:SetTexture(file);
+            slices[3]:SetTexture(file);
+        end
+
+        if disableSharpenging then
+            DisableSharpening(slices[1]);
+            DisableSharpening(slices[2]);
+            DisableSharpening(slices[3]);
+        end
+
+        return slices
+    end
+
     function SliceFrameMixin:CreatePieces(n)
         --[[
         if n == 9 then

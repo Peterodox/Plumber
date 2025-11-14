@@ -5,6 +5,7 @@ addon.GameTooltipManager = GameTooltipManager;
 local After = C_Timer.After;
 local C_TooltipInfo = C_TooltipInfo;
 local GetItemIconByID = C_Item.GetItemIconByID;
+local GetItemLinkByGUID = C_Item.GetItemLinkByGUID;
 local gsub = string.gsub;
 local match = string.match;
 
@@ -154,6 +155,7 @@ do  --GameTooltipManager
             handler.modules = {};
             handler.tooltipDataType = tooltipDataType;
             handler.noModuleEnabled = true;
+            handler.isItemHandler = tooltipDataType == 0;
 
             if useLeftTextAsArgument then
                 function handler.ProcessDisplayedData(tooltip)
@@ -175,7 +177,13 @@ do  --GameTooltipManager
                     if tooltipData and tooltipData.type == tooltipDataType then
                         local arg1 = tooltipData.id;
                         if arg1 then
-                            handler:CallSubModules(tooltip, arg1, tooltipData.hyperlink);
+                            local hyperlink;
+                            if handler.isItemHandler and tooltipData.guid then
+                                hyperlink = GetItemLinkByGUID(tooltipData.guid);
+                            else
+                                hyperlink = tooltipData.hyperlink;
+                            end
+                            handler:CallSubModules(tooltip, arg1, hyperlink);
                         end
                     end
                 end
@@ -238,6 +246,7 @@ do  --APIs
         local found;
         local fs;
         local name = tooltip:GetName();
+        local isLastLine = true;
 
         for i = tooltip:NumLines(), 2, -1 do
             fs = _G[name.."TextLeft"..i];
@@ -255,26 +264,45 @@ do  --APIs
                     break
                 end
             end
+            isLastLine = false;
         end
-        return found
+
+        if not found then
+            isLastLine = false;
+        end
+
+        return found, isLastLine
     end
 
-    function GameTooltipManager.DeleteLineByMatching(tooltip, pattern)
+    function GameTooltipManager.ReplaceLineByMatching(tooltip, pattern, newText, r, g, b)
         local found;
         local fs, text;
         local name = tooltip:GetName();
-
+        local isLastLine = true;
         for i = tooltip:NumLines(), 2, -1 do
             fs = _G[name.."TextLeft"..i];
             if fs then
                 text = fs:GetText();
                 if text and match(text, pattern) then
                     found = true;
-                    fs:SetText(nil);
+                    fs:SetText(newText);
+                    if r then
+                        fs:SetTextColor(r, g, b);
+                    end
                     break
                 end
             end
+            isLastLine = false;
         end
-        return found
+
+        if not found then
+            isLastLine = false;
+        end
+
+        return found, isLastLine
+    end
+
+    function GameTooltipManager.DeleteLineByMatching(tooltip, pattern)
+        return GameTooltipManager.ReplaceLineByMatching(tooltip, pattern)
     end
 end

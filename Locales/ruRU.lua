@@ -688,3 +688,5 @@ L["Upgrade Track 3"] = "Ветеран";
 L["Upgrade Track 4"] = "Защитник";
 L["Upgrade Track 5"] = "Герой";
 L["Upgrade Track 6"] = "Легенда";
+
+L["Match Pattern Transmog Set Partially Known"] = "^Содержит (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS

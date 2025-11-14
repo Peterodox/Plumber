@@ -1,7 +1,7 @@
 ## X-Flavor: retail
 ## X-Expansion: TWW
 ## Interface: 110205, 110207, 120000
-## Version: 1.7.10
+## Version: 1.8.0
 
 ## Title: Plumber
 
@@ -81,6 +81,7 @@ Modules\BlizzFix_ModelLoading.lua
 Modules\Timerunning\LegionRemix.xml
 Modules\HolidayDungeon.lua
 Modules\QueueStatus.lua
+Modules\RaidCheck\RaidCheck.xml
 
 #Modules\MerchantUI\MerchantUI.xml
 

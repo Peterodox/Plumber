@@ -1,0 +1,6 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <Script file="DataProvider.lua"/>
+    <Script file="UI.lua"/>
+    <Script file="LocationTracker.lua"/>
+    <Script file="ModuleRegistry.lua"/>
+</Ui>

@@ -1,5 +1,5 @@
-local VERSION_TEXT = "v1.7.10";
-local VERSION_DATE = 1762900000;
+local VERSION_TEXT = "v1.8.0";
+local VERSION_DATE = 1763100000;
 
 
 local addonName, addon = ...
@@ -195,6 +195,7 @@ local DefaultValues = {
     QueueStatus = false,                --Add a progress bar to LFG Eye
         QueueStatus_ShowTime = false,   --Relative Queue Time
         QueueStatus_TextPosition = 1,   --0:Center, 1-4:Clockwise
+    InstanceDifficulty = false,         --Instance Difficulty Selector
 
 
     --Tooltip

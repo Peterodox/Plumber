@@ -664,13 +664,26 @@
             <AnimationGroup parentKey="Anim" looping="REPEAT">
                 <Rotation degrees="-360" duration="1" order="1" childKey="Spinner"/>
             </AnimationGroup>
+            <AnimationGroup parentKey="Anim2">
+                <Rotation degrees="-720" duration="2" order="1" childKey="Spinner"/>
+                <Scripts>
+                    <OnFinished>
+                        self:GetParent():Hide();
+                    </OnFinished>
+                </Scripts>
+            </AnimationGroup>
         </Animations>
         <Scripts>
             <OnShow>
-                self.Anim:Play();
+                if self.autoHide then
+                    self.Anim2:Play();
+                else
+                    self.Anim:Play();
+                end
             </OnShow>
             <OnHide>
                 self.Anim:Stop();
+                self.Anim2:Stop();
             </OnHide>
         </Scripts>
     </Frame>

@@ -88,6 +88,10 @@ do  --Object Pool
         end
     end
 
+    function ObjectPoolMixin:EnumerateActive()
+        return ipairs(self.activeObjects)
+    end
+
     function ObjectPoolMixin:ProcessActiveObjects(processFunc)
         for _, object in ipairs(self.activeObjects) do
             if processFunc(object) then

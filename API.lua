@@ -2418,6 +2418,10 @@ do  -- ObjectPool
         return self.activeObjects
     end
 
+    function ObjectPoolMixin:EnumerateActive()
+        return ipairs(self.activeObjects)
+    end
+
     local function CreateObjectPool(createObjectFunc, onRemovedFunc, onAcquiredFunc)
         local pool = {};
         API.Mixin(pool, ObjectPoolMixin);
@@ -2441,20 +2445,55 @@ do  -- ObjectPool
 end
 
 do  -- Transmog
-    local GetItemInfo = C_TransmogCollection.GetItemInfo;
-    local PlayerKnowsSource = C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance;
+    if addon.IsToCVersionEqualOrNewerThan(40000) then
+        local GetSourceInfo = C_TransmogCollection.GetSourceInfo;
+        local GetAllAppearanceSources = C_TransmogCollection.GetAllAppearanceSources;
+        local GetItemInfo = C_TransmogCollection.GetItemInfo;
+        local PlayerKnowsSource = C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance;
 
-    local function IsUncollectedTransmogByItemInfo(itemInfo)
-        --C_TransmogCollection.PlayerHasTransmogByItemInfo isn't reliable
-        local visualID, sourceID =GetItemInfo(itemInfo);
-        if sourceID and sourceID ~= 0 and (not PlayerKnowsSource(sourceID)) then
-            return true
+
+        function API.IsUncollectedTransmogByItemInfo(itemInfo)
+            --C_TransmogCollection.PlayerHasTransmogByItemInfo isn't reliable
+            local visualID, sourceID = GetItemInfo(itemInfo);
+            if sourceID and sourceID ~= 0 and (not PlayerKnowsSource(sourceID)) then
+                return true
+            end
         end
-    end
-    API.IsUncollectedTransmogByItemInfo = IsUncollectedTransmogByItemInfo
 
-    if not addon.IsToCVersionEqualOrNewerThan(40000) then
+
+        function API.IsAppearanceCollected(appearanceID)
+            local sources = GetAllAppearanceSources(appearanceID);
+            if sources then
+                for _, itemModifiedAppearanceID in ipairs(sources) do
+                    local sourceInfo = GetSourceInfo(itemModifiedAppearanceID);
+                    if sourceInfo and sourceInfo.isCollected then
+                        return true
+                    end
+                end
+            end
+            return false
+        end
+
+        function API.GetNumCollectedAppearanceSources(appearanceID)
+            local sources = GetAllAppearanceSources(appearanceID);
+            local numCollected = 0;
+            local numTotal = 0;
+            if sources then
+                for _, itemModifiedAppearanceID in ipairs(sources) do
+                    local sourceInfo = GetSourceInfo(itemModifiedAppearanceID);
+                    if sourceInfo then
+                        if sourceInfo.isCollected then
+                            numCollected = numCollected + 1;
+                        end
+                        numTotal = numTotal;
+                    end
+                end
+            end
+            return numCollected, numTotal
+        end
+    else
         API.IsUncollectedTransmogByItemInfo = Nop;
+        API.IsAppearanceCollected = Nop;
     end
 end
 

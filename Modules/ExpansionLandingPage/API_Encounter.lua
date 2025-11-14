@@ -8,6 +8,10 @@ local ipairs = ipairs;
 local EJ_SelectInstance = EJ_SelectInstance;
 local EJ_SelectEncounter = EJ_SelectEncounter;
 local EJ_IsValidInstanceDifficulty = EJ_IsValidInstanceDifficulty;
+local EJ_GetInstanceInfo = EJ_GetInstanceInfo;
+local EJ_SetDifficulty = EJ_SetDifficulty;
+local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
+local IsLegacyDifficulty = IsLegacyDifficulty;
 
 
 local EL = CreateFrame("Frame");
@@ -74,6 +78,20 @@ do  --Derivative of Blizzard_EncounterJournal.lua
         DifficultyUtil.ID.Raid40,
     };
 
+    local VALID_DIFFUICULTY_OPEN_WORLD = {
+        DifficultyUtil.ID.DungeonNormal,
+        DifficultyUtil.ID.DungeonHeroic,
+        DifficultyUtil.ID.DungeonMythic,
+        DifficultyUtil.ID.Raid10Normal,
+        DifficultyUtil.ID.Raid10Heroic,
+        DifficultyUtil.ID.Raid25Normal,
+        DifficultyUtil.ID.Raid25Heroic,
+        DifficultyUtil.ID.PrimaryRaidNormal,
+        DifficultyUtil.ID.PrimaryRaidHeroic,
+        DifficultyUtil.ID.PrimaryRaidMythic,
+        DifficultyUtil.ID.Raid40,
+    };
+
     local ALL_DIFFICULTY_ID = -1;   --If so, track all available difficulties
 
 
@@ -100,10 +118,10 @@ do  --Derivative of Blizzard_EncounterJournal.lua
     API.GetRaidDifficultyString = GetEJDifficultyString;
 
 
-    local function GetValidDifficulties(instanceID, encounterID, showAllDifficulties)
+    local function GetValidDifficulties(journalInstanceID, encounterID, showAllDifficulties)
         local n = 0;
         local tbl = {};
-        SelectInstanceAndEncounter(instanceID, encounterID);
+        SelectInstanceAndEncounter(journalInstanceID, encounterID);
 
         for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
             if EJ_IsValidInstanceDifficulty(difficultyID) then
@@ -138,6 +156,66 @@ do  --Derivative of Blizzard_EncounterJournal.lua
     end
     API.GetValidDifficultiesForInstance = GetValidDifficultiesForInstance;
 
+    function API.GetInstanceInfoForSelector(journalInstanceID)
+        --Selectable at the raid entrance
+        local n = 0;
+        local tbl = {};
+
+        SelectInstanceAndEncounter(journalInstanceID, nil);
+
+        local instanceName, description, bgImage, buttonImage1, loreImage, buttonImage2, dungeonAreaMapID, link, shouldDisplayDifficulty, mapID, covenantID, isRaid = EJ_GetInstanceInfo(journalInstanceID);
+        tbl.name = instanceName;
+        tbl.isRaid = isRaid;
+        tbl.instanceID = mapID;
+
+        local isLegacyRaid;
+        local difficulties = {};
+
+        for index, difficultyID in ipairs(VALID_DIFFUICULTY_OPEN_WORLD) do
+            if EJ_IsValidInstanceDifficulty(difficultyID) then
+                local text = GetEJDifficultyString(difficultyID);
+                n = n + 1;
+                difficulties[n] = {
+                    difficultyID = difficultyID,
+                    text = text,
+                };
+
+                if IsLegacyDifficulty(difficultyID) then
+                    isLegacyRaid = true;
+                end
+            end
+        end
+
+        tbl.difficulties = difficulties;
+        tbl.isLegacyRaid = isLegacyRaid;
+
+        return tbl
+    end
+
+    function API.GetInstanceEncounters(journalInstanceID, difficultyID)
+        EJ_SetDifficulty(difficultyID);
+
+        local encounters = {};
+        local i = 1;
+        local bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);    --No dungeonEncounterID in Classic
+
+        while journalEncounterID do
+            if not dungeonEncounterID then
+                dungeonEncounterID = LandingPageUtil.GetDungeonEncounteID(journalEncounterID);
+            end
+
+            encounters[i] = {
+                name = bossName,
+                id = journalEncounterID,
+                dungeonEncounterID = dungeonEncounterID,
+                difficultyID = difficultyID,
+            };
+            i = i + 1;
+            bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);
+        end
+
+        return encounters
+    end
 
     local function IsDifficultyValidForEncounter(instanceID, encounterID, difficultyID)
         local difficulties = instanceID and GetValidDifficultiesForEncounter(instanceID, encounterID);
