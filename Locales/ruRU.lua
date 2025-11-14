@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.9
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.7.10
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -130,6 +130,8 @@ L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Мгновенный текст";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Текстовый контур";
 L["TalkingHead Option Condition Header"] = "Скрыть тексты из источника:";
+L["TalkingHead Option Hide Everything"] = "Скрыть все";
+L["TalkingHead Option Hide Everything Tooltip"] = "|cffff4800Субтитры больше не будут отображаться.|r\n\nЗакадровый голос продолжит воспроизводиться, а транскрипция будет отображаться в окне чата.";
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Локальные задания";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Скрыть текст, если он из локального задания.\nИногда «Говорящая голова» срабатывает до принятия локального задания, и мы не сможем это скрыть.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Подземелье";
@@ -210,6 +212,13 @@ L["ModuleDescription TooltipItemQuest"] = "Если предмет в вашей
 L["Instruction Show In Quest Log"] = "<ЛКМ по предмету, удерживая клавишу Ctrl, чтобы просмотреть журнал заданий>";
 
 
+--Tooltip Housing
+L["ModuleName TooltipHousing"] = "Дома";
+L["ModuleDescription TooltipHousing"] = "Дома";
+L["Instruction View In Dressing Room"] = "<Нажмите Ctrl, чтобы просмотреть в примерочной>";  --VIEW_IN_DRESSUP_FRAME
+L["Data Loading In Progress"] = "Plumber загружает данные";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "Пиратская буря";
 L["ModuleDescription Plunderstore"] = "Изменить магазин, открытый через Заранее собранные группы:\n\n- Добавлен флажок, позволяющий скрыть собранные предметы.\n\n- Отображение количества несобранных предметов на кнопках категорий.\n\n- В подсказки добавлено место экипировки оружия и брони.\n\n- Позволяет просматривать экипируемые предметы в примерочной.";
@@ -225,6 +234,13 @@ L["Num Items In Bag Format"] = (HUD_EDIT_MODE_BAGS_LABEL or "Сумка") ..": |
 L["Number Thousands"] = "Т";    --15K  15,000
 L["Number Millions"] = "М";     --1.5M 1,500,000
 L["Questionable Item Count Tooltip"] = "Количество предметов может быть неверным из-за ограничений аддона.";
+
+
+--QueueStatus
+L["ModuleName QueueStatus"] = "Статус очереди";
+L["ModuleDescription QueueStatus"] = "Добавьте в «Глаз поиска группы» индикатор прогресса, показывающий процент найденных товарищей по команде. Танки и целители весят больше.\n\n(Необязательно) Показывать разницу между средним временем ожидания и временем в очереди.";
+L["QueueStatus Show Time"] = "Показывать время";
+L["QueueStatus Show Time Tooltip"] = "Показывать разницу между средним временем ожидания и временем в очереди.";
 
 
 --Landing Page (Expansion Summary Minimap)
@@ -672,5 +688,3 @@ L["Upgrade Track 3"] = "Ветеран";
 L["Upgrade Track 4"] = "Защитник";
 L["Upgrade Track 5"] = "Герой";
 L["Upgrade Track 6"] = "Легенда";
-
-L["Match Pattern Transmog Set Partially Known"] = "^Содержит (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
