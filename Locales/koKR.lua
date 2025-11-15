@@ -613,6 +613,10 @@ L["Click To Queue"] = "대기열에 참여하려면 클릭 |cffffffff%s|r";
 L["Click to Open Format"] = "열기 클릭 %s";
 L["List Is Empty"] = "목록이 비어 있습니다.";
 
+--RaidCheck
+L["ModuleName InstanceDifficulty"] = "인스턴스 난이도";
+L["ModuleDescription InstanceDifficulty"] = "- 공격대나 던전 입구에 있을 때 난이도 선택기를 표시합니다.\n\n- 인스턴스에 입장하면 화면 상단에 현재 난이도와 귀속 정보를 표시합니다.";
+L["Cannot Change Difficulty"] = "현재는 인스턴스 난이도를 변경할 수 없습니다.";
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
