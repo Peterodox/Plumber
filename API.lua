@@ -2281,6 +2281,27 @@ do  -- System
 
         TopBannerManager_BannerFinished();
     end
+
+    function API.AddFrameToUISpecialFrames(frame, state)
+        local frameName = frame:GetName();
+        if not frameName then return end;
+
+        if state then
+            for i, name in ipairs(UISpecialFrames) do
+                if name == frameName then
+                    return
+                end
+            end
+            table.insert(UISpecialFrames, frameName);
+        else
+            for i, name in ipairs(UISpecialFrames) do
+                if name == frameName then
+                    table.remove(UISpecialFrames, i);
+                    return
+                end
+            end
+        end
+    end
 end
 
 do  -- Player

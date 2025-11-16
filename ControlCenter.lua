@@ -362,6 +362,7 @@ local function CreateUI()
         settingsOpenTime = 0;
         isFirstMet = true;
     end
+    settingsOpenTime = settingsOpenTime - 7 * 86400;    --NewFeatureMark gone after 7 days
 
     local parent = ControlCenter;
     local showCloseButton = true;

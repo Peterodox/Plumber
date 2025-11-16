@@ -588,6 +588,15 @@ L["ModuleDescription InstanceDifficulty"] = "- 在副本门口外显示难度选
 L["Cannot Change Difficulty"] = "你暂时无法更改副本难度。";
 
 
+--TransmogChatCommand
+L["ModuleName TransmogChatCommand"] = "幻化指令";
+L["ModuleDescription TransmogChatCommand"] = "- 当你使用幻化聊天指令时, 移除已装备的外观，避免它们影响新的外观方案。\n\n- 当你与幻化师交互时，使用幻化指令将自动把外观方案所含的物品设为待确认外观。";
+L["Copy To Clipboard"] = "复制到剪贴板";
+L["Copy Current Outfit Tooltip"] = "复制当前外观方案以在网上分享。";
+L["Missing Appearances Format"] = "%d个外观缺失";
+L["Press Key To Copy Format"] = "按|cffffd100%s|r来复制";
+
+
 --Generic
 L["Total Colon"] = "总计：";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally

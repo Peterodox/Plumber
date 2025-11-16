@@ -7,24 +7,19 @@ local SelectorUI = RaidCheck.SelectorUI;
 
 
 local IsInInstance = IsInInstance;
+local IsIndoors = IsIndoors;
 local GetPlayerMap = API.GetPlayerMap;
 local GetPlayerMapCoord = API.GetPlayerMapCoord;
 local GetDungeonEntrancesForMap = C_EncounterJournal.GetDungeonEntrancesForMap;
 local GetMapWorldSize = C_Map.GetMapWorldSize;
 
 
-local RangeCheckPresets = {
-    --Occasionally Raid Entrance on map is far away from its actual position, increase range check in this case
-    --[uiMapID] = range(number),
-
-    [0] = 31^2,     --Default
-
-    [680] = 120^2,  --Suramar
-};
+local DEFAULT_RANGE = 31^2;
 
 
 local EL = CreateFrame("Frame");
 RaidCheck.LocationTracker = EL;
+EL.updateDelay = 0.5;   --Increase if the player is far away
 
 
 EL.events = {
@@ -34,11 +29,19 @@ EL.events = {
     "ZONE_CHANGED_NEW_AREA",
 };
 
+
 EL.mapEvents = {
     PLAYER_ENTERING_WORLD = true,
     PLAYER_MAP_CHANGED = true,
     ZONE_CHANGED = true,
     ZONE_CHANGED_NEW_AREA = true,
+};
+
+EL.instancePos = {
+    --hardcode XY for certain instance whose entrance position doesn't match the pin
+    --[uiMapID] = {x, y, indoors}
+    [786] = {0.44148, 0.59743, true},     --Nighthold
+    [726] = {0.41068, 0.61744, true},     --The Arcway
 };
 
 function EL:ListenEvents(state)
@@ -89,14 +92,22 @@ function EL:UpdateMap()
                     self.dungeonEntrances = dungeonEntrances;
                     local entranceInfo = {};
                     local n = 0;
+                    local x, y, indoorsOnly;
                     for k, v in ipairs(dungeonEntrances) do
                         if v.position then
                             n = n + 1;
+                            if self.instancePos[v.journalInstanceID] then
+                                x, y, indoorsOnly = unpack(self.instancePos[v.journalInstanceID]);
+                            else
+                                x = v.position.x;
+                                y = v.position.y;
+                            end
                             entranceInfo[n] = {
-                                x = v.position.x,
-                                y = v.position.y,
+                                x = x,
+                                y = y,
                                 journalInstanceID = v.journalInstanceID,
-                            }
+                                indoorsOnly = indoorsOnly,
+                            };
                         end
                     end
                     self.total = n;
@@ -110,7 +121,7 @@ function EL:UpdateMap()
 
         if trackPosition then
             self.trackPosition = true;
-            self.defaultRange = RangeCheckPresets[uiMapID] or RangeCheckPresets[0];
+            self.defaultRange = DEFAULT_RANGE;
             self:SetScript("OnUpdate", self.OnUpdate);
         else
             self.trackPosition = nil;
@@ -131,7 +142,7 @@ end
 
 function EL:OnUpdate(elapsed)
     self.t = self.t + elapsed;
-    if self.t >= 0.5 then
+    if self.t >= self.updateDelay then
         self.t = 0;
 
         if self.mapDirty then
@@ -140,19 +151,30 @@ function EL:OnUpdate(elapsed)
 
         if self.trackPosition then
             self.x, self.y = GetPlayerMapCoord(self.uiMapID);
-            self.closestDistance = self.defaultRange;
+            self.closestDistance = 10000;
             self.closestIndex = nil;
 
-            for i = 1, self.total do
-                local d = self:GetMapPointsDistanceSquare(self.x, self.y, self.entranceInfo[i].x, self.entranceInfo[i].y);
-                if d < self.closestDistance then
-                    self.closestDistance = d;
-                    self.closestIndex = i;
+            if self.x then
+                for i = 1, self.total do
+                    local d = self:GetMapPointsDistanceSquare(self.x, self.y, self.entranceInfo[i].x, self.entranceInfo[i].y);
+                    if d < self.closestDistance then
+                        if (not self.entranceInfo[i].indoorsOnly) or IsIndoors() then
+                            self.closestDistance = d;
+                            self.closestIndex = i;
+                        end
+                    end
+                end
+
+                if self.closestDistance < 3600 then
+                    --60 yds
+                    self.updateDelay = 0.5;
+                else
+                    self.updateDelay = 1;
                 end
             end
 
-            if self.closestIndex then
-                --print(self.entranceInfo[self.closestIndex].journalInstanceID);
+            if self.closestIndex and self.closestDistance < self.defaultRange then
+                --print(self.entranceInfo[self.closestIndex].journalInstanceID, self.x, self.y);
                 SelectorUI:ShowInstance(self.entranceInfo[self.closestIndex].journalInstanceID, self.uiMapID);
             else
                 SelectorUI:HideUI();

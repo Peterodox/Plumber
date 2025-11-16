@@ -1,5 +1,5 @@
 local VERSION_TEXT = "v1.8.0";
-local VERSION_DATE = 1763100000;
+local VERSION_DATE = 1763300000;
 
 
 local addonName, addon = ...
@@ -196,6 +196,7 @@ local DefaultValues = {
         QueueStatus_ShowTime = false,   --Relative Queue Time
         QueueStatus_TextPosition = 1,   --0:Center, 1-4:Clockwise
     InstanceDifficulty = false,         --Instance Difficulty Selector
+    TransmogChatCommand = false,        --Adjust /outfit command behavior
 
 
     --Tooltip

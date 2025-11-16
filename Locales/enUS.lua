@@ -623,6 +623,15 @@ L["ModuleDescription InstanceDifficulty"] = "- Show a Difficulty Selector when y
 L["Cannot Change Difficulty"] = "Instance difficulty cannot be changed at this time.";
 
 
+--TransmogChatCommand
+L["ModuleName TransmogChatCommand"] = "Transmog Chat Command";
+L["ModuleDescription TransmogChatCommand"] = "- When using a transmog chat command, undress your character first so the old items won't be carried over into the new outfit.\n\n- When at the Transmogrifier, using a chat command automatically loads all available items to the Transmog UI.";
+L["Copy To Clipboard"] = "Copy To Clipboard";
+L["Copy Current Outfit Tooltip"] = "Copy the current outfit to share online.";
+L["Missing Appearances Format"] = "%d |4appearance:appearances; missing";
+L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally

@@ -82,6 +82,7 @@ Modules\Timerunning\LegionRemix.xml
 Modules\HolidayDungeon.lua
 Modules\QueueStatus.lua
 Modules\RaidCheck\RaidCheck.xml
+Modules\TransmogUtil.lua
 
 #Modules\MerchantUI\MerchantUI.xml
 
@@ -91,7 +92,7 @@ Modules\RaidCheck\RaidCheck.xml
 #Modules\SecretOfAzeroth.lua
 #Modules\AddonList.lua
 #Modules\BlizzFix_WardrobeTrackingHelpTip.lua
-#Modules\WoWAnniversary.lua
+Modules\WoWAnniversary.lua
 #Modules\Navigator_Dreamseed.lua
 #Modules\AccountStore.lua
 #Modules\MinimapMouseover.lua

@@ -1,6 +1,7 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="SharedWidgets.lua"/>
     <Script file="SharedWidgets_ReorderController.lua"/>
+    <Script file="SharedWidgets_StaticPopup.lua"/>
 
     <Frame name="PlumberBarPulseTemplate" virtual="true">
         <!--Derivative of Blizzard FullResourcePulseFrame-->
@@ -689,4 +690,34 @@
     </Frame>
 
     <Frame name="PlumberPropagateMouseTemplate" propagateMouseInput="Both" virtual="true"/>
+
+    <Frame name="PlumberSharedPopupFrameTemplate" parent="UIParent" frameStrata="DIALOG" toplevel="true" hidden="true" virtual="true">
+        <Size x="320" y="72"/>
+        <Anchors>
+            <Anchor point="TOP" x="0" y="-135"/>
+        </Anchors>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Text" inherits="GameFontHighlight" justifyH="CENTER" justifyV="TOP"/>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame parentKey="BackgroundFrame" inherits="DialogBorderDarkTemplate"/> <!--DialogBorderTemplate-->
+
+            <Button parentKey="CloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" x="-3" y="-3"/>
+                </Anchors>
+            </Button>
+
+            <EditBox parentKey="EditBox" multiLine="false" autoFocus="false">
+                <Size x="130" y="24"/>
+                <FontString inherits="NumberFont_Shadow_Small" justifyH="LEFT"/>
+                <TextInsets left="8" right="8"/>
+                <HighlightColor r="0.05" g="0.41" b="0.85"/>
+            </EditBox>
+
+            <Frame parentKey="KeyListener" propagateKeyboardInput="true" frameLevel="1208"/>
+        </Frames>
+    </Frame>
 </Ui>
