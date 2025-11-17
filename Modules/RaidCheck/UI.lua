@@ -123,6 +123,7 @@ do
             SelectorUI.LoadingIndicator:ClearAllPoints();
             SelectorUI.LoadingIndicator:SetPoint("CENTER", self, "CENTER", 0, 0);
             SelectorUI.LoadingIndicator:Show();
+            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
         end
     end
 

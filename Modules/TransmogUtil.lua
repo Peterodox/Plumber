@@ -179,6 +179,17 @@ local function HookDressUpFunctions()
     end
 end
 
+local function CreateOutfitSlashCommand(itemTransmogInfoList)
+    if itemTransmogInfoList then
+        local slashCommand;
+        if BlizzardTransmogUtil.CreateCustomSetSlashCommand then
+            slashCommand = BlizzardTransmogUtil.CreateCustomSetSlashCommand(itemTransmogInfoList);
+        elseif BlizzardTransmogUtil.CreateOutfitSlashCommand then
+            slashCommand = BlizzardTransmogUtil.CreateOutfitSlashCommand(itemTransmogInfoList);
+        end
+        return slashCommand
+    end
+end
 
 local function AddCopyButtonToDropdowns()
     if D.menuModified then return end;
@@ -192,7 +203,7 @@ local function AddCopyButtonToDropdowns()
         local f = WardrobeTransmogFrame;
         local playerActor = f and f.ModelScene and f.ModelScene:GetPlayerActor();
         local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
-        local slashCommand = itemTransmogInfoList and BlizzardTransmogUtil.CreateOutfitSlashCommand(itemTransmogInfoList);
+        local slashCommand = CreateOutfitSlashCommand(itemTransmogInfoList);
 
         if slashCommand then
             rootDescription:CreateDivider();
@@ -239,7 +250,7 @@ local function AddCopyButtonToDropdowns()
         local slashCommand;
         if activeModel then
             local itemTransmogInfoList = activeModel:GetItemTransmogInfoList();
-            slashCommand = itemTransmogInfoList and BlizzardTransmogUtil.CreateOutfitSlashCommand(itemTransmogInfoList);
+            slashCommand = CreateOutfitSlashCommand(itemTransmogInfoList);
         end
 
         if slashCommand then
