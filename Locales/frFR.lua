@@ -49,7 +49,7 @@ L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";  --Merge 
 L["Module Category Plumber"] = "Plumber";   --This addon's name
 
 --Deprecated
-L["Module Category Dreamseeds"] = "Graine onirique";     --Added in patch 10.2.0
+L["Module Category Dreamseeds"] = "Graines oniriques";     --Added in patch 10.2.0
 L["Module Category AzerothianArchives"] = "Archives d'Azeroth";     --Added in patch 10.2.5
 
 
@@ -111,12 +111,12 @@ L["Pin Size"] = "Taille du repère";
 
 --PlayerChoiceUI: Dreamseed Nurturing (PlayerChoiceFrame Revamp)
 L["ModuleName AlternativePlayerChoiceUI"] = "Choix de l'interface : Manne d'émeraude";
-L["ModuleDescription AlternativePlayerChoiceUI"] = "Remplace l'interface de la Graine onirique par défaut par une interface moins bloquante, affiche le nombre d'objets que vous possédez et de contribuer automatiquement en cliquant et en maintenant le bouton.";
-
+L["ModuleDescription AlternativePlayerChoiceUI"] = "Remplace l'interface de la Graine onirique par défaut par une interface moins bloquante, affiche le nombre d'objets que vous possédez et vous permet de contribuer automatiquement en cliquant et en maintenant le bouton.";
 
 --HandyLockpick (Right-click a lockbox in your bag to unlock when you are not in combat. Available to rogues and mechagnomes)
 L["ModuleName HandyLockpick"] = "Crochetage pratique";
-L["ModuleDescription HandyLockpick"] = "Clic droit sur un coffre verrouillé dans votre sac ou dans l'interface pour le déverrouiller.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Impossible de déverrouiller directement un objet dans la banque\n- Affecté par le mode de ciblage doux";
+L["ModuleDescription HandyLockpick"] = "Clic droit sur un coffre verrouillé dans votre sac ou dans l'interface d'échange pour le déverrouiller.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Impossible de déverrouiller directement un objet dans la banque\n- Affecté par le mode de ciblage doux";
+
 L["Instruction Pick Lock"] = "<Clic droit pour crocheter>";
 
 
@@ -139,12 +139,12 @@ L["TalkingHead Option Condition WorldQuest Tooltip"] = "Masquer la transcription
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instance";
 L["TalkingHead Option Condition Instance Tooltip"] = "Masquer la transcription lorsque vous êtes dans une instance.";
 L["TalkingHead Option Below WorldMap"] = "Placer en arrière-plan à l'ouverture de la carte";
-L["TalkingHead Option Below WorldMap Tooltip"] = "Placer la Tête parlante en arrière-plan lors de l'ouverture de la carte du monde pour ne pas la masquer";
+L["TalkingHead Option Below WorldMap Tooltip"] = "Placer la Tête parlante en arrière-plan lors de l'ouverture de la carte du monde pour ne pas la bloquer";
 
 
 --AzerothianArchives
 L["ModuleName Technoscryers"] = "Emplacement rapide : Divinobidules";
-L["ModuleDescription Technoscryers"] = "Afficher un bouton pour enfiler le Divinobidules lorsque vous effectuez une quête mondiale sur la Bidulodivination."..L["Quick Slot Generic Description"];
+L["ModuleDescription Technoscryers"] = "Afficher un bouton pour enfiler les Divinobidules lorsque vous effectuez une quête mondiale sur la Bidulodivination."..L["Quick Slot Generic Description"];
 
 
 --Navigator(Waypoint/SuperTrack) Shared Strings
@@ -214,8 +214,10 @@ L["ModuleDescription TooltipItemQuest"] = "Si un objet dans votre sac permet de 
 L["Instruction Show In Quest Log"] = "<Ctrl + clic gauche pour afficher le journal des quêtes>";
 
 
-L["ModuleName TooltipTransmogEnsemble"] = "Ensembles de raid"
-L["ModuleDescription TooltipTransmogEnsemble"] = "Les ensembles de classe vendus par le marchand d'équipement de raid Legion Remix débloquent toutes les variantes de difficulté. Indique dans l'infobulle l'ensemble manquant."
+L["ModuleName TooltipTransmogEnsemble"] = "Ensembles de transmogrification";
+L["ModuleDescription TooltipTransmogEnsemble"] = "- Affiche le nombre d'apparences d'un ensemble à collectionner.\n\n- Correction du problème où l'infobulle indiquait « Déjà connu » mais vous pouviez quand même l'utiliser pour débloquer de nouvelles apparences.";
+L["Collected Appearances"] = "Apparences collectées";
+L["Collected Items"] = "Objets collectés";
 
 
 --Tooltip Housing
@@ -227,14 +229,14 @@ L["Data Loading In Progress"] = "Plumber charge les données";
 
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
-L["ModuleDescription Plunderstore"] = "Modification de la boutique accessible via la Recherche de groupe :\n\n– Ajout d'une case à cocher pour masquer les objets déjà collectés.\n\n– Affichage du nombre d'objets non collectés sur les boutons de catégorie.\n\n– Ajout de l'emplacement d'équipement (arme ou armure) dans les infobulles.\n\n– Possibilité de visualiser les objets équipables dans la salle d'essayage."
+L["ModuleDescription Plunderstore"] = "Modification de la boutique accessible via la Recherche de groupe :\n\n– Ajout d'une case à cocher pour masquer les objets déjà collectés.\n\n– Affichage du nombre d'objets non collectés sur les boutons de catégorie.\n\n– Ajout de l'emplacement d'équipement (arme ou armure) dans les infobulles.\n\n– Possibilité de visualiser les objets équipables dans la salle d'essayage.";
 L["Store Full Purchase Price Format"] = "Gagnez |cffffffff%s|r de butin pour acheter tout ce que contient la boutique.";
 L["Store Item Fully Collected"] = "Vous avez tout récupéré dans la boutique !";
 
 
 --Merchant UI Price
 L["ModuleName MerchantPrice"] = "Prix du marchand";
-L["ModuleDescription MerchantPrice"] = "Modification du comportement de l'interface du marchand :\n\n– Griser uniquement les monnaies insuffisantes.\n\n– Afficher tous les objets requis dans la zone des Monnaies."
+L["ModuleDescription MerchantPrice"] = "Modification du comportement de l'interface du marchand :\n\n– Griser uniquement les monnaies insuffisantes.\n\n– Afficher tous les objets requis dans la zone des Monnaies.";
 L["Num Items In Bank Format"] = "Banque : |cffffffff%d|r";
 L["Num Items In Bag Format"] = "Sacs : |cffffffff%d|r";
 L["Number Thousands"] = "K";    --15K  15,000
@@ -436,7 +438,7 @@ L["Spell Not Known"] = "Sort non appris";
 L["Fully Upgraded"] = "Entièrement mis à niveau";
 L["Unlock Level Requirement Format"] = "Atteignez le niveau %d pour débloquer";
 L["Auto Learn Traits"] = "Apprendre automatiquement les Traits";
-L["Auto Learn Traits Tooltip"] = "Améliorer automatiquement les traits d'artefact lorsque vous avez suffisamment de Pouvoir infini";
+L["Auto Learn Traits Tooltip"] = "Améliore automatiquement les traits d'artefact lorsque vous avez suffisamment de Pouvoir infini";
 L["Infinite Power Yield Format"] = "Accorde |cffffffff%s|r Puissance à votre niveau de connaissances actuel.";
 L["Infinite Knowledge Bonus Format"] = "Bonus actuel : |cffffffff%s|r";
 L["Infinite Knowledge Bonus Next Format"] = "Prochain rang : %s";
@@ -444,12 +446,12 @@ L["Infinite Knowledge Bonus Next Format"] = "Prochain rang : %s";
 
 --ItemUpgradeUI
 L["ModuleName ItemUpgradeUI"] = "Améliorations d'objets : Afficher la fiche du personnage";
-L["ModuleDescription ItemUpgradeUI"] = "Ouvrir automatiquement la fiche de votre personnage lorsque vous interagissez avec un PNJ d'améliorations d'objets.";
+L["ModuleDescription ItemUpgradeUI"] = "Ouvre automatiquement la fiche de votre personnage lorsque vous interagissez avec un PNJ d'améliorations d'objets.";
 
 
 --HolidayDungeon
 L["ModuleName HolidayDungeon"] = "Sélection automatique du donjon des Événements saisonniers";
-L["ModuleDescription HolidayDungeon"] = "Sélectionner automatiquement les donjons des Événements saisonniers et des Marcheurs du temps lorsque vous ouvrez la Recherche de groupe pour la première fois.";
+L["ModuleDescription HolidayDungeon"] = "Sélectionne automatiquement les donjons des Événements saisonniers et des Marcheurs du temps lorsque vous ouvrez la Recherche de groupe pour la première fois.";
 
 
 --PlayerPing
@@ -459,7 +461,7 @@ L["ModuleDescription PlayerPing"] = "Mettre en surbrillance l'emplacement du jou
 
 --StaticPopup_Confirm
 L["ModuleName StaticPopup_Confirm"] = "Alerte achat non remboursable";
-L["ModuleDescription StaticPopup_Confirm"] = "Ajustez la boîte de dialogue de confirmation qui apparaît lors de l'achat d'un objet non remboursable, en ajoutant un bref verrouillage au bouton « Oui » et en mettant en évidence les mots clés en rouge.\n\nCe module réduit également de moitié le délai de conversion des ensembles de classes.";
+L["ModuleDescription StaticPopup_Confirm"] = "Ajuste la boîte de dialogue de confirmation qui apparaît lors de l'achat d'un objet non remboursable, en ajoutant un bref verrouillage au bouton « Oui » et en mettant en évidence les mots clés en rouge.\n\nCe module réduit également de moitié le délai de conversion des ensembles de classes.";
 
 
 --Loot UI
@@ -524,7 +526,7 @@ L["PlumberMacro Error NoAction"] = "Aucune action utilisable";
 L["PlumberMacro Error EditMacroInCombat"] = "Impossible de modifier les macros en combat";
 L["Random Favorite Mount"] = "Monture préférée aléatoire"; --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
 L["Dismiss Battle Pet"] = "Renvoyer la mascotte";
-L["Drag And Drop Item Here"] = "Glisser / déposez un objet ici.";
+L["Drag And Drop Item Here"] = "Glisser / déposer un objet ici.";
 L["Drag To Reorder"] = "Clic gauche et faites glisser pour réorganiser";
 L["Click To Set Macro Icon"] = "Ctrl + Clic pour définir comme icône de macro";
 L["Unsupported Action Type Format"] = "Type d'action non pris en charge : %s";
@@ -615,6 +617,21 @@ L["Click to Open Format"] = "Cliquer pour ouvrir %s";
 L["List Is Empty"] = "La liste est vide.";
 
 
+--RaidCheck
+L["ModuleName InstanceDifficulty"] = "Difficulté de l'instance";
+L["ModuleDescription InstanceDifficulty"] = "- Afficher un sélecteur de difficulté lorsque vous vous trouvez à l'entrée d'un raid ou d'un donjon.\n\n- Afficher la difficulté actuelle et les informations de verrouillage en haut de l'écran lorsque vous entrez dans une instance.";
+L["Cannot Change Difficulty"] = "La difficulté de l'instance ne peut pas être modifiée pour le moment.";
+
+
+--TransmogChatCommand
+L["ModuleName TransmogChatCommand"] = "Commande de transmogrification";
+L["ModuleDescription TransmogChatCommand"] = "- Lorsque vous utilisez une commande de transmogrification, déshabillez d'abord votre personnage afin que les anciens objets ne soient pas conservés dans la nouvelle tenue.\n\n- Auprès du Transmogrificateur, utiliser une commande de discussion charge automatiquement tous les objets disponibles dans l'interface de transmogrification.";
+L["Copy To Clipboard"] = "Copier dans le presse-papiers";
+L["Copy Current Outfit Tooltip"] = "Copier la tenue actuelle pour la partager en ligne.";
+L["Missing Appearances Format"] = "%d |4apparence manquante:apparences manquantes";
+L["Press Key To Copy Format"] = "Appuyez sur |cffffd100%s|r pour copier";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total :";
 L["Reposition Button Horizontal"] = "Déplacer horizontalement";   --Move the window horizontally
@@ -698,4 +715,4 @@ L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Héroïque";
 L["Upgrade Track 6"] = "Mythique";
 
-L["Match Pattern Transmog Set Partially Known"] = "^Comprend (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+L["Match Pattern Transmog Set Partially Known"] = "^Comprend (%d+) apparences non collectées";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
