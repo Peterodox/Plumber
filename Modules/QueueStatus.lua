@@ -3,6 +3,7 @@ local L = addon.L;
 local API = addon.API;
 
 
+local GetTime = GetTime;
 local SecondsToClock = API.SecondsToClock;
 
 
@@ -52,8 +53,6 @@ end
 
 local CreateProgressDisplay;
 do  --ProgressDisplayMixin
-    local GetTime = GetTime;
-
     local TEXUTRE_FILE = "Interface/AddOns/Plumber/Art/Frame/QueueStatusEye.png";
 
     local ProgressDisplayMixin = {};
@@ -78,13 +77,19 @@ do  --ProgressDisplayMixin
     end
 
     function ProgressDisplayMixin:UpdateQueueTime()
-        if self.queueStartTime and self.myWait then
-            local diff = (GetTime() - self.queueStartTime)  - self.myWait;
-            if diff < 0 then
-                diff = -diff;
-                self.TimeText:SetTextColor(1, 1, 1, 0.6);
+        if self.queueStartTime then
+            local diff;
+            if self.myWait then
+                diff = GetTime() - self.queueStartTime - self.myWait;
+                if diff < 0 then
+                    diff = -diff;
+                    self.TimeText:SetTextColor(1, 1, 1, 0.6);
+                else
+                    self.TimeText:SetTextColor(1.000, 0.125, 0.125, 1);
+                end
             else
-                self.TimeText:SetTextColor(1.000, 0.125, 0.125, 1);
+                diff = GetTime() - self.queueStartTime;
+                self.TimeText:SetTextColor(1, 1, 1, 0.6);
             end
             self.TimeText:SetText(SecondsToClock(diff));
         end
@@ -116,6 +121,10 @@ do  --ProgressDisplayMixin
     end
 
     function ProgressDisplayMixin:SetQueueTime(myWait, queueStartTime)
+        if myWait and myWait <= 0 then
+            myWait = nil;
+        end
+
         self.myWait = myWait;
         self.queueStartTime = queueStartTime;
 
@@ -169,6 +178,10 @@ end
 local EL = CreateFrame("Frame");
 do
     local GetLFGQueueStats = GetLFGQueueStats;
+    local GetMaxBattlefieldID = GetMaxBattlefieldID;
+    local GetBattlefieldStatus = GetBattlefieldStatus;
+    local GetPVPTimeInQueue = GetBattlefieldTimeWaited;
+    local GetPVPWaitTime = GetBattlefieldEstimatedWaitTime;
 
     local LFGCategories = {
         1,  --Dungeon
@@ -178,6 +191,14 @@ do
     function EL:LoadSettings()
         SHOW_TIME = addon.GetDBBool("QueueStatus_ShowTime");
 
+        if SHOW_TIME and self.enabled then
+            self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS");
+            self:RegisterEvent("PVP_BRAWL_INFO_UPDATED");
+        else
+            self:UnregisterEvent("UPDATE_BATTLEFIELD_STATUS");
+            self:UnregisterEvent("PVP_BRAWL_INFO_UPDATED");
+        end
+
         if DemoFrame then
             DemoFrame:Update();
         end
@@ -186,6 +207,8 @@ do
     end
 
     function EL:Enable()
+        if self.enabled then return end;
+        self.enabled = true;
         self:RegisterEvent("LFG_UPDATE");
         self:RegisterEvent("LFG_QUEUE_STATUS_UPDATE");
         self:SetScript("OnEvent", self.OnEvent);
@@ -194,9 +217,13 @@ do
     end
 
     function EL:Disable()
+        if not self.enabled then return end;
+        self.enabled = nil;
         self:HideWidget();
         self:UnregisterEvent("LFG_UPDATE");
         self:UnregisterEvent("LFG_QUEUE_STATUS_UPDATE");
+        self:UnregisterEvent("UPDATE_BATTLEFIELD_STATUS");
+        self:UnregisterEvent("PVP_BRAWL_INFO_UPDATED");
         self:SetScript("OnEvent", nil);
         self:SetScript("OnUpdate", nil);
         self.t = 0;
@@ -227,6 +254,8 @@ do
     end
 
     function EL:FullUpdate()
+        local hasValidQueue, waitTime, queueStartTime, percentage;
+
         for _, category in ipairs(LFGCategories) do
             local hasData, leaderNeeds, tankNeeds, healerNeeds, dpsNeeds, totalTanks, totalHealers, totalDPS, instanceType, instanceSubType, instanceName, averageWait, tankWait, healerWait, damageWait, myWait, queuedTime, activeID = GetLFGQueueStats(category);
             if activeID then
@@ -234,7 +263,6 @@ do
                 --print(totalTanks, totalHealers, totalDPS);
                 --print(averageWait, myWait, queuedTime);
                 if averageWait > 0 then
-                    local percentage;
                     local total = totalTanks + totalHealers + totalDPS;
                     if total <= 1 then
                         percentage = 1;
@@ -252,26 +280,46 @@ do
                         end
                     end
 
-                    if not ProgressDisplay then
-                        CreateProgressDisplay();
-                    end
-
                     if percentage < 0.02 then
                         percentage = 0;
                     end
 
-                    ProgressDisplay:Attach();
-                    ProgressDisplay:SetPercentage(percentage);
-                    ProgressDisplay:UpdateLabelPosition();
-                    ProgressDisplay:SetQueueTime(myWait, queuedTime);
-                    ProgressDisplay:Show();
+                    hasValidQueue = true;
+                    waitTime = myWait;
+                    queueStartTime = queuedTime;
 
-                    return
+                    break
                 end
             end
         end
 
-        self:HideWidget();
+        if (not hasValidQueue) and SHOW_TIME then
+            --Check PVP queue
+            for i = 1, GetMaxBattlefieldID() do
+                local status = GetBattlefieldStatus(i);
+                if status == "queued" then
+                    hasValidQueue = true;
+                    percentage = 0;
+                    local timeInQueue = GetPVPTimeInQueue(i);
+                    queueStartTime = GetTime() - timeInQueue / 1000;
+                    waitTime = GetPVPWaitTime(i);
+                    break
+                end
+            end
+        end
+
+        if hasValidQueue then
+            if not ProgressDisplay then
+                CreateProgressDisplay();
+            end
+            ProgressDisplay:Attach();
+            ProgressDisplay:SetPercentage(percentage);
+            ProgressDisplay:UpdateLabelPosition();
+            ProgressDisplay:SetQueueTime(waitTime, queueStartTime);
+            ProgressDisplay:Show();
+        else
+            self:HideWidget();
+        end
     end
 end
 

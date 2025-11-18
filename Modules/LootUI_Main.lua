@@ -856,6 +856,15 @@ do  --UI ItemButton
                         end
                     end
                 end
+            elseif IsModifiedClick("CHATLINK") then
+                if self.data.link then
+                    if ChatEdit_InsertLink(self.data.link) then
+                        return
+                    elseif SocialPostFrame and Social_IsShown() then
+                        Social_InsertLink(self.data.link);
+                        return
+                    end
+                end
             end
             if button == "EmulateLeftButton" then
                 return

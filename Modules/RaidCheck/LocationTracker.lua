@@ -12,6 +12,8 @@ local GetPlayerMap = API.GetPlayerMap;
 local GetPlayerMapCoord = API.GetPlayerMapCoord;
 local GetDungeonEntrancesForMap = C_EncounterJournal.GetDungeonEntrancesForMap;
 local GetMapWorldSize = C_Map.GetMapWorldSize;
+local GetMapGroupID = C_Map.GetMapGroupID;
+local GetMapGroupMembersInfo = C_Map.GetMapGroupMembersInfo;
 
 
 local DEFAULT_RANGE = 31^2;
@@ -28,6 +30,7 @@ EL.mapEvents = {
     ZONE_CHANGED = true,
     ZONE_CHANGED_NEW_AREA = true,
     NEW_WMO_CHUNK = true,   --Flying from Caverns of Time exterior to interior doesn't trigger other events, so we need this to update the best uiMapID
+    ZONE_CHANGED_INDOORS = true,
 };
 
 EL.instancePos = {
@@ -42,6 +45,26 @@ EL.instancePos = {
     [255] = {0.35972, 0.83893},           --The Black Morass
     [279] = {0.57488, 0.82711},           --The Culling of Stratholme
 };
+
+EL.mapsWithFloors = {
+    --The usual map events may not trigger when BestMap changes. e.g. flying from Searing Gorge to Blackrock Depths
+    [32] = true,
+    [33] = true,
+    [34] = true,
+    [35] = true,
+};
+
+function EL:DoesMapHaveFloors(uiMapID)
+    if self.mapsWithFloors[uiMapID] == nil then
+        local mapGroupID = GetMapGroupID(uiMapID);
+        if mapGroupID and GetMapGroupMembersInfo(mapGroupID) then
+            self.mapsWithFloors[uiMapID] = true;
+        else
+            self.mapsWithFloors[uiMapID] = false;
+        end
+    end
+    return self.mapsWithFloors[uiMapID]
+end
 
 function EL:ListenEvents(state)
     if state then
@@ -60,6 +83,7 @@ end
 function EL:OnEvent(event, ...)
     if self.mapEvents[event] then
         self:RequestUpdateMap();
+        --print(event);
     else
 
     end
@@ -72,16 +96,29 @@ function EL:RequestUpdateMap()
 end
 
 function EL:UpdateMap()
-    self.mapDirty = nil;
+    if self.isMultiFloors then
+        self.mapDirty = true;
+    else
+        self.mapDirty = nil;
+    end
 
     local uiMapID = GetPlayerMap();
 
     if uiMapID ~= self.uiMapID then
         self.uiMapID = uiMapID;
+
+        local isMultiFloors = uiMapID and self:DoesMapHaveFloors(uiMapID);
+        --print(uiMapID, isMultiFloors)
+        if isMultiFloors then
+            self.isMultiFloors = true;
+        else
+            self.isMultiFloors = nil;
+        end
+
         local trackPosition;
 
         if IsInInstance() then
-            
+            self.isMultiFloors = nil;
         else
             if uiMapID then
                 local dungeonEntrances = GetDungeonEntrancesForMap(uiMapID);

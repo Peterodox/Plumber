@@ -204,6 +204,9 @@ do
                     ButtonBackground.x = x1 - x0;
                     ButtonBackground:ClearAllPoints();
                     ButtonBackground:SetScript("OnUpdate", ButtonBackground_OnUpdate);
+                    if math.abs(ButtonBackground.x) < 1 then
+                        playAnimation = false;
+                    end
                 else
                     playAnimation = false;
                 end
@@ -384,13 +387,21 @@ do  --SelectorUI
     function SelectorUI:OnShow()
         self:RegisterEvent("PLAYER_DIFFICULTY_CHANGED");
         self:RegisterEvent("UPDATE_INSTANCE_INFO");
+        self:RegisterEvent("GROUP_ROSTER_UPDATE");
+        self:RegisterEvent("PARTY_LEADER_CHANGED");
     end
 
     function SelectorUI:OnHide()
         self:UnregisterEvent("PLAYER_DIFFICULTY_CHANGED");
         self:UnregisterEvent("UPDATE_INSTANCE_INFO");
+        self:UnregisterEvent("GROUP_ROSTER_UPDATE");
+        self:UnregisterEvent("PARTY_LEADER_CHANGED");
         if self.LoadingIndicator then
             self.LoadingIndicator:Hide();
+        end
+        if self.OpaqueFrame then
+            self.OpaqueFrame.t = 0;
+            self.OpaqueFrame:SetScript("OnUpdate", nil);
         end
     end
 
@@ -399,6 +410,8 @@ do  --SelectorUI
             self:UpdateDifficulty(true);
         elseif event == "UPDATE_INSTANCE_INFO" then
             self:UpdateInstanceProgress();
+        elseif event == "GROUP_ROSTER_UPDATE" or event == "PARTY_LEADER_CHANGED" then
+            self:RequestUpdate();
         end
     end
 
@@ -471,7 +484,8 @@ do  --SelectorUI
 
                 self:SetTheme(themeID);
 
-                self.fallbackDifficultyID = difficulties[1].difficultyID;
+                self.fallbackDifficultyID = difficulties[#difficulties].difficultyID;
+                self.isValidDifficulty = {};
                 self.instanceName = instanceInfo.name;
                 self.Title:SetText(instanceInfo.name);
                 self.TitleButton:SetWidth(math.max(API.Round(self.Title:GetWrappedWidth() + 8), BUTTON_WIDTH));
@@ -488,6 +502,7 @@ do  --SelectorUI
                     if textWidth > maxTextWidth then
                         maxTextWidth = textWidth;
                     end
+                    self.isValidDifficulty[v.difficultyID] = true;
                 end
 
                 local buttonWidth = math.max(API.Round(maxTextWidth + 32), BUTTON_WIDTH);
@@ -512,6 +527,7 @@ do  --SelectorUI
                 end
                 self:HideUI();
                 self.hasInstanceData = nil;
+                self.isValidDifficulty = {};
                 return
             end
         end
@@ -572,6 +588,20 @@ do  --SelectorUI
         end
     end
 
+    local function UpdateFrame_OnUpdate(self, elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= 0.5 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            SelectorUI:UpdateDifficulty(true);
+        end
+    end
+
+    function SelectorUI:RequestUpdate()
+        self.OpaqueFrame.t = 0;
+        self.OpaqueFrame:SetScript("OnUpdate", UpdateFrame_OnUpdate);
+    end
+
     function SelectorUI:TrySelectDiffulty(difficultyID)
         if difficultyID == self.selectedDifficulty then return end;
 
@@ -608,7 +638,11 @@ do  --SelectorUI
                 C_AddOns.LoadAddOn("Blizzard_EncounterJournal");
             end
             if EncounterJournal_OpenJournal then
-                EncounterJournal_OpenJournal(self.selectedDifficulty or self.fallbackDifficultyID, self.journalInstanceID);
+                local difficultyID = self.selectedDifficulty;
+                if not self.isValidDifficulty[difficultyID] then
+                    difficultyID = self.fallbackDifficultyID;
+                end
+                EncounterJournal_OpenJournal(difficultyID, self.journalInstanceID);
             end
         end
     end
