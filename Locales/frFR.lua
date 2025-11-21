@@ -59,20 +59,20 @@ L["ModuleDescription AutoJoinEvents"] = "Rejoint automatiquement l'événement l
 
 
 --BackpackItemTracker
-L["ModuleName BackpackItemTracker"] = "Traqueur d'objets dans le sac";
-L["ModuleDescription BackpackItemTracker"] = "Suivre les objets empilables dans l'interface du sac comme s'ils étaient des devises.\n\nLes jetons des événements saisonniers sont automatiquement suivis et épinglés à gauche.";
+L["ModuleName BackpackItemTracker"] = "Suivi des objets dans le sac";
+L["ModuleDescription BackpackItemTracker"] = "Suivez les objets empilables dans l'interface utilisateur du sac comme s'il s'agissait de devises. \n\nLes jetons des événements saisonniers sont automatiquement suivis et épinglés à gauche.";
 L["Instruction Track Item"] = "Suivre l'objet";
 L["Hide Not Owned Items"] = "Masquer les objets non possédés";
 L["Hide Not Owned Items Tooltip"] = "Si vous ne possédez plus un objet que vous suiviez, il sera déplacé vers un menu caché.";
 L["Concise Tooltip"] = "Infobulle concise";
 L["Concise Tooltip Tooltip"] = "Afficher uniquement le type de liaison de l'objet et sa quantité maximale.";
-L["Item Track Too Many"] = "Vous pouvez suivre seulement %d objets à la fois."
+L["Item Track Too Many"] = "Vous pouvez suivre seulement %d objets à la fois.";
 L["Tracking List Empty"] = "Votre liste de suivi personnalisée est vide.";
 L["Holiday Ends Format"] = "Se termine : %s";
 L["Not Found"] = "Non trouvé";   --Item not found
-L["Own"] = "Posséder";   --Something that the player has/owns
+L["Own"] = "Possédé";   --Something that the player has/owns
 L["Numbers To Earn"] = "À recevoir";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
-L["Numbers Of Earned"] = "Reçu";    --The number of stuff the player has earned
+L["Numbers Of Earned"] = "Reçus";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Suivre les Écus";       --Crest: e.g. Drake's Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "Épinglez sur la barre le type d'Écu de niveau supérieur que vous avez gagné.";
 L["Track Holiday Item"] = "Suivre la monnaie des événements saisonniers";       --e.g. Tricky Treats (Hallow's End)
@@ -322,7 +322,7 @@ L["Chat Leave"] = "Quitter";
 L["Chat Leave All Characters"] = "Quitter sur tous les personnages";
 L["Chat Leave All Characters Tooltip"] = "Vous quitterez automatiquement ce canal lorsque vous vous connecterez sur un personnage.";
 L["Chat Auto Leave Alert Format"] = "Souhaitez-vous quitter automatiquement |cffffc0c0[%s]|r sur tous vos personnages ?";
-L["Chat Auto Leave Cancel Format"] = "Quitter Auto. a été désativé pour %s. Veuillez utiliser la commande « /join » pour rejoindre le canal.";
+L["Chat Auto Leave Cancel Format"] = "Quitter Auto. a été désactivé pour %s. Veuillez utiliser la commande « /join » pour rejoindre le canal.";
 L["Auto Leave Channel Format"] = "Quitter Auto. \"%s\"";
 L["Click To Disable"] = "Cliquez pour désactiver";
 
@@ -474,7 +474,7 @@ L["Sample Item 4"] = "Objet épique génial";
 L["Sample Item 3"] = "Objet rare génial";
 L["Sample Item 2"] = "Objet peu commun génial";
 L["Sample Item 1"] = "Objet commun";
-L["EditMode LootUI"] =  "Plumber : Fenêtre de butin";
+L["EditMode LootUI"] = "Plumber : Fenêtre de butin";
 L["Manual Loot Instruction Format"] = "Pour annuler temporairement le butin automatique sur un objet spécifique, maintenez la touche |cffffffff%s|r jusqu'à ce que la fenêtre de butin apparaisse.";
 L["LootUI Option Hide Window"] = "Masquer la fenêtre de butin Plumber";
 L["LootUI Option Hide Window Tooltip"] = "Masquer la fenêtre de notification de butin Plumber, mais conserve les fonctionnalités activées telles que le « Forcer le butin automatique » en arrière-plan.";
@@ -498,14 +498,14 @@ L["LootUI Option Use Default UI Tooltip"] = "Utiliser la fenêtre de butin par d
 L["LootUI Option Background Opacity"] = "Opacité";
 L["LootUI Option Background Opacity Tooltip"] = "Définir l'opacité de l'arrière-plan en mode de notification de butin.\n\nCette option n'affecte pas le mode de butin manuel.";
 L["LootUI Option Custom Quality Color"] = "Utiliser une couleur de qualité personnalisée";
-L["LootUI Option Custom Quality Color Tooltip"] = "Utiliser les couleurs que vous définissez dans Options du jeu > Accessibilité > Couleurs."
+L["LootUI Option Custom Quality Color Tooltip"] = "Utiliser les couleurs que vous définissez dans Options du jeu > Accessibilité > Couleurs.";
 L["LootUI Option Grow Direction"] = "Grandir vers le haut";
 L["LootUI Option Grow Direction Tooltip 1"] = "Lorsque cette option est activée : le coin inférieur gauche de la fenêtre reste immobile et les nouvelles notifications apparaîtront au-dessus des anciennes.";
 L["LootUI Option Grow Direction Tooltip 2"] = "Lorsque cette option est désactivée : le coin supérieur gauche de la fenêtre reste immobile et les nouvelles notifications apparaîtront en dessous des anciennes.";
 L["Junk Items"] = "Objets indésirables";
 L["LootUI Option Combine Items"] = "Combiner des objets similaires";
 L["LootUI Option Combine Items Tooltip"] = "Afficher les objets similaires sur une seule ligne. Catégories prises en charge :\n\n- Objets indésirables\n- Souvenirs d'époque (Legion Remix)";
-L["LootUI Option Low Frame Strata"] = "Envoyer à l'arrière";
+L["LootUI Option Low Frame Strata"] = "Mettre à l'arrière-plan";
 L["LootUI Option Low Frame Strata Tooltip"] = "En mode de notification de butin, placez la fenêtre de butin derrière une autre interface utilisateur.\n\nCette option n'affecte pas le mode de butin manuel.";
 
 
