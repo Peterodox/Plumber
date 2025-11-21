@@ -1,5 +1,5 @@
---Contributors: Lazey
---Additional updates done for this fork by OldGromm
+--Contributors: Lazey, OldGromm
+
 if not (GetLocale() == "deDE") then return end;
 
 local _, addon = ...
@@ -21,9 +21,9 @@ L["Quick Slot Layout"] = "Anordnung";
 L["Quick Slot Layout Linear"] = "Linear";
 L["Quick Slot Layout Radial"] = "Radial";
 L["Restriction Combat"] = "Funktioniert nicht im Kampf";   --Indicate a feature can only work when out of combat
-L["Map Pin Change Size Method"] = "\n\n*Sie können die Größe der Kartenmarkierung unter 'Weltkarte> Kartenfilter> Plumber' ändern.";
+L["Map Pin Change Size Method"] = "\n\n*Ihr könnt die Größe der Kartenmarkierung unter 'Weltkarte> Kartenfilter> Plumber' ändern.";
 L["Toggle Plumber UI"] = "Plumber Anzeige umschalten";
-L["Toggle Plumber UI Tooltip"] = "Zeigt die folgenden Plumber Interface-Elemente im Bearbeitungsmodus an:\n%s\n\nDiese Checkbox steuert nur ihre Sichtbarkeit im Bearbeitungsmodus. Sie aktiviert oder deaktiviert diese Module nicht.";
+L["Toggle Plumber UI Tooltip"] = "Zeigt die folgenden Bedienelemente im Bearbeitungsmodus für das Plumber AddOn an:\n%s\n\nDiese Checkbox steuert nur Sichtbarkeit der Elemente im Bearbeitungsmodus. Sie aktiviert oder deaktiviert die einzelnen Module nicht.";
 
 
 --Module Categories
@@ -41,6 +41,8 @@ L["Module Category Class"] = "Klasse";   --Player Class (rogue, paladin...)
 L["Module Category Reduction"] = "Minimalistisches Interface";   --Reduce UI elements
 --- order: -1
 L["Module Category Timerunning"] = "Legion Remix";   --Change this based on timerunning season
+--- Order: -2
+L["Module Category Beta"] = "Testserver";
 
 
 L["Module Category Dragonflight"] = EXPANSION_NAME9 or "Dragonflight";   --Merge Expansion Feature (Dreamseeds, AzerothianArchives) Modules into this   --DE_Notes: wasn't translated would be "Drachenschwärme"
@@ -53,7 +55,7 @@ L["Module Category AzerothianArchives"] = "Archive von Azeroth";   --Added in pa
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Automatisch Events beitreten";
-L["ModuleDescription AutoJoinEvents"] = "Automatisch diesen Events beitreten, wenn Sie mit dem NPC interagieren: \n\n- Zeitriss\n\n- Theatertruppe";
+L["ModuleDescription AutoJoinEvents"] = "Automatisch diesen Events beitreten, wenn Ihr mit dem NPC interagiert: \n\n- Zeitriss\n\n- Theatertruppe";
 
 
 --BackpackItemTracker
@@ -61,10 +63,10 @@ L["ModuleName BackpackItemTracker"] = "Rucksack-Gegenstandverfolgung";
 L["ModuleDescription BackpackItemTracker"] = "Verfolgt stapelbare Gegenstände wie Währungen im Taschenfenster.\n\nFeiertagsmarken werden automatisch verfolgt und links angeheftet.";
 L["Instruction Track Item"] = "Gegenstand verfolgen";
 L["Hide Not Owned Items"] = "Nicht in Besitz befindliche\nGegenstände ausblenden";
-L["Hide Not Owned Items Tooltip"] = "Wenn Sie einen verfolgten Gegenstand nicht mehr besitzen, wird er in ein verstecktes Menü verschoben.";
+L["Hide Not Owned Items Tooltip"] = "Wenn Ihr einen verfolgten Gegenstand nicht mehr besitzt, wird er in ein verstecktes Menü verschoben.";
 L["Concise Tooltip"] = "Knapper Tooltip";
 L["Concise Tooltip Tooltip"] = "Zeigt nur den Bindungstyp des Gegenstands und seine maximale Menge an.";
-L["Item Track Too Many"] = "Sie können nur %d Gegenstände gleichzeitig verfolgen.";
+L["Item Track Too Many"] = "Ihr könnt nur %d Gegenstände gleichzeitig verfolgen.";
 L["Tracking List Empty"] = "Ihre benutzerdefinierte Verfolgungsliste ist leer.";
 L["Holiday Ends Format"] = "Endet: %s";
 L["Not Found"] = "Nicht gefunden";   --Item not found
@@ -72,7 +74,7 @@ L["Own"] = "Besitzen";   --Something that the player has/owns
 L["Numbers To Earn"] = "# Zu verdienen";   --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
 L["Numbers Of Earned"] = "# Verdient";   --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Wappen verfolgen";   --Crest: e.g. Drake’s Dreaming Crest
-L["Track Upgrade Currency Tooltip"] = "Die höchste Wappen-Stufe, die Sie verdient haben, an der Leiste anheften.";
+L["Track Upgrade Currency Tooltip"] = "Die höchste Wappen-Stufe, die Ihr verdient habt, wird an der Leiste angeheftet.";
 L["Track Holiday Item"] = "Feiertagswährung verfolgen";   --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Aktuell angeheftet:";   --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Leiste in der Tasche";   --Put the bar inside the bag UI (below money/currency)
@@ -82,7 +84,7 @@ L["Catalyst Charges"] = "Katalysator-Aufladungen";
 
 --GossipFrameMedal
 L["ModuleName GossipFrameMedal"] = "Drachenreiterrennen-Medaille";
-L["ModuleDescription GossipFrameMedal Format"] = "Ersetzt das Standard-Icon %s durch die Medaille %s, die Sie verdient haben.\n\nEs kann einen Moment dauern, bis Ihre Rekorde abgerufen werden, wenn Sie mit dem NPC interagieren.";
+L["ModuleDescription GossipFrameMedal Format"] = "Ersetzt das Standard-Icon %s durch die Medaille %s, die Ihr errungen habt.\n\nEs kann einen Moment dauern, bis Ihre Rekorde abgerufen werden, wenn Ihr mit dem NPC interagiert.";
 
 
 --DruidModelFix (Disabled after 10.2.0)
@@ -98,7 +100,7 @@ L["ModuleDescription PlayerChoiceFrameToken"] = "Zeigt an, wie viele Gegenständ
 
 --EmeraldBountySeedList (Show available Seeds when approaching Emerald Bounty 10.2.0)
 L["ModuleName EmeraldBountySeedList"] = "Quick Slot: Traumsaaten";
-L["ModuleDescription EmeraldBountySeedList"] = "Zeigt eine Liste von Traumsaaten an, wenn Sie sich einer Smaragdfülle nähern."..L["Quick Slot Generic Description"];
+L["ModuleDescription EmeraldBountySeedList"] = "Zeigt eine Liste von Traumsaaten an, wenn Ihr euch einer Smaragdfülle nähert."..L["Quick Slot Generic Description"];
 
 
 --WorldMapPin: SeedPlanting (Add pins to WorldMapFrame which display soil locations and growth cycle/progress)
@@ -114,13 +116,13 @@ L["ModuleDescription AlternativePlayerChoiceUI"] = "Ersetzt das standardmäßige
 
 --HandyLockpick (Right-click a lockbox in your bag to unlock when you are not in combat. Available to rogues and mechagnomes)
 L["ModuleName HandyLockpick"] = "Praktischer Schlossknacker";
-L["ModuleDescription HandyLockpick"] = "Rechtsklicken Sie eine Schliesskassette in Ihrer Tasche oder im Handelsfenster, um sie zu öffnen.\n\n|cffd4641c- "..L["Restriction Combat"].."\n- Kann Gegenstände in der Bank nicht direkt öffnen\n\n- Betroffen vom Soft Targeting Modus|r";
+L["ModuleDescription HandyLockpick"] = "Rechtsklickt auf eine Schliesskassette in Eurer Tasche oder im Handelsfenster, um sie zu öffnen.\n\n|cffd4641c- "..L["Restriction Combat"].."\n- Kann Gegenstände in der Bank nicht direkt öffnen\n\n- Betroffen vom Soft Targeting Modus|r";
 L["Instruction Pick Lock"] = "<Rechtsklick zum Aufschließen>";
 
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
 L["ModuleName BlizzFixEventToast"] = "Blitz Fix: Event-Toast";
-L["ModuleDescription BlizzFixEventToast"] = "Ändert das Verhalten von Event-Toasts, so dass sie keine Mausklicks blockieren. Ermöglicht auch das sofortige Schließen des Toasts durch Rechtsklick.\n\n*Event-Toasts sind Banner, die oben auf dem Bildschirm erscheinen, wenn Sie bestimmte Aktivitäten abschließen.";
+L["ModuleDescription BlizzFixEventToast"] = "Verhindert, dass Mausklicks durch Event-Toasts blockiert werden. Ermöglicht außerdem das sofortige Schließen des Toasts via Rechtsklick.\n\n*Event-Toasts sind Banner, die oben auf dem Bildschirm erscheinen, nachdem Ihr bestimmte Aktivitäten abgeschlossen habt.";
 
 
 --Talking Head
@@ -135,14 +137,14 @@ L["TalkingHead Option Hide Everything Tooltip"] = "|cffff4800Blendet die Beschre
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Weltquests";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Blendet die Beschreibung aus, wenn sie von einer Weltquest stammt.\nManchmal wird der Sprechende Kopf ausgelöst, bevor die Weltquest angenommen wird, und wir können ihn dann nicht ausblenden.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instanz";
-L["TalkingHead Option Condition Instance Tooltip"] = "Blendet die Beschreibung aus, wenn Sie sich in einer Instanz befinden.";
+L["TalkingHead Option Condition Instance Tooltip"] = "Blendet die Beschreibung aus, wenn Ihr euch in einer Instanz befindet.";
 L["TalkingHead Option Below WorldMap"] = "In den Hintergrund verlagern, wenn die Karte geöffnet ist";
-L["TalkingHead Option Below WorldMap Tooltip"] = "Verlagert den Sprechenden Kopf in den Hintergrund, wenn Sie die Weltkarte öffnen, damit er diese nicht blockiert.";
+L["TalkingHead Option Below WorldMap Tooltip"] = "Verlagert den Sprechenden Kopf in den Hintergrund, wenn die Weltkarte geöffnet wird. Dadurch verdeckt der Kopf die Weltkarte nicht mehr.";
 
 
 --AzerothianArchives
 L["ModuleName Technoscryers"] = "Quick Slot: Technoseher";
-L["ModuleDescription Technoscryers"] = "Zeigt eine Schaltfläche an, um den Technoseher aufzusetzen, wenn Sie eine Technosehen-Weltquest absolvieren."..L["Quick Slot Generic Description"];
+L["ModuleDescription Technoscryers"] = "Zeigt eine Schaltfläche an, um den Technoseher aufzusetzen, wenn Ihr eine Technosehen-Weltquest absolviert."..L["Quick Slot Generic Description"];
 
 
 --Navigator(Waypoint/SuperTrack) Shared Strings
@@ -156,10 +158,10 @@ L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/To
 
 --Navigator_Dreamseed (Use Super Tracking to navigate players)
 L["ModuleName Navigator_Dreamseed"] = "Navigator: Traumsaaten";
-L["ModuleDescription Navigator_Dreamseed"] = "Verwendet das Wegpunkt-System, um Sie zu den Traumsaaten zu führen.\n\n*Rechtsklick auf den Standortindikator (falls vorhanden) für weitere Optionen.\n\n|cffd4641cDie standardmäßigen Wegpunkte des Spiels werden ersetzt, während Sie sich im Smaragdgrünen Traum befinden.\n\nIndikatoren für Saatenstandorte können durch Quests überschrieben werden.|r";
+L["ModuleDescription Navigator_Dreamseed"] = "Verwendet das Wegpunkt-System, die Euch zu den Traumsaaten führt.\n\n*Rechtsklick auf den Standortindikator (falls vorhanden) für weitere Optionen.\n\n|cffd4641cDie standardmäßigen Wegpunkte des Spiels werden ersetzt, während Ihr euch im Smaragdgrünen Traum befinden.\n\nIndikatoren für Saatenstandorte können durch Quests überschrieben werden.|r";
 L["Priority New Seeds"] = "Neue Saaten finden";
 L["Priority Rewards"] = "Belohnungen einsammeln";
-L["Stop Tracking Dreamseed Tooltip"] = "Stoppt die Verfolgung von Saaten, bis Sie auf eine Kartenmarkierung linksklicken.";
+L["Stop Tracking Dreamseed Tooltip"] = "Stoppt die Verfolgung von Saaten, bis Ihr auf eine Kartenmarkierung linksklickt.";
 
 
 --BlizzFixWardrobeTrackingTip (Permanently disable the tip for wardrobe shortcuts)
@@ -169,9 +171,9 @@ L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Blendet das Tutorial für 
 
 --Rare/Location Announcement
 L["Announce Location Tooltip"] = "Diesen Standort im Chat teilen.";
-L["Announce Forbidden Reason In Cooldown"] = "Sie haben kürzlich einen Standort geteilt.";
+L["Announce Forbidden Reason In Cooldown"] = "Ihr habt kürzlich einen Standort geteilt.";
 L["Announce Forbidden Reason Duplicate Message"] = "Dieser Standort wurde kürzlich von einem anderen Spieler geteilt.";
-L["Announce Forbidden Reason Soon Despawn"] = "Sie können diesen Standort nicht teilen, da er bald verschwindet.";
+L["Announce Forbidden Reason Soon Despawn"] = "Ihr können diesen Standort nicht teilen, da er bald verschwinden wird.";
 L["Available In Format"] = "Verfügbar in: |cffffffff%s|r";
 L["Seed Color Epic"] = "Lila";   --Using GlobalStrings as defaults   --DE_Notes: If this is about the (quality) color and not names, almost no one ever uses "Violett" in German
 L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Blau";
@@ -196,20 +198,27 @@ L["Color Applied"] = "Dies ist die aktuell angewendete Farbe.";
 
 --Tooltip Item Reagents
 L["ModuleName TooltipItemReagents"] = "Reagenzien";
-L["ModuleDescription TooltipItemReagents"] = "Wenn ein Gegenstand verwendet werden kann, um etwas Neues zu erschaffen, werden alle 'Reagenzien' angezeigt, die in diesem Prozess kombiniert werden müssen.\n\nHalten Sie die Umschalttaste gedrückt, um den hergestellten Gegenstand anzuzeigen, falls unterstützt.";
-L["Can Create Multiple Item Format"] = "Sie haben die Ressourcen, um |cffffffff%d|r Gegenstände herzustellen.";
+L["ModuleDescription TooltipItemReagents"] = "Wenn ein Gegenstand verwendet werden kann, um etwas Neues zu erschaffen, werden alle Reagenzien angezeigt, die in diesem Prozess kombiniert werden müssen.\n\nHaltet die Umschalttaste gedrückt, um den hergestellten Gegenstand anzuzeigen (falls es Informationen dazu gibt).";
+L["Can Create Multiple Item Format"] = "Ihr habt genügend Ressourcen, um |cffffffff%d|r Gegenstände herzustellen.";
 
 
 --Tooltip DelvesItem
 L["ModuleName TooltipDelvesItem"] = "Gegenstände der Tiefen";
-L["ModuleDescription TooltipDelvesItem"] = "Zeigt an, wie viele Restaurierte Kastenschlüssel und Kastenschlüsselsplitter Sie in dieser Woche erhalten haben.";
-L["You Have Received Weekly Item Format"] = "Sie haben diese Woche %s erhalten.";
+L["ModuleDescription TooltipDelvesItem"] = "Zeigt an, wie viele Restaurierte Kastenschlüssel und Kastenschlüsselsplitter Ihr in dieser Woche erhalten habt.";
+L["You Have Received Weekly Item Format"] = "Ihr habt diese Woche %s erhalten.";
 
 
 --Tooltip ItemQuest
 L["ModuleName TooltipItemQuest"] = "Questbeginn-Gegenstände";
-L["ModuleDescription TooltipItemQuest"] = "Zeigt die Details des Quests an, falls ein Gegenstand zum Starten eines Quests dient.\n\nWenn Sie das Quest bereits gestartet hast, können Sie via Strg + Linksklick das Quest im Questlog anzeigen lassen.";
+L["ModuleDescription TooltipItemQuest"] = "Zeigt die Details des Quests an, falls ein Gegenstand zum Starten eines Quests dient.\n\nWenn Ihr das Quest bereits gestartet habt, könnt Ihr via Strg + Linksklick das Quest im Questlog anzeigen lassen.";
 L["Instruction Show In Quest Log"] = "<Strg + Klick, um den Questlog anzuzeigen>";
+
+
+--Transmog Ensembles
+L["ModuleName TooltipTransmogEnsemble"] = "Vorlagen-Ensembles";
+L["ModuleDescription TooltipTransmogEnsemble"] = "- Zeigt die Anzahl von nicht gesammelten Vorlagen an, welche Bestandteil eines Ensembles sind.\n\n- Behebt den Fehler, wenn der Tooltip eines Ensembles \"Bereits bekannt\" anzeigt, aber in Wahrheit immer noch ein paar unbekannte Vorlagen enthält.";
+L["Collected Appearances"] = "Gesammelte Vorlagen";
+L["Collected Items"] = "Gesammelte Gegenstände";
 
 
 --Tooltip Housing
@@ -223,7 +232,7 @@ L["Data Loading In Progress"] = "Plumber lädt gerade Daten...";
 L["ModuleName Plunderstore"] = "Beuteladen";
 L["ModuleDescription Plunderstore"] = "Modifiziert den Beuteladen, der über die PvP Gruppensuche geöffnet wird:\n\n- Fügt eine Checkbox hinzu, um bereits gesammelte Gegenstände auszublenden.\n\n- Zeigt die Anzahl nicht gesammelter Gegenstände auf den Kategoriebuttons an.\n\n- Fügt Waffen- und Rüstungsausrüstungsorte zu ihren Tooltips hinzu.\n\n- Ermöglicht die Anzeige von ausrüstbaren Gegenständen in der Anprobe.";   --DE_Notes: is this feature preview hidden when Plunderstorm is not active, cause I don’t see it? Not sure what "weapon and armor equip location" is about, so I left it untouched even if the German translation sounds wrong
 L["Store Full Purchase Price Format"] = "Verdiene |cffffffff%s|r Beute, um alles im Beuteladen zu kaufen.";
-L["Store Item Fully Collected"] = "Sie haben alles im Beuteladen gesammelt!";
+L["Store Item Fully Collected"] = "Ihr habt alles vom Beuteladen gesammelt!";
 
 
 --Merchant UI Price
@@ -248,14 +257,14 @@ L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Khaz Al
 L["ModuleDescription ExpansionLandingPage"] = "Zeigt zusätzliche Informationen auf der Zusammenfassungsseite an:\n\n- Paragon-Fortschritt\n\n- Stufe der 'Durchtrennten Fäden' Pakte\n\n- Ansehen bei Kartellen von Lorenhall";
 L["Instruction Track Reputation"] = "<Umschaltklick, um diesen Ruf zu verfolgen>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Umschaltklick, um die Verfolgung zu beenden>";
-L["Error Show UI In Combat"] = "Sie können dieses Fenster im Kampf nicht aufrufen.";
+L["Error Show UI In Combat"] = "Ihr könnt dieses Fenster im Kampf nicht aufrufen.";
 
 
 --Landing Page Switch
 L["ModuleName LandingPageSwitch"] = "Minimap-Missionsbericht";
-L["ModuleDescription LandingPageSwitch"] = "Greifen Sie auf Garnisons- und Ordenshallen-Missionsberichte zu, indem Sie mit der rechten Maustaste auf den Button der Erweiterungszusammenfassung an der Minimap klicken.";
+L["ModuleDescription LandingPageSwitch"] = "Ihr könnt Garnisons- und Ordenshallen-Missionsberichte anzeigen lassen, indem Ihr mit der rechten Maustaste auf den Button der Erweiterungszusammenfassung an der Minimap klickt.";
 L["Mission Complete Count Format"] = "%d Bereit für Abschluss";
-L["Open Mission Report Tooltip"] = "Rechtsklick, um Missionsberichte zu öffnen.";
+L["Open Mission Report Tooltip"] = "Rechtsklick, um Missionsberichte anzeigen zu lassen.";
 
 
 --WorldMapPin_TWW (Show Pins On Continent Map)
@@ -269,7 +278,7 @@ L["Item Level Format"] = ITEM_LEVEL or "Gegenstandsstufe %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
 L["Delves Reputation Name"] = "Reise des Tiefenforschers";
 L["ModuleName Delves_SeasonProgress"] = "Tiefen: Reise des Tiefenforschers";
-L["ModuleDescription Delves_SeasonProgress"] = "Zeigt einen Fortschrittsbalken oben auf dem Bildschirm an, wenn Sie Reise des Tiefenforschers erhalten.";
+L["ModuleDescription Delves_SeasonProgress"] = "Zeigt einen Fortschrittsbalken oben auf dem Bildschirm an, wenn Ihr 'Reise des Tiefenforschers'-Punkte erhaltet.";
 L["ModuleName Delves_Dashboard"] = "Tiefen: Wöchentliche Belohnung";
 L["ModuleDescription Delves_Dashboard"] = "Zeigt Ihren Fortschritt für die Große Schatzkammer und Vergoldete Schätze auf der Tiefen-Übersicht an.";
 L["ModuleName Delves_Automation"] = "Tiefen: Automatische Auswahl von Geliehener Macht";
@@ -286,7 +295,7 @@ L["Power Borrowed"] = "Macht ausgeliehen";
 L["ModuleName WoWAnniversary"] = "WoW-Jubiläum";
 L["ModuleDescription WoWAnniversary"] = "- Erleichtert das Beschwören das entsprechenden Reittiers während des Mount-Maniac-Events.\n\n- Zeigt Abstimmungsergebnisse während des Fashion-Frenzy-Events an.";
 L["Voting Result Header"] = "Ergebnisse";
-L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "Sie haben dieses Reittier nicht gesammelt.";
+L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "Ihr habt dieses Reittier noch nicht erworben.";
 
 
 --BlizzFixFishingArtifact
@@ -295,13 +304,13 @@ L["ModuleDescription BlizzFixFishingArtifact"] = "Ermöglicht es Ihnen, die Eige
 
 
 --QuestItemDestroyAlert
-L["ModuleName QuestItemDestroyAlert"] = "Quest-Gegenstand-Löschbestätigung";
-L["ModuleDescription QuestItemDestroyAlert"] = "Zeigt an, wenn der zu zerstörende Gegenstand eine Quest started. \n\n|cffd4641cFunktioniert nur für Gegenstände, welche die Quests starten, nicht für solche, die Sie nach Annahme einer Quest erhalten.|r";
+L["ModuleName QuestItemDestroyAlert"] = "Questgegenstand-Löschbestätigung";
+L["ModuleDescription QuestItemDestroyAlert"] = "Zeigt an, wenn der zu zerstörende Gegenstand eine Quest startet. \n\n|cffd4641cFunktioniert nur für Gegenstände, welche eine Quest startet.\nFunktioniert nicht für Gegenstände, die Ihr temporär als Teil einer Quest erhaltet.|r";
 
 
 --SpellcastingInfo
 L["ModuleName SpellcastingInfo"] = "Ziel-Zauberinfo";
-L["ModuleDescription SpellcastingInfo"] = "- Zeigt den Zauber-Tooltip an, wenn Sie mit der Maus über die Zauberleiste am Zielrahmen fahren.\n\n- Speichert die Fähigkeiten der Kreatur, die später durch Rechtsklick auf den Zielrahmen angezeigt werden können.";   --DE_Notes: I don't think everything is a monster
+L["ModuleDescription SpellcastingInfo"] = "- Zeigt den Zauber-Tooltip an, wenn Ihr mit der Maus über die Zauberleiste am Zielrahmen fahren.\n\n- Speichert die Fähigkeiten der Kreatur, die später durch Rechtsklick auf den Zielrahmen angezeigt werden können.";   --DE_Notes: I don't think everything is a monster
 L["Abilities"] = ABILITIES or "Fähigkeiten";
 L["Spell Colon"] = "Zauber: ";   --Display SpellID
 L["Icon Colon"] = "Symbol: ";   --Display IconFileID
@@ -312,9 +321,9 @@ L["ModuleName ChatOptions"] = "Chatkanal-Optionen";
 L["ModuleDescription ChatOptions"] = "Fügt dem Menü, das beim Rechtsklick auf den Kanalnamen im Chatfenster erscheint, Verlassen-Schaltflächen hinzu.";
 L["Chat Leave"] = CHAT_LEAVE or "Verlassen";
 L["Chat Leave All Characters"] = "Auf allen Charakteren verlassen";
-L["Chat Leave All Characters Tooltip"] = "Sie verlassen diesen Kanal automatisch, wenn Sie sich mit einem Charakter anmelden.";
-L["Chat Auto Leave Alert Format"] = "Möchten Sie |cffffc0c0[%s]|r automatisch auf allen Ihren Charakteren verlassen?";
-L["Chat Auto Leave Cancel Format"] = "Automatisches Verlassen für %s deaktiviert. Bitte verwenden Sie den /join-Befehl, um den Kanal erneut beizutreten.";
+L["Chat Leave All Characters Tooltip"] = "Ihr verlasst diesen Kanal automatisch, wenn Ihr euch mit einem Charakter anmeldet.";
+L["Chat Auto Leave Alert Format"] = "Möchtet Ihr |cffffc0c0[%s]|r mit all Euren Charakteren automatisch verlassen?";
+L["Chat Auto Leave Cancel Format"] = "Automatisches Verlassen für %s deaktiviert. Bitte verwendet den '/join' Chat-Befehl, um dem Kanal erneut beizutreten.";
 L["Auto Leave Channel Format"] = "Automatisch '%s' verlassen";
 L["Click To Disable"] = "Klicken zum Deaktivieren";
 
@@ -325,8 +334,8 @@ L["ModuleDescription NameplateWidget"] = "Zeigt die Anzahl der vorhandenen Strah
 
 
 --PartyInviterInfo
-L["ModuleName PartyInviterInfo"] = "Gruppeneinladungsinfo";
-L["ModuleDescription PartyInviterInfo"] = "Zeigt das Level und die Klasse des Einladenden an, wenn Sie in eine Gruppe oder Gilde eingeladen werden.";
+L["ModuleName PartyInviterInfo"] = "Gruppeneinladungs-Info";
+L["ModuleDescription PartyInviterInfo"] = "Zeigt das Level und die Klasse des Gruppenanführers an, wenn Ihr in eine Gruppe oder Gilde eingeladen werdet.";
 L["Additional Info"] = "Zusätzliche Info";
 L["Race"] = RACE or "Volk";
 L["Faction"] = FACTION or "Fraktion";
@@ -341,56 +350,56 @@ L["ModuleDescription PlayerTitleUI"] = "Fügt der standardmäßigen Charakteranz
 L["Right Click To Reset Filter"] = "Rechtsklick zum Zurücksetzen.";
 L["Earned"] = ACHIEVEMENTFRAME_FILTER_COMPLETED or "Errungen";
 L["Unearned"] = "Fehlend";   --DE_Notes: I prefer "Fehlend" for missing or "Nicht verfügbar" for not available like in the next tooltip because "Unverdient" is more like someone doesn't deserve something.
-L["Unearned Filter Tooltip"] = "Sie sehen möglicherweise doppelte Titel, die für Ihre Fraktion nicht verfügbar sind.";
+L["Unearned Filter Tooltip"] = "Ihr könnt möglicherweise Titel sehen, die für Ihre Fraktion nicht verfügbar sind.";
 
 
 --BlizzardSuperTrack
 L["ModuleName BlizzardSuperTrack"] = "Wegpunkt: Event-Timer";
-L["ModuleDescription BlizzardSuperTrack"] = "Fügt Ihrem aktiven Wegpunkt einen Timer hinzu, wenn seine Kartenmarkierung einen hat.";
+L["ModuleDescription BlizzardSuperTrack"] = "Fügt Eurem aktiven Wegpunkt einen Timer hinzu, wenn die dazugehörende Kartenmarkierung auch die verbleibende Zeit anzeigt.";
 
 
 --ProfessionsBook
 L["ModuleName ProfessionsBook"] = PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS or "Nicht genutztes Wissen";
 L["ModuleDescription ProfessionsBook"] = "Zeigt die Menge Ihres ungenutzten Berufsspezialisierungs-Wissens im Berufefenster an.";
-L["Unspent Knowledge Tooltip Format"] = "Sie haben |cffffffff%s|r ungenutztes Berufsspezialisierungs-Wissen.";   --See globalstring: PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
+L["Unspent Knowledge Tooltip Format"] = "Ihr habt |cffffffff%s|r ungenutztes Berufsspezialisierungs-Wissen.";   --See globalstring: PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
 
 
 --TooltipProfessionKnowledge
 L["ModuleName TooltipProfessionKnowledge"] = L["ModuleName ProfessionsBook"];
-L["ModuleDescription TooltipProfessionKnowledge"] = "Zeigt die Menge Ihres verfügbaren Berufsspezialisierungs-Wissens in Tooltips an.";
+L["ModuleDescription TooltipProfessionKnowledge"] = "Zeigt die Menge Eures verfügbaren Berufsspezialisierungs-Wissens in den Tooltips an.";
 L["Available Knowledge Format"] = "Verfügbares Wissen: |cffffffff%s|r";
 
 
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "Minimap-Ziel";
-L["ModuleDescription MinimapMouseover"] = "Alt-Klick auf eine Kreatur auf der Minimap, um sie als Ziel festzulegen.".."\n\n|cffd4641c- "..L["Restriction Combat"].."|r";
+L["ModuleDescription MinimapMouseover"] = "Benutzt Alt-Klick bei eine Kreatur auf der Minimap, um sie als Ziel festzulegen.".."\n\n|cffd4641c- "..L["Restriction Combat"].."|r";
 
 
 --BossBanner
 L["ModuleName BossBanner"] = "Beutefenster von Bossen";
 L["ModuleDescription BossBanner"] = "Verhindert, dass das spezielle Beutefenster bei Bossen angezeigt wird.\n\n- Immer ausblenden.\n\n- Ausblenden, wenn man alleine ist.\n\n- Nur wertvolle Gegenstände anzeigen.";
 L["BossBanner Hide When Solo"] = "Solo-Modus";
-L["BossBanner Hide When Solo Tooltip"] = "Das Beutefenster von Bossen wird ausgeblendet, wenn Sie der einzige Spieler in der Gruppe sind.";
-L["BossBanner Valuable Item Only"] = "Nur Wervolle Gegenstände";
+L["BossBanner Hide When Solo Tooltip"] = "Das Beutefenster von Bossen wird ausgeblendet, wenn Ihr der einzige Spieler in der Gruppe seid.";
+L["BossBanner Valuable Item Only"] = "Nur Wertvolle Gegenstände";
 L["BossBanner Valuable Item Only Tooltip"] = "Das Beutefenster von Bossen wird nur angezeigt, wenn wertvolle Gegenstände involviert sind (Reittiere, Gegenstände mit der Qualität 'Sehr selten' und 'Extrem selten' etc.)";
 
 
 --AppearanceTab
 L["ModuleName AppearanceTab"] = "Vorlagen-Menü";
-L["ModuleDescription AppearanceTab"] = "Ändert das Vorlagen-Menü mit den folgenden Funktionen:\n\n- Die Anzahl an Gegenständen pro Seite wird reduziert (Voreinstellung ist 2x3, kann unter 'Filter' geändert werden).\nDiese Massnahme entlastet die Grafikkarte und kann eventuelle Programmabstürze verhindern, wenn das Menü geöffnet wird.\n\n- Speichert die letzte Seite, welche Sie zuletzt in einem Gegenstandplatz offen hatten, wenn Sie zu einem anderen Platz wechseln.";
+L["ModuleDescription AppearanceTab"] = "Ändert das Vorlagen-Menü mit den folgenden Funktionen:\n\n- Die Anzahl an Gegenständen pro Seite wird reduziert (Voreinstellung ist 2x3, kann unter 'Filter' geändert werden).\nDiese Massnahme entlastet die Grafikkarte und kann eventuelle Programmabstürze verhindern, wenn das Menü geöffnet wird.\n\n- Speichert die letzte Seite, welche Ihr euch zuletzt angeschaut habt. Beim nächsten Mal wird dieselbe Seite automatisch angezeigt.";
 
 
 --SoftTargetName
 L["ModuleName SoftTargetName"] = "Namensplakette: Soft Target";
 L["ModuleDescription SoftTargetName"] = "Zeigt den Namen des Ziels an, wenn man die Interaktionstaste benutzt.";
-L["SoftTargetName Req Title"] = "|cffd4641cDie folgenden Einstellungen müssen geändert werden, damit dieses Feature funktioniert::|r";
+L["SoftTargetName Req Title"] = "|cffd4641cDie folgenden Einstellungen müssen geändert werden, damit dieses Feature funktioniert:|r";
 L["SoftTargetName Req 1"] = "|cffffd100 Interaktionstaste aktivieren|r unter 'Optionen> Gameplay> Steuerung'.";
 L["SoftTargetName Req 2"] = "Setze die CVar |cffffd100SoftTargetIconGameObject|r auf |cffffffff1|r";
 L["SoftTargetName CastBar"] = "Zauberbalken Anzeigen";
 L["SoftTargetName CastBar Tooltip"] = "Zeigt einen runden Zauberbalken zuzüglich zu dem Namen an.\n\n|cffff4800Das AddOn kann nicht anzeigen, welches Object das Ziel deines Zaubers ist.|r";
 L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "Questziele Anzeigen";
 L["SoftTargetName QuestObjective Tooltip"] = "Zeigt das Questziel an, falls es das Ziel betrifft.";
-L["SoftTargetName QuestObjective Alert"] = "Diese Funktion benötigt, dass Sie |cffffffffShow Target Tooltip|r unter 'Optionen> Zugänglichkeit> Allgemein' aktivieren.";   --See globalstring: TARGET_TOOLTIP_OPTION
+L["SoftTargetName QuestObjective Alert"] = "Um diese Funktion nutzen zu können, müsst Ihr |cffffffffShow Target Tooltip|r unter 'Optionen> Zugänglichkeit> Allgemein' aktivieren.";   --See globalstring: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "NPC-Namen";
 L["SoftTargetName ShowNPC Tooltip"] = "Wenn diese Funktion deaktiviert ist, wird der Name nur an interaktiven Objekten angezeigt.";
 
@@ -405,12 +414,12 @@ L["ModuleDescription LegionRemix_LFGSpam"] = "Deaktiviert die vielen Nachrichten
 L["Artifact Weapon"] = "Artefaktwaffe";
 L["Artifact Ability"] = "Artefakt-Fähigkeit";
 L["Artifact Traits"] = "Artefakt-Eigenschaften";
-L["Earn X To Upgrade Y Format"] = "Sie benötigen |cffffffff%s|r %s, um %s aufzuwerten.";   --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Earn X To Upgrade Y Format"] = "Ihr benötigt |cffffffff%s|r %s, um %s aufzuwerten.";   --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
 L["Until Next Upgrade Format"] = "%s bis zur nächsten Aufwertung";
 L["New Trait Available"] = "Neue Eigenschaft verfügbar.";
 L["Rank Format"] = "Rang %s";
 L["Rank Increased"] = "nächster Rang erreicht";
-L["Infinite Knowledge Tooltip"] = "Sie können Ewiges Wissen durch bestimmte Erfolge in Legion Remix erlangen.";
+L["Infinite Knowledge Tooltip"] = "Ihr könnt Ewiges Wissen durch bestimmte Erfolge in Legion Remix erlangen.";
 L["Stat Bonuses"] = "Bonuswerte";
 L["Bonus Traits"] = "Bonus-Eigenschaften:";
 L["Instruction Open Artifact UI"] = "Linksklick, um das Artefakt-Menü ein- und auszublenden\nRechtsklick, um das Einstellungs-Menü ein- und auszublenden";
@@ -419,19 +428,19 @@ L["Trait Icon Mode"] = "Eigenschaften-Symbol-Modus:";
 L["Trait Icon Mode Hidden"] = "Symbol nicht anzeigen";
 L["Trait Icon Mode Mini"] = "Kleineres Symbol anzeigen";
 L["Trait Icon Mode Replace"] = "Symbol ersetzen";
-L["Error Drag Spell In Combat"] = "Sie können diesen Zauber nicht verschieben, während Sie sich im Kampf befinden.";
-L["Error Change Trait In Combat"] = "Sie können die Eigenschaften nicht verändern, während Sie sich im Kampf befinden.";
+L["Error Drag Spell In Combat"] = "Ihr könnt diesen Zauber nicht verschieben, während Ihr euch im Kampf befinden.";
+L["Error Change Trait In Combat"] = "Ihr könnt diese Eigenschaft nicht verändern, während Ihr euch im Kampf befinden.";
 L["Amount Required To Unlock Format"] = "%s übrig, um dies freizuschalten: ";   --Earn another x amount to unlock (something)
-L["Soon To Unlock"] = "Sie können bald folgendes freischalten:";
-L["You Can Unlock Title"] = "Sie können folgendes freischalten:";
-L["Artifact Ability Auto Unlock Tooltip"] = "Diese Eigenschaft wird automatisch freigeschaltet, sobald Sie genügend Ewige Macht dafür haben.";
-L["Require More Bag Slot Alert"] = "Sie müssen Platz in ihren Taschen frei machen, bevor man diese Aktion ausführen kann.";
+L["Soon To Unlock"] = "Ihr könnt bald folgendes freischalten:";
+L["You Can Unlock Title"] = "Ihr könnt folgendes freischalten:";
+L["Artifact Ability Auto Unlock Tooltip"] = "Diese Eigenschaft wird automatisch freigeschaltet, sobald Ihr genügend Ewige Macht dafür habt.";
+L["Require More Bag Slot Alert"] = "Ihr müsst Platz in euren Taschen frei machen, bevor man diese Aktion ausführen kann.";
 L["Spell Not Known"] = SPELL_FAILED_NOT_KNOWN or "Zauber nicht erlernt";
 L["Fully Upgraded"] = AZERITE_EMPOWERED_ITEM_FULLY_UPGRADED or "Komplett aufgewertet";
 L["Unlock Level Requirement Format"] = "Erreiche Stufe %d , um dies freizuschalten:";
 L["Auto Learn Traits"] = "Auto-Eigenschaften";
-L["Auto Learn Traits Tooltip"] = "Aktiviert Eigenschaften automatisch, sobald Sie genügend Ewige Macht dafür haben.";
-L["Infinite Power Yield Format"] = "Sie erhalten |cffffffff%s|r Ewige Macht mit ihren momentanen Ewiges Wissen-Level.";
+L["Auto Learn Traits Tooltip"] = "Aktiviert Eigenschaften automatisch, sobald Ihr genügend Ewige Macht dafür habt.";
+L["Infinite Power Yield Format"] = "Ihr erhaltet |cffffffff%s|r Ewige Macht mit eurem momentanen Ewiges Wissen-Level.";
 L["Infinite Knowledge Bonus Format"] = "Momentaner Bonus: |cffffffff%s|r";
 L["Infinite Knowledge Bonus Next Format"] = "Nächster Rang: %s";
 
@@ -460,14 +469,14 @@ L["ModuleDescription StaticPopup_Confirm"] = "Ändert die Warnung, wenn man vers
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Beutefenster";
 L["ModuleDescription LootUI"] = "Ersetzt das standardmäßige Beutefenster und bietet einige optionale Funktionen:\n\n- Gegenstände schnell plündern.\n\n- Behebt den Schnell-Plündern Fehler.\n\n- Zeigt eine 'Alles plündern'-Schaltfläche beim manuellen Looten an.";
 L["Take All"] = "Alles plündern";   --Take all items from a loot window
-L["You Received"] = YOU_RECEIVED_LABEL or "Sie erhielten";
+L["You Received"] = YOU_RECEIVED_LABEL or "Ihr erhielt";
 L["Reach Currency Cap"] = "Währungslimit erreicht";
 L["Sample Item 4"] = "Fantastischer epischer Gegenstand";
 L["Sample Item 3"] = "Fantastischer seltener Gegenstand";
 L["Sample Item 2"] = "Fantastischer ungewöhnlicher Gegenstand";
 L["Sample Item 1"] = "Gewöhnlicher Gegenstand";
 L["EditMode LootUI"] = "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Beutefenster");
-L["Manual Loot Instruction Format"] = "Um Schnell-Plündern vorübergehend zu deaktivieren, halten Sie die |cffffffff%s|r-Taste gedrückt, bis das Beutefenster erscheint.";
+L["Manual Loot Instruction Format"] = "Um Schnell-Plündern vorübergehend zu deaktivieren, müsst Ihr die |cffffffff%s|r-Taste gedrückt halten, bis das Beutefenster erscheint.";
 L["LootUI Option Hide Window"] = "Beutefenster deaktivieren";
 L["LootUI Option Hide Window Tooltip"] = "Es werden keine Nachrichten bezüglich des plünderns angezeigt, aber alle anderen Funktionen wie etwa Schnell-Plündern bleiben weiterhin aktiv.";
 L["LootUI Option Hide Window Tooltip 2"] = "Diese Option hat keinen Einfluss auf das Blizzard-Beutefenster.";
@@ -475,10 +484,10 @@ L["LootUI Option Force Auto Loot"] = "Schnell-Plündern erzwingen";
 L["LootUI Option Force Auto Loot Tooltip"] = "Schnell-Plündern immer aktiviert lassen, um gelegentliche Fehler zu verhindern.";
 L["LootUI Option Owned Count"] = "Anzahl der Gegenstände im Besitz anzeigen";
 L["LootUI Option New Transmog"] = "Ungesammeltes Aussehen markieren";
-L["LootUI Option New Transmog Tooltip"] = "Fügt eine Markierung %s hinzu, wenn Sie das Aussehen des Gegenstands nicht gesammelt haben.";
+L["LootUI Option New Transmog Tooltip"] = "Fügt eine Markierung %s hinzu, wenn Ihr das Aussehen des Gegenstands nicht gesammelt habt.";
 L["LootUI Option Use Hotkey"] = "Taste drücken, um alle Gegenstände zu plündern";
-L["LootUI Option Use Hotkey Tooltip"] = "Drücken Sie die folgende Taste im manuellen Plünder-Modus, um alle Gegenstände zu plündern.";
-L["LootUI Option Fade Delay"] = "Verzögerung des Ausblendens pro Gegenstand";
+L["LootUI Option Use Hotkey Tooltip"] = "Drückt die folgende Taste im manuellen Plünder-Modus, um alle Gegenstände zu plündern.";
+L["LootUI Option Fade Delay"] = "Anzeigedauer pro Gegenstand";
 L["LootUI Option Items Per Page"] = "Gegenstände pro Seite";
 L["LootUI Option Items Per Page Tooltip"] = "Passt die Anzahl der Gegenstände an, die auf einer Seite angezeigt werden können, wenn Beute erhalten wird.\n\nDiese Option betrifft nicht den manuellen Plünder-Modus oder den Bearbeitungsmodus.";
 L["LootUI Option Replace Default"] = "Standard-Beutebenachrichtigung ersetzen";
@@ -503,7 +512,7 @@ L["LootUI Option Low Frame Strata Tooltip"] = "Wenn der Beute- Benachrichtigungs
 
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "Modulinfo";
-L["QuickSlot Error 1"] = "Quick Slot: Sie haben diesen Controller bereits hinzugefügt.";
+L["QuickSlot Error 1"] = "Quick Slot: Ihr habt diesen Controller bereits hinzugefügt.";
 L["QuickSlot Error 2"] = "Quick Slot: Dem Controller fehlt '%s'";
 L["QuickSlot Error 3"] = "Quick Slot: Ein Controller mit demselben Schlüssel '%s' existiert bereits.";
 
@@ -518,7 +527,7 @@ L["PlumberMacro Error NoAction"] = "Keine verwendbaren Aktionen";
 L["PlumberMacro Error EditMacroInCombat"] = "Makros können im Kampf nicht bearbeitet werden";
 L["Random Favorite Mount"] = "Zufälliges Lieblingsreittier";   --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
 L["Dismiss Battle Pet"] = "Kampfhaustier freigeben";
-L["Drag And Drop Item Here"] = "Ziehen Sie einen Gegenstand hierher und legen Sie ihn ab.";
+L["Drag And Drop Item Here"] = "Zieht einen Gegenstand hierher und legt ihn dann hier ab.";
 L["Drag To Reorder"] = "Linksklick und ziehen, um die Reihenfolge zu ändern";
 L["Click To Set Macro Icon"] = "Strg + Klick, um als Makro-Symbol festzulegen";
 L["Unsupported Action Type Format"] = "Nicht unterstützter Aktionstyp: %s";
@@ -534,7 +543,7 @@ L["Drawer Option Hide Unusable"] = "Unbrauchbare Aktionen ausblenden";
 L["Drawer Option Hide Unusable Tooltip"] = "Blendet nicht vorhandene Gegenstände und nicht erlernte Zauber aus.";
 L["Drawer Option Hide Unusable Tooltip 2"] = "Verbrauchbare Gegenstände wie Tränke werden immer angezeigt.";
 L["Drawer Option Update Frequently"] = "Häufig aktualisieren";
-L["Drawer Option Update Frequently Tooltip"] = "Versucht, den Zustand der Buttons bei jeder Änderung in Ihren Taschen oder dem Zauberbuch zu aktualisieren. Diese Option kann die Ressourcennutzung leicht erhöhen.";
+L["Drawer Option Update Frequently Tooltip"] = "Versucht, den Zustand der Buttons bei jeder Änderung in Ihren Taschen oder dem Zauberbuch zu aktualisieren. Diese Option kann den Leistungsbedarf Eurer Hardware leicht erhöhen.";
 
 
 --New Expansion Landing Page
@@ -545,7 +554,7 @@ L["Paragon Reward Available"] = "Paragon-Belohnung verfügbar";
 L["Until Next Level Format"] = "%d bis zum nächsten Level";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d bis zur Paragon-Belohnung";
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Klicken, um Ruhm anzusehen>";
-L["Not On Quest"] = "Sie befinded sich momentan nicht auf dieser Quest. ";
+L["Not On Quest"] = "Ihr befindet euch momentan nicht auf dieser Quest. ";
 L["Factions"] = "Fraktionen";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Aktivitäten";
 L["Raids"] = RAIDS or "Raids";
@@ -585,7 +594,7 @@ L["Accountwide"] = "Accountweit";
 L["Flag Quest"] = "Quest Markieren";
 L["Boss Name"] = "Name des Bosses";
 L["Instance Or Boss Name"] = "Instanzen- oder Bossname";
-L["Name EditBox Disabled Reason Format"] = "Dieses Feld wird automatisch ausgefüllt, wenn Sie einen gültigen %s eingeben.";
+L["Name EditBox Disabled Reason Format"] = "Dieses Feld wird automatisch ausgefüllt, wenn ein gültiger %s eingegeben wird.";
 L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "Keine Ergebnisse";
 L["Create New Tracker"] = "Neuer Tracker";
 L["FailureReason Already Exist"] = "Dieser Eintrag existiert bereits.";
@@ -596,8 +605,8 @@ L["Delete"] = DELETE or "Löschen";
 L["Visit Quest Hub To Log Quests"] = "Sprich mit allen NPCs, welche täglich neue Quests anbieten, um alle neuen Quests für das AddOn zu registrieren.";
 L["Quest Hub Instruction Celestials"] = "Sprich mit dem Ruhmrüstmeister der 'Himmlischen Erhabenen' im Tal der Ewigen Blüten, um herauszufinden, welcher Tempel heute deine Hilfe benötigt.";
 L["Unavailable Klaxxi Paragons"] = "Nicht verfügbare Getreuen der Klaxxi:";
-L["Weekly Coffer Key Tooltip"] = "Die ersten vier Truhen, welche Sie in der momentanen Woche erhalten, beinhalten einen Restaurierten Kastenschlüssel.";
-L["Weekly Coffer Key Shards Tooltip"] = "Die ersten vier Truhen, welche Sie in der momentanen Woche erhalten, beinhalten Kastenschlüsselsplitter.";
+L["Weekly Coffer Key Tooltip"] = "Die ersten vier Truhen, welche Ihr in der momentanen Woche erhaltet, beinhalten einen Restaurierten Kastenschlüssel.";
+L["Weekly Coffer Key Shards Tooltip"] = "Die ersten vier Truhen, welche Ihr in der momentanen Woche erhaltet, beinhalten Kastenschlüsselsplitter.";
 L["Weekly Cap"] = "Wöchentliches Limit";
 L["Weekly Cap Reached"] = "Wöchentliches Limit erreicht.";
 L["Instruction Right Click To Use"] = "<Rechtsklick zum Benutzen>";
@@ -607,6 +616,21 @@ L["Click To Switch"] = "Hier klicken, um zum |cffffffff%s|r zu wechseln";
 L["Click To Queue"] = "Her klickem, um sich in die Warteschlange für |cffffffff%s|r einzugliedern";
 L["Click to Open Format"] = "Mausklick um %s zu öffnen";
 L["List Is Empty"] = "Die Liste ist leer.";
+
+
+--RaidCheck
+L["ModuleName InstanceDifficulty"] = "Schwierigkeitsgrad von Instanzen";
+L["ModuleDescription InstanceDifficulty"] = "Zeigt ein Menü am oberen Bildschirmrand an. Es zeigt den vom Schlachtzugsleiter ausgewählten Schwierigkeitsgrad an.\nIhr könnt den Schwierigkeitsgrad ändern, indem Ihr mit der Maus auf einen der angezeigten Felder klickt.\n\nDarüber hinaus zeigt das Menü die bereits besiegten Bosse des jeweiligen Schwierigkeitsgrads an. Eine detaillierte Liste wird via Mouseover angezeigt.";
+L["Cannot Change Difficulty"] = "Der Schwierigkeitsgrad dieser Instanz kann momentan nicht geändert werden.";
+
+
+--TransmogChatCommand
+L["ModuleName TransmogChatCommand"] = "Chat-Befehl für Vorlagen";
+L["ModuleDescription TransmogChatCommand"] = "- Wenn ein Vorlagen Chat-Befehl benutzt wird, wird das alte Outfit komplett entfernt.\n\n- Wenn man mit dem Transmogrifizierer interagiert, werden bei einem Chat-Befehl alle Gegenstände automatisch in das Vorlagen-Menü geladen.";
+L["Copy To Clipboard"] = "In die Zwischenablage kopieren ";
+L["Copy Current Outfit Tooltip"] = "Den Link kopieren, um das Outfit online zu teilen.";
+L["Missing Appearances Format"] = "%d |4Vorlage:Vorlagen fehlen;";
+L["Press Key To Copy Format"] = "Zum Kopieren auf die |cffffd100%s|r-Taste drücken";
 
 
 --Generic
@@ -621,13 +645,13 @@ L["Renown Level Label"] = "Ruhmstufe ";   --There is a space
 L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maximiert)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Aktuell:";
-L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Sie haben unbeanspruchte Belohnungen";
-L["Uncollected Set Counter Format"] = "Sie haben |cffffffff%d|r unbekannte Vorlagen |4set:sets;.";
+L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Ihr habt unbeanspruchte Belohnungen";
+L["Uncollected Set Counter Format"] = "Ihr habt |cffffffff%d|r unbekannte Vorlagen |4set:sets;.";
 
 
 --Plumber AddOn Settings
 L["ModuleName EnableNewByDefault"] = "Neue Funktionen standardmäßig aktivieren";
-L["ModuleDescription EnableNewByDefault"] = "Neu hinzugefügte Funktionen standardmäßig aktivieren.\n\n*Sie erhalten eine Benachrichtigung im Chatfenster, wenn ein neues Modul auf diese Weise aktiviert wird.";
+L["ModuleDescription EnableNewByDefault"] = "Neu hinzugefügte Funktionen standardmäßig aktivieren.\n\n*Ihr erhaltet eine Benachrichtigung im Chatfenster, wenn ein neues Modul auf diese Weise aktiviert wird.";
 L["New Feature Auto Enabled Format"] = "Neues Modul %s wurde aktiviert.";
 L["Click To See Details"] = "Klicken, um Details anzuzeigen";
 L["Click To Show Settings"] = "Klicken, um die Einstellungen anzuzeigen";
@@ -692,4 +716,4 @@ L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Held";
 L["Upgrade Track 6"] = "Mythos";
 
-L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";   --See globalstring: TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
