@@ -10,7 +10,7 @@ local IsInInstance = IsInInstance;
 local IsIndoors = IsIndoors;
 local GetPlayerMap = API.GetPlayerMap;
 local GetPlayerMapCoord = API.GetPlayerMapCoord;
-local GetDungeonEntrancesForMap = C_EncounterJournal.GetDungeonEntrancesForMap;
+local API_GetDungeonEntrancesForMap = C_EncounterJournal.GetDungeonEntrancesForMap;
 local GetMapWorldSize = C_Map.GetMapWorldSize;
 local GetMapGroupID = C_Map.GetMapGroupID;
 local GetMapGroupMembersInfo = C_Map.GetMapGroupMembersInfo;
@@ -35,7 +35,7 @@ EL.mapEvents = {
 
 EL.instancePos = {
     --hardcode XY for certain instance whose entrance position doesn't match the pin
-    --[uiMapID] = {x, y, indoors}
+    --[journalInstanceID] = {x, y, indoors}
     [786] = {0.44148, 0.59743, true},     --Nighthold
     [726] = {0.41068, 0.61744, true},     --The Arcway
     [187] = {0.61534, 0.26397},           --Dragon Soul
@@ -53,6 +53,45 @@ EL.mapsWithFloors = {
     [34] = true,
     [35] = true,
 };
+
+EL.extraPins = {
+    --For instances with multiple entrances but the map only shows one.
+    --[uimapID] = { {position = {x = 0, y = 0}, journalInstanceID = 0} }
+
+    [42] = {
+        {position = {x = 0.46691, y = 0.70226}, journalInstanceID = 745},    --Karazhan Side Entrance
+    },
+
+    [55] = {
+        {position = {x = 0.25667, y = 0.50933}, journalInstanceID = 63},    --Deadmines
+    },
+};
+
+EL.ignoredMap = {
+    --[uiMapID] = true,
+    [52] = true,    --Westfall Deadmines entrance is actually on 55
+};
+
+
+local function GetDungeonEntrancesForMap(uiMapID)
+    local dungeonEntrances;
+
+    if not EL.ignoredMap[uiMapID] then
+        dungeonEntrances = API_GetDungeonEntrancesForMap(uiMapID);
+    end
+
+    if EL.extraPins[uiMapID] then
+        if not dungeonEntrances then
+            dungeonEntrances = {};
+        end
+        for _, v in ipairs(EL.extraPins[uiMapID]) do
+            table.insert(dungeonEntrances, v);
+        end
+    end
+
+    return dungeonEntrances
+end
+
 
 function EL:DoesMapHaveFloors(uiMapID)
     if self.mapsWithFloors[uiMapID] == nil then

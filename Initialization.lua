@@ -372,6 +372,7 @@ EL:SetScript("OnEvent", function(self, event, ...)
         if seasonID and seasonID > 0 then
             CallbackRegistry:Trigger("TimerunningSeason", seasonID);
         end
+        addon.ControlCenter:InitializeModules();
     end
 end);
 

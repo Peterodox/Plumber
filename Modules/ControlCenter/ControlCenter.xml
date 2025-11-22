@@ -1,0 +1,129 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <Script file="Preload.lua"/>
+    <Script file="ScrollBar.lua"/>
+    <Script file="SettingsPanel.lua"/>
+
+
+    <Button name="PlumberTextureHighlightButtonTemplate" virtual="true">
+        <Size x="16" y="16"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Texture">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="Highlight" alphaMode="ADD" alpha="0.5">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Texture" relativePoint="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Texture" relativePoint="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <Frame name="PlumberScrollBarWithDynamicSizeTemplate" virtual="true">
+        <Size x="16" y="80"/>
+        <Frames>
+            <Frame parentKey="Rail" useParentLevel="true">
+                <Size x="16" y="80"/>
+                <Anchors>
+                    <Anchor point="TOP" y="0"/>
+                    <Anchor point="BOTTOM" y="0"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Top">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
+                            </Anchors>
+                        </Texture>
+                        <Texture parentKey="Bottom">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
+                            </Anchors>
+                        </Texture>
+                        <Texture parentKey="Middle">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="BOTTOMLEFT"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="TOPRIGHT"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Frame>
+
+            <Button parentKey="UpArrow" inherits="PlumberTextureHighlightButtonTemplate">
+                <Size x="16" y="16"/>
+                <Anchors>
+                    <Anchor point="TOP"/>
+                </Anchors>
+            </Button>
+
+            <Button parentKey="DownArrow" inherits="PlumberTextureHighlightButtonTemplate">
+                <Size x="16" y="16"/>
+                <Anchors>
+                    <Anchor point="BOTTOM"/>
+                </Anchors>
+            </Button>
+
+            <Button parentKey="Thumb">
+                <Size x="16" y="48"/>
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.Rail" relativePoint="TOP"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Top">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
+                            </Anchors>
+                        </Texture>
+                        <Texture parentKey="Bottom">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
+                            </Anchors>
+                        </Texture>
+                        <Texture parentKey="Middle">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="BOTTOMLEFT"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="TOPRIGHT"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <Layer level="HIGHLIGHT">
+                        <Texture parentKey="HighlightTop" alphaMode="ADD">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
+                            </Anchors>
+                        </Texture>
+                        <Texture parentKey="HighlightBottom" alphaMode="ADD">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
+                            </Anchors>
+                        </Texture>
+                        <Texture parentKey="HighlightMiddle" alphaMode="ADD">
+                            <Size x="16" y="16"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.HighlightTop" relativePoint="BOTTOMLEFT"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.HighlightBottom" relativePoint="TOPRIGHT"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Button>
+        </Frames>
+    </Frame>
+</Ui>

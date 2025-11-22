@@ -24,7 +24,7 @@ Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
 Modules\BlizzardEditMode.lua
 
-ControlCenter.lua
+Modules\ControlCenter\ControlCenter.xml
 
 Modules\LootUI.xml
 Modules\QuickSlot.xml

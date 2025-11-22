@@ -793,8 +793,6 @@ do  --SecureHandler
                 API.Mixin(vb, VisualButtonMixin);
                 vb:SetFrameStrata("FULLSCREEN_DIALOG");
                 vb:OnLoad();
-                vb:SetScript("OnEnter", vb.OnEnter);
-                vb:SetScript("OnLeave", vb.OnLeave);
             end
         end
         self:UpdateClicks();

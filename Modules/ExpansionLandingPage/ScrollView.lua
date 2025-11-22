@@ -319,6 +319,11 @@ do
             Thumb:SharedOnMouseUp(button);
         end);
 
+        Thumb:SetScript("OnHide", function()
+            Thumb:UnlockHighlight();
+            Thumb:SharedOnMouseUp();
+        end);
+
         return f
     end
 end
@@ -326,7 +331,7 @@ end
 
 local ScrollViewMixin = {};
 
-local function CreateScrollView(parent)
+local function CreateScrollView(parent, scrollBar)
     local f = CreateFrame("Frame", nil, parent);
     API.Mixin(f, ScrollViewMixin);
     f:SetClipsChildren(true);
@@ -350,9 +355,15 @@ local function CreateScrollView(parent)
     f:SetScript("OnMouseWheel", f.OnMouseWheel);
     f:SetScript("OnHide", f.OnHide);
 
-    f.ScrollBar = CreateScrollBar(f);
-    f.ScrollBar:SetFrameLevel(f:GetFrameLevel() + 10);
-    f.ScrollBar:UpdateThumbRange();
+    if not (f.ScrollBar or scrollBar) then
+        f.ScrollBar = CreateScrollBar(f);
+        f.ScrollBar:SetFrameLevel(f:GetFrameLevel() + 10);
+        f.ScrollBar:UpdateThumbRange();
+    end
+
+    if scrollBar then
+        f.ScrollBar = scrollBar;
+    end
 
     f.NoContentAlert = f:CreateFontString(nil, "ARTWORK", "PlumberFont_16");
     f.NoContentAlert:Hide();
@@ -503,6 +514,10 @@ do  --ScrollView Basic Content Render
         end
     end
 
+    function ScrollViewMixin:GetScrollRange()
+        return self.range or 0
+    end
+
     function ScrollViewMixin:IsScrollable()
         return self.scrollable
     end
@@ -597,10 +612,17 @@ do  --ScrollView Smooth Scroll
         self.isScrolling = true;
         self.offset = DeltaLerp(self.offset, self.scrollTarget, self.blendSpeed, elapsed);
 
-        if (self.offset - self.scrollTarget) > -0.4 and (self.offset - self.scrollTarget) < 0.4 then
+        self.targetDiff = self.offset - self.scrollTarget;
+        if self.targetDiff < 0 then
+            self.targetDiff = -self.targetDiff;
+        end
+
+        if self.targetDiff < 0.4 then
             self.offset = self.scrollTarget;
             self:SnapToScrollTarget();
             return
+        elseif self.targetDiff < 2 and self.useMouseBlocker then
+            self.MouseBlocker:Hide();
         end
 
         self.recycleTimer = self.recycleTimer + elapsed;

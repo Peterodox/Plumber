@@ -31,7 +31,7 @@ Modules\ScenarioTracker.lua
 #Modules\DevTool.lua
 #Modules\DevTool_HyperlinkEditor.lua
 
-ControlCenter.lua
+Modules\ControlCenter\ControlCenter.xml
 
 Modules\GossipFrameMedal.lua
 Modules\BackpackItemTracker.lua
