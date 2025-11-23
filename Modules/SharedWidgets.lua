@@ -85,7 +85,7 @@ do  -- Slice Frame
         frame.NineSlice:SetTexture(texture);
     end
 
-    function API.CreateThreeSliceTextures(parent, layer, sideWidth, sideHeight, sideOffset, file, disableSharpenging)
+    function API.CreateThreeSliceTextures(parent, layer, sideWidth, sideHeight, sideOffset, file, disableSharpenging, useTrilinearFilter)
         local slices = {};
         slices[1] = parent:CreateTexture(nil, layer);
         slices[2] = parent:CreateTexture(nil, layer);
@@ -101,9 +101,10 @@ do  -- Slice Frame
         end
 
         if file then
-            slices[1]:SetTexture(file);
-            slices[2]:SetTexture(file);
-            slices[3]:SetTexture(file);
+            local filter = useTrilinearFilter and "TRILINEAR" or "LINEAR";
+            slices[1]:SetTexture(file, nil, nil, filter);
+            slices[2]:SetTexture(file, nil, nil, filter);
+            slices[3]:SetTexture(file, nil, nil, filter);
         end
 
         if disableSharpenging then

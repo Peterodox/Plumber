@@ -27,10 +27,10 @@
     </Button>
 
     <Frame name="PlumberScrollBarWithDynamicSizeTemplate" virtual="true">
-        <Size x="16" y="80"/>
+        <Size x="20" y="80"/>
         <Frames>
             <Frame parentKey="Rail" useParentLevel="true">
-                <Size x="16" y="80"/>
+                <Size x="20" y="80"/>
                 <Anchors>
                     <Anchor point="TOP" y="0"/>
                     <Anchor point="BOTTOM" y="0"/>
@@ -61,21 +61,21 @@
             </Frame>
 
             <Button parentKey="UpArrow" inherits="PlumberTextureHighlightButtonTemplate">
-                <Size x="16" y="16"/>
+                <Size x="20" y="16"/>
                 <Anchors>
                     <Anchor point="TOP"/>
                 </Anchors>
             </Button>
 
             <Button parentKey="DownArrow" inherits="PlumberTextureHighlightButtonTemplate">
-                <Size x="16" y="16"/>
+                <Size x="20" y="16"/>
                 <Anchors>
                     <Anchor point="BOTTOM"/>
                 </Anchors>
             </Button>
 
             <Button parentKey="Thumb">
-                <Size x="16" y="48"/>
+                <Size x="20" y="48"/>
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.Rail" relativePoint="TOP"/>
                 </Anchors>
@@ -105,13 +105,15 @@
                         <Texture parentKey="HighlightTop" alphaMode="ADD">
                             <Size x="16" y="16"/>
                             <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="TOPLEFT"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Top" relativePoint="BOTTOMRIGHT"/>
                             </Anchors>
                         </Texture>
                         <Texture parentKey="HighlightBottom" alphaMode="ADD">
                             <Size x="16" y="16"/>
                             <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.Bottom" relativePoint="TOPLEFT"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="BOTTOMRIGHT"/>
                             </Anchors>
                         </Texture>
                         <Texture parentKey="HighlightMiddle" alphaMode="ADD">

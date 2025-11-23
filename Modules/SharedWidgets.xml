@@ -690,6 +690,7 @@
     </Frame>
 
     <Frame name="PlumberPropagateMouseTemplate" propagateMouseInput="Both" virtual="true"/>
+    <Frame name="PlumberPropagateMouseMotionTemplate" propagateMouseInput="Motion" virtual="true"/>
 
     <Frame name="PlumberSharedPopupFrameTemplate" parent="UIParent" frameStrata="DIALOG" toplevel="true" hidden="true" virtual="true">
         <Size x="320" y="72"/>

@@ -15,8 +15,10 @@ do
         self:SetScript("OnMouseUp", self.OnMouseUp);
         self:SetScript("OnEnable", self.OnEnable);
         self:SetScript("OnDisable", self.OnDisable);
+        self:SetScript("OnEnter", self.OnEnter);
+        self:SetScript("OnLeave", self.OnLeave);
 
-        self.Highlight:SetAlpha(0.2);
+        self.Highlight:SetAlpha(0.5);
     end
 
     function ArrowButtonMixin:OnMouseDown(button)
@@ -44,6 +46,14 @@ do
         self.Texture:SetVertexColor(0.5, 0.5, 0.5);
         self.Texture:SetDesaturated(true);
     end
+
+    function ArrowButtonMixin:OnEnter()
+        self:GetParent():UpdateVisual();
+    end
+
+    function ArrowButtonMixin:OnLeave()
+        self:GetParent():UpdateVisual();
+    end
 end
 
 
@@ -54,6 +64,9 @@ do
 
         self:SetScript("OnMouseDown", self.OnMouseDown);
         self:SetScript("OnMouseUp", self.OnMouseUp);
+        self:SetScript("OnEnter", self.OnEnter);
+        self:SetScript("OnLeave", self.OnLeave);
+        self:SetScript("OnHide", self.OnHide);
 
         self.HighlightTop:SetAlpha(0.2);
         self.HighlightMiddle:SetAlpha(0.2);
@@ -76,9 +89,69 @@ do
             self.HighlightTop:SetAlpha(0.2);
             self.HighlightMiddle:SetAlpha(0.2);
             self.HighlightBottom:SetAlpha(0.2);
-            self:GetParent():StopUpdating();
             self:UnlockHighlight();
+            self:GetParent():StopUpdating();
+            self:GetParent():UpdateVisual();
         end
+    end
+
+    local function Thumb_Expand_OnUpdate(self, elapsed)
+        self.capSize = self.capSize + 128 * elapsed;
+        if self.capSize >= 16 then
+            self.capSize = 16;
+            self:SetScript("OnUpdate", nil);
+        end
+        self.Top:SetSize(self.capSize, self.capSize);
+        self.Bottom:SetSize(self.capSize, self.capSize);
+    end
+
+    local function Thumb_Shrink_OnUpdate(self, elapsed)
+        self.capSize = self.capSize - 128 * elapsed;
+        if self.capSize <= 16 then
+            self.capSize = 16;
+            self:SetScript("OnUpdate", nil);
+        end
+        self.Top:SetSize(self.capSize, self.capSize);
+        self.Bottom:SetSize(self.capSize, self.capSize);
+    end
+
+    function ThumbButtonMixin:Expand()
+        self.expanded = true;
+        self.Top:SetTexCoord(0/512, 32/512, 264/512, 296/512);
+        self.Middle:SetTexCoord(0/512, 32/512, 296/512, 360/512);
+        self.Bottom:SetTexCoord(0/512, 32/512, 360/512, 392/512);
+        self.HighlightTop:SetTexCoord(0/512, 32/512, 264/512, 296/512);
+        self.HighlightMiddle:SetTexCoord(0/512, 32/512, 296/512, 360/512);
+        self.HighlightBottom:SetTexCoord(0/512, 32/512, 360/512, 392/512);
+
+        self.capSize = self.Top:GetWidth() * 0.5;
+        self:SetScript("OnUpdate", Thumb_Expand_OnUpdate);
+        Thumb_Expand_OnUpdate(self, 0);
+    end
+
+    function ThumbButtonMixin:Shrink()
+        self.Top:SetTexCoord(0/512, 32/512, 132/512, 164/512);
+        self.Middle:SetTexCoord(0/512, 32/512, 164/512, 228/512);
+        self.Bottom:SetTexCoord(0/512, 32/512, 228/512, 260/512);
+        self.HighlightTop:SetTexCoord(0/512, 32/512, 132/512, 164/512);
+        self.HighlightMiddle:SetTexCoord(0/512, 32/512, 164/512, 228/512);
+        self.HighlightBottom:SetTexCoord(0/512, 32/512, 228/512, 260/512);
+
+        self.capSize = self.Top:GetWidth() * 2;
+        self:SetScript("OnUpdate", Thumb_Shrink_OnUpdate);
+        Thumb_Shrink_OnUpdate(self, 0);
+    end
+
+    function ThumbButtonMixin:OnEnter()
+        self:GetParent():UpdateVisual();
+    end
+
+    function ThumbButtonMixin:OnLeave()
+        self:GetParent():UpdateVisual();
+    end
+
+    function ThumbButtonMixin:OnHide()
+        self:OnMouseUp("LeftButton");
     end
 end
 
@@ -109,27 +182,41 @@ do
         end
 
         SetTexCoord(self.Rail.Top, 0, 32, 0, 32);
-        SetTexCoord(self.Rail.Middle, 0, 32, 32, 160);
-        SetTexCoord(self.Rail.Bottom, 0, 32, 160, 192);
+        SetTexCoord(self.Rail.Middle, 0, 32, 32, 96);
+        SetTexCoord(self.Rail.Bottom, 0, 32, 96, 128);
 
-        SetTexCoord(self.Thumb.Top, 0, 32, 208, 240);
-        SetTexCoord(self.Thumb.Middle, 0, 32, 240, 304);
-        SetTexCoord(self.Thumb.Bottom, 0, 32, 304, 336);
-        SetTexCoord(self.Thumb.HighlightTop, 0, 32, 208, 240);
-        SetTexCoord(self.Thumb.HighlightMiddle, 0, 32, 240, 304);
-        SetTexCoord(self.Thumb.HighlightBottom, 0, 32, 304, 336);
+        SetTexCoord(self.Thumb.Top, 0, 32, 132, 164);
+        SetTexCoord(self.Thumb.HighlightTop, 0, 32, 132, 164);
+        SetTexCoord(self.Thumb.Middle, 0, 32, 164, 228);
+        SetTexCoord(self.Thumb.HighlightMiddle, 0, 32, 164, 228);
+        SetTexCoord(self.Thumb.Bottom, 0, 32, 228, 260);
+        SetTexCoord(self.Thumb.HighlightBottom, 0, 32, 228, 260);
 
-        SetTexCoord(self.UpArrow.Texture, 0, 32, 352, 384);
-        SetTexCoord(self.UpArrow.Highlight, 0, 32, 352, 384);
-        SetTexCoord(self.DownArrow.Texture, 0, 32, 384, 416);
-        SetTexCoord(self.DownArrow.Highlight, 0, 32, 384, 416);
+        SetTexCoord(self.UpArrow.Texture, 0, 32, 396, 428);
+        SetTexCoord(self.UpArrow.Highlight, 0, 32, 396, 428);
+        SetTexCoord(self.DownArrow.Texture, 0, 32, 428, 460);
+        SetTexCoord(self.DownArrow.Highlight, 0, 32, 428, 460);
+
+
+        self.Rail:SetScript("OnMouseDown", function(_, button)
+            if button == "LeftButton" then
+                self:ScrollToMouseDownPosition();
+                addon.LandingPageUtil.PlayUISound("ScrollBarThumbDown");
+            end
+        end);
+
+        self.Rail:SetScript("OnEnter", function()
+            self:UpdateVisual();
+        end);
+
+        self.Rail:SetScript("OnLeave", function()
+            self:UpdateVisual();
+        end);
     end
 
     function ScrollBarMixin:SetTexure(texture)
-        local DisableSharpening = API.DisableSharpening;
         for obj in pairs(self.textureObjects) do
             obj:SetTexture(texture);
-            --DisableSharpening(obj);
         end
     end
 
@@ -220,11 +307,30 @@ do
         self:UpdateThumbRange();
     end
 
+    function ScrollBarMixin:UpdateVisual()
+        if self.Rail:IsMouseMotionFocus() or self.Thumb:IsMouseMotionFocus() or self:IsDraggingThumb() then
+            if not self.expanded then
+                self.expanded = true;
+                self.Thumb:Expand();
+            end
+        else
+            if self.expanded then
+                self.expanded = nil;
+                self.Thumb:Shrink();
+            end
+        end
+    end
+
     function ScrollBarMixin:StartDraggingThumb()
         self:Snapshot();
         self:UpdateThumbRange();
         self.t = 0;
+        self.isDraggingThumb = true;
         self:SetScript("OnUpdate", self.OnUpdate_ThumbDragged);
+    end
+
+    function ScrollBarMixin:IsDraggingThumb()
+        return self.isDraggingThumb
     end
 
     function ScrollBarMixin:OnUpdate_ThumbDragged(elapsed)
@@ -268,6 +374,7 @@ do
         self.x0, self.y0 = nil, nil;
         self.dx, self.dy = nil, nil;
         self.scale = nil;
+        self.isDraggingThumb = nil;
     end
 
     function ScrollBarMixin:ScrollToMouseDownPosition()
@@ -333,7 +440,7 @@ local function CreateScrollBarWithDynamicSize(parent)
 
     Mixin(f, ScrollBarMixin);
     f:OnLoad();
-    f:SetTexure("Interface/AddOns/Plumber/Art/ControlCenter/SettingsSlider.png");
+    f:SetTexure("Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanelWidget.png");
     f:ShowArrowButtons(true);
     f:UpdateThumbRange();
     f:SetValueByRatio(0);

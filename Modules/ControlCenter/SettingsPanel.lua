@@ -14,8 +14,8 @@ local HEADER_HEIGHT = 18;
 local BUTTON_OFFSET_H = 16;
 local SCROLL_FRAME_SHRINK = 4;
 local PADDING = 16;
-local BUTTON_HEIGHT = 24;
-local OPTION_GAP_Y = 8;
+local BUTTON_HEIGHT = 30;
+local OPTION_GAP_Y = 2;
 local DIFFERENT_CATEGORY_OFFSET = 8;
 local LEFT_SECTOR_WIDTH = math.floor(0.618*FRAME_WIDTH + 0.5);
 
@@ -118,24 +118,6 @@ do
         self.collapsed = CollapsedCateogry[self.categoryID];
         self:UpdateArrow();
     end
-
-    function CategoryButtonMixin:AddChildOption(checkbox)
-        if not self.numOptions then
-            self.numOptions = 0;
-        end
-        self.numOptions = self.numOptions + 1;
-        if not checkbox.parentDBKey then
-            tinsert(self.childOptions, checkbox);
-        end
-    end
-
-    function CategoryButtonMixin:UpdateNineSlice(offset)
-        --Texture Slice don't follow its parent scale
-        --This texture has 4px gap in each direction
-        --Unused
-        self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
-        self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);
-    end
 end
 
 
@@ -144,12 +126,12 @@ local function CreateCategoryButton(parent)
 
     b:SetSize(LEFT_SECTOR_WIDTH - 2*PADDING, BUTTON_HEIGHT);
 
-    b.Background = b:CreateTexture(nil, "BACKGROUND");
-    b.Background:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/CategoryButton-NineSlice");
-    b.Background:SetTextureSliceMargins(16, 16, 16, 16);
-    b.Background:SetTextureSliceMode(0);
-    b.Background:SetPoint("TOPLEFT", b, "TOPLEFT", 0, 0);
-    b.Background:SetPoint("BOTTOMRIGHT", b, "BOTTOMRIGHT", 0, 0);
+    local disableSharpenging = true;
+    local useTrilinearFilter = true;
+    b.BackgroundTextures = API.CreateThreeSliceTextures(b, "BACKGROUND", 16, 40, 8, "Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanelWidget.png", disableSharpenging, useTrilinearFilter);
+    b.BackgroundTextures[1]:SetTexCoord(36/512, 68/512, 0, 80/512);
+    b.BackgroundTextures[2]:SetTexCoord(68/512, 132/512, 0, 80/512);
+    b.BackgroundTextures[3]:SetTexCoord(132/512, 164/512, 0, 80/512);
 
     b.Arrow = b:CreateTexture(nil, "OVERLAY");
     b.Arrow:SetSize(14, 14);
@@ -159,7 +141,7 @@ local function CreateCategoryButton(parent)
     b.Label = b:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     b.Label:SetJustifyH("LEFT");
     b.Label:SetJustifyV("TOP");
-    b.Label:SetTextColor(1, 1, 1);
+    b.Label:SetTextColor(0.92, 0.92, 0.92);
     b.Label:SetPoint("LEFT", b, "LEFT", 28, 0);
 
     b.Count = b:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
@@ -194,7 +176,7 @@ local function OptionToggle_OnHide(self)
 end
 
 local function CreateOptionToggle(checkbox)
-    local b = CreateFrame("Button", nil, checkbox);
+    local b = CreateFrame("Button", nil, checkbox, "PlumberPropagateMouseMotionTemplate");
     b:SetSize(48, 24);
     b:SetPoint("RIGHT", checkbox, "RIGHT", 0, 0);
     b.Texture = b:CreateTexture(nil, "OVERLAY");
@@ -207,6 +189,15 @@ local function CreateOptionToggle(checkbox)
     b.isPlumberEditModeToggle = true;
     OptionToggle_SetFocused(b, false);
     return b
+end
+
+local function GenericFadeIn_OnUpdate(self, elapsed)
+    self.alpha = self.alpha + 8 * elapsed;
+    if self.alpha >= 1 then
+        self.alpha = 1;
+        self:SetScript("OnUpdate", nil);
+    end
+    self:SetAlpha(self.alpha);
 end
 
 local function CreateUI()
@@ -318,20 +309,18 @@ local function CreateUI()
     Slider.ScrollView = ScrollView;
 
 
-    local SelectionTexture = ScrollView:CreateTexture(nil, "ARTWORK");
-    SelectionTexture:SetSize(LEFT_SECTOR_WIDTH - PADDING, BUTTON_HEIGHT);
-    SelectionTexture:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/SelectionTexture");
-    SelectionTexture:SetVertexColor(1, 1, 1, 0.1);
-    SelectionTexture:SetBlendMode("ADD");
+    local SelectionTexture = CreateFrame("Frame", nil, ScrollView);
+    SelectionTexture:SetSize(LEFT_SECTOR_WIDTH, 64);
+    SelectionTexture.Texture = SelectionTexture:CreateTexture(nil, "ARTWORK");
+    SelectionTexture.Texture:SetAllPoints(true);
+    SelectionTexture.Texture:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/OptionEntryHighlight.png", nil, nil, "TRILINEAR");
+    API.DisableSharpening(SelectionTexture.Texture);
     SelectionTexture:Hide();
 
     ScrollView:SetOnScrollStartCallback(function()
         SelectionTexture:Hide();
     end);
 
-
-    local fromOffsetY = PADDING - SCROLL_FRAME_SHRINK; -- +headerHeight
-    local numButton = 0;
 
     parent.Checkboxs = {};
 
@@ -354,8 +343,13 @@ local function CreateUI()
         end
 
         SelectionTexture:ClearAllPoints();
-        SelectionTexture:SetPoint("LEFT", self, "LEFT", -PADDING, 0);
+        SelectionTexture:SetPoint("LEFT", self, "LEFT", -32, 0);
+        SelectionTexture:SetPoint("RIGHT", self, "RIGHT", 32, 0);
+        SelectionTexture.alpha = 0;
+        SelectionTexture:SetAlpha(0);
+        SelectionTexture:SetScript("OnUpdate", GenericFadeIn_OnUpdate);
         SelectionTexture:Show();
+
         if self.OptionToggle then
             OptionToggle_SetFocused(self.OptionToggle, true);
         end
@@ -377,7 +371,6 @@ local function CreateUI()
     local function Checkbox_OnClick(self)
         if self.dbKey and self.data.toggleFunc then
             self.data.toggleFunc( self:GetChecked() );
-            MainFrame:UpdateCategoryButtons();
         end
 
         if self.subOptionWidgets then
@@ -388,11 +381,16 @@ local function CreateUI()
             end
         end
 
-        self:UpdateChecked();
+        if self.data.subOptions then
+            MainFrame:UpdateCheckboxes();
+        else
+            self:UpdateChecked();
+        end
+
+        MainFrame:UpdateCategoryCount();
     end
 
     local function OptionToggle_OnEnter(self)
-        Checkbox_OnEnter(self:GetParent());
         self.Texture:SetVertexColor(1, 1, 1);
         local tooltip = GameTooltip;
         tooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -401,7 +399,6 @@ local function CreateUI()
     end
 
     local function OptionToggle_OnLeave(self)
-        Checkbox_OnLeave(self:GetParent());
         self.Texture:SetVertexColor(0.6, 0.6, 0.6);
         GameTooltip:Hide();
     end
@@ -435,6 +432,12 @@ local function CreateUI()
                 self.OptionToggle:Hide();
             end
         end
+
+        if self.parentDBKey and not GetDBBool(self.parentDBKey) then
+            self:Disable();
+        else
+            self:Enable();
+        end
     end
 
     local function SetupCheckboxFromData(checkbox, data)
@@ -452,6 +455,7 @@ local function CreateUI()
         obj:SetMotionScriptsWhileDisabled(true);
         obj.SetupCheckboxFromData = SetupCheckboxFromData;
         obj.UpdateChecked = Checkbox_UpdateChecked;
+        obj:SetHeight(BUTTON_HEIGHT)
         return obj
     end
 
@@ -529,19 +533,15 @@ function MainFrame:ShowUI(mode)
     self:Show();
     self.BackgroundFrame:SetShown(mode == "standalone");
     self:UpdateLayout();
-    self:UpdateButtonStates();
-
-    self:UpdateContent(true);
+    self:UpdateContent();
 end
 
-
-function MainFrame:UpdateCategoryButtons()
-
+function MainFrame:UpdateCheckboxes()
+    self.ScrollView:CallObjectMethod("Checkbox", "UpdateChecked");
 end
 
-function MainFrame:UpdateButtonStates()
-
-    self:UpdateCategoryButtons();
+function MainFrame:UpdateCategoryCount()
+    self.ScrollView:CallObjectMethod("CategoryButton", "UpdateCategoryButton");
 end
 
 function MainFrame:UpdateContent()
@@ -555,6 +555,7 @@ function MainFrame:UpdateContent()
     local categoryButtonWidth = LEFT_SECTOR_WIDTH - 2*PADDING;
     local checkboxWidth = LEFT_SECTOR_WIDTH - 2*PADDING - BUTTON_OFFSET_H;
     local buttonGap = OPTION_GAP_Y;
+    local subOptionOffset = 20;
     local offsetX = -4;
 
     for index, categoryInfo in ipairs(ControlCenter:GetValidModules()) do
@@ -585,6 +586,7 @@ function MainFrame:UpdateContent()
                     dataIndex = n,
                     templateKey = "Checkbox",
                     setupFunc = function(obj)
+                        obj.parentDBKey = nil;
                         obj:SetupCheckboxFromData(data);
                         obj:SetWidth(checkboxWidth);
                     end,
@@ -593,6 +595,27 @@ function MainFrame:UpdateContent()
                     offsetX = offsetX,
                 };
                 offsetY = bottom;
+
+                if data.subOptions then
+                    for _, v in ipairs(data.subOptions) do
+                        n = n + 1;
+                        top = offsetY;
+                        bottom = offsetY + buttonHeight + buttonGap;
+                        content[n] = {
+                            dataIndex = n,
+                            templateKey = "Checkbox",
+                            setupFunc = function(obj)
+                                obj.parentDBKey = data.dbKey;
+                                obj:SetupCheckboxFromData(v);
+                                obj:SetWidth(checkboxWidth - subOptionOffset);
+                            end,
+                            top = top,
+                            bottom = bottom,
+                            offsetX = offsetX + 0.5*subOptionOffset,
+                        };
+                        offsetY = bottom;
+                    end
+                end
             end
 
             offsetY = offsetY + DIFFERENT_CATEGORY_OFFSET;
