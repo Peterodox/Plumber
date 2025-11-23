@@ -104,6 +104,19 @@ function ControlCenter:GetValidModules()
         return self.validModules
     end
 
+
+    local settingsOpenTime = PlumberDB.settingsOpenTime;
+    local canShowNewTag;
+    if settingsOpenTime then
+        canShowNewTag = true;
+    else
+        settingsOpenTime = 0;
+        canShowNewTag = false;
+    end
+    settingsOpenTime = settingsOpenTime - 7 * 86400;    --NewFeatureMark gone after 7 days
+    PlumberDB.settingsOpenTime = time()
+
+
     local function SortFunc_Module(a, b)
         if a.categoryID ~= b.categoryID then
             return a.categoryID < b.categoryID
@@ -142,6 +155,11 @@ function ControlCenter:GetValidModules()
                 };
                 subModules = validModules[numCate].subModules;
             end
+
+            if canShowNewTag and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
+                data.isNewFeature = true;
+            end
+
             table.insert(subModules, data);
         end
     end
@@ -149,6 +167,7 @@ function ControlCenter:GetValidModules()
     self.validModules = validModules;
     return validModules
 end
+
 
 do  --Our SuperTracking system is unused
     function ControlCenter:ShouldShowNavigatorOnDreamseedPins()

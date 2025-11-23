@@ -42,6 +42,16 @@ local function CreateNewFeatureMark(button)
     newTag:SetSize(16, 16);
     newTag:SetPoint("RIGHT", button, "LEFT", -2, 0);
     newTag:Show();
+    return newTag
+end
+
+local function GenericFadeIn_OnUpdate(self, elapsed)
+    self.alpha = self.alpha + 8 * elapsed;
+    if self.alpha >= 1 then
+        self.alpha = 1;
+        self:SetScript("OnUpdate", nil);
+    end
+    self:SetAlpha(self.alpha);
 end
 
 
@@ -54,8 +64,10 @@ do
 
     function CategoryButtonMixin:OnLoad()
         self.collapsed = false;
-        self.childOptions = {};
         self:UpdateArrow();
+        self:SetScript("OnClick", self.OnClick);
+        self:SetScript("OnEnter", self.OnEnter);
+        self:SetScript("OnLeave", self.OnLeave);
     end
 
     function CategoryButtonMixin:UpdateArrow()
@@ -98,7 +110,15 @@ do
     end
 
     function CategoryButtonMixin:OnEnter()
+        self.HighlightFrame.alpha = 0;
+        self.HighlightFrame:SetScript("OnUpdate", GenericFadeIn_OnUpdate);
+        self.HighlightFrame:Show();
+    end
 
+    function CategoryButtonMixin:OnLeave()
+        self.HighlightFrame:SetScript("OnUpdate", nil);
+        self.HighlightFrame:Hide();
+        self.HighlightFrame:SetAlpha(0);
     end
 
     function CategoryButtonMixin:UpdateCategoryButton()
@@ -120,15 +140,15 @@ do
     end
 end
 
-
 local function CreateCategoryButton(parent)
     local b = CreateFrame("Button", nil, parent);
-
     b:SetSize(LEFT_SECTOR_WIDTH - 2*PADDING, BUTTON_HEIGHT);
+
+    local textureFile = "Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanelWidget.png";
 
     local disableSharpenging = true;
     local useTrilinearFilter = true;
-    b.BackgroundTextures = API.CreateThreeSliceTextures(b, "BACKGROUND", 16, 40, 8, "Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanelWidget.png", disableSharpenging, useTrilinearFilter);
+    b.BackgroundTextures = API.CreateThreeSliceTextures(b, "BACKGROUND", 16, 40, 8, textureFile, disableSharpenging, useTrilinearFilter);
     b.BackgroundTextures[1]:SetTexCoord(36/512, 68/512, 0, 80/512);
     b.BackgroundTextures[2]:SetTexCoord(68/512, 132/512, 0, 80/512);
     b.BackgroundTextures[3]:SetTexCoord(132/512, 164/512, 0, 80/512);
@@ -151,9 +171,21 @@ local function CreateCategoryButton(parent)
     b.Count:SetPoint("RIGHT", b, "RIGHT", -8, 0);
 
 
+    local HighlightFrame = CreateFrame("Frame", nil, b);
+    b.HighlightFrame = HighlightFrame;
+    HighlightFrame:SetUsingParentLevel(true);
+    HighlightFrame:SetSize(128, 40);
+    HighlightFrame:SetPoint("LEFT", b, "LEFT", -24, 0);
+    HighlightFrame:SetPoint("RIGHT", b, "RIGHT", 24, 0);
+    HighlightFrame.Texture = HighlightFrame:CreateTexture(nil, "ARTWORK");
+    HighlightFrame.Texture:SetAllPoints(true);
+    HighlightFrame.Texture:SetTexture(textureFile);
+    HighlightFrame.Texture:SetTexCoord(168/512, 296/512, 0, 80/512);
+    HighlightFrame:Hide();
+    HighlightFrame:SetAlpha(0);
+
+
     API.Mixin(b, CategoryButtonMixin);
-    b:SetScript("OnClick", b.OnClick);
-    b:SetScript("OnEnter", b.OnEnter);
 
     b:OnLoad();
 
@@ -191,27 +223,8 @@ local function CreateOptionToggle(checkbox)
     return b
 end
 
-local function GenericFadeIn_OnUpdate(self, elapsed)
-    self.alpha = self.alpha + 8 * elapsed;
-    if self.alpha >= 1 then
-        self.alpha = 1;
-        self:SetScript("OnUpdate", nil);
-    end
-    self:SetAlpha(self.alpha);
-end
 
 local function CreateUI()
-    local db = PlumberDB;
-    DB = db;
-
-    local settingsOpenTime = db.settingsOpenTime;
-    local isFirstMet;
-    if not settingsOpenTime then
-        settingsOpenTime = 0;
-        isFirstMet = true;
-    end
-    settingsOpenTime = settingsOpenTime - 7 * 86400;    --NewFeatureMark gone after 7 days
-
     local parent = MainFrame;
     local showCloseButton = true;
     local f = addon.CreateHeaderFrame(parent, showCloseButton);
@@ -445,6 +458,15 @@ local function CreateUI()
         checkbox.data = data;
         checkbox:SetLabel(data.name);
         checkbox:UpdateChecked();
+
+        if data.isNewFeature then
+            if not checkbox.NewTag then
+                checkbox.NewTag = CreateNewFeatureMark(checkbox);
+            end
+            checkbox.NewTag:Show();
+        elseif checkbox.NewTag then
+            checkbox.NewTag:Hide();
+        end
     end
 
     local function Checkbox_Create()
@@ -467,7 +489,11 @@ local function CreateUI()
         return obj
     end
 
-    ScrollView:AddTemplate("CategoryButton", CategoryButton_Create);
+    local function CategoryButton_Remove(obj)
+        obj:OnLeave();
+    end
+
+    ScrollView:AddTemplate("CategoryButton", CategoryButton_Create, CategoryButton_Remove);
 
 
     --Temporary "About" Tab
@@ -477,8 +503,6 @@ local function CreateUI()
     VersionText:SetJustifyH("RIGHT");
     VersionText:SetJustifyV("BOTTOM");
     VersionText:SetText(addon.VERSION_TEXT);
-
-    db.settingsOpenTime = time();
 
 
     function MainFrame:UpdateLayout()
@@ -545,7 +569,6 @@ function MainFrame:UpdateCategoryCount()
 end
 
 function MainFrame:UpdateContent()
-
     local top, bottom;
     local n = 0;
     local offsetY = 12;
