@@ -7,6 +7,7 @@ local ControlCenter = {};
 addon.ControlCenter = ControlCenter;
 ControlCenter.modules = {};
 ControlCenter.newDBKeys = {};
+ControlCenter.dbKeyXModule = {};
 
 
 local CategoryDefinition = {
@@ -72,6 +73,8 @@ function ControlCenter:InitializeModules()
             if enabled and isForceEnabled then
                 API.PrintMessage(string.format(L["New Feature Auto Enabled Format"], moduleData.name));     --Todo: click link to view detail |cff71d5ff
             end
+
+            self.dbKeyXModule[moduleData.dbKey] = moduleData;
         end
     end
 
@@ -166,6 +169,12 @@ function ControlCenter:GetValidModules()
 
     self.validModules = validModules;
     return validModules
+end
+
+function ControlCenter:GetModuleDescription(dbKey)
+    if dbKey and self.dbKeyXModule[dbKey] then
+        return self.dbKeyXModule[dbKey].description
+    end
 end
 
 

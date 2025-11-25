@@ -3,6 +3,102 @@
     <Script file="ScrollBar.lua"/>
     <Script file="SettingsPanel.lua"/>
 
+    <!--Script file="SettingsPanelNew.lua"/-->
+
+
+    <EditBox name="PlumberEditBoxArtTemplate" autoFocus="false" virtual="true">
+        <Size x="80" y="28"/>
+        <FontString inherits="GameFontNormal" justifyH="LEFT"/>
+        <TextInsets left="26" right="28"/>
+        <Color r="1" g="1" b="1"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="40" y="40"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <Texture parentKey="Magnifier" parentArray="SkinnableObjects">
+                    <Size x="20" y="20"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="14"/>
+                    </Anchors>
+                </Texture>
+                <FontString parentKey="Instruction" justifyH="LEFT" inherits="GameFontNormal">
+                    <Color r="0.5" g="0.5" b="0.5"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="26"/>
+                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-8"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button parentKey="ResetButton" hidden="true" parentArray="SkinnableObjects">
+                <Size x="28" y="28"/>
+                <Anchors>
+                    <Anchor point="RIGHT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <Texture parentKey="Texture" parentArray="SkinnableObjects">
+                            <Size x="20" y="20"/>
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Button>
+        </Frames>
+    </EditBox>
+
+    <Button name="PlumberSquareButtonArtTemplate" virtual="true">
+        <Size x="26" y="26"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="40" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Texture" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="24" y="24"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="Highlight" parentArray="SkinnableObjects" alphaMode="ADD">
+                    <Color r="0.4" g="0.2" b="0.1"/>
+                    <Size x="32" y="32"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Button>
 
     <Button name="PlumberTextureHighlightButtonTemplate" virtual="true">
         <Size x="16" y="16"/>

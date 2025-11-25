@@ -194,8 +194,8 @@ do
 
         local Background = f:CreateTexture(nil, "BACKGROUND");
         f.Background = Background;
-        Background:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, -4);
-        Background:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 4);
+        Background:SetPoint("TOPLEFT", f.pieces[1], "TOPLEFT", 4, -4);
+        Background:SetPoint("BOTTOMRIGHT", f.pieces[9], "BOTTOMRIGHT", -4, 4);
         Background:SetColorTexture(0.067, 0.040, 0.024);    --0.082, 0.047, 0.027
 
         f:SetTexture(tex);
