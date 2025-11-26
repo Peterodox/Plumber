@@ -25,6 +25,22 @@ L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map
 L["Toggle Plumber UI"] = "Toggle Plumber UI";
 L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
 
+--Settings Category
+L["SC Signature"] = "Signature Features";
+L["SC Current"] = "Current Content";
+L["SC ActionBar"] = "Action Bars";
+L["SC Chat"] = "Chat";
+L["SC Collection"] = "Collections";
+L["SC Instance"] = "Instances";
+L["SC Inventory"] = "Inventory";
+L["SC Loot"] = "Loot";
+L["SC Map"] = "Map";
+L["SC Profession"] = "Professions";
+L["SC Quest"] = "Quests";
+L["SC UnitFrame"] = "Unit Frame";
+L["SC Old"] = "Legacy Content";
+L["SC Uncategorized"] = "Uncategorized";
+
 
 --Module Categories
 --- order: 0
@@ -364,7 +380,7 @@ L["Unspent Knowledge Tooltip Format"] = "You have |cffffffff%s|r unspent Profess
 
 
 --TooltipProfessionKnowledge
-L["ModuleName TooltipProfessionKnowledge"] = L["ModuleName ProfessionsBook"];
+L["ModuleName TooltipProfessionKnowledge"] = "Tooltip: Unspent Knowledge";
 L["ModuleDescription TooltipProfessionKnowledge"] = "Show the number of your unspent Profession Specialization Knowledge.";
 L["Available Knowledge Format"] = "Available Knowledge: |cffffffff%s|r";
 

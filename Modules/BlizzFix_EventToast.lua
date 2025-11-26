@@ -300,6 +300,9 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 2,
+		categoryKeys = {
+			"Instance",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

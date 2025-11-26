@@ -120,6 +120,9 @@ do
         categoryID = 1,
         uiOrder = -10,
         moduleAddedTime = 1750160000,
+		categoryKeys = {
+			"Signature",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

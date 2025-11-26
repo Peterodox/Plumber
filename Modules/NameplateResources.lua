@@ -219,6 +219,9 @@ do
         categoryID = 2,
         uiOrder = 10,
         moduleAddedTime = 1734426000,
+		categoryKeys = {
+			"UnitFrame",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

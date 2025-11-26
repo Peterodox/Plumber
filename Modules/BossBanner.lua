@@ -179,6 +179,9 @@ do  --Module Registry
         categoryID = 5,
         uiOrder = 1,
         moduleAddedTime = 1753100000,
+		categoryKeys = {
+			"Loot",
+		},
 
         subOptions = {
             {

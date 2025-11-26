@@ -556,6 +556,9 @@ do	--Module Registry
         categoryID = 2,
         uiOrder = 20,
         moduleAddedTime = 1728990000,
+		categoryKeys = {
+			"Inventory",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

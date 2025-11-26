@@ -219,6 +219,9 @@ do
         categoryID = 1,
         uiOrder = 1170,
         moduleAddedTime = 1744520000,
+		categoryKeys = {
+			"Map",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

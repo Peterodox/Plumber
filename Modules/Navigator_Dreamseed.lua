@@ -385,6 +385,9 @@ do
         moduleAddedTime = 1702258000,
         categoryID = 10020000,
         uiOrder = 4,
+		categoryKeys = {
+			"Old",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

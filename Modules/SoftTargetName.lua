@@ -710,6 +710,9 @@ do  --Module Registery
         uiOrder = 9,
         optionToggleFunc = OptionToggle_OnClick,
         moduleAddedTime = 1756400000,
+		categoryKeys = {
+			"UnitFrame",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

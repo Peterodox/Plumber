@@ -356,6 +356,9 @@ do
         categoryID = 1,
         uiOrder = 1160,
         moduleAddedTime = 1732700000,
+		categoryKeys = {
+			"Chat",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

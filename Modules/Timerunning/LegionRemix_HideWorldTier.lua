@@ -74,6 +74,9 @@ do
         uiOrder = 5,
         moduleAddedTime = 1760500000,
         timerunningSeason = 2,
+		categoryKeys = {
+			"Current",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

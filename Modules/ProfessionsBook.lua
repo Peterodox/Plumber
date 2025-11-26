@@ -319,6 +319,9 @@ do
         categoryID = 1,
         uiOrder = 1170,
         moduleAddedTime = 1740755000,
+		categoryKeys = {
+			"Profession",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);
@@ -470,6 +473,9 @@ do  --Tooltip Module
         categoryID = 3,
         uiOrder = 1152,
         moduleAddedTime = 1736940000,
+		categoryKeys = {
+			"Profession",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

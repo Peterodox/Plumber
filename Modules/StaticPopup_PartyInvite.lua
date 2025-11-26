@@ -346,6 +346,7 @@ do
         uiOrder = 1146,
         moduleAddedTime = 1735040000,
         optionToggleFunc = OptionToggle_OnClick,
+        categoryKeys = {"Instance"},
     };
 
     addon.ControlCenter:AddModule(moduleData);

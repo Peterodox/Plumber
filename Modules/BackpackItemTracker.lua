@@ -2608,6 +2608,9 @@ do
         categoryID = 1,
         uiOrder = 1,
         optionToggleFunc = SettingsFrame_ToggleUIAtCursorPosition,
+		categoryKeys = {
+			"Inventory",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

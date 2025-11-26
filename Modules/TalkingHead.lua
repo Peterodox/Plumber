@@ -779,6 +779,10 @@ do
         exitEditMode = function()
             NewTalkingHead:ExitEditMode();
         end,
+
+		categoryKeys = {
+			"Signature",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

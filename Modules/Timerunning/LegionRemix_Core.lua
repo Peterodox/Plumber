@@ -1811,6 +1811,9 @@ do	--Module Registry
         uiOrder = 0,
         moduleAddedTime = 1759900000,
 		timerunningSeason = 2,
+		categoryKeys = {
+			"Current",
+		},
 
         subOptions = {
             {

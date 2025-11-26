@@ -2012,6 +2012,10 @@ do  --Module Registry
         exitEditMode = function()
             MainFrame:ExitEditMode();
         end,
+
+		categoryKeys = {
+			"Signature", "Loot",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

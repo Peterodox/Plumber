@@ -73,6 +73,10 @@ do
         categoryID = 2,
         uiOrder = 15,
         moduleAddedTime = 1728990000,
+
+		categoryKeys = {
+			"Profession",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

@@ -702,6 +702,9 @@ do  --Master Switch
         categoryID = 1,
         uiOrder = 1101,
         moduleAddedTime = 1721730000,
+		categoryKeys = {
+			"Map",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

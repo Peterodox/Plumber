@@ -479,6 +479,9 @@ do  --Module Registry: Delves_SeasonProgress
         categoryID = 1,
         uiOrder = 1105,
         moduleAddedTime = 1724100000,
+		categoryKeys = {
+			"Instance",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

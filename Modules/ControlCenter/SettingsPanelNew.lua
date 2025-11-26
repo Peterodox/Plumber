@@ -2,6 +2,7 @@ local _, addon = ...
 local L = addon.L;
 local API = addon.API;
 local ControlCenter = addon.ControlCenter;
+local GetDBBool = addon.GetDBBool;
 
 
 local Def = {
@@ -9,6 +10,7 @@ local Def = {
     ButtonSize = 28,
     WidgetGap = 14,
     PageHeight = 576,
+    CategoryGap = 40,
 
 
     TextColorNormal = {215/255, 192/255, 163/255},
@@ -17,7 +19,7 @@ local Def = {
 };
 
 
-local MainFrame = CreateFrame("Frame", nil, UIParent);
+local MainFrame = CreateFrame("Frame", nil, nil);  --UIParent
 local SearchBox;
 local FilterButton;
 local CategoryHighlight;
@@ -71,9 +73,14 @@ do
         self:SetAlpha(self.alpha);
     end
 
-    function FadeMixin:FadeIn()
-        self.alpha = self:GetAlpha();
-        self:SetScript("OnUpdate", FadeIn_OnUpdate);
+    function FadeMixin:FadeIn(instant)
+        if instant then
+            self.alpha = 1;
+            self:SetScript("OnUpdate", nil);
+        else
+            self.alpha = self:GetAlpha();
+            self:SetScript("OnUpdate", FadeIn_OnUpdate);
+        end
         self:Show();
     end
 
@@ -339,19 +346,35 @@ do
         SetTextColor(self.Label, Def.TextColorNormal);
     end
 
-    function CategoryButtonMixin:SetCategory(text)
+    function CategoryButtonMixin:SetCategory(text, scrollOffset)
         self.Label:SetText(text);
         self.cateogoryName = string.lower(text);
+        self.scrollOffset = scrollOffset;
     end
 
     function CategoryButtonMixin:OnClick()
+        MainFrame.ScrollView:ScrollTo(self.scrollOffset);
+    end
 
+    function CategoryButtonMixin:OnMouseDown()
+        if self:IsEnabled() then
+            self.Label:SetPoint("LEFT", self, "LEFT", self.labelOffset + 1, -1);
+        end
+    end
+
+    function CategoryButtonMixin:OnMouseUp()
+        self:ResetOffset();
+    end
+
+    function CategoryButtonMixin:ResetOffset()
+        self.Label:SetPoint("LEFT", self, "LEFT", self.labelOffset, 0);
     end
 
     function CreateCategoryButton(parent)
         local f = CreateFrame("Button", nil, parent);
         Mixin(f, CategoryButtonMixin);
         f:SetSize(120, 26);
+        f.labelOffset = 9;
         f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         f.Label:SetJustifyH("LEFT");
         f.Label:SetPoint("LEFT", f, "LEFT", 9, 0);
@@ -360,6 +383,8 @@ do
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
         f:SetScript("OnClick", f.OnClick);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
 
         return f
     end
@@ -373,12 +398,13 @@ do
     function EntryButtonMixin:SetData(moduleData)
         self.Label:SetText(moduleData.name);
         self.dbKey = moduleData.dbKey;
+        self:UpdateState();
     end
 
     function EntryButtonMixin:OnEnter()
         MainFrame:HighlightButton(self);
         SetTextColor(self.Label, Def.TextColorHighlight);
-        MainFrame:ShowFeaturePreview(self.dbKey);
+        MainFrame:ShowFeaturePreview(self.dbKey, self.parentDBKey);
     end
 
     function EntryButtonMixin:OnLeave()
@@ -398,6 +424,14 @@ do
 
     end
 
+    function EntryButtonMixin:UpdateState()
+        if GetDBBool(self.dbKey) then
+            SetTexCoord(self.Box, 736, 784, 16, 64);
+        else
+            SetTexCoord(self.Box, 688, 736, 16, 64);
+        end
+    end
+
 
     function CreateSettingsEntry(parent)
         local f = CreateFrame("Button", nil, parent, "PlumberSettingsPanelEntryTemplate");
@@ -409,6 +443,10 @@ do
         f:SetScript("OnDisable", f.OnDisable);
         f:SetScript("OnClick", f.OnClick);
         SetTextColor(f.Label, Def.TextColorNormal);
+
+        f.Box.useTrilinearFilter = true;
+        SkinObjects(f, Def.TextureFile);
+
         return f
     end
 end
@@ -453,8 +491,8 @@ end
 
 
 do  --Right Section
-    function MainFrame:ShowFeaturePreview(dbKey)
-        self.FeaturePreview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..dbKey);
+    function MainFrame:ShowFeaturePreview(dbKey, parentDBKey)
+        self.FeaturePreview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..(parentDBKey or dbKey));
         self.FeatureDescription:SetText(ControlCenter:GetModuleDescription(dbKey));
     end
 end
@@ -465,7 +503,7 @@ do  --Search
         if text then
             text = string.lower(text);
             local find = string.find;
-            for _, button in ipairs(self.CategoryButtons) do
+            for _, button in self.primaryCategoryPool:EnumerateActive() do
                 if find(button.cateogoryName, text) then
                     button:FadeIn();
                 else
@@ -473,7 +511,7 @@ do  --Search
                 end
             end
         else
-            for _, button in ipairs(self.CategoryButtons) do
+            for _, button in self.primaryCategoryPool:EnumerateActive() do
                 button:FadeIn();
             end
         end
@@ -485,19 +523,27 @@ do  --Centeral
     function MainFrame:RefreshContent()
         local top, bottom;
         local n = 0;
-        local offsetY = Def.ButtonSize;
+        local fromOffsetY = Def.ButtonSize;
+        local offsetY = fromOffsetY;
         local content = {};
 
         local buttonHeight = Def.ButtonSize;
-        local categoryGap = buttonHeight;
+        local categoryGap = Def.CategoryGap;
         local buttonGap = 0;
         local subOptionOffset = Def.ButtonSize;
         local offsetX = 0;
 
-        for index, categoryInfo in ipairs(ControlCenter:GetValidModules()) do
+        self.primaryCategoryPool:ReleaseAll();
+
+        for index, categoryInfo in ipairs(ControlCenter:GetNewSortedModules()) do   --ControlCenter:GetValidModules()
             n = n + 1;
             top = offsetY;
             bottom = offsetY + buttonHeight + buttonGap;
+
+            local categoryButton = self.primaryCategoryPool:Acquire();
+            categoryButton:SetCategory(categoryInfo.categoryName, top - fromOffsetY);
+            categoryButton:SetPoint("TOPLEFT", self.LeftSection, self.primaryCategoryPool.offsetX, self.primaryCategoryPool.leftListFromY - (index - 1) * Def.ButtonSize);
+
             content[n] = {
                 dataIndex = n,
                 templateKey = "Header",
@@ -510,7 +556,7 @@ do  --Centeral
             };
             offsetY = bottom;
 
-            for _, data in ipairs(categoryInfo.subModules) do
+            for _, data in ipairs(categoryInfo.modules) do
                 n = n + 1;
                 top = offsetY;
                 bottom = offsetY + buttonHeight + buttonGap;
@@ -557,10 +603,6 @@ do  --Centeral
 end
 
 
-local CategoryDef = {
-    "Signature", "Current Content", "Action Bars", "Chat", "Collections", "Instances", "Inventory", "Loot", "Map", "Professions", "Quests", "Unit Frame",
-};
-
 
 local function CreateUI()
     local function CreateBG(frame, a)
@@ -577,11 +619,13 @@ local function CreateUI()
     local centralSection = API.Round((height * scalerWidth) * ratio_Center);
     MainFrame:SetSize(2 * sideSectionWidth + centralSection, Def.PageHeight);
     MainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+    MainFrame:SetScale(UIParent:GetEffectiveScale());
 
 
     local baseFrameLevel = MainFrame:GetFrameLevel();
 
     local LeftSection = CreateFrame("Frame", nil, MainFrame);
+    MainFrame.LeftSection = LeftSection;
     LeftSection:SetPoint("TOPLEFT", MainFrame, "TOPLEFT", 0, 0);
     LeftSection:SetPoint("BOTTOMLEFT", MainFrame, "BOTTOMLEFT", 0, 0);
     LeftSection:SetWidth(sideSectionWidth);
@@ -589,12 +633,14 @@ local function CreateUI()
 
 
     local RightSection = CreateFrame("Frame", nil, MainFrame);
+    MainFrame.RightSection = RightSection;
     RightSection:SetPoint("TOPRIGHT", MainFrame, "TOPRIGHT", 0, 0);
     RightSection:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
     RightSection:SetWidth(sideSectionWidth);
 
 
     local CentralSection = CreateFrame("Frame", nil, MainFrame);
+    MainFrame.CentralSection = CentralSection;
     CentralSection:SetPoint("TOPLEFT", LeftSection, "TOPRIGHT", 0, 0);
     CentralSection:SetPoint("BOTTOMRIGHT", RightSection, "BOTTOMLEFT", 0, 0);
 
@@ -617,19 +663,27 @@ local function CreateUI()
         DivH:SetTexture(Def.TextureFile);
         SetTexCoord(DivH, 416, 672, 16, 64);
 
+
         leftListFromY = leftListFromY + Def.WidgetGap;
         local categoryButtonWidth = sideSectionWidth - 2*Def.WidgetGap;
-        MainFrame.CategoryButtons = {};
-        for i, name in ipairs(CategoryDef) do
-            local button = CreateCategoryButton(LeftSection);
-            button:SetSize(categoryButtonWidth, Def.ButtonSize);
-            button:SetPoint("TOPLEFT", LeftSection, "TOPLEFT", Def.WidgetGap, -leftListFromY - (i - 1) * Def.ButtonSize);
-            button:SetCategory(name);
-            MakeFadingObject(button);
-            button:SetFadeInAlpha(1);
-            button:SetFadeOutAlpha(0.5);
-            MainFrame.CategoryButtons[i] = button;
+
+        local function Category_Create()
+            local obj = CreateCategoryButton(LeftSection);
+            obj:SetSize(categoryButtonWidth, Def.ButtonSize);
+            MakeFadingObject(obj);
+            obj:SetFadeInAlpha(1);
+            obj:SetFadeOutAlpha(0.5);
+            return obj
         end
+
+        local function Category_Acquire(obj)
+            obj:FadeIn(true);
+            obj:ResetOffset();
+        end
+
+        MainFrame.primaryCategoryPool = addon.LandingPageUtil.CreateObjectPool(Category_Create, Category_Acquire);
+        MainFrame.primaryCategoryPool.leftListFromY = -leftListFromY;
+        MainFrame.primaryCategoryPool.offsetX = Def.WidgetGap;
 
 
         CategoryHighlight = CreateFrame("Frame", nil, LeftSection);
@@ -711,23 +765,23 @@ local function CreateUI()
         Background:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
 
 
-        local Slider = ControlCenter.CreateScrollBarWithDynamicSize(CentralSection);
-        Slider:SetPoint("TOP", CentralSection, "TOPRIGHT", 0, -Def.WidgetGap)
-        Slider:SetPoint("BOTTOM", CentralSection, "BOTTOMRIGHT", 0, Def.WidgetGap);
-        Slider:SetFrameLevel(20);
-        MainFrame.ScrollBar = Slider;
-        Slider:UpdateThumbRange();
+        local ScrollBar = ControlCenter.CreateScrollBarWithDynamicSize(CentralSection);
+        ScrollBar:SetPoint("TOP", CentralSection, "TOPRIGHT", 0, -0.5*Def.WidgetGap)
+        ScrollBar:SetPoint("BOTTOM", CentralSection, "BOTTOMRIGHT", 0, 0.5*Def.WidgetGap);
+        ScrollBar:SetFrameLevel(20);
+        MainFrame.ScrollBar = ScrollBar;
+        ScrollBar:UpdateThumbRange();
 
 
-        local ScrollView = API.CreateScrollView(CentralSection, Slider);
+        local ScrollView = API.CreateScrollView(CentralSection, ScrollBar);
         MainFrame.ScrollView = ScrollView;
         ScrollView:SetPoint("TOPLEFT", CentralSection, "TOPLEFT", 0, -2);
         ScrollView:SetPoint("BOTTOMRIGHT", CentralSection, "BOTTOMRIGHT", 0, 2);
         ScrollView:SetStepSize(Def.ButtonSize * 2);
         ScrollView:OnSizeChanged();
         ScrollView:EnableMouseBlocker(true);
-        ScrollView:SetBottomOvershoot(Def.ButtonSize);
-        Slider.ScrollView = ScrollView;
+        ScrollView:SetBottomOvershoot(Def.CategoryGap);
+        ScrollBar.ScrollView = ScrollView;
 
 
         local centerButtonWidth = API.Round(centralSection - 2*Def.ButtonSize);
@@ -758,4 +812,4 @@ local function CreateUI()
     NineSlice:CoverParent(-24);
 end
 
-C_Timer.After(0, CreateUI);
+C_Timer.After(1, CreateUI);

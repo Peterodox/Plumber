@@ -214,6 +214,9 @@ do
         categoryID = 3,
         uiOrder = 10,
         moduleAddedTime = 1736940000,
+		categoryKeys = {
+			"Inventory",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

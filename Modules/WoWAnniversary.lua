@@ -818,6 +818,10 @@ do
         moduleAddedTime = 1763300000,
         validityCheck = ValidityCheck,
         optionToggleFunc = OptionToggle_OnClick,
+
+		categoryKeys = {
+			"Collection",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

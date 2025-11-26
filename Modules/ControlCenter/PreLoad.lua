@@ -34,6 +34,13 @@ local CategoryDefinition = {
 };
 
 
+local PrimaryCategory = {
+    "Signature", "Current",
+    "ActionBar", "Chat", "Collection", "Instance", "Inventory", "Loot", "Map", "Profession", "Quest", "UnitFrame", "Old",
+    "Uncategorized",
+};
+
+
 function ControlCenter:InitializeModules()
     --Initial Enable/Disable Modules
     local db = PlumberDB;
@@ -191,6 +198,83 @@ do  --Our SuperTracking system is unused
 end
 
 
+do  --Settings Panel Revamp
+    local SortFunc = {};
+
+    function SortFunc.Alphabet(a, b)
+        return a.name < b.name
+    end
+
+    function ControlCenter:GetPrimaryCategoryName(categoryKey)
+        return L["SC "..categoryKey] or "Unknown"
+    end
+
+    function ControlCenter:GetNewSortedModules()
+        if self.sortedModules then
+            return self.sortedModules
+        end
+
+
+        local settingsOpenTime = PlumberDB.settingsOpenTime;
+        local canShowNewTag;
+        if settingsOpenTime then
+            canShowNewTag = true;
+        else
+            settingsOpenTime = 0;
+            canShowNewTag = false;
+        end
+        settingsOpenTime = settingsOpenTime - 7 * 86400;    --NewFeatureMark gone after 7 days
+        PlumberDB.settingsOpenTime = time()
+
+
+        local tinsert = table.insert;
+        local tbl = {};
+        local numValid = 0;
+
+        local categoryXModule = {};
+
+        for i, data in ipairs(self.modules) do
+            if (not data.validityCheck) or (data.validityCheck()) then
+                numValid = numValid + 1;
+
+                if canShowNewTag and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
+                    data.isNewFeature = true;
+                end
+
+                if not data.categoryKeys then
+                    data.categoryKeys = {"Uncategorized"};
+                end
+
+                for _, cateKey in ipairs(data.categoryKeys) do
+                    if not categoryXModule[cateKey] then
+                        categoryXModule[cateKey] = {};
+                    end
+
+                    tinsert(categoryXModule[cateKey], data);
+                end
+            end
+        end
+
+        for cateKey, v in pairs(categoryXModule) do
+            table.sort(v, SortFunc.Alphabet);
+        end
+
+        for _, cateKey in ipairs(PrimaryCategory) do
+            if categoryXModule[cateKey] and #categoryXModule[cateKey] > 0 then
+                tinsert(tbl, {
+                    key = cateKey,
+                    categoryName = self:GetPrimaryCategoryName(cateKey),
+                    modules = categoryXModule[cateKey],
+                });
+            end
+        end
+
+        self.sortedModules = tbl;
+        return tbl
+    end
+end
+
+
 do  --Option: Always Enable New Features
     addon.CallbackRegistry:Register("NewDBKeysAdded", function(newDBKeys)
         ControlCenter.newDBKeys = newDBKeys;
@@ -209,5 +293,5 @@ do  --Option: Always Enable New Features
         uiOrder = 1,
     };
 
-    ControlCenter:AddModule(moduleData);
+    --ControlCenter:AddModule(moduleData);
 end

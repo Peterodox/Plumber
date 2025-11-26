@@ -103,6 +103,9 @@ do
         toggleFunc = EnableModule,
         categoryID = 2,
         uiOrder = 2,
+		categoryKeys = {
+			"Quest",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

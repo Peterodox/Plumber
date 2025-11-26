@@ -80,6 +80,9 @@ do  --Module Registry
         categoryID = 2,
         uiOrder = 25,
         moduleAddedTime = 1758032000,
+		categoryKeys = {
+			"Instance",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

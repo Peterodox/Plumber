@@ -497,6 +497,9 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 100,
+		categoryKeys = {
+			"Inventory",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);

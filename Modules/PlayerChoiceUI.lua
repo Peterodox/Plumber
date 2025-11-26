@@ -1008,6 +1008,9 @@ do
         toggleFunc = EnableModule,
         categoryID = 1002,
         uiOrder = 3,
+		categoryKeys = {
+			"Old",
+		},
     };
 
     addon.ControlCenter:AddModule(moduleData);
