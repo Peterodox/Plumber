@@ -531,11 +531,7 @@ local function CreateUI()
             dividerTop:SetShown(false);
             dividerMiddle:SetShown(false);
             dividerBottom:SetShown(false);
-            local range = self.ScrollView:GetScrollRange();
-            local viewHeight = self.ScrollView:GetHeight();
-            self.ScrollBar:SetVisibleExtentPercentage(viewHeight / (viewHeight + range));
-            self.ScrollBar:UpdateThumbRange();
-            self.ScrollBar:SetValueByRatio(self.ScrollBar.ratio);
+            self.ScrollBar:UpdateVisibleExtentPercentage();
         else
             self.ScrollBar:Hide();
             dividerTop:SetShown(true);

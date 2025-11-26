@@ -13,6 +13,7 @@ local Def = {
 
     TextColorNormal = {215/255, 192/255, 163/255},
     TextColorHighlight = {1, 1, 1},
+    TextColorNonInteractable = {138/255, 118/255, 93/255},
 };
 
 
@@ -22,16 +23,16 @@ local FilterButton;
 local CategoryHighlight;
 
 
-local function SkinObjects(objects, texture)
-    for _, obj in ipairs(objects) do
-        if obj.SkinnableObjects then
-            SkinObjects(obj.SkinnableObjects, texture);
-        elseif obj.SetTexture then
-            if obj.useTrilinearFilter then
-                obj:SetTexture(texture, nil, nil, "TRILINEAR");
-            else
-                obj:SetTexture(texture);
-            end
+local function SkinObjects(obj, texture)
+    if obj.SkinnableObjects then
+        for _, _obj in ipairs(obj.SkinnableObjects) do
+            SkinObjects(_obj, texture)
+        end
+    elseif obj.SetTexture then
+        if obj.useTrilinearFilter then
+            obj:SetTexture(texture, nil, nil, "TRILINEAR");
+        else
+            obj:SetTexture(texture);
         end
     end
 end
@@ -114,7 +115,7 @@ do
     local StringTrim = API.StringTrim;
 
     function SearchBoxMixin:SetTexture(texture)
-        SkinObjects(self.SkinnableObjects, texture);
+        SkinObjects(self, texture);
     end
 
     function SearchBoxMixin:SetInstruction(text)
@@ -309,7 +310,7 @@ do
         Mixin(f, FilterButtonMixin);
         f:SetSize(Def.ButtonSize, Def.ButtonSize);
 
-        SkinObjects(f.SkinnableObjects, Def.TextureFile);
+        SkinObjects(f, Def.TextureFile);
         SetTexCoord(f.Background, 192, 272, 0, 80);
         SetTexCoord(f.Texture, 272, 320, 16, 64);
         SetTexCoord(f.Highlight, 368, 416, 16, 64);
@@ -329,17 +330,17 @@ do
     local CategoryButtonMixin = {};
 
     function CategoryButtonMixin:OnEnter()
-        MainFrame:HighlightCategoryButton(self);
-        SetTextColor(self.Text, Def.TextColorHighlight);
+        MainFrame:HighlightButton(self);
+        SetTextColor(self.Label, Def.TextColorHighlight);
     end
 
     function CategoryButtonMixin:OnLeave()
-        MainFrame:HighlightCategoryButton();
-        SetTextColor(self.Text, Def.TextColorNormal);
+        MainFrame:HighlightButton();
+        SetTextColor(self.Label, Def.TextColorNormal);
     end
 
     function CategoryButtonMixin:SetCategory(text)
-        self.Text:SetText(text);
+        self.Label:SetText(text);
         self.cateogoryName = string.lower(text);
     end
 
@@ -351,10 +352,10 @@ do
         local f = CreateFrame("Button", nil, parent);
         Mixin(f, CategoryButtonMixin);
         f:SetSize(120, 26);
-        f.Text = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        f.Text:SetJustifyH("LEFT");
-        f.Text:SetPoint("LEFT", f, "LEFT", 9, 0);
-        SetTextColor(f.Text, Def.TextColorNormal);
+        f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Label:SetJustifyH("LEFT");
+        f.Label:SetPoint("LEFT", f, "LEFT", 9, 0);
+        SetTextColor(f.Label, Def.TextColorNormal);
 
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
@@ -365,13 +366,85 @@ do
 end
 
 
+local CreateSettingsEntry;
+do
+    local EntryButtonMixin = {};
+
+    function EntryButtonMixin:SetData(moduleData)
+        self.Label:SetText(moduleData.name);
+        self.dbKey = moduleData.dbKey;
+    end
+
+    function EntryButtonMixin:OnEnter()
+        MainFrame:HighlightButton(self);
+        SetTextColor(self.Label, Def.TextColorHighlight);
+        MainFrame:ShowFeaturePreview(self.dbKey);
+    end
+
+    function EntryButtonMixin:OnLeave()
+        MainFrame:HighlightButton();
+        SetTextColor(self.Label, Def.TextColorNormal);
+    end
+
+    function EntryButtonMixin:OnEnable()
+
+    end
+
+    function EntryButtonMixin:OnDisable()
+
+    end
+
+    function EntryButtonMixin:OnClick()
+
+    end
+
+
+    function CreateSettingsEntry(parent)
+        local f = CreateFrame("Button", nil, parent, "PlumberSettingsPanelEntryTemplate");
+        Mixin(f, EntryButtonMixin);
+        f:SetMotionScriptsWhileDisabled(true);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnEnable", f.OnEnable);
+        f:SetScript("OnDisable", f.OnDisable);
+        f:SetScript("OnClick", f.OnClick);
+        SetTextColor(f.Label, Def.TextColorNormal);
+        return f
+    end
+end
+
+
+local CreateSettingsHeader;
+do
+    local HeaderMixin = {};
+
+    function HeaderMixin:SetText(text)
+        self.Label:SetText(text)
+    end
+
+
+    function CreateSettingsHeader(parent)
+        local f = CreateFrame("Frame", nil, parent, "PlumberSettingsPanelHeaderTemplate");
+        Mixin(f, HeaderMixin);
+        SetTextColor(f.Label, Def.TextColorNonInteractable);
+
+        SkinObjects(f, Def.TextureFile);
+        SetTexCoord(f.Left, 416, 456, 80, 120);
+        SetTexCoord(f.Right, 456, 736, 80, 120);
+
+        return f
+    end
+end
+
+
 do  --Left Section
-    function MainFrame:HighlightCategoryButton(button)
+    function MainFrame:HighlightButton(button)
         CategoryHighlight:Hide();
         CategoryHighlight:ClearAllPoints();
         if button then
             CategoryHighlight:SetAlpha(0);
-            CategoryHighlight:SetPoint("CENTER", button, "CENTER", 0, 0);
+            CategoryHighlight:SetPoint("LEFT", button, "LEFT", 0, 0);
+            CategoryHighlight:SetPoint("RIGHT", button, "RIGHT", 0, 0);
             CategoryHighlight:SetParent(button);
             CategoryHighlight:FadeIn();
         end
@@ -408,6 +481,82 @@ do  --Search
 end
 
 
+do  --Centeral
+    function MainFrame:RefreshContent()
+        local top, bottom;
+        local n = 0;
+        local offsetY = Def.ButtonSize;
+        local content = {};
+
+        local buttonHeight = Def.ButtonSize;
+        local categoryGap = buttonHeight;
+        local buttonGap = 0;
+        local subOptionOffset = Def.ButtonSize;
+        local offsetX = 0;
+
+        for index, categoryInfo in ipairs(ControlCenter:GetValidModules()) do
+            n = n + 1;
+            top = offsetY;
+            bottom = offsetY + buttonHeight + buttonGap;
+            content[n] = {
+                dataIndex = n,
+                templateKey = "Header",
+                setupFunc = function(obj)
+                    obj:SetText(categoryInfo.categoryName);
+                end,
+                top = top,
+                bottom = bottom,
+                offsetX = offsetX,
+            };
+            offsetY = bottom;
+
+            for _, data in ipairs(categoryInfo.subModules) do
+                n = n + 1;
+                top = offsetY;
+                bottom = offsetY + buttonHeight + buttonGap;
+                content[n] = {
+                    dataIndex = n,
+                    templateKey = "Entry",
+                    setupFunc = function(obj)
+                        obj.parentDBKey = nil;
+                        obj:SetData(data);
+                    end,
+                    top = top,
+                    bottom = bottom,
+                    offsetX = offsetX,
+                };
+                offsetY = bottom;
+
+                if data.subOptions then
+                    for _, v in ipairs(data.subOptions) do
+                        n = n + 1;
+                        top = offsetY;
+                        bottom = offsetY + buttonHeight + buttonGap;
+                        content[n] = {
+                            dataIndex = n,
+                            templateKey = "Entry",
+                            setupFunc = function(obj)
+                                obj.parentDBKey = data.dbKey;
+                                obj:SetData(v);
+                            end,
+                            top = top,
+                            bottom = bottom,
+                            offsetX = offsetX + 0.5*subOptionOffset,
+                        };
+                        offsetY = bottom;
+                    end
+                end
+            end
+            offsetY = offsetY + categoryGap;
+        end
+
+        local retainPosition = true;
+        self.ScrollView:SetContent(content, retainPosition);
+        self.ScrollBar:UpdateVisibleExtentPercentage();
+    end
+end
+
+
 local CategoryDef = {
     "Signature", "Current Content", "Action Bars", "Chat", "Collections", "Instances", "Inventory", "Loot", "Map", "Professions", "Quests", "Unit Frame",
 };
@@ -425,29 +574,29 @@ local function CreateUI()
     local scalerWidth = 1/ 0.85;
     local ratio_Center = 0.618;
     local sideSectionWidth = API.Round((height * scalerWidth) * (1 - ratio_Center));
-    local centerSectionWidth = API.Round((height * scalerWidth) * ratio_Center);
-    MainFrame:SetSize(2 * sideSectionWidth + centerSectionWidth, Def.PageHeight);
+    local centralSection = API.Round((height * scalerWidth) * ratio_Center);
+    MainFrame:SetSize(2 * sideSectionWidth + centralSection, Def.PageHeight);
     MainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
 
+
+    local baseFrameLevel = MainFrame:GetFrameLevel();
 
     local LeftSection = CreateFrame("Frame", nil, MainFrame);
     LeftSection:SetPoint("TOPLEFT", MainFrame, "TOPLEFT", 0, 0);
     LeftSection:SetPoint("BOTTOMLEFT", MainFrame, "BOTTOMLEFT", 0, 0);
     LeftSection:SetWidth(sideSectionWidth);
-    CreateBG(LeftSection, 0.1);
+    LeftSection:SetFrameLevel(baseFrameLevel + 10);
 
 
     local RightSection = CreateFrame("Frame", nil, MainFrame);
     RightSection:SetPoint("TOPRIGHT", MainFrame, "TOPRIGHT", 0, 0);
     RightSection:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
     RightSection:SetWidth(sideSectionWidth);
-    CreateBG(RightSection, 0.1);
 
 
-    local CenterSection = CreateFrame("Frame", nil, MainFrame);
-    CenterSection:SetPoint("TOPLEFT", LeftSection, "TOPRIGHT", 0, 0);
-    CenterSection:SetPoint("BOTTOMRIGHT", RightSection, "BOTTOMLEFT", 0, 0);
-    CreateBG(CenterSection, 0.08);
+    local CentralSection = CreateFrame("Frame", nil, MainFrame);
+    CentralSection:SetPoint("TOPLEFT", LeftSection, "TOPRIGHT", 0, 0);
+    CentralSection:SetPoint("BOTTOMRIGHT", RightSection, "BOTTOMLEFT", 0, 0);
 
 
     --LeftSection
@@ -495,6 +644,31 @@ local function CreateUI()
         SetTexCoord(CategoryHighlight.BackgroundTextures[3], 160, 192, 80, 160);
         MakeFadingObject(CategoryHighlight);
         CategoryHighlight:SetFadeInAlpha(1);
+
+
+        -- 6-piece Background
+        local function CreatePiece(point, relativeTo, relativePoint, offsetX, offsetY, l, r, t, b)
+            local tex = LeftSection:CreateTexture(nil, "BACKGROUND");
+            tex:SetTexture(Def.TextureFile);
+            tex:SetPoint(point, relativeTo, relativePoint, offsetX, offsetY);
+            SetTexCoord(tex, l, r, t, b);
+            API.DisableSharpening(tex);
+            return tex
+        end
+
+        local r1 = CreatePiece("TOP", LeftSection, "TOPRIGHT", 0, 0,    280, 360, 176, 240);
+        r1:SetSize(40, 32);
+        local r3 = CreatePiece("BOTTOM", LeftSection, "BOTTOMRIGHT", 0, 0,    280, 360, 832, 896);
+        r3:SetSize(40, 32);
+        local r2 = CreatePiece("TOPLEFT", r1, "BOTTOMLEFT", 0, 0,    280, 360, 240, 832);
+        r2:SetPoint("BOTTOMRIGHT", r3, "TOPRIGHT", 0, 0);
+
+        local l1 = CreatePiece("TOPLEFT", LeftSection, "TOPLEFT", 0, 0,    0, 280, 176, 240);
+        l1:SetPoint("BOTTOMRIGHT", r1, "BOTTOMLEFT", 0, 0);
+        local l3 = CreatePiece("BOTTOMLEFT", LeftSection, "BOTTOMLEFT", 0, 0,    0, 280, 832, 896);
+        l3:SetPoint("TOPRIGHT", r3, "TOPLEFT", 0, 0);
+        local l2 = CreatePiece("TOPLEFT", l1, "BOTTOMLEFT", 0, 0,    0, 280, 240, 832);
+        l2:SetPoint("BOTTOMRIGHT", l3, "TOPRIGHT", 0, 0);
     end
 
 
@@ -530,14 +704,53 @@ local function CreateUI()
     end
 
 
-    do  --CenterSection
-        local Slider = ControlCenter.CreateScrollBarWithDynamicSize(CenterSection);
-        Slider:SetPoint("TOP", CenterSection, "TOPRIGHT", 0, -Def.WidgetGap)
-        Slider:SetPoint("BOTTOM", CenterSection, "BOTTOMRIGHT", 0, Def.WidgetGap);
+    do  --CentralSection
+        local Background = CentralSection:CreateTexture(nil, "BACKGROUND");
+        Background:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanelBackground");
+        Background:SetPoint("TOPLEFT", CentralSection, "TOPLEFT", -8, 0);
+        Background:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
+
+
+        local Slider = ControlCenter.CreateScrollBarWithDynamicSize(CentralSection);
+        Slider:SetPoint("TOP", CentralSection, "TOPRIGHT", 0, -Def.WidgetGap)
+        Slider:SetPoint("BOTTOM", CentralSection, "BOTTOMRIGHT", 0, Def.WidgetGap);
         Slider:SetFrameLevel(20);
         MainFrame.ScrollBar = Slider;
-        Slider:SetVisibleExtentPercentage(0.25);
         Slider:UpdateThumbRange();
+
+
+        local ScrollView = API.CreateScrollView(CentralSection, Slider);
+        MainFrame.ScrollView = ScrollView;
+        ScrollView:SetPoint("TOPLEFT", CentralSection, "TOPLEFT", 0, -2);
+        ScrollView:SetPoint("BOTTOMRIGHT", CentralSection, "BOTTOMRIGHT", 0, 2);
+        ScrollView:SetStepSize(Def.ButtonSize * 2);
+        ScrollView:OnSizeChanged();
+        ScrollView:EnableMouseBlocker(true);
+        ScrollView:SetBottomOvershoot(Def.ButtonSize);
+        Slider.ScrollView = ScrollView;
+
+
+        local centerButtonWidth = API.Round(centralSection - 2*Def.ButtonSize);
+
+        local function EntryButton_Create()
+            local obj = CreateSettingsEntry(ScrollView);
+            obj:SetSize(centerButtonWidth, Def.ButtonSize);
+            return obj
+        end
+
+        ScrollView:AddTemplate("Entry", EntryButton_Create);
+
+
+        local function Header_Create()
+            local obj = CreateSettingsHeader(ScrollView);
+            obj:SetSize(centerButtonWidth, Def.ButtonSize);
+            return obj
+        end
+
+        ScrollView:AddTemplate("Header", Header_Create);
+
+
+        MainFrame:RefreshContent();
     end
 
 

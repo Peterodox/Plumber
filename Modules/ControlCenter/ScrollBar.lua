@@ -244,6 +244,14 @@ do
         self.Thumb:SetHeight(height);
     end
 
+    function ScrollBarMixin:UpdateVisibleExtentPercentage()
+        local range = self.ScrollView:GetScrollRange();
+        local viewHeight = self.ScrollView:GetHeight();
+        self:SetVisibleExtentPercentage(viewHeight / (viewHeight + range));
+        self:UpdateThumbRange();
+        self:SetValueByRatio(self.ratio or 0);
+    end
+
     function ScrollBarMixin:OnSizeChanged()
 
     end

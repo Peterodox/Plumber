@@ -70,7 +70,7 @@
     </EditBox>
 
     <Button name="PlumberSquareButtonArtTemplate" virtual="true">
-        <Size x="26" y="26"/>
+        <Size x="28" y="28"/>
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="Background" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
@@ -96,6 +96,58 @@
                         <Anchor point="CENTER"/>
                     </Anchors>
                 </Texture>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <Button name="PlumberSettingsPanelEntryTemplate" virtual="true">
+        <Size x="128" y="28"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Box" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="12" y="12"/>
+                    <Color r="1" g="1" b="1" a="0.2"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="14"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Label" justifyH="LEFT" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="28"/>
+                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-28"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <Button name="PlumberSettingsPanelHeaderTemplate" virtual="true">
+        <Size x="128" y="28"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="20" y="20"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="-8" y="-2"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="20" y="20"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT" x="0"/>
+                        <Anchor point="BOTTOMLEFT" relativeKey="$parent.Left" relativePoint="BOTTOMRIGHT" x="0"/>
+                        <Anchor point="RIGHT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Label" justifyH="LEFT" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="LEFT" x="8" y="5"/>
+                    </Anchors>
+                </FontString>
             </Layer>
         </Layers>
     </Button>
