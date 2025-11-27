@@ -147,6 +147,9 @@ do
 		categoryKeys = {
 			"Inventory", "Quests",
 		},
+        SearchTags = {
+            "Tooltip",
+        };
     };
 
     addon.ControlCenter:AddModule(moduleData);

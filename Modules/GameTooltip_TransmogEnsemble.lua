@@ -272,6 +272,9 @@ do
 		categoryKeys = {
 			"Collection",
 		},
+        SearchTags = {
+            "Tooltip", "Transmog",
+        },
     };
 
     addon.ControlCenter:AddModule(moduleData);

@@ -4,6 +4,8 @@ local API = addon.API;
 local ControlCenter = addon.ControlCenter;
 local GetDBBool = addon.GetDBBool;
 
+local CreateFrame = CreateFrame;
+
 
 local Def = {
     TextureFile = "Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanel.png";
@@ -24,6 +26,7 @@ local MainFrame = CreateFrame("Frame", nil, nil);  --UIParent
 local SearchBox;
 local FilterButton;
 local CategoryHighlight;
+local ActiveCategoryInfo = {};
 
 
 local function SkinObjects(obj, texture)
@@ -68,7 +71,7 @@ do
     local FadeMixin = {};
 
     local function FadeIn_OnUpdate(self, elapsed)
-        self.alpha = self.alpha + 5 * elapsed;
+        self.alpha = self.alpha + self.fadeSpeed * elapsed;
         if self.alpha >= self.fadeInAlpha then
             self:SetScript("OnUpdate", nil);
             self.alpha = self.fadeInAlpha;
@@ -77,7 +80,7 @@ do
     end
 
     local function FadeOut_OnUpdate(self, elapsed)
-        self.alpha = self.alpha - 5 * elapsed;
+        self.alpha = self.alpha - self.fadeSpeed * elapsed;
         if self.alpha <= self.fadeOutAlpha then
             self:SetScript("OnUpdate", nil);
             self.alpha = self.fadeOutAlpha;
@@ -122,10 +125,15 @@ do
         end
     end
 
+    function FadeMixin:SetFadeSpeed(fadeSpeed)
+        self.fadeSpeed = fadeSpeed;
+    end
+
     function MakeFadingObject(obj)
         Mixin(obj, FadeMixin);
         obj:SetFadeOutAlpha(0);
         obj:SetFadeInAlpha(1);
+        obj:SetFadeSpeed(5);
         obj.alpha = 1;
     end
 end
@@ -361,23 +369,34 @@ do
         SetTextColor(self.Label, Def.TextColorNormal);
     end
 
-    function CategoryButtonMixin:SetCategory(text, scrollOffset, anyNewFeature)
+    function CategoryButtonMixin:SetCategory(key, text)
         self.Label:SetText(text);
         self.cateogoryName = string.lower(text);
-        self.scrollOffset = scrollOffset;
+        self.categoryKey = key;
 
         self.NewTag:ClearAllPoints();
         self.NewTag:SetPoint("CENTER", self, "LEFT", 0, 0);
         --self.NewTag:SetShown(anyNewFeature);  --debug
     end
 
+    function CategoryButtonMixin:ShowCount(count)
+        if count and count > 0 then
+            self.Count:SetText(count);
+            self.CountContainer:FadeIn();
+        else
+            self.CountContainer:FadeOut();
+        end
+    end
+
     function CategoryButtonMixin:OnClick()
-        MainFrame.ScrollView:ScrollTo(self.scrollOffset);
-        addon.LandingPageUtil.PlayUISound("ScrollBarStep");
+        if ActiveCategoryInfo[self.categoryKey] then
+            MainFrame.ScrollView:ScrollTo(ActiveCategoryInfo[self.categoryKey].scrollOffset);
+            addon.LandingPageUtil.PlayUISound("ScrollBarStep");
+        end
     end
 
     function CategoryButtonMixin:OnMouseDown()
-        if self:IsEnabled() then
+        if ActiveCategoryInfo[self.categoryKey] then
             self.Label:SetPoint("LEFT", self, "LEFT", self.labelOffset + 1, -1);
         end
     end
@@ -399,6 +418,20 @@ do
         f.Label:SetJustifyH("LEFT");
         f.Label:SetPoint("LEFT", f, "LEFT", 9, 0);
         SetTextColor(f.Label, Def.TextColorNormal);
+
+        local CountContainer = CreateFrame("Frame", nil, f);
+        f.CountContainer = CountContainer;
+        CountContainer:SetSize(Def.ButtonSize, Def.ButtonSize);
+        CountContainer:SetPoint("RIGHT", f, "RIGHT", 0, 0);
+        CountContainer:Hide();
+        CountContainer:SetAlpha(0);
+        MakeFadingObject(CountContainer);
+        CountContainer:SetFadeSpeed(8);
+
+        f.Count = CountContainer:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Count:SetJustifyH("RIGHT");
+        f.Count:SetPoint("RIGHT", CountContainer, "RIGHT", -9, 0);
+        SetTextColor(f.Count, Def.TextColorNonInteractable);
 
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
@@ -709,18 +742,25 @@ end
 do  --Search
     function MainFrame:RunSearch(text)
         if text then
-            text = string.lower(text);
-            local find = string.find;
+            self.listGetter = function()
+                return ControlCenter:GetSearchResult(text);
+            end;
+            self:RefreshFeatureList();
             for _, button in self.primaryCategoryPool:EnumerateActive() do
-                if find(button.cateogoryName, text) then
+                if ActiveCategoryInfo[button.categoryKey] then
                     button:FadeIn();
+                    button:ShowCount(ActiveCategoryInfo[button.categoryKey].numModules)
                 else
                     button:FadeOut();
+                    button:ShowCount(false);
                 end
             end
         else
+            self.listGetter = ControlCenter.GetSortedModules;
+            self:RefreshFeatureList();
             for _, button in self.primaryCategoryPool:EnumerateActive() do
                 button:FadeIn();
+                button:ShowCount(false);
             end
         end
     end
@@ -728,7 +768,7 @@ end
 
 
 do  --Centeral
-    function MainFrame:RefreshContent()
+    function MainFrame:RefreshFeatureList()
         local top, bottom;
         local n = 0;
         local fromOffsetY = Def.ButtonSize;
@@ -741,16 +781,20 @@ do  --Centeral
         local subOptionOffset = Def.ButtonSize;
         local offsetX = 0;
 
-        self.primaryCategoryPool:ReleaseAll();
+        ActiveCategoryInfo = {};
+        self.firstModuleData = nil;
 
-        for index, categoryInfo in ipairs(ControlCenter:GetNewSortedModules()) do   --ControlCenter:GetValidModules()
+        local sortedModule = self.listGetter and self.listGetter() or ControlCenter:GetSortedModules();
+
+        for index, categoryInfo in ipairs(sortedModule) do   --ControlCenter:GetValidModules()
             n = n + 1;
             top = offsetY;
             bottom = offsetY + buttonHeight + buttonGap;
 
-            local categoryButton = self.primaryCategoryPool:Acquire();
-            categoryButton:SetCategory(categoryInfo.categoryName, top - fromOffsetY, categoryInfo.anyNewFeature);
-            categoryButton:SetPoint("TOPLEFT", self.LeftSection, self.primaryCategoryPool.offsetX, self.primaryCategoryPool.leftListFromY - (index - 1) * Def.ButtonSize);
+            ActiveCategoryInfo[categoryInfo.key] = {
+                scrollOffset = top - fromOffsetY,
+                numModules = categoryInfo.numModules,
+            };
 
             content[n] = {
                 dataIndex = n,
@@ -763,6 +807,10 @@ do  --Centeral
                 offsetX = offsetX,
             };
             offsetY = bottom;
+
+            if n == 1 then
+                self.firstModuleData = categoryInfo.modules[1];
+            end
 
             for _, data in ipairs(categoryInfo.modules) do
                 n = n + 1;
@@ -807,6 +855,19 @@ do  --Centeral
         local retainPosition = true;
         self.ScrollView:SetContent(content, retainPosition);
         self.ScrollBar:UpdateVisibleExtentPercentage();
+
+        if self.firstModuleData then
+            self:ShowFeaturePreview(self.firstModuleData);
+        end
+    end
+
+    function MainFrame:RefreshCategoryList()
+        self.primaryCategoryPool:ReleaseAll();
+        for index, categoryInfo in ipairs(ControlCenter:GetSortedModules()) do
+            local categoryButton = self.primaryCategoryPool:Acquire();
+            categoryButton:SetCategory(categoryInfo.key, categoryInfo.categoryName);
+            categoryButton:SetPoint("TOPLEFT", self.LeftSection, self.primaryCategoryPool.offsetX, self.primaryCategoryPool.leftListFromY - (index - 1) * Def.ButtonSize);
+        end
     end
 
     function MainFrame:UpdateSettingsEntries()
@@ -890,6 +951,7 @@ local function CreateUI()
             MakeFadingObject(obj);
             obj:SetFadeInAlpha(1);
             obj:SetFadeOutAlpha(0.5);
+            obj.Label:SetWidth(categoryButtonWidth - 2 * obj.labelOffset - 14);
             return obj
         end
 
@@ -985,6 +1047,7 @@ local function CreateUI()
         ScrollView:OnSizeChanged();
         ScrollView:EnableMouseBlocker(true);
         ScrollView:SetBottomOvershoot(Def.CategoryGap);
+        ScrollView:SetAlwaysShowScrollBar(true);
         ScrollBar.ScrollView = ScrollView;
 
 
@@ -1008,7 +1071,8 @@ local function CreateUI()
         ScrollView:AddTemplate("Header", Header_Create);
 
 
-        MainFrame:RefreshContent();
+        MainFrame:RefreshFeatureList();
+        MainFrame:RefreshCategoryList();
     end
 
 

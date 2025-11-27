@@ -41,6 +41,11 @@ L["SC UnitFrame"] = "Unit Frame";
 L["SC Old"] = "Legacy Content";
 L["SC Uncategorized"] = "Uncategorized";
 
+--Settings Search Keywords, Search Tags
+L["KW Tooltip"] = "Tooltip";
+L["KW Transmog"] = "Transmog";
+L["KW Vendor"] = "Vendor";
+
 
 --Module Categories
 --- order: 0

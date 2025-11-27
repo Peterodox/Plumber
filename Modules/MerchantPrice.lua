@@ -711,6 +711,9 @@ do
 		categoryKeys = {
 			"Inventory",
 		},
+        SearchTags = {
+            "Vendor",
+        },
     };
 
     addon.ControlCenter:AddModule(moduleData);

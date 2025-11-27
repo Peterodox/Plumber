@@ -209,12 +209,11 @@ do  --Settings Panel Revamp
         return L["SC "..categoryKey] or "Unknown"
     end
 
-    function ControlCenter:GetNewSortedModules()
-        if self.sortedModules then
-            return self.sortedModules
-        end
+    function ControlCenter:GetSearchTagName(tag)
+        return L["KW "..tag]
+    end
 
-
+    function ControlCenter:UpdateSettingsOpenTime()
         local settingsOpenTime = PlumberDB.settingsOpenTime;
         local canShowNewTag;
         if settingsOpenTime then
@@ -225,8 +224,16 @@ do  --Settings Panel Revamp
         end
         settingsOpenTime = settingsOpenTime - 7 * 86400;    --NewFeatureMark gone after 7 days
         PlumberDB.settingsOpenTime = time()
+        return settingsOpenTime, canShowNewTag
+    end
 
+    function ControlCenter:GetSortedModules()
+        if ControlCenter.sortedModules then
+            return ControlCenter.sortedModules
+        end
 
+        local settingsOpenTime, canShowNewTag = self:UpdateSettingsOpenTime();
+        local ipairs = ipairs;
         local tinsert = table.insert;
         local tbl = {};
         local numValid = 0;
@@ -234,7 +241,7 @@ do  --Settings Panel Revamp
         local categoryXModule = {};
         local anyNewFeatureInCategory = {};
 
-        for i, data in ipairs(self.modules) do
+        for i, data in ipairs(ControlCenter.modules) do
             if (not data.validityCheck) or (data.validityCheck()) then
                 numValid = numValid + 1;
 
@@ -264,18 +271,107 @@ do  --Settings Panel Revamp
             table.sort(v, SortFunc.Alphabet);
         end
 
+        local numModules;
+
         for _, cateKey in ipairs(PrimaryCategory) do
-            if categoryXModule[cateKey] and #categoryXModule[cateKey] > 0 then
+            numModules = categoryXModule[cateKey] and #categoryXModule[cateKey] or 0;
+            if numModules > 0 then
                 tinsert(tbl, {
                     key = cateKey,
-                    categoryName = self:GetPrimaryCategoryName(cateKey),
+                    categoryName = ControlCenter:GetPrimaryCategoryName(cateKey),
                     modules = categoryXModule[cateKey],
                     anyNewFeature = anyNewFeatureInCategory[cateKey],
+                    numModules = numModules,
                 });
             end
         end
 
-        self.sortedModules = tbl;
+        ControlCenter.sortedModules = tbl;
+        return tbl
+    end
+
+    function ControlCenter:GetSearchResult(keyword)
+        if not keyword then
+            return self:GetSortedModules();
+        end
+
+        local settingsOpenTime, canShowNewTag = self:UpdateSettingsOpenTime();
+        local lower = string.lower;
+        local find = string.find;
+        local ipairs = ipairs;
+        local tinsert = table.insert;
+        local tbl = {};
+        local numValid = 0;
+
+        local categoryXModule = {};
+        local anyNewFeatureInCategory = {};
+        local shownCategory = {};
+
+        keyword = lower(keyword);
+
+        for _, cateKey in ipairs(PrimaryCategory) do
+            local categoryName = ControlCenter:GetPrimaryCategoryName(cateKey);
+            if categoryName and find(lower(categoryName), keyword) then
+                shownCategory[cateKey] = true;
+            end
+        end
+
+        local tagName;
+
+        for i, data in ipairs(ControlCenter.modules) do
+            if (not data.validityCheck) or (data.validityCheck()) then
+                local cateKey = data.categoryKeys and data.categoryKeys[1] or "Uncategorized";
+                local matched = shownCategory[cateKey] or (data.name and find(lower(data.name), keyword));
+
+                if (not matched) and data.SearchTags then
+                    for _, tag in ipairs(data.SearchTags) do
+                        tagName = self:GetSearchTagName(tag);
+                        if tagName and find(lower(tagName), keyword) then
+                            matched = true;
+                            break
+                        end
+                    end
+                end
+
+                if matched then
+                    numValid = numValid + 1;
+
+                    if canShowNewTag and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
+                        data.isNewFeature = true;
+                    end
+
+                    if not categoryXModule[cateKey] then
+                        categoryXModule[cateKey] = {};
+                    end
+
+                    tinsert(categoryXModule[cateKey], data);
+
+                    if data.isNewFeature then
+                        anyNewFeatureInCategory[cateKey] = true;
+                    end
+                end
+            end
+        end
+
+        for cateKey, v in pairs(categoryXModule) do
+            table.sort(v, SortFunc.Alphabet);
+        end
+
+        local numModules;
+
+        for _, cateKey in ipairs(PrimaryCategory) do
+            numModules = categoryXModule[cateKey] and #categoryXModule[cateKey] or 0;
+            if numModules > 0 then
+                tinsert(tbl, {
+                    key = cateKey,
+                    categoryName = ControlCenter:GetPrimaryCategoryName(cateKey),
+                    modules = categoryXModule[cateKey],
+                    anyNewFeature = anyNewFeatureInCategory[cateKey],
+                    numModules = numModules,
+                });
+            end
+        end
+
         return tbl
     end
 end
