@@ -232,6 +232,7 @@ do  --Settings Panel Revamp
         local numValid = 0;
 
         local categoryXModule = {};
+        local anyNewFeatureInCategory = {};
 
         for i, data in ipairs(self.modules) do
             if (not data.validityCheck) or (data.validityCheck()) then
@@ -251,6 +252,10 @@ do  --Settings Panel Revamp
                     end
 
                     tinsert(categoryXModule[cateKey], data);
+
+                    if data.isNewFeature then
+                        anyNewFeatureInCategory[cateKey] = true;
+                    end
                 end
             end
         end
@@ -265,6 +270,7 @@ do  --Settings Panel Revamp
                     key = cateKey,
                     categoryName = self:GetPrimaryCategoryName(cateKey),
                     modules = categoryXModule[cateKey],
+                    anyNewFeature = anyNewFeatureInCategory[cateKey],
                 });
             end
         end

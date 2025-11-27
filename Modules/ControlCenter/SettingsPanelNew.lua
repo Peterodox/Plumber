@@ -16,6 +16,7 @@ local Def = {
     TextColorNormal = {215/255, 192/255, 163/255},
     TextColorHighlight = {1, 1, 1},
     TextColorNonInteractable = {138/255, 118/255, 93/255},
+    TextColorDisabled = {0.5, 0.5, 0.5},
 };
 
 
@@ -45,6 +46,20 @@ end
 
 local function SetTextColor(obj, color)
     obj:SetTextColor(color[1], color[2], color[3])
+end
+
+local function CreateNewFeatureMark(button, smallDot)
+    local newTag = button:CreateTexture(nil, "OVERLAY");
+    newTag:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/NewFeatureTag", nil, nil, smallDot and "TRILINEAR" or "LINEAR");
+    newTag:SetSize(16, 16);
+    newTag:SetPoint("RIGHT", button, "LEFT", 0, 0);
+    newTag:Hide();
+    if smallDot then
+        newTag:SetTexCoord(0.5, 1, 0, 1);
+    else
+        newTag:SetTexCoord(0, 0.5, 0, 1);
+    end
+    return newTag
 end
 
 
@@ -346,14 +361,19 @@ do
         SetTextColor(self.Label, Def.TextColorNormal);
     end
 
-    function CategoryButtonMixin:SetCategory(text, scrollOffset)
+    function CategoryButtonMixin:SetCategory(text, scrollOffset, anyNewFeature)
         self.Label:SetText(text);
         self.cateogoryName = string.lower(text);
         self.scrollOffset = scrollOffset;
+
+        self.NewTag:ClearAllPoints();
+        self.NewTag:SetPoint("CENTER", self, "LEFT", 0, 0);
+        --self.NewTag:SetShown(anyNewFeature);  --debug
     end
 
     function CategoryButtonMixin:OnClick()
         MainFrame.ScrollView:ScrollTo(self.scrollOffset);
+        addon.LandingPageUtil.PlayUISound("ScrollBarStep");
     end
 
     function CategoryButtonMixin:OnMouseDown()
@@ -386,6 +406,8 @@ do
         f:SetScript("OnMouseDown", f.OnMouseDown);
         f:SetScript("OnMouseUp", f.OnMouseUp);
 
+        f.NewTag = CreateNewFeatureMark(f, true);
+
         return f
     end
 end
@@ -398,37 +420,84 @@ do
     function EntryButtonMixin:SetData(moduleData)
         self.Label:SetText(moduleData.name);
         self.dbKey = moduleData.dbKey;
+        self.data = moduleData;
+        self.NewTag:SetShown(moduleData.isNewFeature);
         self:UpdateState();
     end
 
     function EntryButtonMixin:OnEnter()
         MainFrame:HighlightButton(self);
-        SetTextColor(self.Label, Def.TextColorHighlight);
-        MainFrame:ShowFeaturePreview(self.dbKey, self.parentDBKey);
+        if self:IsEnabled() then
+            SetTextColor(self.Label, Def.TextColorHighlight);
+        end
+        MainFrame:ShowFeaturePreview(self.data, self.parentDBKey);
     end
 
     function EntryButtonMixin:OnLeave()
         MainFrame:HighlightButton();
-        SetTextColor(self.Label, Def.TextColorNormal);
+        if self:IsEnabled() then
+            SetTextColor(self.Label, Def.TextColorNormal);
+        end
     end
 
     function EntryButtonMixin:OnEnable()
-
+        self:UpdateVisual();
     end
 
     function EntryButtonMixin:OnDisable()
-
+        self:UpdateVisual();
     end
 
     function EntryButtonMixin:OnClick()
+        if self.dbKey and self.data.toggleFunc then
+            local newState = not GetDBBool(self.dbKey);
+            addon.SetDBValue(self.dbKey, newState, true);
+            self.data.toggleFunc(newState);
+            if newState then
+                addon.LandingPageUtil.PlayUISound("CheckboxOn");
+            else
+                addon.LandingPageUtil.PlayUISound("CheckboxOff");
+            end
+        end
 
+        MainFrame:UpdateSettingsEntries();
     end
 
     function EntryButtonMixin:UpdateState()
+        local disabled;
+        if self.parentDBKey and not GetDBBool(self.parentDBKey) then
+            disabled = true;
+        end
         if GetDBBool(self.dbKey) then
-            SetTexCoord(self.Box, 736, 784, 16, 64);
+            if disabled then
+                SetTexCoord(self.Box, 784, 832, 64, 112);
+            else
+                SetTexCoord(self.Box, 736, 784, 16, 64);
+            end
         else
-            SetTexCoord(self.Box, 688, 736, 16, 64);
+            if disabled then
+                SetTexCoord(self.Box, 784, 832, 16, 64);
+            else
+                SetTexCoord(self.Box, 688, 736, 16, 64);
+            end
+        end
+
+        if disabled then
+            self:Disable();
+        else
+            self:Enable();
+        end
+    end
+
+    function EntryButtonMixin:UpdateVisual()
+        if self:IsEnabled() then
+            if self:IsMouseMotionFocus() then
+                SetTextColor(self.Label, Def.TextColorHighlight);
+            else
+                SetTextColor(self.Label, Def.TextColorNormal);
+            end
+        else
+            SetTextColor(self.Label, Def.TextColorDisabled);
         end
     end
 
@@ -446,6 +515,8 @@ do
 
         f.Box.useTrilinearFilter = true;
         SkinObjects(f, Def.TextureFile);
+
+        f.NewTag = CreateNewFeatureMark(f);
 
         return f
     end
@@ -475,12 +546,140 @@ do
 end
 
 
+local CreateSelectionHighlight;
+do
+    local SelectionHighlightMixin = {};
+    local outQuart = addon.EasingFunctions.outQuart;
+
+    function SelectionHighlightMixin:FadeIn()
+        self.isFading = true;
+        self:SetAlpha(0);
+        self.t = 0;
+        self.alpha = 0;
+        --self:UpdateSize();
+        self:SetScript("OnUpdate", self.OnUpdate);
+        self:Show();
+    end
+
+    function SelectionHighlightMixin:UpdateSize()
+        local width, height = self:GetSize();
+        width = width;
+        self.length = 2 * (width + height);
+        self.fromX = -0.5*width;
+        self.fromY = 0.5*height;
+        self.speed = 256;
+        self.t1 = width / self.speed;
+        self.t2 = (width + height) / self.speed;
+        self.t3 = (2*width + height) / self.speed;
+        self.t4 = (2*width + 2*height) / self.speed;
+        self.Mask1:ClearAllPoints();
+        self.Mask1:SetPoint("CENTER", self, "CENTER", self.fromX, self.fromY);
+        self.Mask2:ClearAllPoints();
+        self.Mask2:SetPoint("CENTER", self, "CENTER", -self.fromX, -self.fromY);
+    end
+
+    --[[
+    function SelectionHighlightMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+
+        if self.isFading then
+            self.alpha = self.alpha + 5 * elapsed;
+            if self.alpha > 1 then
+                self.alpha = 1;
+                self.isFading = nil;
+            end
+            self:SetAlpha(self.alpha);
+        end
+
+        if self.t > self.t4 then
+            self.t = self.t - self.t4;
+        end
+
+        if self.t > self.t3 then
+            self.a = (self.t - self.t3)/(self.t4 - self.t3);
+            self.x = self.fromX;
+            self.y =  -(1-self.a)*self.fromY + self.a*self.fromY;
+        elseif self.t > self.t2 then
+            self.a = (self.t - self.t2)/(self.t3 - self.t2);
+            self.x = -(1-self.a)*self.fromX +self.a*self.fromX;
+            self.y = -self.fromY;
+        elseif self.t > self.t1 then
+            self.a = (self.t - self.t1)/(self.t2 - self.t1);
+            self.x = -self.fromX;
+            self.y = (1-self.a)*self.fromY - self.a*self.fromY;
+        else
+            self.a = self.t/self.t1;
+            self.x = (1-self.a)*self.fromX -self.a*self.fromX;
+            self.y = self.fromY;
+        end
+
+        self.Mask1:SetPoint("CENTER", self, "CENTER", self.x, self.y);
+        self.Mask2:SetPoint("CENTER", self, "CENTER", -self.x, -self.y);
+    end
+    --]]
+
+    function SelectionHighlightMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+
+        if self.isFading then
+            self.alpha = self.alpha + 5 * elapsed;
+            if self.alpha > 1 then
+                self.alpha = 1;
+                self.isFading = nil;
+                self:SetScript("OnUpdate", nil);
+            end
+            self:SetAlpha(self.alpha);
+        end
+
+        --[[
+        self.x = outQuart(self.t, self.fromX - 160, self.fromX, self.d);
+        self.Mask1:SetPoint("CENTER", self, "CENTER", self.x, self.fromY);
+        self.Mask2:SetPoint("CENTER", self, "CENTER", -self.x, -self.fromY -20);
+        if self.t > self.d then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+        end
+        --]]
+    end
+
+    function SelectionHighlightMixin:OnHide()
+        self:Hide();
+        self:ClearAllPoints();
+    end
+
+    function CreateSelectionHighlight(parent)
+        local f = CreateFrame("Frame", nil, parent, "PlumberSettingsAnimSelectionTemplate");
+        Mixin(f, SelectionHighlightMixin);
+
+        SkinObjects(f, Def.TextureFile);
+
+        SetTexCoord(f.Left, 0, 32, 80, 160);
+        SetTexCoord(f.Center, 32, 160, 80, 160);
+        SetTexCoord(f.Right, 160, 192, 80, 160);
+
+        --[[
+        SetTexCoord(f.Border1Left, 192, 224, 80, 160);
+        SetTexCoord(f.Border2Left, 192, 224, 80, 160);
+        SetTexCoord(f.Border1Center, 224, 352, 80, 160);
+        SetTexCoord(f.Border2Center, 224, 352, 80, 160);
+        SetTexCoord(f.Border1Right, 352, 384, 80, 160);
+        SetTexCoord(f.Border2Right, 352, 384, 80, 160);
+        --]]
+
+        f.d = 0.6;
+        f:Hide();
+        f:SetScript("OnHide", f.OnHide);
+
+        return f
+    end
+end
+
+
 do  --Left Section
     function MainFrame:HighlightButton(button)
         CategoryHighlight:Hide();
         CategoryHighlight:ClearAllPoints();
         if button then
-            CategoryHighlight:SetAlpha(0);
             CategoryHighlight:SetPoint("LEFT", button, "LEFT", 0, 0);
             CategoryHighlight:SetPoint("RIGHT", button, "RIGHT", 0, 0);
             CategoryHighlight:SetParent(button);
@@ -491,9 +690,18 @@ end
 
 
 do  --Right Section
-    function MainFrame:ShowFeaturePreview(dbKey, parentDBKey)
-        self.FeaturePreview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..(parentDBKey or dbKey));
-        self.FeatureDescription:SetText(ControlCenter:GetModuleDescription(dbKey));
+    function MainFrame:ShowFeaturePreview(moduleData, parentDBKey)
+        local desc = moduleData.description;
+        local additonalDesc = moduleData.descriptionFunc and moduleData.descriptionFunc() or nil;
+        if additonalDesc then
+            if desc then
+                desc = desc.."\n\n"..additonalDesc;
+            else
+                desc = additonalDesc;
+            end
+        end
+        self.FeatureDescription:SetText(desc);
+        self.FeaturePreview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..(parentDBKey or moduleData.dbKey));
     end
 end
 
@@ -541,7 +749,7 @@ do  --Centeral
             bottom = offsetY + buttonHeight + buttonGap;
 
             local categoryButton = self.primaryCategoryPool:Acquire();
-            categoryButton:SetCategory(categoryInfo.categoryName, top - fromOffsetY);
+            categoryButton:SetCategory(categoryInfo.categoryName, top - fromOffsetY, categoryInfo.anyNewFeature);
             categoryButton:SetPoint("TOPLEFT", self.LeftSection, self.primaryCategoryPool.offsetX, self.primaryCategoryPool.leftListFromY - (index - 1) * Def.ButtonSize);
 
             content[n] = {
@@ -600,6 +808,10 @@ do  --Centeral
         self.ScrollView:SetContent(content, retainPosition);
         self.ScrollBar:UpdateVisibleExtentPercentage();
     end
+
+    function MainFrame:UpdateSettingsEntries()
+        self.ScrollView:CallObjectMethod("Entry", "UpdateState");
+    end
 end
 
 
@@ -620,6 +832,11 @@ local function CreateUI()
     MainFrame:SetSize(2 * sideSectionWidth + centralSection, Def.PageHeight);
     MainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
     MainFrame:SetScale(UIParent:GetEffectiveScale());
+    MainFrame:SetToplevel(true);
+    MainFrame:EnableMouse(true);
+    MainFrame:EnableMouseMotion(true);
+    MainFrame:SetScript("OnMouseWheel", function(self, delta)
+    end);
 
 
     local baseFrameLevel = MainFrame:GetFrameLevel();
@@ -686,18 +903,8 @@ local function CreateUI()
         MainFrame.primaryCategoryPool.offsetX = Def.WidgetGap;
 
 
-        CategoryHighlight = CreateFrame("Frame", nil, LeftSection);
-        CategoryHighlight:Hide();
-        CategoryHighlight:SetUsingParentLevel(true);
+        CategoryHighlight = CreateSelectionHighlight(LeftSection);
         CategoryHighlight:SetSize(categoryButtonWidth, Def.ButtonSize);
-        local disableSharpenging = true;
-        CategoryHighlight.BackgroundTextures = API.CreateThreeSliceTextures(CategoryHighlight, "BACKGROUND", 16, 40, 8, Def.TextureFile, disableSharpenging);
-        CategoryHighlight:SetAlpha(0);
-        SetTexCoord(CategoryHighlight.BackgroundTextures[1], 0, 32, 80, 160);
-        SetTexCoord(CategoryHighlight.BackgroundTextures[2], 32, 160, 80, 160);
-        SetTexCoord(CategoryHighlight.BackgroundTextures[3], 160, 192, 80, 160);
-        MakeFadingObject(CategoryHighlight);
-        CategoryHighlight:SetFadeInAlpha(1);
 
 
         -- 6-piece Background
@@ -752,9 +959,6 @@ local function CreateUI()
         description:SetPoint("BOTTOMRIGHT", RightSection, "BOTTOMRIGHT", -visualOffset -Def.WidgetGap, Def.WidgetGap);
         description:SetShadowColor(0, 0, 0);
         description:SetShadowOffset(1, -1);
-
-
-        MainFrame:ShowFeaturePreview("WorldMapPin_TWW")  --debug
     end
 
 

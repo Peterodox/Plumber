@@ -38,10 +38,11 @@ BlizzardPanel:Hide();
 
 local function CreateNewFeatureMark(button)
     local newTag = button:CreateTexture(nil, "OVERLAY");
-    newTag:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/NewFeatureMark");
+    newTag:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/NewFeatureTag");
     newTag:SetSize(16, 16);
     newTag:SetPoint("RIGHT", button, "LEFT", -2, 0);
     newTag:Show();
+    newTag:SetTexCoord(0, 0.5, 0, 1);
     return newTag
 end
 

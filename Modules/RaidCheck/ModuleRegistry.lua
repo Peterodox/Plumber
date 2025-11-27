@@ -26,7 +26,7 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 1200,
-        moduleAddedTime = 1763100000,
+        moduleAddedTime = 1764200000,   --1763100000
         categoryKeys = {"Signature", "Instance"},
     };
 

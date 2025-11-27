@@ -369,7 +369,7 @@ do
 
     function ScrollBarMixin:OnUpdate_ArrowPushed(elapsed)
         self.t = self.t + elapsed;
-        if self.t > 0.5 then
+        if self.t > 0.3 then
             self.t = 0;
             self.ScrollView:SteadyScroll(-self.delta);
         end

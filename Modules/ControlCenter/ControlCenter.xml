@@ -151,6 +151,96 @@
         </Layers>
     </Button>
 
+    <Frame name="PlumberSettingsAnimSelectionTemplate" virtual="true" useParentLevel="true">
+        <Size x="128" y="28"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="40" y="40"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <!--Layer level="BACKGROUND" textureSubLevel="1">
+                <Texture parentKey="Border1Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Border1Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Border1Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="40" y="40"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Border1Left" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border1Right" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+				<MaskTexture parentKey="Mask1" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle-Blurry">
+					<Size x="240" y="80"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOPLEFT"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Border1Left"/>
+                        <MaskedTexture childKey="Border1Center"/>
+                        <MaskedTexture childKey="Border1Right"/>
+					</MaskedTextures>
+				</MaskTexture>
+
+                <Texture parentKey="Border2Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Border2Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="16" y="40"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Border2Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="40" y="40"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Border2Left" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border2Right" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+				<MaskTexture parentKey="Mask2" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle-Blurry">
+					<Size x="240" y="80"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Border2Left"/>
+                        <MaskedTexture childKey="Border2Center"/>
+                        <MaskedTexture childKey="Border2Right"/>
+					</MaskedTextures>
+				</MaskTexture>
+            </Layer-->
+        </Layers>
+    </Frame>
+
     <Button name="PlumberTextureHighlightButtonTemplate" virtual="true">
         <Size x="16" y="16"/>
         <Layers>

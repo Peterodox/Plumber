@@ -14,6 +14,8 @@ Processor.shouldChangeTexture = true;
 
 
 function Processor:OnMapChanged(uiMapID, mapScale)
+    if not self.enabled then return end;
+
     local changeTexture = self.shouldChangeTexture;
     if changeTexture then
         self.shouldChangeTexture = nil;
