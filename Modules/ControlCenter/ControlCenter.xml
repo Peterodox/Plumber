@@ -52,6 +52,9 @@
         <Frames>
             <Button parentKey="ResetButton" hidden="true" parentArray="SkinnableObjects">
                 <Size x="28" y="28"/>
+				<HitRectInsets>
+					<AbsInset left="-2" right="-2" top="-2" bottom="-2"/>
+				</HitRectInsets>
                 <Anchors>
                     <Anchor point="RIGHT"/>
                 </Anchors>
@@ -120,6 +123,27 @@
                 </FontString>
             </Layer>
         </Layers>
+        <Frames>
+            <Button parentKey="OptionToggle" propagateMouseInput="Motion" parentArray="SkinnableObjects" hidden="true">
+                <Size x="28" y="28"/>
+				<HitRectInsets>
+					<AbsInset left="-14" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+                <Anchors>
+                    <Anchor point="RIGHT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <Texture parentKey="Texture" parentArray="SkinnableObjects">
+                            <Size x="20" y="20"/>
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Button>
+        </Frames>
     </Button>
 
     <Button name="PlumberSettingsPanelHeaderTemplate" virtual="true">

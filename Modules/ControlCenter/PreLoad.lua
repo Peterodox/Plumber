@@ -1,6 +1,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local JoinText = API.JoinText;
 
 
 local ControlCenter = {};
@@ -43,6 +44,7 @@ local PrimaryCategory = {
 
 function ControlCenter:InitializeModules()
     --Initial Enable/Disable Modules
+
     local db = PlumberDB;
     local enabled, isForceEnabled;
 
@@ -52,7 +54,7 @@ function ControlCenter:InitializeModules()
         if moduleData.timerunningSeason and moduleData.timerunningSeason ~= timerunningSeason then
             moduleData.validityCheck = function()
                 return false
-            end;
+            end
         end
     end
 
@@ -60,6 +62,7 @@ function ControlCenter:InitializeModules()
         isForceEnabled = false;
         if (not moduleData.validityCheck) or (moduleData.validityCheck()) then
             enabled = db[moduleData.dbKey];
+            moduleData.isValid = true;
 
             if (not enabled) and (self.newDBKeys[moduleData.dbKey]) then
                 enabled = true;
@@ -86,6 +89,14 @@ function ControlCenter:InitializeModules()
     end
 
     self.newDBKeys = {};
+
+
+    --NewFeatureMark
+    --/run PlumberDB.seenNewFeatureMark = nil
+    if not db.seenNewFeatureMark then
+        db.seenNewFeatureMark = {};
+    end
+    self.seenNewFeatureMark = db.seenNewFeatureMark;
 end
 
 function ControlCenter:AddModule(moduleData)
@@ -153,7 +164,7 @@ function ControlCenter:GetValidModules()
     local subModules;
 
     for i, data in ipairs(self.modules) do
-        if (not data.validityCheck) or (data.validityCheck()) then
+        if data.isValid then
             numValid = numValid + 1;
             if data.categoryID ~= lastCategoryID then
                 lastCategoryID = data.categoryID;
@@ -205,6 +216,69 @@ do  --Settings Panel Revamp
         return a.name < b.name
     end
 
+    function SortFunc.Date(a, b)
+        if a.moduleAddedTime and b.moduleAddedTime then
+            return a.moduleAddedTime > b.moduleAddedTime
+        end
+
+        if not(a.moduleAddedTime or b.moduleAddedTime) then
+            return a.name < b.name
+        end
+
+        return a.moduleAddedTime ~= nil
+    end
+
+
+    local CurrentSortMethod = SortFunc.Alphabet;
+
+    local FilterSortByMethods = {
+        SortFunc.Alphabet,
+        SortFunc.Date,
+    };
+
+    function ControlCenter:ClearFilterCache()
+        self.sortedModules = nil;
+    end
+
+    function ControlCenter:UpdateCurrentSortMethod()
+        local index = PlumberDB and PlumberDB.SettingsPanelFilterIndex;
+        index = self:GetValidSortMethodIndex(index);
+
+        if CurrentSortMethod ~= FilterSortByMethods[index] then
+            CurrentSortMethod = FilterSortByMethods[index];
+            self:ClearFilterCache();
+        end
+
+        return index
+    end
+
+    function ControlCenter:SetCurrentSortMethod(index)
+        if not (index and FilterSortByMethods[index]) then
+            index = 1;
+        end
+
+        if CurrentSortMethod ~= FilterSortByMethods[index] then
+            CurrentSortMethod = FilterSortByMethods[index];
+            self.sortedModules = nil;
+        end
+
+        if PlumberDB then
+            PlumberDB.SettingsPanelFilterIndex = index;
+        end
+    end
+
+    function ControlCenter:GetValidSortMethodIndex(index)
+        if not (index and FilterSortByMethods[index]) then
+            index = 1;
+        end
+        return index
+    end
+
+    function ControlCenter:GetNumFilters()
+        return #FilterSortByMethods
+    end
+
+
     function ControlCenter:GetPrimaryCategoryName(categoryKey)
         return L["SC "..categoryKey] or "Unknown"
     end
@@ -227,12 +301,20 @@ do  --Settings Panel Revamp
         return settingsOpenTime, canShowNewTag
     end
 
+    function ControlCenter:IsNewFeatureMarkerSeen(dbKey)
+        return self.seenNewFeatureMark[dbKey]
+    end
+
+    function ControlCenter:FlagNewFeatureMarkerSeen(dbKey)
+        self.seenNewFeatureMark[dbKey] = true;
+    end
+
     function ControlCenter:GetSortedModules()
         if ControlCenter.sortedModules then
             return ControlCenter.sortedModules
         end
 
-        local settingsOpenTime, canShowNewTag = self:UpdateSettingsOpenTime();
+        local settingsOpenTime, canShowNewTag = ControlCenter:UpdateSettingsOpenTime();
         local ipairs = ipairs;
         local tinsert = table.insert;
         local tbl = {};
@@ -242,11 +324,13 @@ do  --Settings Panel Revamp
         local anyNewFeatureInCategory = {};
 
         for i, data in ipairs(ControlCenter.modules) do
-            if (not data.validityCheck) or (data.validityCheck()) then
+            if data.isValid then
                 numValid = numValid + 1;
 
                 if canShowNewTag and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
-                    data.isNewFeature = true;
+                    if not ControlCenter:IsNewFeatureMarkerSeen(data.dbKey) then
+                        data.isNewFeature = true;
+                    end
                 end
 
                 if not data.categoryKeys then
@@ -268,7 +352,7 @@ do  --Settings Panel Revamp
         end
 
         for cateKey, v in pairs(categoryXModule) do
-            table.sort(v, SortFunc.Alphabet);
+            table.sort(v, CurrentSortMethod);
         end
 
         local numModules;
@@ -311,7 +395,7 @@ do  --Settings Panel Revamp
 
         for _, cateKey in ipairs(PrimaryCategory) do
             local categoryName = ControlCenter:GetPrimaryCategoryName(cateKey);
-            if categoryName and find(lower(categoryName), keyword) then
+            if categoryName and find(lower(categoryName), keyword, 1, true) then
                 shownCategory[cateKey] = true;
             end
         end
@@ -319,17 +403,31 @@ do  --Settings Panel Revamp
         local tagName;
 
         for i, data in ipairs(ControlCenter.modules) do
-            if (not data.validityCheck) or (data.validityCheck()) then
-                local cateKey = data.categoryKeys and data.categoryKeys[1] or "Uncategorized";
-                local matched = shownCategory[cateKey] or (data.name and find(lower(data.name), keyword));
+            if data.isValid then
+                if not data.combinedSearchText then
+                    local text = lower(data.name);
 
-                if (not matched) and data.SearchTags then
-                    for _, tag in ipairs(data.SearchTags) do
-                        tagName = self:GetSearchTagName(tag);
-                        if tagName and find(lower(tagName), keyword) then
-                            matched = true;
-                            break
+                    if data.SearchTags then
+                        for _, tag in ipairs(data.SearchTags) do
+                            tagName = self:GetSearchTagName(tag);
+                            text = JoinText(" ", text, lower(tagName));
                         end
+                    end
+
+                    --Support searching in descriptions?
+                    if data.description then
+                        text = JoinText(" ", text, lower(data.description));
+                    end
+
+                    data.combinedSearchText = text;
+                end
+
+                local cateKey = data.categoryKeys and data.categoryKeys[1] or "Uncategorized";
+                local matched = shownCategory[cateKey];
+
+                if (not matched) and data.combinedSearchText then
+                    if find(data.combinedSearchText, keyword, 1, true) then
+                        matched = true;
                     end
                 end
 
@@ -337,7 +435,9 @@ do  --Settings Panel Revamp
                     numValid = numValid + 1;
 
                     if canShowNewTag and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
-                        data.isNewFeature = true;
+                        if not ControlCenter:IsNewFeatureMarkerSeen(data.dbKey) then
+                            data.isNewFeature = true;
+                        end
                     end
 
                     if not categoryXModule[cateKey] then
@@ -354,7 +454,7 @@ do  --Settings Panel Revamp
         end
 
         for cateKey, v in pairs(categoryXModule) do
-            table.sort(v, SortFunc.Alphabet);
+            table.sort(v, CurrentSortMethod);
         end
 
         local numModules;
@@ -373,6 +473,30 @@ do  --Settings Panel Revamp
         end
 
         return tbl
+    end
+
+    function ControlCenter:FlagCurrentNewFeatureMarkerSeen()
+        local settingsOpenTime, canShowNewTag = self:UpdateSettingsOpenTime();
+        for i, data in ipairs(self.modules) do
+            if data.isValid then
+                data.isNewFeature = nil;
+                if canShowNewTag and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime then
+                    self:FlagNewFeatureMarkerSeen(data.dbKey);
+                end
+            end
+        end
+        self:ClearFilterCache();
+    end
+
+    function ControlCenter:AnyNewFeatureMarker()
+        local settingsOpenTime, canShowNewTag = self:UpdateSettingsOpenTime();
+        for i, data in ipairs(self.modules) do
+            if data.isValid then
+                if canShowNewTag and data.moduleAddedTime and data.moduleAddedTime > settingsOpenTime and (not self:IsNewFeatureMarkerSeen(data.dbKey)) then
+                    return true
+                end
+            end
+        end
     end
 end
 

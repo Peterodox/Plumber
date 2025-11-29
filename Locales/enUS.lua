@@ -24,6 +24,7 @@ L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map> Map Filter> Plumber";
 L["Toggle Plumber UI"] = "Toggle Plumber UI";
 L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
+L["Remove New Feature Marker"] = "Remove New Feature Marker";
 
 --Settings Category
 L["SC Signature"] = "Signature Features";
@@ -45,6 +46,10 @@ L["SC Uncategorized"] = "Uncategorized";
 L["KW Tooltip"] = "Tooltip";
 L["KW Transmog"] = "Transmog";
 L["KW Vendor"] = "Vendor";
+
+--Filter Sort Method
+L["SortMethod 1"] = "Name";  --Alphabetical Order
+L["SortMethod 2"] = "Date added";  --New on the top
 
 
 --Module Categories

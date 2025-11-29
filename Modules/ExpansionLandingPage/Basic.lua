@@ -572,11 +572,20 @@ do  --Dropdown Menu
     function MenuButtonMixin:OnEnter()
         self.Text:SetTextColor(1, 1, 1);
         self.parent:HighlightButton(self);
+        if self.tooltip then
+            local tooltip = GameTooltip;
+            tooltip:SetOwner(self, "ANCHOR_NONE");
+            tooltip:SetPoint("TOPLEFT", self, "TOPRIGHT", 4, 4);
+            tooltip:SetText(self.Text:GetText(), 1, 1, 1, 1, true);
+            tooltip:AddLine(self.tooltip, 1, 0.82, 0, true);
+            tooltip:Show();
+        end
     end
 
     function MenuButtonMixin:OnLeave()
         self:UpdateVisual();
         self.parent:HighlightButton(nil);
+        GameTooltip:Hide();
     end
 
     function MenuButtonMixin:UpdateVisual()
@@ -591,8 +600,12 @@ do  --Dropdown Menu
             else
                 self.Text:SetTextColor(0.922, 0.871, 0.761);
             end
+            self.LeftTexture:SetDesaturated(false);
+            self.LeftTexture:SetVertexColor(1, 1, 1);
         else
             self.Text:SetTextColor(0.5, 0.5, 0.5);
+            self.LeftTexture:SetDesaturated(true);
+            self.LeftTexture:SetVertexColor(0.6, 0.6, 0.6);
         end
     end
 
@@ -603,6 +616,8 @@ do  --Dropdown Menu
 
         if self.closeAfterClick then
             self.parent:HideMenu();
+        elseif self.refreshAfterClick then
+            self.parent:RefreshMenu();
         end
     end
 
@@ -641,6 +656,7 @@ do  --Dropdown Menu
         self.leftOffset = 20;
         self.selected = selected;
         self.isHeader = nil;
+        self.refreshAfterClick = true;
         self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         if selected then
             self.LeftTexture:SetTexCoord(32/512, 64/512, 0/512, 32/512);
@@ -655,6 +671,7 @@ do  --Dropdown Menu
         self.leftOffset = 20;
         self.selected = selected;
         self.isHeader = nil;
+        self.refreshAfterClick = true;
         self.LeftTexture:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/DropdownMenu", nil, nil, "LINEAR");
         if selected then
             self.LeftTexture:SetTexCoord(96/512, 128/512, 0/512, 32/512);
@@ -737,6 +754,12 @@ do  --Dropdown Menu
         self.texturePool:ReleaseAll();
     end
 
+    function SharedMenuMixin:IsShown()
+        if self.Frame then
+            return self.Frame:IsShown()
+        end
+    end
+
     function SharedMenuMixin:HideMenu()
         if self.Frame then
             self.Frame:Hide();
@@ -745,6 +768,7 @@ do  --Dropdown Menu
                 self:ReleaseAllObjects();
             end
         end
+        self.menuInfoGetter = nil;
     end
 
     function SharedMenuMixin:SetKeepContentOnHide(keepContentOnHide)
@@ -830,6 +854,7 @@ do  --Dropdown Menu
                     contentHeight = contentHeight + buttonHeight;
                     widget.onClickFunc = v.onClickFunc;
                     widget.closeAfterClick = v.closeAfterClick;
+                    widget.refreshAfterClick = v.refreshAfterClick;
                     widget.isDangerousAction = v.isDangerousAction;
                     widget:SetLeftText(v.text);
                     if v.type == "Radio" then
@@ -840,6 +865,9 @@ do  --Dropdown Menu
                         widget:SetHeader(v.text);
                     else
                         widget:SetRegular();
+                    end
+                    if v.disabled then
+                        widget:Disable();
                     end
                     widget:UpdateVisual();
                 elseif v.type == "Divider" then
@@ -855,6 +883,7 @@ do  --Dropdown Menu
                     contentHeight = contentHeight + dividerHeight + 2 * gap;
                 end
                 widget.parent = self;
+                widget.tooltip = v.tooltip;
                 widgets[n] = widget;
                 if widget.GetContentWidth then
                     widgetWidth = widget:GetContentWidth();
@@ -894,8 +923,16 @@ do  --Dropdown Menu
         if self.owner == owner and (self.Frame and self.Frame:IsShown()) then
             self:HideMenu();
         else
-            local menuInfo = (owner.menuInfoGetter and owner.menuInfoGetter()) or (menuInfoGetter and menuInfoGetter()) or nil;
+            self.menuInfoGetter = owner.menuInfoGetter or menuInfoGetter;
+            local menuInfo = self.menuInfoGetter and self.menuInfoGetter() or nil;
             self:ShowMenu(owner, menuInfo);
+        end
+    end
+
+    function SharedMenuMixin:RefreshMenu()
+        if self.owner and self.owner:IsVisible() and self:IsShown() and self.menuInfoGetter then
+            local menuInfo = self.menuInfoGetter and self.menuInfoGetter() or nil;
+            self:ShowMenu(self.owner, menuInfo);
         end
     end
 

@@ -4,6 +4,8 @@ local API = addon.API;
 local ControlCenter = addon.ControlCenter;
 local GetDBBool = addon.GetDBBool;
 
+
+local Mixin = Mixin;
 local CreateFrame = CreateFrame;
 
 
@@ -318,6 +320,60 @@ do
 end
 
 
+local FilterUtil = {};
+do
+    function FilterUtil.MenuInfoGetter()
+        local tbl = {
+            key = "SettingsPanelFilterMenu",
+        };
+
+        local tinsert = table.insert;
+
+        local widgets = {
+            {type = "Header", text = CLUB_FINDER_SORT_BY},
+        };
+
+
+        local selectedIndex = ControlCenter:UpdateCurrentSortMethod();
+        for i = 1, ControlCenter:GetNumFilters() do
+            tinsert(widgets, {
+                type = "Radio",
+                text = L["SortMethod "..i];
+                closeAfterClick = true,
+                onClickFunc = function()
+                    ControlCenter:SetCurrentSortMethod(i);
+                    MainFrame:RefreshFeatureList();
+                end,
+                selected = i == selectedIndex,
+            });
+        end
+
+
+        tinsert(widgets, {type = "Divider"});
+        tinsert(widgets, {type = "Header", text = L["Module Control"]});
+        tinsert(widgets, {type = "Checkbox", text = L["ModuleName EnableNewByDefault"], tooltip = L["ModuleDescription EnableNewByDefault"], closeAfterClick = false,
+            selected = GetDBBool("EnableNewByDefault"),
+            onClickFunc = function() addon.FlipDBBool("EnableNewByDefault") end,
+        });
+
+
+        if ControlCenter:AnyNewFeatureMarker() then
+            tinsert(widgets, {type = "Divider"});
+            tinsert(widgets, {type = "Button", text = L["Remove New Feature Marker"], closeAfterClick = true,
+                onClickFunc = function()
+                    ControlCenter:FlagCurrentNewFeatureMarkerSeen();
+                    MainFrame:RefreshFeatureList();
+                end,
+            });
+        end
+
+
+        tbl.widgets = widgets;
+        return tbl
+    end
+end
+
+
 local CreateSquareButton;
 do
     local FilterButtonMixin = {};
@@ -332,8 +388,9 @@ do
     end
 
     function FilterButtonMixin:OnClick()
-
+        addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, FilterUtil.MenuInfoGetter);
     end
+
 
     function CreateSquareButton(parent)
         local f = CreateFrame("Button", nil, parent, "PlumberSquareButtonArtTemplate");
@@ -446,6 +503,45 @@ do
 end
 
 
+local OptionToggleMixin = {};
+do
+    function OptionToggleMixin:OnEnter()
+        self.Texture:SetVertexColor(1, 1, 1);
+        local tooltip = GameTooltip;
+        tooltip:SetOwner(self, "ANCHOR_RIGHT");
+        tooltip:SetText(SETTINGS, 1, 1, 1, 1);
+        tooltip:Show();
+    end
+
+    function OptionToggleMixin:OnLeave()
+        self:ResetVisual();
+        GameTooltip:Hide();
+    end
+
+    function OptionToggleMixin:OnClick(button)
+        if self.onClickFunc then
+            self.onClickFunc(button);
+        end
+    end
+
+    function OptionToggleMixin:SetOnClickFunc(onClickFunc)
+        self.onClickFunc = onClickFunc;
+    end
+
+    function OptionToggleMixin:ResetVisual()
+        self.Texture:SetVertexColor(0.65, 0.65, 0.65);
+    end
+
+    function OptionToggleMixin:OnLoad()
+        self:SetScript("OnEnter", self.OnEnter);
+        self:SetScript("OnLeave", self.OnLeave);
+        self:SetScript("OnClick", self.OnClick);
+        self:ResetVisual();
+        self.isPlumberEditModeToggle = true;
+    end
+end
+
+
 local CreateSettingsEntry;
 do
     local EntryButtonMixin = {};
@@ -455,22 +551,21 @@ do
         self.dbKey = moduleData.dbKey;
         self.data = moduleData;
         self.NewTag:SetShown(moduleData.isNewFeature);
+        self.OptionToggle:SetOnClickFunc(moduleData.optionToggleFunc);
+        self.hasOptions = moduleData.optionToggleFunc ~= nil;
         self:UpdateState();
+        self:UpdateVisual();
     end
 
     function EntryButtonMixin:OnEnter()
         MainFrame:HighlightButton(self);
-        if self:IsEnabled() then
-            SetTextColor(self.Label, Def.TextColorHighlight);
-        end
+        self:UpdateVisual();
         MainFrame:ShowFeaturePreview(self.data, self.parentDBKey);
     end
 
     function EntryButtonMixin:OnLeave()
         MainFrame:HighlightButton();
-        if self:IsEnabled() then
-            SetTextColor(self.Label, Def.TextColorNormal);
-        end
+        self:UpdateVisual();
     end
 
     function EntryButtonMixin:OnEnable()
@@ -501,18 +596,21 @@ do
         if self.parentDBKey and not GetDBBool(self.parentDBKey) then
             disabled = true;
         end
+
         if GetDBBool(self.dbKey) then
             if disabled then
                 SetTexCoord(self.Box, 784, 832, 64, 112);
             else
                 SetTexCoord(self.Box, 736, 784, 16, 64);
             end
+            self.OptionToggle:SetShown(self.hasOptions);
         else
             if disabled then
                 SetTexCoord(self.Box, 784, 832, 16, 64);
             else
                 SetTexCoord(self.Box, 688, 736, 16, 64);
             end
+            self.OptionToggle:Hide();
         end
 
         if disabled then
@@ -526,14 +624,15 @@ do
         if self:IsEnabled() then
             if self:IsMouseMotionFocus() then
                 SetTextColor(self.Label, Def.TextColorHighlight);
+                SetTexCoord(self.OptionToggle.Texture, 904, 944, 40, 80);
             else
                 SetTextColor(self.Label, Def.TextColorNormal);
+                SetTexCoord(self.OptionToggle.Texture, 864, 904, 40, 80);
             end
         else
             SetTextColor(self.Label, Def.TextColorDisabled);
         end
     end
-
 
     function CreateSettingsEntry(parent)
         local f = CreateFrame("Button", nil, parent, "PlumberSettingsPanelEntryTemplate");
@@ -547,9 +646,13 @@ do
         SetTextColor(f.Label, Def.TextColorNormal);
 
         f.Box.useTrilinearFilter = true;
+        --f.OptionToggle.Texture.useTrilinearFilter = true;
         SkinObjects(f, Def.TextureFile);
 
         f.NewTag = CreateNewFeatureMark(f);
+
+        Mixin(f.OptionToggle, OptionToggleMixin);
+        f.OptionToggle:OnLoad();
 
         return f
     end
@@ -741,7 +844,7 @@ end
 
 do  --Search
     function MainFrame:RunSearch(text)
-        if text then
+        if text and text ~= "" then
             self.listGetter = function()
                 return ControlCenter:GetSearchResult(text);
             end;
@@ -1071,6 +1174,7 @@ local function CreateUI()
         ScrollView:AddTemplate("Header", Header_Create);
 
 
+        ControlCenter:UpdateCurrentSortMethod();
         MainFrame:RefreshFeatureList();
         MainFrame:RefreshCategoryList();
     end
