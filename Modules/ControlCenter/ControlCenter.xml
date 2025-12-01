@@ -115,13 +115,13 @@
                 <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
                     <Size x="24" y="48"/>
                     <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" y="-2"/>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" y="-1"/>
                     </Anchors>
                 </Texture>
                 <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
                     <Size x="24" y="48"/>
                     <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" y="-2"/>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" y="-1"/>
                     </Anchors>
                 </Texture>
                 <Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">

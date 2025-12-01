@@ -542,7 +542,7 @@ do  --ScrollView Basic Content Render
 
         if self.numContent > 0 then
             local range = content[self.numContent].bottom - self.viewportSize;
-            if range > 0 then
+            if true or range > 0 then
                 range = range + self.bottomOvershoot;
             end
             self:SetScrollRange(range);

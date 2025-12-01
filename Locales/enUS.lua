@@ -28,7 +28,8 @@ L["Remove New Feature Marker"] = "Remove New Feature Marker";
 L["Remove New Feature Marker Tooltip"] = "New Feature Markers %s disappear after a week. But you can click this button to remove them now.";
 L["Modules"] = "Modules";
 L["Release Notes"] = "Release Notes";
-L["Auto Show Relase Notes"] = "Show release notes after an update";
+L["Option AutoShowChangelog"] = "Auto Show Release Notes";
+L["Option AutoShowChangelog Tooltip"] = "Automatically show release notes after an update.";
 
 --Settings Category
 L["SC Signature"] = "Signature Features";

@@ -21,6 +21,7 @@ local Def = {
     ChangelogLineSpacing = 4,
     ChangelogParagraphSpacing = 16,
     ChangelogIndent = 16,   --22 to match Checkbox Label
+    ChangelogImageSize = 240,
 
 
     TextColorNormal = {215/255, 192/255, 163/255},
@@ -1244,11 +1245,6 @@ do  --ChangelogTab
         local Tab2 = MainFrame.ChangelogTab;
 
 
-        --local Background = Tab2:CreateTexture(nil, "BACKGROUND");
-        --Background:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanelBackground");
-        --Background:SetPoint("TOPLEFT", CentralSection, "TOPLEFT", -8, 0);
-        --Background:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
-
         local scrollBarOffsetX = 12;
         local ScrollBar = ControlCenter.CreateScrollBarWithDynamicSize(Tab2);
         ScrollBar:SetPoint("TOP", MainFrame, "TOPRIGHT", -scrollBarOffsetX, -32);
@@ -1322,17 +1318,30 @@ do  --ChangelogTab
 
 
         local AutoShowToggle = CreateSettingsEntry(Tab2);
+        Tab2.AutoShowToggle = AutoShowToggle;
         AutoShowToggle:SetSize(sideSectionWidth - 2*Def.WidgetGap, Def.ButtonSize);
         AutoShowToggle:SetPoint("BOTTOM", LeftSection, "BOTTOM", 0, Def.WidgetGap);
+        AutoShowToggle.isChangelogButton = true;
 
         local AutoShowToggleData = {
-            name = L["Auto Show Relase Notes"],
+            name = L["Option AutoShowChangelog"],
             dbKey = "SettingsPanel_AutoShowChangelog",
             toggleFunc = function() end,
         };
 
         AutoShowToggle:SetData(AutoShowToggleData);
-        Tab2.AutoShowToggle = AutoShowToggle;
+
+        AutoShowToggle:HookScript("OnEnter", function(self)
+            local tooltip = GameTooltip;
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            tooltip:SetText(L["Option AutoShowChangelog"], 1, 1, 1);
+            tooltip:AddLine(L["Option AutoShowChangelog Tooltip"], 1, 0.82, 0, true);
+            tooltip:Show();
+        end);
+
+        AutoShowToggle:HookScript("OnLeave", function(self)
+            GameTooltip:Hide();
+        end);
 
         MainFrame:ShowLatestChangelog();
     end
@@ -1350,18 +1359,23 @@ do  --ChangelogTab
         local offsetY = fromOffsetY;
         local content = {};
         local objectHeight;
+        local postfixNewFeature = " ("..NEW..")";
 
         for i, info in ipairs(changelog) do
             top = offsetY;
 
             if info.type == "h1" or info.type == "p" then
+                local text = info.text;
+                if info.isNewFeature then
+                    text = text .. postfixNewFeature;
+                end
                 local textWidth;
                 if info.bullet then
                     textWidth = objectWidth - Def.ChangelogIndent;
                 else
                     textWidth = objectWidth;
                 end
-                objectHeight = Formatter:GetTextHeight(info.type, info.text, textWidth);
+                objectHeight = Formatter:GetTextHeight(info.type, text, textWidth);
                 bottom = offsetY + objectHeight;
                 if not (changelog[i + 1] and changelog[i + 1].type == "Checkbox") then
                     bottom = bottom + Def.ChangelogParagraphSpacing;
@@ -1378,28 +1392,13 @@ do  --ChangelogTab
                     setupFunc = function(obj)
                         obj:SetWidth(textWidth);
                         obj:SetFontObject(Formatter.TagFonts[info.type]);
-                        obj:SetText(info.text);
+                        obj:SetText(text);
                         SetTextColor(obj, Def.TextColorReadable);
                     end;
                 };
 
                 if info.type == "h1" then
                     content[n].offsetX = leftOffset;
-                    if false and info.previewKey then   --debug
-                        n = n + 1;
-                        content[n] = {
-                            dataIndex = n,
-                            templateKey = "Texture",
-                            top = top + 6,
-                            bottom = bottom,
-                            point = "LEFT",
-                            relativePoint = "TOPLEFT",
-                            offsetX = leftOffset -6,
-                            setupFunc = function(obj)
-
-                            end,
-                        };
-                    end
                 else
                     content[n].offsetX = leftOffset + (info.bullet and Def.ChangelogIndent or 0);
                     if info.bullet then
@@ -1444,6 +1443,50 @@ do  --ChangelogTab
 
             elseif info.type == "br" then
                 bottom = bottom + Def.ChangelogParagraphSpacing + 2*Def.ChangelogLineSpacing;
+
+            elseif info.type == "img" then
+                if info.dbKey then
+                    n = n + 1;
+                    bottom = top + Def.ChangelogImageSize + Def.ChangelogParagraphSpacing;
+                    content[n] = {
+                        dataIndex = n,
+                        templateKey = "Texture",
+                        top = top,
+                        bottom = bottom,
+                        point = "TOPLEFT",
+                        relativePoint = "TOPLEFT",
+                        offsetX = leftOffset,
+                        setupFunc = function(obj)
+                            obj:SetSize(Def.ChangelogImageSize, Def.ChangelogImageSize);
+                            obj:SetTexCoord(0, 1, 0, 1);
+                            obj:SetVertexColor(1, 1, 1);
+                            obj:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..info.dbKey);
+                        end;
+                    };
+                end
+
+            elseif info.type == "date" then
+                if info.versionText and info.timestamp then
+                    local text = string.format("%s %s    %s", GAME_VERSION_LABEL, info.versionText, API.SecondsToDate(info.timestamp));
+                    objectHeight = Formatter:GetTextHeight(info.type, text);
+                    bottom = top + objectHeight + Def.ChangelogParagraphSpacing + 2*Def.ChangelogLineSpacing;
+                    n = n + 1;
+                    content[n] = {
+                        dataIndex = n,
+                        templateKey = "FontString",
+                        top = top,
+                        bottom = bottom,
+                        point = "TOPLEFT",
+                        relativePoint = "TOPLEFT",
+                        offsetX = leftOffset,
+                        setupFunc = function(obj)
+                            obj:SetWidth(objectWidth);
+                            obj:SetFontObject(Formatter.TagFonts["p"]);
+                            obj:SetText(text);
+                            SetTextColor(obj, Def.TextColorNonInteractable);
+                        end;
+                    };
+                end
             end
 
             offsetY = bottom;

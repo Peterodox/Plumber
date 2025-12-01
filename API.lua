@@ -550,6 +550,15 @@ do  -- Time
         return 3600 * hours + 60 * minutes + seconds;
     end
     API.TimeLeftTextToSeconds = ConvertTextToSeconds;
+
+
+    function API.SecondsToDate(seconds)
+        local timeString = date("%d %m %y", seconds);
+        local day, month, year = string.split(" ", timeString);
+        month = tonumber(month);
+        local monthName = CALENDAR_FULLDATE_MONTH_NAMES[month];
+        return string.format(EVENT_SCHEDULER_DAY_FORMAT, monthName, day);
+    end
 end
 
 do  -- Item

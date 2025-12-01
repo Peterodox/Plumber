@@ -12,9 +12,14 @@ local changelogs = addon.ControlCenter.changelogs;
 
 changelogs[10800] = {
     {
+        type = "date",
+        versionText = "1.8.0",
+        timestamp = 1763400000,
+    },
+
+    {
         type = "h1",
         isNewFeature = true,
-        previewKey = "InstanceDifficulty",
         text = L["ModuleName InstanceDifficulty"],
     },
 
@@ -35,6 +40,10 @@ changelogs[10800] = {
         text = "Show the current difficulty and lockout info at the top of the screen when you enter an instance.",
     },
 
+    {
+        type = "img",
+        dbKey = "InstanceDifficulty",
+    },
 
     {
         type = "br",
@@ -43,7 +52,6 @@ changelogs[10800] = {
     {
         type = "h1",
         isNewFeature = true,
-        previewKey = "TooltipTransmogEnsemble",
         text = L["ModuleName TooltipTransmogEnsemble"],
     },
 
@@ -64,6 +72,11 @@ changelogs[10800] = {
         text = "Fixed the issue where the tooltip says \"Already known,\" but you can still use it to unlock new appearances.",
     },
 
+    {
+        type = "img",
+        dbKey = "TooltipTransmogEnsemble",
+    },
+
 
     {
         type = "br",
@@ -72,7 +85,6 @@ changelogs[10800] = {
     {
         type = "h1",
         isNewFeature = true,
-        previewKey = "TransmogChatCommand",
         text = L["ModuleName TransmogChatCommand"],
     },
 
@@ -100,7 +112,6 @@ changelogs[10800] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = MISCELLANEOUS,
     },
 

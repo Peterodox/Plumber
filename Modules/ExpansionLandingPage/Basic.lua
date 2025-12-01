@@ -590,7 +590,7 @@ do  --Dropdown Menu
 
     function MenuButtonMixin:UpdateVisual()
         if self.isHeader then
-            self.Text:SetTextColor(0.804, 0.667, 0.498);
+            self.Text:SetTextColor(148/255, 124/255, 102/255);  --0.804, 0.667, 0.498
             return
         end
 
@@ -598,7 +598,7 @@ do  --Dropdown Menu
             if self.isDangerousAction then
                 self.Text:SetTextColor(1.000, 0.125, 0.125);
             else
-                self.Text:SetTextColor(0.922, 0.871, 0.761);
+                self.Text:SetTextColor(215/255, 192/255, 163/255);  --0.922, 0.871, 0.761
             end
             self.LeftTexture:SetDesaturated(false);
             self.LeftTexture:SetVertexColor(1, 1, 1);
