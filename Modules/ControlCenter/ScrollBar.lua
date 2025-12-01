@@ -241,6 +241,9 @@ do
 
     function ScrollBarMixin:SetVisibleExtentPercentage(ratio)
         local height = API.Round(ratio * self.Rail:GetHeight());
+        if height < 32 then
+            height = 32;
+        end
         self.Thumb:SetHeight(height);
     end
 
@@ -253,7 +256,7 @@ do
     end
 
     function ScrollBarMixin:OnSizeChanged()
-
+        self:UpdateVisibleExtentPercentage();
     end
 
    function ScrollBarMixin:SetValueByRatio(ratio)
@@ -290,7 +293,11 @@ do
         local railLength = self.Rail:GetHeight();
         local range = API.Round(railLength - self.Thumb:GetHeight());
         self.thumbRange = range;
-        self.ratioPerUnit = 1 / range;
+        if range > 0 then
+            self.ratioPerUnit = 1 / range;
+        else
+            self.ratioPerUnit = 1;
+        end
     end
 
     function ScrollBarMixin:SetScrollable(scrollable)

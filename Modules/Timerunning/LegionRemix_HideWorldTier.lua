@@ -77,6 +77,9 @@ do
 		categoryKeys = {
 			"Current",
 		},
+        SearchTags = {
+            "LegionRemix",
+        },
     };
 
     addon.ControlCenter:AddModule(moduleData);

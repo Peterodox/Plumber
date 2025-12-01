@@ -1,5 +1,5 @@
 --Reserved space below so all localization files line up
--- Traductions française : Hanchen-Yu, Zazou89, KatyPurry et Klep-Ysondre
+-- Traductions française : Zazou89, KatyPurry et Klep-Ysondre
 if not (GetLocale() == "frFR") then return end;
 
 local _, addon = ...

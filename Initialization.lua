@@ -1,5 +1,6 @@
 local VERSION_TEXT = "v1.8.0";
 local VERSION_DATE = 1763400000;
+local VERSION_ID   = 10800;
 
 
 local addonName, addon = ...
@@ -14,6 +15,7 @@ PlumberGlobals = {};
 addon.L = L;
 addon.API = API;
 addon.VERSION_TEXT = VERSION_TEXT;
+addon.VERSION_ID = VERSION_ID;
 
 
 local CallbackRegistry = {};
@@ -294,6 +296,7 @@ local DefaultValues = {
 
 
     EnableNewByDefault = false,             --Always enable newly added features
+    SettingsPanel_AutoShowChangelog = false,
 
 
     --Test Server

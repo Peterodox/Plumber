@@ -9,6 +9,7 @@ addon.ControlCenter = ControlCenter;
 ControlCenter.modules = {};
 ControlCenter.newDBKeys = {};
 ControlCenter.dbKeyXModule = {};
+ControlCenter.changelogs = {};
 
 
 local CategoryDefinition = {
@@ -96,6 +97,7 @@ function ControlCenter:InitializeModules()
     if not db.seenNewFeatureMark then
         db.seenNewFeatureMark = {};
     end
+    db.seenNewFeatureMark = {}; --debug
     self.seenNewFeatureMark = db.seenNewFeatureMark;
 end
 
@@ -187,6 +189,11 @@ function ControlCenter:GetValidModules()
 
     self.validModules = validModules;
     return validModules
+end
+
+
+function ControlCenter:GetModule(dbKey)
+    return dbKey and self.dbKeyXModule[dbKey]
 end
 
 function ControlCenter:GetModuleDescription(dbKey)

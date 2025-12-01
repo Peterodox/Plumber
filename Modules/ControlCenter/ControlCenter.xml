@@ -1,9 +1,45 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
     <Script file="Preload.lua"/>
+    <Include file="Changelog\Localization.xml"/>
     <Script file="ScrollBar.lua"/>
-    <Script file="SettingsPanel.lua"/>
 
-    <!--Script file="SettingsPanelNew.lua"/-->
+
+    <Frame name="PlumberSettingsPanelLayoutTemplate" hidden="true" virtual="true">
+        <Size x="128" y="128"/>
+        <Frames>
+            <Frame parentKey="LeftSection">
+                <Size x="8"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+                    <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="RightSection">
+                <Size x="8"/>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="CentralSection">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.LeftSection" relativePoint="TOPRIGHT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightSection" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+
+            <Frame parentKey="SideTab"/>
+            <Frame parentKey="TabButtonContainer" enableMouse="true" enableMouseMotion="true"/>
+
+            <Frame parentKey="ModuleTab"/>
+            <Frame parentKey="ChangelogTab" hidden="true"/>
+        </Frames>
+    </Frame>
+
+
+    <!--Script file="SettingsPanel.lua"/-->
+    <Script file="SettingsPanelNew.lua"/>
+    <Script file="SettingsPanelRegistry.lua"/>
 
 
     <EditBox name="PlumberEditBoxArtTemplate" autoFocus="false" virtual="true">
@@ -71,6 +107,41 @@
             </Button>
         </Frames>
     </EditBox>
+
+    <Button name="PlumberTabButtonTemplate" virtual="true">
+        <Size x="72" y="40"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="24" y="48"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" y="-2"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="24" y="48"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" y="-2"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+                    <Size x="48" y="48"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Name" justifyH="CENTER" inherits="GameFontNormal">
+                    <Color r="0.5" g="0.5" b="0.5"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
 
     <Button name="PlumberSquareButtonArtTemplate" virtual="true">
         <Size x="28" y="28"/>

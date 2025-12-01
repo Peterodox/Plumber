@@ -25,6 +25,10 @@ L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map
 L["Toggle Plumber UI"] = "Toggle Plumber UI";
 L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
 L["Remove New Feature Marker"] = "Remove New Feature Marker";
+L["Remove New Feature Marker Tooltip"] = "New Feature Markers %s disappear after a week. But you can click this button to remove them now.";
+L["Modules"] = "Modules";
+L["Release Notes"] = "Release Notes";
+L["Auto Show Relase Notes"] = "Show release notes after an update";
 
 --Settings Category
 L["SC Signature"] = "Signature Features";
@@ -46,6 +50,7 @@ L["SC Uncategorized"] = "Uncategorized";
 L["KW Tooltip"] = "Tooltip";
 L["KW Transmog"] = "Transmog";
 L["KW Vendor"] = "Vendor";
+L["KW LegionRemix"] = "Legion Remix";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Name";  --Alphabetical Order
@@ -676,7 +681,7 @@ L["Uncollected Set Counter Format"] = "You have |cffffffff%d|r uncollected trans
 
 --Plumber AddOn Settings
 L["ModuleName EnableNewByDefault"] = "Always Enable New Features";
-L["ModuleDescription EnableNewByDefault"] = "Always enable newly added features.\n\n*You will see a notification in the chat window when a new module is enabled this way.";
+L["ModuleDescription EnableNewByDefault"] = "Always enable newly added features.\n\nYou will see a notification in the chat window when a new module is enabled this way.";
 L["New Feature Auto Enabled Format"] = "New Module %s has been enabled.";
 L["Click To See Details"] = "Click to see details";
 L["Click To Show Settings"] = "Click to toggle settings.";

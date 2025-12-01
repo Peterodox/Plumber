@@ -15,16 +15,24 @@ local Def = {
     WidgetGap = 14,
     PageHeight = 576,
     CategoryGap = 40,
+    TabButtonHeight = 40,
+
+
+    ChangelogLineSpacing = 4,
+    ChangelogParagraphSpacing = 16,
+    ChangelogIndent = 16,   --22 to match Checkbox Label
 
 
     TextColorNormal = {215/255, 192/255, 163/255},
     TextColorHighlight = {1, 1, 1},
-    TextColorNonInteractable = {138/255, 118/255, 93/255},
+    TextColorNonInteractable = {148/255, 124/255, 102/255},
     TextColorDisabled = {0.5, 0.5, 0.5},
+    TextColorReadable = {163/255, 157/255, 147/255},
 };
 
 
-local MainFrame = CreateFrame("Frame", nil, nil);  --UIParent
+local MainFrame = CreateFrame("Frame", nil, UIParent, "PlumberSettingsPanelLayoutTemplate");
+ControlCenter.SettingsPanel = MainFrame;
 local SearchBox;
 local FilterButton;
 local CategoryHighlight;
@@ -359,10 +367,13 @@ do
 
         if ControlCenter:AnyNewFeatureMarker() then
             tinsert(widgets, {type = "Divider"});
-            tinsert(widgets, {type = "Button", text = L["Remove New Feature Marker"], closeAfterClick = true,
+            tinsert(widgets, {type = "Button", text = L["Remove New Feature Marker"], tooltip = L["Remove New Feature Marker Tooltip"]:format("|TInterface\\AddOns\\Plumber\\Art\\ControlCenter\\NewFeatureTooltipIcon:0:0|t"), closeAfterClick = true,
                 onClickFunc = function()
                     ControlCenter:FlagCurrentNewFeatureMarkerSeen();
                     MainFrame:RefreshFeatureList();
+                    for _, button in MainFrame.primaryCategoryPool:EnumerateActive() do
+                        button.NewTag:Hide();
+                    end
                 end,
             });
         end
@@ -426,14 +437,14 @@ do
         SetTextColor(self.Label, Def.TextColorNormal);
     end
 
-    function CategoryButtonMixin:SetCategory(key, text)
+    function CategoryButtonMixin:SetCategory(key, text, anyNewFeature)
         self.Label:SetText(text);
         self.cateogoryName = string.lower(text);
         self.categoryKey = key;
 
         self.NewTag:ClearAllPoints();
         self.NewTag:SetPoint("CENTER", self, "LEFT", 0, 0);
-        --self.NewTag:SetShown(anyNewFeature);  --debug
+        self.NewTag:SetShown(anyNewFeature);
     end
 
     function CategoryButtonMixin:ShowCount(count)
@@ -447,7 +458,7 @@ do
 
     function CategoryButtonMixin:OnClick()
         if ActiveCategoryInfo[self.categoryKey] then
-            MainFrame.ScrollView:ScrollTo(ActiveCategoryInfo[self.categoryKey].scrollOffset);
+            MainFrame.ModuleTab.ScrollView:ScrollTo(ActiveCategoryInfo[self.categoryKey].scrollOffset);
             addon.LandingPageUtil.PlayUISound("ScrollBarStep");
         end
     end
@@ -550,7 +561,7 @@ do
         self.Label:SetText(moduleData.name);
         self.dbKey = moduleData.dbKey;
         self.data = moduleData;
-        self.NewTag:SetShown(moduleData.isNewFeature);
+        self.NewTag:SetShown((not self.isChangelogButton) and moduleData.isNewFeature);
         self.OptionToggle:SetOnClickFunc(moduleData.optionToggleFunc);
         self.hasOptions = moduleData.optionToggleFunc ~= nil;
         self:UpdateState();
@@ -560,7 +571,9 @@ do
     function EntryButtonMixin:OnEnter()
         MainFrame:HighlightButton(self);
         self:UpdateVisual();
-        MainFrame:ShowFeaturePreview(self.data, self.parentDBKey);
+        if not self.isChangelogButton then
+            MainFrame:ShowFeaturePreview(self.data, self.parentDBKey);
+        end
     end
 
     function EntryButtonMixin:OnLeave()
@@ -827,6 +840,7 @@ end
 
 do  --Right Section
     function MainFrame:ShowFeaturePreview(moduleData, parentDBKey)
+        if not moduleData then return end;
         local desc = moduleData.description;
         local additonalDesc = moduleData.descriptionFunc and moduleData.descriptionFunc() or nil;
         if additonalDesc then
@@ -956,8 +970,7 @@ do  --Centeral
         end
 
         local retainPosition = true;
-        self.ScrollView:SetContent(content, retainPosition);
-        self.ScrollBar:UpdateVisibleExtentPercentage();
+        self.ModuleTab.ScrollView:SetContent(content, retainPosition);
 
         if self.firstModuleData then
             self:ShowFeaturePreview(self.firstModuleData);
@@ -968,34 +981,31 @@ do  --Centeral
         self.primaryCategoryPool:ReleaseAll();
         for index, categoryInfo in ipairs(ControlCenter:GetSortedModules()) do
             local categoryButton = self.primaryCategoryPool:Acquire();
-            categoryButton:SetCategory(categoryInfo.key, categoryInfo.categoryName);
+            categoryButton:SetCategory(categoryInfo.key, categoryInfo.categoryName, categoryInfo.anyNewFeature);
             categoryButton:SetPoint("TOPLEFT", self.LeftSection, self.primaryCategoryPool.offsetX, self.primaryCategoryPool.leftListFromY - (index - 1) * Def.ButtonSize);
         end
     end
 
     function MainFrame:UpdateSettingsEntries()
-        self.ScrollView:CallObjectMethod("Entry", "UpdateState");
+        self.ModuleTab.ScrollView:CallObjectMethod("Entry", "UpdateState");
+        if self.ChangelogTab.ScrollView then
+            self.ChangelogTab.ScrollView:CallObjectMethod("Entry", "UpdateState");
+            self.ChangelogTab.AutoShowToggle:UpdateState();
+        end
     end
 end
 
 
 
 local function CreateUI()
-    local function CreateBG(frame, a)
-        local bg = frame:CreateTexture(nil, "BACKGROUND");
-        bg:SetAllPoints(true);
-        --bg:SetColorTexture(a, a, a, 1);
-    end
-
-    local height = Def.PageHeight;
+    local pageHeight = Def.PageHeight;
 
     local scalerWidth = 1/ 0.85;
     local ratio_Center = 0.618;
-    local sideSectionWidth = API.Round((height * scalerWidth) * (1 - ratio_Center));
-    local centralSection = API.Round((height * scalerWidth) * ratio_Center);
-    MainFrame:SetSize(2 * sideSectionWidth + centralSection, Def.PageHeight);
+    local sideSectionWidth = API.Round((pageHeight * scalerWidth) * (1 - ratio_Center));
+    local centralSectionWidth = API.Round((pageHeight * scalerWidth) * ratio_Center);
+    MainFrame:SetSize(2 * sideSectionWidth + centralSectionWidth, Def.PageHeight);
     MainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
-    MainFrame:SetScale(UIParent:GetEffectiveScale());
     MainFrame:SetToplevel(true);
     MainFrame:EnableMouse(true);
     MainFrame:EnableMouseMotion(true);
@@ -1005,39 +1015,27 @@ local function CreateUI()
 
     local baseFrameLevel = MainFrame:GetFrameLevel();
 
-    local LeftSection = CreateFrame("Frame", nil, MainFrame);
-    MainFrame.LeftSection = LeftSection;
-    LeftSection:SetPoint("TOPLEFT", MainFrame, "TOPLEFT", 0, 0);
-    LeftSection:SetPoint("BOTTOMLEFT", MainFrame, "BOTTOMLEFT", 0, 0);
+    local LeftSection = MainFrame.LeftSection;
+    local CentralSection = MainFrame.CentralSection;
+    local RightSection = MainFrame.RightSection;
+    local Tab1 = MainFrame.ModuleTab;
+
     LeftSection:SetWidth(sideSectionWidth);
-    LeftSection:SetFrameLevel(baseFrameLevel + 10);
-
-
-    local RightSection = CreateFrame("Frame", nil, MainFrame);
-    MainFrame.RightSection = RightSection;
-    RightSection:SetPoint("TOPRIGHT", MainFrame, "TOPRIGHT", 0, 0);
-    RightSection:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
     RightSection:SetWidth(sideSectionWidth);
-
-
-    local CentralSection = CreateFrame("Frame", nil, MainFrame);
-    MainFrame.CentralSection = CentralSection;
-    CentralSection:SetPoint("TOPLEFT", LeftSection, "TOPRIGHT", 0, 0);
-    CentralSection:SetPoint("BOTTOMRIGHT", RightSection, "BOTTOMLEFT", 0, 0);
 
 
     --LeftSection
     do
-        SearchBox = CreateSearchBox(LeftSection);
+        SearchBox = CreateSearchBox(Tab1);
         SearchBox:SetPoint("TOPLEFT", LeftSection, "TOPLEFT", Def.WidgetGap, -Def.WidgetGap);
         SearchBox:SetWidth(sideSectionWidth - Def.ButtonSize - 3 * Def.WidgetGap);
 
-        FilterButton = CreateSquareButton(LeftSection);
+        FilterButton = CreateSquareButton(Tab1);
         FilterButton:SetPoint("LEFT", SearchBox, "RIGHT", Def.WidgetGap, 0);
 
         local leftListFromY = 2*Def.WidgetGap + Def.ButtonSize;
 
-        local DivH = LeftSection:CreateTexture(nil, "OVERLAY");
+        local DivH = Tab1:CreateTexture(nil, "OVERLAY");
         DivH:SetSize(sideSectionWidth - 0.5*Def.WidgetGap, 24);
         DivH:SetPoint("CENTER", LeftSection, "TOP", 0, -leftListFromY);
         API.DisableSharpening(DivH);
@@ -1049,7 +1047,7 @@ local function CreateUI()
         local categoryButtonWidth = sideSectionWidth - 2*Def.WidgetGap;
 
         local function Category_Create()
-            local obj = CreateCategoryButton(LeftSection);
+            local obj = CreateCategoryButton(Tab1);
             obj:SetSize(categoryButtonWidth, Def.ButtonSize);
             MakeFadingObject(obj);
             obj:SetFadeInAlpha(1);
@@ -1068,13 +1066,13 @@ local function CreateUI()
         MainFrame.primaryCategoryPool.offsetX = Def.WidgetGap;
 
 
-        CategoryHighlight = CreateSelectionHighlight(LeftSection);
+        CategoryHighlight = CreateSelectionHighlight(Tab1);
         CategoryHighlight:SetSize(categoryButtonWidth, Def.ButtonSize);
 
 
         -- 6-piece Background
         local function CreatePiece(point, relativeTo, relativePoint, offsetX, offsetY, l, r, t, b)
-            local tex = LeftSection:CreateTexture(nil, "BACKGROUND");
+            local tex = MainFrame.SideTab:CreateTexture(nil, "BORDER");
             tex:SetTexture(Def.TextureFile);
             tex:SetPoint(point, relativeTo, relativePoint, offsetX, offsetY);
             SetTexCoord(tex, l, r, t, b);
@@ -1101,21 +1099,21 @@ local function CreateUI()
     do  --RightSection
         local previewSize = sideSectionWidth - 2*Def.WidgetGap;
 
-        local preview = RightSection:CreateTexture(nil, "OVERLAY");
+        local preview = Tab1:CreateTexture(nil, "OVERLAY");
         MainFrame.FeaturePreview = preview;
         preview:SetSize(previewSize, previewSize);
         preview:SetPoint("TOP", RightSection, "TOP", 0, -Def.WidgetGap);
 
-        local mask = RightSection:CreateMaskTexture(nil, "OVERLAY");
+        local mask = Tab1:CreateMaskTexture(nil, "OVERLAY");
         mask:SetPoint("TOPLEFT", preview, "TOPLEFT", 0, 0);
         mask:SetPoint("BOTTOMRIGHT", preview, "BOTTOMRIGHT", 0, 0);
         mask:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/PreviewMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
         preview:AddMaskTexture(mask);
 
 
-        local description = RightSection:CreateFontString(nil, "OVERLAY", "GameTooltipText"); --GameFontNormal (ObjectiveFont), GameTooltipTextSmall
+        local description = Tab1:CreateFontString(nil, "OVERLAY", "GameTooltipText"); --GameFontNormal (ObjectiveFont), GameTooltipTextSmall
         MainFrame.FeatureDescription = description;
-        description:SetTextColor(0.659, 0.659, 0.659);    --0.5, 0.5, 0.5
+        SetTextColor(description, Def.TextColorReadable);
         description:SetJustifyH("LEFT");
         description:SetJustifyV("TOP");
         description:SetSpacing(4);
@@ -1134,16 +1132,17 @@ local function CreateUI()
         Background:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
 
 
-        local ScrollBar = ControlCenter.CreateScrollBarWithDynamicSize(CentralSection);
+        local ScrollBar = ControlCenter.CreateScrollBarWithDynamicSize(Tab1);
         ScrollBar:SetPoint("TOP", CentralSection, "TOPRIGHT", 0, -0.5*Def.WidgetGap)
         ScrollBar:SetPoint("BOTTOM", CentralSection, "BOTTOMRIGHT", 0, 0.5*Def.WidgetGap);
         ScrollBar:SetFrameLevel(20);
-        MainFrame.ScrollBar = ScrollBar;
+        MainFrame.ModuleTab.ScrollBar = ScrollBar;
         ScrollBar:UpdateThumbRange();
 
 
-        local ScrollView = API.CreateScrollView(CentralSection, ScrollBar);
-        MainFrame.ScrollView = ScrollView;
+        local ScrollView = API.CreateScrollView(Tab1, ScrollBar);
+        MainFrame.ModuleTab.ScrollView = ScrollView;
+        ScrollBar.ScrollView = ScrollView;
         ScrollView:SetPoint("TOPLEFT", CentralSection, "TOPLEFT", 0, -2);
         ScrollView:SetPoint("BOTTOMRIGHT", CentralSection, "BOTTOMRIGHT", 0, 2);
         ScrollView:SetStepSize(Def.ButtonSize * 2);
@@ -1151,10 +1150,12 @@ local function CreateUI()
         ScrollView:EnableMouseBlocker(true);
         ScrollView:SetBottomOvershoot(Def.CategoryGap);
         ScrollView:SetAlwaysShowScrollBar(true);
-        ScrollBar.ScrollView = ScrollView;
+        ScrollView:SetShowNoContentAlert(true);
+        ScrollView:SetNoContentAlertText(CATALOG_SHOP_NO_SEARCH_RESULTS);
 
 
-        local centerButtonWidth = API.Round(centralSection - 2*Def.ButtonSize);
+        local centerButtonWidth = API.Round(centralSectionWidth - 2*Def.ButtonSize);
+        Def.centerButtonWidth = centerButtonWidth;
 
         local function EntryButton_Create()
             local obj = CreateSettingsEntry(ScrollView);
@@ -1172,16 +1173,439 @@ local function CreateUI()
         end
 
         ScrollView:AddTemplate("Header", Header_Create);
-
-
-        ControlCenter:UpdateCurrentSortMethod();
-        MainFrame:RefreshFeatureList();
-        MainFrame:RefreshCategoryList();
     end
 
 
     local NineSlice = addon.LandingPageUtil.CreateExpansionThemeFrame(MainFrame, 10);
+    MainFrame.NineSlice = NineSlice;
     NineSlice:CoverParent(-24);
+    NineSlice.Background:Hide();
+    NineSlice:SetUsingParentLevel(false);
+    NineSlice:SetFrameLevel(baseFrameLevel + 20);
+    NineSlice:ShowCloseButton(true);
+    NineSlice:SetCloseButtonOwner(MainFrame);
+
+
+    Tab1:SetScript("OnShow", function()
+        MainFrame:RefreshFeatureList();
+    end);
 end
 
-C_Timer.After(1, CreateUI);
+function MainFrame:UpdateLayout()
+    local frameWidth = math.floor(self:GetWidth() + 0.5);
+    if frameWidth == self.frameWidth then
+        return
+    end
+    self.frameWidth = frameWidth;
+
+    self.ModuleTab.ScrollView:OnSizeChanged();
+    self.ModuleTab.ScrollBar:OnSizeChanged();
+
+    if self.ChangelogTab.ScrollView then
+        self.ChangelogTab.ScrollView:OnSizeChanged();
+        self.ChangelogTab.ScrollBar:OnSizeChanged();
+    end
+end
+
+
+local InitChangelogTab;
+do  --ChangelogTab
+    local Formatter = {};
+
+    Formatter.TagFonts = {
+        ["h1"] = "PlumberFont_16",
+        ["p"] = "GameFontNormal",
+    };
+
+    function Formatter:GetTextHeight(fontTag, text, width)
+        if not self.UtilityFontString then
+            local UtilityFontString = MainFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
+            UtilityFontString:SetJustifyH("LEFT");
+            UtilityFontString:SetPoint("TOP", UIParent, "BOTTOM", 0, -4);
+            self.UtilityFontString = UtilityFontString;
+        end
+
+        self.UtilityFontString:SetSpacing(Def.ChangelogLineSpacing);
+        self.UtilityFontString:SetSize(width or Def.centerButtonWidth, 0);
+        if fontTag ~= self.utilityFontTag then
+            self.utilityFontTag = fontTag;
+            self.UtilityFontString:SetFontObject(self.TagFonts[fontTag]);
+        end
+        self.UtilityFontString:SetText(text);
+        local height = self.UtilityFontString:GetHeight();
+        self.UtilityFontString:SetText(nil);
+        return height
+    end
+
+
+    function InitChangelogTab()
+        local LeftSection = MainFrame.LeftSection;
+        local CentralSection = MainFrame.CentralSection;
+        local Tab2 = MainFrame.ChangelogTab;
+
+
+        --local Background = Tab2:CreateTexture(nil, "BACKGROUND");
+        --Background:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/SettingsPanelBackground");
+        --Background:SetPoint("TOPLEFT", CentralSection, "TOPLEFT", -8, 0);
+        --Background:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 0);
+
+        local scrollBarOffsetX = 12;
+        local ScrollBar = ControlCenter.CreateScrollBarWithDynamicSize(Tab2);
+        ScrollBar:SetPoint("TOP", MainFrame, "TOPRIGHT", -scrollBarOffsetX, -32);
+        ScrollBar:SetPoint("BOTTOM", MainFrame, "BOTTOMRIGHT", -scrollBarOffsetX, 0.5*Def.WidgetGap);
+        ScrollBar:SetFrameLevel(20);
+        Tab2.ScrollBar = ScrollBar;
+        ScrollBar:UpdateThumbRange();
+
+
+        local ScrollView = API.CreateScrollView(Tab2, ScrollBar);
+        Tab2.ScrollView = ScrollView;
+        ScrollBar.ScrollView = ScrollView;
+        ScrollView:SetPoint("TOPLEFT", CentralSection, "TOPLEFT", 0, -2);
+        ScrollView:SetPoint("BOTTOMRIGHT", MainFrame, "BOTTOMRIGHT", 0, 2);
+        ScrollView:SetStepSize(Def.ButtonSize * 2);
+        ScrollView:OnSizeChanged();
+        ScrollView:EnableMouseBlocker(true);
+        ScrollView:SetBottomOvershoot(Def.CategoryGap);
+        ScrollView:SetAlwaysShowScrollBar(false);
+        ScrollView.renderAllObjects = true;     --debug
+
+
+        local function CreateFontString()
+            local fontString = ScrollView:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            fontString:SetSpacing(Def.ChangelogLineSpacing);
+            fontString:SetJustifyH("LEFT")
+            return fontString
+        end
+
+        local function RemoveFontString(fontString)
+            fontString:SetText(nil);
+            fontString:Hide();
+            fontString:ClearAllPoints();
+        end
+
+        ScrollView:AddTemplate("FontString", CreateFontString, RemoveFontString);
+
+
+        local function EntryButton_Create()
+            local obj = CreateSettingsEntry(ScrollView);
+            obj:SetSize(Def.centerButtonWidth + 6, Def.ButtonSize);
+            obj.isChangelogButton = true;
+            return obj
+        end
+
+        ScrollView:AddTemplate("Entry", EntryButton_Create);
+
+
+        local function CreateTextureObject()
+            local texture = ScrollView:CreateTexture(nil, "OVERLAY");
+            texture:SetTexture(Def.TextureFile);
+            texture:SetSize(8, 8);
+            return texture
+        end
+
+        local function RemoveTextureObject(obj)
+            obj:ClearAllPoints();
+            obj:Hide();
+        end
+
+        ScrollView:AddTemplate("Texture", CreateTextureObject, RemoveTextureObject);
+
+
+        local DivH = Tab2:CreateTexture(nil, "OVERLAY");
+        local sideSectionWidth = LeftSection:GetWidth();
+        DivH:SetSize(sideSectionWidth - 0.5*Def.WidgetGap, 24);
+        DivH:SetPoint("CENTER", LeftSection, "BOTTOM", 0, 2*Def.WidgetGap + Def.ButtonSize);
+        API.DisableSharpening(DivH);
+        DivH:SetTexture(Def.TextureFile);
+        SetTexCoord(DivH, 416, 672, 16, 64);
+
+
+        local AutoShowToggle = CreateSettingsEntry(Tab2);
+        AutoShowToggle:SetSize(sideSectionWidth - 2*Def.WidgetGap, Def.ButtonSize);
+        AutoShowToggle:SetPoint("BOTTOM", LeftSection, "BOTTOM", 0, Def.WidgetGap);
+
+        local AutoShowToggleData = {
+            name = L["Auto Show Relase Notes"],
+            dbKey = "SettingsPanel_AutoShowChangelog",
+            toggleFunc = function() end,
+        };
+
+        AutoShowToggle:SetData(AutoShowToggleData);
+        Tab2.AutoShowToggle = AutoShowToggle;
+
+        MainFrame:ShowLatestChangelog();
+    end
+
+
+    function MainFrame:ShowChangelog(versionID)
+        local changelog = ControlCenter.changelogs[versionID];
+        if not changelog then return end;
+
+        local top, bottom;
+        local n = 0;
+        local objectWidth = Def.centerButtonWidth;
+        local fromOffsetY = 1.5 * Def.ButtonSize;
+        local leftOffset = 1.5 * Def.ButtonSize;
+        local offsetY = fromOffsetY;
+        local content = {};
+        local objectHeight;
+
+        for i, info in ipairs(changelog) do
+            top = offsetY;
+
+            if info.type == "h1" or info.type == "p" then
+                local textWidth;
+                if info.bullet then
+                    textWidth = objectWidth - Def.ChangelogIndent;
+                else
+                    textWidth = objectWidth;
+                end
+                objectHeight = Formatter:GetTextHeight(info.type, info.text, textWidth);
+                bottom = offsetY + objectHeight;
+                if not (changelog[i + 1] and changelog[i + 1].type == "Checkbox") then
+                    bottom = bottom + Def.ChangelogParagraphSpacing;
+                end
+
+                n = n + 1;
+                content[n] = {
+                    dataIndex = n,
+                    templateKey = "FontString",
+                    top = top,
+                    bottom = bottom,
+                    point = "TOPLEFT",
+                    relativePoint = "TOPLEFT",
+                    setupFunc = function(obj)
+                        obj:SetWidth(textWidth);
+                        obj:SetFontObject(Formatter.TagFonts[info.type]);
+                        obj:SetText(info.text);
+                        SetTextColor(obj, Def.TextColorReadable);
+                    end;
+                };
+
+                if info.type == "h1" then
+                    content[n].offsetX = leftOffset;
+                    if false and info.previewKey then   --debug
+                        n = n + 1;
+                        content[n] = {
+                            dataIndex = n,
+                            templateKey = "Texture",
+                            top = top + 6,
+                            bottom = bottom,
+                            point = "LEFT",
+                            relativePoint = "TOPLEFT",
+                            offsetX = leftOffset -6,
+                            setupFunc = function(obj)
+
+                            end,
+                        };
+                    end
+                else
+                    content[n].offsetX = leftOffset + (info.bullet and Def.ChangelogIndent or 0);
+                    if info.bullet then
+                        n = n + 1;
+                        content[n] = {
+                            dataIndex = n,
+                            templateKey = "Texture",
+                            top = top + 6,
+                            bottom = bottom,
+                            point = "LEFT",
+                            relativePoint = "TOPLEFT",
+                            offsetX = leftOffset -6,
+                            setupFunc = function(obj)
+                                obj:SetSize(20, 20);
+                                SetTexCoord(obj, 904, 944, 80, 120); --864, 904, 80, 120
+                                local color = Def.TextColorReadable;
+                                obj:SetVertexColor(color[1], color[2], color[3]);
+                            end;
+                        };
+                    end
+                end
+
+            elseif info.type == "Checkbox" then
+                local visualOffset = 12;
+                objectHeight = Def.ButtonSize;
+                top = top + visualOffset - 4;
+                bottom = top + objectHeight + visualOffset;
+                n = n + 1;
+                content[n] = {
+                    dataIndex = n,
+                    templateKey = "Entry",
+                    setupFunc = function(obj)
+                        local data = ControlCenter:GetModule(info.dbKey);
+                        obj:SetData(data);
+                    end,
+                    top = top,
+                    bottom = bottom,
+                    point = "TOPLEFT",
+                    relativePoint = "TOPLEFT",
+                    offsetX = leftOffset - 6,
+                };
+
+            elseif info.type == "br" then
+                bottom = bottom + Def.ChangelogParagraphSpacing + 2*Def.ChangelogLineSpacing;
+            end
+
+            offsetY = bottom;
+        end
+
+        self.ChangelogTab.ScrollView:SetContent(content);
+    end
+
+    function MainFrame:ShowLatestChangelog()
+        self:ShowChangelog(10800);
+    end
+end
+
+
+do  --Tab Buttons
+    local TabInfo = {
+        {name = L["Modules"], tabKey = "ModuleTab"},
+        {name = L["Release Notes"], tabKey = "ChangelogTab", initFunc = InitChangelogTab},
+    };
+
+
+    local TabButtonMixin = {};
+
+    function TabButtonMixin:OnEnter()
+        self:UpdateVisual();
+    end
+
+    function TabButtonMixin:OnLeave()
+        self:UpdateVisual();
+    end
+
+    function TabButtonMixin:OnClick()
+        MainFrame:ShowTab(self.tabKey);
+    end
+
+    function TabButtonMixin:OnMouseDown()
+        if not self.selected then
+            self.Name:SetPoint("CENTER", self, "CENTER", 1, -1);
+        end
+    end
+
+    function TabButtonMixin:OnMouseUp()
+        self.Name:SetPoint("CENTER", self, "CENTER", 0, 0);
+    end
+
+    function TabButtonMixin:UpdateVisual()
+        if self.selected then
+            SetTextColor(self.Name, Def.TextColorHighlight);
+            SetTexCoord(self.Left, 600, 648, 176, 272);
+            SetTexCoord(self.Center, 648, 760, 176, 272);
+            SetTexCoord(self.Right, 760, 808, 176, 272);
+        else
+            if self:IsMouseMotionFocus() then
+                SetTextColor(self.Name, Def.TextColorHighlight);
+            else
+                SetTextColor(self.Name, Def.TextColorNormal);
+            end
+            SetTexCoord(self.Left, 392, 440, 176, 272);
+            SetTexCoord(self.Center, 440, 552, 176, 272);
+            SetTexCoord(self.Right, 552, 600, 176, 272);
+        end
+    end
+
+    function TabButtonMixin:UpdateState()
+        self.selected = MainFrame[self.tabKey] and MainFrame[self.tabKey]:IsShown();
+        self:UpdateVisual();
+    end
+
+    function TabButtonMixin:SetTabInfo(info)
+        self.Name:SetText(info.name);
+        self.tabKey = info.tabKey;
+        local buttonWidth = API.Round(math.max(18*2 + self.Name:GetWrappedWidth(), 2.5*Def.TabButtonHeight));
+        self:SetSize(buttonWidth, Def.TabButtonHeight);
+        return buttonWidth
+    end
+
+
+    local function CreateTabButton(parent)
+        local f = CreateFrame("Button", nil, parent, "PlumberTabButtonTemplate");
+        Mixin(f, TabButtonMixin);
+        SkinObjects(f, Def.TextureFile);
+        SetTexCoord(f.Left, 392, 440, 176, 272);
+        SetTexCoord(f.Center, 440, 552, 176, 272);
+        SetTexCoord(f.Right, 552, 600, 176, 272);
+        f:UpdateVisual();
+
+        f:SetScript("OnClick", f.OnClick);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
+
+        return f
+    end
+
+
+    function MainFrame:UpdateTabButtons()
+        if not self.tabButtonPool then
+            local function TabButton_Create()
+                local obj = CreateTabButton(self.TabButtonContainer);
+                return obj
+            end
+            self.tabButtonPool = addon.LandingPageUtil.CreateObjectPool(TabButton_Create);
+
+            local offsetX = Def.WidgetGap;
+            local gap = Def.WidgetGap/2;
+
+            for k, v in ipairs(TabInfo) do
+                local button = self.tabButtonPool:Acquire();
+                button:SetPoint("TOPLEFT", self, "BOTTOMLEFT", offsetX, 0);
+                local width = button:SetTabInfo(v);
+                button.index = k;
+                offsetX = offsetX + width + gap;
+            end
+
+            self.TabButtonContainer:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, 0);
+            self.TabButtonContainer:SetSize(offsetX, Def.TabButtonHeight);
+        end
+
+        self.tabButtonPool:CallMethod("UpdateState");
+    end
+
+    function MainFrame:ShowTab(tabKey)
+        if not tabKey then
+            tabKey = "ModuleTab";
+        end
+
+        for i, info in ipairs(TabInfo) do
+            if info.tabKey == tabKey then
+                if info.initFunc then
+                    local func = info.initFunc;
+                    info.initFunc = nil;
+                    func(self);
+                end
+                self[info.tabKey]:Show();
+            else
+                self[info.tabKey]:Hide();
+            end
+        end
+
+        self:UpdateTabButtons();
+    end
+end
+
+
+function MainFrame:ShowUI(mode)
+    if CreateUI then
+        CreateUI();
+        CreateUI = nil;
+
+        ControlCenter:UpdateCurrentSortMethod();
+        self:RefreshCategoryList();
+    end
+
+    mode = mode or "standalone";
+    self.mode = mode;
+    self:UpdateLayout();
+    self:UpdateTabButtons();
+    self:Show();
+end
+
+
+C_Timer.After(1, function()
+    MainFrame:ShowUI();
+end);
