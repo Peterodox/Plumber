@@ -1,7 +1,5 @@
 --Track: Blizzard_HousingTemplates/Blizzard_HousingCatalogFilters.lua
 
-if not (C_HousingCatalog) then return end;
-
 
 local _, addon = ...
 local API = addon.API;
@@ -15,7 +13,7 @@ local REF_UNIT = 0.52336;   --Banana Length
 
 local MODULE_ENABLED = false;
 local SHOW_REF_MODEL = false;
-local MODEL_DB_KEY = "Test_ModuleScaleRef_ShowBanana";
+local MODEL_DB_KEY = "DecorModelScaleRef_ShowBanana";
 
 
 local RefActors = {};
@@ -352,13 +350,20 @@ do
     end
 
     local moduleData = {
-        name = "Decor Catalog: Banana For Scale",
-        dbKey ="Test_ModuleScaleRef",
-        description = "- Add a size reference (a banana) to the decor preview window, allowing you to gauge the size of the objects.\n\n- Also allow you to change the camera pitch by holding down the Left Button and moving vertically.",
+        name = addon.L["ModuleName DecorModelScaleRef"],
+        dbKey ="DecorModelScaleRef",
+        description = addon.L["ModuleDescription DecorModelScaleRef"],
         toggleFunc = EnableModule,
         categoryID = -2,
         uiOrder = 1,
-        moduleAddedTime = 1762900000,
+        moduleAddedTime = 1764600000,
+        minimumTocVersion = 110207,
+		categoryKeys = {
+			"Collection",
+		},
+        searchTags = {
+            "Housing",
+        },
     };
 
     addon.ControlCenter:AddModule(moduleData);

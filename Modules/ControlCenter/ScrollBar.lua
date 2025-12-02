@@ -250,7 +250,11 @@ do
     function ScrollBarMixin:UpdateVisibleExtentPercentage()
         local range = self.ScrollView:GetScrollRange();
         local viewHeight = self.ScrollView:GetHeight();
-        self:SetVisibleExtentPercentage(viewHeight / (viewHeight + range));
+        local ratio = viewHeight / (viewHeight + range);
+        if ratio > 0.95 then
+            ratio = 0.95;
+        end
+        self:SetVisibleExtentPercentage(ratio);
         self:UpdateThumbRange();
         self:SetValueByRatio(self.ratio or 0);
     end

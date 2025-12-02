@@ -15,15 +15,57 @@ BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "打开/关闭资料片概要";   --Sh
 L["Module Control"] = "功能选项";
 L["Quick Slot Generic Description"] = "\n\n*快捷按钮是一组在特定情形下出现的、可交互的按钮。";
 L["Quick Slot Edit Mode"] = "更改布局";
+L["Quick Slot High Contrast Mode"] = "切换高对比度模式";
 L["Quick Slot Reposition"] = "调整位置";
 L["Quick Slot Layout"] = "布局";
 L["Quick Slot Layout Linear"] = "线性";
 L["Quick Slot Layout Radial"] = "环形";
-L["Quick Slot High Contrast Mode"] = "切换高对比度模式";
 L["Restriction Combat"] = "战斗中不可用";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*如需更改标记大小，请打开 世界地图 - 地图筛选 - Plumber";
 L["Toggle Plumber UI"] = "Plumber界面可见性";
 L["Toggle Plumber UI Tooltip"] = "在编辑模式中显示以下Plumber界面：\n%s\n\n此选项仅控制它们在编辑模式下是否可见，并不会启用或禁用这些功能。";
+L["Remove New Feature Marker"] = "移除新功能标记";
+L["Remove New Feature Marker Tooltip"] = "新功能标记 %s 通常在一周后消失，你也可以现在就移除它们。";
+L["Modules"] = "模块控制";
+L["Release Notes"] = "版本说明";
+L["Option AutoShowChangelog"] = "自动显示版本说明";
+L["Option AutoShowChangelog Tooltip"] = "在插件更新后自动打开版本说明。";
+L["Category Colon"] = "类别：";
+L["Module Wrong Game Version"] = "此模块对当前游戏版本无效。";
+L["Changelog Wrong Game Version"] = "以下更新对当前游戏版本无效。";
+L["Settings Panel"] = "设置界面";
+L["Version"] = "版本";
+L["New Features"] = "新功能";
+L["New Feature Abbr"] = "新";
+L["Format Month Day"] = "%s%d日";
+
+
+--Settings Category
+L["SC Signature"] = "特色功能";
+L["SC Current"] = "当前内容";
+L["SC ActionBar"] = "动作条";
+L["SC Chat"] = "聊天";
+L["SC Collection"] = "战团藏品";
+L["SC Instance"] = "副本";
+L["SC Inventory"] = "物品栏";
+L["SC Loot"] = "战利品";
+L["SC Map"] = "地图";
+L["SC Profession"] = "专业";
+L["SC Quest"] = "任务";
+L["SC UnitFrame"] = "单位框体";
+L["SC Old"] = "旧内容";
+L["SC Uncategorized"] = "未分类";
+
+--Settings Search Keywords, Search Tags
+L["KW Tooltip"] = "鼠标小提示鼠标提示";
+L["KW Transmog"] = "幻化";
+L["KW Vendor"] = "商人";
+L["KW LegionRemix"] = "军团再临";
+L["KW Housing"] = "房屋住宅";
+
+--Filter Sort Method
+L["SortMethod 1"] = "名称";  --Alphabetical Order
+L["SortMethod 2"] = "加入时间";  --New on the top
 
 
 --Module Categories
@@ -595,6 +637,11 @@ L["Copy To Clipboard"] = "复制到剪贴板";
 L["Copy Current Outfit Tooltip"] = "复制当前外观方案以在网上分享。";
 L["Missing Appearances Format"] = "%d个外观缺失";
 L["Press Key To Copy Format"] = "按|cffffd100%s|r来复制";
+
+
+--DecorModelScaleRef
+L["ModuleName DecorModelScaleRef"] = "装饰品: 参照物";
+L["ModuleDescription DecorModelScaleRef"] = "- 为装饰品预览窗口增加一个参照物（一根香蕉），帮助你理解物体的大小。\n\n- 允许你按住鼠标左键并在模型上上下拖动来改变镜头的俯仰角。";
 
 
 --Generic

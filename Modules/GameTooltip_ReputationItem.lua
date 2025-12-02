@@ -119,9 +119,9 @@ do
 		categoryKeys = {
 			"Inventory",
 		},
-        SearchTags = {
+        searchTags = {
             "Tooltip",
-        };
+        },
     };
 
     addon.ControlCenter:AddModule(moduleData);

@@ -711,7 +711,7 @@ do
 		categoryKeys = {
 			"Inventory",
 		},
-        SearchTags = {
+        searchTags = {
             "Vendor",
         },
     };

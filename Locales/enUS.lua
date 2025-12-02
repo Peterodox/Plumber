@@ -30,6 +30,15 @@ L["Modules"] = "Modules";
 L["Release Notes"] = "Release Notes";
 L["Option AutoShowChangelog"] = "Auto Show Release Notes";
 L["Option AutoShowChangelog Tooltip"] = "Automatically show release notes after an update.";
+L["Category Colon"] = (CATEGORY or "Category")..": ";
+L["Module Wrong Game Version"] = "This module is ineffective for your current game version.";
+L["Changelog Wrong Game Version"] = "The following changes do not apply to your current game version.";
+L["Settings Panel"] = "Settings Panel";
+L["Version"] = "Version";
+L["New Features"] = "New Features";
+L["New Feature Abbr"] = "New";
+L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
+
 
 --Settings Category
 L["SC Signature"] = "Signature Features";
@@ -52,6 +61,7 @@ L["KW Tooltip"] = "Tooltip";
 L["KW Transmog"] = "Transmog";
 L["KW Vendor"] = "Vendor";
 L["KW LegionRemix"] = "Legion Remix";
+L["KW Housing"] = "Player Housing House";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Name";  --Alphabetical Order
@@ -663,6 +673,10 @@ L["Copy Current Outfit Tooltip"] = "Copy the current outfit to share online.";
 L["Missing Appearances Format"] = "%d |4appearance:appearances; missing";
 L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
 
+
+--DecorModelScaleRef
+L["ModuleName DecorModelScaleRef"] = "Decor Catalog: Banana For Scale"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
+L["ModuleDescription DecorModelScaleRef"] = "- Add a size reference (a banana) to the decor preview window, allowing you to gauge the size of the objects.\n\n- Also allow you to change the camera pitch by holding down the Left Button and moving vertically.";
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";

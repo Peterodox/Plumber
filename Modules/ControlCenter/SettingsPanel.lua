@@ -1,4 +1,6 @@
 local _, addon = ...
+if addon.IsToCVersionEqualOrNewerThan(110000) then return end;
+
 local API = addon.API;
 local L = addon.L;
 local GetDBBool = addon.GetDBBool;
@@ -27,7 +29,7 @@ local CollapsedCateogry = {
 
 local MainFrame = CreateFrame("Frame", nil, UIParent);
 addon.SettingsPanel = MainFrame;
-ControlCenter.OldSettingsPanel = MainFrame;
+ControlCenter.SettingsPanel = MainFrame;
 MainFrame:SetSize(FRAME_WIDTH, FRAME_WIDTH * RATIO);
 MainFrame:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
 MainFrame:Hide();

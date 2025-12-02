@@ -557,7 +557,7 @@ do  -- Time
         local day, month, year = string.split(" ", timeString);
         month = tonumber(month);
         local monthName = CALENDAR_FULLDATE_MONTH_NAMES[month];
-        return string.format(EVENT_SCHEDULER_DAY_FORMAT, monthName, day);
+        return string.format(L["Format Month Day"], monthName, day);
     end
 end
 
@@ -3898,6 +3898,7 @@ do  -- Slash Commands
         end
         SlashCmdList[name] = func;
     end
+    API.CreateSlashCommand = SlashCmdUtil.CreateSlashCommand;
 
     function API.AddSlashSubcommand(name, func)
         if not SlashCmdUtil.cmdID[name] then return end;

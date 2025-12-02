@@ -86,6 +86,12 @@ function ControlCenter:InitializeModules()
             end
 
             self.dbKeyXModule[moduleData.dbKey] = moduleData;
+
+            if moduleData.minimumTocVersion then
+                if not addon.IsToCVersionEqualOrNewerThan(moduleData.minimumTocVersion) then
+                    moduleData.tocVersionCheckFailed = true;
+                end
+            end
         end
     end
 
@@ -97,7 +103,6 @@ function ControlCenter:InitializeModules()
     if not db.seenNewFeatureMark then
         db.seenNewFeatureMark = {};
     end
-    db.seenNewFeatureMark = {}; --debug
     self.seenNewFeatureMark = db.seenNewFeatureMark;
 end
 
@@ -199,6 +204,21 @@ end
 function ControlCenter:GetModuleDescription(dbKey)
     if dbKey and self.dbKeyXModule[dbKey] then
         return self.dbKeyXModule[dbKey].description
+    end
+end
+
+function ControlCenter:GetModuleCategoryName(dbKey)
+    local module = self:GetModule(dbKey);
+    if module and module.categoryKeys then
+        local text;
+        for i, cateKey in ipairs(module.categoryKeys) do
+            if i == 1 then
+                text = self:GetPrimaryCategoryName(cateKey);
+            else
+                text = text..", "..self:GetPrimaryCategoryName(cateKey);
+            end
+        end
+        return text
     end
 end
 
@@ -414,8 +434,8 @@ do  --Settings Panel Revamp
                 if not data.combinedSearchText then
                     local text = lower(data.name);
 
-                    if data.SearchTags then
-                        for _, tag in ipairs(data.SearchTags) do
+                    if data.searchTags then
+                        for _, tag in ipairs(data.searchTags) do
                             tagName = self:GetSearchTagName(tag);
                             text = JoinText(" ", text, lower(tagName));
                         end

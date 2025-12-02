@@ -1,6 +1,6 @@
-## X-Flavor: wrath
-## X-Expansion: WOTLK
-## Interface: 30404
+## X-Flavor: era
+## X-Expansion: TBC
+## Interface: 20505
 ## Version: 1.8.1
 
 ## Title: Plumber

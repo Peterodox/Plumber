@@ -1,6 +1,5 @@
-local VERSION_TEXT = "v1.8.0";
-local VERSION_DATE = 1763400000;
-local VERSION_ID   = 10800;
+local VERSION_TEXT = "v1.8.1";
+local VERSION_DATE = 1764600000;
 
 
 local addonName, addon = ...
@@ -15,7 +14,6 @@ PlumberGlobals = {};
 addon.L = L;
 addon.API = API;
 addon.VERSION_TEXT = VERSION_TEXT;
-addon.VERSION_ID = VERSION_ID;
 
 
 local CallbackRegistry = {};
@@ -300,8 +298,8 @@ local DefaultValues = {
 
 
     --Test Server
-    Test_ModuleScaleRef = true,
-        Test_ModuleScaleRef_ShowBanana = false,
+    DecorModelScaleRef = true,
+        DecorModelScaleRef_ShowBanana = false,
 
 
     --Declared elsewhere:
@@ -350,6 +348,13 @@ local function LoadDatabase()
     if not DB.installTime or type(DB.installTime) ~= "number" then
         DB.installTime = VERSION_DATE;
     end
+
+    if DB.lastVersionTime then
+        if (VERSION_DATE - 1 > DB.lastVersionTime) and DB.SettingsPanel_AutoShowChangelog then
+            CallbackRegistry:Trigger("ShowChangelog");
+        end
+    end
+    DB.lastVersionTime = VERSION_DATE;
 
     DefaultValues = nil;
 

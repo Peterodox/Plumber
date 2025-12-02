@@ -272,7 +272,7 @@ do
 		categoryKeys = {
 			"Collection",
 		},
-        SearchTags = {
+        searchTags = {
             "Tooltip", "Transmog",
         },
     };

@@ -37,7 +37,7 @@
     </Frame>
 
 
-    <!--Script file="SettingsPanel.lua"/-->
+    <Script file="SettingsPanel.lua"/>
     <Script file="SettingsPanelNew.lua"/>
     <Script file="SettingsPanelRegistry.lua"/>
 

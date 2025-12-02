@@ -91,4 +91,33 @@ do  --Globals, AddOn Compartment
     end
 
     API.AddButtonToAddonCompartment(IDENTIFIER, L["Module Category Plumber"], "Interface/AddOns/Plumber/Art/Logo/PlumberLogo64", AddonCompartment_OnClick, AddonCompartment_OnEnter, AddonCompartment_OnLeave);
+
+
+    API.CreateSlashCommand(Plumber_ToggleSettings, "plumber");
+
+
+    local EL = CreateFrame("Frame");
+
+    function EL:RequestShowChangelog()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function EL:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 2 then
+            self.t = 0;
+            if not(SplashFrame and SplashFrame:IsShown()) then
+                self:SetScript("OnUpdate", nil);
+                if not MainFrame:IsShown() then
+                    Plumber_ToggleSettings();
+                    MainFrame:ShowTab("ChangelogTab");
+                end
+            end
+        end
+    end
+
+    addon.CallbackRegistry:Register("ShowChangelog", function()
+        EL:RequestShowChangelog();
+    end);
 end

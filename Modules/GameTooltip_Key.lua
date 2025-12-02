@@ -210,9 +210,9 @@ do
 		categoryKeys = {
 			"Instance",
 		},
-        SearchTags = {
+        searchTags = {
             "Tooltip",
-        };
+        },
     };
 
     addon.ControlCenter:AddModule(moduleData);

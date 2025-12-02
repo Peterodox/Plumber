@@ -3,11 +3,83 @@
 -- DO NOT BOTHER TO TRANSLATE
 
 
-if not (GetLocale() == "enUS") then return end;
+if false then return end;
 
 local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
+
+
+changelogs[10801] = {
+    {
+        type = "date",
+        versionText = "1.8.1",
+        timestamp = 1764700000,
+    },
+
+    {
+        type = "h1",
+        text = L["Settings Panel"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "The Settings Panel has been redesigned, and you are looking at it right now. Hopefully, the new search box and categorization can help you find the features you need.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "A checkbox may appear on the release note, allowing you to conveniently enable or disable a new feature.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can now use slash command |cffd7c0a3/plumber|r to toggle the Settings Panel.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "tocVersionCheck",
+        minimumTocVersion = 110207,
+        breakpoint = false,
+    },
+
+    {
+        type = "h1",
+        isNewFeature = true,
+        text = L["ModuleName DecorModelScaleRef"],
+        dbKey = "DecorModelScaleRef",
+    },
+
+
+    {
+        type = "Checkbox",
+        dbKey = "DecorModelScaleRef",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Add a size reference (a banana) to the decor preview window, allowing you to gauge the size of the objects. You can show/hide the banana at any time.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Allow you to change the camera pitch by holding down the Left Button and moving vertically.",
+    },
+
+    {
+        type = "img",
+        dbKey = "DecorModelScaleRef",
+    },
+};
 
 
 changelogs[10800] = {
@@ -21,6 +93,7 @@ changelogs[10800] = {
         type = "h1",
         isNewFeature = true,
         text = L["ModuleName InstanceDifficulty"],
+        dbKey = "InstanceDifficulty",
     },
 
     {
@@ -53,6 +126,7 @@ changelogs[10800] = {
         type = "h1",
         isNewFeature = true,
         text = L["ModuleName TooltipTransmogEnsemble"],
+        dbKey = "TooltipTransmogEnsemble",
     },
 
     {
@@ -86,6 +160,7 @@ changelogs[10800] = {
         type = "h1",
         isNewFeature = true,
         text = L["ModuleName TransmogChatCommand"],
+        dbKey = "TransmogChatCommand",
     },
 
     {
@@ -124,18 +199,148 @@ changelogs[10800] = {
     {
         type = "p",
         bullet = true,
-        text = "Settings UI: New feature markers now stay for a week instead of going away after opening the Settings UI once.",
-    },
-
-    {
-        type = "p",
-        bullet = true,
         text = "Loot UI, Link Item: You can link an item in chat by Shift + clicking an item in Manual Loot mode.",
     },
+};
+
+
+changelogs[10709] = {
+    {
+        type = "date",
+        versionText = "1.7.9",
+        timestamp = 1761400000,
+    },
+
+    {
+        type = "h1",
+        isNewFeature = true,
+        text = L["ModuleName QueueStatus"],
+        dbKey = "QueueStatus",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "QueueStatus",
+    },
 
     {
         type = "p",
         bullet = true,
-        text = "Instance Difficulty Selector, No-Show: Fixed an issue where the UI doesn't appear when you travel between different floors in Blackrock Mountain and Caverns of Time. Adjusted the Caverns of Time instance entrance locations. Please note that the UI will not appear for Blackwing Descent's entrance due to limitations.",
+        text = "Add a progress bar to the Group Finder Eye that shows the percentage of teammates found. Tanks and Healers weigh more.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "(Optional) Show the delta between Average Wait Time and your Time In Queue.",
+    },
+
+    {
+        type = "img",
+        dbKey = "QueueStatus",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        isNewFeature = true,
+        text = L["ModuleName PlayerPing"],
+        dbKey = "WorldMapPin_PlayerPing",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "WorldMapPin_PlayerPing",
+    },
+
+    {
+        type = "p",
+        text = "By default, WoW only shows the player ping when you change maps or the first time you open the World Map. Whereas this module highlights the player's location with a ping effect when you:",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Open World Map.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Press the ALT key.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Click the Maximize button.",
+    },
+
+    {
+        type = "p",
+        text = "Updated the ping texture",
+    },
+
+    {
+        type = "img",
+        dbKey = "WorldMapPin_PlayerPing",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        isNewFeature = true,
+        text = L["ModuleName HolidayDungeon"],
+        dbKey = "HolidayDungeon",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "HolidayDungeon",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Automatically select holiday and timewalking dungeons when you open Dungeon Finder for the first time.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = L["New Features"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Tooltip: Quest Starting Items: If an item in your bag starts a quest, show the quest details. You can Ctrl Left Click the item to view it in the quest log if you are already on the quest.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Non-refundable Purchase Alert: Adjust the confirmation dialog that appears when buying a non-refundable item, adding a brief lockdown to the 'Yes' button and highlighting the keywords in red. This module also reduces the class set conversion delay by half.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Legion Remix: Auto-set Adventure Guide expansion to Legion.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "This module should now support addons that modify the max number of items per page. It also shows thousands separator on alt currencies like Bronze.",
     },
 };

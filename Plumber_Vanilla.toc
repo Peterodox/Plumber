@@ -1,12 +1,12 @@
 ## X-Flavor: era
 ## X-Expansion: VANILLA
 ## Interface: 11508
-## Version: 1.8.0
+## Version: 1.8.1
 
 ## Title: Plumber
 
-## Notes: Provides a variety of quality-of-life features.|nMore details in the AddOn Settings.
-## Notes-zhCN: 提供多种便捷功能。|n请前往插件设置来查看更多信息。
+## Notes: Provides a variety of quality-of-life features.|n|nOpen Settings with Slash Command:|n/plumber
+## Notes-zhCN: 提供多种便捷功能。|n|n使用此命令打开设置界面|n/plumber
 
 ## Author: Peterodox
 ## SavedVariables: PlumberDB, PlumberDevData
@@ -30,3 +30,5 @@ Modules\LootUI.xml
 Modules\QuickSlot.xml
 Modules\SpellFlyout_Secure.lua
 Modules\Macros.lua
+
+Modules\ExpansionLandingPage\ExpansionLandingPage_MOP.xml

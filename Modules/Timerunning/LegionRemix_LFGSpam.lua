@@ -99,7 +99,7 @@ do
 		categoryKeys = {
 			"Current",
 		},
-        SearchTags = {
+        searchTags = {
             "LegionRemix",
         },
     };

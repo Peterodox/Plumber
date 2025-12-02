@@ -1,4 +1,6 @@
 local _, addon = ...
+if not addon.IsToCVersionEqualOrNewerThan(110000) then return end;
+
 local L = addon.L;
 local API = addon.API;
 local ControlCenter = addon.ControlCenter;
@@ -7,6 +9,7 @@ local GetDBBool = addon.GetDBBool;
 
 local Mixin = Mixin;
 local CreateFrame = CreateFrame;
+local DisableSharpening = API.DisableSharpening;
 
 
 local Def = {
@@ -20,6 +23,7 @@ local Def = {
 
     ChangelogLineSpacing = 4,
     ChangelogParagraphSpacing = 16,
+    ChangelogLineBreakHeight = 32,
     ChangelogIndent = 16,   --22 to match Checkbox Label
     ChangelogImageSize = 240,
 
@@ -74,6 +78,15 @@ local function CreateNewFeatureMark(button, smallDot)
         newTag:SetTexCoord(0, 0.5, 0, 1);
     end
     return newTag
+end
+
+local function CreateDivider(frame, width)
+    local div = frame:CreateTexture(nil, "OVERLAY");
+    div:SetSize(width, 24);
+    div:SetTexture(Def.TextureFile);
+    DisableSharpening(div);
+    SetTexCoord(div, 416, 672, 16, 64);
+    return div
 end
 
 
@@ -286,6 +299,7 @@ do
 
     local function ResetButton_OnClick(self)
         self:GetParent():ClearText();
+        addon.LandingPageUtil.PlayUISound("CheckboxOff");
     end
 
 
@@ -851,6 +865,14 @@ do  --Right Section
                 desc = additonalDesc;
             end
         end
+        if moduleData.tocVersionCheckFailed then
+            local warningText = "|cffd4641c"..L["Module Wrong Game Version"].."|r";
+            if desc then
+                desc = desc.."\n\n"..warningText;
+            else
+                desc = warningText;
+            end
+        end
         self.FeatureDescription:SetText(desc);
         self.FeaturePreview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..(parentDBKey or moduleData.dbKey));
     end
@@ -1036,12 +1058,8 @@ local function CreateUI()
 
         local leftListFromY = 2*Def.WidgetGap + Def.ButtonSize;
 
-        local DivH = Tab1:CreateTexture(nil, "OVERLAY");
-        DivH:SetSize(sideSectionWidth - 0.5*Def.WidgetGap, 24);
+        local DivH = CreateDivider(Tab1, sideSectionWidth - 0.5*Def.WidgetGap);
         DivH:SetPoint("CENTER", LeftSection, "TOP", 0, -leftListFromY);
-        API.DisableSharpening(DivH);
-        DivH:SetTexture(Def.TextureFile);
-        SetTexCoord(DivH, 416, 672, 16, 64);
 
 
         leftListFromY = leftListFromY + Def.WidgetGap;
@@ -1077,7 +1095,7 @@ local function CreateUI()
             tex:SetTexture(Def.TextureFile);
             tex:SetPoint(point, relativeTo, relativePoint, offsetX, offsetY);
             SetTexCoord(tex, l, r, t, b);
-            API.DisableSharpening(tex);
+            DisableSharpening(tex);
             return tex
         end
 
@@ -1209,13 +1227,86 @@ function MainFrame:UpdateLayout()
 end
 
 
+local CreateChangelogVersionButton;
+do
+    local VersionButtonMixin = {};
+
+    function VersionButtonMixin:OnEnter()
+        MainFrame:HighlightButton(self);
+        self:UpdateVisual();
+    end
+
+    function VersionButtonMixin:OnLeave()
+        MainFrame:HighlightButton();
+        self:UpdateVisual();
+    end
+
+    function VersionButtonMixin:SetVersionID(versionID)
+        self.versionID = versionID;
+        local x, y, z = string.match(versionID, "(%d?%d)(%d%d)(%d%d)");
+        x = tonumber(x);
+        y = tonumber(y);
+        z = tonumber(z);
+        self.Label:SetText(string.format("%d.%d.%d", x, y, z));
+    end
+
+    function VersionButtonMixin:OnClick()
+        MainFrame:ShowChangelog(self.versionID);
+        addon.LandingPageUtil.PlayUISound("ScrollBarStep");
+    end
+
+    function VersionButtonMixin:OnMouseDown()
+        self.Label:SetPoint("LEFT", self, "LEFT", self.labelOffset + 1, -1);
+    end
+
+    function VersionButtonMixin:OnMouseUp()
+        self:ResetOffset();
+    end
+
+    function VersionButtonMixin:ResetOffset()
+        self.Label:SetPoint("LEFT", self, "LEFT", self.labelOffset, 0);
+    end
+
+    function VersionButtonMixin:UpdateVisual()
+        if self:IsMouseMotionFocus() then
+            SetTextColor(self.Label, Def.TextColorHighlight);
+        else
+            if self.selected then
+                SetTextColor(self.Label, Def.TextColorHighlight);
+            else
+                SetTextColor(self.Label, Def.TextColorNormal);
+            end
+        end
+    end
+
+    function CreateChangelogVersionButton(parent)
+        local f = CreateFrame("Button", nil, parent);
+        Mixin(f, VersionButtonMixin);
+        f:SetSize(120, 26);
+        f.labelOffset = 9;
+        f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.Label:SetJustifyH("LEFT");
+        f.Label:SetPoint("LEFT", f, "LEFT", 9, 0);
+        SetTextColor(f.Label, Def.TextColorNormal);
+
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:SetScript("OnClick", f.OnClick);
+        f:SetScript("OnMouseDown", f.OnMouseDown);
+        f:SetScript("OnMouseUp", f.OnMouseUp);
+
+        return f
+    end
+end
+
+
 local InitChangelogTab;
 do  --ChangelogTab
     local Formatter = {};
 
     Formatter.TagFonts = {
-        ["h1"] = "PlumberFont_16",
-        ["p"] = "GameFontNormal",
+        ["h1"] = "ObjectiveTrackerFont16",  --PlumberFont_16
+        ["p"] = "GameFontNormal",   --GameFontNormal ObjectiveTrackerFont14
     };
 
     function Formatter:GetTextHeight(fontTag, text, width)
@@ -1268,19 +1359,23 @@ do  --ChangelogTab
 
 
         local function CreateFontString()
-            local fontString = ScrollView:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            fontString:SetSpacing(Def.ChangelogLineSpacing);
-            fontString:SetJustifyH("LEFT")
-            return fontString
+            local obj = ScrollView:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            obj:SetSpacing(Def.ChangelogLineSpacing);
+            obj:SetJustifyH("LEFT")
+            return obj
         end
 
-        local function RemoveFontString(fontString)
-            fontString:SetText(nil);
-            fontString:Hide();
-            fontString:ClearAllPoints();
+        local function RemoveFontString(obj)
+            obj:SetText(nil);
+            obj:Hide();
+            obj:ClearAllPoints();
         end
 
-        ScrollView:AddTemplate("FontString", CreateFontString, RemoveFontString);
+        local function OnAcquireFontString(obj)
+            obj:SetSpacing(Def.ChangelogLineSpacing);
+        end
+
+        ScrollView:AddTemplate("FontString", CreateFontString, RemoveFontString, OnAcquireFontString);
 
 
         local function EntryButton_Create()
@@ -1303,23 +1398,23 @@ do  --ChangelogTab
         local function RemoveTextureObject(obj)
             obj:ClearAllPoints();
             obj:Hide();
+            obj:SetTexture(nil);
+            DisableSharpening(obj, false);
         end
 
         ScrollView:AddTemplate("Texture", CreateTextureObject, RemoveTextureObject);
 
 
-        local DivH = Tab2:CreateTexture(nil, "OVERLAY");
         local sideSectionWidth = LeftSection:GetWidth();
-        DivH:SetSize(sideSectionWidth - 0.5*Def.WidgetGap, 24);
-        DivH:SetPoint("CENTER", LeftSection, "BOTTOM", 0, 2*Def.WidgetGap + Def.ButtonSize);
-        API.DisableSharpening(DivH);
-        DivH:SetTexture(Def.TextureFile);
-        SetTexCoord(DivH, 416, 672, 16, 64);
+        local widgetWidth = sideSectionWidth - 2*Def.WidgetGap;
+
+        local DivBottom = CreateDivider(Tab2, sideSectionWidth - 0.5*Def.WidgetGap);
+        DivBottom:SetPoint("CENTER", LeftSection, "BOTTOM", 0, 2*Def.WidgetGap + Def.ButtonSize);
 
 
         local AutoShowToggle = CreateSettingsEntry(Tab2);
         Tab2.AutoShowToggle = AutoShowToggle;
-        AutoShowToggle:SetSize(sideSectionWidth - 2*Def.WidgetGap, Def.ButtonSize);
+        AutoShowToggle:SetSize(widgetWidth, Def.ButtonSize);
         AutoShowToggle:SetPoint("BOTTOM", LeftSection, "BOTTOM", 0, Def.WidgetGap);
         AutoShowToggle.isChangelogButton = true;
 
@@ -1343,11 +1438,23 @@ do  --ChangelogTab
             GameTooltip:Hide();
         end);
 
+
+        local function VerisonButton_Create()
+            local obj = CreateChangelogVersionButton(Tab2);
+            obj:SetSize(widgetWidth, Def.ButtonSize);
+            obj.Label:SetWidth(widgetWidth - 2 * obj.labelOffset);
+            return obj
+        end
+
+        Tab2.VersionButtonPool = addon.LandingPageUtil.CreateObjectPool(VerisonButton_Create);
+
+
         MainFrame:ShowLatestChangelog();
     end
 
 
     function MainFrame:ShowChangelog(versionID)
+        --Format Changelog
         local changelog = ControlCenter.changelogs[versionID];
         if not changelog then return end;
 
@@ -1359,10 +1466,37 @@ do  --ChangelogTab
         local offsetY = fromOffsetY;
         local content = {};
         local objectHeight;
-        local postfixNewFeature = " ("..NEW..")";
+        local postfixNewFeature = " ("..L["New Feature Abbr"]..")";
 
         for i, info in ipairs(changelog) do
             top = offsetY;
+
+            if info.type == "tocVersionCheck" then
+                if not addon.IsToCVersionEqualOrNewerThan(info.minimumTocVersion) then
+                    if info.breakpoint then
+                        break
+                    else
+                        local text = "|cffd4641c"..L["Changelog Wrong Game Version"].."|r";
+                        objectHeight = Formatter:GetTextHeight(info.type, text);
+                        bottom = offsetY + objectHeight + Def.ChangelogParagraphSpacing + Def.ChangelogLineBreakHeight;
+                        n = n + 1;
+                        content[n] = {
+                            dataIndex = n,
+                            templateKey = "FontString",
+                            top = top,
+                            bottom = bottom,
+                            point = "TOPLEFT",
+                            relativePoint = "TOPLEFT",
+                            offsetX = leftOffset,
+                            setupFunc = function(obj)
+                                obj:SetWidth(objectWidth);
+                                obj:SetFontObject(Formatter.TagFonts["p"]);
+                                obj:SetText(text);
+                            end;
+                        };
+                    end
+                end
+            end
 
             if info.type == "h1" or info.type == "p" then
                 local text = info.text;
@@ -1399,6 +1533,33 @@ do  --ChangelogTab
 
                 if info.type == "h1" then
                     content[n].offsetX = leftOffset;
+
+                    --Add Keywords
+                    if info.dbKey then
+                        local text = ControlCenter:GetModuleCategoryName(info.dbKey);
+                        if text then
+                            text = L["Category Colon"]..text;
+                            objectHeight = Formatter:GetTextHeight(info.type, text);
+                            top = bottom + Def.ChangelogLineSpacing;
+                            bottom = top + objectHeight;
+                            n = n + 1;
+                            content[n] = {
+                                dataIndex = n,
+                                templateKey = "FontString",
+                                setupFunc = function(obj)
+                                    obj:SetFontObject(Formatter.TagFonts["p"]);
+                                    obj:SetText(text);
+                                    SetTextColor(obj, Def.TextColorNonInteractable);
+                                end,
+                                top = top,
+                                bottom = bottom,
+                                point = "TOPLEFT",
+                                relativePoint = "TOPLEFT",
+                                offsetX = leftOffset,
+                            };
+                            top = bottom;
+                        end
+                    end
                 else
                     content[n].offsetX = leftOffset + (info.bullet and Def.ChangelogIndent or 0);
                     if info.bullet then
@@ -1413,6 +1574,7 @@ do  --ChangelogTab
                             offsetX = leftOffset -6,
                             setupFunc = function(obj)
                                 obj:SetSize(20, 20);
+                                obj:SetTexture(Def.TextureFile);
                                 SetTexCoord(obj, 904, 944, 80, 120); --864, 904, 80, 120
                                 local color = Def.TextColorReadable;
                                 obj:SetVertexColor(color[1], color[2], color[3]);
@@ -1442,7 +1604,7 @@ do  --ChangelogTab
                 };
 
             elseif info.type == "br" then
-                bottom = bottom + Def.ChangelogParagraphSpacing + 2*Def.ChangelogLineSpacing;
+                bottom = bottom + Def.ChangelogLineBreakHeight;
 
             elseif info.type == "img" then
                 if info.dbKey then
@@ -1467,9 +1629,9 @@ do  --ChangelogTab
 
             elseif info.type == "date" then
                 if info.versionText and info.timestamp then
-                    local text = string.format("%s %s    %s", GAME_VERSION_LABEL, info.versionText, API.SecondsToDate(info.timestamp));
+                    local text = string.format("%s %s   %s", GAME_VERSION_LABEL, info.versionText, API.SecondsToDate(info.timestamp));
                     objectHeight = Formatter:GetTextHeight(info.type, text);
-                    bottom = top + objectHeight + Def.ChangelogParagraphSpacing + 2*Def.ChangelogLineSpacing;
+                    bottom = top + objectHeight;
                     n = n + 1;
                     content[n] = {
                         dataIndex = n,
@@ -1486,6 +1648,27 @@ do  --ChangelogTab
                             SetTextColor(obj, Def.TextColorNonInteractable);
                         end;
                     };
+
+                    --HorizontalLine
+                    top = bottom + Def.ChangelogLineSpacing;
+                    bottom = top + Def.ChangelogParagraphSpacing + 2*Def.ChangelogLineSpacing;
+                    n = n + 1;
+                    content[n] = {
+                        dataIndex = n,
+                        templateKey = "Texture",
+                        top = top,
+                        bottom = bottom,
+                        point = "TOPLEFT",
+                        relativePoint = "TOPLEFT",
+                        offsetX = leftOffset - 1,
+                        setupFunc = function(obj)
+                            obj:SetSize(objectWidth + 32, 8);
+                            SetTexCoord(obj, 424, 864, 132, 148)
+                            obj:SetVertexColor(1, 1, 1);
+                            obj:SetTexture(Def.TextureFile, nil, nil, "TRILINEAR");
+                            DisableSharpening(obj, true);
+                        end;
+                    };
                 end
             end
 
@@ -1493,10 +1676,44 @@ do  --ChangelogTab
         end
 
         self.ChangelogTab.ScrollView:SetContent(content);
+
+        for _, button in self.ChangelogTab.VersionButtonPool:EnumerateActive() do
+            button.selected = button.versionID == versionID;
+            button:UpdateVisual();
+        end
+    end
+
+    function MainFrame:BuildChangelogList()
+        if not self.changelogList then
+            local tbl = {};
+            local n = 0;
+            for versionID, changelog in pairs(ControlCenter.changelogs) do
+                n = n + 1;
+                tbl[n] = {
+                    versionID = versionID,
+                    changelog = changelog,
+                };
+            end
+            table.sort(tbl, function(a, b)
+                return a.versionID > b.versionID
+            end);
+            self.changelogList = tbl;
+            self.latestVersionID = tbl[1].versionID;
+
+            local fromOffsetY = - Def.ButtonSize;
+            local pool = self.ChangelogTab.VersionButtonPool;
+            pool:ReleaseAll();
+            for index, v in ipairs(tbl) do
+                local button = pool:Acquire();
+                button:SetVersionID(v.versionID);
+                button:SetPoint("TOP", self.LeftSection, "TOP", 0, fromOffsetY - (index - 1) * Def.ButtonSize);
+            end
+        end
     end
 
     function MainFrame:ShowLatestChangelog()
-        self:ShowChangelog(10800);
+        self:BuildChangelogList();
+        self:ShowChangelog(self.latestVersionID);
     end
 end
 
@@ -1614,6 +1831,9 @@ do  --Tab Buttons
             tabKey = "ModuleTab";
         end
 
+        if tabKey == self.currentTabKey then return end;
+        self.currentTabKey = tabKey;
+
         for i, info in ipairs(TabInfo) do
             if info.tabKey == tabKey then
                 if info.initFunc then
@@ -1628,6 +1848,8 @@ do  --Tab Buttons
         end
 
         self:UpdateTabButtons();
+
+        addon.LandingPageUtil.PlayUISound("SwitchTab");
     end
 end
 
@@ -1643,12 +1865,8 @@ function MainFrame:ShowUI(mode)
 
     mode = mode or "standalone";
     self.mode = mode;
+    self.NineSlice:ShowCloseButton(mode ~= "blizzard");
     self:UpdateLayout();
     self:UpdateTabButtons();
     self:Show();
 end
-
-
-C_Timer.After(1, function()
-    MainFrame:ShowUI();
-end);
