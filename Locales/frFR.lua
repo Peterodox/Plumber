@@ -260,8 +260,8 @@ L["Error Show UI In Combat"] = "Vous ne pouvez pas afficher / masquer ceci en co
 
 
 --Landing Page Switch
-L["ModuleName LandingPageSwitch"] = "Rapport de mission sur la minicarte";
-L["ModuleDescription LandingPageSwitch"] = "Accéder aux Rapports du fief et Rapport de domaine en faisant Clic droit sur le Résumé de Renom, sur la minicarte.";
+L["ModuleName LandingPageSwitch"] = "Rapport de mission sur la mini-carte";
+L["ModuleDescription LandingPageSwitch"] = "Accéder aux Rapports du fief et Rapport de domaine en faisant Clic droit sur le Résumé de Renom, sur la mini-carte.";
 L["Mission Complete Count Format"] = "%d Prêt à terminer";
 L["Open Mission Report Tooltip"] = "Clic droit pour ouvrir les rapports de mission.";
 
@@ -370,8 +370,8 @@ L["Available Knowledge Format"] = "Connaissances disponibles : |cffffffff%s|r";
 
 
 --MinimapMouseover (click to /tar creature on the minimap)
-L["ModuleName MinimapMouseover"] = "Cible de la minicarte";
-L["ModuleDescription MinimapMouseover"] = "Alt + Clic sur une créature sur la minicarte pour la définir comme cible.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+L["ModuleName MinimapMouseover"] = "Cible de la mini-carte";
+L["ModuleDescription MinimapMouseover"] = "Alt + Clic sur une créature sur la mini-carte pour la définir comme cible.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
 
 
 --BossBanner
@@ -407,7 +407,7 @@ L["SoftTargetName ShowNPC Tooltip"] = "Si cette option est désactivée, le nom 
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Apprend automatiquement les traits.\n\n- Ajoute un widget à la feuille de personnage affichant diverses informations. Vous pouvez cliquer sur ce widget pour ouvrir une nouvelle interface d'artefact.";
 L["ModuleName LegionRemix_HideWorldTier"] = "Masquer l'icône de palier mondial";
-L["ModuleDescription LegionRemix_HideWorldTier"] = "Masque l'icône du palier mondial héroïque située sous la minicarte.";
+L["ModuleDescription LegionRemix_HideWorldTier"] = "Masque l'icône du palier mondial héroïque située sous la mini-carte.";
 L["ModuleName LegionRemix_LFGSpam"] = "Spam de la Recherche de raid";
 L["ModuleDescription LegionRemix_LFGSpam"] = "Supprimer le message indésirable suivant :\n\n"..ERR_LFG_PROPOSAL_FAILED;
 L["Artifact Weapon"] = "Arme prodigieuse";
