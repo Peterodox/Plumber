@@ -343,9 +343,9 @@ do
 end
 
 
-local FilterUtil = {};
+local MenuInfo = {};
 do
-    function FilterUtil.MenuInfoGetter()
+    function MenuInfo.InfoGetter_ModuleFilter()
         local tbl = {
             key = "SettingsPanelFilterMenu",
         };
@@ -397,30 +397,60 @@ do
         tbl.widgets = widgets;
         return tbl
     end
+
+    function MenuInfo.InfoGetter_ChangelogMenu()
+        local tbl = {
+            key = "SettingsPanelChangelogMenu",
+        };
+
+        local widgets = {
+            {type = "Header", text = L["Font Size"]},
+        };
+
+
+        local selectedIndex = PlumberDB and PlumberDB.SettingsPanel_ChangelogFontSize or 1;
+        local sizes = {12, 14};
+
+        for k, v in ipairs(sizes) do
+            table.insert(widgets, {
+                type = "Radio",
+                text = v;
+                closeAfterClick = true,
+                onClickFunc = function()
+                    PlumberDB.SettingsPanel_ChangelogFontSize = k;
+                    MainFrame:ShowChangelog(MainFrame.currentVersionID or MainFrame.latestVersionID);
+                end,
+                selected = k == selectedIndex,
+            });
+        end
+
+        tbl.widgets = widgets;
+        return tbl
+    end
 end
 
 
 local CreateSquareButton;
 do
-    local FilterButtonMixin = {};
+    local SqaureButtonMixin = {};
 
-    function FilterButtonMixin:OnMouseDown()
+    function SqaureButtonMixin:OnMouseDown()
         if not self:IsEnabled() then return end;
-        SetTexCoord(self.Texture, 320, 368, 16, 64);
+        self.onMouseDownFunc(self);
     end
 
-    function FilterButtonMixin:OnMouseUp()
-        SetTexCoord(self.Texture, 272, 320, 16, 64);
+    function SqaureButtonMixin:OnMouseUp()
+        self.onMouseUpFunc(self);
     end
 
-    function FilterButtonMixin:OnClick()
-        addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, FilterUtil.MenuInfoGetter);
+    function SqaureButtonMixin:OnClick(button)
+        self.onClickFunc(self, button);
     end
 
 
     function CreateSquareButton(parent)
         local f = CreateFrame("Button", nil, parent, "PlumberSquareButtonArtTemplate");
-        Mixin(f, FilterButtonMixin);
+        Mixin(f, SqaureButtonMixin);
         f:SetSize(Def.ButtonSize, Def.ButtonSize);
 
         SkinObjects(f, Def.TextureFile);
@@ -575,6 +605,7 @@ do
     function EntryButtonMixin:SetData(moduleData)
         self.Label:SetText(moduleData.name);
         self.dbKey = moduleData.dbKey;
+        self.virtual = moduleData.virtual;
         self.data = moduleData;
         self.NewTag:SetShown((not self.isChangelogButton) and moduleData.isNewFeature);
         self.OptionToggle:SetOnClickFunc(moduleData.optionToggleFunc);
@@ -620,6 +651,13 @@ do
     end
 
     function EntryButtonMixin:UpdateState()
+        if self.virtual then
+            self:Enable();
+            self.OptionToggle:SetShown(self.hasOptions);
+            SetTexCoord(self.Box, 736, 784, 64, 112);
+            return
+        end
+
         local disabled;
         if self.parentDBKey and not GetDBBool(self.parentDBKey) then
             disabled = true;
@@ -1053,8 +1091,24 @@ local function CreateUI()
         SearchBox:SetPoint("TOPLEFT", LeftSection, "TOPLEFT", Def.WidgetGap, -Def.WidgetGap);
         SearchBox:SetWidth(sideSectionWidth - Def.ButtonSize - 3 * Def.WidgetGap);
 
+
         FilterButton = CreateSquareButton(Tab1);
         FilterButton:SetPoint("LEFT", SearchBox, "RIGHT", Def.WidgetGap, 0);
+
+        FilterButton.onClickFunc = function(self)
+            addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, MenuInfo.InfoGetter_ModuleFilter);
+        end
+
+        FilterButton.onMouseDownFunc = function(self)
+            SetTexCoord(self.Texture, 272, 320, 16, 64);
+        end
+
+        FilterButton.onMouseUpFunc = function(self)
+            SetTexCoord(self.Texture, 272, 320, 16, 64);
+        end
+
+        FilterButton:OnMouseUp();
+
 
         local leftListFromY = 2*Def.WidgetGap + Def.ButtonSize;
 
@@ -1306,7 +1360,7 @@ do  --ChangelogTab
 
     Formatter.TagFonts = {
         ["h1"] = "ObjectiveTrackerFont16",  --PlumberFont_16
-        ["p"] = "GameFontNormal",   --GameFontNormal ObjectiveTrackerFont14
+        ["p"] = "GameFontNormal",   --GameFontNormal 
     };
 
     function Formatter:GetTextHeight(fontTag, text, width)
@@ -1329,6 +1383,15 @@ do  --ChangelogTab
         return height
     end
 
+    function Formatter:LoadUserFont()
+        self.utilityFontTag = nil;
+        local sizeIndex = PlumberDB and PlumberDB.SettingsPanel_ChangelogFontSize or 1;
+        if sizeIndex == 2 then
+            self.TagFonts["p"] = "ObjectiveTrackerFont14";
+        else
+            self.TagFonts["p"] = "GameFontNormal";
+        end
+    end
 
     function InitChangelogTab()
         local LeftSection = MainFrame.LeftSection;
@@ -1408,9 +1471,27 @@ do  --ChangelogTab
         local sideSectionWidth = LeftSection:GetWidth();
         local widgetWidth = sideSectionWidth - 2*Def.WidgetGap;
 
+
+        local MenuButton = CreateSquareButton(Tab2);
+        MenuButton:SetPoint("TOPRIGHT", LeftSection, "TOPRIGHT", -Def.WidgetGap, -Def.WidgetGap);
+
+        MenuButton.onClickFunc = function(self)
+            addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, MenuInfo.InfoGetter_ChangelogMenu);
+        end
+
+        MenuButton.onMouseDownFunc = function(self)
+            SetTexCoord(self.Texture, 912, 960, 176, 224);
+        end
+
+        MenuButton.onMouseUpFunc = function(self)
+            SetTexCoord(self.Texture, 864, 912, 176, 224);
+        end
+
+        MenuButton:OnMouseUp();
+
+
         local DivBottom = CreateDivider(Tab2, sideSectionWidth - 0.5*Def.WidgetGap);
         DivBottom:SetPoint("CENTER", LeftSection, "BOTTOM", 0, 2*Def.WidgetGap + Def.ButtonSize);
-
 
         local AutoShowToggle = CreateSettingsEntry(Tab2);
         Tab2.AutoShowToggle = AutoShowToggle;
@@ -1439,6 +1520,15 @@ do  --ChangelogTab
         end);
 
 
+        local VersionTitle = Tab2:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        VersionTitle:SetJustifyH("LEFT");
+        VersionTitle:SetPoint("LEFT", LeftSection, "TOPLEFT", Def.WidgetGap + 9 + 2, -Def.WidgetGap - 0.5 * Def.ButtonSize);
+        SetTextColor(VersionTitle, Def.TextColorNonInteractable);
+        VersionTitle:SetText(L["Version"].." "..addon.VERSION_TEXT);
+
+        local DivH = CreateDivider(Tab2, sideSectionWidth - 0.5*Def.WidgetGap);
+        DivH:SetPoint("CENTER", LeftSection, "TOP", 0, -Def.ButtonSize -2*Def.WidgetGap);
+
         local function VerisonButton_Create()
             local obj = CreateChangelogVersionButton(Tab2);
             obj:SetSize(widgetWidth, Def.ButtonSize);
@@ -1457,6 +1547,9 @@ do  --ChangelogTab
         --Format Changelog
         local changelog = ControlCenter.changelogs[versionID];
         if not changelog then return end;
+
+        Formatter:LoadUserFont();
+        self.currentVersionID = versionID;
 
         local top, bottom;
         local n = 0;
@@ -1630,7 +1723,7 @@ do  --ChangelogTab
             elseif info.type == "date" then
                 if info.versionText and info.timestamp then
                     local text = string.format("%s %s   %s", GAME_VERSION_LABEL, info.versionText, API.SecondsToDate(info.timestamp));
-                    objectHeight = Formatter:GetTextHeight(info.type, text);
+                    objectHeight = Formatter:GetTextHeight("p", text);
                     bottom = top + objectHeight;
                     n = n + 1;
                     content[n] = {
@@ -1700,7 +1793,7 @@ do  --ChangelogTab
             self.changelogList = tbl;
             self.latestVersionID = tbl[1].versionID;
 
-            local fromOffsetY = - Def.ButtonSize;
+            local fromOffsetY = - Def.ButtonSize - 3*Def.WidgetGap;
             local pool = self.ChangelogTab.VersionButtonPool;
             pool:ReleaseAll();
             for index, v in ipairs(tbl) do
