@@ -38,6 +38,7 @@ L["Version"] = "버전";
 L["New Features"] = "새 기능";
 L["New Feature Abbr"] = "신규";
 L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
+L["Always On Module"] = "이 모듈은 항상 활성화되어 있습니다.";
 
 
 --Settings Category
@@ -62,10 +63,12 @@ L["KW Transmog"] = "형상변환";
 L["KW Vendor"] = "상인";
 L["KW LegionRemix"] = "군단 리믹스";
 L["KW Housing"] = "하우징";
+L["KW Combat"] = "전투";
+L["KW ActionBar"] = "행동 단축바";
 
 --Filter Sort Method
-L["SortMethod 1"] = "이름";
-L["SortMethod 2"] = "추가된 날짜";
+L["SortMethod 1"] = "이름";  --Alphabetical Order
+L["SortMethod 2"] = "추가된 날짜";  --New on the top
 
 
 --Module Categories
@@ -126,7 +129,7 @@ L["Catalyst Charges"] = "변환 촉매 횟수";
 
 --GossipFrameMedal
 L["ModuleName GossipFrameMedal"] = "용 조련 경주 메달";
-L["ModuleDescription GossipFrameMedal Format"] = "기본 아이콘 %s을(를) 당신이 획득한 메달 %s로 교체합니다. \n\nNPC와 상호작용할 때 기록을 불러오는 데 잠시 시간이 걸릴 수 있습니다.";
+L["ModuleDescription GossipFrameMedal Format"] = "기본 아이콘 %s를 획득한 메달 %s로 교체합니다.\n\nNPC와 상호작용 시 기록을 불러오는 데 잠시 시간이 소요될 수 있습니다.";
 
 
 --DruidModelFix (Disabled after 10.2.0)
@@ -191,7 +194,7 @@ L["ModuleDescription Technoscryers"] = "기술탐지기 퀘스트 중 착용 버
 
 --Navigator(Waypoint/SuperTrack) Shared Strings
 L["Priority"] = "우선순위";
-L["Priority Default"] = "기본값";
+L["Priority Default"] = "기본값";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
 L["Priority Default Tooltip"] = "WoW의 기본 설정을 따릅니다. 퀘스트, 시체, 상인 위치를 우선 추적하며, 해당 위치가 없을 경우 활성화된 씨앗을 추적합니다.";
 L["Stop Tracking"] = "추적 중지";
 L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "왼쪽 클릭으로 위치 추적";
@@ -247,7 +250,7 @@ L["Can Create Multiple Item Format"] = "|cffffffff%d|r개의 항목을 생성할
 --Tooltip DelvesItem
 L["ModuleName TooltipDelvesItem"] = "구렁 아이템";
 L["ModuleDescription TooltipDelvesItem"] = "주간 보상 상자에서 획득한 보관함 열쇠와 파편 수량을 표시합니다.";
-L["You Have Received Weekly Item Format"] = "이번 주에 %s을(를) 획득했습니다.";
+L["You Have Received Weekly Item Format"] = "이번 주에 %s를 받았습니다.";
 
 
 --Tooltip ItemQuest
@@ -440,7 +443,7 @@ L["SoftTargetName CastBar"] = "시전 바 표시";
 L["SoftTargetName CastBar Tooltip"] = "이름표에 원형 시전 바를 표시합니다.\n\n|cffff4800애드온은 주문의 실제 대상이 어떤 오브젝트인지 알 수 없습니다.|r";
 L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "퀘스트 목표 표시";
 L["SoftTargetName QuestObjective Tooltip"] = "이름 아래에 퀘스트 목표(있는 경우)를 표시합니다.";
-L["SoftTargetName QuestObjective Alert"] = "이 기능을 사용하려면 게임 설정 > 손쉬운 사용 > 일반에서 |cffffffff대상 표시 툴팁|r 옵션을 활성화해야 합니다.";
+L["SoftTargetName QuestObjective Alert"] = "이 기능을 사용하려면 게임 설정 > 손쉬운 사용 > 일반에서 |cffffffff대상 표시 툴팁|r 옵션을 활성화해야 합니다.";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "NPC 포함";
 L["SoftTargetName ShowNPC Tooltip"] = "비활성화하면 이름은 상호작용 가능한 게임 오브젝트에만 표시됩니다.";
 
@@ -455,7 +458,7 @@ L["ModuleDescription LegionRemix_LFGSpam"] = "다음 알림 메시지를 차단�
 L["Artifact Weapon"] = "유물 무기";
 L["Artifact Ability"] = "유물 능력";
 L["Artifact Traits"] = "유물 특성";
-L["Earn X To Upgrade Y Format"] = "|cffffffff%s|r %s을(를) 추가로 획득하여 %s을(를) 업그레이드하세요";
+L["Earn X To Upgrade Y Format"] = "|cffffffff%s|r %s를 추가로 획득하여 %s를 업그레이드하세요"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
 L["Until Next Upgrade Format"] = "다음 업그레이드까지 %s";
 L["New Trait Available"] = "새로운 특성이 사용 가능합니다.";
 L["Rank Format"] = "등급 %s";
@@ -554,8 +557,8 @@ L["LootUI Option Low Frame Strata Tooltip"] = "전리품 알림 모드에서 전
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "모듈 정보";
 L["QuickSlot Error 1"] = "퀵 슬롯: 이 컨트롤러는 이미 추가되었습니다.";
-L["QuickSlot Error 2"] = "퀵 슬롯: 컨트롤러에 \"%s\"이(가) 없습니다.";
-L["QuickSlot Error 3"] = "퀵 슬롯: 동일한 키 \"%s\"을(를) 가진 컨트롤러가 이미 존재합니다.";
+L["QuickSlot Error 2"] = "퀵 슬롯: 컨트롤러에 \"%s\"가 없습니다.";
+L["QuickSlot Error 3"] = "퀵 슬롯: 동일한 키 \"%s\"를 가진 컨트롤러가 이미 존재합니다.";
 
 
 --Plumber Macro
@@ -585,6 +588,8 @@ L["Drawer Option Hide Unusable Tooltip"] = "미보유 아이템 및 미습득 �
 L["Drawer Option Hide Unusable Tooltip 2"] = "포션과 같은 소비 아이템은 항상 표시됩니다.";
 L["Drawer Option Update Frequently"] = "항상 최신 상태 유지";
 L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경이 있을 때마다 버튼 상태를 갱신합니다. 이 옵션을 켜면 시스템 자원을 약간 더 사용할 수 있습니다";
+L["ModuleName DrawerMacro"] = "패널 매크로";
+L["ModuleDescription DrawerMacro"] = "아이템, 주문, 애완동물, 탈것, 장난감을 관리할 수 있는 맞춤형 확장 메뉴를 생성하세요.\n\n패널 매크로를 만들려면 먼저 새 매크로를 생성한 후 명령어 편집창에 |cffd7c0a3#plumber:drawer|r 입력하세요.";
 
 
 --New Expansion Landing Page
@@ -678,7 +683,6 @@ L["Press Key To Copy Format"] = "|cffffd100%s|r 키를 눌러 복사";
 L["ModuleName DecorModelScaleRef"] = "장식품: 크기 비교용 바나나";
 L["ModuleDescription DecorModelScaleRef"] = "- 장식 미리보기 창에 크기 참조용 바나나를 추가하여 오브젝트의 크기를 가늠할 수 있습니다.\n\n- 또한 왼쪽 버튼을 누른 채 수직으로 이동하여 카메라 각도를 변경할 수 있습니다.";
 
-
 --Generic
 L["Total Colon"] = FROM_TOTAL or "합계:";
 L["Reposition Button Horizontal"] = "수평 이동";
@@ -687,7 +691,7 @@ L["Reposition Button Tooltip"] = "창을 이동하려면 왼쪽 클릭 후 드�
 L["Font Size"] = FONT_SIZE or "글꼴 크기";
 L["Icon Size"] = "아이콘 크기";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "기본 위치로 초기화";
-L["Renown Level Label"] = "평판 ";
+L["Renown Level Label"] = "평판 ";  --There is a space
 L["Paragon Reputation"] = "불멸의 동맹 평판";
 L["Level Maxed"] = "(최대)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "현재:";
@@ -707,7 +711,7 @@ L["Click To Show Settings"] = "클릭하면 설정을 열거나 닫습니다.";
 L["ItemType Consumables"] = AUCTION_CATEGORY_CONSUMABLES or "소비용품";
 L["ItemType Weapons"] = AUCTION_CATEGORY_WEAPONS or "무기";
 L["ItemType Gems"] = AUCTION_CATEGORY_GEMS or "보석";
-L["ItemType Armor Generic"] = AUCTION_SUBCATEGORY_PROFESSION_ACCESSORIES or "장신구";
+L["ItemType Armor Generic"] = AUCTION_SUBCATEGORY_PROFESSION_ACCESSORIES or "장신구";  --Trinkets, Rings, Necks
 L["ItemType Mounts"] = MOUNTS or "탈것";
 L["ItemType Pets"] = PETS or "애완동물";
 L["ItemType Toys"] = "장난감";
@@ -736,8 +740,8 @@ L["Completed CHETT List"] = "완료한 안.녕.거.기. 목록";
 L["Devourer Attack"] = "포식자 습격";
 L["Restored Coffer Key"] = "복원된 보관함 열쇠";
 L["Coffer Key Shard"] = "보관함 열쇠 파편";
-L["Epoch Mementos"] = "시대의 기념품";
-L["Timeless Scrolls"] = "영원 두루마리";
+L["Epoch Mementos"] = "시대의 기념품";     --See currency:3293
+L["Timeless Scrolls"] = "영원 두루마리"; --item: 217605
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "%s : 정말로 다음 아이템으로 교환하시겠습니까?\n\n|cffff2020아이템은 환불받을 수 없습니다.|r\n %s";
 
