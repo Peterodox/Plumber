@@ -1922,3 +1922,23 @@ do  --For other modules like Legion Remix
     end
     addon.AcquireCharacterMacro = AcquireCharacterMacro;
 end
+
+
+do  --Module Registry
+    local moduleData = {
+        name = L["ModuleName DrawerMacro"],
+        dbKey = "DrawerMacro",
+        description = L["ModuleDescription DrawerMacro"],
+        categoryID = 1,
+        uiOrder = 1,
+        virtual = true,
+		categoryKeys = {
+			"Signature",
+		},
+        searchTags = {
+            "ActionBar", "Combat",
+        },
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
+end

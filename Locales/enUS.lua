@@ -38,6 +38,7 @@ L["Version"] = "Version";
 L["New Features"] = "New Features";
 L["New Feature Abbr"] = "New";
 L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
+L["Always On Module"] = "This module is always enabled.";
 
 
 --Settings Category
@@ -62,6 +63,8 @@ L["KW Transmog"] = "Transmog";
 L["KW Vendor"] = "Vendor";
 L["KW LegionRemix"] = "Legion Remix";
 L["KW Housing"] = "Player Housing House";
+L["KW Combat"] = "Combat";
+L["KW ActionBar"] = "Action Bars";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Name";  --Alphabetical Order
@@ -585,6 +588,8 @@ L["Drawer Option Hide Unusable Tooltip"] = "Hide unowned items and unlearned spe
 L["Drawer Option Hide Unusable Tooltip 2"] = "Consumable items like potions will always be shown."
 L["Drawer Option Update Frequently"] = "Update Frequently";
 L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
+L["ModuleName DrawerMacro"] = "Drawer Macro";
+L["ModuleDescription DrawerMacro"] = "Create a custom flyout menu to manage your items, spells, pets, mounts, toys.\n\nTo make a Drawer Macro, create a new macro first, then enter |cffd7c0a3#plumber:drawer|r in the command editbox.";
 
 
 --New Expansion Landing Page

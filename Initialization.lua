@@ -1,4 +1,4 @@
-local VERSION_TEXT = "v1.8.1";
+local VERSION_TEXT = "1.8.1";
 local VERSION_DATE = 1764600000;
 
 
@@ -295,6 +295,7 @@ local DefaultValues = {
 
     EnableNewByDefault = false,             --Always enable newly added features
     SettingsPanel_AutoShowChangelog = false,
+    SettingsPanel_ChangelogFontSize = 1,
 
 
     --Test Server

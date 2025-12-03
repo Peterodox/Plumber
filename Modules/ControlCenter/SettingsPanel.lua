@@ -126,7 +126,7 @@ do
             local total = #self.subModules;
             local numEnabled = 0;
             for i, data in ipairs(self.subModules) do
-                if GetDBBool(data.dbKey) then
+                if GetDBBool(data.dbKey) or data.virtual then
                     numEnabled = numEnabled + 1;
                 end
             end
@@ -417,6 +417,15 @@ local function CreateUI()
     end
 
     local function Checkbox_UpdateChecked(self)
+        if self.data.virtual then
+            self:SetChecked(true);
+            if self.OptionToggle then
+                self.OptionToggle:Hide();
+            end
+            self:Disable();
+            return
+        end
+
         local isChecked = GetDBBool(self.dbKey);
         self:SetChecked(isChecked);
         if self.dbKey and self.data.toggleFunc then
