@@ -38,6 +38,8 @@ L["Version"] = "版本";
 L["New Features"] = "新功能";
 L["New Feature Abbr"] = "新";
 L["Format Month Day"] = "%s%d日";
+L["Always On Module"] = "此模块将被一直启用。";
+L["Return To Module List"] = "返回模块列表";
 
 
 --Settings Category
@@ -62,6 +64,8 @@ L["KW Transmog"] = "幻化";
 L["KW Vendor"] = "商人";
 L["KW LegionRemix"] = "军团再临";
 L["KW Housing"] = "房屋住宅";
+L["KW Combat"] = "战斗";
+L["KW ActionBar"] = "动作条技能栏";
 
 --Filter Sort Method
 L["SortMethod 1"] = "名称";  --Alphabetical Order
@@ -582,6 +586,8 @@ L["Drawer Option Hide Unusable Tooltip"] = "隐藏身上没有的物品和未学
 L["Drawer Option Hide Unusable Tooltip 2"] = "消耗品例如药水不受此选项影响。"
 L["Drawer Option Update Frequently"] = "频繁更新";
 L["Drawer Option Update Frequently Tooltip"] = "在你背包或法术书发生变化时更新所有收纳宏。启用此选项可能会略微增加运算量。";
+L["ModuleName DrawerMacro"] = "技能收纳宏";
+L["ModuleDescription DrawerMacro"] = "创建自定义弹出菜单来整理你的物品、法术、宠物、坐骑、玩具。\n\n要创建技能收纳宏, 请先创建一个新宏，然后在宏编辑框中输入 |cffd7c0a3#plumber:drawer|r";
 
 
 --New Expansion Landing Page

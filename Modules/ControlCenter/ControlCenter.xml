@@ -7,32 +7,36 @@
     <Frame name="PlumberSettingsPanelLayoutTemplate" hidden="true" virtual="true">
         <Size x="128" y="128"/>
         <Frames>
-            <Frame parentKey="LeftSection">
-                <Size x="8"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
-                    <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT"/>
-                </Anchors>
-            </Frame>
-            <Frame parentKey="RightSection">
-                <Size x="8"/>
-                <Anchors>
-                    <Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT"/>
-                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
-                </Anchors>
-            </Frame>
-            <Frame parentKey="CentralSection">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.LeftSection" relativePoint="TOPRIGHT"/>
-                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightSection" relativePoint="BOTTOMLEFT"/>
-                </Anchors>
-            </Frame>
+            <Frame parentKey="FrameContainer" setAllPoints="true" useParentLevel="true">
+                <Frames>
+                    <Frame parentKey="LeftSection">
+                        <Size x="8"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+                            <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="RightSection">
+                        <Size x="8"/>
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT"/>
+                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="CentralSection">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.LeftSection" relativePoint="TOPRIGHT"/>
+                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightSection" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
 
-            <Frame parentKey="SideTab"/>
-            <Frame parentKey="TabButtonContainer" enableMouse="true" enableMouseMotion="true"/>
+                    <Frame parentKey="SideTab"/>
+                    <Frame parentKey="TabButtonContainer" enableMouse="true" enableMouseMotion="true"/>
 
-            <Frame parentKey="ModuleTab"/>
-            <Frame parentKey="ChangelogTab" hidden="true"/>
+                    <Frame parentKey="ModuleTab"/>
+                    <Frame parentKey="ChangelogTab" hidden="true"/>
+                </Frames>
+            </Frame>
         </Frames>
     </Frame>
 

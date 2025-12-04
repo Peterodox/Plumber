@@ -40,7 +40,9 @@ do  --Press Escape to close
     table.insert(UISpecialFrames, CloseDummy:GetName());
 
     CloseDummy:SetScript("OnHide", function()
-        MainFrame:Hide();
+        if MainFrame:HandleEscape() then
+            CloseDummy:Show();
+        end
     end);
 
     MainFrame:HookScript("OnShow", function()

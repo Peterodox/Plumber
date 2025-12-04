@@ -11,7 +11,7 @@ local UIParent = UIParent;
 local UnitName = UnitName;
 local UnitIsPlayer = UnitIsPlayer;
 local UnitIsGameObject = UnitIsGameObject;
-local StripHyperlinks = StripHyperlinks;
+local StripHyperlinks = API.StripHyperlinks;
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
 local GetCVarBool = C_CVar.GetCVarBool;
 local GetWorldCursor = C_TooltipInfo and C_TooltipInfo.GetWorldCursor or API.Nop;
@@ -709,6 +709,7 @@ do  --Module Registery
         categoryID = 2,
         uiOrder = 9,
         optionToggleFunc = OptionToggle_OnClick,
+        hasMovableWidget = true,
         moduleAddedTime = 1756400000,
 		categoryKeys = {
 			"UnitFrame",

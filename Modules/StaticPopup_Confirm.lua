@@ -19,7 +19,7 @@ local ModifiedStaticPopupInfo = {
             dialog:GetButton1():SetText(YES);
         end,
 
-        acceptDelay = 1.2,
+        acceptDelay = 0.5,
     },
 
 
@@ -97,6 +97,7 @@ do
         uiOrder = 30,
         moduleAddedTime = 1761400000,
         categoryKeys = {"Inventory"},
+        searchTags = {"Vendor"},
     };
 
     addon.ControlCenter:AddModule(moduleData);

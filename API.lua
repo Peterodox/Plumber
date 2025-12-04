@@ -187,6 +187,9 @@ do  -- String
             return name
         end
     end
+
+
+    API.StripHyperlinks = C_StringUtil and C_StringUtil.StripHyperlinks or StripHyperlinks;
 end
 
 do  -- DEBUG
@@ -3973,7 +3976,7 @@ do  -- Macro Util
     end
 end
 
-do  --Professions
+do  -- Professions
     --/dump ProfessionsBook_GetSpellBookItemSlot(GetMouseFoci()[1]) --Used on ProfessionsBookFrame SpellButton
 
     local GetProfessions = GetProfessions;
@@ -4043,7 +4046,7 @@ do  --Professions
     PlumberGlobals.OpenProfessionFrame = API.OpenProfessionFrame;
 end
 
-do  --Addon Skin
+do  -- Addon Skin
     local AddOnSkinHandler = {
         ElvUI = {
             global = "ElvUI",
@@ -4070,7 +4073,7 @@ do  --Addon Skin
     end
 end
 
-do  --FrameUtil
+do  -- FrameUtil
     function API.RegisterFrameForEvents(frame, events)
         for i, event in ipairs(events) do
             frame:RegisterEvent(event);
@@ -4084,7 +4087,7 @@ do  --FrameUtil
     end
 end
 
-do  --Locale-dependent API
+do  -- Locale-dependent API
     local locale = GetLocale();
     if locale == "ruRU" then
         function API.GetItemCountFromText(text)
@@ -4153,7 +4156,7 @@ do  --Locale-dependent API
     end
 end
 
-do  --Delves
+do  -- Delves
     local function IsInDelves()
         --See Blizzard InstanceDifficulty.lua
         --[[    --This fails when relogging inside a delve
@@ -4273,7 +4276,7 @@ do  --Delves
     end
 end
 
-do  --FocusSolver (Run something when being hovered long enough)
+do  -- FocusSolver (Run something when being hovered long enough)
     local FocusSolverMixin = {};
 
     function FocusSolverMixin:OnUpdate(elapsed)
@@ -4361,9 +4364,37 @@ do  --FocusSolver (Run something when being hovered long enough)
     end
 end
 
-do  --Timerunning Remix
+do  -- Timerunning Remix
     function API.GetTimerunningSeason()
         return PlayerGetTimerunningSeasonID and PlayerGetTimerunningSeasonID()
+    end
+end
+
+do  -- Plumber Settings
+    local ModuleOptionFrames = {
+        --[frame] = "CloseMethod" (function)
+    };
+
+    addon.AddModuleOptionExitMethod = function(frame, method)
+        ModuleOptionFrames[frame] = method
+    end
+
+    addon.CloseAllModuleOptions = function()
+        --return true: any closed
+        for frame, method in pairs(ModuleOptionFrames) do
+            if method(frame) then
+                return true
+            end
+        end
+        return false
+    end
+
+    addon.AnyShownModuleOptions = function()
+        for frame in pairs(ModuleOptionFrames) do
+            if (frame.IsShown and frame:IsShown()) then
+                return true
+            end
+        end
     end
 end
 

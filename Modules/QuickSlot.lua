@@ -1046,8 +1046,8 @@ function QuickSlot:EnableEditMode(state)
                 self.closeUIAfterEditing = nil;
                 self:CloseUI();
             end
-        else
-            return
+
+            addon.CallbackRegistry:Trigger("SettingsPanel.ModuleOptionClosed");
         end
     end
 end
@@ -1116,11 +1116,16 @@ function QuickSlot:ShowUI()
     return true
 end
 
-function QuickSlot:CloseUI()
+function QuickSlot:CloseUI(instant)
     if self:IsShown() then
         self:EnableEditMode(false);
         self.isClosing = true;
-        UIFrameFade(self, 0.5, 0);
+        if instant then
+            self:Hide();
+            self:SetAlpha(0);
+        else
+            UIFrameFade(self, 0.5, 0);
+        end
         self:UnregisterEvent("PLAYER_REGEN_DISABLED");
         self:UnregisterEvent("PLAYER_REGEN_ENABLED");
         self:UnregisterEvent("UI_SCALE_CHANGED");
@@ -1183,6 +1188,14 @@ function QuickSlot:UpdateItemCooldowns()
         end
     end
 end
+
+function QuickSlot:ExitEditMode()
+    if self:IsShown() and self:IsInEditMode() then
+        QuickSlot:CloseUI(true);
+        return true
+    end
+end
+addon.AddModuleOptionExitMethod(QuickSlot, QuickSlot.ExitEditMode);
 
 do  --Spell Cooldown
     local GetSpellCooldown = API.GetSpellCooldown;

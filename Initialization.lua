@@ -98,6 +98,24 @@ do  --CallbackRegistry
             end
         end
     end
+
+    function CallbackRegistry:UnregisterCallbackOwner(event, owner)
+        if not owner then return end;
+
+        if self.events[event] then
+            local callbacks = self.events[event];
+            local i = 1;
+            local cb = callbacks[i];
+            while cb do
+                if cb[3] == owner then
+                    tremove(callbacks, i);
+                else
+                    i = i + 1;
+                end
+                cb = callbacks[i];
+            end
+        end
+    end
 end
 
 local function GetDBValue(dbKey)

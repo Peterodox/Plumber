@@ -218,7 +218,7 @@ local function CreateOptionToggle(checkbox)
     b.Texture:SetVertexColor(0.6, 0.6, 0.6);
     API.DisableSharpening(b.Texture);
     b:SetScript("OnHide", OptionToggle_OnHide);
-    b.isPlumberEditModeToggle = true;
+    b.isPlumberSettingsPanelToggle = true;
     OptionToggle_SetFocused(b, false);
     return b
 end
@@ -653,4 +653,8 @@ function MainFrame:UpdateContent()
     local retainPosition = true;
     self.ScrollView:SetContent(content, retainPosition);
     self:ShowScrollBar(self.ScrollView:IsScrollable());
+end
+
+function MainFrame:HandleEscape()
+    self:Hide();
 end

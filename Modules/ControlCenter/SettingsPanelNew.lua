@@ -38,6 +38,12 @@ local Def = {
 
 local MainFrame = CreateFrame("Frame", nil, UIParent, "PlumberSettingsPanelLayoutTemplate");
 ControlCenter.SettingsPanel = MainFrame;
+do
+    local frameKeys = {"LeftSection", "RightSection", "CentralSection", "SideTab", "TabButtonContainer", "ModuleTab", "ChangelogTab"};
+    for _, key in ipairs(frameKeys) do
+        MainFrame[key] = MainFrame.FrameContainer[key];
+    end
+end
 local SearchBox;
 local FilterButton;
 local CategoryHighlight;
@@ -577,11 +583,17 @@ do
     function OptionToggleMixin:OnClick(button)
         if self.onClickFunc then
             self.onClickFunc(button);
+            if self.hasMovableWidget then
+                if addon.AnyShownModuleOptions() then
+                    MainFrame:Minimize();
+                end
+            end
         end
     end
 
-    function OptionToggleMixin:SetOnClickFunc(onClickFunc)
+    function OptionToggleMixin:SetOnClickFunc(onClickFunc, hasMovableWidget)
         self.onClickFunc = onClickFunc;
+        self.hasMovableWidget = hasMovableWidget;
     end
 
     function OptionToggleMixin:ResetVisual()
@@ -593,7 +605,7 @@ do
         self:SetScript("OnLeave", self.OnLeave);
         self:SetScript("OnClick", self.OnClick);
         self:ResetVisual();
-        self.isPlumberEditModeToggle = true;
+        self.isPlumberSettingsPanelToggle = true;
     end
 end
 
@@ -608,7 +620,7 @@ do
         self.virtual = moduleData.virtual;
         self.data = moduleData;
         self.NewTag:SetShown((not self.isChangelogButton) and moduleData.isNewFeature);
-        self.OptionToggle:SetOnClickFunc(moduleData.optionToggleFunc);
+        self.OptionToggle:SetOnClickFunc(moduleData.optionToggleFunc, self.data.hasMovableWidget);
         self.hasOptions = moduleData.optionToggleFunc ~= nil;
         self:UpdateState();
         self:UpdateVisual();
@@ -1068,9 +1080,9 @@ local function CreateUI()
     MainFrame:SetSize(2 * sideSectionWidth + centralSectionWidth, Def.PageHeight);
     MainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
     MainFrame:SetToplevel(true);
-    MainFrame:EnableMouse(true);
-    MainFrame:EnableMouseMotion(true);
-    MainFrame:SetScript("OnMouseWheel", function(self, delta)
+    MainFrame.FrameContainer:EnableMouse(true);
+    MainFrame.FrameContainer:EnableMouseMotion(true);
+    MainFrame.FrameContainer:SetScript("OnMouseWheel", function(self, delta)
     end);
 
 
@@ -1230,6 +1242,7 @@ local function CreateUI()
         local centerButtonWidth = API.Round(centralSectionWidth - 2*Def.ButtonSize);
         Def.centerButtonWidth = centerButtonWidth;
 
+
         local function EntryButton_Create()
             local obj = CreateSettingsEntry(ScrollView);
             obj:SetSize(centerButtonWidth, Def.ButtonSize);
@@ -1249,7 +1262,7 @@ local function CreateUI()
     end
 
 
-    local NineSlice = addon.LandingPageUtil.CreateExpansionThemeFrame(MainFrame, 10);
+    local NineSlice = addon.LandingPageUtil.CreateExpansionThemeFrame(MainFrame.FrameContainer, 10);
     MainFrame.NineSlice = NineSlice;
     NineSlice:CoverParent(-24);
     NineSlice.Background:Hide();
@@ -1357,13 +1370,14 @@ end
 local InitChangelogTab;
 do  --ChangelogTab
     local Formatter = {};
+    Formatter.ChangelogTextWidth = 363;
 
     Formatter.TagFonts = {
         ["h1"] = "ObjectiveTrackerFont16",  --PlumberFont_16
         ["p"] = "GameFontNormal",   --GameFontNormal 
     };
 
-    function Formatter:GetTextHeight(fontTag, text, width)
+    function Formatter:GetTextHeight(fontTag, text, textWidthShrink)
         if not self.UtilityFontString then
             local UtilityFontString = MainFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
             UtilityFontString:SetJustifyH("LEFT");
@@ -1372,7 +1386,7 @@ do  --ChangelogTab
         end
 
         self.UtilityFontString:SetSpacing(Def.ChangelogLineSpacing);
-        self.UtilityFontString:SetSize(width or Def.centerButtonWidth, 0);
+        self.UtilityFontString:SetSize(self.ChangelogTextWidth - (textWidthShrink or 0), 0);
         if fontTag ~= self.utilityFontTag then
             self.utilityFontTag = fontTag;
             self.UtilityFontString:SetFontObject(self.TagFonts[fontTag]);
@@ -1388,8 +1402,10 @@ do  --ChangelogTab
         local sizeIndex = PlumberDB and PlumberDB.SettingsPanel_ChangelogFontSize or 1;
         if sizeIndex == 2 then
             self.TagFonts["p"] = "ObjectiveTrackerFont14";
+            self.ChangelogTextWidth = 423;
         else
             self.TagFonts["p"] = "GameFontNormal";
+            self.ChangelogTextWidth = 363;
         end
     end
 
@@ -1553,7 +1569,7 @@ do  --ChangelogTab
 
         local top, bottom;
         local n = 0;
-        local objectWidth = Def.centerButtonWidth;
+        local objectWidth = Formatter.ChangelogTextWidth;
         local fromOffsetY = 1.5 * Def.ButtonSize;
         local leftOffset = 1.5 * Def.ButtonSize;
         local offsetY = fromOffsetY;
@@ -1596,13 +1612,14 @@ do  --ChangelogTab
                 if info.isNewFeature then
                     text = text .. postfixNewFeature;
                 end
-                local textWidth;
+                local textWidthShrink;
                 if info.bullet then
-                    textWidth = objectWidth - Def.ChangelogIndent;
+                    textWidthShrink = Def.ChangelogIndent;
                 else
-                    textWidth = objectWidth;
+                    textWidthShrink = 0;
                 end
-                objectHeight = Formatter:GetTextHeight(info.type, text, textWidth);
+                local textWidth = objectWidth - textWidthShrink;
+                objectHeight = Formatter:GetTextHeight(info.type, text, textWidthShrink);
                 bottom = offsetY + objectHeight;
                 if not (changelog[i + 1] and changelog[i + 1].type == "Checkbox") then
                     bottom = bottom + Def.ChangelogParagraphSpacing;
@@ -1687,7 +1704,9 @@ do  --ChangelogTab
                     templateKey = "Entry",
                     setupFunc = function(obj)
                         local data = ControlCenter:GetModule(info.dbKey);
+                        obj.Label:SetFontObject(Formatter.TagFonts["p"]);
                         obj:SetData(data);
+                        obj:SetWidth(objectWidth);
                     end,
                     top = top,
                     bottom = bottom,
@@ -1947,6 +1966,116 @@ do  --Tab Buttons
 end
 
 
+do  --MainFrame Minimize UI while certain module options are shown
+    function MainFrame:OnShow()
+        addon.CallbackRegistry:Register("SettingsPanel.ModuleOptionClosed", self.Maximize, self);
+    end
+    MainFrame:SetScript("OnShow", MainFrame.OnShow);
+
+    function MainFrame:OnHide()
+        addon.CallbackRegistry:UnregisterCallbackOwner("SettingsPanel.ModuleOptionClosed", self);
+
+        if self.minimized then
+            self:Maximize();
+        end
+    end
+    MainFrame:SetScript("OnHide", MainFrame.OnHide);
+
+    --[[    --Not applied. Anim Transition is distracting.
+    local easingFunc = addon.EasingFunctions.outQuint;
+
+    local function MinimizedFrame_OnUpdate(self, elapsed)
+        self.alpha = self.alpha + 8 * elapsed;
+        if self.alpha >= 1 then
+            self.alpha = 1;
+        end
+        self.t = self.t + elapsed;
+        local width = easingFunc(self.t, self.fromWidth, self.toWidth, self.duration);
+        local height = easingFunc(self.t, self.fromHeight, self.toHeight, self.duration);
+        if self.t >= self.duration then
+            width = self.toWidth;
+            height = self.toHeight;
+            self:SetScript("OnUpdate", nil);
+            self.alpha = 1;
+            self.t = 0;
+        end
+        self:SetSize(width, height);
+        self:SetAlpha(self.alpha);
+        MainFrame:SetAlpha(1 - self.alpha);
+    end
+    --]]
+
+    function MainFrame:Minimize()
+        if (self.mode == "blizzard") or self.minimized then return end;
+        self.minimized = true;
+        self.FrameContainer:Hide();
+        self:InitMinimizedFrame();
+        self.MinimizedFrame:Show();
+    end
+
+    function MainFrame:Maximize()
+        if not self.minimized then return end;
+        self.minimized = nil;
+        self.FrameContainer:Show();
+        if self.MinimizedFrame then
+            self.MinimizedFrame:Hide();
+        end
+    end
+
+    function MainFrame:InitMinimizedFrame()
+        if self.MinimizedFrame then return end;
+
+        local f = CreateFrame("Frame", nil, self);
+        f:SetIgnoreParentAlpha(true);
+        f:SetFrameLevel(self:GetFrameLevel() + 50);
+        self.MinimizedFrame = f;
+
+        f.toWidth = 256;
+        f.toHeight = 64.01;
+        f.duration = 0.5;
+
+        f:SetPoint("TOP", self, "TOP", 0, 0);
+        f:SetWidth(f.toWidth);
+        f:SetHeight(f.toHeight);
+
+        local NineSlice = addon.CreateNineSliceFrame(f, "ExpansionBorder_TWW");
+        NineSlice:SetCornerSize(32, 32);
+        NineSlice:SetDisableSharpening(false);
+        local offset = 8;
+        NineSlice:ClearAllPoints();
+        NineSlice:SetPoint("TOPLEFT", f, "TOPLEFT", offset, -offset);
+        NineSlice:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -offset, offset);
+
+        local Background = NineSlice:CreateTexture(nil, "BACKGROUND");
+        NineSlice.Background = Background;
+        Background:SetPoint("TOPLEFT", NineSlice.pieces[1], "TOPLEFT", 4, -4);
+        Background:SetPoint("BOTTOMRIGHT", NineSlice.pieces[9], "BOTTOMRIGHT", -4, 4);
+        Background:SetColorTexture(0.067, 0.040, 0.024, 0.8);
+
+        NineSlice:SetTexture(Def.TextureFile);
+        SetTexCoord(NineSlice.pieces[1], 512, 576, 832, 896);
+        SetTexCoord(NineSlice.pieces[2], 576, 960, 832, 896);
+        SetTexCoord(NineSlice.pieces[3], 960, 1024, 832, 896);
+        SetTexCoord(NineSlice.pieces[4], 512, 576, 896, 960);
+        SetTexCoord(NineSlice.pieces[5], 576, 960, 896, 960);
+        SetTexCoord(NineSlice.pieces[6], 960, 1024, 896, 960);
+        SetTexCoord(NineSlice.pieces[7], 512, 576, 960, 1024);
+        SetTexCoord(NineSlice.pieces[8], 576, 960, 960, 1024);
+        SetTexCoord(NineSlice.pieces[9], 960, 1024, 960, 1024);
+        NineSlice:SetUsingParentLevel(true);
+
+        local ReturnButton = addon.LandingPageUtil.CreateRedButton(f);
+        ReturnButton:SetPoint("CENTER", f, "CENTER", 0, 0);
+        ReturnButton:SetButtonText(L["Return To Module List"]);
+        ReturnButton:SetWidth(f.toWidth - 30);
+        ReturnButton:SetScript("OnClick", function()
+            addon.CloseAllModuleOptions();
+            MainFrame:Maximize();
+        end);
+    end
+end
+
+
 function MainFrame:ShowUI(mode)
     if CreateUI then
         CreateUI();
@@ -1962,4 +2091,18 @@ function MainFrame:ShowUI(mode)
     self:UpdateLayout();
     self:UpdateTabButtons();
     self:Show();
+end
+
+function MainFrame:HandleEscape()
+    local reshowCloseDummy;
+
+    if not UIParent:IsVisible() then
+        self:Hide();
+    elseif addon.CloseAllModuleOptions() then
+        reshowCloseDummy = true;
+    else
+        self:Hide();
+    end
+
+    return reshowCloseDummy
 end

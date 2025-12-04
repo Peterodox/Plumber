@@ -610,13 +610,23 @@ function SettingsFrame:Init()
         f:Hide();
         DragUtil:Stop();
         self:StopArranging();
+        addon.CallbackRegistry:Trigger("SettingsPanel.ModuleOptionClosed");
     end);
 
     function SettingsFrame:CloseUI()
-        f:Hide();
-        PlaySound(SOUNDKIT.IG_MAINMENU_QUIT);
+        if f:IsShown() then
+            f:Hide();
+            PlaySound(SOUNDKIT.IG_MAINMENU_QUIT);
+            return true
+        end
     end
     f.CloseUI = SettingsFrame.CloseUI;
+    addon.AddModuleOptionExitMethod(SettingsFrame, SettingsFrame.CloseUI);
+
+    function SettingsFrame:IsShown()
+        return f:IsShown()
+    end
+
 
     local PADDING = 12;
     local HEADER_HEIGHT = 18;

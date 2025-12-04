@@ -24,6 +24,48 @@ L["Restriction Combat"] = "No funciona en combate";    --Indicate a feature can 
 L["Map Pin Change Size Method"] = "\n\n*Puedes cambiar el tamaño del pin en el mapa - Filtro de mapa - Plumber";
 L["Toggle Plumber UI"] = "Toggle Plumber UI";
 L["Toggle Plumber UI Tooltip"] = "Mostrar la siguiente interfaz de usuario de Plumber en el modo de edición:\n%s\n\nEsta casilla de verificación solo controla su visibilidad en el modo de edición. No habilitará ni deshabilitará estos módulos.";
+L["Remove New Feature Marker"] = "Eliminar marcador de nueva función";
+L["Remove New Feature Marker Tooltip"] = "Los marcadores de nuevas funciones %s desaparecen después de una semana. Pero puedes hacer click en este botón para eliminarlos ahora.";
+L["Modules"] = "Módulos";
+L["Release Notes"] = "Notas de la versión";
+L["Option AutoShowChangelog"] = "Mostrar automáticamente notas de la version";
+L["Option AutoShowChangelog Tooltip"] = "Muestra automáticamente las notas de la versión después de una actualización.";
+L["Category Colon"] = (CATEGORY or "Categoría")..": ";
+L["Module Wrong Game Version"] = "Este módulo no es compatible con la versión actual del juego.";
+L["Changelog Wrong Game Version"] = "Los siguientes cambios no se aplican a la versión actual del juego.";
+L["Settings Panel"] = "Panel de configuración";
+L["Version"] = "Versión";
+L["New Features"] = "Nuevas funciones";
+L["New Feature Abbr"] = "Nuevo";
+L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
+
+
+--Settings Category
+L["SC Signature"] = "Funciones especiales";
+L["SC Current"] = "Contenido actual";
+L["SC ActionBar"] = "Barras de acción";
+L["SC Chat"] = "Chat";
+L["SC Collection"] = "Colecciones";
+L["SC Instance"] = "Estancias";
+L["SC Inventory"] = "Inventario";
+L["SC Loot"] = "Botín";
+L["SC Map"] = "Mapa";
+L["SC Profession"] = "Profesiones";
+L["SC Quest"] = "Misiones";
+L["SC UnitFrame"] = "Marco de unidad";
+L["SC Old"] = "Contenido de legado";
+L["SC Uncategorized"] = "Sin categoría";
+
+--Settings Search Keywords, Search Tags
+L["KW Tooltip"] = "Información emergente";
+L["KW Transmog"] = "Transfiguración";
+L["KW Vendor"] = "Vendedor";
+L["KW LegionRemix"] = "Legion Remix";
+L["KW Housing"] = "Hogar del jugador";
+
+--Filter Sort Method
+L["SortMethod 1"] = "Nombre";  --Alphabetical Order
+L["SortMethod 2"] = "Fecha de adición";  --New on the top
 
 
 --Module Categories
@@ -71,8 +113,8 @@ L["Tracking List Empty"] = "Tu lista de seguimiento personalizada está vacía."
 L["Holiday Ends Format"] = "Ends: %s";
 L["Not Found"] = "No encontrado";   --Item not found
 L["Own"] = "Own";   --Something that the player has/owns
-L["Numbers To Earn"] = "# To Earn";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
-L["Numbers Of Earned"] = "# Earned";    --The number of stuff the player has earned
+L["Numbers To Earn"] = "# Para obtener";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
+L["Numbers Of Earned"] = "# Obtenido";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Rastrear blasones";     --Crest: e.g. Drake’s Dreaming Crest
 L["Track Upgrade Currency Tooltip"] = "Pin the top-tier crest you have earned to the bar.";
 L["Track Holiday Item"] = "Rastrear monedas de eventos vacacionales";       --e.g. Tricky Treats (Hallow's End)
@@ -216,6 +258,8 @@ L["Instruction Show In Quest Log"] = "<Ctrl Click to View in Quest Log>";
 
 L["ModuleName TooltipTransmogEnsemble"] = "Conjuntos de banda";
 L["ModuleDescription TooltipTransmogEnsemble"] = "Los conjuntos de clase que ofrece Pythagorus, el vendedor de vestimentas de bandas de Legion Remix, desbloquean todas las variantes de dificultad. En la descripción emergente se muestra cuales aún no se han conseguido.";
+L["Collected Appearances"] = "Apariencias conocidas";
+L["Collected Items"] = "Items conocidos";
 
 
 --Tooltip Housing
@@ -352,7 +396,7 @@ L["Unearned Filter Tooltip"] = "Es posible que veas títulos duplicados que no e
 
 --BlizzardSuperTrack
 L["ModuleName BlizzardSuperTrack"] = "Punto de referencia: temporizador de eventos";
-L["ModuleDescription BlizzardSuperTrack"] = "Añade un temporizador a tu punto de referencia activo si la información sobre herramientas del pin del mapa tiene uno.";
+L["ModuleDescription BlizzardSuperTrack"] = "Añade un temporizador a tu punto de referencia activo si la información emergente del pin del mapa tiene uno.";
 
 
 --ProfessionsBook
@@ -363,7 +407,7 @@ L["Unspent Knowledge Tooltip Format"] = "Tienes |cffffffff%s|r puntos de conocim
 
 --TooltipProfessionKnowledge
 L["ModuleName TooltipProfessionKnowledge"] = L["ModuleName ProfessionsBook"];
-L["ModuleDescription TooltipProfessionKnowledge"] = "Muestra el número de tus Conocimientos de Especialización de profesión no gastados.";
+L["ModuleDescription TooltipProfessionKnowledge"] = "Muestra el número de tus Conocimientos de especialización de profesión no gastados.";
 L["Available Knowledge Format"] = "Conocimiento disponible: |cffffffff%s|r";
 
 
@@ -448,8 +492,8 @@ L["ModuleDescription ItemUpgradeUI"] = "Abre automáticamente el panel de person
 
 
 --HolidayDungeon
-L["ModuleName HolidayDungeon"] = "Selección automática de mazmorras festivas";
-L["ModuleDescription HolidayDungeon"] = "Selecciona automáticamente mazmorras festivas y de paseo en el tiempo cuando abres el buscador de mazmorras por primera vez.";
+L["ModuleName HolidayDungeon"] = "Selección automática de mazmorras especiales";
+L["ModuleDescription HolidayDungeon"] = "Selecciona automáticamente mazmorras festivas y de paseo en el tiempo cuando los eventos correspondientes se encuentran activos y abres el buscador de mazmorras por primera vez.";
 
 
 --PlayerPing
@@ -570,12 +614,12 @@ L["Completed"] = CRITERIA_COMPLETED or "Completado";
 L["Filter Hide Completed Format"] = "Ocultar completados (%d)";
 L["Weekly Reset Format"] = "Reinicio semanal: %s";
 L["Daily Reset Format"] = "Reinicio diario: %s";
-L["Ready To Turn In Tooltip"] = "Ready to turn in.";
-L["Trackers"] = "Trackers";
-L["New Tracker Title"] = "New Tracker";     --Create a new Tracker
-L["Edit Tracker Title"] = "Edit Tracker";
+L["Ready To Turn In Tooltip"] = "Listo para entregar.";
+L["Trackers"] = "Rastreadores";
+L["New Tracker Title"] = "Nuevo rastreador";     --Create a new Tracker
+L["Edit Tracker Title"] = "Editar rastreador";
 L["Type"] = "Tipo";
-L["Select Instruction"] = LFG_LIST_SELECT or "Select";
+L["Select Instruction"] = LFG_LIST_SELECT or "Seleccionar";
 L["Name"] = "Nombre";
 L["Difficulty"] = LFG_LIST_DIFFICULTY or "Dificultad";
 L["All Difficulties"] = "Todas las dificultades";
@@ -591,10 +635,10 @@ L["Accountwide"] = "Account-wide";
 L["Flag Quest"] = "Flag Quest";
 L["Boss Name"] = "Nombre del jefe";
 L["Instance Or Boss Name"] = "Nombre de instancia o jefe";
-L["Name EditBox Disabled Reason Format"] = "This box will be filled automatically when you enter a valid %s.";
+L["Name EditBox Disabled Reason Format"] = "Este cuadro se rellenará automáticamente cuando introduzcas un dato válido %s.";
 L["Search No Matches"] = CLUB_FINDER_APPLICANT_LIST_NO_MATCHING_SPECS or "No Matches";
 L["Create New Tracker"] = "New Tracker";
-L["FailureReason Already Exist"] = "This entry already exists.";
+L["FailureReason Already Exist"] = "Esta entrada ya existe.";
 L["Quest ID"] = "Misión ID";
 L["Creature ID"] = "Criatura ID";
 L["Edit"] = EDIT or "Editar";
@@ -615,13 +659,32 @@ L["Click to Open Format"] = "Click para abrir %s";
 L["List Is Empty"] = "La lista está vacía.";
 
 
+--RaidCheck
+L["ModuleName InstanceDifficulty"] = "Dificultad de la estancia";
+L["ModuleDescription InstanceDifficulty"] = "- Muestra un selector de dificultad cuando estés en la entrada de una banda o mazmorra.\n\n- Muestra la dificultad actual y la información de bloqueo en la parte superior de la pantalla cuando ingresas a una estancia.";
+L["Cannot Change Difficulty"] = "La dificultad de la estancia no se puede cambiar en este momento.";
+
+
+--TransmogChatCommand
+L["ModuleName TransmogChatCommand"] = "Comando de chat para transfiguración";
+L["ModuleDescription TransmogChatCommand"] = "- Cuando utilices un comando de chat de transfiguración, primero desviste a tu personaje para que los elementos antiguos no se transfieran al nuevo atuendo.\n\n- Cuando estés en el Transfigurador, al usar un comando de chat, se cargarán automáticamente todos los elementos disponibles en la interfaz de transfiguración.";
+L["Copy To Clipboard"] = "Copiar al portapapeles";
+L["Copy Current Outfit Tooltip"] = "Copiar el atuendo actual para compartirlo en línea.";
+L["Missing Appearances Format"] = "%d |4appearance:appearances; missing";
+L["Press Key To Copy Format"] = "Presiona |cffffd100%s|r para copiar";
+
+
+--DecorModelScaleRef
+L["ModuleName DecorModelScaleRef"] = "Catálogo de decoración: Plátano para escala"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
+L["ModuleDescription DecorModelScaleRef"] = "- Añade una referencia de tamaño (un plátano) a la ventana de vista previa de la decoración, lo que te permitirá calcular el tamaño de los objetos.\n\n- También te permite cambiar el ángulo de la cámara manteniendo pulsado el botón izquierdo y moviéndolo verticalmente.";
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Mover horizontalmente";   --Move the window horizontally
 L["Reposition Button Vertical"] = "Mover verticalmente";
-L["Reposition Button Tooltip"] = "Has click izquierdo y arrastra para mover la ventana";
+L["Reposition Button Tooltip"] = "Has click y arrastra para mover la ventana";
 L["Font Size"] = "Tamaño de la fuente";
-L["Icon Size"] = "Icon Size";
+L["Icon Size"] = "Tamaño del icono";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Restablecer a la posición predeterminada";
 L["Renown Level Label"] = "Renombre ";  --There is a space
 L["Paragon Reputation"] = "Dechado";

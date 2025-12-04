@@ -3,7 +3,7 @@ local L = addon.L;
 local API = addon.API;
 
 local GetMapID = API.GetMapID;
-local StripHyperlinks = StripHyperlinks;
+local StripHyperlinks = API.StripHyperlinks;
 local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local GetItemName = C_Item.GetItemNameByID;
 local GetItemCount = C_Item.GetItemCount;

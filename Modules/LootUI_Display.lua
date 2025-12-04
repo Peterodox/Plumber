@@ -18,7 +18,7 @@ local GetLootSlotType = GetLootSlotType;
 local GetLootSlotInfo = GetLootSlotInfo;
 local GetNumLootItems = GetNumLootItems;
 local IsFishingLoot = IsFishingLoot;
-local StripHyperlinks = StripHyperlinks;
+local StripHyperlinks = API.StripHyperlinks;
 local time = time;
 
 local GetMoney = GetMoney;
@@ -2004,7 +2004,7 @@ do  --Module Registry
         uiOrder = 0,
         moduleAddedTime = 1727793830,
         optionToggleFunc = OptionToggle_OnClick,
-
+        hasMovableWidget = true,
         visibleInEditMode = true,
         enterEditMode = function()
             MainFrame:EnterEditMode();

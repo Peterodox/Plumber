@@ -818,7 +818,7 @@ do
     end
 
     local function QuestIcon_Update(self)
-        if C_QuestLog.IsOnQuest(self.questID) then
+        if C_QuestLog.IsOnQuest(self.questID) and not C_QuestLog.ReadyForTurnIn(self.questID) then
             self:Show();
         else
             self:Hide();

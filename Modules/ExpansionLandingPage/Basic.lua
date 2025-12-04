@@ -893,6 +893,9 @@ do  --Dropdown Menu
                 end
             end
 
+            if contentWidth < 96 then
+                contentWidth = 96;
+            end
             contentWidth = API.Round(contentWidth);
             contentHeight = API.Round(contentHeight);
 

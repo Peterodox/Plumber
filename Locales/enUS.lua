@@ -39,6 +39,7 @@ L["New Features"] = "New Features";
 L["New Feature Abbr"] = "New";
 L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "This module is always enabled.";
+L["Return To Module List"] = "Return to List";
 
 
 --Settings Category

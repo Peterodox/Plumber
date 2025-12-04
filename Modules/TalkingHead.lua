@@ -771,7 +771,7 @@ do
         uiOrder = 3,
         moduleAddedTime = 1704423300,
         optionToggleFunc = OptionToggle_OnClick,
-
+        hasMovableWidget = true,
         visibleInEditMode = true,
         enterEditMode = function()
             NewTalkingHead:EnterEditMode();

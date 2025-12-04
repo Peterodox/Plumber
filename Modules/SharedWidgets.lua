@@ -4180,6 +4180,7 @@ do  --Slider
         else
             self:GetParent().isDraggingThumb = false;
         end
+        GameTooltip:Hide();
     end
 
     function SliderScripts:OnMouseUp()
@@ -4748,7 +4749,7 @@ do  --EditMode
 
     local function IsMouseOverOptionToggle()
         local obj = GetMouseFocus();
-        if obj and obj.isPlumberEditModeToggle then
+        if obj and obj.isPlumberSettingsPanelToggle then
             return true
         else
             return false
@@ -5118,6 +5119,17 @@ do  --EditMode
         end
     end
 
+    function EditModeSettingsDialogMixin:CloseUI()
+        if self:IsShown() then
+            self:Exit();
+            return true
+        end
+    end
+
+    function EditModeSettingsDialogMixin:OnHide()
+        addon.CallbackRegistry:Trigger("SettingsPanel.ModuleOptionClosed");
+    end
+
     local function SetupSettingsDialog(parent, schematic, forceUpdate)
         if not EditModeSettingsDialog then
             local f = CreateFrame("Frame", nil, UIParent);
@@ -5137,6 +5149,7 @@ do  --EditMode
             f.requireResetPosition = true;
 
             Mixin(f, EditModeSettingsDialogMixin);
+            addon.AddModuleOptionExitMethod(f, f.CloseUI);
 
             f.Border = CreateFrame("Frame", nil, f, "DialogBorderTranslucentTemplate");
             f.CloseButton = CreateFrame("Button", nil, f, "UIPanelCloseButtonNoScripts");
@@ -5150,7 +5163,7 @@ do  --EditMode
 
             f:SetScript("OnDragStart", f.OnDragStart);
             f:SetScript("OnDragStop", f.OnDragStop);
-
+            f:SetScript("OnHide", f.OnHide);
 
             local function CreateCheckbox()
                 return addon.CreateCheckbox(f);

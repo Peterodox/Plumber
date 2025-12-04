@@ -3,7 +3,7 @@
 local _, addon = ...
 
 local GetAddOnInfo = C_AddOns.GetAddOnInfo;
-local StripHyperlinks = StripHyperlinks;
+local StripHyperlinks = addon.API.StripHyperlinks;
 local sub = string.sub;
 local find = string.find;
 local lower = string.lower;
