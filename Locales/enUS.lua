@@ -56,6 +56,7 @@ L["SC Profession"] = "Professions";
 L["SC Quest"] = "Quests";
 L["SC UnitFrame"] = "Unit Frame";
 L["SC Old"] = "Legacy Content";
+L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "Housing";
 L["SC Uncategorized"] = "Uncategorized";
 
 --Settings Search Keywords, Search Tags
@@ -565,6 +566,8 @@ L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" alre
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. Macro";
 L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
+L["PlumberMacro Housing"] = "Plumber Housing Macro";
+L["PlumberMacro Torch"] = "Plumber Torch Macro";
 L["PlumberMacro DrawerFlag Combat"] = "The drawer will be updated after leaving combat.";
 L["PlumberMacro DrawerFlag Stuck"] = "Something went wrong when updating the drawer.";
 L["PlumberMacro Error Combat"] = "Unavailable in combat";
@@ -683,6 +686,15 @@ L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "Decor Catalog: Banana For Scale"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Add a size reference (a banana) to the decor preview window, allowing you to gauge the size of the objects.\n\n- Also allow you to change the camera pitch by holding down the Left Button and moving vertically.";
+
+
+--Player Housing
+L["ModuleName Housing_Macro"] = "Housing Macros";
+L["ModuleDescription Housing_Macro"] = "You can create a Teleport Home macro: create a new macro first, then enter |cffd7c0a3#plumber:home|r in the command editbox.";
+L["Teleport Home"] = "Teleport Home";
+L["Instruction Drag To Action Bar"] = "<Click and Drag this to your Action Bars>";
+L["Toggle Torch"] = "Toggle Torch";
+
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";

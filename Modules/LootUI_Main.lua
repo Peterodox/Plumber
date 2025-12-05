@@ -17,7 +17,6 @@ local GetItemCount = C_Item.GetItemCount;
 local GetCursorPosition = GetCursorPosition;
 local IsDressableItemByID = C_Item.IsDressableItemByID or API.Nop;
 local QualityColorGetter = API.GetItemQualityColor;
-local HousingDataProvider = addon.HousingDataProvider;
 
 
 -- User Settings
@@ -850,10 +849,9 @@ do  --UI ItemButton
                         return
                     end
 
-                    if C_Item.IsDecorItem and C_Item.IsDecorItem(itemID) and HousingDataProvider then
-                        if HousingDataProvider:GetDecorModelFileIDByItem(itemID) then
-                            DressUpLink(self.data.link);
-                        end
+                    if C_Item.IsDecorItem and C_Item.IsDecorItem(itemID) then
+                        DressUpLink(self.data.link);
+                        return
                     end
                 end
             elseif IsModifiedClick("CHATLINK") then

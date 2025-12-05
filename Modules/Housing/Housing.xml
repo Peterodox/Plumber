@@ -1,0 +1,101 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="Housing_DataProvider.lua"/>
+	<Script file="ModelScaleReference.lua"/>
+	<Script file="Housing_Macro.lua"/>
+	<Script file="Housing_DecorHover.lua"/>
+
+	<Frame name="PlumberHouseEditorInstructionTemplate" virtual="true">
+		<KeyValues>
+			<KeyValue key="minimumHeight" value="45" type="number"/>
+			<KeyValue key="spacing" value="10" type="number"/>
+		</KeyValues>
+		<Size x="45" y="45"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="InstructionText" inherits="GameFontHighlight" justifyH="RIGHT" wordwrap="false">
+					<Size x="0" y="0"/>
+					<Anchors>
+						<Anchor point="RIGHT" x="-55"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="ItemCountText" inherits="GameFontHighlight" justifyH="CENTER">
+					<Size x="0" y="0"/>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeKey="$parent.InstructionText" relativePoint="TOPRIGHT" x="2" y="2"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Control">
+				<Size x="45" y="45"/>
+				<Anchors>
+					<Anchor point="RIGHT" x="0"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Background" useAtlasSize="false" atlas="housing-hotkey-icon-key-9slice" texelSnappingBias="0.0" snapToPixelGrid="false" hidden="true">
+							<Size x="54" y="30"/>
+							<Anchors>
+								<Anchor point="RIGHT" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" useAtlasSize="false">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="RIGHT" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+						<FontString parentKey="Text" inherits="GameFontHighlight" hidden="true">
+							<Size x="0" y="0"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Background"/>
+							</Anchors>
+							<Color color="HIGHLIGHT_FONT_COLOR"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+
+    <Button name="PlumberModelSceneControlButtonTemplate" virtual="true">
+		<Size x="24" y="24"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="Icon">
+					<Size x="16" y="16"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture parentKey="NormalTexture" atlas="common-button-square-gray-up">
+            <Size x="32" y="32"/>
+            <Anchors>
+                <Anchor point="CENTER"/>
+            </Anchors>
+        </NormalTexture>
+		<HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" alpha="0.4">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT"/>
+			</Anchors>
+		</HighlightTexture>
+		<PushedTexture parentKey="PushedTexture" atlas="common-button-square-gray-down">
+            <Size x="32" y="32"/>
+            <Anchors>
+                <Anchor point="CENTER" x="1" y="-1"/>
+            </Anchors>
+		</PushedTexture>
+	</Button>
+
+    <!--Actor name="PlumberHousingDecorActorTemplate" mixin="PlumberHousingDecorActorMixin" virtual="true">
+        <Scripts>
+            <OnModelLoaded method="OnModelLoaded"/>
+        </Scripts>
+    </Actor-->
+</Ui>

@@ -8,7 +8,7 @@ local API = addon.API;
 local After = C_Timer.After;
 
 
-local REF_UNIT = 0.52336;   --Banana Length
+local REF_UNIT = 0.51399;   --Banana Length 0.52336
 
 
 local MODULE_ENABLED = false;
@@ -250,7 +250,7 @@ local function SharedPreviewFrame_OnLoad(previewFrame)
 
 
     local refActor = modelScene:CreateActor();
-    refActor:SetModelByFileID(528752);
+    refActor:SetModelByFileID(647739);    --528752
     refActor:SetYaw(math.pi * 0.5);
     refActor:Hide();
     actor.plumberRefActor = refActor;
@@ -354,12 +354,12 @@ do
         dbKey ="DecorModelScaleRef",
         description = addon.L["ModuleDescription DecorModelScaleRef"],
         toggleFunc = EnableModule,
-        categoryID = -2,
+        categoryID = 1,
         uiOrder = 1,
         moduleAddedTime = 1764600000,
         minimumTocVersion = 110207,
 		categoryKeys = {
-			"Collection",
+			"Housing",
 		},
         searchTags = {
             "Housing",

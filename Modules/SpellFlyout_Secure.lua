@@ -314,6 +314,8 @@ do  --VisualButtonMixin
             --Only RandomFavoriteMount use this method
             --Regular mounts have been converted to spells 
             self:SetMount(self.id);
+        elseif self.actionType == "teleportHome" then
+            self:SetTeleportHome();
         elseif self[action.actionType] then
             self[action.actionType](self, action.id);
         end
@@ -392,6 +394,13 @@ do  --VisualButtonMixin
             tooltip:Show();
             self.UpdateTooltip = nil;
             return true
+        elseif self.tooltipFunc then
+            local tooltip = GameTooltip;
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            self.tooltipFunc(tooltip, self.id);
+            tooltip:Show();
+            self.UpdateTooltip = self.ShowTooltip;
+            return true
         else
             self.UpdateTooltip = nil;
         end
@@ -403,6 +412,7 @@ do  --VisualButtonMixin
             self.id = nil;
             self.actionType = nil;
             self.tooltipMethod = nil;
+            self.tooltipFunc = nil;
             self.macroText = nil;
             self.rawMacroText = nil;
             self.tooltipLineText = nil;
@@ -487,6 +497,12 @@ do  --VisualButtonMixin
     function VisualButtonMixin:SetMount(spellID)
         self.tooltipMethod = "SetMountBySpellID";
         self.Icon:SetTexture(GetSpellTexture(spellID));
+    end
+
+    function VisualButtonMixin:SetTeleportHome()
+        self.tooltipMethod = nil;
+        self.tooltipText = nil;
+        self.tooltipFunc = addon.Housing and addon.Housing.SetupTeleportTooltip;
     end
 
 

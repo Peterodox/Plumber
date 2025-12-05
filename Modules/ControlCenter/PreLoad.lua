@@ -38,7 +38,7 @@ local CategoryDefinition = {
 
 local PrimaryCategory = {
     "Signature", "Current",
-    "ActionBar", "Chat", "Collection", "Instance", "Inventory", "Loot", "Map", "Profession", "Quest", "UnitFrame", "Old",
+    "ActionBar", "Chat", "Collection", "Housing", "Instance", "Inventory", "Loot", "Map", "Profession", "Quest", "UnitFrame", "Old",
     "Uncategorized",
 };
 
@@ -80,10 +80,12 @@ function ControlCenter:InitializeModules()
             end
 
             if moduleData.toggleFunc then
-                moduleData.virtual = false;
                 moduleData.toggleFunc(enabled);
             else
                 moduleData.virtual = true;
+            end
+
+            if moduleData.virtual then
                 if moduleData.description then
                     moduleData.description = moduleData.description.."\n\n"..L["Always On Module"];
                 end

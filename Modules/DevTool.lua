@@ -1,5 +1,5 @@
 local M = {
-    AuraWather = true,
+    AuraWather = false,
     Prof = false,
     CurrencyWatcher = false,
     POI = false,

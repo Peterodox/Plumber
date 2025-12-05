@@ -316,9 +316,10 @@ local DefaultValues = {
     SettingsPanel_ChangelogFontSize = 1,
 
 
-    --Test Server
+    --Housing
     DecorModelScaleRef = true,
         DecorModelScaleRef_ShowBanana = false,
+    Housing_Macro = true,
 
 
     --Declared elsewhere:
