@@ -792,8 +792,14 @@ do  --Dropdown Menu
         local f = self.Frame;
         if f then
             f:ClearAllPoints();
-            f:SetParent(object);
-            f:SetPoint("TOPLEFT", object, "BOTTOMLEFT", 0, -6);
+            if self.independent then
+                f:SetParent(UIParent);
+                local x, y = object:GetCenter();
+                f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x + 12, y + 8);
+            else
+                f:SetParent(object);
+                f:SetPoint("TOPLEFT", object, "BOTTOMLEFT", 0, -6);
+            end
         end
     end
 
@@ -816,11 +822,13 @@ do  --Dropdown Menu
 
         self.buttonPool:ReleaseAll();
         self.owner = owner;
+        self.independent = nil;
 
         if not owner then return end;
 
         if menuInfo and menuInfo.widgets then
             self.NoContentAlert:Hide();
+            self.independent = menuInfo.independent;
 
             local f = self.Frame;
             if self.openAtCursorPosition or menuInfo.openAtCursorPosition then

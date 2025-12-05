@@ -47,6 +47,13 @@ do  --UI
         local textWidth = (self.Control.Text:GetWrappedWidth()) + 20;
         self.Control.Background:SetWidth(textWidth);
         self.Control:SetWidth(textWidth);
+
+        self.InstructionText:ClearAllPoints();
+        if textWidth > 50 then
+            self.InstructionText:SetPoint("RIGHT", self, "RIGHT", -textWidth - 5, 0);
+        else
+            self.InstructionText:SetPoint("RIGHT", self, "RIGHT", -55, 0);
+        end
     end
 
     function DisplayFrameMixin:OnLoad()
@@ -99,15 +106,10 @@ do  --UI
         local stored = entryInfo.quantity + entryInfo.remainingRedeemable;
         self.ItemCountText:SetText(stored);
         self.ItemCountText:SetShown(stored > 0);
-        self.SubFrame:SetShown(stored > 0);
+        self.SubFrame:SetShown(EL.dupeEnabled and stored > 0);
     end
-
-
-    --[[
-        RotateControlFrame.String
-        C_HousingBasicMode.RotateDecor(1)   --Top-down, counter-clockwise 15 degrees
-    --]]
 end
+
 
 local function Blizzard_HouseEditor_OnLoaded()
     --parentKey="SelectInstruction" inherits="HouseEditorInstructionTemplate" parentArray="UnselectedInstructions"
@@ -130,7 +132,7 @@ local function Blizzard_HouseEditor_OnLoaded()
         DisplayFrame.SubFrame = SubFrame;
         SubFrame:SetPoint("TOPRIGHT", DisplayFrame, "BOTTOMRIGHT", 0, 0);
         Mixin(SubFrame, DisplayFrameMixin);
-        SubFrame:SetHotkey("Duplicate", "Ctrl");
+        SubFrame:SetHotkey(L["Duplicate"], EL:CurrentGetDupeKeyName());
     end
 
     container.UnselectedInstructions = {DisplayFrame};
@@ -146,6 +148,7 @@ do  --Event Listener
         "HOUSE_EDITOR_MODE_CHANGED",    --1 Enum.HouseEditorMode.BasicDecor
         "HOUSING_BASIC_MODE_HOVERED_TARGET_CHANGED",
     };
+
     function EL:SetEnabled(state)
         if state and not self.enabled then
             self.enabled = true;
@@ -157,10 +160,20 @@ do  --Event Listener
             else
                 EventUtil.ContinueOnAddOnLoaded(blizzardAddOnName, Blizzard_HouseEditor_OnLoaded);
             end
+            if DisplayFrame then
+                DisplayFrame:Show();
+            end
+            self:LoadSettings();
         elseif (not state) and self.enabled then
             self.enabled = nil;
             API.UnregisterFrameForEvents(self, self.dynamicEvents);
             self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+            self:SetScript("OnUpdate", nil);
+            self.t = 0;
+            self.isUpdating = nil;
+            if DisplayFrame then
+                DisplayFrame:Hide();
+            end
         end
     end
 
@@ -168,7 +181,7 @@ do  --Event Listener
         if event == "HOUSING_BASIC_MODE_HOVERED_TARGET_CHANGED" then
             self:OnHoveredTargetChanged(...);
         elseif event == "HOUSE_EDITOR_MODE_CHANGED" then
-            self:OnEditorModeChanged(...);
+            self:OnEditorModeChanged();
         elseif event == "MODIFIER_STATE_CHANGED" then
             self:OnModifierStateChanged(...)
         end
@@ -211,7 +224,9 @@ do  --Event Listener
         if IsHoveringDecor() then
             local info = GetHoveredDecorInfo(); --HousingDecorInstanceInfo, see Interface/AddOns/Blizzard_APIDocumentationGenerated/HousingDecorSharedDocumentation.lua
             if info then
-                self:RegisterEvent("MODIFIER_STATE_CHANGED");
+                if self.dupeEnabled then
+                    self:RegisterEvent("MODIFIER_STATE_CHANGED");
+                end
                 self.decorInstanceInfo = info;
                 if DisplayFrame then
                     DisplayFrame:SetDecorInfo(info);
@@ -238,6 +253,7 @@ do  --Event Listener
     end
 
     function EL:TryDuplicateItem()
+        if not self.dupeEnabled then return end;
         if not IsHouseEditorActive() then return end;
         if IsDecorSelected() then return end;
 
@@ -278,11 +294,115 @@ do  --Event Listener
     end
 
     function EL:OnModifierStateChanged(key, down)
-        if key == "LCTRL" and down == 0 then
+        if key == self.dupeKey and down == 0 then
             self:TryDuplicateItem();
         end
     end
 
 
-    EL:SetEnabled(true);
+    EL.DuplicateKeyOptions = {
+        {name = CTRL_KEY_TEXT, key = "LCTRL"},
+        {name = ALT_KEY_TEXT, key = "LALT"},
+    };
+
+    function EL:LoadSettings()
+        local dupeEnabled = addon.GetDBBool("Housing_DecorHover_EnableDupe");
+        local dupeKeyIndex = addon.GetDBValue("Housing_DecorHover_DuplicateKey");
+        self.dupeEnabled = dupeEnabled;
+
+        if (not type(dupeKeyIndex) == "number") and (self.DuplicateKeyOptions[dupeKeyIndex]) then
+            dupeKeyIndex = 2;
+        end
+
+        self.currentDupeKeyName = self.DuplicateKeyOptions[dupeKeyIndex].name;
+        self.dupeKey = self.DuplicateKeyOptions[dupeKeyIndex].key;
+
+        if DisplayFrame and DisplayFrame.SubFrame then
+            DisplayFrame.SubFrame:SetHotkey(L["Duplicate"], self:CurrentGetDupeKeyName());
+            if not dupeEnabled then
+                DisplayFrame.SubFrame:Hide();
+            end
+        end
+    end
+
+    function EL:CurrentGetDupeKeyName()
+        return self.currentDupeKeyName
+    end
+end
+
+
+local OptionToggle_OnClick;
+do  --Options
+    local function InfoGetter_DecorHoverSettings()
+        local tbl = {
+            key = "DecorHoverSettings",
+            independent = true,
+        };
+
+        local widgets = {
+            {type = "Header", text = L["ModuleName Housing_DecorHover"]},
+        };
+
+        local dupeEnabled = addon.GetDBBool("Housing_DecorHover_EnableDupe");
+
+        table.insert(widgets, {type = "Checkbox", text = L["Enable Duplicate"], tooltip = L["Enable Duplicate tooltip"], refreshAfterClick = true,
+            selected = dupeEnabled,
+            onClickFunc = function()
+                addon.FlipDBBool("Housing_DecorHover_EnableDupe");
+                EL:LoadSettings();
+            end,
+        });
+
+        table.insert(widgets, {type = "Divider"});
+        table.insert(widgets, {type = "Header", text = L["Duplicate Decor Key"]});
+
+        local selectedIndex = addon.GetDBValue("Housing_DecorHover_DuplicateKey") or 2;
+
+        for k, v in ipairs(EL.DuplicateKeyOptions) do
+            table.insert(widgets, {
+                type = "Radio",
+                text = v.name;
+                closeAfterClick = true,
+                onClickFunc = function()
+                    addon.SetDBValue("Housing_DecorHover_DuplicateKey", k, true);
+                    EL:LoadSettings();
+                end,
+                selected = k == selectedIndex,
+                disabled = not dupeEnabled,
+            });
+        end
+
+        tbl.widgets = widgets;
+        return tbl
+    end
+
+    function OptionToggle_OnClick(self)
+        addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, InfoGetter_DecorHoverSettings);
+    end
+end
+
+
+do
+    local function EnableModule(state)
+        EL:SetEnabled(state);
+    end
+
+    local moduleData = {
+        name = L["ModuleName Housing_DecorHover"],
+        dbKey ="Housing_DecorHover",
+        description = L["ModuleDescription Housing_DecorHover"],
+        toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 1,
+        moduleAddedTime = 1764600000,
+        optionToggleFunc = OptionToggle_OnClick,
+        categoryKeys = {
+            "Housing",
+        },
+        searchTags = {
+            "Housing",
+        },
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
 end

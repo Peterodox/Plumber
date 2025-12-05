@@ -582,7 +582,7 @@ do
 
     function OptionToggleMixin:OnClick(button)
         if self.onClickFunc then
-            self.onClickFunc(button);
+            self.onClickFunc(self, button);
             if self.hasMovableWidget then
                 if addon.AnyShownModuleOptions() then
                     MainFrame:Minimize();
@@ -1112,7 +1112,7 @@ local function CreateUI()
         end
 
         FilterButton.onMouseDownFunc = function(self)
-            SetTexCoord(self.Texture, 272, 320, 16, 64);
+            SetTexCoord(self.Texture, 320, 368, 16, 64);
         end
 
         FilterButton.onMouseUpFunc = function(self)

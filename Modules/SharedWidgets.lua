@@ -5032,7 +5032,7 @@ do  --EditMode
             for order, widgetData in ipairs(schematic.widgets) do
                 local widget;
                 if (not widgetData.validityCheckFunc) or (widgetData.validityCheckFunc()) then
-                    
+
                     if widgetData.type == "Checkbox" then
                         widget = self:CreateCheckbox(widgetData);
                     elseif widgetData.type == "RadioGroup" then

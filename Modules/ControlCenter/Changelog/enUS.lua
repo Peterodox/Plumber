@@ -10,6 +10,106 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10802] = {
+    {
+        type = "date",
+        versionText = "1.8.2",
+        timestamp = 1764900000,
+    },
+
+    {
+        type = "h1",
+        text = "Decor Editor: Object Name and Duplicate",
+        dbKey = "Housing_DecorHover",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "Housing_DecorHover",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "This module only functions in Decorate Mode.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Hover the cursor over a decor to display its name and its item count in storage.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "While a decor is hovered, press the ALT key to place another instance of this object if there is at least one left in storage.",
+    },
+
+    {
+        type = "img",
+        dbKey = "Housing_DecorHover",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Plumber Macros",
+    },
+
+    {
+        type = "p",
+        text = "Create a new macro then enter the following |cffd7c0a3#plumber:command|r in the command editbox.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "|cffd7c0a3#plumber:home|r\nUse this macro to teleport to your house.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "|cffd7c0a3#plumber:torch|r\nToggle Cave Spelunker's Torch while you are in housing zones.",
+    },
+
+    {
+        type = "img",
+        dbKey = "Housing_Macro",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = MISCELLANEOUS,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Settings Panel: If a module has a movable widget, clicking the module settings will minimize the module list to avoid blocking other UI elements.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Settings Panel: Added an option to increase the font size for release notes.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Decor Catalog: Banana For Scale: Updated the banana to its HD version.",
+    },
+};
+
 changelogs[10801] = {
     {
         type = "date",

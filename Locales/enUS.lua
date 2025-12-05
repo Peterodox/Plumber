@@ -694,6 +694,12 @@ L["ModuleDescription Housing_Macro"] = "You can create a Teleport Home macro: cr
 L["Teleport Home"] = "Teleport Home";
 L["Instruction Drag To Action Bar"] = "<Click and Drag this to your Action Bars>";
 L["Toggle Torch"] = "Toggle Torch";
+L["ModuleName Housing_DecorHover"] = "Editor: Object Name and Duplicate";
+L["ModuleDescription Housing_DecorHover"] = "In Decorate Mode:\n\n- Hover the cursor over a decor to display its name and its item count in storage.\n\n- Allows you to \"duplicate\" a decor by pressing Alt.\n\nThe new object will not inherit the current angles and scales.";
+L["Duplicate"] = "Duplicate";
+L["Duplicate Decor Key"] = "\"Duplicate\" Key";
+L["Enable Duplicate"] = "Enable \"Duplicate\"";
+L["Enable Duplicate tooltip"] = "While in Decorate Mode, you can hover the cursor over a decor and then press a key to place another instance of this object.";
 
 
 --Generic

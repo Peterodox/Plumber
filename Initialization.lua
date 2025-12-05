@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.8.1";
-local VERSION_DATE = 1764600000;
+local VERSION_TEXT = "1.8.2";
+local VERSION_DATE = 1764900000;
 
 
 local addonName, addon = ...
@@ -320,6 +320,9 @@ local DefaultValues = {
     DecorModelScaleRef = true,
         DecorModelScaleRef_ShowBanana = false,
     Housing_Macro = true,
+    Housing_DecorHover = true,
+        Housing_DecorHover_EnableDupe = true,
+        Housing_DecorHover_DuplicateKey = 2,    --1:Ctrl, 2:Alt
 
 
     --Declared elsewhere:
