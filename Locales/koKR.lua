@@ -39,6 +39,7 @@ L["New Features"] = "새 기능";
 L["New Feature Abbr"] = "신규";
 L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "이 모듈은 항상 활성화되어 있습니다.";
+L["Return To Module List"] = "목록으로 돌아가기";
 
 
 --Settings Category
@@ -55,6 +56,7 @@ L["SC Profession"] = "전문 기술";
 L["SC Quest"] = "퀘스트";
 L["SC UnitFrame"] = "유닛 프레임";
 L["SC Old"] = "이전 콘텐츠";
+L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "하우징";
 L["SC Uncategorized"] = "미분류";
 
 --Settings Search Keywords, Search Tags
@@ -564,6 +566,8 @@ L["QuickSlot Error 3"] = "퀵 슬롯: 동일한 키 \"%s\"를 가진 컨트롤�
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber 고.속.주.행. 매크로";
 L["PlumberMacro Drawer"] = "Plumber 패널 매크로";
+L["PlumberMacro Housing"] = "Plumber 하우징 매크로";
+L["PlumberMacro Torch"] = "Plumber 횃불 매크로";
 L["PlumberMacro DrawerFlag Combat"] = "전투 종료 시 서랍이 갱신됩니다.";
 L["PlumberMacro DrawerFlag Stuck"] = "패널 갱신에 실패했습니다.";
 L["PlumberMacro Error Combat"] = "전투 중 제한됨";
@@ -682,6 +686,15 @@ L["Press Key To Copy Format"] = "|cffffd100%s|r 키를 눌러 복사";
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "장식품: 크기 비교용 바나나";
 L["ModuleDescription DecorModelScaleRef"] = "- 장식 미리보기 창에 크기 참조용 바나나를 추가하여 오브젝트의 크기를 가늠할 수 있습니다.\n\n- 또한 왼쪽 버튼을 누른 채 수직으로 이동하여 카메라 각도를 변경할 수 있습니다.";
+
+
+--Player Housing
+L["ModuleName Housing_Macro"] = "하우징 매크로";
+L["ModuleDescription Housing_Macro"] = "하우징 순간이동 매크로를 생성할 수 있습니다: 먼저 새 매크로를 생성한 후, 명령어 입력창에 |cffd7c0a3#plumber:home|r 을 입력하세요.";
+L["Teleport Home"] = "집으로 순간이동";
+L["Instruction Drag To Action Bar"] = "<클릭하고 드래그하여 행동 단축바로 이동>";
+L["Toggle Torch"] = "횃불 전환";
+
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "합계:";
