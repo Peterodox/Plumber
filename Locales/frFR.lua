@@ -61,7 +61,7 @@ L["KW Tooltip"] = "Info-bulle";
 L["KW Transmog"] = "Transmogrification";
 L["KW Vendor"] = "Vendeur";
 L["KW LegionRemix"] = "Remix de Legion";
-L["KW Housing"] = "Logis du joueur";
+L["KW Housing"] = "Maison du joueur";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Nom";          --Ordre alphabétique
