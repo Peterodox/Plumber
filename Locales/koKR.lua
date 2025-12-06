@@ -694,6 +694,12 @@ L["ModuleDescription Housing_Macro"] = "하우징 순간이동 매크로를 생�
 L["Teleport Home"] = "집으로 순간이동";
 L["Instruction Drag To Action Bar"] = "<클릭하고 드래그하여 행동 단축바로 이동>";
 L["Toggle Torch"] = "횃불 전환";
+L["ModuleName Housing_DecorHover"] = "편집기: 객체 이름 및 복제";
+L["ModuleDescription Housing_DecorHover"] = "장식 모드:\n\n- 커서를 장식 위에 올려놓으면 해당 장식 이름과 저장된 아이템 수가 표시됩니다.\n\n- Alt를 눌러 장식을 \"복제\"할 수 있습니다.\n\n새로 생성된 오브젝트는 현재 각도와 크기를 상속받지 않습니다.";
+L["Duplicate"] = "복제";
+L["Duplicate Decor Key"] = "\"복제\" 키";
+L["Enable Duplicate"] = "\"복제\" 활성화";
+L["Enable Duplicate tooltip"] = "장식 모드에서는 커서를 장식 위에 올려놓은 후 키를 눌러 해당 객체의 다른 인스턴스를 배치할 수 있습니다.";
 
 
 --Generic
