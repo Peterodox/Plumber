@@ -38,6 +38,8 @@ L["Version"] = "Version";
 L["New Features"] = "Nouvelles fonctionnalités";
 L["New Feature Abbr"] = "Nouv.";
 L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
+L["Always On Module"] = "Ce module est toujours activé.";
+L["Return To Module List"] = "Retour à la liste";
 
 
 --Settings Category
@@ -54,6 +56,7 @@ L["SC Profession"] = "Métiers";
 L["SC Quest"] = "Quêtes";
 L["SC UnitFrame"] = "Cadres d'unité";
 L["SC Old"] = "Ancien contenu";
+L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "Logis";
 L["SC Uncategorized"] = "Non classé";
 
 --Settings Search Keywords, Search Tags
@@ -62,6 +65,8 @@ L["KW Transmog"] = "Transmogrification";
 L["KW Vendor"] = "Vendeur";
 L["KW LegionRemix"] = "Remix de Legion";
 L["KW Housing"] = "Maison du joueur";
+L["KW Combat"] = "Combat";
+L["KW ActionBar"] = "Barres d'action";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Nom";          --Ordre alphabétique
@@ -155,10 +160,10 @@ L["Pin Size"] = "Taille du repère";
 L["ModuleName AlternativePlayerChoiceUI"] = "Choix de l'interface : Manne d'émeraude";
 L["ModuleDescription AlternativePlayerChoiceUI"] = "Remplace l'interface de la Graine onirique par défaut par une interface moins bloquante, affiche le nombre d'objets que vous possédez et vous permet de contribuer automatiquement en cliquant et en maintenant le bouton.";
 
+
 --HandyLockpick (Right-click a lockbox in your bag to unlock when you are not in combat. Available to rogues and mechagnomes)
 L["ModuleName HandyLockpick"] = "Crochetage pratique";
 L["ModuleDescription HandyLockpick"] = "Clic droit sur un coffre verrouillé dans votre sac ou dans l'interface d'échange pour le déverrouiller.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Impossible de déverrouiller directement un objet dans la banque\n- Affecté par le mode de ciblage doux";
-
 L["Instruction Pick Lock"] = "<Clic droit pour crocheter>";
 
 
@@ -561,6 +566,8 @@ L["QuickSlot Error 3"] = "Emplacement rapide : un contrôleur avec la même clé
 --Plumber Macro
 L["PlumberMacro Drive"] = "Macro V.R.O.U.M. de Plumber";
 L["PlumberMacro Drawer"] = "Création de macro Plumber";
+L["PlumberMacro Housing"] = "Macro Logis de Plumber";
+-- L["PlumberMacro Torch"] = "Plumber Torch Macro"; -- à traduire
 L["PlumberMacro DrawerFlag Combat"] = "La macro sera mise à jour après avoir quitté le combat.";
 L["PlumberMacro DrawerFlag Stuck"] = "Une erreur s'est produite lors de la mise à jour de la macro.";
 L["PlumberMacro Error Combat"] = "Indisponible en combat";
@@ -585,6 +592,8 @@ L["Drawer Option Hide Unusable Tooltip"] = "Masquer les objets non possédés et
 L["Drawer Option Hide Unusable Tooltip 2"] = "Les objets consommables comme les potions seront toujours affichés."
 L["Drawer Option Update Frequently"] = "Mis à jour fréquemment";
 L["Drawer Option Update Frequently Tooltip"] = "Essaie de mettre à jour l'état des boutons dès qu'un changement survient dans vos sacs ou grimoires. Activer cette option peut légèrement augmenter la consommation de ressources.";
+L["ModuleName DrawerMacro"] = "Création de Macro";
+L["ModuleDescription DrawerMacro"] = "Créer un menu déroulant personnalisé pour gérer vos objets, sorts, mascottes, montures et jouets.\n\nPour créer une macro, créez d'abord une nouvelle macro, puis entrez |cffd7c0a3#plumber:drawer|r dans la zone d'édition de la macro.";
 
 
 --New Expansion Landing Page
@@ -677,6 +686,21 @@ L["Press Key To Copy Format"] = "Appuyez sur |cffffd100%s|r pour copier";
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "Catalogue d'éléments de décoration : Échelle de la Banane"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Ajoute une référence de taille (une banane) à la fenêtre d'aperçu du décor, vous permettant d'évaluer la taille des objets.\n\n- Vous permet également de modifier l'inclinaison de la caméra en maintenant le bouton gauche enfoncé et en vous déplaçant verticalement.";
+
+
+--Player Housing
+L["ModuleName Housing_Macro"] = "Macros de Logis";
+L["ModuleDescription Housing_Macro"] = "Vous pouvez créer une macro de téléportation à votre Logi : créez d'abord une nouvelle macro, puis saisissez |cffd7c0a3#plumber:home|r dans la zone de commande.";
+L["Teleport Home"] = "Téléportation au domicile";
+L["Instruction Drag To Action Bar"] = "<Cliquez et faites glisser ceci vers vos barres d'action>";
+L["Toggle Torch"] = "Activer / désactiver la torche";
+L["ModuleName Housing_DecorHover"] = "Éditeur : Nom d'objet et Duplication";
+L["ModuleDescription Housing_DecorHover"] = "En mode Décoration :\n\n- Survolez un décor pour afficher son nom et le nombre d'exemplaires en stock.\n\n- Permet de « dupliquer » un décor en appuyant sur Alt.\n\nLe nouvel objet n'héritera pas des angles et échelles actuels.";
+L["Duplicate"] = "Dupliquer";
+L["Duplicate Decor Key"] = "Touche « Dupliquer »";
+L["Enable Duplicate"] = "Activer « Dupliquer »";
+L["Enable Duplicate tooltip"] = "En mode Décoration, vous pouvez survoler un décor puis appuyer sur une touche pour placer un autre exemplaire de cet objet.";
+
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total :";
