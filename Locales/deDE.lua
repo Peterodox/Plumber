@@ -85,7 +85,7 @@ L["Module Category NPC Interaction"] = "NPC-Interaktion";
 ---order: 3
 L["Module Category Tooltip"] = "Tooltip";    --Additional Info on Tooltips
 ---order: 4
-L["Module Category Class"] = "Klasse";    --Player Class (rogue, paladin…)
+L["Module Category Class"] = "Klasse";    --Player Class (rogue, paladin...)
 ---order: 5
 L["Module Category Reduction"] = "Minimalistisches Interface";    --Reduce UI elements
 ---order: -1
@@ -225,7 +225,7 @@ L["Announce Forbidden Reason In Cooldown"] = "Ihr habt kürzlich einen Standort 
 L["Announce Forbidden Reason Duplicate Message"] = "Dieser Standort wurde kürzlich von einem anderen Spieler geteilt.";
 L["Announce Forbidden Reason Soon Despawn"] = "Ihr können diesen Standort nicht teilen, da er bald verschwinden wird.";
 L["Available In Format"] = "Verfügbar in: |cffffffff%s|r";
-L["Seed Color Epic"] = ICON_TAG_RAID_TARGET_DIAMOND3 or "Lila";    --Using GlobalStrings as defaults    --DE_Notes: If this is about the (quality) color and not names, almost no one ever uses "Violett" in German
+L["Seed Color Epic"] = "Lila";    --Using GlobalStrings as defaults    --DE_Notes: If this is about the (quality) color and not names, almost no one ever uses "Violett" in German
 L["Seed Color Rare"] = ICON_TAG_RAID_TARGET_SQUARE3 or "Blau";
 L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Grün";
 
