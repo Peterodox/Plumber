@@ -12,7 +12,7 @@
     <Script file="GameTooltip_DelvesItem.lua"/>
     <Script file="GameTooltip_TransmogEnsemble.lua"/>
 
-    <!--Script file="GameTooltip_Housing.lua"/-->
+    <Script file="GameTooltip_DyeDeez.lua"/>
 
 
     <!--No Longer Relevant-->

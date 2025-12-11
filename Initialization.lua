@@ -226,7 +226,6 @@ local DefaultValues = {
     TooltipDelvesItem = true,           --Show weekly Coffer Key cap on chest tooltip
     TooltipItemQuest = true,            --Show the quest of quest starting items in bags
     TooltipTransmogEnsemble = true,     --A Raid Ensemble now unlocks outfits (tints) from 4 difficulties, but the default UI only gives one
-    TooltipHousing = true,              --TEMP Midnight BETA PTR
 
 
     --Reduction
@@ -323,6 +322,7 @@ local DefaultValues = {
     Housing_DecorHover = true,
         Housing_DecorHover_EnableDupe = true,
         Housing_DecorHover_DuplicateKey = 2,    --1:Ctrl, 2:Alt
+    TooltipDyeDeez = true,                  --Show dyes on pigment tooltip
 
 
     --Declared elsewhere:

@@ -9,6 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber Addon";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Toggle Plumber Expansion Summary";   --Show/hide Expansion Summary UI
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Focus On Next Quest";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Focus On Previous Quest";
 
 
 --Module Control Panel
@@ -67,6 +69,7 @@ L["KW LegionRemix"] = "Legion Remix";
 L["KW Housing"] = "Player Housing House";
 L["KW Combat"] = "Combat";
 L["KW ActionBar"] = "Action Bars";
+L["KW Console"] = "Console Gamepad Controller";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Name";  --Alphabetical Order
@@ -683,6 +686,10 @@ L["Missing Appearances Format"] = "%d |4appearance:appearances; missing";
 L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
 
 
+L["ModuleName QuestWatchCycle"] = "Keybindings: Focus Quest";
+L["ModuleDescription QuestWatchCycle"] = "Allows you to press hotkeys to focus on the next/previous quest in the objective tracker.\n\n|cffd4641cSet your hotkeys in Keybindings> Plumber Addon.|r";
+
+
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "Decor Catalog: Banana For Scale"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Add a size reference (a banana) to the decor preview window, allowing you to gauge the size of the objects.\n\n- Also allow you to change the camera pitch by holding down the Left Button and moving vertically.";
@@ -700,6 +707,14 @@ L["Duplicate"] = "Duplicate";
 L["Duplicate Decor Key"] = "\"Duplicate\" Key";
 L["Enable Duplicate"] = "Enable \"Duplicate\"";
 L["Enable Duplicate tooltip"] = "While in Decorate Mode, you can hover the cursor over a decor and then press a key to place another instance of this object.";
+L["Copy Dyes"] = "Copy";
+L["Dyes Copied"] = "Dyes Copied";
+L["Apply Dyes"] = "Apply";
+L["Preview Dyes"] = "Preview";
+L["ModuleName TooltipDyeDeez"] = "Tooltip: Dye Pigment";
+L["ModuleDescription TooltipDyeDeez"] = "Tooltip: Dye Pigment";
+L["Instruction Show More Info"] = "<Press Alt to Show More Info>";
+L["Instruction Show Less Info"] = "<Press Alt to Show Less Info>";
 
 
 --Generic
@@ -716,6 +731,12 @@ L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "You have unclaimed rewards";
 L["Uncollected Set Counter Format"] = "You have |cffffffff%d|r uncollected transmog |4set:sets;.";
+L["InstructionFormat Left Click"] = "Left Click to %s";
+L["InstructionFormat Right Click"] = "Right Click to %s";
+L["InstructionFormat Ctrl Left Click"] = "Ctrl Left Click to %s";
+L["InstructionFormat Ctrl Right Click"] = "Ctrl Right Click to %s";
+L["InstructionFormat Alt Left Click"] = "Alt Left Click to %s";
+L["InstructionFormat Alt Right Click"] = "Alt Right Click to %s";
 
 
 --Plumber AddOn Settings

@@ -9,6 +9,7 @@ Housing.DataProvider = DataProvider;
 
 
 local C_Housing = C_Housing;
+local GetCatalogEntryInfoByRecordID = C_HousingCatalog.GetCatalogEntryInfoByRecordID;
 
 
 do  --Basic
@@ -43,6 +44,14 @@ do  --Basic
         };
         self:RegisterEvent(event);
     end
+
+
+    function Housing.GetCatalogDecorInfo(decorID, tryGetOwnedInfo)
+        --Enum.HousingCatalogEntryType.Decor
+        tryGetOwnedInfo = true;
+        return GetCatalogEntryInfoByRecordID(1, decorID, tryGetOwnedInfo)
+    end
+
 end
 
 
@@ -108,7 +117,7 @@ do  --Item Search
 end
 
 
-do  --House Level
+do  --House Level / Info / Teleport
     function DataProvider:GetMaxHousePlayerCanOwn()
         return 2
     end
@@ -196,7 +205,7 @@ do  --House Level
                     end
                     C_Housing.TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);     --C_Housing.ReturnAfterVisitingHouse
                 end
-                if mapIndex == factionMapIndex then
+                if i == 1 or mapIndex == factionMapIndex then
                     _G.Plumber_TeleportHome = teleportFunc;
                 end
                 self.teleportHomeInfo[i] = {
@@ -224,5 +233,106 @@ do  --House Level
                 Housing.isUpdatingHouseInfo = nil;
             end);
         end
+    end
+end
+
+
+do  --Dye
+    local SWATCH_FORMAT = "|TInterface\\AddOns\\Plumber\\Art\\Housing\\DyeSwatchSmall:%d:%d:0:0:64:64:0:32:0:32:%d:%d:%d|t";
+    local EMPTY_SWATCH_MARKUP = "|TInterface\\AddOns\\Plumber\\Art\\Housing\\DyeSwatchSmall:%d:%d:0:0:64:64:0:32:32:64|t";
+
+
+    local GetDyeColorInfo = C_DyeColor.GetDyeColorInfo;
+
+
+    function Housing.GetSwatchMarkup(dyeColorID, iconSize, showName)
+        iconSize = iconSize or 0;
+        local markup;
+        local dyeColorInfo = dyeColorID and GetDyeColorInfo(dyeColorID);
+        local numOwned = 0;
+        if dyeColorInfo then
+            local r, g, b = dyeColorInfo.swatchColorStart:GetRGBAsBytes();
+            markup = SWATCH_FORMAT:format(iconSize, iconSize, r, g, b);
+            if showName then
+                markup = markup.." "..dyeColorInfo.name;
+            end
+            numOwned = dyeColorInfo.numOwned;
+        else
+            markup = EMPTY_SWATCH_MARKUP:format(iconSize, iconSize);
+            if showName then
+                markup = markup.." "..NONE;
+            end
+        end
+        return markup, numOwned
+    end
+
+
+    local PigmentNameSorted = {};
+    local DyeColors = {
+        -- {dyeColorID1, dyeColorID2, ...} (by SortOrder)
+        Black = {31, 33, 13, 18, 21, 7},
+        Blue = {63, 56, 25, 45, 39},
+        Brown = {51, 55, 38, 32, 22, 3, 12, 5, 10},
+        Green = {44, 24, 57, 53, 34, 43, 60},
+        Orange = {42, 28, 17, 14},
+        Purple = {41, 29, 50, 26, 36, 40, 54},
+        Red = {23, 49, 64, 37, 52, 62, 61, 11},
+        Teal = {46, 58, 35, 19},
+        White = {30, 59, 4, 8},
+        Yellow = {27, 48, 47, 16, 15, 20, 9, 6},
+    };
+
+    local PigmentData = {
+        --[pigmentItemID]
+        --See: https://wago.tools/db2/DyeColor?sort%5BSortOrder%5D=asc
+
+        [262639] = DyeColors.Black,
+        [262643] = DyeColors.Blue,
+        [262642] = DyeColors.Brown,
+        [262647] = DyeColors.Green,
+        [262656] = DyeColors.Orange,
+        [262625] = DyeColors.Purple,
+        [262655] = DyeColors.Red,
+        [262628] = DyeColors.Teal,
+        [260947] = DyeColors.White,
+        [262648] = DyeColors.Yellow,
+    };
+
+    local PigmentRecipes = {
+        --[recipeID]
+
+        [1269228] = DyeColors.Black,
+        [1269226] = DyeColors.Blue,
+        [1269235] = DyeColors.Brown,
+        [1269230] = DyeColors.Green,
+        [1269233] = DyeColors.Orange,
+        [1269231] = DyeColors.Purple,
+        [1269229] = DyeColors.Red,
+        [1269232] = DyeColors.Teal,
+        [1269227] = DyeColors.White,
+        [1269234] = DyeColors.Yellow,
+    };
+
+    function Housing.GetDyesByPigmentItemID(itemID)
+        if PigmentData[itemID] then
+            if not PigmentNameSorted[itemID] then
+                PigmentNameSorted[itemID] = true;
+                local dyeName = {};
+                for _, dyeColorID in ipairs(PigmentData[itemID]) do
+                    local dyeColorInfo = GetDyeColorInfo(dyeColorID);
+                    dyeName[dyeColorID] = dyeColorInfo and dyeColorInfo.name or dyeColorID;
+                end
+
+                table.sort(PigmentData[itemID], function(a, b)
+                    return dyeName[a] < dyeName[b]
+                end);
+            end
+
+            return PigmentData[itemID]
+        end
+    end
+
+    function Housing.GetPigmentRecipes()
+        return PigmentRecipes
     end
 end

@@ -19,6 +19,61 @@ local ItemIconInfoTable = {
 };
 
 
+local AltModeListener = CreateFrame("Frame");
+do
+    --Alt Mode Instruction Color: 0.000, 0.800, 1.000
+
+    function AltModeListener:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= 0.5 then
+            self.t = nil;
+            self:SetScript("OnUpdate", nil);
+            self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+        end
+    end
+
+    function AltModeListener:OnEvent(event, key, down)
+        if down == 1 and (key == "LALT" or key == "RALT") then
+            if self.handler then
+                self.handler:TriggerAltMode();
+            end
+        end
+    end
+
+    function AltModeListener:SetHandlerAndStart(handler)
+        if not self.t then
+            self:SetScript("OnEvent", self.OnEvent);
+            self:SetScript("OnUpdate", self.OnUpdate);
+            self:RegisterEvent("MODIFIER_STATE_CHANGED");
+        end
+        self.handler = handler;
+        self.t = 0;
+    end
+end
+
+
+local function GetModuleAltModeDBKey(module)
+    if module.hasAltMode then
+        return module:GetDBKey().."_AltMode"
+    end
+end
+
+local function LoadModuleAltMode(module)
+    local key = GetModuleAltModeDBKey(module);
+    if key then
+        module.altModeEnabled = addon.GetDBBool(key);
+    end
+end
+
+local function ToggleModuleAltMode(module)
+    local key = GetModuleAltModeDBKey(module);
+    if key then
+        addon.FlipDBBool(key);
+        LoadModuleAltMode(module);
+    end
+end
+
+
 local HandlerMixin = {};
 do
     local ipairs = ipairs;
@@ -33,13 +88,24 @@ do
     end
 
     function HandlerMixin:CallSubModules(tooltip, itemID, hyperlink)
+        self.hasAltMode = nil;
+        self.currentTooltip = tooltip;
+
         for _, m in ipairs(self.modules) do
             if m:ProcessData(tooltip, itemID, hyperlink) then
                 self.anyChange = true;
+                if m.hasAltMode then
+                    self.hasAltMode = true;
+                end
             end
         end
+
         if self.anyChange then
             tooltip:Show();
+        end
+
+        if self.hasAltMode then
+            AltModeListener:SetHandlerAndStart(self);
         end
     end
 
@@ -49,6 +115,9 @@ do
         for _, m in ipairs(self.modules) do
             if m:IsEnabled() then
                 self.noModuleEnabled = false;
+            end
+            if m.hasAltMode then
+                LoadModuleAltMode(m);
             end
         end
 
@@ -75,6 +144,7 @@ do
     end
 
     function HandlerMixin:AppendTooltipInfo(tooltip, method, arg1, arg2, arg3, arg4)
+        self.currentTooltip = tooltip;
         if C_TooltipInfo[method] then
             local tooltipData = C_TooltipInfo[method](arg1, arg2, arg3, arg4);
             if tooltipData then
@@ -87,6 +157,7 @@ do
     end
 
     function HandlerMixin:AppendItemInfo(tooltip, itemID)
+        self.currentTooltip = tooltip;
         local tooltipData = C_TooltipInfo.GetItemByID(itemID);
         if tooltipData then
             tooltip:AddLine(" ");
@@ -97,6 +168,22 @@ do
                     tooltip:AddTexture(icon, ItemIconInfoTable);
                 end
             end
+        end
+    end
+
+    function HandlerMixin:TriggerAltMode()
+        if not (self.currentTooltip and self.currentTooltip:IsVisible()) then return end;
+
+        local anyChange;
+        for _, m in ipairs(self.modules) do
+            if m.hasAltMode and m:IsEnabled() then
+                ToggleModuleAltMode(m);
+                anyChange = true;
+            end
+        end
+
+        if anyChange and self.currentTooltip.RebuildFromTooltipInfo then
+            self.currentTooltip:RebuildFromTooltipInfo();
         end
     end
 

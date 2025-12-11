@@ -46,6 +46,7 @@ do  -- Slice Frame
         NineSlice_GenericBox_Border = true,     --used by BackpackItemTracker
         NineSlice_GenericBox_Black = true,
         NineSlice_GenericBox_Black_Shadowed = true, --CustomSpellFlyout
+        NineSlice_DarkBrownBox = true,
     };
 
     local ThreeSliceLayouts = {

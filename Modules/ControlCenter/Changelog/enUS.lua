@@ -20,6 +20,7 @@ changelogs[10802] = {
     {
         type = "h1",
         text = "Decor Editor: Object Name and Duplicate",
+        isNewFeature = true,
         dbKey = "Housing_DecorHover",
     },
 
@@ -58,6 +59,7 @@ changelogs[10802] = {
     {
         type = "h1",
         text = "Plumber Macros",
+        isNewFeature = true,
     },
 
     {

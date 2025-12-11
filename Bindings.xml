@@ -4,4 +4,16 @@
             Plumber_ToggleLandingPage();
         end
     </Binding>
+
+    <Binding name="PLUMBER_QUESTWATCH_NEXT" category="BINDING_HEADER_PLUMBER">
+        if Plumber_FocusNextQuest then
+            Plumber_FocusNextQuest();
+        end
+    </Binding>
+
+    <Binding name="PLUMBER_QUESTWATCH_PREVIOUS" category="BINDING_HEADER_PLUMBER">
+        if Plumber_FocusPreviousQuest then
+            Plumber_FocusPreviousQuest();
+        end
+    </Binding>
 </Bindings>

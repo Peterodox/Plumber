@@ -1,29 +1,19 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
-local Housing = addon.Housing;
+local Housing = addon.Housing;  --Housing.HouseEditorController
 
 
 local C_HousingDecor = C_HousingDecor;
 local GetHoveredDecorInfo = C_HousingDecor.GetHoveredDecorInfo;
 local IsHoveringDecor = C_HousingDecor.IsHoveringDecor;
-local GetActiveHouseEditorMode = C_HouseEditor.GetActiveHouseEditorMode;
 local IsHouseEditorActive = C_HouseEditor.IsHouseEditorActive;
-local GetCatalogEntryInfoByRecordID = C_HousingCatalog.GetCatalogEntryInfoByRecordID;
 local IsDecorSelected = C_HousingBasicMode.IsDecorSelected;
+local GetCatalogDecorInfo = Housing.GetCatalogDecorInfo;
 
 
+local Handler = Housing.HouseEditorController.CreateModeHandler("BasicDecor");
 local DisplayFrame;
-
-
-local function GetCatalogDecorInfo(decorID, tryGetOwnedInfo)
-    --Enum.HousingCatalogEntryType.Decor
-    tryGetOwnedInfo = true;
-    return GetCatalogEntryInfoByRecordID(1, decorID, tryGetOwnedInfo)
-end
-
-
-local EL = CreateFrame("Frame");
 
 
 local DisplayFrameMixin = {};
@@ -106,88 +96,103 @@ do  --UI
         local stored = entryInfo.quantity + entryInfo.remainingRedeemable;
         self.ItemCountText:SetText(stored);
         self.ItemCountText:SetShown(stored > 0);
-        self.SubFrame:SetShown(EL.dupeEnabled and stored > 0);
+        self.SubFrame:SetShown(Handler.dupeEnabled and stored > 0);
     end
 end
 
 
-local function Blizzard_HouseEditor_OnLoaded()
-    --parentKey="SelectInstruction" inherits="HouseEditorInstructionTemplate" parentArray="UnselectedInstructions"
-    --HouseEditorInstructionTemplate, InstructionText
+do
+    function Handler:Init()
+        self.Init = nil;
 
-    local container = HouseEditorFrame.BasicDecorModeFrame.Instructions;
-    for _, v in ipairs(container.UnselectedInstructions) do
-        v:Hide();
+        local container = HouseEditorFrame.BasicDecorModeFrame.Instructions;
+        for _, v in ipairs(container.UnselectedInstructions) do
+            v:Hide();
+        end
+        container.UnselectedInstructions = {};
+
+        if not DisplayFrame then
+            DisplayFrame = CreateFrame("Frame", nil, container, "PlumberHouseEditorInstructionTemplate");
+            DisplayFrame:SetPoint("RIGHT", HouseEditorFrame.BasicDecorModeFrame, "RIGHT", -30, 0);
+            Mixin(DisplayFrame, DisplayFrameMixin);
+            DisplayFrame:OnLoad();
+
+
+            local SubFrame = CreateFrame("Frame", nil, DisplayFrame, "PlumberHouseEditorInstructionTemplate");
+            DisplayFrame.SubFrame = SubFrame;
+            SubFrame:SetPoint("TOPRIGHT", DisplayFrame, "BOTTOMRIGHT", 0, 0);
+            Mixin(SubFrame, DisplayFrameMixin);
+            SubFrame:SetHotkey(L["Duplicate"], Handler:CurrentGetDupeKeyName());
+        end
+
+        container.UnselectedInstructions = {DisplayFrame};
+
+        if IsDecorSelected() then
+            DisplayFrame:Hide();
+        end
     end
-    container.UnselectedInstructions = {};
-
-    if not DisplayFrame then
-        DisplayFrame = CreateFrame("Frame", nil, container, "PlumberHouseEditorInstructionTemplate");
-        DisplayFrame:SetPoint("RIGHT", HouseEditorFrame.BasicDecorModeFrame, "RIGHT", -30, 0);
-        Mixin(DisplayFrame, DisplayFrameMixin);
-        DisplayFrame:OnLoad();
 
 
-        local SubFrame = CreateFrame("Frame", nil, DisplayFrame, "PlumberHouseEditorInstructionTemplate");
-        DisplayFrame.SubFrame = SubFrame;
-        SubFrame:SetPoint("TOPRIGHT", DisplayFrame, "BOTTOMRIGHT", 0, 0);
-        Mixin(SubFrame, DisplayFrameMixin);
-        SubFrame:SetHotkey(L["Duplicate"], EL:CurrentGetDupeKeyName());
-    end
-
-    container.UnselectedInstructions = {DisplayFrame};
-
-    if IsDecorSelected() then
-        DisplayFrame:Hide();
-    end
-end
-
-
-do  --Event Listener
-    EL.dynamicEvents = {
+    Handler.dynamicEvents = {
         "HOUSE_EDITOR_MODE_CHANGED",    --1 Enum.HouseEditorMode.BasicDecor
         "HOUSING_BASIC_MODE_HOVERED_TARGET_CHANGED",
     };
 
-    function EL:SetEnabled(state)
+    function Handler:IsEnabled()
+        return self.enabled
+    end
+
+    function Handler:SetEnabled(state)
         if state and not self.enabled then
             self.enabled = true;
-            API.RegisterFrameForEvents(self, self.dynamicEvents);
-            self:SetScript("OnEvent", self.OnEvent);
-            local blizzardAddOnName = "Blizzard_HouseEditor";
-            if C_AddOns.IsAddOnLoaded(blizzardAddOnName) then
-                Blizzard_HouseEditor_OnLoaded();
-            else
-                EventUtil.ContinueOnAddOnLoaded(blizzardAddOnName, Blizzard_HouseEditor_OnLoaded);
-            end
-            if DisplayFrame then
-                DisplayFrame:Show();
-            end
-            self:LoadSettings();
         elseif (not state) and self.enabled then
             self.enabled = nil;
-            API.UnregisterFrameForEvents(self, self.dynamicEvents);
-            self:UnregisterEvent("MODIFIER_STATE_CHANGED");
-            self:SetScript("OnUpdate", nil);
-            self.t = 0;
-            self.isUpdating = nil;
-            if DisplayFrame then
-                DisplayFrame:Hide();
-            end
+            self:Deactivate();
+        else
+            return
+        end
+
+        Housing.HouseEditorController:RequestUpdate();
+    end
+
+    function Handler:OnActivated()
+        API.RegisterFrameForEvents(self, self.dynamicEvents);
+        self:SetScript("OnEvent", self.OnEvent);
+        if DisplayFrame then
+            DisplayFrame:Show();
+        end
+        self:LoadSettings();
+        self:RequestUpdateHover();
+    end
+
+    function Handler:OnDeactivated()
+        API.UnregisterFrameForEvents(self, self.dynamicEvents);
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+        self:UnregisterEvent("HOUSING_STORAGE_ENTRY_UPDATED");
+        self:SetScript("OnUpdate", nil);
+        self.t = 0;
+        self.isUpdating = nil;
+        if DisplayFrame then
+            DisplayFrame:Hide();
         end
     end
 
-    function EL:OnEvent(event, ...)
+    function Handler:OnEvent(event, ...)
         if event == "HOUSING_BASIC_MODE_HOVERED_TARGET_CHANGED" then
             self:OnHoveredTargetChanged(...);
         elseif event == "HOUSE_EDITOR_MODE_CHANGED" then
             self:OnEditorModeChanged();
         elseif event == "MODIFIER_STATE_CHANGED" then
+            if not IsHouseEditorActive() then
+                self:UnregisterEvent(event);
+            end
             self:OnModifierStateChanged(...)
+        elseif event == "HOUSING_STORAGE_ENTRY_UPDATED" then
+            self:RequestUpdateHover();
         end
     end
 
-    function EL:OnHoveredTargetChanged(hasHoveredTarget, targetType)
+    function Handler:OnHoveredTargetChanged(hasHoveredTarget, targetType)
         --HousingBasicModeTargetType: 0 None, 1 Decor, 2 House
         if hasHoveredTarget then
             if not self.isUpdating then
@@ -209,9 +214,9 @@ do  --Event Listener
         end
     end
 
-    function EL:OnUpdate(elapsed)
+    function Handler:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        if self.t > 0.1 then
+        if self.t > 0.05 then
             self.t = 0;
             self.isUpdating = nil;
             self:SetScript("OnUpdate", nil);
@@ -219,7 +224,12 @@ do  --Event Listener
         end
     end
 
-    function EL:ProcessHoveredDecor()
+    function Handler:RequestUpdateHover()
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function Handler:ProcessHoveredDecor()
         self.decorInstanceInfo = nil;
         if IsHoveringDecor() then
             local info = GetHoveredDecorInfo(); --HousingDecorInstanceInfo, see Interface/AddOns/Blizzard_APIDocumentationGenerated/HousingDecorSharedDocumentation.lua
@@ -231,18 +241,20 @@ do  --Event Listener
                 if DisplayFrame then
                     DisplayFrame:SetDecorInfo(info);
                     DisplayFrame:FadeIn();
+                    self:RegisterEvent("HOUSING_STORAGE_ENTRY_UPDATED");
                 end
                 return true
             end
         end
         self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+        self:UnregisterEvent("HOUSING_STORAGE_ENTRY_UPDATED");
 
         if DisplayFrame then
             DisplayFrame:FadeOut();
         end
     end
 
-    function EL:GetHoveredDecorEntryID()
+    function Handler:GetHoveredDecorEntryID()
         if not self.decorInstanceInfo then return end;
 
         local decorID = self.decorInstanceInfo.decorID;
@@ -252,7 +264,7 @@ do  --Event Listener
         end
     end
 
-    function EL:TryDuplicateItem()
+    function Handler:TryDuplicateItem()
         if not self.dupeEnabled then return end;
         if not IsHouseEditorActive() then return end;
         if IsDecorSelected() then return end;
@@ -289,23 +301,23 @@ do  --Event Listener
         StartPlacing();
     end
 
-    function EL:OnEditorModeChanged()
+    function Handler:OnEditorModeChanged()
 
     end
 
-    function EL:OnModifierStateChanged(key, down)
+    function Handler:OnModifierStateChanged(key, down)
         if key == self.dupeKey and down == 0 then
             self:TryDuplicateItem();
         end
     end
 
 
-    EL.DuplicateKeyOptions = {
+    Handler.DuplicateKeyOptions = {
         {name = CTRL_KEY_TEXT, key = "LCTRL"},
         {name = ALT_KEY_TEXT, key = "LALT"},
     };
 
-    function EL:LoadSettings()
+    function Handler:LoadSettings()
         local dupeEnabled = addon.GetDBBool("Housing_DecorHover_EnableDupe");
         local dupeKeyIndex = addon.GetDBValue("Housing_DecorHover_DuplicateKey");
         self.dupeEnabled = dupeEnabled;
@@ -325,7 +337,7 @@ do  --Event Listener
         end
     end
 
-    function EL:CurrentGetDupeKeyName()
+    function Handler:CurrentGetDupeKeyName()
         return self.currentDupeKeyName
     end
 end
@@ -349,7 +361,7 @@ do  --Options
             selected = dupeEnabled,
             onClickFunc = function()
                 addon.FlipDBBool("Housing_DecorHover_EnableDupe");
-                EL:LoadSettings();
+                Handler:LoadSettings();
             end,
         });
 
@@ -358,14 +370,14 @@ do  --Options
 
         local selectedIndex = addon.GetDBValue("Housing_DecorHover_DuplicateKey") or 2;
 
-        for k, v in ipairs(EL.DuplicateKeyOptions) do
+        for k, v in ipairs(Handler.DuplicateKeyOptions) do
             table.insert(widgets, {
                 type = "Radio",
                 text = v.name;
                 closeAfterClick = true,
                 onClickFunc = function()
                     addon.SetDBValue("Housing_DecorHover_DuplicateKey", k, true);
-                    EL:LoadSettings();
+                    Handler:LoadSettings();
                 end,
                 selected = k == selectedIndex,
                 disabled = not dupeEnabled,
@@ -384,7 +396,7 @@ end
 
 do
     local function EnableModule(state)
-        EL:SetEnabled(state);
+        Handler:SetEnabled(state);
     end
 
     local moduleData = {

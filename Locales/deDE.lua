@@ -777,11 +777,11 @@ L["Match Pattern Gold"] = "([%d%,]+) Gold";
 L["Match Pattern Silver"] = "([%d]+) Silber";
 L["Match Pattern Copper"] = "([%d]+) Kupfer";
 
-L["Match Pattern Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion \"(.+)\" hat sich um ([%d%,]+) verbessert";    --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
-L["Match Pattern Rep 2"] = "Euer Ruf bei der Fraktion \"(.+)\" hat sich um ([%d%,]+) verbessert";    --FACTION_STANDING_INCREASED
+L["Match Pattern Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --See globalstring: FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Pattern Rep 2"] = "Euer Ruf bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --See globalstring: FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 
 L["Match Pattern Item Level"] = "^Gegenstandsstufe (%d+)";
-L["Match Pattern Item Upgrade Tooltip"] = "^Aufwertungsgrad: (.+) (%d+)/(%d+)";    --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Match Pattern Item Upgrade Tooltip"] = "^Aufwertungsgrad: (.+) (%d+)/(%d+)";   --See globalstring: ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
 L["Upgrade Track 1"] = "Abenteurer";
 L["Upgrade Track 2"] = "Forscher";
 L["Upgrade Track 3"] = "Veteran";
@@ -789,4 +789,4 @@ L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Held";
 L["Upgrade Track 6"] = "Mythos";
 
-L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";    --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";   --See globalstring: TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
