@@ -10,6 +10,159 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10803] = {
+    {
+        type = "date",
+        versionText = "1.8.3",
+        timestamp = 1765550000,
+    },
+
+    {
+        type = "h1",
+        text = "Editor: Customize Mode",
+        dbKey = "Housing_CustomizeMode",
+        isNewFeature = true,
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "Housing_CustomizeMode",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "This module only functions in Customize Mode.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Allows you to copy dyes from one decor to another.\nRight Click on a decor to copy the applied dyes.\nCtrl Left Click on another object to preview the dyes.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "When a decor is already selected, you can Right Click on another object to copy its dyes.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Change the dye slot name from index to the color's name.",
+    },
+
+    {
+        type = "img",
+        dbKey = "Housing_CustomizeMode",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Extend Search Results",
+        dbKey = "CraftSearchExtended",
+        isNewFeature = true,
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "CraftSearchExtended",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "For Alchemy and Inscription: you can now find housing pigment recipes by searching dye colors.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Press Enter to select the first match.",
+    },
+
+    {
+        type = "img",
+        dbKey = "CraftSearchExtended",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Tooltip: Dye Pigment",
+        dbKey = "TooltipDyeDeez",
+        isNewFeature = true,
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "TooltipDyeDeez",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Display the dye color names on housing pigment's tooltip.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can press Alt to show or hide this info.",
+    },
+
+    {
+        type = "img",
+        dbKey = "TooltipDyeDeez",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Keybindings: Focus On Quest",
+        isNewFeature = true,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Allows you to press hotkeys to focus on the next/previous quest in the objective tracker.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Set your hotkeys in Game Settings> Keybindings> Plumber Addon.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = MISCELLANEOUS,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Editor, Decorate Mode: The hovered decor's placement cost will be displayed next to its name.",
+    },
+};
+
+
 changelogs[10802] = {
     {
         type = "date",

@@ -687,7 +687,7 @@ L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
 
 
 --QuestWatchCycle
-L["ModuleName QuestWatchCycle"] = "Keybindings: Focus Quest";
+L["ModuleName QuestWatchCycle"] = "Keybindings: Focus On Quest";
 L["ModuleDescription QuestWatchCycle"] = "Allows you to press hotkeys to focus on the next/previous quest in the objective tracker.\n\n|cffd4641cSet your hotkeys in Keybindings> Plumber Addon.|r";
 
 
@@ -714,13 +714,13 @@ L["Duplicate Decor Key"] = "\"Duplicate\" Key";
 L["Enable Duplicate"] = "Enable \"Duplicate\"";
 L["Enable Duplicate tooltip"] = "While in Decorate Mode, you can hover the cursor over a decor and then press a key to place another instance of this object.";
 L["ModuleName Housing_CustomizeMode"] = "Editor: 3 Customize Mode";
-L["ModuleDescription Housing_CustomizeMode"] = "In Customize Mode:\n\n- Allows you to copy and paste dyes.\n\n- Change the dye slot name from index to the color's name.";
+L["ModuleDescription Housing_CustomizeMode"] = "In Customize Mode:\n\n- Allows you to copy dyes from one decor to another.\n\n- Change the dye slot name from index to the color's name.";
 L["Copy Dyes"] = "Copy";
 L["Dyes Copied"] = "Dyes Copied";
 L["Apply Dyes"] = "Apply";
 L["Preview Dyes"] = "Preview";
 L["ModuleName TooltipDyeDeez"] = "Tooltip: Dye Pigment";
-L["ModuleDescription TooltipDyeDeez"] = "Tooltip: Dye Pigment";
+L["ModuleDescription TooltipDyeDeez"] = "Display the dye color names on housing pigment's tooltip.";
 L["Instruction Show More Info"] = "<Press Alt to Show More Info>";
 L["Instruction Show Less Info"] = "<Press Alt to Show Less Info>";
 

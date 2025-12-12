@@ -9,6 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber插件";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "打开/关闭资料片概要";   --Show/hide Expansion Summary UI
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "设下一个任务为焦点";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "设上一个任务为焦点";
 
 
 --Module Control Panel
@@ -56,6 +58,7 @@ L["SC Profession"] = "专业";
 L["SC Quest"] = "任务";
 L["SC UnitFrame"] = "单位框体";
 L["SC Old"] = "旧内容";
+L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "房屋";
 L["SC Uncategorized"] = "未分类";
 
 --Settings Search Keywords, Search Tags
@@ -66,6 +69,7 @@ L["KW LegionRemix"] = "军团再临";
 L["KW Housing"] = "房屋住宅";
 L["KW Combat"] = "战斗";
 L["KW ActionBar"] = "动作条技能栏";
+L["KW Console"] = "主机手柄";
 
 --Filter Sort Method
 L["SortMethod 1"] = "名称";  --Alphabetical Order
@@ -87,6 +91,8 @@ L["Module Category Class"] = "职业";   --Player Class (rogue, paladin...)
 L["Module Category Reduction"] = "做减法";   --Reduce UI elements
 --- order: -1
 L["Module Category Timerunning"] = "军团再临：幻境新生";    --Change this based on timerunning season
+--- order: -2
+L["Module Category Beta"] = "测试服";
 
 
 L["Module Category Dragonflight"] = "巨龙时代";
@@ -562,6 +568,8 @@ L["QuickSlot Error 3"] = "快捷按钮：A controller with the same key \"%s\" a
 --Plumber Macro
 L["PlumberMacro Drive"] = "Plumber赛车坐骑宏";
 L["PlumberMacro Drawer"] = "Plumber技能收纳宏";
+L["PlumberMacro Housing"] = "Plumber房屋宏";
+L["PlumberMacro Torch"] = "Plumber火把宏";
 L["PlumberMacro DrawerFlag Combat"] = "技能收纳宏将在你离开战斗后更新。";
 L["PlumberMacro DrawerFlag Stuck"] = "更新技能收纳宏时遇到了错误。";
 L["PlumberMacro Error Combat"] = "战斗中不可用";
@@ -645,9 +653,43 @@ L["Missing Appearances Format"] = "%d个外观缺失";
 L["Press Key To Copy Format"] = "按|cffffd100%s|r来复制";
 
 
+--QuestWatchCycle
+L["ModuleName QuestWatchCycle"] = "快捷键：任务焦点";
+L["ModuleDescription QuestWatchCycle"] = "允许你设置快捷键来设下一个或上一个任务为焦点。\n\n|cffd4641c请前往以下位置设置按键：游戏设置> 快捷键> Plumber 插件.|r";
+
+
+--CraftSearchExtended
+L["ModuleName CraftSearchExtended"] = "搜索结果拓展";
+L["ModuleDescription CraftSearchExtended"] = "在搜索某些词语时显示更多结果。\n\n- 炼金和铭文：可通过搜索染料名字找到所需颜料。";
+
+
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "装饰品: 参照物";
 L["ModuleDescription DecorModelScaleRef"] = "- 为装饰品预览窗口增加一个参照物（一根香蕉），帮助你理解物体的大小。\n\n- 允许你按住鼠标左键并在模型上上下拖动来改变镜头的俯仰角。";
+
+
+--Player Housing
+L["ModuleName Housing_Macro"] = "房屋宏";
+L["ModuleDescription Housing_Macro"] = "要创建一个回家宏：请先创建一个新宏，然后在宏编辑框中输入 |cffd7c0a3#plumber:home|r";
+L["Teleport Home"] = "传送到房屋";
+L["Instruction Drag To Action Bar"] = "<可点击并拖动到技能栏>";
+L["Toggle Torch"] = "勾选火把";
+L["ModuleName Housing_DecorHover"] = "编辑器：1 装饰模式";
+L["ModuleDescription Housing_DecorHover"] = "装饰模式下：\n\n- 将光标悬停在装饰物上，可显示其占用空间、名称以及库存数量。\n\n- 允许你按下Alt键来摆放一个同样的物体。\n\n新物体不会继承当前的选择角度和缩放比例。";
+L["Duplicate"] = "复制";
+L["Duplicate Decor Key"] = "“复制”键";
+L["Enable Duplicate"] = "启用“复制”";
+L["Enable Duplicate tooltip"] = "在装饰模式下，将光标悬停在装饰物上并按下特定按键，即可摆放一个同样的物体。";
+L["ModuleName Housing_CustomizeMode"] = "编辑器：3 自定义模式";
+L["ModuleDescription Housing_CustomizeMode"] = "自定义模式下：\n\n- 允许你将一个装饰物的染料组合复制到另一个物体上。\n\n- 将染料栏的名字从其序号更改为颜色名称。";
+L["Copy Dyes"] = "复制";
+L["Dyes Copied"] = "已复制";
+L["Apply Dyes"] = "应用";
+L["Preview Dyes"] = "预览";
+L["ModuleName TooltipDyeDeez"] = "鼠标提示：染料颜料";
+L["ModuleDescription TooltipDyeDeez"] = "在颜料的鼠标提示上显示其可制作的颜色名称。";
+L["Instruction Show More Info"] = "<按Alt键显示更多信息>";
+L["Instruction Show Less Info"] = "<按Alt键显示更少信息>";
 
 
 --Generic
