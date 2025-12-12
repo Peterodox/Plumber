@@ -9,6 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber 애드온";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Plumber 추가 기능 요약 전환";   --Show/hide Expansion Summary UI
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "다음 퀘스트에 포커스";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "이전 퀘스트에 포커스";
 
 
 --Module Control Panel
@@ -67,6 +69,7 @@ L["KW LegionRemix"] = "군단 리믹스";
 L["KW Housing"] = "하우징";
 L["KW Combat"] = "전투";
 L["KW ActionBar"] = "행동 단축바";
+L["KW Console"] = "콘솔 게임패드 컨트롤러";
 
 --Filter Sort Method
 L["SortMethod 1"] = "이름";  --Alphabetical Order
@@ -683,6 +686,10 @@ L["Missing Appearances Format"] = "%d개 외형 누락";
 L["Press Key To Copy Format"] = "|cffffd100%s|r 키를 눌러 복사";
 
 
+L["ModuleName QuestWatchCycle"] = "단축키: 퀘스트 포커스";
+L["ModuleDescription QuestWatchCycle"] = "단축키로 목표 추적기에서 다음/이전 퀘스트에 포커스를 이동할 수 있습니다.\n\n|cffd4641c단축키 설정: 설정 > 단축키 > Plumber 애드온.|r";
+
+
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "장식품: 크기 비교용 바나나";
 L["ModuleDescription DecorModelScaleRef"] = "- 장식 미리보기 창에 크기 참조용 바나나를 추가하여 오브젝트의 크기를 가늠할 수 있습니다.\n\n- 또한 왼쪽 버튼을 누른 채 수직으로 이동하여 카메라 각도를 변경할 수 있습니다.";
@@ -700,6 +707,14 @@ L["Duplicate"] = "복제";
 L["Duplicate Decor Key"] = "\"복제\" 키";
 L["Enable Duplicate"] = "\"복제\" 활성화";
 L["Enable Duplicate tooltip"] = "장식 모드에서는 커서를 장식 위에 올려놓은 후 키를 눌러 해당 객체의 다른 인스턴스를 배치할 수 있습니다.";
+L["Copy Dyes"] = "염색 복사";
+L["Dyes Copied"] = "염색 설정이 복사되었습니다";
+L["Apply Dyes"] = "염색 적용";
+L["Preview Dyes"] = "염색 미리보기";
+L["ModuleName TooltipDyeDeez"] = "툴팁: 염료 색소";
+L["ModuleDescription TooltipDyeDeez"] = "아이템 툴팁에 염료 색소 정보를 표시합니다.";
+L["Instruction Show More Info"] = "<Alt 키를 눌러 추가 정보 보기>";
+L["Instruction Show Less Info"] = "<Alt 키를 눌러 정보 줄이기>";
 
 
 --Generic
@@ -716,6 +731,12 @@ L["Level Maxed"] = "(최대)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "현재:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "수령하지 않은 보상이 있습니다";
 L["Uncollected Set Counter Format"] = "아직 수집하지 않은 형상변환 세트: |cffffffff%d|r개";
+L["InstructionFormat Left Click"] = "좌클릭: %s";
+L["InstructionFormat Right Click"] = "우클릭: %s";
+L["InstructionFormat Ctrl Left Click"] = "Ctrl+좌클릭: %s";
+L["InstructionFormat Ctrl Right Click"] = "Ctrl+우클릭: %s";
+L["InstructionFormat Alt Left Click"] = "Alt+좌클릭: %s";
+L["InstructionFormat Alt Right Click"] = "Alt+우클릭: %s";
 
 
 --Plumber AddOn Settings
