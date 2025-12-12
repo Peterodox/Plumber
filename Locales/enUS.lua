@@ -686,8 +686,14 @@ L["Missing Appearances Format"] = "%d |4appearance:appearances; missing";
 L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
 
 
+--QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Keybindings: Focus Quest";
 L["ModuleDescription QuestWatchCycle"] = "Allows you to press hotkeys to focus on the next/previous quest in the objective tracker.\n\n|cffd4641cSet your hotkeys in Keybindings> Plumber Addon.|r";
+
+
+--CraftSearchExtended
+L["ModuleName CraftSearchExtended"] = "Extend Search Results";
+L["ModuleDescription CraftSearchExtended"] = "Shows more results when searching certain words.\n\n- Alchemy and Inscription: Find housing pigment recipes by searching dye colors.";
 
 
 --DecorModelScaleRef
@@ -701,12 +707,14 @@ L["ModuleDescription Housing_Macro"] = "You can create a Teleport Home macro: cr
 L["Teleport Home"] = "Teleport Home";
 L["Instruction Drag To Action Bar"] = "<Click and Drag this to your Action Bars>";
 L["Toggle Torch"] = "Toggle Torch";
-L["ModuleName Housing_DecorHover"] = "Editor: Object Name and Duplicate";
-L["ModuleDescription Housing_DecorHover"] = "In Decorate Mode:\n\n- Hover the cursor over a decor to display its name and its item count in storage.\n\n- Allows you to \"duplicate\" a decor by pressing Alt.\n\nThe new object will not inherit the current angles and scales.";
+L["ModuleName Housing_DecorHover"] = "Editor: 1 Decorate Mode";
+L["ModuleDescription Housing_DecorHover"] = "In Decorate Mode:\n\n- Hover the cursor over a decor to display its placement cost, name, and its item count in storage.\n\n- Allows you to \"duplicate\" a decor by pressing Alt.\n\nThe new object will not inherit the current angles and scales.";
 L["Duplicate"] = "Duplicate";
 L["Duplicate Decor Key"] = "\"Duplicate\" Key";
 L["Enable Duplicate"] = "Enable \"Duplicate\"";
 L["Enable Duplicate tooltip"] = "While in Decorate Mode, you can hover the cursor over a decor and then press a key to place another instance of this object.";
+L["ModuleName Housing_CustomizeMode"] = "Editor: 3 Customize Mode";
+L["ModuleDescription Housing_CustomizeMode"] = "In Customize Mode:\n\n- Allows you to copy and paste dyes.\n\n- Change the dye slot name from index to the color's name.";
 L["Copy Dyes"] = "Copy";
 L["Dyes Copied"] = "Dyes Copied";
 L["Apply Dyes"] = "Apply";
@@ -807,3 +815,14 @@ L["Upgrade Track 5"] = "Hero";
 L["Upgrade Track 6"] = "Myth";
 
 L["Match Pattern Transmog Set Partially Known"] = "^Contains (%d+) uncollected";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+
+L["DyeColorNameAbbr Black"] = "Black";
+L["DyeColorNameAbbr Blue"] = "Blue";
+L["DyeColorNameAbbr Brown"] = "Brown";
+L["DyeColorNameAbbr Green"] = "Green";
+L["DyeColorNameAbbr Orange"] = "Orange";
+L["DyeColorNameAbbr Purple"] = "Purple";
+L["DyeColorNameAbbr Red"] = "Red";
+L["DyeColorNameAbbr Teal"] = "Teal";
+L["DyeColorNameAbbr White"] = "White";
+L["DyeColorNameAbbr Yellow"] = "Yellow";

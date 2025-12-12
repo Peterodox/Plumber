@@ -136,6 +136,20 @@ do  --Create Handler
     function HanlderSharedMixin:OnDeactivated()
     end
 
+    function HanlderSharedMixin:SetEnabled(state)
+        if state and not self.enabled then
+            self.enabled = true;
+        elseif (not state) and self.enabled then
+            self.enabled = nil;
+            self:Deactivate();
+        else
+            return
+        end
+
+        Controller:RequestUpdate();
+    end
+
+
     local function CreateModeHandler(editMode)
         local handler = CreateFrame("Frame");
         Mixin(handler, HanlderSharedMixin);

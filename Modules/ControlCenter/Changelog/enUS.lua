@@ -20,7 +20,6 @@ changelogs[10802] = {
     {
         type = "h1",
         text = "Decor Editor: Object Name and Duplicate",
-        isNewFeature = true,
         dbKey = "Housing_DecorHover",
     },
 
@@ -59,7 +58,6 @@ changelogs[10802] = {
     {
         type = "h1",
         text = "Plumber Macros",
-        isNewFeature = true,
     },
 
     {
@@ -154,7 +152,6 @@ changelogs[10801] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = L["ModuleName DecorModelScaleRef"],
         dbKey = "DecorModelScaleRef",
     },
@@ -226,7 +223,6 @@ changelogs[10800] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = L["ModuleName TooltipTransmogEnsemble"],
         dbKey = "TooltipTransmogEnsemble",
     },
@@ -260,7 +256,6 @@ changelogs[10800] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = L["ModuleName TransmogChatCommand"],
         dbKey = "TransmogChatCommand",
     },
@@ -315,7 +310,6 @@ changelogs[10709] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = L["ModuleName QueueStatus"],
         dbKey = "QueueStatus",
     },
@@ -348,7 +342,6 @@ changelogs[10709] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = L["ModuleName PlayerPing"],
         dbKey = "WorldMapPin_PlayerPing",
     },
@@ -397,7 +390,6 @@ changelogs[10709] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = L["ModuleName HolidayDungeon"],
         dbKey = "HolidayDungeon",
     },

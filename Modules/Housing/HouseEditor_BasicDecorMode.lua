@@ -96,6 +96,7 @@ do  --UI
         local stored = entryInfo.quantity + entryInfo.remainingRedeemable;
         self.ItemCountText:SetText(stored);
         self.ItemCountText:SetShown(stored > 0);
+        self.BudgetValue:SetText(entryInfo.placementCost);
         self.SubFrame:SetShown(Handler.dupeEnabled and stored > 0);
     end
 end
@@ -116,6 +117,20 @@ do
             DisplayFrame:SetPoint("RIGHT", HouseEditorFrame.BasicDecorModeFrame, "RIGHT", -30, 0);
             Mixin(DisplayFrame, DisplayFrameMixin);
             DisplayFrame:OnLoad();
+
+            local BudgetIcon = DisplayFrame:CreateTexture(nil, "ARTWORK");
+            DisplayFrame.BudgetIcon = BudgetIcon;
+            BudgetIcon:SetSize(24, 24);
+            BudgetIcon:SetTexture("Interface/AddOns/Plumber/Art/Housing/BudgetIcon");
+            BudgetIcon:SetTexCoord(0, 0.5, 0, 1);
+            BudgetIcon:SetPoint("RIGHT", DisplayFrame.InstructionText, "LEFT", -4, 0);
+
+            local BudgetValue = DisplayFrame:CreateFontString(nil, "OVERLAY");
+            DisplayFrame.BudgetValue = BudgetValue;
+            BudgetValue:SetFont("Fonts\\FRIZQT__.TTF", 12, "");
+            BudgetValue:SetPoint("CENTER", BudgetIcon, "CENTER", 0, -3);
+            BudgetValue:SetText(5);
+            BudgetValue:SetTextColor(232/255, 215/255, 140/255);
 
 
             local SubFrame = CreateFrame("Frame", nil, DisplayFrame, "PlumberHouseEditorInstructionTemplate");
@@ -140,19 +155,6 @@ do
 
     function Handler:IsEnabled()
         return self.enabled
-    end
-
-    function Handler:SetEnabled(state)
-        if state and not self.enabled then
-            self.enabled = true;
-        elseif (not state) and self.enabled then
-            self.enabled = nil;
-            self:Deactivate();
-        else
-            return
-        end
-
-        Housing.HouseEditorController:RequestUpdate();
     end
 
     function Handler:OnActivated()

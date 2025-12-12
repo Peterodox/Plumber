@@ -215,6 +215,7 @@ local DefaultValues = {
         QueueStatus_TextPosition = 1,   --0:Center, 1-4:Clockwise
     InstanceDifficulty = false,         --Instance Difficulty Selector
     TransmogChatCommand = false,        --Adjust /outfit command behavior
+    CraftSearchExtended = false,        --Show more search result, custom keywords
 
 
     --Tooltip
@@ -322,6 +323,7 @@ local DefaultValues = {
     Housing_DecorHover = true,
         Housing_DecorHover_EnableDupe = true,
         Housing_DecorHover_DuplicateKey = 2,    --1:Ctrl, 2:Alt
+    Housing_CustomizeMode = true,
     TooltipDyeDeez = true,                  --Show dyes on pigment tooltip
 
 

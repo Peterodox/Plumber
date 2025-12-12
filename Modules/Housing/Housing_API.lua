@@ -118,6 +118,21 @@ end
 
 
 do  --House Level / Info / Teleport
+    --local SecureButton_Home1 = CreateFrame("Button", "PLMR_HOME1", nil, "SecureActionButtonTemplate");
+    --SecureButton_Home1:SetSize(1, 1);
+    --SecureButton_Home1:SetPoint("BOTTOMRIGHT", UIParent, "TOPLEFT", 0, 0);
+
+    local function SetAction_TeleportHome(neighborhoodGUID, houseGUID, plotID)
+        if not InCombatLockdown() then
+            SecureButton_Home1:RegisterForClicks("AnyDown", "AnyUp");
+            SecureButton_Home1:SetAttribute("type", "teleporthome");
+            SecureButton_Home1:SetAttribute("house-neighborhood-guid", neighborhoodGUID);
+            SecureButton_Home1:SetAttribute("house-guid", houseGUID);
+            SecureButton_Home1:SetAttribute("house-plot-id", plotID);
+        end
+    end
+
+
     function DataProvider:GetMaxHousePlayerCanOwn()
         return 2
     end
@@ -207,6 +222,7 @@ do  --House Level / Info / Teleport
                 end
                 if i == 1 or mapIndex == factionMapIndex then
                     _G.Plumber_TeleportHome = teleportFunc;
+                    --SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
                 end
                 self.teleportHomeInfo[i] = {
                     ownerName = info.ownerName,
@@ -234,6 +250,8 @@ do  --House Level / Info / Teleport
             end);
         end
     end
+
+    addon.CallbackRegistry:Register("ModulesLoaded", Housing.RequestUpdateHouseInfo);
 end
 
 
@@ -268,6 +286,9 @@ do  --Dye
 
 
     local PigmentNameSorted = {};
+
+    local DyePigmentNames;
+
     local DyeColors = {
         -- {dyeColorID1, dyeColorID2, ...} (by SortOrder)
         Black = {31, 33, 13, 18, 21, 7},
@@ -301,16 +322,31 @@ do  --Dye
     local PigmentRecipes = {
         --[recipeID]
 
-        [1269228] = DyeColors.Black,
-        [1269226] = DyeColors.Blue,
-        [1269235] = DyeColors.Brown,
-        [1269230] = DyeColors.Green,
-        [1269233] = DyeColors.Orange,
-        [1269231] = DyeColors.Purple,
-        [1269229] = DyeColors.Red,
-        [1269232] = DyeColors.Teal,
-        [1269227] = DyeColors.White,
-        [1269234] = DyeColors.Yellow,
+        Alchemy = {
+            [1269228] = DyeColors.Black,
+            [1269226] = DyeColors.Blue,
+            [1269235] = DyeColors.Brown,
+            [1269230] = DyeColors.Green,
+            [1269233] = DyeColors.Orange,
+            [1269231] = DyeColors.Purple,
+            [1269229] = DyeColors.Red,
+            [1269232] = DyeColors.Teal,
+            [1269227] = DyeColors.White,
+            [1269234] = DyeColors.Yellow,
+        },
+
+        Inscription = {
+            [1268662] = DyeColors.Black,
+            [1268984] = DyeColors.Blue,
+            [1267108] = DyeColors.Brown,
+            [1268985] = DyeColors.Green,
+            [1268993] = DyeColors.Orange,
+            [1269057] = DyeColors.Purple,
+            [1268998] = DyeColors.Red,
+            [1268999] = DyeColors.Teal,
+            [1268770] = DyeColors.White,
+            [1268989] = DyeColors.Yellow,
+        },
     };
 
     function Housing.GetDyesByPigmentItemID(itemID)
@@ -332,7 +368,22 @@ do  --Dye
         end
     end
 
-    function Housing.GetPigmentRecipes()
-        return PigmentRecipes
+    function Housing.GetPigmentRecipes(profession)
+        return PigmentRecipes[profession]
+    end
+
+    function Housing.GetDyePigmentName(dyeColorID)
+        if not DyePigmentNames then
+            DyePigmentNames = {};
+            for key, colors in pairs(DyeColors) do
+                local name = L["DyeColorNameAbbr "..key];
+                if name then
+                    for _, id in ipairs(colors) do
+                        DyePigmentNames[id] = name;
+                    end
+                end
+            end
+        end
+        return DyePigmentNames[dyeColorID]
     end
 end

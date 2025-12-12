@@ -78,7 +78,17 @@ do
     function CustomizeModeCallbacks.ShowSelectedDecorInfo()
         local info = C_HousingCustomizeMode.GetSelectedDecorInfo();
         if info and info.canBeCustomized then
-            print(GetTimePreciseSec())
+            --print(GetTimePreciseSec())
+        end
+    end
+
+    local function DyeSlotFrameSwatch_OnClick(self, button)
+        if IsModifiedClick("CHATLINK") and self.dyeColorInfo and self.dyeColorInfo.itemID then
+            --local link = string.format("|cffffffff|H:item:%d:0:|h[%s]|h|r", self.dyeColorInfo.itemID, self.dyeColorInfo.name);
+            local _, link = C_Item.GetItemInfo(self.dyeColorInfo.itemID)
+            if ChatEdit_InsertLink(link) then
+
+            end
         end
     end
 
@@ -89,6 +99,11 @@ do
                 dyeSlotFrame.Label:SetSpacing(2);
                 dyeSlotFrame.Label:SetHeight(32);
                 dyeSlotFrame.Label:SetText(dyeSlotFrame.CurrentSwatch.dyeColorInfo.name);
+            end
+
+            if not dyeSlotFrame.hookedByPlumber then
+                dyeSlotFrame.hookedByPlumber = true;
+                dyeSlotFrame.CurrentSwatch:HookScript("OnClick", DyeSlotFrameSwatch_OnClick);
             end
         end
     end
@@ -109,6 +124,12 @@ do
         hooksecurefunc(CustomizeModeFrame, "ShowDecorInstanceTooltip", CustomizeModeCallbacks.ShowDecorInstanceTooltip);
         --hooksecurefunc(CustomizeModeFrame, "ShowSelectedDecorInfo", CustomizeModeCallbacks.ShowSelectedDecorInfo);
         hooksecurefunc(self.DyePane, "SetDecorInfo", CustomizeModeCallbacks.DyePaneSetDecorInfo);
+
+
+        --Fixed an issue where tooltip doesn't update when closing DyePane while the cursor hovers on the same decor
+        self.DyePane:HookScript("OnHide", function()
+            Handler:TriggerCursorBlocker();
+        end);
 
 
         self.CursorBlocker = CreateFrame("Button", nil, self.parentFrame);
@@ -144,7 +165,7 @@ do
 
     function Handler:LoadSettings()
         Instructions.CopyDye = L["InstructionFormat Right Click"]:format(L["Copy Dyes"]);
-        Instructions.ApplyDye = L["InstructionFormat Ctrl Left Click"]:format(L["Apply Dyes"]);
+        Instructions.ApplyDye = L["InstructionFormat Ctrl Left Click"]:format(L["Preview Dyes"]);   --L["Apply Dyes"]
         Instructions.IsModifierPressed = IsControlKeyDown;
     end
 
@@ -209,13 +230,17 @@ do
     end
 
     function Handler:TriggerCursorBlocker()
-        local x, y = InputUtil.GetCursorPosition(self.parentFrame)
-        self.CursorBlocker:ClearAllPoints();
-        self.CursorBlocker:SetPoint("CENTER", self.parentFrame, "BOTTOMLEFT", x, y);
-        self.CursorBlocker:Show();
-        C_Timer.After(0.0, function()
-            self.CursorBlocker:Hide();
-        end);
+        if not self.blockerShown then
+            local x, y = InputUtil.GetCursorPosition(self.parentFrame)
+            self.CursorBlocker:ClearAllPoints();
+            self.CursorBlocker:SetPoint("CENTER", self.parentFrame, "BOTTOMLEFT", x, y);
+            self.CursorBlocker:Show();
+            self.blockerShown = true;
+            C_Timer.After(0.0, function()
+                self.blockerShown = nil;
+                self.CursorBlocker:Hide();
+            end);
+        end
     end
 
     function Handler:TryPasteCustomization()
@@ -254,4 +279,29 @@ do
             end
         end
     end
+end
+
+
+do
+    local function EnableModule(state)
+        Handler:SetEnabled(state);
+    end
+
+    local moduleData = {
+        name = L["ModuleName Housing_CustomizeMode"],
+        dbKey ="Housing_CustomizeMode",
+        description = L["ModuleDescription Housing_CustomizeMode"],
+        toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 1,
+        moduleAddedTime = 1765500000,
+        categoryKeys = {
+            "Housing",
+        },
+        searchTags = {
+            "Housing",
+        },
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
 end

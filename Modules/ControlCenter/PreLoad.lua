@@ -80,7 +80,9 @@ function ControlCenter:InitializeModules()
             end
 
             if moduleData.toggleFunc then
-                moduleData.toggleFunc(enabled);
+                if enabled then
+                    moduleData.toggleFunc(enabled);
+                end
             else
                 moduleData.virtual = true;
             end
@@ -114,6 +116,8 @@ function ControlCenter:InitializeModules()
         db.seenNewFeatureMark = {};
     end
     self.seenNewFeatureMark = db.seenNewFeatureMark;
+
+    addon.CallbackRegistry:Trigger("ModulesLoaded");
 end
 
 function ControlCenter:AddModule(moduleData)

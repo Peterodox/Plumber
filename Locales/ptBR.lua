@@ -474,3 +474,14 @@ L["Match Pattern Rep 1"] = "A Reputação do seu Bando de Guerra com (.+) aument
 L["Match Pattern Rep 2"] = "Reputação com (.+) aumentou em ([%d%,]+)";   --FACTION_STANDING_INCREASED
 
 L["Match Pattern Transmog Set Partially Known"] = "^Contém (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+
+L["DyeColorNameAbbr Black"] = "Preto";
+L["DyeColorNameAbbr Blue"] = "Azul";
+L["DyeColorNameAbbr Brown"] = "Marrom";
+L["DyeColorNameAbbr Green"] = "Verde";
+L["DyeColorNameAbbr Orange"] = "Laranja";
+L["DyeColorNameAbbr Purple"] = "Roxo";
+L["DyeColorNameAbbr Red"] = "Vermelho";
+L["DyeColorNameAbbr Teal"] = "Verde-azulado";
+L["DyeColorNameAbbr White"] = "Branco";
+L["DyeColorNameAbbr Yellow"] = "Amarelo";

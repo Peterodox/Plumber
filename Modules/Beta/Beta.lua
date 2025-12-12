@@ -109,3 +109,7 @@ do  --Quest API
     --GetActivePreyQuest
 end
 
+
+do  --LuaDurationObject
+    --trim StringUtilDocumentation.lua
+end

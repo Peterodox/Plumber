@@ -90,9 +90,9 @@ do
         toggleFunc = EnableModule,
         categoryID = 3,
         uiOrder = 2000,
-        moduleAddedTime = 1755200000,
+        moduleAddedTime = 1765500000,
 		categoryKeys = {
-			"Housing", "Profession",
+			"Profession",
 		},
         searchTags = {
             "Tooltip", "Housing",

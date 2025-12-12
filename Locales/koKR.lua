@@ -786,3 +786,14 @@ L["Upgrade Track 5"] = "영웅";
 L["Upgrade Track 6"] = "신화";
 
 L["Match Pattern Transmog Set Partially Known"] = "^미획득 형상 (%d+)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+
+L["DyeColorNameAbbr Black"] = "블랙";
+L["DyeColorNameAbbr Blue"] = "블루";
+L["DyeColorNameAbbr Brown"] = "브라운";
+L["DyeColorNameAbbr Green"] = "그린";
+L["DyeColorNameAbbr Orange"] = "오렌지";
+L["DyeColorNameAbbr Purple"] = "퍼플";
+L["DyeColorNameAbbr Red"] = "레드";
+L["DyeColorNameAbbr Teal"] = "틸";
+L["DyeColorNameAbbr White"] = "화이트";
+L["DyeColorNameAbbr Yellow"] = "옐로우";

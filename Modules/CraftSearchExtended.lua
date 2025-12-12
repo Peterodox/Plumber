@@ -1,8 +1,8 @@
 -- Extend search results (custom keywords)
--- Could be tainty?
 
 
 local _, addon = ...
+local API = addon.API;
 
 
 local ipairs = ipairs;
@@ -15,93 +15,133 @@ local GetFilteredRecipeIDs_Old = C_TradeSkillUI.GetFilteredRecipeIDs;
 local GetRecipeSchematic = C_TradeSkillUI.GetRecipeSchematic;
 
 
+local MODULE_ENABLED = false;
 local MainFrame;
 
 local Def = {
-    UIMinWidth = 210,   --274
+    UIMinWidth = 240,   --274
     UIMinHeight = 40,
     UIMaxHeight = 100,
 
-    ButtonWidth = 200,
+    ButtonWidth = 230,
     ButtonHeight = 20,
     ListPaddingV = 4;
+
+    ResultFormat = "%s, |cff808080%s|r",
 };
 
 
 local ProfessionModule = {};
 do  --ProfessionModule
-    local NameRecipeIDList;
+    local NameRecipeIDList_Alchemy;
+    local NameRecipeIDList_Inscription;
 
-    local function LoadDyeNames()
-        if not NameRecipeIDList then
-            NameRecipeIDList = {};
-            local GetDyeColorInfo = C_DyeColor.GetDyeColorInfo;
-            local n = 0;
-            for recipeID, dyeColors in pairs(addon.Housing.GetPigmentRecipes()) do
-                for _, dyeColorID in ipairs(dyeColors) do
-                    local info = GetDyeColorInfo(dyeColorID);
-                    if info and info.name then
-                        n = n + 1;
-                        NameRecipeIDList[n] = {
-                            string.lower(info.name),
-                            recipeID,
-                        };
-                    end
+
+    local function LoadDyeNames(profession)
+        local GetDyePigmentName = addon.Housing.GetDyePigmentName;
+        local GetDyeColorInfo = C_DyeColor.GetDyeColorInfo;
+        local tbl = {};
+        local n = 0;
+
+        local UtilityFontString = MainFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight_NoShadow");
+        UtilityFontString:SetJustifyH("LEFT");
+        UtilityFontString:SetPoint("TOP", UIParent, "BOTTOM", 0, -4);
+
+        for recipeID, dyeColors in pairs(addon.Housing.GetPigmentRecipes(profession)) do
+            local schematic = GetRecipeSchematic(recipeID, false);
+            local recipeName = schematic.name;
+            for _, dyeColorID in ipairs(dyeColors) do
+                local info = GetDyeColorInfo(dyeColorID);
+                if info and info.name then
+                    local colorName = info.name;
+                    local pigmentName = GetDyePigmentName(dyeColorID) or recipeName;
+                    local labelText = Def.ResultFormat:format(pigmentName, colorName);
+                    UtilityFontString:SetText(labelText);
+                    local buttonWidth = 20 + math.ceil(UtilityFontString:GetWrappedWidth());
+                    n = n + 1;
+                    tbl[n] = {
+                        string.lower(colorName),
+                        recipeID,
+                        labelText,
+                        buttonWidth,
+                    };
                 end
             end
         end
+
+        return tbl
     end
 
-    local function FindPigmentByDyeName(tbl, text)
+    local function FindPigmentByDyeName(tbl, text, sourceList)
         text = text and strtrim(text) or "";
         if text ~= "" then
-            LoadDyeNames();
             local addedID = {};
             local recipeID;
             local n = #tbl;
-            for _, v in ipairs(NameRecipeIDList) do
+            for _, v in ipairs(sourceList) do
                 if find(v[1], text, 1, true) then
                     recipeID = v[2];
                     if not addedID[recipeID] then
                         addedID[recipeID] = true;
                         n = n + 1;
-                        tbl[n] = recipeID;
+                        tbl[n] = {recipeID, v[3], v[4]};
                     end
                 end
             end
         end
     end
 
-    ProfessionModule[3] = FindPigmentByDyeName;     --Alchemy
-end
 
-
-local function GetFilteredRecipeIDs_New()
-    local info = GetChildProfessionInfo();
-    if info and info.profession and ProfessionModule[info.profession] then
-        local tbl = GetFilteredRecipeIDs_Old() or {};
-        local text = GetRecipeItemNameFilter(); --already lowercased
-        ProfessionModule[info.profession](tbl, text)
-
-        return tbl
-    else
-        return GetFilteredRecipeIDs_Old()
+    local function FindPigment_Alchemy(tbl, text)
+        if not NameRecipeIDList_Alchemy then
+            NameRecipeIDList_Alchemy = {};
+            NameRecipeIDList_Alchemy = LoadDyeNames("Alchemy");
+        end
+        FindPigmentByDyeName(tbl, text, NameRecipeIDList_Alchemy);
     end
+    ProfessionModule[3] = FindPigment_Alchemy;
+
+    local function FindPigment_Inscription(tbl, text)
+        if not NameRecipeIDList_Inscription then
+            NameRecipeIDList_Inscription = {};
+            NameRecipeIDList_Inscription = LoadDyeNames("Inscription");
+        end
+        FindPigmentByDyeName(tbl, text, NameRecipeIDList_Inscription);
+    end
+    ProfessionModule[13] = FindPigment_Inscription;
 end
 
---Dangerous API overwrite!!!
---C_TradeSkillUI.GetFilteredRecipeIDs = GetFilteredRecipeIDs_New;
 
---local CraftingPage = ProfessionsFrame.CraftingPage;   --MinimizedSearchBox, RecipeList.SearchBox
+do  --Deprecated Global API Overwrite
+    local function GetFilteredRecipeIDs_New()
+        local info = GetChildProfessionInfo();
+        if info and info.profession and ProfessionModule[info.profession] then
+            local tbl = GetFilteredRecipeIDs_Old() or {};
+            local text = GetRecipeItemNameFilter(); --already lowercased
+            ProfessionModule[info.profession](tbl, text)
+
+            return tbl
+        else
+            return GetFilteredRecipeIDs_Old()
+        end
+    end
+
+    --C_TradeSkillUI.GetFilteredRecipeIDs = GetFilteredRecipeIDs_New;
+end
 
 
 local function OpenToRecipe(recipeID)
     local recipeInfo = recipeID and C_TradeSkillUI.GetRecipeInfo(recipeID);
     if recipeInfo then
-        local skipSelectInList = true;
-        ProfessionsFrame.CraftingPage:SelectRecipe(recipeInfo, skipSelectInList);
+        C_TradeSkillUI.SetRecipeItemNameFilter(recipeInfo.name);
+        C_Timer.After(0, function()
+            C_TradeSkillUI.OpenRecipe(recipeID);    --This API find recipe on the Filtered list!
+        end);
     end
+
+    --ProfessionsUtil.OpenProfessionFrameToRecipe(recipeID);  --Taint after clicking Minimize button
 end
+
 
 local CreateListButton;
 do
@@ -128,11 +168,11 @@ do
         end
     end
 
-    function RecipeListButtonMixin:SetRecipe(recipeID)
+    function RecipeListButtonMixin:SetRecipe(recipeID, labelText)
         local info = GetRecipeSchematic(recipeID, false);
         if info then
             self.recipeID = recipeID;
-            self.Label:SetText(info.name);
+            self.Label:SetText(labelText);
         else
             self.recipeID = nil;
             self.Label:SetText(UNKNOWN);
@@ -149,7 +189,7 @@ do
         f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight_NoShadow");
         f.Label:SetJustifyH("LEFT");
         f.Label:SetPoint("LEFT", f, "LEFT", 8, 0);
-        f.Label:SetPoint("RIGHT", f, "RIGHT", -16, 0);
+        f.Label:SetPoint("RIGHT", f, "RIGHT", -12, 0);
         f.Label:SetMaxLines(1);
 
         f.Highlight = f:CreateTexture(nil, "HIGHLIGHT");
@@ -205,14 +245,25 @@ do
         local n = 0;
         local offsetY = Def.ListPaddingV;
         local content = {};
+        local maxButtonWidth = 160;
 
-        for _, recipeID in ipairs(recipeIDs) do
+        for _, v in ipairs(recipeIDs) do
+            if v[3] > maxButtonWidth then
+                maxButtonWidth = v[3];
+            end
+        end
+
+        for _, v in ipairs(recipeIDs) do
             top = offsetY;
             bottom = top + Def.ButtonHeight;
+            local recipeID = v[1];
+            local matchedWord = v[2];
+
             n = n + 1;
             if n == 1 then
                 self.firstRecipeID = recipeID;
             end
+
             content[n] = {
                 dataIndex = n,
                 templateKey = "ListButton",
@@ -222,7 +273,8 @@ do
                 relativePoint = "TOPLEFT",
                 offsetX = 1,
                 setupFunc = function(obj)
-                    obj:SetRecipe(recipeID);
+                    obj:SetWidth(maxButtonWidth);
+                    obj:SetRecipe(recipeID, matchedWord);
                 end
             };
             offsetY = bottom;
@@ -231,9 +283,15 @@ do
         if self:DockToBestSearchBox() then
             self:Show();
             self:AdjustFrameLevel();
-            local height = n * Def.ButtonHeight + 2 * Def.ListPaddingV + 4;
-            self:SetHeight(math.min(height, Def.UIMaxHeight));
         end
+
+        local frameWidth = maxButtonWidth;
+        if n > 4 then
+            frameWidth = frameWidth + 12;
+        end
+
+        local height = n * Def.ButtonHeight + 2 * Def.ListPaddingV + 4;
+        self:SetSize(frameWidth, math.min(height, Def.UIMaxHeight));
 
         self.ScrollView:OnSizeChanged();
         self.ScrollView:SetContent(content);
@@ -251,20 +309,61 @@ do
         for _, f in ipairs(self.searchBoxes) do
             if f:IsVisible() then
                 self:ClearAllPoints();
-                self:SetPoint("BOTTOMLEFT", f, "TOPLEFT", f.plumberMenuOffsetX, 4);
+                self.hasStickyFocus = f.HasStickyFocus ~= nil;
+                if self.hasStickyFocus then --MinimizedSearchBox
+                    self:SetPoint("BOTTOMRIGHT", f, "TOPRIGHT", f.plumberMenuOffsetX, 4);
+                else
+                    self:SetPoint("BOTTOMLEFT", f, "TOPLEFT", f.plumberMenuOffsetX, 4);
+                end
                 self:Show();
-                self.plumberEnableEnter = f.plumberEnableEnter;
                 return true
             end
         end
     end
 
+    function SearchSuggestionUIMixin:SetSearchBoxText(text)
+        for _, f in ipairs(self.searchBoxes) do
+            if f:IsVisible() then
+                f:SetText(text);
+                return
+            end
+        end
+    end
+
     function SearchSuggestionUIMixin:OnEnterPressed()
-        if self:IsVisible() and self.plumberEnableEnter then
+        if self:IsVisible() then
             if self.firstRecipeID then
+                if self.hasStickyFocus then
+                    local list = GetFilteredRecipeIDs_Old();
+                    if list and #list > 1 then
+                        return
+                    end
+                end
                 OpenToRecipe(self.firstRecipeID);
             end
         end
+    end
+end
+
+
+local function SearchBox_OnTextChanged(self, userInput)
+    if MainFrame and MODULE_ENABLED then
+        MainFrame:RequestUpdate();
+    end
+end
+
+local function SearchBox_OnEnterPressed(self, userInput)
+    if MainFrame and MODULE_ENABLED then
+        MainFrame:OnEnterPressed();
+    end
+end
+
+local function HookSearchBox(searchBox, offsetX)
+    if searchBox then
+        searchBox:HookScript("OnTextChanged", SearchBox_OnTextChanged);
+        searchBox.plumberMenuOffsetX = offsetX;
+        table.insert(MainFrame.searchBoxes, searchBox);
+        searchBox:HookScript("OnEnterPressed", SearchBox_OnEnterPressed);
     end
 end
 
@@ -299,7 +398,7 @@ local function CreateUI()
     ScrollBar:UpdateThumbRange();
 
 
-    local ScrollView = addon.API.CreateScrollView(MainFrame, ScrollBar);
+    local ScrollView = API.CreateScrollView(MainFrame, ScrollBar);
     MainFrame.ScrollView = ScrollView;
     ScrollBar.ScrollView = ScrollView;
     ScrollView:SetPoint("TOPLEFT", MainFrame, "TOPLEFT", 0, -2);
@@ -315,44 +414,69 @@ local function CreateUI()
     end
 
     ScrollView:AddTemplate("ListButton", ListButton_Create);
+
+
+    MainFrame:SetScript("OnShow", SearchBox_OnTextChanged);
 end
 
 
-local function SearchBox_OnTextChanged(self, userInput)
-    MainFrame:RequestUpdate();
-end
 
-local function SearchBox_OnEnterPressed(self, userInput)
-    MainFrame:OnEnterPressed();
-end
-
-local function HookSearchBox(searchBox, offsetX, hookEnter)
-    if searchBox then
-        searchBox:HookScript("OnTextChanged", SearchBox_OnTextChanged);
-        searchBox.plumberMenuOffsetX = offsetX;
-        table.insert(MainFrame.searchBoxes, searchBox);
-
-        if hookEnter then
-            searchBox:HookScript("OnEnterPressed", SearchBox_OnEnterPressed);
-        end
-        searchBox.plumberEnableEnter = hookEnter;
-    end
-end
 
 local function Blizzard_Professions_OnLoaded()
+    if MainFrame then return end;
+
     CreateUI();
 
     local CraftingPage = ProfessionsFrame.CraftingPage;
 
-    HookSearchBox(CraftingPage.RecipeList.SearchBox, -3, true);
-    HookSearchBox(CraftingPage.MinimizedSearchBox, -40);    --Avoide Maximize/Close buttons
-
-    CraftingPage:HookScript("OnHide", function()
-        HideUI();
-    end);
+    HookSearchBox(CraftingPage.RecipeList.SearchBox, -3);
+    HookSearchBox(CraftingPage.MinimizedSearchBox, -38);    --Avoide Maximize/Close buttons
 
     MainFrame:SetParent(CraftingPage);
     MainFrame:SetFrameStrata("HIGH");
+    MainFrame:SetFixedFrameStrata(true);
 end
 
-EventUtil.ContinueOnAddOnLoaded("Blizzard_Professions", Blizzard_Professions_OnLoaded);
+
+
+do  --Module Registry
+    local DummyOwner = {};
+
+    local function EnabledModule(state)
+        MODULE_ENABLED = state;
+        if state then
+            local blizzardAddonName = "Blizzard_Professions";
+            if C_AddOns.IsAddOnLoaded(blizzardAddonName) then
+                Blizzard_Professions_OnLoaded();
+            else
+                if not DummyOwner.callbackAdded then
+                    DummyOwner.callbackAdded = true;
+                    EventUtil.ContinueOnAddOnLoaded("Blizzard_Professions", Blizzard_Professions_OnLoaded);
+                end
+            end
+
+            EventRegistry:RegisterCallback("ProfessionsFrame.Minimized", SearchBox_OnTextChanged, DummyOwner);
+        else
+            EventRegistry:UnregisterCallback("ProfessionsFrame.Minimized", DummyOwner);
+            HideUI();
+        end
+    end
+
+    local moduleData = {
+        name = addon.L["ModuleName CraftSearchExtended"],
+        dbKey = "CraftSearchExtended",
+        description = addon.L["ModuleDescription CraftSearchExtended"],
+        categoryID = 1,
+        uiOrder = 1,
+        toggleFunc = EnabledModule,
+        moduleAddedTime = 1765500000,
+		categoryKeys = {
+			"Profession",
+		},
+        searchTags = {
+            "Housing",
+        },
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
+end

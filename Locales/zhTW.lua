@@ -476,3 +476,14 @@ L["Match Pattern Rep 1"] = "戰隊的(.+)聲望提高([%d%,]+)";   --FACTION_STA
 L["Match Pattern Rep 2"] = "你於(.+)的聲望提高了([%d%,]+)";   --FACTION_STANDING_INCREASED
 
 L["Match Pattern Transmog Set Partially Known"] = "^包含(%d)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+
+L["DyeColorNameAbbr Black"] = "黑色";
+L["DyeColorNameAbbr Blue"] = "藍色";
+L["DyeColorNameAbbr Brown"] = "棕色";
+L["DyeColorNameAbbr Green"] = "綠色";
+L["DyeColorNameAbbr Orange"] = "橙色";
+L["DyeColorNameAbbr Purple"] = "紫色";
+L["DyeColorNameAbbr Red"] = "紅色";
+L["DyeColorNameAbbr Teal"] = "水藍色";
+L["DyeColorNameAbbr White"] = "白色";
+L["DyeColorNameAbbr Yellow"] = "黄色";

@@ -59,6 +59,7 @@ do  --Module Registry
         description = addon.L["ModuleDescription QuestWatchCycle"],
         categoryID = 1,
         uiOrder = 1,
+        moduleAddedTime = 1765500000,
         virtual = true,
 		categoryKeys = {
 			"Quest",

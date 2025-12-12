@@ -505,7 +505,6 @@ do  --VisualButtonMixin
         self.tooltipFunc = addon.Housing and addon.Housing.SetupTeleportTooltip;
     end
 
-
     function SpellFlyout:PopulateButtonMixin(externalMixin)
         for k, v in pairs(VisualButtonMixin) do
             if not externalMixin[k] then

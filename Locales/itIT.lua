@@ -37,3 +37,14 @@ L["Match Pattern Rep 1"] = "La reputazione della Brigata con \"(.+)\" è aumenta
 L["Match Pattern Rep 2"] = "La reputazione con \"(.+)\" è aumentata di ([%d%,]+)";   --FACTION_STANDING_INCREASED
 
 L["Match Pattern Transmog Set Partially Known"] = "^Contiene (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+
+L["DyeColorNameAbbr Black"] = "Nero";
+L["DyeColorNameAbbr Blue"] = "Blu";
+L["DyeColorNameAbbr Brown"] = "Marrone";
+L["DyeColorNameAbbr Green"] = "Verde";
+L["DyeColorNameAbbr Orange"] = "Arancione";
+L["DyeColorNameAbbr Purple"] = "Viola";
+L["DyeColorNameAbbr Red"] = "Rosso";
+L["DyeColorNameAbbr Teal"] = "Verde acqua";
+L["DyeColorNameAbbr White"] = "Bianco";
+L["DyeColorNameAbbr Yellow"] = "Giallo";

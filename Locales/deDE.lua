@@ -790,3 +790,14 @@ L["Upgrade Track 5"] = "Held";
 L["Upgrade Track 6"] = "Mythos";
 
 L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";   --See globalstring: TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+
+L["DyeColorNameAbbr Black"] = "Schwarz";
+L["DyeColorNameAbbr Blue"] = "Blau";
+L["DyeColorNameAbbr Brown"] = "Braun";
+L["DyeColorNameAbbr Green"] = "Grün";
+L["DyeColorNameAbbr Orange"] = "Orange";
+L["DyeColorNameAbbr Purple"] = "Lila";
+L["DyeColorNameAbbr Red"] = "Rot";
+L["DyeColorNameAbbr Teal"] = "Türkis";
+L["DyeColorNameAbbr White"] = "Weiß";
+L["DyeColorNameAbbr Yellow"] = "Gelb";

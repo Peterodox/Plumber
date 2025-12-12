@@ -762,3 +762,14 @@ L["Upgrade Track 5"] = "Héroe";
 L["Upgrade Track 6"] = "Mítico";
 
 L["Match Pattern Transmog Set Partially Known"] = "^Contiene (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+
+L["DyeColorNameAbbr Black"] = "Negro";
+L["DyeColorNameAbbr Blue"] = "Azul";
+L["DyeColorNameAbbr Brown"] = "Marrón";
+L["DyeColorNameAbbr Green"] = "Verde";
+L["DyeColorNameAbbr Orange"] = "Naranja";
+L["DyeColorNameAbbr Purple"] = "Morado";
+L["DyeColorNameAbbr Red"] = "Rojo";
+L["DyeColorNameAbbr Teal"] = "Cian";
+L["DyeColorNameAbbr White"] = "Blanco";
+L["DyeColorNameAbbr Yellow"] = "Amarillo";
