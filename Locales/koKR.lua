@@ -117,7 +117,7 @@ L["Hide Not Owned Items Tooltip"] = "추적 중인 아이템을 더 이상 보�
 L["Concise Tooltip"] = "간결한 툴팁";
 L["Concise Tooltip Tooltip"] = "아이템의 귀속 방식과 최대 수량만 표시합니다.";
 L["Item Track Too Many"] = "한 번에 최대 %d개의 아이템만 추적할 수 있습니다.";
-L["Tracking List Empty"] = "사용자 지정 추적 목록이 비어 있습니다.";
+L["Tracking List Empty"] = "사용자 정의 추적 목록이 비어 있습니다.";
 L["Holiday Ends Format"] = "종료: %s";
 L["Not Found"] = "찾을 수 없음";   --Item not found
 L["Own"] = "보유 중";   --Something that the player has/owns
@@ -547,7 +547,7 @@ L["LootUI Option Use Default UI"] = "기본 전리품 창 사용";
 L["LootUI Option Use Default UI Tooltip"] = "기본 전리품 창을 사용합니다\n\n|cffff4800이 항목을 사용하면 앞서 설정한 옵션들이 적용되지 않습니다.|r";
 L["LootUI Option Background Opacity"] = "투명도";
 L["LootUI Option Background Opacity Tooltip"] = "전리품 알림 모드에서 배경 투명도를 조절할 수 있어요. 이 설정은 수동 루팅 모드에는 적용되지 않아요.";
-L["LootUI Option Custom Quality Color"] = "사용자 지정 품질 색상 사용";
+L["LootUI Option Custom Quality Color"] = "사용자 정의 품질 색상 사용";
 L["LootUI Option Custom Quality Color Tooltip"] = "게임 설정 > 손쉬운 사용 > 색상 - 설정한 색상을 사용합니다.";
 L["LootUI Option Grow Direction"] = "위로 쌓기";
 L["LootUI Option Grow Direction Tooltip 1"] = "활성화 시: 창의 왼쪽 하단이 고정되며, 새로운 알림이 기존 알림 위에 표시됩니다.";
@@ -686,8 +686,14 @@ L["Missing Appearances Format"] = "%d개 외형 누락";
 L["Press Key To Copy Format"] = "|cffffd100%s|r 키를 눌러 복사";
 
 
+--QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "단축키: 퀘스트 포커스";
 L["ModuleDescription QuestWatchCycle"] = "단축키로 목표 추적기에서 다음/이전 퀘스트에 포커스를 이동할 수 있습니다.\n\n|cffd4641c단축키 설정: 설정 > 단축키 > Plumber 애드온.|r";
+
+
+--CraftSearchExtended
+L["ModuleName CraftSearchExtended"] = "검색 결과 확장";
+L["ModuleDescription CraftSearchExtended"] = "특정 단어를 검색할 때 더 많은 결과를 표시합니다.\n\n- 연금술과 주문각인: 염료 색상을 검색하여 하우징 색상 제조법을 찾으세요.";
 
 
 --DecorModelScaleRef
@@ -707,12 +713,14 @@ L["Duplicate"] = "복제";
 L["Duplicate Decor Key"] = "\"복제\" 키";
 L["Enable Duplicate"] = "\"복제\" 활성화";
 L["Enable Duplicate tooltip"] = "장식 모드에서는 커서를 장식 위에 올려놓은 후 키를 눌러 해당 객체의 다른 인스턴스를 배치할 수 있습니다.";
+L["ModuleName Housing_CustomizeMode"] = "편집기: 사용자 정의 모드";
+L["ModuleDescription Housing_CustomizeMode"] = "사용자 정의 모드:\n\n- 한 장식에서 다른 장식으로 염료를 복사할 수 있습니다.\n\n- 염료 이름을 색상 이름으로 변경합니다.";
 L["Copy Dyes"] = "염색 복사";
 L["Dyes Copied"] = "염색 설정이 복사되었습니다";
 L["Apply Dyes"] = "염색 적용";
 L["Preview Dyes"] = "염색 미리보기";
-L["ModuleName TooltipDyeDeez"] = "툴팁: 염료 색소";
-L["ModuleDescription TooltipDyeDeez"] = "아이템 툴팁에 염료 색소 정보를 표시합니다.";
+L["ModuleName TooltipDyeDeez"] = "툴팁: 염료 색상";
+L["ModuleDescription TooltipDyeDeez"] = "아이템 툴팁에 염료 색상 이름을 표시합니다.";
 L["Instruction Show More Info"] = "<Alt 키를 눌러 추가 정보 보기>";
 L["Instruction Show Less Info"] = "<Alt 키를 눌러 정보 줄이기>";
 
