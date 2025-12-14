@@ -725,6 +725,18 @@ L["Instruction Show More Info"] = "<Press Alt to Show More Info>";
 L["Instruction Show Less Info"] = "<Press Alt to Show Less Info>";
 
 
+--Housing Clock
+L["ModuleName Housing_Clock"] = "Clock & Message Notification";
+L["ModuleDescription Housing_Clock"] = "While using the house editor, show a clock on the top of the screen and notify you when you receive chat messages.";
+L["Time Spent In Editor"] = "Time Spent In Editor";
+L["This Session Colon"] = "This Session: ";
+L["Right Click Show Settings"] = "Right click to show settings.";
+L["Plumber Clock"] = "Plumber Clock";
+L["Clock Type"] = "Clock Type";
+L["Clock Type Analog"] = "Analog";
+L["Clock Type Digital"] = "Digital";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally

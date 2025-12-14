@@ -153,10 +153,6 @@ do
         "HOUSING_BASIC_MODE_HOVERED_TARGET_CHANGED",
     };
 
-    function Handler:IsEnabled()
-        return self.enabled
-    end
-
     function Handler:OnActivated()
         API.RegisterFrameForEvents(self, self.dynamicEvents);
         self:SetScript("OnEvent", self.OnEvent);

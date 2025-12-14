@@ -324,6 +324,8 @@ local DefaultValues = {
         Housing_DecorHover_EnableDupe = true,
         Housing_DecorHover_DuplicateKey = 2,    --1:Ctrl, 2:Alt
     Housing_CustomizeMode = true,
+    Housing_Clock = true,
+        Housing_Clock_AnalogClock = true,
     TooltipDyeDeez = true,                  --Show dyes on pigment tooltip
 
 
