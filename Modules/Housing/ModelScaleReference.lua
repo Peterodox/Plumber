@@ -222,6 +222,51 @@ do
 end
 
 
+--Test SourceInfo
+do
+    --[[    --StoragePanel watcher
+    local function Load()
+        local f = HouseEditorFrame.StoragePanel;
+
+        local function UpdateChatFrame()
+            if f:IsVisible() then
+                --if f:IsCollapsed() then
+            else
+
+            end
+        end
+
+        f:HookScript("OnShow", UpdateChatFrame)
+        f:HookScript("OnHide", UpdateChatFrame);
+    end
+
+    EventUtil.ContinueOnAddOnLoaded("Blizzard_HouseEditor", Load);
+    --]]
+
+
+    --[[    --ElvUI Chat Fix
+    local f = CreateFrame("Frame");
+    f:RegisterEvent("HOUSE_EDITOR_MODE_CHANGED");
+
+    f:SetScript("OnEvent", function(self)
+        local isActive = C_HouseEditor.IsHouseEditorActive();
+        if isActive ~= self.isActive then
+            self.isActive = isActive;
+            if isActive then
+                if LeftChatPanel then
+                    LeftChatPanel:SetParent(HousingControlsFrame);
+                end
+            else
+                if LeftChatPanel then
+                    LeftChatPanel:SetParent(ElvUIParent);
+                end
+            end
+        end
+    end);
+    --]]
+end
+
+
 local function ModelScene_OnUpdate(self, elapsed)
 	if self.activeCamera then
 		local yawDirection = self.yawDirection;
@@ -258,7 +303,7 @@ local function SharedPreviewFrame_OnLoad(previewFrame)
 
 
     if previewFrame.PreviewCatalogEntryInfo then
-        hooksecurefunc(previewFrame, "PreviewCatalogEntryInfo", function()
+        hooksecurefunc(previewFrame, "PreviewCatalogEntryInfo", function(_, catalogEntryInfo)
             refActor:Hide();
         end);
     end

@@ -737,6 +737,11 @@ L["Clock Type Analog"] = "Analog";
 L["Clock Type Digital"] = "Digital";
 
 
+--CatalogExtendedSearch
+L["Match Sources"] = "Match Sources";
+
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
@@ -757,6 +762,7 @@ L["InstructionFormat Ctrl Left Click"] = "Ctrl Left Click to %s";
 L["InstructionFormat Ctrl Right Click"] = "Ctrl Right Click to %s";
 L["InstructionFormat Alt Left Click"] = "Alt Left Click to %s";
 L["InstructionFormat Alt Right Click"] = "Alt Right Click to %s";
+L["Close Frame Format"]= "|cff808080(Close %s)|r";
 
 
 --Plumber AddOn Settings

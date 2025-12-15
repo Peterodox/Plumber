@@ -1,6 +1,9 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="Housing_API.lua"/>
+	<Script file="DecorDB.lua"/>
+
 	<Script file="ModelScaleReference.lua"/>
+	<Script file="CatalogSearch.lua"/>
 	<Script file="Housing_Macro.lua"/>
 
 	<Script file="HouseEditor_Main.lua"/>

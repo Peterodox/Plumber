@@ -4,7 +4,7 @@ local L = addon.L;
 local TooltipFrame = addon.SharedTooltip;
 local UpgradeCurrencies = addon.ItemUpgradeConstant.Crests;
 
-local ENABLE_THIS_MODULE = true;        --DB.BackpackItemTracker
+local ENABLE_THIS_MODULE = false;        --DB.BackpackItemTracker
 local HIDE_ZERO_COUNT_ITEM = true;      --DB.HideZeroCountItem      Dock items inside a flyout menu
 local USE_CONSISE_TOOLTIP = true;       --DB.ConciseTokenTooltip
 local TRACK_UPGRADE_CURRENCY = true;    --DB.TrackItemUpgradeCurrency
