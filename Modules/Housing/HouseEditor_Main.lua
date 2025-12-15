@@ -7,12 +7,18 @@ local Housing = addon.Housing;
 local Controller = CreateFrame("Frame");
 Housing.HouseEditorController = Controller;
 Controller.modeHandlers = {};
+Controller.alwaysOnHandlers = {};
 
 
 local IsHouseEditorActive = C_HouseEditor.IsHouseEditorActive;
 
 
 function Controller.AddSubModule(modeHandler)
+    if modeHandler.alwaysOn then
+        table.insert(Controller.alwaysOnHandlers, modeHandler);
+        return
+    end
+
     local modeID = Enum.HouseEditorMode[modeHandler.editMode];
     if modeID then
         Controller.modeHandlers[modeID] = modeHandler;
@@ -89,6 +95,22 @@ function Controller:OnActiveModeChanged(newMode)
 		self.modeHandlers[newMode]:Activate();
         self.activeModeHandler = self.modeHandlers[newMode];
 	end
+
+    if newMode ~= 0 then
+        if not self.isEditingHouse then
+            self.isEditingHouse = true;
+            for _, handler in ipairs(self.alwaysOnHandlers) do
+                handler:Activate();
+            end
+        end
+    else
+        if self.isEditingHouse then
+            self.isEditingHouse = false;
+            for _, handler in ipairs(self.alwaysOnHandlers) do
+                handler:Deactivate();
+            end
+        end
+    end
 end
 
 function Controller:UpdateActiveMode()
@@ -136,6 +158,10 @@ do  --Create Handler
     function HanlderSharedMixin:OnDeactivated()
     end
 
+    function HanlderSharedMixin:IsEnabled()
+        return self.enabled
+    end
+
     function HanlderSharedMixin:SetEnabled(state)
         if state and not self.enabled then
             self.enabled = true;
@@ -153,7 +179,11 @@ do  --Create Handler
     local function CreateModeHandler(editMode)
         local handler = CreateFrame("Frame");
         Mixin(handler, HanlderSharedMixin);
-        handler.editMode = editMode;
+        if editMode == "AnyMode" then
+            handler.alwaysOn = true;
+        else
+            handler.editMode = editMode;
+        end
         Controller.AddSubModule(handler);
         return handler
     end

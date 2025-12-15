@@ -48,6 +48,8 @@ do
             return
         end
 
+        if not Handler:IsEnabled() then return end;
+
         local tooltip = GameTooltip;
         if tooltip:GetOwner() == modeFrame then
             local anyNewLine;
@@ -93,6 +95,8 @@ do
     end
 
     function CustomizeModeCallbacks.DyePaneSetDecorInfo(self, decorInstanceInfo)
+        if not Handler:IsEnabled() then return end;
+
         for dyeSlotFrame in self.dyeSlotPool:EnumerateActive() do
             if dyeSlotFrame.dyeSlotInfo and dyeSlotFrame.CurrentSwatch.dyeColorInfo then
                 dyeSlotFrame.Label:SetPoint("LEFT", dyeSlotFrame, "LEFT", 52, 0);
@@ -130,6 +134,9 @@ do
         self.DyePane:HookScript("OnHide", function()
             Handler:TriggerCursorBlocker();
         end);
+        self.DyePane:HookScript("OnShow", function()
+            Handler:TriggerCursorBlocker();
+        end);
 
 
         self.CursorBlocker = CreateFrame("Button", nil, self.parentFrame);
@@ -142,10 +149,6 @@ do
         self.DyePopout.ShowOnlyOwned:HookScript("OnClick", function(self)
             addon.SetDBValue("Housing_DyePopout_ShowOnlyOwned", self:GetChecked());
         end);
-    end
-
-    function Handler:IsEnabled()
-        return self.enabled or true --debug
     end
 
     function Handler:OnActivated()
@@ -230,6 +233,8 @@ do
     end
 
     function Handler:TriggerCursorBlocker()
+        if not self:IsEnabled() then return end;
+
         if not self.blockerShown then
             local x, y = InputUtil.GetCursorPosition(self.parentFrame)
             self.CursorBlocker:ClearAllPoints();

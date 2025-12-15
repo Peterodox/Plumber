@@ -4,6 +4,7 @@
 	<Script file="Housing_Macro.lua"/>
 
 	<Script file="HouseEditor_Main.lua"/>
+	<Script file="HouseEditor_Clock.lua"/>
 	<Script file="HouseEditor_BasicDecorMode.lua"/>
 	<Script file="HouseEditor_CustomizeMode.lua"/>
 

@@ -442,7 +442,11 @@ do  -- Time
 
     local function SecondsToClock(seconds)
         --Clock: 00:00
-        return format("%s:%02d", floor(seconds / 60), floor(seconds % 60))
+        if seconds >= 3600 then
+            return format("%s:%02d:%02d", floor(seconds / 3600), floor((seconds - 3600 * floor(seconds / 3600)) / 60), floor(seconds % 60))
+        else
+            return format("%s:%02d", floor(seconds / 60), floor(seconds % 60))
+        end
     end
     API.SecondsToClock = SecondsToClock;
 
