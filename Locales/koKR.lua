@@ -725,6 +725,18 @@ L["Instruction Show More Info"] = "<Alt 키를 눌러 추가 정보 보기>";
 L["Instruction Show Less Info"] = "<Alt 키를 눌러 정보 줄이기>";
 
 
+--Housing Clock
+L["ModuleName Housing_Clock"] = "시계 & 메세지 알림";
+L["ModuleDescription Housing_Clock"] = "하우징 편집기 사용 중 화면 상단에 시계를 표시하고, 채팅 메세지를 받으면 알려줍니다.";
+L["Time Spent In Editor"] = "편집기 사용 시간";
+L["This Session Colon"] = "이번 세션: ";
+L["Right Click Show Settings"] = "우클릭으로 설정을 엽니다.";
+L["Plumber Clock"] = "Plumber 시계";
+L["Clock Type"] = "시계 유형";
+L["Clock Type Analog"] = "아날로그";
+L["Clock Type Digital"] = "디지털";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "합계:";
 L["Reposition Button Horizontal"] = "수평 이동";
