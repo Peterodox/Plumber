@@ -9,6 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Addon Plumber";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Activer / désactiver le résumé de l'extension";   --Show/hide Expansion Summary UI
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Passer à la quête suivante";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Passer à la quête précédente";
 
 
 --Module Control Panel
@@ -60,13 +62,14 @@ L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "Logis";
 L["SC Uncategorized"] = "Non classé";
 
 --Settings Search Keywords, Search Tags
-L["KW Tooltip"] = "Info-bulle";
+L["KW Tooltip"] = "infobulle";
 L["KW Transmog"] = "Transmogrification";
 L["KW Vendor"] = "Vendeur";
 L["KW LegionRemix"] = "Remix de Legion";
 L["KW Housing"] = "Maison du joueur";
 L["KW Combat"] = "Combat";
 L["KW ActionBar"] = "Barres d'action";
+L["KW Console"] = "Contrôleur de jeu"; -- à revoir
 
 --Filter Sort Method
 L["SortMethod 1"] = "Nom";          --Ordre alphabétique
@@ -81,7 +84,7 @@ L["Module Category General"] = "Général";
 --- order: 2
 L["Module Category NPC Interaction"] = "Interaction avec les PNJ";
 --- order: 3
-L["Module Category Tooltip"] = "Info-bulle";   --Additional Info on Tooltips
+L["Module Category Tooltip"] = "infobulle";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "Classe";   --Player Class (rogue, paladin...)
 --- order: 5
@@ -111,7 +114,7 @@ L["ModuleDescription BackpackItemTracker"] = "Suivez les objets empilables dans 
 L["Instruction Track Item"] = "Suivre l'objet";
 L["Hide Not Owned Items"] = "Masquer les objets non possédés";
 L["Hide Not Owned Items Tooltip"] = "Si vous ne possédez plus un objet que vous suiviez, il sera déplacé vers un menu caché.";
-L["Concise Tooltip"] = "Info-bulle concise";
+L["Concise Tooltip"] = "infobulle concise";
 L["Concise Tooltip Tooltip"] = "Afficher uniquement le type de liaison de l'objet et sa quantité maximale.";
 L["Item Track Too Many"] = "Vous pouvez suivre seulement %d objets à la fois.";
 L["Tracking List Empty"] = "Votre liste de suivi personnalisée est vide.";
@@ -262,7 +265,7 @@ L["Instruction Show In Quest Log"] = "<Ctrl + clic gauche pour afficher le journ
 
 
 L["ModuleName TooltipTransmogEnsemble"] = "Ensembles de transmogrification";
-L["ModuleDescription TooltipTransmogEnsemble"] = "- Affiche le nombre d'apparences d'un ensemble à collectionner.\n\n- Correction du problème où l'Info-bulle indiquait « Déjà connu » mais vous pouviez quand même l'utiliser pour débloquer de nouvelles apparences.";
+L["ModuleDescription TooltipTransmogEnsemble"] = "- Affiche le nombre d'apparences d'un ensemble à collectionner.\n\n- Correction du problème où l'infobulle indiquait « Déjà connu » mais vous pouviez quand même l'utiliser pour débloquer de nouvelles apparences.";
 L["Collected Appearances"] = "Apparences collectées";
 L["Collected Items"] = "Objets collectés";
 
@@ -276,7 +279,7 @@ L["Data Loading In Progress"] = "Plumber charge les données";
 
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
-L["ModuleDescription Plunderstore"] = "Modification de la boutique accessible via la Recherche de groupe :\n\n– Ajout d'une case à cocher pour masquer les objets déjà collectés.\n\n– Affichage du nombre d'objets non collectés sur les boutons de catégorie.\n\n– Ajout de l'emplacement d'équipement (arme ou armure) dans les info-bulles.\n\n– Possibilité de visualiser les objets équipables dans la salle d'essayage.";
+L["ModuleDescription Plunderstore"] = "Modification de la boutique accessible via la Recherche de groupe :\n\n– Ajout d'une case à cocher pour masquer les objets déjà collectés.\n\n– Affichage du nombre d'objets non collectés sur les boutons de catégorie.\n\n– Ajout de l'emplacement d'équipement (arme ou armure) dans les infobulles.\n\n– Possibilité de visualiser les objets équipables dans la salle d'essayage.";
 L["Store Full Purchase Price Format"] = "Gagnez |cffffffff%s|r de butin pour acheter tout ce que contient la boutique.";
 L["Store Item Fully Collected"] = "Vous avez tout récupéré dans la boutique !";
 
@@ -356,7 +359,7 @@ L["ModuleDescription QuestItemDestroyAlert"] = "Afficher les informations de qu�
 
 --SpellcastingInfo
 L["ModuleName SpellcastingInfo"] = "Informations sur les sorts de la cible";
-L["ModuleDescription SpellcastingInfo"] = "– Affiche l'info-bulle du sort lorsque vous survolez la barre d'incantation sur le cadre de la cible.\n\n– Enregistre les capacités des monstres, consultables ultérieurement par un clic droit sur le cadre de la cible.";
+L["ModuleDescription SpellcastingInfo"] = "– Affiche l'infobulle du sort lorsque vous survolez la barre d'incantation sur le cadre de la cible.\n\n– Enregistre les capacités des monstres, consultables ultérieurement par un clic droit sur le cadre de la cible.";
 L["Abilities"] = "Capacités";
 L["Spell Colon"] = "Sort : ";   --Display SpellID
 L["Icon Colon"] = "Icône : ";     --Display IconFileID
@@ -401,7 +404,7 @@ L["Unearned Filter Tooltip"] = "Vous pouvez voir des Titres en double qui ne son
 
 --BlizzardSuperTrack
 L["ModuleName BlizzardSuperTrack"] = "Point de passage : Minuteur d'événement";
-L["ModuleDescription BlizzardSuperTrack"] = "Ajouter un minuteur sur votre point de passage actif si son info-bulle de carte en possède un.";
+L["ModuleDescription BlizzardSuperTrack"] = "Ajouter un minuteur sur votre point de passage actif si son infobulle de carte en possède un.";
 
 
 --ProfessionsBook
@@ -683,6 +686,16 @@ L["Missing Appearances Format"] = "%d |4apparence manquante:apparences manquante
 L["Press Key To Copy Format"] = "Appuyez sur |cffffd100%s|r pour copier";
 
 
+--QuestWatchCycle
+L["ModuleName QuestWatchCycle"] = "Raccourcis clavier : Quête";
+L["ModuleDescription QuestWatchCycle"] = "Permet d'utiliser des raccourcis clavier pour passer à la quête suivante/précédente dans le suivi des objectifs.\n\n|cffd4641cConfigurer vos raccourcis clavier dans Raccourcis clavier > Plumber.|r";
+
+
+--CraftSearchExtended
+L["ModuleName CraftSearchExtended"] = "Élargir les résultats de recherche";
+L["ModuleDescription CraftSearchExtended"] = "Afficher plus de résultats lors de la recherche de certains mots.\n\n- Alchimie et Calligraphie : Trouver des recettes de Pigments pour la construction en recherchant des couleurs de teinture.";
+
+
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "Catalogue d'éléments de décoration : Échelle de la Banane"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Ajoute une référence de taille (une banane) à la fenêtre d'aperçu du décor, vous permettant d'évaluer la taille des objets.\n\n- Vous permet également de modifier l'inclinaison de la caméra en maintenant le bouton gauche enfoncé et en vous déplaçant verticalement.";
@@ -700,6 +713,16 @@ L["Duplicate"] = "Dupliquer";
 L["Duplicate Decor Key"] = "Touche « Dupliquer »";
 L["Enable Duplicate"] = "Activer « Dupliquer »";
 L["Enable Duplicate tooltip"] = "En mode Décoration, vous pouvez survoler un décor puis appuyer sur une touche pour placer un autre exemplaire de cet objet.";
+L["ModuleName Housing_CustomizeMode"] = "Éditeur : 3 Mode de personnalisation";
+L["ModuleDescription Housing_CustomizeMode"] = "En mode Personnalisation :\n\n- Permet de copier les teintures d'un décor à un autre.\n\n- Modifie le nom de l'emplacement de teinture : remplace l'index par le nom de la couleur.";
+L["Copy Dyes"] = "Copier";
+L["Dyes Copied"] = "Teintures copiées";
+L["Apply Dyes"] = "Appliquer";
+L["Preview Dyes"] = "Aperçu";
+L["ModuleName TooltipDyeDeez"] = "Infobulle : Pigment de teinture";
+L["ModuleDescription TooltipDyeDeez"] = "Affiche le nom des couleurs de teinture dans l'infobulle des pigments de logis.";
+L["Instruction Show More Info"] = "<Appuyez sur Alt pour afficher plus d'informations>";
+L["Instruction Show Less Info"] = "<Appuyez sur Alt pour afficher moins d'informations>";
 
 
 --Generic
@@ -716,6 +739,12 @@ L["Level Maxed"] = "(Maximum)";   --Reached max level
 L["Current Colon"] = "Actuel :";
 L["Unclaimed Reward Alert"] = "Vous avez des récompenses non réclamées";
 L["Uncollected Set Counter Format"] = "Vous avez |cffffffff%d|r transmogrifications non collectées |4set:sets;.";
+L["InstructionFormat Left Click"] = "Clic gaucge pour %s";
+L["InstructionFormat Right Click"] = "Clic droit pour %s";
+L["InstructionFormat Ctrl Left Click"] = "Ctrl + Clic gauche pour %s";
+L["InstructionFormat Ctrl Right Click"] = "Ctrl + Clic droit pour %s";
+L["InstructionFormat Alt Left Click"] = "Alt + Clic gauche pour %s";
+L["InstructionFormat Alt Right Click"] = "Alt + Clic droite pour %s";
 
 
 --Plumber AddOn Settings
