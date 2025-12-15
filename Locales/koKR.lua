@@ -736,6 +736,10 @@ L["Clock Type"] = "시계 유형";
 L["Clock Type Analog"] = "아날로그";
 L["Clock Type Digital"] = "디지털";
 
+--CatalogExtendedSearch
+L["Match Sources"] = "출처 일치";
+
+
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "합계:";
@@ -757,6 +761,7 @@ L["InstructionFormat Ctrl Left Click"] = "Ctrl+좌클릭: %s";
 L["InstructionFormat Ctrl Right Click"] = "Ctrl+우클릭: %s";
 L["InstructionFormat Alt Left Click"] = "Alt+좌클릭: %s";
 L["InstructionFormat Alt Right Click"] = "Alt+우클릭: %s";
+L["Close Frame Format"]= "|cff808080(%s 닫기)|r";
 
 
 --Plumber AddOn Settings
