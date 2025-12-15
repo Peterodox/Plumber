@@ -3,6 +3,8 @@ local L = addon.L;
 local Housing = {};
 addon.Housing = Housing;
 
+Housing.Database = {};
+
 
 local DataProvider = CreateFrame("Frame");
 Housing.DataProvider = DataProvider;
@@ -52,6 +54,15 @@ do  --Basic
         return GetCatalogEntryInfoByRecordID(1, decorID, tryGetOwnedInfo)
     end
 
+    function Housing.GetDecorSourceText(decorID, ownedOnly)
+        if ownedOnly then
+            local info = GetCatalogEntryInfoByRecordID(1, decorID, true);
+            return info and info.numStored > 0 and info.sourceText
+        else
+            local info = GetCatalogEntryInfoByRecordID(1, decorID, false);
+            return info and info.sourceText
+        end
+    end
 end
 
 
@@ -72,26 +83,11 @@ do  --Item Search
             local total = #entries;
             if total > 0 then
                 self.catalogSearcher:SetResultsUpdatedCallback(function() end);
-
-                local GetCatalogEntryInfo = C_HousingCatalog.GetCatalogEntryInfo
-                local entryInfo;
-                self.itemIDXFileID = {};
-                for _, entryID in ipairs(entries) do
-                    entryInfo = GetCatalogEntryInfo(entryID);
-                    if entryInfo then
-                        if entryInfo.asset and entryInfo.itemID then
-                            self.itemIDXFileID[entryInfo.itemID] = entryInfo.asset;
-                        else
-                            --print("Missing", entryInfo.name, entryInfo.itemID);
-                        end
-                    end
-                end
-
-                collectgarbage();
+                self.allEntries = entries;
             else
                 if not requeryDone then
                     requeryDone = true;
-                    C_Timer.After(1.0, function()
+                    C_Timer.After(0.5, function()
                         self.catalogSearcher:RunSearch();
                     end);
                 end
@@ -100,19 +96,28 @@ do  --Item Search
         self.catalogSearcher:SetSearchText("");
         self.catalogSearcher:RunSearch();
         self.isLoadingData = true;
-        --SetSearchText
-    end
-
-    function DataProvider:GetDecorModelFileIDByItem(item)
-        self:Init();
-
-        if self.itemIDXFileID then
-            return self.itemIDXFileID[item];
-        end
     end
 
     function DataProvider:IsLoadingData()
         return self.isLoadingData
+    end
+
+    function DataProvider:GetAllDecorIDs()
+        self:Init();
+        if not self.allDecorIDs then
+            local tbl = {};
+            self.allDecorIDs = tbl;
+            local n = 0;
+            if self.allEntries then
+                for k, v in ipairs(self.allEntries) do
+                    if v.entryType == 1 and v.recordID then
+                        n = n + 1;
+                        tbl[n] = v.recordID;
+                    end
+                end
+            end
+        end
+        return self.allDecorIDs
     end
 end
 
