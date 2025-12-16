@@ -1,7 +1,7 @@
 ## X-Flavor: retail
 ## X-Expansion: TWW
 ## Interface: 110207, 120000, 120001
-## Version: 1.8.2
+## Version: 1.8.4
 
 ## Title: Plumber
 
@@ -23,7 +23,6 @@ Modules\SharedData.lua
 Modules\SharedFonts.xml
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
-Modules\SharedAchievementLink.lua
 Modules\BlizzardEditMode.lua
 Modules\ScenarioTracker.lua
 #Modules\DirectionArrow.lua
@@ -86,6 +85,7 @@ Modules\RaidCheck\RaidCheck.xml
 Modules\TransmogUtil.lua
 Modules\QuestWatchCycle.lua
 Modules\CraftSearchExtended.lua
+Modules\SourceAchievementLink.lua
 
 #Modules\MerchantUI\MerchantUI.xml
 

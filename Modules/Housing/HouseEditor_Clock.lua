@@ -98,9 +98,13 @@ do
     end
 
     function ClockUIMixin:SetTime_Analog(hour, minute)
+        --hour, minute = 10, 10;  --debug
+        --/script local f = HousingControlsFrame;f:SetPoint("TOP", 0, -160)
+
         if hour > 12 then
             hour = hour - 12;
         end
+
         local rad1 = -2 * math.pi * (hour + minute/60) / 12;
         local rad2 = -2 * math.pi * minute/60;
         self.HourHand:SetRotation(rad1);
@@ -110,6 +114,8 @@ do
     end
 
     function ClockUIMixin:SetTime_Digital(hour, minute)
+        --hour, minute = 10, 10;  --debug
+
         if not self.useMilitaryTime then
             if hour == 0 then
                 hour = 12;
@@ -163,6 +169,7 @@ do
     function ClockUIMixin:OnEnter()
         self.lastTimeText = nil;
         self:ShowTooltip();
+        self:UpdateTime();
         if not self.tooltipUpdator then
             local f = CreateFrame("Frame", nil, self);
             self.tooltipUpdator = f;
@@ -174,7 +181,7 @@ do
                 if f.t > 0.2 then
                     f.t = 0;
                     if self:IsMouseMotionFocus() then
-                        self:OnEnter();
+                        self:ShowTooltip();
                     else
                         f:Hide();
                     end
@@ -359,42 +366,35 @@ end
 
 local OptionToggle_OnClick;
 do  --Options
-    local function InfoGetter_DecorHoverSettings()
+    local function InfoGetter_ClockSettings()
         local tbl = {
-            key = "DecorHoverSettings",
+            key = "HouseEditorClockSettings",
             independent = true,
         };
 
         local widgets = {
-            {type = "Header", text = L["ModuleName Housing_DecorHover"]},
+            {type = "Header", text = L["Plumber Clock"]},
+            {type = "Divider"},
+            {type = "Header", text = L["Clock Type"]},
         };
 
-        local dupeEnabled = addon.GetDBBool("Housing_DecorHover_EnableDupe");
+        local selectedIndex = addon.GetDBBool("Housing_Clock_AnalogClock") and 1 or 2;
 
-        table.insert(widgets, {type = "Checkbox", text = L["Enable Duplicate"], tooltip = L["Enable Duplicate tooltip"], refreshAfterClick = true,
-            selected = dupeEnabled,
-            onClickFunc = function()
-                addon.FlipDBBool("Housing_DecorHover_EnableDupe");
-                Handler:LoadSettings();
-            end,
-        });
+        local clockTypeOptions = {
+            {name = L["Clock Type Analog"]},
+            {name = L["Clock Type Digital"]},
+        };
 
-        table.insert(widgets, {type = "Divider"});
-        table.insert(widgets, {type = "Header", text = L["Duplicate Decor Key"]});
-
-        local selectedIndex = addon.GetDBValue("Housing_DecorHover_DuplicateKey") or 2;
-
-        for k, v in ipairs(Handler.DuplicateKeyOptions) do
+        for index, v in ipairs(clockTypeOptions) do
             table.insert(widgets, {
                 type = "Radio",
                 text = v.name;
                 closeAfterClick = true,
                 onClickFunc = function()
-                    addon.SetDBValue("Housing_DecorHover_DuplicateKey", k, true);
+                    addon.SetDBValue("Housing_Clock_AnalogClock", index == 1, true);
                     Handler:LoadSettings();
                 end,
-                selected = k == selectedIndex,
-                disabled = not dupeEnabled,
+                selected = index == selectedIndex,
             });
         end
 
@@ -403,7 +403,7 @@ do  --Options
     end
 
     function OptionToggle_OnClick(self)
-        addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, InfoGetter_DecorHoverSettings);
+        addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, InfoGetter_ClockSettings);
     end
 end
 
@@ -420,7 +420,7 @@ do
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 1,
-        moduleAddedTime = 1764600000,
+        moduleAddedTime = 1765900000,
         optionToggleFunc = OptionToggle_OnClick,
         categoryKeys = {
             "Housing",

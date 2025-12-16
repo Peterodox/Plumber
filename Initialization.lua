@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.8.3";
-local VERSION_DATE = 1765500000;
+local VERSION_TEXT = "1.8.4";
+local VERSION_DATE = 1765900000;
 
 
 local addonName, addon = ...
@@ -216,6 +216,7 @@ local DefaultValues = {
     InstanceDifficulty = false,         --Instance Difficulty Selector
     TransmogChatCommand = false,        --Adjust /outfit command behavior
     CraftSearchExtended = false,        --Show more search result, custom keywords
+    SourceAchievementLink = true,       --Make Achievement name in MountJournal, DecorCatalog interactable
 
 
     --Tooltip
@@ -327,6 +328,7 @@ local DefaultValues = {
     Housing_Clock = true,
         Housing_Clock_AnalogClock = true,
     TooltipDyeDeez = true,                  --Show dyes on pigment tooltip
+    Housing_CatalogSearch = false,
 
 
     --Declared elsewhere:

@@ -726,8 +726,8 @@ L["Instruction Show Less Info"] = "<Press Alt to Show Less Info>";
 
 
 --Housing Clock
-L["ModuleName Housing_Clock"] = "Clock & Message Notification";
-L["ModuleDescription Housing_Clock"] = "While using the house editor, show a clock on the top of the screen and notify you when you receive chat messages.";
+L["ModuleName Housing_Clock"] = "Editor: Clock";
+L["ModuleDescription Housing_Clock"] = "While using the house editor, show a clock on the top of the screen.";
 L["Time Spent In Editor"] = "Time Spent In Editor";
 L["This Session Colon"] = "This Session: ";
 L["Right Click Show Settings"] = "Right click to show settings.";
@@ -738,7 +738,14 @@ L["Clock Type Digital"] = "Digital";
 
 
 --CatalogExtendedSearch
+L["ModuleName Housing_CatalogSearch"] = "Decor Catalog: Extend Search Results";
+L["ModuleDescription Housing_CatalogSearch"] = "Enhances the search box on the Decor Catalog and Storage Tab, allowing you to find items by achievement, vendor, zone, or currency.";
 L["Match Sources"] = "Match Sources";
+
+
+--SourceAchievementLink
+L["ModuleName SourceAchievementLink"] = "Interactable Source Info";
+L["ModuleDescription SourceAchievementLink"] = "The Achievement names on the following UI become interactable, allowing you to see their details or track them.\n\n- Mount Journal\n\n- Decor Catalog";
 
 
 

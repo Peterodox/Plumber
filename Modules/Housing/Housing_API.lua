@@ -67,6 +67,8 @@ end
 
 
 do  --Item Search
+    DataProvider.numEntries = 0;
+
     function DataProvider:Init()
         if self.catalogSearcher then return end;
 
@@ -74,26 +76,22 @@ do  --Item Search
 
         self.catalogSearcher = C_HousingCatalog.CreateCatalogSearcher();
         self.catalogSearcher:SetOwnedOnly(false);
-        self.catalogSearcher:SetIncludeMarketEntries(true);
-        self.catalogSearcher:SetResultsUpdatedCallback(function()
-            self.isLoaded = true;
-            self.isLoadingData = false;
+        self.catalogSearcher:SetEditorModeContext(Enum.HouseEditorMode.BasicDecor);
+        self.catalogSearcher:SetCollected(true);
+        self.catalogSearcher:SetUncollected(true);
+        self.catalogSearcher:SetFirstAcquisitionBonusOnly(false);
+        --self.catalogSearcher:SetIncludeMarketEntries(true);
 
-            local entries = self.catalogSearcher:GetCatalogSearchResults(); --A list of HousingCatalogEntryID (this is a table)
-            local total = #entries;
-            if total > 0 then
-                self.catalogSearcher:SetResultsUpdatedCallback(function() end);
-                self.allEntries = entries;
-            else
-                if not requeryDone then
-                    requeryDone = true;
-                    C_Timer.After(0.5, function()
-                        self.catalogSearcher:RunSearch();
-                    end);
-                end
+        self.catalogSearcher:SetResultsUpdatedCallback(function()
+            self.isLoadingData = false;
+            if self.resultsUpdatedCallback then
+                local callback = self.resultsUpdatedCallback;
+                self.resultsUpdatedCallback = nil;
+                callback();
             end
         end);
-        self.catalogSearcher:SetSearchText("");
+
+        self.catalogSearcher:SetSearchText();
         self.catalogSearcher:RunSearch();
         self.isLoadingData = true;
     end
@@ -118,6 +116,27 @@ do  --Item Search
             end
         end
         return self.allDecorIDs
+    end
+
+    function DataProvider:GetNumEntries()
+        return self.numEntries
+    end
+
+    function DataProvider:GetAllEntries()
+        return self.catalogSearcher:GetCatalogSearchResults();
+    end
+
+    function DataProvider:TriggerRefresh()
+        self.isLoadingData = true;
+        self.catalogSearcher:RunSearch();
+    end
+
+    function DataProvider:CleaSearchCallback()
+        self.resultsUpdatedCallback = nil;
+    end
+
+    function DataProvider:SetSearchCallback(resultsUpdatedCallback)
+        self.resultsUpdatedCallback = resultsUpdatedCallback;
     end
 end
 

@@ -1,13 +1,10 @@
 local _, addon = ...
 local L = addon.L;
+local API = addon.API;
 
 
-local GetGlobalObject = addon.API.GetGlobalObject;
 local Housing = addon.Housing;
-
-
-local SharedAchievementLinkScripts = addon.SharedAchievementLinkScripts;
-local Database_DecorAchievement = Housing.Database.DecorAchievement;
+local GetCurrencyName = API.GetCurrencyName;
 local GetDecorSourceText = Housing.GetDecorSourceText;
 
 
@@ -15,15 +12,21 @@ local strlenutf8 = strlenutf8;
 local strtrim = strtrim;
 local find = string.find;
 local lower = string.lower;
+local match = string.match;
 
 
-local MODULE_ENABLED = true;
+local MODULE_ENABLED;
 
 
 --Storage List Injection
 --  HouseEditorStorageFrameTemplate (HouseEditorFrame.StoragePanel.OptionsContainer)
 --      OptionsContainer (ScrollingHousingCatalogTemplate) HouseEditorFrame.StoragePanel.OptionsContainer.SetCatalogElements
 --      SetCatalogData
+
+
+local function ShouldShowDecor(catalogSearcher)
+    return catalogSearcher:GetEditorModeContext() ~= Enum.HouseEditorMode.Layout;
+end
 
 
 local CreateUpdator;
@@ -35,10 +38,22 @@ do
     end
 
     function UpdatorMixin:OnUpdate(elapsed)
+        if not self.foundIDs then
+            local foundIDs = {};
+            for _, v in ipairs(self.catalogEntries) do
+                if v.entryType == 1 then
+                    foundIDs[v.recordID] = true;
+                end
+            end
+            self.foundIDs = foundIDs;
+            return
+        end
+
         local v, decorID, sourceText;
+        local currencyID, currencyName;
         local updateThisFrame = 0;
 
-        while updateThisFrame < 100 do
+        while updateThisFrame < 50 do   --update per frame: 50
             self.index = self.index + 1;
             v = self.allEntries[self.index];
             if v then
@@ -49,7 +64,18 @@ do
                         if sourceText then
                             updateThisFrame = updateThisFrame + 1;
                             sourceText = lower(sourceText);
-                            if find(sourceText, self.searchText, 1, true) then
+                            currencyID = match(sourceText, "currency:(%d+)");
+
+                            if currencyID then
+                                currencyName = GetCurrencyName(currencyID);
+                                if currencyName then
+                                    currencyName = lower(currencyName);
+                                end
+                            else
+                                currencyName = nil;
+                            end
+
+                            if find(sourceText, self.searchText, 1, true) or (currencyName and find(currencyName, self.searchText, 1, true)) then
                                 self.foundIDs[decorID] = true;
                                 if not self.anyMatch then
                                     self.anyMatch = true;
@@ -79,8 +105,9 @@ do
         self.searchText = nil;
         self.headerText = nil;
         self.instructionText = nil;
+        self.foundIDs = nil;
         self.catalogEntries = {};
-        self.foundIDs = {};
+        Housing.DataProvider:CleaSearchCallback();
     end
 
     function UpdatorMixin:ProcessResult()
@@ -90,13 +117,14 @@ do
         searchText = strtrim(searchText);
 
         local useAdvancedSearch = searchText and strlenutf8(searchText) >= 3;
-        if not (useAdvancedSearch and self.catalogEntries) then
+        if not (ShouldShowDecor(self.searcher) and useAdvancedSearch and self.catalogEntries) then
             self:Wipe();
             return
         end
 
         local entryTypeDecor = Enum.HousingCatalogEntryType.Decor;
         local entryTypeRoom = Enum.HousingCatalogEntryType.Room;
+
         local lastTemplate = nil;
         local n = 0;
         local catalogElements = {};
@@ -109,7 +137,6 @@ do
         for _, catalogEntry in ipairs(self.catalogEntries) do
             local elementData = catalogEntry;
 
-            -- Bundle entries have a list of decor entries
             if catalogEntry.decorEntries then
                 elementData.templateKey = "CATALOG_ENTRY_BUNDLE";
             else
@@ -124,11 +151,9 @@ do
                 else
                     if catalogEntry.decorID then
                         elementData = { bundleItemInfo = catalogEntry, };
-
                         elementData.templateKey = "CATALOG_ENTRY_DECOR";
                     else
                         elementData = { entryID = catalogEntry, };
-
                         local entryType = catalogEntry.entryType;
                         if entryType == entryTypeDecor then
                             elementData.templateKey = "CATALOG_ENTRY_DECOR";
@@ -177,84 +202,39 @@ local function ModifySearcherBase(f, ownedOnly)
 
     hooksecurefunc(f.OptionsContainer, "SetCatalogData", function(_, catalogEntries, retainCurrentPosition, headerText, instructionText)
         Updator:Wipe();
-        if MODULE_ENABLED and catalogEntries then
+        if MODULE_ENABLED and ShouldShowDecor(searcher) and catalogEntries then
             local searchText = searcher:GetSearchText() or "";
             if strlenutf8(searchText) >= 3 then
                 searchText = strtrim(searchText);
-                local allEntries = Housing.DataProvider.allEntries;
+                Housing.DataProvider:SetSearchCallback(
+                    function()
+                        local allEntries = Housing.DataProvider:GetAllEntries() --Housing.DataProvider.allEntries;
 
-                if allEntries then
-                    Updator.index = 1;
-                    Updator.toIndex = #allEntries;
-                    Updator.allEntries = allEntries;
-                    Updator.searchText = lower(searchText);
-                    Updator.n = #catalogEntries;
+                        if allEntries then
+                            Updator.toIndex = #allEntries;
+                            Updator.index = 1;
+                            Updator.allEntries = allEntries;
+                            Updator.searchText = lower(searchText);
+                            Updator.n = #catalogEntries;
 
-                    Updator.catalogEntries = catalogEntries;
-                    Updator.retainCurrentPosition = retainCurrentPosition;
-                    Updator.headerText = headerText;
-                    Updator.instructionText = instructionText;
+                            Updator.catalogEntries = catalogEntries;
+                            Updator.retainCurrentPosition = retainCurrentPosition;
+                            Updator.headerText = headerText;
+                            Updator.instructionText = instructionText;
 
-                    for _, v in ipairs(catalogEntries) do
-                        if v.entryType == 1 then
-                            Updator.foundIDs[v.recordID] = true;
+                            Updator:SetScript("OnUpdate", Updator.OnUpdate);
+                            Updator:Show();
                         end
                     end
-
-                    Updator:SetScript("OnUpdate", Updator.OnUpdate);
-                    Updator:Show();
-                end
+                );
+                Housing.DataProvider:TriggerRefresh();
             end
         end
     end);
 end
 
 
-local TextContainerHooked = false;
-
-
-
-local function ModifySourceInfo(catalogEntryInfo)
-    if not catalogEntryInfo.sourceText then return end;
-
-    local decorID = catalogEntryInfo.entryID.recordID;
-    if Database_DecorAchievement[decorID] then
-        local achievementID = Database_DecorAchievement[decorID][2];
-        local _, name = GetAchievementInfo(achievementID);
-        local link = GetAchievementLink(achievementID);
-
-        name = string.gsub(name, "%-", "%%-");
-        name = string.gsub(name, "%!", "%%!");
-        name = string.gsub(name, "%(", "%%(");
-        name = string.gsub(name, "%)", "%%)");
-
-        local sourceText = string.gsub(catalogEntryInfo.sourceText, name, link);
-        local TextContainer = GetGlobalObject("HousingDashboardFrame.CatalogContent.PreviewFrame.TextContainer");
-
-        if not TextContainerHooked then
-            TextContainerHooked = true;
-            TextContainer:SetHyperlinksEnabled(true);
-            TextContainer:HookScript("OnHyperlinkClick", SharedAchievementLinkScripts.OnHyperlinkClick);
-            TextContainer:HookScript("OnHyperlinkEnter", SharedAchievementLinkScripts.OnHyperlinkEnter);
-            TextContainer:HookScript("OnHyperlinkLeave", SharedAchievementLinkScripts.OnHyperlinkLeave);
-        end
-
-        TextContainer.SourceInfo:SetText(sourceText);
-        --TextContainer:Layout();
-    end
-end
-
-
-local function ModifyTextContainer(previewFrame)
-    if previewFrame.PreviewCatalogEntryInfo then
-        hooksecurefunc(previewFrame, "PreviewCatalogEntryInfo", function(_, catalogEntryInfo)
-            ModifySourceInfo(catalogEntryInfo);
-        end);
-    end
-end
-
-
-local function Load_Blizzard_HouseEditor()
+local function Blizzard_HouseEditor_OnLoad()
     Housing.DataProvider:Init();
 
     C_Timer.After(0, function()
@@ -262,15 +242,57 @@ local function Load_Blizzard_HouseEditor()
         ModifySearcherBase(HouseEditorFrame.StoragePanel, ownedOnly);
     end);
 end
-EventUtil.ContinueOnAddOnLoaded("Blizzard_HouseEditor", Load_Blizzard_HouseEditor);
 
 
-local function Load_Blizzard_HousingDashboard()
+local function Blizzard_HousingDashboard_OnLoad()
     Housing.DataProvider:Init();
 
     C_Timer.After(0, function()
         ModifySearcherBase(HousingDashboardFrame.CatalogContent);
-        ModifyTextContainer(HousingDashboardFrame.CatalogContent.PreviewFrame);
     end);
 end
-EventUtil.ContinueOnAddOnLoaded("Blizzard_HousingDashboard", Load_Blizzard_HousingDashboard);
+
+
+local BlizzardAddOns = {
+    {name = "Blizzard_HousingDashboard", callback = Blizzard_HousingDashboard_OnLoad},
+    {name = "Blizzard_HouseEditor", callback = Blizzard_HouseEditor_OnLoad},
+};
+
+do
+    local function EnableModule(state)
+        if state then
+            for _, v in ipairs(BlizzardAddOns) do
+                if not v.registered then
+                    v.registered = true;
+                    if C_AddOns.IsAddOnLoaded(v.name) then
+                        v.callback();
+                    else
+                        EventUtil.ContinueOnAddOnLoaded(v.name, v.callback);
+                    end
+                end
+            end
+
+            MODULE_ENABLED = true;
+        else
+            MODULE_ENABLED = false;
+        end
+    end
+
+    local moduleData = {
+        name = L["ModuleName Housing_CatalogSearch"],
+        dbKey ="Housing_CatalogSearch",
+        description = L["ModuleDescription Housing_CatalogSearch"],
+        toggleFunc = EnableModule,
+        categoryID = 1,
+        uiOrder = 1,
+        moduleAddedTime = 1765900000,
+		categoryKeys = {
+			"Housing",
+		},
+        searchTags = {
+            "Housing",
+        },
+    };
+
+    addon.ControlCenter:AddModule(moduleData);
+end

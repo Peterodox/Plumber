@@ -1078,6 +1078,7 @@ local function CreateUI()
     local sideSectionWidth = API.Round((pageHeight * scalerWidth) * (1 - ratio_Center));
     local centralSectionWidth = API.Round((pageHeight * scalerWidth) * ratio_Center);
     MainFrame:SetSize(2 * sideSectionWidth + centralSectionWidth, Def.PageHeight);
+    MainFrame:ClearAllPoints();
     MainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
     MainFrame:SetToplevel(true);
     MainFrame.FrameContainer:EnableMouse(true);

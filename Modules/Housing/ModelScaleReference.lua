@@ -346,6 +346,17 @@ local function SharedPreviewFrame_OnLoad(previewFrame)
     BananaButton:Hide();
     Mixin(BananaButton, BananaButtonMixin);
     BananaButton:OnLoad();
+
+
+    --Slightly adjust default pitch
+    hooksecurefunc(modelScene, "TransitionToModelSceneID", function()
+        if MODULE_ENABLED then
+            local camera = modelScene:GetActiveCamera();
+            if camera then
+                camera:SetPitch(15/180*3.14);
+            end
+        end
+    end);
 end
 
 local function HousingDashboard_OnLoad()
@@ -402,7 +413,6 @@ do
         categoryID = 1,
         uiOrder = 1,
         moduleAddedTime = 1764600000,
-        minimumTocVersion = 110207,
 		categoryKeys = {
 			"Housing",
 		},
