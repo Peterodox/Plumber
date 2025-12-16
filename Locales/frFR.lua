@@ -248,7 +248,7 @@ L["Color Applied"] = "Ceci est la couleur actuellement appliquée.";
 
 --Tooltip Item Reagents
 L["ModuleName TooltipItemReagents"] = "Réactifs";
-L["ModuleDescription TooltipItemReagents"] = "Si un objet peut être utilisé pour se combiner en quelque chose de nouveau, affiche tous les « Réactifs » utilisés dans le processus.\n\nAppuyez sur la touche Maj et maintenez-la enfoncée pour afficher l'objet fabriqué si cette option est prise en charge.";
+L["ModuleDescription TooltipItemReagents"] = "Si un objet peut être utilisé pour se combiner en quelque chose de nouveau, alors afficher tous les « Réactifs » utilisés dans le processus.\n\nAppuyez sur la touche Maj et maintenez-la enfoncée pour afficher l'objet fabriqué si cette option est prise en charge.";
 L["Can Create Multiple Item Format"] = "Vous disposez des ressources pour créer |cffffffff%d|r éléments.";
 
 
@@ -568,7 +568,7 @@ L["QuickSlot Error 3"] = "Emplacement rapide : un contrôleur avec la même clé
 
 --Plumber Macro
 L["PlumberMacro Drive"] = "Macro V.R.O.U.M. de Plumber";
-L["PlumberMacro Drawer"] = "Création de macro Plumber";
+L["PlumberMacro Drawer"] = "Macro Plumber";
 L["PlumberMacro Housing"] = "Macro Logis de Plumber";
 -- L["PlumberMacro Torch"] = "Plumber Torch Macro"; -- à traduire
 L["PlumberMacro DrawerFlag Combat"] = "La macro sera mise à jour après avoir quitté le combat.";
@@ -589,14 +589,14 @@ L["Drawer Option Global Tooltip"] = "Ce paramètre est partagé par toutes les m
 L["Drawer Option CloseAfterClick"] = "Fermer après avoir cliqué";
 L["Drawer Option CloseAfterClick Tooltip"] = "Fermer la macro après avoir cliqué sur n'importe quel bouton, que cela soit réussi ou non.";
 L["Drawer Option SingleRow"] = "Ligne unique";
-L["Drawer Option SingleRow Tooltip"] = "Si cette option est cochée, alignez tous les boutons sur la même ligne au lieu de 4 éléments par ligne.";
+L["Drawer Option SingleRow Tooltip"] = "Si cette option est cochée, aligner tous les boutons sur la même ligne au lieu de 4 par ligne.";
 L["Drawer Option Hide Unusable"] = "Masquer les actions inutilisables";
 L["Drawer Option Hide Unusable Tooltip"] = "Masquer les objets non possédés et les sorts non appris.";
 L["Drawer Option Hide Unusable Tooltip 2"] = "Les objets consommables comme les potions seront toujours affichés."
 L["Drawer Option Update Frequently"] = "Mis à jour fréquemment";
 L["Drawer Option Update Frequently Tooltip"] = "Essaie de mettre à jour l'état des boutons dès qu'un changement survient dans vos sacs ou grimoires. Activer cette option peut légèrement augmenter la consommation de ressources.";
-L["ModuleName DrawerMacro"] = "Création de Macro";
-L["ModuleDescription DrawerMacro"] = "Créer un menu déroulant personnalisé pour gérer vos objets, sorts, mascottes, montures et jouets.\n\nPour créer une macro, créez d'abord une nouvelle macro, puis entrez |cffd7c0a3#plumber:drawer|r dans la zone d'édition de la macro.";
+L["ModuleName DrawerMacro"] = "Macro Plumber";
+L["ModuleDescription DrawerMacro"] = "Créer un menu déroulant personnalisé pour gérer vos objets, sorts, mascottes, montures et jouets.\n\nPour créer une Macro Plumber, créez d'abord une nouvelle macro, puis entrez |cffd7c0a3#plumber:drawer|r dans la zone d'édition de la macro.";
 
 
 --New Expansion Landing Page
@@ -697,7 +697,7 @@ L["ModuleDescription CraftSearchExtended"] = "Afficher plus de résultats lors d
 
 
 --DecorModelScaleRef
-L["ModuleName DecorModelScaleRef"] = "Catalogue d'éléments de décoration : Échelle de la Banane"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
+L["ModuleName DecorModelScaleRef"] = "Éléments de décoration : Échelle de la Banane"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Ajoute une référence de taille (une banane) à la fenêtre d'aperçu du décor, vous permettant d'évaluer la taille des objets.\n\n- Vous permet également de modifier l'inclinaison de la caméra en maintenant le bouton gauche enfoncé et en vous déplaçant verticalement.";
 
 
