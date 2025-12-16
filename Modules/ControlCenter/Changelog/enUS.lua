@@ -10,6 +10,142 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10804] = {
+    {
+        type = "date",
+        versionText = "1.8.4",
+        timestamp = 1765900000,
+    },
+
+    {
+        type = "h1",
+        text = "House Editor: Clock",
+        dbKey = "Housing_Clock",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "Housing_Clock",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "While using the house editor, show a clock on the top of the screen. You can switch Between analog and digital.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Hover the cursor over the clock to show how long you have spent in the house Editor during your current game session.",
+    },
+
+    {
+        type = "img",
+        dbKey = "Housing_Clock",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Interactable Source Info",
+        dbKey = "SourceAchievementLink",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "SourceAchievementLink",
+    },
+
+    {
+        type = "p",
+        text = "The Achievement names on the following UI become interactable, allowing you to See their details or track them.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Decor Catalog",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Mount Journal",
+    },
+
+    {
+        type = "img",
+        dbKey = "SourceAchievementLink",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Decor Catalog: Extend Search Results",
+        dbKey = "Housing_CatalogSearch",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "Housing_CatalogSearch",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Enhances the search box on the decor catalog and storage Tab, allowing you to find items by achievement, vendor, zone, or currency.",
+    },
+
+    {
+        type = "img",
+        dbKey = "Housing_CatalogSearch",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Bug Fixes",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Backpack Item Tracker: Fixed an issue that automatically Re-enabled this module when disabled.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Keybindings, Focus On Quest: Fixed An issue where the next/previous quest you set doesn't match its order in the objective tracker.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = MISCELLANEOUS,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Decor Catalog: Banana For Scale: This module will slightly adjust the default camera pitch angle when Enabled.",
+    },
+};
+
+
 changelogs[10803] = {
     {
         type = "date",
@@ -21,7 +157,6 @@ changelogs[10803] = {
         type = "h1",
         text = "Editor: Customize Mode",
         dbKey = "Housing_CustomizeMode",
-        isNewFeature = true,
     },
 
     {
@@ -66,7 +201,6 @@ changelogs[10803] = {
         type = "h1",
         text = "Extend Search Results",
         dbKey = "CraftSearchExtended",
-        isNewFeature = true,
     },
 
     {
@@ -99,7 +233,6 @@ changelogs[10803] = {
         type = "h1",
         text = "Tooltip: Dye Pigment",
         dbKey = "TooltipDyeDeez",
-        isNewFeature = true,
     },
 
     {
@@ -131,7 +264,6 @@ changelogs[10803] = {
     {
         type = "h1",
         text = "Keybindings: Focus On Quest",
-        isNewFeature = true,
     },
 
     {
@@ -263,6 +395,7 @@ changelogs[10802] = {
     },
 };
 
+
 changelogs[10801] = {
     {
         type = "date",
@@ -343,7 +476,6 @@ changelogs[10800] = {
 
     {
         type = "h1",
-        isNewFeature = true,
         text = L["ModuleName InstanceDifficulty"],
         dbKey = "InstanceDifficulty",
     },

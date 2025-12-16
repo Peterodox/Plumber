@@ -745,8 +745,7 @@ L["Match Sources"] = "Match Sources";
 
 --SourceAchievementLink
 L["ModuleName SourceAchievementLink"] = "Interactable Source Info";
-L["ModuleDescription SourceAchievementLink"] = "The Achievement names on the following UI become interactable, allowing you to see their details or track them.\n\n- Mount Journal\n\n- Decor Catalog";
-
+L["ModuleDescription SourceAchievementLink"] = "Makes most achievement names on the following UI become clickable, allowing you to see their details or track them.\n\n- Decor Catalog\n\n- Mount Journal";
 
 
 --Generic

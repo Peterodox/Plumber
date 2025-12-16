@@ -481,6 +481,7 @@ L["Error Drag Spell In Combat"] = "战斗中不可拖拽技能。";
 L["Error Change Trait In Combat"] = "战斗中不能更改特质。";
 L["Amount Required To Unlock Format"] = "%s 后解锁";   --Earn another x amount to unlock (something)
 L["Soon To Unlock"] = "即将解锁";
+L["You Can Unlock Title"] = "可以解锁";
 L["Artifact Ability Auto Unlock Tooltip"] = "此特质将在你获得足够的永恒能量后自动解锁。";
 L["Require More Bag Slot Alert"] = "你需要腾出一些背包格子才能进行此操作。";
 L["Spell Not Known"] = "未找到法术";
@@ -690,6 +691,29 @@ L["ModuleName TooltipDyeDeez"] = "鼠标提示：染料颜料";
 L["ModuleDescription TooltipDyeDeez"] = "在颜料的鼠标提示上显示其可制作的颜色名称。";
 L["Instruction Show More Info"] = "<按Alt键显示更多信息>";
 L["Instruction Show Less Info"] = "<按Alt键显示更少信息>";
+
+
+--Housing Clock
+L["ModuleName Housing_Clock"] = "编辑器：时钟";
+L["ModuleDescription Housing_Clock"] = "在使用房屋编辑器时，在屏幕上方显示一个时钟。";
+L["Time Spent In Editor"] = "已使用编辑器时长";
+L["This Session Colon"] = "本次登录期间：";
+L["Right Click Show Settings"] = "右键单击以打开设置。";
+L["Plumber Clock"] = "Plumber时钟";
+L["Clock Type"] = "时钟类型";
+L["Clock Type Analog"] = "指针式时钟";
+L["Clock Type Digital"] = "数字时钟";
+
+
+--CatalogExtendedSearch
+L["ModuleName Housing_CatalogSearch"] = "装饰品: 搜索结果拓展";
+L["ModuleDescription Housing_CatalogSearch"] = "拓展装饰品搜索结果，允许你通过搜索成就、商人、区域或是所需货币来找到相关装饰品。";
+L["Match Sources"] = "Match Sources";
+
+
+--SourceAchievementLink
+L["ModuleName SourceAchievementLink"] = "可交互的来源信息";
+L["ModuleDescription SourceAchievementLink"] = "将以下界面上的成就名称变为可点击的链接，允许你查看成就详情或追踪它。\n\n- 装饰类别\n\n- 坐骑手册";
 
 
 --Generic

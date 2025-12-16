@@ -791,7 +791,7 @@ L["Coffer Key Shard"] = "Estilhaço de Chave de Cofre";
 L["Epoch Mementos"] = "Lembrança das Eras";
 L["Timeless Scrolls"] = "Pergaminho Perene";
 
-L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Tem certeza de que deseja trocar %s pelo item a seguir?\n\n|cffff2020Essa compra não é reembolsável.|r\n %s";
+L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Tem certeza de que deseja trocar %s pelo item a seguir?\n\n|cffff2020Esta compra não é reembolsável.|r\n %s";
 
 
 --Map Pin Filter Name (name should be plural)
@@ -823,6 +823,6 @@ L["DyeColorNameAbbr Green"] = "Verde";
 L["DyeColorNameAbbr Orange"] = "Laranja";
 L["DyeColorNameAbbr Purple"] = "Roxo";
 L["DyeColorNameAbbr Red"] = "Vermelho";
-L["DyeColorNameAbbr Teal"] = "Azul-piscina";
+L["DyeColorNameAbbr Teal"] = "Verde-água";
 L["DyeColorNameAbbr White"] = "Branco";
 L["DyeColorNameAbbr Yellow"] = "Amarelo";
