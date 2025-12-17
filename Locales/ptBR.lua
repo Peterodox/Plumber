@@ -267,8 +267,8 @@ L["Collected Appearances"] = "Aparências coletadas";
 L["Collected Items"] = "Itens coletados";
 
 
---Tooltip Housing
-L["ModuleName TooltipHousing"] = "Moradia";
+--Tooltip 
+L["ModuleName Tooltip"] = "Moradia";
 L["ModuleDescription TooltipHousing"] = "Moradia";
 L["Instruction View In Dressing Room"] = "<Ctrl+cliq. para ver no Guarda‑roupa>";  --VIEW_IN_DRESSUP_FRAME
 L["Data Loading In Progress"] = "Plumber está carregando dados";
@@ -716,7 +716,7 @@ L["Duplicate Decor Key"] = "Atalho para \"duplicar\"";
 L["Enable Duplicate"] = "Habilitar \"duplicar\"";
 L["Enable Duplicate Tooltip"] = "Quando estiver no modo de decoração, você pode passar o cursor por cima de uma decoração e apertar um atalho para colocar uma cópia desse objeto.";
 L["ModuleName Housing_CustomizeMode"] = "Editor: Modo personalização";
-L["ModuleDescription Housing_CustomizeMode"] = "No modo personalização:\n\n- Permite que você copie pigmentos de uma decoração para a outra.\n\n- Exibe o nome da cor no slot em vez do número.";
+L["ModuleDescription Housing_CustomizeMode"] = "No modo personalização:\n\n- Permite que você copie pigmentos de uma decoração para a outra.\n\n- Exibe o nome do pigmento em vez do número do compartimento.";
 L["Copy Dyes"] = "copiar";
 L["Dyes Copied"] = "Pigmentos copiados";
 L["Apply Dyes"] = "Aplicar";
