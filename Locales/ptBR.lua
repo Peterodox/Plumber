@@ -162,9 +162,9 @@ L["ModuleDescription AlternativePlayerChoiceUI"] = "Substitui a interface padrã
 
 
 --HandyLockpick (Right-click a lockbox in your bag to unlock when you are not in combat. Available to rogues and mechagnomes)
-L["ModuleName HandyLockpick"] = "Lockpick Conveniente";
-L["ModuleDescription HandyLockpick"] = "Clique com o botão direito em uma caixa trancada na sua bolsa ou na UI de Troca para destrancá-la.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Não pode destrancar diretamente um item do banco\n- Afetado pelo Modo de Alvo Suave";
-L["Instruction Pick Lock"] = "<Cliq. direito para Arrombar>";
+L["ModuleName HandyLockpick"] = "Bater carteira prático";
+L["ModuleDescription HandyLockpick"] = "Cliq. direito em uma caixa trancada na sua bolsa ou na interface de Troca para destrancá-la.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Não pode destrancar diretamente um item do banco\n- Que esteja afetado pela seleção de alvo de ação.";
+L["Instruction Pick Lock"] = "<Cliq. direito para arrombar>";
 
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
@@ -257,7 +257,7 @@ L["You Have Received Weekly Item Format"] = "Você recebeu %s essa semana.";
 
 --Tooltip ItemQuest
 L["ModuleName TooltipItemQuest"] = "Itens que iniciam missões";
-L["ModuleDescription TooltipItemQuest"] = "Se um item em suas bolsas começar uma missão, exibe os detalhes dessa missão.\n\nVocê pode usar ctrl+cliq. esquerdo no item para visualizá-la no registro de missões, caso já esteja em andamento.";
+L["ModuleDescription TooltipItemQuest"] = "Se um item em suas bolsas começar uma missão, exibe os detalhes dessa missão.\n\nVocê pode usar ctrl+cliq. esquerdo no item para visualizá-la no registro de missões, caso a missão já esteja em andamento.";
 L["Instruction Show In Quest Log"] = "<Ctrl+cliq. para ver no registro de missões>";
 
 
@@ -294,14 +294,14 @@ L["Questionable Item Count Tooltip"] = "Esse contador de itens pode estar incorr
 --QueueStatus
 L["ModuleName QueueStatus"] = "Status da fila";
 L["ModuleDescription QueueStatus"] = "Adiciona uma barra de progresso ao olho do Localizador de Grupos que mostra a porcentagem de companheiros de equipes encontrados. Tanques e Curandeiros pesam mais.\n\n(Opcional) Mostra a diferença entre o tempo médio de espera e o seu tempo na fila.";
-L["QueueStatus Show Time"] = "Mostrar tempo";
+L["QueueStatus Show Time"] = "Exibir tempo";
 L["QueueStatus Show Time Tooltip"] = "Mostra a diferença entre o tempo médio de espera e o seu tempo na fila.";
 
 
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = "Sumário de Khaz Algar";
 L["ModuleDescription ExpansionLandingPage"] = "Exibe informações extras na página de resumo:\n\n- Progresso de Paragão\n\n- Nível de Pacto de Fios Cortados\n\n- Relações com os Cartéis da Inframina";
-L["Instruction Track Reputation"] = "<Shift+cliq. para rastrear esta reputação>";
+L["Instruction Track Reputation"] = "<Shift+cliq. para rastrear a reputação>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift-cliq. para parar de rastrear>";
 L["Error Show UI In Combat"] = "Você não pode exibir essa interface enquanto estiver em combate.";
 
@@ -315,7 +315,7 @@ L["Open Mission Report Tooltip"] = "Clique com o botão direito para abrir relat
 --QueueStatus
 L["ModuleName QueueStatus"] = "Status da fila";
 L["ModuleDescription QueueStatus"] = "Adiciona uma barra de progresso ao olho do Localizador de Grupos que mostra a porcentagem de companheiros de equipes encontrados. Tanques e Curandeiros pesam mais.\n\n(Opcional) Mostra a diferença entre o tempo médio de espera e o seu tempo na fila.";
-L["QueueStatus Show Time"] = "Mostrar tempo";
+L["QueueStatus Show Time"] = "Exibit tempo";
 L["QueueStatus Show Time Tooltip"] = "Mostra a diferença entre o tempo médio de espera e o seu tempo na fila.";
 
 
@@ -446,13 +446,13 @@ L["ModuleDescription AppearanceTab"] = "Modifica a aba de aparências nas coleç
 L["ModuleName SoftTargetName"] = "Placa de identificação: ícone de interação";
 L["ModuleDescription SoftTargetName"] = "Exibe o nome do ícone de interação de um objeto.";
 L["SoftTargetName Req Title"] = "|cffd4641cVocê precisa mudar manualmente essas configurações para que funcione:|r";
-L["SoftTargetName Req 1"] = "|cffffd100Ativar a tecla de interação|r em Opções do jogo>Jogabilidade>Controles.";
+L["SoftTargetName Req 1"] = "|cffffd100Ativar a tecla de interação|r em Opções do jogo > Jogabilidade > Controles.";
 L["SoftTargetName Req 2"] = "Definir CVar |cffffd100SoftTargetIconGameObject|r como |cffffffff1|r";
 L["SoftTargetName CastBar"] = "Exibir barra de conjuração";
 L["SoftTargetName CastBar Tooltip"] = "Exibir uma barra radial de conjuração na placa de identificação.\n\n|cffff4800O addon não será capaz de te dizer qual objeto é o seu alvo.|r";
 L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "Exibir objetivos de missão";
 L["SoftTargetName QuestObjective Tooltip"] = "Exibir objetivos de missão (se houver algum) embaixo do nome.";
-L["SoftTargetName QuestObjective Alert"] = "Esse recurso requer que você habilite |cffffffffMostrar dica de alvo|r nas Opções do jogo>Accessibilidade>Geral.";   --See globals: TARGET_TOOLTIP_OPTION
+L["SoftTargetName QuestObjective Alert"] = "Esse recurso requer que você habilite |cffffffffmostrar dica de alvo|r nas Opções do jogo > Accessibilidade > Geral.";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "Incluir NPC";
 L["SoftTargetName ShowNPC Tooltip"] = "Se desabilitado, o nome aparecerá apenas em objetos interativos.";
 
@@ -535,13 +535,13 @@ L["LootUI Option Hide Window Tooltip"] = "Oculta a janela de saque do Plumber, m
 L["LootUI Option Hide Window Tooltip 2"] = "Essa opção não afeta a janela de saque da Blizzard.";
 L["LootUI Option Force Auto Loot"] = "Forçar saque automático";
 L["LootUI Option Force Auto Loot Tooltip"] = "Sempre ativa o Saque Automático para contornar falhas ocasionais.";
-L["LootUI Option Owned Count"] = "Mostrar número de itens possuídos";
+L["LootUI Option Owned Count"] = "Exibir número de itens possuídos";
 L["LootUI Option New Transmog"] = "Marcar aparência não coletada";
 L["LootUI Option New Transmog Tooltip"] = "Adiciona um marcador %s se você não tiver coletado a aparência do item.";
 L["LootUI Option Use Hotkey"] = "Pressione um atalho para pegar todos os itens";
 L["LootUI Option Use Hotkey Tooltip"] = "No Modo de Saque Manual, pressione a seguinte tecla de atalho para pegar todos os itens.";
-L["LootUI Option Fade Delay"] = "Atraso de Esmaecimento por Item";
-L["LootUI Option Items Per Page"] = "Itens por Página";
+L["LootUI Option Fade Delay"] = "Atraso para desbotar por item";
+L["LootUI Option Items Per Page"] = "Itens por página";
 L["LootUI Option Items Per Page Tooltip"] = "Ajusta a quantidade de itens que podem ser exibidos em uma página ao receber saques.\n\nEsta opção não afeta o Modo de Saque Manual ou o Modo de Edição.";
 L["LootUI Option Replace Default"] = "Substituir alerta de saque padrão";
 L["LootUI Option Replace Default Tooltip"] = "Substitui os alertas de saque padrão que geralmente aparecem acima das barras de ação.";
@@ -552,7 +552,7 @@ L["LootUI Option Use Default UI Tooltip"] = "Usa a janela de saque padrão do Wo
 L["LootUI Option Background Opacity"] = "Opacidade";
 L["LootUI Option Background Opacity Tooltip"] = "Define a opacidade do fundo no Modo de Notificação de Saque.\n\nEssa opção não afeta o modo de saque manual.";
 L["LootUI Option Custom Quality Color"] = "Usar cor de qualidade personalizada";
-L["LootUI Option Custom Quality Color Tooltip"] = "Usa as cores que você escolheu em Opções de jogo>Acessibilidade>Cores.";
+L["LootUI Option Custom Quality Color Tooltip"] = "Usa as cores que você escolheu em Opções de jogo > Acessibilidade > Cores.";
 L["LootUI Option Grow Direction"] = "Crescer para cima";
 L["LootUI Option Grow Direction Tooltip 1"] = "Quando habilitado: a parte inferior esquerda da janela fica fixada, e novas notificações aparecerão no topo das antigas.";
 L["LootUI Option Grow Direction Tooltip 2"] = "Quando desabilitado: a parte superior esquerda da janela fica fixada, e novas notificações aparecerão na parte inferior das antigas.";
@@ -605,17 +605,17 @@ L["ModuleDescription DrawerMacro"] = "Cria um menu flutuante personalizado para 
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Sumário da expansão";
-L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode acessá-la ao:\n\n- Clicar no botão Sumário de Khaz Algar no minimapa.\n\n- Usar a tecla de atalho atribuída em Opções (do WoW)>Atalhos do teclado.";
+L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode acessá-la ao:\n\n- Clicar no botão Sumário de Khaz Algar no minimapa.\n\n- Usar a tecla de atalho atribuída em Opções do jogo > Atalhos do teclado.";
 L["Reward Available"] = "Recompensa Disponível";
 L["Paragon Reward Available"] = "Recompensa de paragão disponível";
 L["Until Next Level Format"] = "%d até o próximo nível";
 L["Until Paragon Reward Format"] = "%d até a recompensa Paragão";
-L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Clique para ver Renown>";
+L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Clique para ver Renome>";
 L["Not On Quest"] = "Você não está nesta missão";
 L["Factions"] = "Facções";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Atividades";
 L["Raids"] = RAIDS or "Raides";
-L["Instruction Track Achievement"] = "<Shift+cliq. para rastrear esta conquista>";
+L["Instruction Track Achievement"] = "<Shift+cliq. para rastrear essa conquista>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift+cliq. para parar de rastrear>";
 L["No Data"] = "Sem dados";
 L["No Raid Boss Selected"] = "Nenhum chefe selecionado";
@@ -690,7 +690,7 @@ L["Press Key To Copy Format"] = "Aperte |cffffd100%s|r para copiar";
 
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Atalhos do teclado: Focar na missão";
-L["ModuleDescription QuestWatchCycle"] = "Permite usar atalhos para focar na missão próxima/anterior no rastreador de objetivos.\n\n|cffd4641cEscolha suas teclas de atalho em Atalhos do teclado>Plumber.";
+L["ModuleDescription QuestWatchCycle"] = "Permite usar atalhos para focar na missão próxima/anterior no rastreador de objetivos.\n\n|cffd4641cEscolha suas teclas de atalho em Atalhos do teclado > Plumber.";
 
 
 --CraftSearchExtended
@@ -723,13 +723,37 @@ L["Apply Dyes"] = "Aplicar";
 L["Preview Dyes"] = "Pré-visualização";
 L["ModuleName TooltipDyeDeez"] = "Dica: Pigmentos de tinta";
 L["ModuleDescription TooltipDyeDeez"] = "Exibe o nome da cor dos pigmentos na dica de ferramenta de corantes.";
-L["Instruction Show More Info"] = "<Aperte ALT para exibir mais informações>";
-L["Instruction Show Less Info"] = "<Aperte ALT para exibir menos informações>";
+L["Instruction Show More Info"] = "<Alt+cliq. para exibir mais informações>";
+L["Instruction Show Less Info"] = "<Alt+cliq. para exibir menos informações>";
+
+
+--Housing Clock
+L["ModuleName Housing_Clock"] = "Editor: Relógio";
+L["ModuleDescription Housing_Clock"] = "Quando estiver no modo de edição, exibe um relógio no topo da tela.";
+L["Time Spent In Editor"] = "Tempo gasto no editor";
+L["This Session Colon"] = "Essa sessão: ";
+L["Right Click Show Settings"] = "Cliq. direito para exibir as configurações.";
+L["Plumber Clock"] = "Relógio do Plumber";
+L["Clock Type"] = "Tipo de Relógio";
+L["Clock Type Analog"] = "Analógico";
+L["Clock Type Digital"] = "Digital";
+
+
+--CatalogExtendedSearch
+L["ModuleName Housing_CatalogSearch"] = "Catálogo de mobília: Pesquisa avançada";
+L["ModuleDescription Housing_CatalogSearch"] = "Melhora a caixa de pesquisa no catálogo de decorações e na aba de armazenamento, permitindo que você ache itens filtrando por conquistas, comerciante, zona, ou moeda.";
+L["Match Sources"] = "Origem compatível";
+
+
+--SourceAchievementLink
+L["ModuleName SourceAchievementLink"] = "Conquista de origem interativa";
+L["ModuleDescription SourceAchievementLink"] = "Faz com que a maioria das conquistas nas interfaces a seguir se tornem clicáveis, permitindo que você veja detalhes ou as rastreie.\n\n- Catálogo de decoração\n\n- Jornal de montarias";
+
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
-L["Reposition Button Horizontal"] = "Mover Horizontalmente";
-L["Reposition Button Vertical"] = "Mover Verticalmente";
+L["Reposition Button Horizontal"] = "Mover horizontalmente";
+L["Reposition Button Vertical"] = "Mover verticalmente";
 L["Reposition Button Tooltip"] = "Clique e arraste para mover a janela";
 L["Font Size"] = FONT_SIZE or "Tamanho da Fonte";
 L["Icon Size"] = "Tamanho do ícone";
