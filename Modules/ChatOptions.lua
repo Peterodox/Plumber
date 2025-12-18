@@ -37,8 +37,8 @@ function ChatOptions:Hook()
     if self.isHooked then return end;
     self.isHooked = true;
 
-    if ChatChannelDropdown_Show then
-        hooksecurefunc("ChatChannelDropdown_Show", function(chatFrame, chatType, chatTarget, chatName)
+    if ChatFrameUtil and ChatFrameUtil.ShowChatChannelContextMenu then
+        hooksecurefunc(ChatFrameUtil, "ShowChatChannelContextMenu", function(chatFrame, chatType, chatTarget, chatName)
             self.chatTarget = chatTarget;
         end);
     end

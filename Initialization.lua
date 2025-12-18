@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.8.4";
-local VERSION_DATE = 1765900000;
+local VERSION_TEXT = "1.8.4 b";
+local VERSION_DATE = 1766000000;
 
 
 local addonName, addon = ...
@@ -205,6 +205,9 @@ local DefaultValues = {
         SoftTarget_IconSize = 2,
         SoftTarget_CastBar = true,
         SoftTarget_Objectives = false,
+        SoftTarget_House_HideIcon = false,
+        SoftTarget_House_HideName = false,
+
     AppearanceTab = false,              --Adjust Appearance Tab models to reduce GPU usage spike
         AppearanceTab_ModelCount = 1,
     ItemUpgradeUI = true,
@@ -329,6 +332,7 @@ local DefaultValues = {
         Housing_Clock_AnalogClock = true,
     TooltipDyeDeez = true,                  --Show dyes on pigment tooltip
     Housing_CatalogSearch = false,
+    Housing_ItemAcquiredAlert = true,       --Click AlertFrame to view decor model
 
 
     --Declared elsewhere:

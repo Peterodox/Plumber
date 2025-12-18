@@ -10,12 +10,14 @@ local Handler = Housing.HouseEditorController.CreateModeHandler("AnyMode");
 local Counter = CreateFrame("Frame");
 do
     Counter.timeSpentInHouseEditor = 0;
+    Counter.totalTimeSpentInHouseEditor = 0;
 
     Counter:RegisterEvent("PLAYER_ENTERING_WORLD");
 
     Counter:SetScript("OnEvent", function(self, event, isInitialLogin)
         self:SetScript("OnEvent", nil);
         self:UnregisterEvent(event);
+        self.totalTimeSpentInHouseEditor = addon.GetDBValue("totalTimeSpentInHouseEditor") or 1;
         if isInitialLogin then
             self.timeSpentInHouseEditor = 1;
             addon.SetDBValue("timeSpentInHouseEditor", 0);
@@ -24,12 +26,22 @@ do
         end
     end);
 
-    function Counter:GetTime()
+    function Counter:OnTimeElapsed(elapsed)
+        self.timeSpentInHouseEditor = self.timeSpentInHouseEditor + elapsed;
+        self.totalTimeSpentInHouseEditor = self.totalTimeSpentInHouseEditor + elapsed;
+    end
+
+    function Counter:GetSessionTime()
         return API.SecondsToTime(math.floor(self.timeSpentInHouseEditor), true, true);
+    end
+
+    function Counter:GetLifeTIme()
+        return API.SecondsToTime(math.floor(self.totalTimeSpentInHouseEditor), true, true);
     end
 
     function Counter:SaveTime()
         addon.SetDBValue("timeSpentInHouseEditor", math.floor(self.timeSpentInHouseEditor));
+        addon.SetDBValue("totalTimeSpentInHouseEditor", math.floor(self.totalTimeSpentInHouseEditor));
     end
 end
 
@@ -85,7 +97,7 @@ do
 
     function ClockUIMixin:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        Counter.timeSpentInHouseEditor = Counter.timeSpentInHouseEditor + elapsed;
+        Counter:OnTimeElapsed(elapsed);
         if self.t >= 5 then
             self.t = 0;
             self:UpdateTime();
@@ -158,7 +170,8 @@ do
 
         tooltip:AddLine(" ");
         tooltip:AddLine(L["Time Spent In Editor"], 1, 1, 1);
-        tooltip:AddDoubleLine(L["This Session Colon"], Counter:GetTime(), 1, 0.82, 0, 1, 1, 1);
+        tooltip:AddDoubleLine(L["This Session Colon"], Counter:GetSessionTime(), 1, 0.82, 0, 1, 1, 1);
+        tooltip:AddDoubleLine(L["Time Spent Total Colon"], Counter:GetLifeTIme(), 1, 0.82, 0, 1, 1, 1);
 
         tooltip:AddLine(" ");
         tooltip:AddLine(L["Right Click Show Settings"], 1, 0.82, 0, true);

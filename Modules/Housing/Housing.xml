@@ -5,6 +5,7 @@
 	<Script file="ModelScaleReference.lua"/>
 	<Script file="CatalogSearch.lua"/>
 	<Script file="Housing_Macro.lua"/>
+	<Script file="ItemAcquiredAlert.lua"/>
 
 	<Script file="HouseEditor_Main.lua"/>
 	<Script file="HouseEditor_Clock.lua"/>

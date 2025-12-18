@@ -77,8 +77,8 @@ do
 
                             if find(sourceText, self.searchText, 1, true) or (currencyName and find(currencyName, self.searchText, 1, true)) then
                                 self.foundIDs[decorID] = true;
-                                if not self.anyMatch then
-                                    self.anyMatch = true;
+                                if not self.anyExtraMatch then
+                                    self.anyExtraMatch = true;
                                     self.n = self.n + 1;
                                     self.catalogEntries[self.n] = {isHeader = true, text = L["Match Sources"]};
                                 end
@@ -98,7 +98,8 @@ do
 
     function UpdatorMixin:Wipe()
         self:SetScript("OnUpdate", nil);
-        self.anyMatch = nil;
+        self.anyOriginalMatch = nil;
+        self.anyExtraMatch = nil;
         self.n = 0;
         self.index = 0;
         self.toIndex = 0;
@@ -117,7 +118,7 @@ do
         searchText = strtrim(searchText);
 
         local useAdvancedSearch = searchText and strlenutf8(searchText) >= 3;
-        if not (ShouldShowDecor(self.searcher) and useAdvancedSearch and self.catalogEntries) then
+        if not (ShouldShowDecor(self.searcher) and useAdvancedSearch and self.catalogEntries and self.optionsContainer:IsShown())  then
             self:Wipe();
             return
         end
@@ -177,17 +178,41 @@ do
         end
 
         self.optionsContainer:SetCatalogElements(catalogElements, self.retainCurrentPosition);
+
+        if self.previewFrame and (not self.anyOriginalMatch) and n >= 2 then    --First element is a header
+            local firstEntry = self.catalogEntries[2];
+		    local firstEntryInfo = C_HousingCatalog.GetCatalogEntryInfo(firstEntry);
+            if firstEntryInfo then
+                self.previewFrame:PreviewCatalogEntryInfo(firstEntryInfo);
+            end
+        end
+
+        if self.ResultCount and self.n > 1 then
+            self.ResultCount:SetText(self.n - 1);
+        end
     end
 
 
-    function CreateUpdator(searcher, optionsContainer)
+    function CreateUpdator(searcher, optionsContainer, previewFrame)
+        --PreviewFrame only exists for HousingDashboardCatalog
+
         local f = CreateFrame("Frame", nil, optionsContainer);
         f:Hide();
         Mixin(f, UpdatorMixin);
 
         f.searcher = searcher;
         f.optionsContainer = optionsContainer;
+        f.previewFrame = previewFrame;
         f:SetScript("OnHide", f.OnHide);
+
+        if optionsContainer.CategoryText then
+            local ResultCount = optionsContainer:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            ResultCount:SetTextColor(0.5, 0.5, 0.5);
+            ResultCount:SetPoint("LEFT", optionsContainer.CategoryText, "RIGHT", 4, 0);
+            f.ResultCount = ResultCount;
+
+            optionsContainer.CategoryText:SetText(HOUSING_CATALOG_CATEGORIES_ALL); --Fixed category not showing during the first OnShow
+        end
 
         return f
     end
@@ -197,12 +222,22 @@ end
 local function ModifySearcherBase(f, ownedOnly)
     local searcher = f.catalogSearcher;
 
-    local Updator = CreateUpdator(searcher, f.OptionsContainer);
+    local Updator = CreateUpdator(searcher, f.OptionsContainer, f.PreviewFrame);
     Updator.ownedOnly = ownedOnly;
 
     hooksecurefunc(f.OptionsContainer, "SetCatalogData", function(_, catalogEntries, retainCurrentPosition, headerText, instructionText)
         Updator:Wipe();
+
+        if Updator.ResultCount then
+            Updator.ResultCount:SetText(nil);
+        end
+
         if MODULE_ENABLED and ShouldShowDecor(searcher) and catalogEntries then
+            local n = #catalogEntries;
+            if n > 0 and Updator.ResultCount then
+                Updator.ResultCount:SetText(n);
+            end
+
             local searchText = searcher:GetSearchText() or "";
             if strlenutf8(searchText) >= 3 then
                 searchText = strtrim(searchText);
@@ -215,7 +250,8 @@ local function ModifySearcherBase(f, ownedOnly)
                             Updator.index = 1;
                             Updator.allEntries = allEntries;
                             Updator.searchText = lower(searchText);
-                            Updator.n = #catalogEntries;
+                            Updator.n = n;
+                            Updator.anyOriginalMatch = n > 0;
 
                             Updator.catalogEntries = catalogEntries;
                             Updator.retainCurrentPosition = retainCurrentPosition;

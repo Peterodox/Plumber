@@ -71,6 +71,27 @@ do
 end
 
 
+local function TrackAchievement(achievementID, state)
+    local _, _, _, completed = GetAchievementInfo(achievementID);
+    if completed then return end;
+
+    if state then
+        C_ContentTracking.StartTracking(Enum.ContentTrackingType.Achievement, achievementID);
+    else
+        C_ContentTracking.StopTracking(Enum.ContentTrackingType.Achievement, achievementID, Enum.ContentTrackingStopType.Manual);
+    end
+
+    if AchievementFrameAchievements_ForceUpdate then
+        AchievementFrameAchievements_ForceUpdate();
+    end
+end
+
+local function ToggleTrackingAchievement(achievementID)
+    local newState = not C_ContentTracking.IsTracking(Enum.ContentTrackingType.Achievement, achievementID);
+    TrackAchievement(achievementID, newState);
+end
+
+
 do  --SharedAchievementLinkScripts
     local function OnHyperlinkClick(self, link, text, button, fontString, left, bottom, width, height)
         if button == "RightButton" then
@@ -116,10 +137,7 @@ do  --SharedAchievementLinkScripts
                             type = "Button",
                             name = OBJECTIVES_STOP_TRACKING,
                             OnClick = function()
-                                C_ContentTracking.StopTracking(Enum.ContentTrackingType.Achievement, achievementID, Enum.ContentTrackingStopType.Manual);
-                                if AchievementFrameAchievements_ForceUpdate then
-                                    AchievementFrameAchievements_ForceUpdate();
-                                end
+                                TrackAchievement(achievementID, false);
                             end,
                         });
                     else
@@ -127,10 +145,7 @@ do  --SharedAchievementLinkScripts
                             type = "Button",
                             name = TRACK_ACHIEVEMENT,
                             OnClick = function()
-                                C_ContentTracking.StartTracking(Enum.ContentTrackingType.Achievement, achievementID);
-                                if AchievementFrameAchievements_ForceUpdate then
-                                    AchievementFrameAchievements_ForceUpdate();
-                                end
+                                TrackAchievement(achievementID, true);
                             end,
                         });
                     end
@@ -152,6 +167,14 @@ do  --SharedAchievementLinkScripts
             link = C_CurrencyInfo.GetCurrencyLink(currencyID);
             HandleModifiedItemClick(link);
             return
+        end
+
+        if IsModifiedClick("QUESTWATCHTOGGLE") and GetCurrentKeyBoardFocus() == nil then
+            local achievementID = match(link, "achievement:(%d+)");
+            if achievementID then
+                ToggleTrackingAchievement(achievementID);
+                return
+            end
         end
 
         SetItemRef(link, text, button);

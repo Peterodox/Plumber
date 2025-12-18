@@ -11,6 +11,7 @@ local UIParent = UIParent;
 local UnitName = UnitName;
 local UnitIsPlayer = UnitIsPlayer;
 local UnitIsGameObject = UnitIsGameObject;
+local UnitIsUnit = UnitIsUnit;
 local StripHyperlinks = API.StripHyperlinks;
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
 local GetCVarBool = C_CVar.GetCVarBool;
@@ -40,6 +41,8 @@ local Settings = {
     fontObject = "GameFontNormal",
     textOutline = false,
     showObjectives = false,
+    hideIconInHouse = false,
+    hideNameInHouse = false,
     IS_MIDNIGHT = addon.IS_MIDNIGHT,
 };
 
@@ -182,8 +185,22 @@ do  --Display
         end
     end
 
+    function Display:UpdateInHouseStatus(state)
+        if state ~= nil then
+            self.inHouseArea = state;
+        else
+            self.inHouseArea = C_Housing.IsInsideHouseOrPlot();
+        end
+
+        if self.inHouseArea then
+            self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
+        else
+            self:UnregisterEvent("NAME_PLATE_UNIT_ADDED");
+        end
+    end
+
     function Display:OnShow()
-        if Settings.showCastBar then
+        if Settings.showCastBar and not self:ShouldHideIcon() then
             self:ListenSpellCastEvents(true);
         end
     end
@@ -197,17 +214,25 @@ do  --Display
         if event == "UNIT_SPELLCAST_SUCCEEDED" then
             local unitTarget, castGUID, spellID = ...
             self.succeededSpellID = spellID;
-        else
-            if event == "UNIT_SPELLCAST_STOP" then
-                if self.succeededSpellID == self.currentSpellID then
-                    self:ShowCastSuccessVisual();
-                else
-                    self:UpdateCastingIndicator();
-                end
-                self.succeededSpellID = nil;
-                self.currentSpellID = nil;
+        elseif event == "UNIT_SPELLCAST_STOP" then
+            if self.succeededSpellID == self.currentSpellID then
+                self:ShowCastSuccessVisual();
             else
                 self:UpdateCastingIndicator();
+            end
+            self.succeededSpellID = nil;
+            self.currentSpellID = nil;
+        elseif event == "UNIT_SPELLCAST_START" or  event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
+            self:UpdateCastingIndicator();
+        elseif event == "NAME_PLATE_UNIT_ADDED" then
+            local unit = ...
+            if UnitIsUnit(unit, "softinteract") then
+                if Settings.hideIconInHouse then
+                    local nameplate = GetNamePlateForUnit("softinteract");
+                    if nameplate then
+                        nameplate.UnitFrame.SoftTargetFrame.Icon:SetAlpha(0);
+                    end
+                end
             end
         end
     end
@@ -221,10 +246,21 @@ do  --Display
         self:SetAlpha(self.alpha);
     end
 
+    function Display:ShouldHideIcon()
+        return self.inHouseArea and Settings.hideIconInHouse
+    end
+
+    function Display:ShouldHideName()
+        return self.inHouseArea and Settings.hideNameInHouse
+    end
+
     function Display:ShowBlizzardInteractIcon(state)
         local nameplate = GetNamePlateForUnit("softinteract");
         if nameplate then
-            nameplate.UnitFrame.SoftTargetFrame.Icon:SetShown(state)
+            if self:ShouldHideIcon() then
+                state = false;
+            end
+            nameplate.UnitFrame.SoftTargetFrame.Icon:SetShown(state);
         end
     end
 
@@ -413,6 +449,8 @@ do  --Display
         Settings.showObjectives = GetDBBool("SoftTarget_Objectives");
         Settings.textOutline = GetDBBool("SoftTarget_TextOutline");
         Settings.includeNPC = GetDBBool("SoftTarget_ShowNPC");
+        Settings.hideIconInHouse = GetDBBool("SoftTarget_House_HideIcon");
+        Settings.hideNameInHouse = GetDBBool("SoftTarget_House_HideName");
 
         if self.Init then return end;
 
@@ -516,12 +554,6 @@ do  --EL
                 else
                     Display.Background:Show();
                 end
-                --[[
-                local guid = UnitGUID(unit);
-                if guid then
-                    TTI = C_TooltipInfo.GetHyperlink("unit:"..guid);    --debug, always nil
-                end
-                --]]
 
                 local subtextFontHeight = Round(Settings.subtextHeight*uiScale);
                 Display.subtextFontHeight = subtextFontHeight;
@@ -538,7 +570,19 @@ do  --EL
                     Display:WatchTooltip(false);
                 end
 
-                if Settings.showCastBar then
+                if Display:ShouldHideIcon() then
+                    f.Icon:Hide();
+                else
+                    f.Icon:SetAlpha(1);
+                end
+
+                if Display:ShouldHideName() then
+                    Display.Title:Hide();
+                    Display.Subtext:Hide();
+                    Display.Background:Hide();
+                end
+
+                if Settings.showCastBar and not Display:ShouldHideIcon() then
                     Display:UpdateCastingIndicator();
                 end
             else
@@ -564,6 +608,29 @@ do  --EL
                 Display:Hide();
                 self.softTargetUnit = nil;
             end
+        elseif event == "HOUSE_PLOT_ENTERED" then
+            Display:UpdateInHouseStatus(true);
+        elseif event == "HOUSE_PLOT_EXITED" then
+            Display:UpdateInHouseStatus(false);
+        elseif event == "HOUSE_EDITOR_AVAILABILITY_CHANGED" then
+            Display:UpdateInHouseStatus();
+        end
+    end
+
+    EL.events = {
+        "PLAYER_SOFT_INTERACT_CHANGED",
+        "HOUSE_PLOT_ENTERED",
+        "HOUSE_PLOT_EXITED",
+        "HOUSE_EDITOR_AVAILABILITY_CHANGED",
+    };
+
+    function EL:ListenEvents(state)
+        if state then
+            self:SetScript("OnEvent", EL.OnEvent);
+            API.RegisterFrameForEvents(self, self.events);
+        else
+            self:SetScript("OnEvent", nil);
+            API.UnregisterFrameForEvents(self, self.events);
         end
     end
 end
@@ -624,7 +691,7 @@ do  --Options, Settings
         end
     end
 
-    local function Options_ShowNPC_OnClick(self, state)
+    local function CheckboxShared_OnClick(self, state)
         Display:LoadSettings();
     end
 
@@ -641,12 +708,18 @@ do  --Options, Settings
 
             {type = "Divider"},
             --{type = "Header", label = L["SoftTargetName Option Condition Header"]};
-            {type = "Checkbox", label = L["SoftTargetName ShowNPC"], tooltip = L["SoftTargetName ShowNPC Tooltip"], onClickFunc = Options_ShowNPC_OnClick, dbKey = "SoftTarget_ShowNPC"},
+            {type = "Checkbox", label = L["SoftTargetName ShowNPC"], tooltip = L["SoftTargetName ShowNPC Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_ShowNPC"},
+
+
+            {type = "Divider"},
+            {type = "Header", label = L["SC Housing"]},
+            {type = "Checkbox", label = L["SoftTargetName HideIcon"], tooltip = L["SoftTargetName HideIcon Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideIcon"},
+            {type = "Checkbox", label = L["SoftTargetName HideName"], tooltip = L["SoftTargetName HideName Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideName"},
         },
     };
 
     if not Settings.IS_MIDNIGHT then
-        table.insert(OPTIONS_SCHEMATIC, 5,
+        table.insert(OPTIONS_SCHEMATIC.widgets, 5,
             {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"}
         );
     end
@@ -664,12 +737,12 @@ do  --Module Registery
     local function EnableModule(state)
         if state and not EL.enabled then
             EL.enabled = true;
-            EL:SetScript("OnEvent", EL.OnEvent);
-            EL:RegisterEvent("PLAYER_SOFT_INTERACT_CHANGED");
+            EL:ListenEvents(true);
             EL:ProcessSoftInteractNameplate();
+            Display:UpdateInHouseStatus();
         elseif (not state) and EL.enabled then
             EL.enabled = nil;
-            EL:UnregisterEvent("PLAYER_SOFT_INTERACT_CHANGED");
+            EL:ListenEvents(false);
             EL:SetScript("OnUpdate", nil);
             Display:Remove();
         end

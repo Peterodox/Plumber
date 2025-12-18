@@ -72,8 +72,6 @@ do  --Item Search
     function DataProvider:Init()
         if self.catalogSearcher then return end;
 
-        local requeryDone = false;
-
         self.catalogSearcher = C_HousingCatalog.CreateCatalogSearcher();
         self.catalogSearcher:SetOwnedOnly(false);
         self.catalogSearcher:SetEditorModeContext(Enum.HouseEditorMode.BasicDecor);

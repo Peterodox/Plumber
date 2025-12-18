@@ -13,6 +13,76 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10804] = {
     {
         type = "date",
+        versionText = "1.8.4 b",
+        timestamp = 1766070000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName Housing_ItemAcquiredAlert"],
+        dbKey = "Housing_ItemAcquiredAlert",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "Housing_ItemAcquiredAlert",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = L["ModuleDescription Housing_ItemAcquiredAlert"],
+    },
+
+    {
+        type = "img",
+        dbKey = "Housing_ItemAcquiredAlert",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = MISCELLANEOUS,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Chat Channel Options: Fixed an issue where the Leave Channel buttons always appeared disabled.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Nameplate: Soft Target: Added options to hide the interact icon and object name when you are in a house.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Decor Catalog: Extend Search Results: Shows the number of matches next to the category. Auto-selects the first match.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "House Editor: Clock: It now tracks your total time spent in the house editor, instead of just the current game session.",
+    },
+
+    {
+        type = "br",
+    },
+    {
+        type = "br",
+    },
+
+
+
+    {
+        type = "date",
         versionText = "1.8.4",
         timestamp = 1765900000,
     },

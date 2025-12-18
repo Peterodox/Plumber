@@ -451,6 +451,11 @@ L["SoftTargetName QuestObjective Tooltip"] = "Show quest objectives (if any) bel
 L["SoftTargetName QuestObjective Alert"] = "This feature requires enabling |cffffffffShow Target Tooltip|r in Game Options> Accessibility> General.";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "Include NPC";
 L["SoftTargetName ShowNPC Tooltip"] = "If disabled, the name will only appear on interactable Game Objects";
+L["SoftTargetName HideIcon"] = "Hide Interact Icon";
+L["SoftTargetName HideIcon Tooltip"] = "Hide the interact icon and the radial cast bar when you are in a house.";
+L["SoftTargetName HideName"] = "Hide Object Name";
+L["SoftTargetName HideName Tooltip"] = "Hide the soft target object name when you are in a house."
+
 
 
 --LegionRemix
@@ -723,13 +728,16 @@ L["ModuleName TooltipDyeDeez"] = "Tooltip: Dye Pigment";
 L["ModuleDescription TooltipDyeDeez"] = "Display the dye color names on housing pigment's tooltip.";
 L["Instruction Show More Info"] = "<Press Alt to Show More Info>";
 L["Instruction Show Less Info"] = "<Press Alt to Show Less Info>";
+L["ModuleName Housing_ItemAcquiredAlert"] = "Decor Collected Alert";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "Allows you to left click the Decor Collected Alert to preview its model.";
 
 
 --Housing Clock
 L["ModuleName Housing_Clock"] = "Editor: Clock";
-L["ModuleDescription Housing_Clock"] = "While using the house editor, show a clock on the top of the screen.";
+L["ModuleDescription Housing_Clock"] = "While using the house editor, show a clock on the top of the screen.\n\nIt also tracks the time you spent in house editor.";
 L["Time Spent In Editor"] = "Time Spent In Editor";
 L["This Session Colon"] = "This Session: ";
+L["Time Spent Total Colon"] = "Total: ";
 L["Right Click Show Settings"] = "Right click to show settings.";
 L["Plumber Clock"] = "Plumber Clock";
 L["Clock Type"] = "Clock Type";
@@ -739,7 +747,7 @@ L["Clock Type Digital"] = "Digital";
 
 --CatalogExtendedSearch
 L["ModuleName Housing_CatalogSearch"] = "Decor Catalog: Extend Search Results";
-L["ModuleDescription Housing_CatalogSearch"] = "Enhances the search box on the Decor Catalog and Storage Tab, allowing you to find items by achievement, vendor, zone, or currency.";
+L["ModuleDescription Housing_CatalogSearch"] = "Enhances the search box on the Decor Catalog and Storage Tab, allowing you to find items by achievement, vendor, zone, or currency.\n\nShows the number of matches next to the category.";
 L["Match Sources"] = "Match Sources";
 
 
