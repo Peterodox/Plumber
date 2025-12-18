@@ -726,8 +726,8 @@ L["Instruction Show Less Info"] = "<Alt 키를 눌러 정보 줄이기>";
 
 
 --Housing Clock
-L["ModuleName Housing_Clock"] = "시계 & 메세지 알림";
-L["ModuleDescription Housing_Clock"] = "하우징 편집기 사용 중 화면 상단에 시계를 표시하고, 채팅 메세지를 받으면 알려줍니다.";
+L["ModuleName Housing_Clock"] = "편집기: 시계";
+L["ModuleDescription Housing_Clock"] = "하우징 편집기 사용 중 화면 상단에 시계를 표시합니다.";
 L["Time Spent In Editor"] = "편집기 사용 시간";
 L["This Session Colon"] = "이번 세션: ";
 L["Right Click Show Settings"] = "우클릭으로 설정을 엽니다.";
@@ -736,9 +736,16 @@ L["Clock Type"] = "시계 유형";
 L["Clock Type Analog"] = "아날로그";
 L["Clock Type Digital"] = "디지털";
 
+
 --CatalogExtendedSearch
+L["ModuleName Housing_CatalogSearch"] = "장식 카탈로그: 검색 결과 확장";
+L["ModuleDescription Housing_CatalogSearch"] = "장식 목록과 창고 탭의 검색창을 강화하여 업적, 판매자, 지역 또는 화폐로 아이템을 검색할 수 있습니다.";
 L["Match Sources"] = "출처 일치";
 
+
+--SourceAchievementLink
+L["ModuleName SourceAchievementLink"] = "상호작용 가능한 출처 정보";
+L["ModuleDescription SourceAchievementLink"] = "다음 UI의 업적 이름이 상호작용 가능해져 세부 정보 확인 또는 추적이 가능합니다.\n\n- 탈것 사전\n\n- 장식 카탈로그";
 
 
 --Generic
