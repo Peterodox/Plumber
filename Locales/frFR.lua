@@ -72,8 +72,8 @@ L["KW ActionBar"] = "Barres d'action";
 L["KW Console"] = "Contrôleur de jeu"; -- à revoir
 
 --Filter Sort Method
-L["SortMethod 1"] = "Nom";          --Ordre alphabétique
-L["SortMethod 2"] = "Date d'ajout"; --Les nouveautés en premier
+L["SortMethod 1"] = "Nom";  --Alphabetical Order
+L["SortMethod 2"] = "Date d'ajout";  --New on the top
 
 
 --Module Categories
@@ -84,7 +84,7 @@ L["Module Category General"] = "Général";
 --- order: 2
 L["Module Category NPC Interaction"] = "Interaction avec les PNJ";
 --- order: 3
-L["Module Category Tooltip"] = "infobulle";   --Additional Info on Tooltips
+L["Module Category Tooltip"] = "Infobulle";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "Classe";   --Player Class (rogue, paladin...)
 --- order: 5
@@ -100,7 +100,7 @@ L["Module Category Plumber"] = "Plumber";   --This addon's name
 
 --Deprecated
 L["Module Category Dreamseeds"] = "Graines oniriques";     --Added in patch 10.2.0
-L["Module Category AzerothianArchives"] = "Archives d'Azeroth";     --Added in patch 10.2.5
+L["Module Category AzerothianArchives"] = "Archives d’Azeroth";     --Added in patch 10.2.5
 
 
 --AutoJoinEvents
@@ -570,7 +570,7 @@ L["QuickSlot Error 3"] = "Emplacement rapide : un contrôleur avec la même clé
 L["PlumberMacro Drive"] = "Macro V.R.O.U.M. de Plumber";
 L["PlumberMacro Drawer"] = "Macro Plumber";
 L["PlumberMacro Housing"] = "Macro Logis de Plumber";
--- L["PlumberMacro Torch"] = "Plumber Torch Macro"; -- à traduire
+L["PlumberMacro Torch"] = "Macro Torche de Plumber";
 L["PlumberMacro DrawerFlag Combat"] = "La macro sera mise à jour après avoir quitté le combat.";
 L["PlumberMacro DrawerFlag Stuck"] = "Une erreur s'est produite lors de la mise à jour de la macro.";
 L["PlumberMacro Error Combat"] = "Indisponible en combat";
@@ -725,6 +725,29 @@ L["Instruction Show More Info"] = "<Appuyez sur Alt pour afficher plus d'informa
 L["Instruction Show Less Info"] = "<Appuyez sur Alt pour afficher moins d'informations>";
 
 
+--Housing Clock
+L["ModuleName Housing_Clock"] = "Éditeur : Horloge";
+L["ModuleDescription Housing_Clock"] = "Lors de l'utilisation de l'éditeur de maison, afficher une horloge en haut de l'écran.";
+L["Time Spent In Editor"] = "Temps passé dans l'éditeur";
+L["This Session Colon"] = "Cette session : ";
+L["Right Click Show Settings"] = "Clic droit pour afficher les paramètres.";
+L["Plumber Clock"] = "Horloge de Plumber";
+L["Clock Type"] = "Type d'horloge";
+L["Clock Type Analog"] = "Analogique";
+L["Clock Type Digital"] = "Numérique";
+
+
+--CatalogExtendedSearch
+L["ModuleName Housing_CatalogSearch"] = "Catalogue de décoration : Élargir les résultats de recherche";
+L["ModuleDescription Housing_CatalogSearch"] = "Améliorer la zone de recherche des onglets Catalogue de décoration et Stockage, vous permettant de trouver des objets par haut fait, vendeur, zone ou monnaie.";
+L["Match Sources"] = "Correspondance des sources";
+
+
+--SourceAchievementLink
+L["ModuleName SourceAchievementLink"] = "Informations sur la source interactive";
+L["ModuleDescription SourceAchievementLink"] = "Rend la plupart des noms de haut fait de l'interface cliquables, vous permettant ainsi de consulter leurs détails ou de suivre leur progression.\n\n- Catalogue de décorations\n\n- Journal des montures";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total :";
 L["Reposition Button Horizontal"] = "Déplacer horizontalement";   --Move the window horizontally
@@ -745,6 +768,7 @@ L["InstructionFormat Ctrl Left Click"] = "Ctrl + Clic gauche pour %s";
 L["InstructionFormat Ctrl Right Click"] = "Ctrl + Clic droit pour %s";
 L["InstructionFormat Alt Left Click"] = "Alt + Clic gauche pour %s";
 L["InstructionFormat Alt Right Click"] = "Alt + Clic droite pour %s";
+L["Close Frame Format"]= "|cff808080(Fermer %s)|r";
 
 
 --Plumber AddOn Settings
@@ -814,7 +838,7 @@ L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Héroïque";
 L["Upgrade Track 6"] = "Mythique";
 
-L["Match Pattern Transmog Set Partially Known"] = "^Comprend (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+L["Match Pattern Transmog Set Partially Known"] = "^Comprend (%d+) non collectées";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
 L["DyeColorNameAbbr Black"] = "Noire";
 L["DyeColorNameAbbr Blue"] = "Bleue";
