@@ -451,6 +451,10 @@ L["SoftTargetName QuestObjective Tooltip"] = "在名字下方显示任务目标�
 L["SoftTargetName QuestObjective Alert"] = "此功能需要你前往游戏选项> 辅助功能> 综合，并勾选|cffffffff动作瞄准提示信息|r。";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "包括NPC";
 L["SoftTargetName ShowNPC Tooltip"] = "若禁用此选项，我们将只显示可互动物体（Game Objects）的名字。";
+L["SoftTargetName HideIcon"] = "隐藏交互图标";
+L["SoftTargetName HideIcon Tooltip"] = "在房屋区域内不显示交互图标和环形施法条。";
+L["SoftTargetName HideName"] = "隐藏物体名字";
+L["SoftTargetName HideName Tooltip"] = "在房屋区域内不显示物体名字。"
 
 
 --LegionRemix
@@ -691,13 +695,16 @@ L["ModuleName TooltipDyeDeez"] = "鼠标提示：染料颜料";
 L["ModuleDescription TooltipDyeDeez"] = "在颜料的鼠标提示上显示其可制作的颜色名称。";
 L["Instruction Show More Info"] = "<按Alt键显示更多信息>";
 L["Instruction Show Less Info"] = "<按Alt键显示更少信息>";
+L["ModuleName Housing_ItemAcquiredAlert"] = "装饰品收集通知";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "允许你左键点击装饰品收集通知来预览其模型。";
 
 
 --Housing Clock
 L["ModuleName Housing_Clock"] = "编辑器：时钟";
-L["ModuleDescription Housing_Clock"] = "在使用房屋编辑器时，在屏幕上方显示一个时钟。";
+L["ModuleDescription Housing_Clock"] = "在使用房屋编辑器时，在屏幕上方显示一个时钟。\n\n记录你使用编辑器的时长。";
 L["Time Spent In Editor"] = "已使用编辑器时长";
 L["This Session Colon"] = "本次登录期间：";
+L["Time Spent Total Colon"] = "总计时间：";
 L["Right Click Show Settings"] = "右键单击以打开设置。";
 L["Plumber Clock"] = "Plumber时钟";
 L["Clock Type"] = "时钟类型";
@@ -707,7 +714,7 @@ L["Clock Type Digital"] = "数字时钟";
 
 --CatalogExtendedSearch
 L["ModuleName Housing_CatalogSearch"] = "装饰品: 搜索结果拓展";
-L["ModuleDescription Housing_CatalogSearch"] = "拓展装饰品搜索结果，允许你通过搜索成就、商人、区域或是所需货币来找到相关装饰品。";
+L["ModuleDescription Housing_CatalogSearch"] = "拓展装饰品搜索结果，允许你通过搜索成就、商人、区域或是所需货币来找到相关装饰品。\n\n在装饰品类别右侧显示搜索结果数量。";
 L["Match Sources"] = "Match Sources";
 
 
