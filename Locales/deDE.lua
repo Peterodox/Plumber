@@ -9,6 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber Addon";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Erweiterungszusammenfassung umschalten";    --Show/hide Expansion Summary UI
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Auf das nächste Quest fokussieren";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Auf das vorherige Quest fokussieren";
 
 
 --Module Control Panel
@@ -21,7 +23,7 @@ L["Quick Slot Layout"] = "Anordnung";
 L["Quick Slot Layout Linear"] = "Linear";
 L["Quick Slot Layout Radial"] = "Radial";
 L["Restriction Combat"] = "Funktioniert nicht im Kampf";    --Indicate a feature can only work when out of combat
-L["Map Pin Change Size Method"] = "\n\n*Ihr könnt die Größe der Kartenmarkierung unter \"Weltkarte> Kartenfilter> Plumber\" ändern.";
+L["Map Pin Change Size Method"] = "\n\n*Ihr könnt die Größe der Kartenmarkierung unter \'Weltkarte> Kartenfilter> Plumber\' ändern.";
 L["Toggle Plumber UI"] = "Plumber Anzeige umschalten";
 L["Toggle Plumber UI Tooltip"] = "Zeigt die folgenden Bedienelemente im Bearbeitungsmodus für das Plumber AddOn an:\n%s\n\nDiese Checkbox steuert nur Sichtbarkeit der Elemente im Bearbeitungsmodus. Sie aktiviert oder deaktiviert die einzelnen Module nicht.";
 L["Remove New Feature Marker"] = "Keine Neuen Features Hervorheben";
@@ -68,6 +70,7 @@ L["KW LegionRemix"] = "Legion Remix";
 L["KW Housing"] = "Spieler Behausung Haus";
 L["KW Combat"] = "Kampfhandlungen";
 L["KW ActionBar"] = "Aktionsleisten";
+L["KW Console"] = "Konsolen-/Gamepad-Controller";
 
 
 --Filter Sort Method
@@ -128,7 +131,7 @@ L["Track Upgrade Currency Tooltip"] = "Die höchste Wappen-Stufe, die Ihr verdie
 L["Track Holiday Item"] = "Feiertagswährung verfolgen";    --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Aktuell angeheftet:";    --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Leiste in der Tasche";    --Put the bar inside the bag UI (below money/currency)
-L["Bar Inside The Bag Tooltip"] = "Platziert die Leiste innerhalb des Taschen-Interface.\n\nFunktioniert nur, wenn die \"getrennte Taschen\" Option aktiv ist.";
+L["Bar Inside The Bag Tooltip"] = "Platziert die Leiste innerhalb des Taschen-Interface.\n\nFunktioniert nur, wenn die \'getrennte Taschen\' Option aktiv ist.";
 L["Catalyst Charges"] = "Katalysator-Aufladungen";
 
 
@@ -177,7 +180,7 @@ L["ModuleDescription BlizzFixEventToast"] = "Verhindert, dass Mausklicks durch E
 
 --Talking Head
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Sprechender Kopf";
-L["ModuleDescription TalkingHead"] = "Ersetzt das \"Sprechender Kopf\" Fenster durch eine saubere, kopflose Version.";
+L["ModuleDescription TalkingHead"] = "Ersetzt das \'Sprechender Kopf\' Fenster durch eine Version mit nur Text.";
 L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Sofortiger Text";    --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Textumrandung";    --Added a stroke/outline to the letter
@@ -266,7 +269,7 @@ L["Instruction Show In Quest Log"] = "<Strg + Klick, um den Questlog anzuzeigen>
 
 --Transmog Ensembles
 L["ModuleName TooltipTransmogEnsemble"] = "Vorlagen-Ensembles";
-L["ModuleDescription TooltipTransmogEnsemble"] = "- Zeigt die Anzahl von nicht gesammelten Vorlagen an, welche Bestandteil eines Ensembles sind.\n\n- Behebt den Fehler, wenn der Tooltip eines Ensembles \"Bereits bekannt\" anzeigt, aber in Wahrheit immer noch ein paar unbekannte Vorlagen enthält.";
+L["ModuleDescription TooltipTransmogEnsemble"] = "- Zeigt die Anzahl von nicht gesammelten Vorlagen an, welche Bestandteil eines Ensembles sind.\n\n- Behebt den Fehler, wenn der Tooltip eines Ensembles \'Bereits bekannt\' anzeigt, aber in Wahrheit immer noch ein paar unbekannte Vorlagen enthält.";
 L["Collected Appearances"] = "Gesammelte Vorlagen";
 L["Collected Items"] = "Gesammelte Gegenstände";
 
@@ -304,7 +307,7 @@ L["QueueStatus Show Time Tooltip"] = "Zeigt die Differenz zwischen der durchschn
 
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = WAR_WITHIN_LANDING_PAGE_TITLE or "Khaz Algar Zusammenfassung";
-L["ModuleDescription ExpansionLandingPage"] = "Zeigt zusätzliche Informationen auf der Zusammenfassungsseite an:\n\n- Paragon-Fortschritt\n\n- Stufe der \"Durchtrennten Fäden\" Pakte\n\n- Ansehen bei Kartellen von Lorenhall";
+L["ModuleDescription ExpansionLandingPage"] = "Zeigt zusätzliche Informationen auf der Zusammenfassungsseite an:\n\n- Paragon-Fortschritt\n\n- Stufe der \'Durchtrennten Fäden\' Pakte\n\n- Ansehen bei Kartellen von Lorenhall";
 L["Instruction Track Reputation"] = "<Umschaltklick, um diesen Ruf zu verfolgen>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Umschaltklick, um die Verfolgung zu beenden>";
 L["Error Show UI In Combat"] = "Ihr könnt dieses Fenster im Kampf nicht aufrufen.";
@@ -328,7 +331,7 @@ L["Item Level Format"] = ITEM_LEVEL or "Gegenstandsstufe %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
 L["Delves Reputation Name"] = "Reise des Tiefenforschers";
 L["ModuleName Delves_SeasonProgress"] = "Tiefen: Reise des Tiefenforschers";
-L["ModuleDescription Delves_SeasonProgress"] = "Zeigt einen Fortschrittsbalken oben auf dem Bildschirm an, wenn Ihr \"Reise des Tiefenforschers\"-Punkte erhaltet.";
+L["ModuleDescription Delves_SeasonProgress"] = "Zeigt einen Fortschrittsbalken oben auf dem Bildschirm an, wenn Ihr \'Reise des Tiefenforschers\'-Punkte erhaltet.";
 L["ModuleName Delves_Dashboard"] = "Tiefen: Wöchentliche Belohnung";
 L["ModuleDescription Delves_Dashboard"] = "Zeigt Ihren Fortschritt für die Große Schatzkammer und Vergoldete Schätze auf der Tiefen-Übersicht an.";
 L["ModuleName Delves_Automation"] = "Tiefen: Automatische Auswahl von Geliehener Macht";
@@ -368,13 +371,13 @@ L["Icon Colon"] = "Symbol: ";    --Display IconFileID
 
 --Chat Options
 L["ModuleName ChatOptions"] = "Chatkanal-Optionen";
-L["ModuleDescription ChatOptions"] = "Fügt dem Menü, das beim Rechtsklick auf den Kanalnamen im Chatfenster erscheint, Verlassen-Schaltflächen hinzu.";
+L["ModuleDescription ChatOptions"] = "Fügt dem Menü, das beim Rechtsklick auf den Kanalnamen im Chatfenster erscheint, eine \'Verlassen\'-Option hinzu.";
 L["Chat Leave"] = CHAT_LEAVE or "Verlassen";
 L["Chat Leave All Characters"] = "Auf allen Charakteren verlassen";
 L["Chat Leave All Characters Tooltip"] = "Ihr verlasst diesen Kanal automatisch, wenn Ihr euch mit einem Charakter anmeldet.";
 L["Chat Auto Leave Alert Format"] = "Möchtet Ihr |cffffc0c0[%s]|r mit all Euren Charakteren automatisch verlassen?";
 L["Chat Auto Leave Cancel Format"] = "Automatisches Verlassen für %s deaktiviert. Bitte verwendet den /join Chat-Befehl, um dem Kanal erneut beizutreten.";
-L["Auto Leave Channel Format"] = "Automatisch \"%s\" verlassen";
+L["Auto Leave Channel Format"] = "Automatisch \'%s\' verlassen";
 L["Click To Disable"] = "Klicken zum Deaktivieren";
 
 
@@ -385,7 +388,7 @@ L["ModuleDescription NameplateWidget"] = "Zeigt die Anzahl der vorhandenen Strah
 
 --PartyInviterInfo
 L["ModuleName PartyInviterInfo"] = "Gruppeneinladungs-Info";
-L["ModuleDescription PartyInviterInfo"] = "Zeigt das Level und die Klasse des Gruppenanführers an, wenn Ihr in eine Gruppe oder Gilde eingeladen werdet.";
+L["ModuleDescription PartyInviterInfo"] = "Zeigt den Level sowie die Klasse des Gruppenanführers an, wenn Ihr in eine Gruppe oder Gilde eingeladen werdet.";
 L["Additional Info"] = "Zusätzliche Info";
 L["Race"] = RACE or "Volk";
 L["Faction"] = FACTION or "Fraktion";
@@ -431,25 +434,25 @@ L["ModuleDescription BossBanner"] = "Verhindert, dass das spezielle Beutefenster
 L["BossBanner Hide When Solo"] = "Solo-Modus";
 L["BossBanner Hide When Solo Tooltip"] = "Das Beutefenster von Bossen wird ausgeblendet, wenn Ihr der einzige Spieler in der Gruppe seid.";
 L["BossBanner Valuable Item Only"] = "Nur Wertvolle Gegenstände";
-L["BossBanner Valuable Item Only Tooltip"] = "Das Beutefenster von Bossen wird nur angezeigt, wenn wertvolle Gegenstände involviert sind (Reittiere, Gegenstände mit der Qualität \"Sehr selten\" und \"Extrem selten\" etc.)";
+L["BossBanner Valuable Item Only Tooltip"] = "Das Beutefenster von Bossen wird nur angezeigt, wenn wertvolle Gegenstände involviert sind (Reittiere, Gegenstände mit der Qualität \'Sehr selten\' und \'Extrem selten\' etc.)";
 
 
 --AppearanceTab
 L["ModuleName AppearanceTab"] = "Vorlagen-Menü";
-L["ModuleDescription AppearanceTab"] = "Folgende Veränderungen werden am Vorlagen-Menü vorgenommen:\n\n- Die Anzahl an Gegenständen pro Seite wird reduziert (Voreinstellung ist 2x3, kann unter \"Filter\" geändert werden).\nDiese Maßnahme entlastet die Grafikkarte und kann eventuelle Programmabstürze verhindern, wenn das Menü geöffnet wird.\n\n- Das Add-on merkt sich die letzte Seite, welche Ihr im Vorlagen-Menü offen hattet. Beim nächsten Mal wird dieselbe Seite automatisch angezeigt.";
+L["ModuleDescription AppearanceTab"] = "Folgende Veränderungen werden am Vorlagen-Menü vorgenommen:\n\n- Die Anzahl an Gegenständen pro Seite wird reduziert (Voreinstellung ist 2x3, kann unter \'Filter\' geändert werden).\nDiese Maßnahme entlastet die Grafikkarte und kann eventuelle Programmabstürze verhindern, wenn das Menü geöffnet wird.\n\n- Das Add-on merkt sich die letzte Seite, welche Ihr im Vorlagen-Menü offen hattet. Beim nächsten Mal wird dieselbe Seite automatisch angezeigt.";
 
 
 --SoftTargetName
 L["ModuleName SoftTargetName"] = "Namensplakette: Soft Target";
 L["ModuleDescription SoftTargetName"] = "Zeigt den Namen des Ziels an, wenn man die Interaktionstaste benutzt.";
 L["SoftTargetName Req Title"] = "|cffd4641cDie folgenden Einstellungen müssen geändert werden, damit dieses Feature funktioniert:|r";
-L["SoftTargetName Req 1"] = "|cffffd100 Interaktionstaste aktivieren|r unter \"Optionen> Gameplay> Steuerung\".";
+L["SoftTargetName Req 1"] = "|cffffd100 Interaktionstaste aktivieren|r (Siehe \'Optionen> Gameplay> Steuerung\').";
 L["SoftTargetName Req 2"] = "Setze die CVar |cffffd100SoftTargetIconGameObject|r auf |cffffffff1|r";
 L["SoftTargetName CastBar"] = "Zauberbalken Anzeigen";
 L["SoftTargetName CastBar Tooltip"] = "Zeigt einen runden Zauberbalken zuzüglich zu dem Namen an.\n\n|cffff4800Das AddOn kann nicht anzeigen, welches Object das Ziel deines Zaubers ist.|r";
 L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "Questziele Anzeigen";
 L["SoftTargetName QuestObjective Tooltip"] = "Zeigt das Questziel an, falls es das Ziel betrifft.";
-L["SoftTargetName QuestObjective Alert"] = "Um diese Funktion nutzen zu können, müsst Ihr |cffffffffZieltooltip anzeigen|r unter \"Optionen> Zugänglichkeit> Allgemein\" aktivieren.";    --See globals: TARGET_TOOLTIP_OPTION
+L["SoftTargetName QuestObjective Alert"] = "Um diese Funktion nutzen zu können, müsst Ihr |cffffffffZieltooltip anzeigen|r unter \'Optionen> Zugänglichkeit> Allgemein\' aktivieren.";    --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "NPC-Namen";
 L["SoftTargetName ShowNPC Tooltip"] = "Wenn diese Funktion deaktiviert ist, wird der Name nur an interaktiven Objekten angezeigt.";
 
@@ -458,9 +461,9 @@ L["SoftTargetName ShowNPC Tooltip"] = "Wenn diese Funktion deaktiviert ist, wird
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Lerne Eigenschaften automatisch.\n\n- Zeige ein neues Steuerelement im Charakterinfo-Menü an, welches das Artefakt-Menü anzeigt.";
 L["ModuleName LegionRemix_HideWorldTier"] = "Weltstufe Heroisch Symbol";
-L["ModuleDescription LegionRemix_HideWorldTier"] = "Das \"Weltstufe Heroisch\" Symbol, welches unter der Minikarte positioniert ist, wird ausgeblendet.";
+L["ModuleDescription LegionRemix_HideWorldTier"] = "Das \'Weltstufe Heroisch\' Symbol, welches unter der Minikarte positioniert ist, wird ausgeblendet.";
 L["ModuleName LegionRemix_LFGSpam"] = "Schlachtzugsbrowser-Spam";
-L["ModuleDescription LegionRemix_LFGSpam"] = "Deaktiviert die vielen Nachrichten, welche durch das Benutzen der \"Schlachtzugsbrowser\" Option in Legion Remix entstehen. \n\nHier ein Beispiel:\n"..ERR_LFG_PROPOSAL_FAILED;
+L["ModuleDescription LegionRemix_LFGSpam"] = "Deaktiviert die vielen Nachrichten, welche durch das Benutzen der \'Schlachtzugsbrowser\' Option in Legion Remix entstehen. \n\nHier ein Beispiel:\n"..ERR_LFG_PROPOSAL_FAILED;
 L["Artifact Weapon"] = "Artefaktwaffe";
 L["Artifact Ability"] = "Artefakt-Fähigkeit";
 L["Artifact Traits"] = "Artefakt-Eigenschaften";
@@ -512,12 +515,12 @@ L["ModuleDescription PlayerPing"] = "Deine Position wird über einen Ping auf de
 
 --StaticPopup_Confirm
 L["ModuleName StaticPopup_Confirm"] = "Warnung für Nicht Zurückerstattbare Gegenstände";
-L["ModuleDescription StaticPopup_Confirm"] = "Ändert die Warnung, wenn man versucht, einen nicht zurückerstattbaren Gegenstand von einem NPC zu kaufen. (Der \"Ja\" Button wird kurzfristig deaktiviert).\n\nDiese Funktion halbiert außerdem die Wartezeit der Bestätigungsnachricht, wenn man versucht, den Katalysator zu benutzen.";
+L["ModuleDescription StaticPopup_Confirm"] = "Ändert die Warnung, wenn man versucht, einen nicht zurückerstattbaren Gegenstand von einem NPC zu kaufen. (Der \'Ja\' Button wird kurzfristig deaktiviert).\n\nDiese Funktion halbiert außerdem die Wartezeit der Bestätigungsnachricht, wenn man versucht, den Katalysator zu benutzen.";
 
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Beutefenster";
-L["ModuleDescription LootUI"] = "Ersetzt das standardmäßige Beutefenster und bietet einige optionale Funktionen:\n\n- Gegenstände schnell plündern.\n\n- Behebt den Schnell-Plündern Fehler.\n\n- Zeigt eine \"Alles plündern\"-Schaltfläche beim manuellen plündern an.";
+L["ModuleDescription LootUI"] = "Ersetzt das standardmäßige Beutefenster und bietet einige optionale Funktionen:\n\n- Gegenstände schnell plündern.\n\n- Behebt den Schnell-Plündern Fehler.\n\n- Zeigt eine \'Alles plündern\'-Schaltfläche beim manuellen plündern an.";
 L["Take All"] = "Alles plündern";    --Take all items from a loot window
 L["You Received"] = YOU_RECEIVED_LABEL or "Ihr erhielt";
 L["Reach Currency Cap"] = "Währungslimit erreicht";
@@ -549,7 +552,7 @@ L["LootUI Option Use Default UI Tooltip"] = "Verwendet das standardmäßige Beut
 L["LootUI Option Background Opacity"] = "Deckkraft";
 L["LootUI Option Background Opacity Tooltip"] = "Legt die Deckkraft des Hintergrunds im Beute- Benachrichtigungsmodus fest.\n\nDiese Option betrifft nicht den manuellen Plünder-Modus.";
 L["LootUI Option Custom Quality Color"] = "Individuelle Qualitätsfarben";
-L["LootUI Option Custom Quality Color Tooltip"] = "Die Gegenstände im Beutefenster werden die Farben für die Gegenstandsqualitäten benutzen, die unter \"Optionen> Zugänglichkeit> Farben\" definiert sind.";
+L["LootUI Option Custom Quality Color Tooltip"] = "Die Gegenstände im Beutefenster werden die Farben für die Gegenstandsqualitäten benutzen, die unter \'Optionen> Zugänglichkeit> Farben\' definiert sind.";
 L["LootUI Option Grow Direction"] = "Gegenstandslisten-Verhalten";
 L["LootUI Option Grow Direction Tooltip 1"] = "Wenn diese Funktion aktiviert ist, werden neue Gegenstände an oberster Stelle in der Liste angezeigt.";
 L["LootUI Option Grow Direction Tooltip 2"] = "Wenn diese Funktion deaktiviert ist, werden neue Gegenstände an unterster Stelle in der Liste angezeigt.";
@@ -563,8 +566,8 @@ L["LootUI Option Low Frame Strata Tooltip"] = "Wenn der Beute- Benachrichtigungs
 --Quick Slot For Third-party Dev
 L["Quickslot Module Info"] = "Modulinfo";
 L["QuickSlot Error 1"] = "Quick Slot: Ihr habt diesen Controller bereits hinzugefügt.";
-L["QuickSlot Error 2"] = "Quick Slot: Dem Controller fehlt \"%s\"";
-L["QuickSlot Error 3"] = "Quick Slot: Ein Controller mit demselben Schlüssel \"%s\" existiert bereits.";
+L["QuickSlot Error 2"] = "Quick Slot: Dem Controller fehlt \'%s\'";
+L["QuickSlot Error 3"] = "Quick Slot: Ein Controller mit demselben Schlüssel \'%s\' existiert bereits.";
 
 
 --Plumber Macro
@@ -586,7 +589,7 @@ L["Unsupported Action Type Format"] = "Nicht unterstützter Aktionstyp: %s";
 L["Drawer Add Action Format"] = "Füge |cffffffff%s|r zum Makro hinzu";
 L["Drawer Add Profession1"] = "Erster Beruf";
 L["Drawer Add Profession2"] = "Zweiter Beruf";
-L["Drawer Option Global Tooltip"] = "Diese Einstellung wird von allen Schubladen-Makros geteilt.";
+L["Drawer Option Global Tooltip"] = "Diese Einstellung wird von allen Schubladen-Makros übernommen.";
 L["Drawer Option CloseAfterClick"] = "Nach dem Anklicken schließen";
 L["Drawer Option CloseAfterClick Tooltip"] = "Schließt das Schubladen-Menü nach dem Klicken auf einen Button, unabhängig davon, ob die Aktion erfolgreich war oder nicht.";
 L["Drawer Option SingleRow"] = "Einzelne Reihe";
@@ -597,17 +600,17 @@ L["Drawer Option Hide Unusable Tooltip 2"] = "Verbrauchbare Gegenstände wie Tr�
 L["Drawer Option Update Frequently"] = "Häufig aktualisieren";
 L["Drawer Option Update Frequently Tooltip"] = "Der Zustand der Buttons wird bei jeder Änderung in Euren Taschen oder dem Zauberbuch aktualisiert. Diese Option kann den Leistungsbedarf Eurer Hardware leicht erhöhen.";
 L["ModuleName DrawerMacro"] = "Schubladen-Makro";
-L["ModuleDescription DrawerMacro"] = "Wenn Ihr |cffd7c0a3#plumber:drawer|r in ein leeres Makro schreibt, wird es zu einem Schubladen-Makro. Wenn man das Makro auswählt. Wird ein Feld angezeigt. Haltet die linke Maustaste gedrückt und verschiebt einen Gegenstand, Reittier, Spielzeug etc. in das Feld.";
+L["ModuleDescription DrawerMacro"] = "Wenn Ihr |cffd7c0a3#plumber:drawer|r in ein leeres Makro schreibt, wird es zu einem Schubladen-Makro. Wenn man daraufhin das Makro auswählt, wird ein Feld angezeigt.\nHaltet die linke Maustaste gedrückt und verschiebt einen Gegenstand, Reittier, Spielzeug etc. in das Feld. Das Objekt ist nun über das Schubladen-Menü des Makros auswählbar.";
 
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Erweiterungszusammenfassung";
-L["ModuleDescription NewExpansionLandingPage"] = "Ein Fenster, das Fraktionen, wöchentliche Aktivitäten und Raid-Lockouts anzeigt. Man öffnet es mit:\n\n- einem Klick auf das anklickbare Symbol der Erweiterungszusammenfassung an der Minimap\n\n- einer Taste, die man unter \"Optionen> Tastaturbelegung\" festlegen kann";
+L["ModuleDescription NewExpansionLandingPage"] = "Dies ist ein neues Menü, welches Informationen über die verschiedenen Fraktionen, wöchentlichen Aktivitäten und Schlachtzugs-Lockouts anzeigt.\n\nDas Menü kann mit einem Klick auf das Symbol an der Minimap angezeigt werden.\nDarüber hinaus gibt es einen Tastenkürzel, den man unter \'Optionen> Tastaturbelegung\' festlegen kann.";
 L["Reward Available"] = "Belohnung verfügbar";    --As brief as possible
 L["Paragon Reward Available"] = "Paragon-Belohnung verfügbar";
 L["Until Next Level Format"] = "%d bis zum nächsten Level";    --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d bis zur Paragon-Belohnung";
-L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Klicken, um Ruhm anzusehen>";
+L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Hier klicken, um Ruhm anzusehen>";
 L["Not On Quest"] = "Ihr befindet euch momentan nicht auf dieser Quest. ";
 L["Factions"] = "Fraktionen";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Aktivitäten";
@@ -657,7 +660,7 @@ L["Creature ID"] = "Kreaturen-ID";
 L["Edit"] = EDIT or "Bearbeiten";
 L["Delete"] = DELETE or "Löschen";
 L["Visit Quest Hub To Log Quests"] = "Sprich mit allen NPCs, welche täglich neue Quests anbieten, um alle neuen Quests für das AddOn zu registrieren.";
-L["Quest Hub Instruction Celestials"] = "Sprich mit dem Ruhmrüstmeister der \"Himmlischen Erhabenen\" im Tal der Ewigen Blüten, um herauszufinden, welcher Tempel heute deine Hilfe benötigt.";
+L["Quest Hub Instruction Celestials"] = "Sprich mit dem Ruhmrüstmeister der \'Himmlischen Erhabenen\' im Tal der Ewigen Blüten, um herauszufinden, welcher Tempel heute deine Hilfe benötigt.";
 L["Unavailable Klaxxi Paragons"] = "Nicht verfügbare Getreuen der Klaxxi:";
 L["Weekly Coffer Key Tooltip"] = "Die ersten vier Truhen, welche Ihr in der momentanen Woche erhaltet, beinhalten einen Restaurierten Kastenschlüssel.";
 L["Weekly Coffer Key Shards Tooltip"] = "Die ersten vier Truhen, welche Ihr in der momentanen Woche erhaltet, beinhalten Kastenschlüsselsplitter.";
@@ -687,6 +690,16 @@ L["Missing Appearances Format"] = "%d |4Vorlage:Vorlagen fehlen;";
 L["Press Key To Copy Format"] = "Zum Kopieren auf die |cffffd100%s|r-Taste drücken";
 
 
+--QuestWatchCycle
+L["ModuleName QuestWatchCycle"] = "Tastenkürzel: Auf ein Quest focussieren";
+L["ModuleDescription QuestWatchCycle"] = "Per Tastendruck kann man das vorherige oder nächste Quest im Questzielverfolgungs-Menü auswählen und verfolgen.\n\n|cffd4641cDas Tastenkürzel kann unter \'Optionen> Tastaturbelegung>Plumber Addon\' festgelegt werden.|r";
+
+
+--CraftSearchExtended
+L["ModuleName CraftSearchExtended"] = "Verbesserte Suchanfragen";
+L["ModuleDescription CraftSearchExtended"] = "Es werden mehr Ergebnisse für die folgenden Kategorien angezeigt:\n\n- Alchemie und  Inschriftenkunde: Es werden Rezepte für Dekorationspigmenten angezeigt, wenn man nach Farben sucht.";
+
+
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "Dekorationskatalog: Banane zum Vergleich anzeigen";    --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Eine Banane wird in in der Vorschau eines Dekorationsgegenstandes angezeigt. Sodurch kann man die Größe eines Gegenstandes in Relation sehen.\n\n- Ihr könnt außerdem noch den Kamerawinkel des Gegenstandes in der Vorschau via Linksklick verändern.";
@@ -694,16 +707,49 @@ L["ModuleDescription DecorModelScaleRef"] = "- Eine Banane wird in in der Vorsch
 
 --Player Housing
 L["ModuleName Housing_Macro"] = "Makros für Behausungen";
-L["ModuleDescription Housing_Macro"] = "Fügt |cffd7c0a3#plumber:home|r in ein leeres Makro hinzu. Dieses Makro kann daraufhin verwendet werden, um sich zu Eurer Behausung zu teleportieren.";
+L["ModuleDescription Housing_Macro"] = "Fügt |cffd7c0a3#plumber:home|r in ein leeres Makro hinzu. Dieses Makro kann daraufhin verwendet werden, um Euch zu einer Behausung zu teleportieren.";
 L["Teleport Home"] = "Nach Hause teleportieren";
 L["Instruction Drag To Action Bar"] = "<Anklicken und bei gedrückter Maustaste auf die Aktionsleiste ziehen>";
 L["Toggle Torch"] = "Fackel umschalten";
-L["ModuleName Housing_DecorHover"] = "Hauseditor: Name, Anzahl, Duplikation";
-L["ModuleDescription Housing_DecorHover"] = "Folgende Veränderungen werden am Dekorationsmodus vorgenommen:\n\n- Der Name einer Dekoration, sowie die Anzahl der zusätzlichen Kopien, werden beim Mouseover angezeigt.\n\n- Die momentan ausgewählte Dekoration kann via Strg/Alt + Linksklick \"dupliziert\" werden. Die Skalierung und Ausrichtung der ursprünglichen Dekoration wird dabei nicht beibehalten.";
+L["ModuleName Housing_DecorHover"] = "Hauseditor: 1 Dekorationsmodus";
+L["ModuleDescription Housing_DecorHover"] = "Folgende Veränderungen werden am Dekorationsmodus vorgenommen:\n\n- Zusätzliche Information werden beim Mouseover angezeigt (Name, Anzahl an Kopien, Kosten für die Platzierung).\n\n- Die momentan ausgewählte Dekoration kann via Strg/Alt + Linksklick \'dupliziert\' werden. Die Skalierung und Ausrichtung der ursprünglichen Dekoration wird dabei nicht beibehalten.";
 L["Duplicate"] = "Duplizieren";
-L["Duplicate Decor Key"] = "\"Duplizieren\" Tastaturkürzel";
-L["Enable Duplicate"] = " \"Duplizieren\" Funktion aktivieren";
+L["Duplicate Decor Key"] = "\'Duplizieren\' Tastaturkürzel";
+L["Enable Duplicate"] = "\'Duplizieren\' Funktion aktivieren";
 L["Enable Duplicate tooltip"] = "Im Dekorationsmodus kann eine platzierte Dekoration über einen Tastaturkürzel dupliziert werden.";
+L["ModuleName Housing_CustomizeMode"] = "Editor: 3 Anpassungsmodus";
+L["ModuleDescription Housing_CustomizeMode"] = "Folgende Veränderungen werden am Anpassungsmodus vorgenommen:\n\n- Die Farbe einer Dekoration kann auf eine andere angewendet werden, ohne dass man diese vorher extra auswählen muss.\n\n- Der Name des Farbstoffplatzes kann von der Indexnummer zum Namen der Farbe geändert werden.";
+L["Copy Dyes"] = "Kopieren";
+L["Dyes Copied"] = "Farbstoff kopiert";
+L["Apply Dyes"] = "Übernehmen";
+L["Preview Dyes"] = "Vorschau";
+L["ModuleName TooltipDyeDeez"] = "Tooltip: Farbstoff-Pigment";
+L["ModuleDescription TooltipDyeDeez"] = "Zeigt die Namen der Farbstoffe im Tooltip des Pigments an.";
+L["Instruction Show More Info"] = "<Alt-Taste drücken, um mehr Information anzuzeigen>";
+L["Instruction Show Less Info"] = "<Alt-Taste drücken, um weniger Information anzuzeigen>";
+
+
+--Housing Clock
+L["ModuleName Housing_Clock"] = "Editor: Uhr";
+L["ModuleDescription Housing_Clock"] = "Zeigt eine Uhr am oberen Bereich des Hauseditors an.";
+L["Time Spent In Editor"] = "Zeit im Editor Verbracht";
+L["This Session Colon"] = "Momentane Sitzung: ";
+L["Right Click Show Settings"] = "Rechtsklick, um die Einstellungen anzuzeigen.";
+L["Plumber Clock"] = "Plumber Uhr";
+L["Clock Type"] = "Darstellungsart";
+L["Clock Type Analog"] = "Analog";
+L["Clock Type Digital"] = "Digital";
+
+
+--CatalogExtendedSearch
+L["ModuleName Housing_CatalogSearch"] = "Dekorationskatalog: Mehr Suchergebnisse";
+L["ModuleDescription Housing_CatalogSearch"] = "Verbessert die Suchanfrage des Katalogs. Es werden jetzt nach Dekorationen anhand des Namens von Errungenschaften,  Händlern, Bereichen und Währungen angezeigt.";
+L["Match Sources"] = "Übereinstimmende Quellen";
+
+
+--SourceAchievementLink
+L["ModuleName SourceAchievementLink"] = "Interaktive Quelleninfo";
+L["ModuleDescription SourceAchievementLink"] = "Die meisten Errungenschaften können in den folgenden Menüs angeklickt und via Rechtsklick verfolgt werden:\n\n- Dekorationskatalog\n\n- Reittiere";
 
 
 --Generic
@@ -720,14 +766,21 @@ L["Level Maxed"] = "(Maximiert)";    --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Aktuell:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Ihr habt unbeanspruchte Belohnungen";
 L["Uncollected Set Counter Format"] = "Ihr habt |cffffffff%d|r unbekannte Vorlagen |4set:sets;.";
+L["InstructionFormat Left Click"] = "Linksklick um %s";
+L["InstructionFormat Right Click"] = "Rechtsklick um %s";
+L["InstructionFormat Ctrl Left Click"] = "Strg + Linksklick um %s";
+L["InstructionFormat Ctrl Right Click"] = "Strg + Rechtsklick um %s";
+L["InstructionFormat Alt Left Click"] = "Alt + Linksklick um %s";
+L["InstructionFormat Alt Right Click"] = "Alt + Rechtsklick um %s";
+L["Close Frame Format"] = "|cff808080(Schließen %s)|r";
 
 
 --Plumber AddOn Settings
 L["ModuleName EnableNewByDefault"] = "Neue Funktionen standardmäßig aktivieren";
 L["ModuleDescription EnableNewByDefault"] = "Neu hinzugefügte Funktionen standardmäßig aktivieren.\n\nIhr erhaltet eine Benachrichtigung im Chatfenster, wenn ein neues Modul auf diese Weise aktiviert wird.";
 L["New Feature Auto Enabled Format"] = "Neues Modul %s wurde aktiviert.";
-L["Click To See Details"] = "Klicken, um Details anzuzeigen";
-L["Click To Show Settings"] = "Klicken, um die Einstellungen anzuzeigen";
+L["Click To See Details"] = "Hier klicken, um Details anzuzeigen";
+L["Click To Show Settings"] = "Hier klicken, um die Einstellungen anzuzeigen";
 
 
 --WIP Merchant UI
@@ -777,11 +830,11 @@ L["Match Pattern Gold"] = "([%d%,]+) Gold";
 L["Match Pattern Silver"] = "([%d]+) Silber";
 L["Match Pattern Copper"] = "([%d]+) Kupfer";
 
-L["Match Pattern Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --See globalstring: FACTION_STANDING_INCREASED_ACCOUNT_WIDE
-L["Match Pattern Rep 2"] = "Euer Ruf bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";   --See globalstring: FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Pattern Rep 1"] = "Der Ruf der Kriegsmeute bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";    --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
+L["Match Pattern Rep 2"] = "Euer Ruf bei der Fraktion '(.+)' hat sich um ([%d%,]+) verbessert";    --FACTION_STANDING_INCREASED
 
 L["Match Pattern Item Level"] = "^Gegenstandsstufe (%d+)";
-L["Match Pattern Item Upgrade Tooltip"] = "^Aufwertungsgrad: (.+) (%d+)/(%d+)";   --See globalstring: ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Match Pattern Item Upgrade Tooltip"] = "^Aufwertungsgrad: (.+) (%d+)/(%d+)";    --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
 L["Upgrade Track 1"] = "Abenteurer";
 L["Upgrade Track 2"] = "Forscher";
 L["Upgrade Track 3"] = "Veteran";
@@ -789,7 +842,7 @@ L["Upgrade Track 4"] = "Champion";
 L["Upgrade Track 5"] = "Held";
 L["Upgrade Track 6"] = "Mythos";
 
-L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";   --See globalstring: TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
+L["Match Pattern Transmog Set Partially Known"] = "^Enthält (%d+) unbekannte";    --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
 L["DyeColorNameAbbr Black"] = "Schwarz";
 L["DyeColorNameAbbr Blue"] = "Blau";
