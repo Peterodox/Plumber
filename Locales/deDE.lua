@@ -455,6 +455,10 @@ L["SoftTargetName QuestObjective Tooltip"] = "Zeigt das Questziel an, falls es d
 L["SoftTargetName QuestObjective Alert"] = "Um diese Funktion nutzen zu können, müsst Ihr |cffffffffZieltooltip anzeigen|r unter \'Optionen> Zugänglichkeit> Allgemein\' aktivieren.";    --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "NPC-Namen";
 L["SoftTargetName ShowNPC Tooltip"] = "Wenn diese Funktion deaktiviert ist, wird der Name nur an interaktiven Objekten angezeigt.";
+L["SoftTargetName HideIcon"] = "Interaktionssymbol Ausblenden";
+L["SoftTargetName HideIcon Tooltip"] = "Das Symbol sowie der kreisförmige Zauberbalken werden nicht angezeigt, wenn der Interaktionsmodus aktiviert ist.";
+L["SoftTargetName HideName"] = "Interaktionsname Ausblenden";
+L["SoftTargetName HideName Tooltip"] = "Der Name eines Objektes wird nicht angezeigt, wenn der Interaktionsmodus aktiviert ist.";
 
 
 --LegionRemix
@@ -697,7 +701,7 @@ L["ModuleDescription QuestWatchCycle"] = "Per Tastendruck kann man das vorherige
 
 --CraftSearchExtended
 L["ModuleName CraftSearchExtended"] = "Verbesserte Suchanfragen";
-L["ModuleDescription CraftSearchExtended"] = "Es werden mehr Ergebnisse für die folgenden Kategorien angezeigt:\n\n- Alchemie und  Inschriftenkunde: Es werden Rezepte für Dekorationspigmenten angezeigt, wenn man nach Farben sucht.";
+L["ModuleDescription CraftSearchExtended"] = "Es werden mehr Ergebnisse für die folgenden Kategorien angezeigt:\n\n- Alchemie und Inschriftenkunde: Es werden Rezepte für Dekorationspigmenten angezeigt, wenn man nach Farben sucht.";
 
 
 --DecorModelScaleRef
@@ -727,13 +731,16 @@ L["ModuleName TooltipDyeDeez"] = "Tooltip: Farbstoff-Pigment";
 L["ModuleDescription TooltipDyeDeez"] = "Zeigt die Namen der Farbstoffe im Tooltip des Pigments an.";
 L["Instruction Show More Info"] = "<Alt-Taste drücken, um mehr Information anzuzeigen>";
 L["Instruction Show Less Info"] = "<Alt-Taste drücken, um weniger Information anzuzeigen>";
+L["ModuleName Housing_ItemAcquiredAlert"] = "Neue Dekoration Hinweis - Vorschau";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "Diese Funktion erlaubt es, auf den Hinweis einer neu erhaltenen Dekoration zu linksklicken. Dadurch wird eine Vorschau des Dekorationsmodells angezeigt.";
 
 
 --Housing Clock
 L["ModuleName Housing_Clock"] = "Editor: Uhr";
-L["ModuleDescription Housing_Clock"] = "Zeigt eine Uhr am oberen Bereich des Hauseditors an.";
-L["Time Spent In Editor"] = "Zeit im Editor Verbracht";
+L["ModuleDescription Housing_Clock"] = "Zeigt eine Uhr am oberen Bereich des Hauseditors an.\n\nEs wird außerdem angezeigt, wie lange man sich im Hauseditor-Menü aufhält.";
+L["Time Spent In Editor"] = "Zeit im Hauseditor Verbracht";
 L["This Session Colon"] = "Momentane Sitzung: ";
+L["Time Spent Total Colon"] = "Insgesamt: ";
 L["Right Click Show Settings"] = "Rechtsklick, um die Einstellungen anzuzeigen.";
 L["Plumber Clock"] = "Plumber Uhr";
 L["Clock Type"] = "Darstellungsart";
@@ -743,7 +750,7 @@ L["Clock Type Digital"] = "Digital";
 
 --CatalogExtendedSearch
 L["ModuleName Housing_CatalogSearch"] = "Dekorationskatalog: Mehr Suchergebnisse";
-L["ModuleDescription Housing_CatalogSearch"] = "Verbessert die Suchanfrage des Katalogs. Es werden jetzt nach Dekorationen anhand des Namens von Errungenschaften,  Händlern, Bereichen und Währungen angezeigt.";
+L["ModuleDescription Housing_CatalogSearch"] = "Verbessert die Suchanfrage des Katalogs. Es werden jetzt nach Dekorationen anhand des Namens von Errungenschaften, Händlern, Bereichen und Währungen angezeigt.\n\nDie Anzahl der Suchtreffer wird neben dem Kategorienamen angezeigt.";
 L["Match Sources"] = "Übereinstimmende Quellen";
 
 
