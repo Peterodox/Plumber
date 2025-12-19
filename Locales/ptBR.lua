@@ -9,6 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Abre o sumário de Expansão do Plumber";   --Show/hide Expansion Summary UI
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Concentrar na próxima missão";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Concentrar na missão anterior";
 
 
 --Module Control Panel
@@ -67,6 +69,7 @@ L["KW LegionRemix"] = "Legion Remix";
 L["KW Housing"] = "Moradia";
 L["KW Combat"] = "Combate";
 L["KW ActionBar"] = "Barras de ação";
+L["KW Console"] = "Gamepad";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Nome";  --Alphabetical Order
@@ -312,13 +315,6 @@ L["ModuleDescription LandingPageSwitch"] = "Acesse relatórios de missão de Gua
 L["Mission Complete Count Format"] = "%d Prontos para completar";
 L["Open Mission Report Tooltip"] = "Clique com o botão direito para abrir relatórios de missão.";
 
---QueueStatus
-L["ModuleName QueueStatus"] = "Status da fila";
-L["ModuleDescription QueueStatus"] = "Adiciona uma barra de progresso ao olho do Localizador de Grupos que mostra a porcentagem de companheiros de equipes encontrados. Tanques e Curandeiros pesam mais.\n\n(Opcional) Mostra a diferença entre o tempo médio de espera e o seu tempo na fila.";
-L["QueueStatus Show Time"] = "Exibit tempo";
-L["QueueStatus Show Time Tooltip"] = "Mostra a diferença entre o tempo médio de espera e o seu tempo na fila.";
-
-
 
 --WorldMapPin_TWW (Show Pins On Continent Map)
 L["ModuleName WorldMapPin_TWW"] = "Marcador de Mapa: "..(EXPANSION_NAME10 or "The War Within");
@@ -448,13 +444,18 @@ L["ModuleDescription SoftTargetName"] = "Exibe o nome do ícone de interação d
 L["SoftTargetName Req Title"] = "|cffd4641cVocê precisa mudar manualmente essas configurações para que funcione:|r";
 L["SoftTargetName Req 1"] = "|cffffd100Ativar a tecla de interação|r em Opções do jogo > Jogabilidade > Controles.";
 L["SoftTargetName Req 2"] = "Definir CVar |cffffd100SoftTargetIconGameObject|r como |cffffffff1|r";
-L["SoftTargetName CastBar"] = "Exibir barra de conjuração";
-L["SoftTargetName CastBar Tooltip"] = "Exibir uma barra radial de conjuração na placa de identificação.\n\n|cffff4800O addon não será capaz de te dizer qual objeto é o seu alvo.|r";
+L["SoftTargetName CastBar"] = "Exibir barra de interação";
+L["SoftTargetName CastBar Tooltip"] = "Exibe uma barra radial de progresso durante interações com objetos.\n\n|cffff4800O addon não será capaz de te dizer qual objeto é o seu alvo.|r";
 L["SoftTargetName QuestObjective"] = QUEST_LOG_SHOW_OBJECTIVES or "Exibir objetivos de missão";
 L["SoftTargetName QuestObjective Tooltip"] = "Exibir objetivos de missão (se houver algum) embaixo do nome.";
 L["SoftTargetName QuestObjective Alert"] = "Esse recurso requer que você habilite |cffffffffmostrar dica de alvo|r nas Opções do jogo > Accessibilidade > Geral.";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "Incluir NPC";
 L["SoftTargetName ShowNPC Tooltip"] = "Se desabilitado, o nome aparecerá apenas em objetos interativos.";
+L["SoftTargetName HideIcon"] = "Esconder ícone de interação";
+L["SoftTargetName HideIcon Tooltip"] = "Esconde o ícone de interação e a barra de conjuração radial quando você estiver numa casa.";
+L["SoftTargetName HideName"] = "Esconder nome de objeto";
+L["SoftTargetName HideName Tooltip"] = "Esconde o nome do objeto do ícone de interação quando você estiver numa casa.";
+
 
 
 --LegionRemix
@@ -680,6 +681,7 @@ L["ModuleName InstanceDifficulty"] = "Dificuldade da instância";
 L["ModuleDescription InstanceDifficulty"] = "- Mostra um seletor de dificuldade quando você está numa entrada de masmorra ou raide.\n\n- Mostra a dificuldade atual e informações do vínculo de raide no topo da tela quando você entra em uma instância.";
 L["Cannot Change Difficulty"] = "A dificuldade da instância não pode ser alterada neste momento.";
 
+
 --TransmogChatCommand
 L["ModuleName TransmogChatCommand"] = "Comando de chat de transmog";
 L["ModuleDescription TransmogChatCommand"] = "- Quando usar um comando de chat de transmog, remove as roupas do seu personagem primeiro para que itens antigos não sejam atribuídos ao novo conjunto.\n\n- Quando estiver no transmogrificador, usar um comando de chat carrega automaticamente todos os itens disponíveis para a interface de transmog.";
@@ -687,6 +689,7 @@ L["Copy To Clipboard"] = "Copiar para área de transferência";
 L["Copy Current Outfit Tooltip"] = "Copia a roupa atual para compartilhar online.";
 L["Missing Appearances Format"] = "%d |4aparência:aparências; faltando";
 L["Press Key To Copy Format"] = "Aperte |cffffd100%s|r para copiar";
+
 
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Atalhos do teclado: Focar na missão";
@@ -725,6 +728,8 @@ L["ModuleName TooltipDyeDeez"] = "Dica: Pigmentos de tinta";
 L["ModuleDescription TooltipDyeDeez"] = "Exibe o nome da cor dos pigmentos na dica de ferramenta de corantes.";
 L["Instruction Show More Info"] = "<Alt+cliq. para exibir mais informações>";
 L["Instruction Show Less Info"] = "<Alt+cliq. para exibir menos informações>";
+L["ModuleName Housing_ItemAcquiredAlert"] = "Alerta de decoração coletada";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permite que você clique com o botão esquerdo no aviso de decoração coletada para visualizar seu modelo.";
 
 
 --Housing Clock
@@ -732,6 +737,7 @@ L["ModuleName Housing_Clock"] = "Editor: Relógio";
 L["ModuleDescription Housing_Clock"] = "Quando estiver no modo de edição, exibe um relógio no topo da tela.";
 L["Time Spent In Editor"] = "Tempo gasto no editor";
 L["This Session Colon"] = "Essa sessão: ";
+L["Time Spent Total Colon"] = "Total: ";
 L["Right Click Show Settings"] = "Cliq. direito para exibir as configurações.";
 L["Plumber Clock"] = "Relógio do Plumber";
 L["Clock Type"] = "Tipo de Relógio";
@@ -770,6 +776,8 @@ L["InstructionFormat Ctrl Left Click"] = "Ctrl+Cliq. esquerdo para %s";
 L["InstructionFormat Ctrl Right Click"] = "Ctrl+Cliq. direito para %s";
 L["InstructionFormat Alt Left Click"] = "Alt+Cliq. esquerdo para %s";
 L["InstructionFormat Alt Right Click"] = "Alt+Cliq. direito para %s";
+L["Close Frame Format"]= "|cff808080(Fechar %s)|r";
+
 
 --Plumber AddOn Settings
 L["ModuleName EnableNewByDefault"] = "Sempre ativar novos recursos";
