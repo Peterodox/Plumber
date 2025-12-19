@@ -451,6 +451,11 @@ L["SoftTargetName QuestObjective Tooltip"] = "이름 아래에 퀘스트 목표(
 L["SoftTargetName QuestObjective Alert"] = "이 기능을 사용하려면 게임 설정 > 손쉬운 사용 > 일반에서 |cffffffff대상 표시 툴팁|r 옵션을 활성화해야 합니다.";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "NPC 포함";
 L["SoftTargetName ShowNPC Tooltip"] = "비활성화하면 이름은 상호작용 가능한 게임 오브젝트에만 표시됩니다.";
+L["SoftTargetName HideIcon"] = "상호작용 아이콘 숨기기";
+L["SoftTargetName HideIcon Tooltip"] = "내부에 있을 때 상호작용 아이콘과 원형 시전 바를 숨깁니다.";
+L["SoftTargetName HideName"] = "오브젝트 이름 숨기기";
+L["SoftTargetName HideName Tooltip"] = "내부에 있을 때 오브젝트 이름을 숨깁니다."
+
 
 
 --LegionRemix
@@ -723,13 +728,16 @@ L["ModuleName TooltipDyeDeez"] = "툴팁: 염료 색상";
 L["ModuleDescription TooltipDyeDeez"] = "아이템 툴팁에 염료 색상 이름을 표시합니다.";
 L["Instruction Show More Info"] = "<Alt 키를 눌러 추가 정보 보기>";
 L["Instruction Show Less Info"] = "<Alt 키를 눌러 정보 줄이기>";
+L["ModuleName Housing_ItemAcquiredAlert"] = "장식 수집 알림";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "‘장식 수집’ 알림을 왼쪽 클릭해서 해당 장식의 모델을 미리 볼 수 있습니다.";
 
 
 --Housing Clock
 L["ModuleName Housing_Clock"] = "편집기: 시계";
-L["ModuleDescription Housing_Clock"] = "하우징 편집기 사용 중 화면 상단에 시계를 표시합니다.";
+L["ModuleDescription Housing_Clock"] = "하우징 편집기 사용 중 화면 상단에 시계를 표시합니다.\n\n편집기에서 보낸 시간도 추적합니다.";
 L["Time Spent In Editor"] = "편집기 사용 시간";
 L["This Session Colon"] = "이번 세션: ";
+L["Time Spent Total Colon"] = "총 시간: ";
 L["Right Click Show Settings"] = "우클릭으로 설정을 엽니다.";
 L["Plumber Clock"] = "Plumber 시계";
 L["Clock Type"] = "시계 유형";
@@ -739,7 +747,7 @@ L["Clock Type Digital"] = "디지털";
 
 --CatalogExtendedSearch
 L["ModuleName Housing_CatalogSearch"] = "장식 카탈로그: 검색 결과 확장";
-L["ModuleDescription Housing_CatalogSearch"] = "장식 목록과 창고 탭의 검색창을 강화하여 업적, 판매자, 지역 또는 화폐로 아이템을 검색할 수 있습니다.";
+L["ModuleDescription Housing_CatalogSearch"] = "장식 목록과 창고 탭의 검색창을 강화하여 업적, 판매자, 지역 또는 화폐로 아이템을 검색할 수 있습니다.\n\n카테고리 옆에 일치하는 항목의 수를 표시합니다.";
 L["Match Sources"] = "출처 일치";
 
 
