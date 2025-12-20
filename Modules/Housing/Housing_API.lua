@@ -63,6 +63,14 @@ do  --Basic
             return info and info.sourceText
         end
     end
+
+    function Housing.GetDecorItemID(decorID)
+        local info = GetCatalogEntryInfoByRecordID(1, decorID, false);
+        if info and info.itemID then
+            return info.itemID
+        end
+        return Housing.Database.DecorItem[decorID]
+    end
 end
 
 

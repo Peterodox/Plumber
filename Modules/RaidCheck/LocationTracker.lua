@@ -59,7 +59,7 @@ EL.extraPins = {
     --[uimapID] = { {position = {x = 0, y = 0}, journalInstanceID = 0} }
 
     [42] = {
-        {position = {x = 0.46691, y = 0.70226}, journalInstanceID = 745},    --Karazhan Side Entrance
+        {position = {x = 0.46691, y = 0.70226}, journalInstanceID = 860},    --Karazhan Side Entrance (Return to Karazhan, the dungeon) Main Entrance is the old raid
     },
 
     [55] = {

@@ -715,7 +715,7 @@ L["Clock Type Digital"] = "数字时钟";
 --CatalogExtendedSearch
 L["ModuleName Housing_CatalogSearch"] = "装饰品: 搜索结果拓展";
 L["ModuleDescription Housing_CatalogSearch"] = "拓展装饰品搜索结果，允许你通过搜索成就、商人、区域或是所需货币来找到相关装饰品。\n\n在装饰品类别右侧显示搜索结果数量。";
-L["Match Sources"] = "Match Sources";
+L["Match Sources"] = "匹配来源";
 
 
 --SourceAchievementLink

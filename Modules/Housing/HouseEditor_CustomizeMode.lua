@@ -87,10 +87,7 @@ do
     local function DyeSlotFrameSwatch_OnClick(self, button)
         if IsModifiedClick("CHATLINK") and self.dyeColorInfo and self.dyeColorInfo.itemID then
             --local link = string.format("|cffffffff|H:item:%d:0:|h[%s]|h|r", self.dyeColorInfo.itemID, self.dyeColorInfo.name);
-            local _, link = C_Item.GetItemInfo(self.dyeColorInfo.itemID)
-            if ChatEdit_InsertLink(link) then
-
-            end
+            API.ChatLinkItem(self.dyeColorInfo.itemID);
         end
     end
 
@@ -103,6 +100,10 @@ do
                 dyeSlotFrame.Label:SetSpacing(2);
                 dyeSlotFrame.Label:SetHeight(32);
                 dyeSlotFrame.Label:SetText(dyeSlotFrame.CurrentSwatch.dyeColorInfo.name);
+                local itemID = dyeSlotFrame.dyeSlotInfo.itemID;
+                if itemID then
+                    C_Item.GetItemInfo(itemID);
+                end
             end
 
             if not dyeSlotFrame.hookedByPlumber then

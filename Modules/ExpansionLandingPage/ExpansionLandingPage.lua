@@ -9,10 +9,14 @@ local IS_MOP = addon.IS_MOP;
 local MainFrame;
 
 
+local Def = {
+    TabButtonHeight = 32,
+    TabButtonTextOffset = 10,
+};
+
+
 local CreateTabButton;
 do  --TabButtonMixin
-    local TEXT_OFFSET = 10;
-    local BUTTON_HEIGHT = 32;
     local TabButtonMixin = {};
 
     function TabButtonMixin:OnClick()
@@ -60,21 +64,21 @@ do  --TabButtonMixin
     end
 
     function TabButtonMixin:OnMouseDown()
-        self.Name:SetPoint("LEFT", self, "LEFT", self.leftOffset or TEXT_OFFSET, -1);
+        self.Name:SetPoint("LEFT", self, "LEFT", self.leftOffset or Def.TabButtonTextOffset, -1);
     end
 
     function TabButtonMixin:OnMouseUp()
-        self.Name:SetPoint("LEFT", self, "LEFT", self.leftOffset or TEXT_OFFSET, 0);
+        self.Name:SetPoint("LEFT", self, "LEFT", self.leftOffset or Def.TabButtonTextOffset, 0);
     end
 
     function TabButtonMixin:SetName(name)
         self.Name:SetText(name);
-        local width = self.Name:GetWrappedWidth() + 2 * TEXT_OFFSET;
-        if width < BUTTON_HEIGHT then
-            self.leftOffset = 0.5 * (BUTTON_HEIGHT - width);
-            width = BUTTON_HEIGHT;
+        local width = self.Name:GetWrappedWidth() + 2 * Def.TabButtonTextOffset;
+        if width < Def.TabButtonHeight then
+            self.leftOffset = 0.5 * (Def.TabButtonHeight - width);
+            width = Def.TabButtonHeight;
         else
-            self.leftOffset = TEXT_OFFSET;
+            self.leftOffset = Def.TabButtonTextOffset;
         end
         self.Name:SetPoint("LEFT", self, "LEFT", self.leftOffset, 0);
         self:SetWidth(width);
@@ -103,10 +107,10 @@ do  --TabButtonMixin
         button:SetScript("OnLeave", button.OnLeave);
         button:SetScript("OnMouseDown", button.OnMouseDown);
         button:SetScript("OnMouseUp", button.OnMouseUp);
-        button:SetSize(BUTTON_HEIGHT, BUTTON_HEIGHT);
+        button:SetSize(Def.TabButtonHeight, Def.TabButtonHeight);
 
         button.Name = button:CreateFontString(nil, "OVERLAY", "PlumberFont_16");
-        button.Name:SetPoint("LEFT", button, "LEFT", TEXT_OFFSET, 0);
+        button.Name:SetPoint("LEFT", button, "LEFT", Def.TabButtonTextOffset, 0);
         button.Name:SetAlpha(0.9);
 
         button.GreenDot = button:CreateTexture(nil, "OVERLAY");
@@ -115,6 +119,69 @@ do  --TabButtonMixin
         button.GreenDot:Hide();
         button.GreenDot:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/AlertFrame", nil, nil, "TRILINEAR");
         button.GreenDot:SetTexCoord(0/512, 32/512, 0/512, 32/512);
+
+        return button
+    end
+end
+
+
+local CreateExpansionSelectButton
+do  --Expansion Select
+    local ExpansionSelectButtonMixin = {};
+
+    function ExpansionSelectButtonMixin:OnMouseDown()
+        self.Name:SetPoint("RIGHT", self, "RIGHT", -Def.TabButtonTextOffset, -1);
+    end
+
+    function ExpansionSelectButtonMixin:OnMouseUp()
+        self.Name:SetPoint("RIGHT", self, "RIGHT", -Def.TabButtonTextOffset, 0);
+    end
+
+    function ExpansionSelectButtonMixin:OnClick()
+
+    end
+
+    function ExpansionSelectButtonMixin:OnEnter()
+        self:SetAlpha(1);
+        self.Name:SetTextColor(1, 1, 1);
+    end
+
+    function ExpansionSelectButtonMixin:OnLeave()
+        self:SetAlpha(0.9);
+        self.Name:SetTextColor(1, 0.82, 0);
+    end
+
+    function ExpansionSelectButtonMixin:Refresh()
+        local expansionID = 10;
+        self.Name:SetText(_G["EXPANSION_NAME"..expansionID]);
+        local width = math.floor(math.max(self.Name:GetWrappedWidth() + self.extraWidth, Def.TabButtonHeight));
+        self:SetWidth(width);
+
+        local numOptions = 1;
+        self:SetShown(numOptions > 1);
+    end
+
+    function CreateExpansionSelectButton(parent)
+        local button = CreateFrame("Button", nil, parent);
+        API.Mixin(button, ExpansionSelectButtonMixin);
+        button:SetScript("OnClick", button.OnClick);
+        button:SetScript("OnEnter", button.OnEnter);
+        button:SetScript("OnLeave", button.OnLeave);
+        button:SetScript("OnMouseDown", button.OnMouseDown);
+        button:SetScript("OnMouseUp", button.OnMouseUp);
+        button:SetSize(Def.TabButtonHeight, Def.TabButtonHeight);
+        button:SetAlpha(0.9);
+
+        button.Name = button:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        button.Name:SetPoint("RIGHT", button, "RIGHT", -Def.TabButtonTextOffset, 0);
+
+        button.Arrow = button:CreateTexture(nil, "OVERLAY");
+        button.Arrow:SetSize(18, 18);
+        button.Arrow:SetPoint("RIGHT", button.Name, "LEFT", 0, 0);
+        button.Arrow:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga", nil, nil, "TRILINEAR");
+        button.Arrow:SetTexCoord(0, 48/512, 208/512, 256/512);
+
+        button.extraWidth = Def.TabButtonTextOffset + 18;
 
         return button
     end
@@ -208,6 +275,7 @@ do
 
         local button;
         local buttonWidth;
+        local offsetY = -12;
         local totalWidth = 46;
         local buttonContainer = self.RightSection.Header;
 
@@ -221,7 +289,7 @@ do
             button.notificationGetter = tabInfo.notificationGetter;
             buttonWidth = API.Round(button:SetName(tabInfo.name));
             button:ClearAllPoints();
-            button:SetPoint("LEFT", buttonContainer, "LEFT", totalWidth, -12);
+            button:SetPoint("LEFT", buttonContainer, "LEFT", totalWidth, offsetY);
             totalWidth = totalWidth + buttonWidth + 0;
         end
 
@@ -234,6 +302,11 @@ do
             self:UpdateTabs();
         end
         buttonContainer:SetScript("OnMouseWheel", Header_OnMouseWheel);
+
+
+        local ExpansionSelectButton = CreateExpansionSelectButton(buttonContainer);
+        ExpansionSelectButton:SetPoint("RIGHT", buttonContainer, "RIGHT", -48, offsetY);
+        ExpansionSelectButton:Refresh();
     end
 
     function PlumberExpansionLandingPageMixin:UpdateTabButtons()

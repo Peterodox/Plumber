@@ -1,6 +1,6 @@
 --Reserved space below so all localization files line up
 -- Traductions françaises : Zazou89, KatyPurry et Klep-Ysondre
-if not (GetLocale() == "frFR") then return end;
+if not (GetLocale() == "frFR") then return end
 
 local _, addon = ...
 local L = addon.L;
@@ -729,7 +729,7 @@ L["ModuleDescription TooltipDyeDeez"] = "Affiche le nom des couleurs de teinture
 L["Instruction Show More Info"] = "<Appuyez sur Alt pour afficher plus d'informations>";
 L["Instruction Show Less Info"] = "<Appuyez sur Alt pour afficher moins d'informations>";
 L["ModuleName Housing_ItemAcquiredAlert"] = "Alerte Décoration collectée";
-L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permet de cliquer avec le bouton gauche sur l'alerte « Décoration collectée » pour prévisualiser son modèle.;
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permet de cliquer avec le bouton gauche sur l'alerte « Décoration collectée » pour prévisualiser son modèle.";
 
 
 --Housing Clock

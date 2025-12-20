@@ -680,6 +680,10 @@ L["List Is Empty"] = "The list is empty.";
 L["ModuleName InstanceDifficulty"] = "Instance Difficulty";
 L["ModuleDescription InstanceDifficulty"] = "- Show a Difficulty Selector when you are at the entrance of a raid or dungeon.\n\n- Show the current difficulty and lockout info at the top of the screen when you enter an instance.";
 L["Cannot Change Difficulty"] = "Instance difficulty cannot be changed at this time.";
+L["Cannot Reset Instance"] = "You cannot reset instances at this time.";
+L["Difficulty Not Accurate"] = "Difficulty is inaccurate because you are not the party leader";
+L["Instruction Click To Open Adventure Guide"] = "Left-Click: |cffffffffOpen Adventure Guide|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt Right-Click: |cffffffffReset all instances|r";
 
 
 --TransmogChatCommand
@@ -702,7 +706,7 @@ L["ModuleDescription CraftSearchExtended"] = "Shows more results when searching 
 
 
 --DecorModelScaleRef
-L["ModuleName DecorModelScaleRef"] = "Decor Catalog: Banana For Scale"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
+L["ModuleName DecorModelScaleRef"] = "Decor Preview: Banana For Scale"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Add a size reference (a banana) to the decor preview window, allowing you to gauge the size of the objects.\n\n- Also allow you to change the camera pitch by holding down the Left Button and moving vertically.";
 
 
@@ -746,8 +750,8 @@ L["Clock Type Digital"] = "Digital";
 
 
 --CatalogExtendedSearch
-L["ModuleName Housing_CatalogSearch"] = "Decor Catalog: Extend Search Results";
-L["ModuleDescription Housing_CatalogSearch"] = "Enhances the search box on the Decor Catalog and Storage Tab, allowing you to find items by achievement, vendor, zone, or currency.\n\nShows the number of matches next to the category.";
+L["ModuleName Housing_CatalogSearch"] = "Decor Catalog";
+L["ModuleDescription Housing_CatalogSearch"] = "- Enhances the search box on the Decor Catalog and Storage Tab, allowing you to find items by achievement, vendor, zone, or currency.\n\n- Shows the number of matches next to the category.\n\n- Allows you to link decor in chat.";
 L["Match Sources"] = "Match Sources";
 
 

@@ -1672,6 +1672,27 @@ do  -- Chat Message
         return false
     end
     API.SearchChatHistory = SearchChatHistory;
+
+
+    function API.ChatInsertLink(link)
+        if ChatEdit_InsertLink then
+            return ChatEdit_InsertLink(link)
+        elseif ChatFrameUtil and ChatFrameUtil.InsertLink then
+            return ChatFrameUtil.InsertLink(link)
+        end
+    end
+
+    function API.ChatLinkItem(itemID, itemLink)
+        if not itemLink then
+            itemLink = select(2, C_Item.GetItemInfo(itemID));
+        end
+
+        if ChatEdit_LinkItem then
+            return ChatEdit_LinkItem(itemID, itemLink)
+        elseif ChatFrameUtil and ChatFrameUtil.LinkItem then
+            return ChatFrameUtil.LinkItem(itemID, itemLink)
+        end
+    end
 end
 
 do  -- Cursor Position
@@ -2194,10 +2215,7 @@ do  -- System
         if InCombatLockdown() then return false end;
 
         if IsModifiedClick("CHATLINK") then
-            if ( ChatEdit_InsertLink(link) ) then
-                return true
-            elseif SocialPostFrame and Social_IsShown() then
-                Social_InsertLink(link);
+            if API.ChatInsertLink(link) then
                 return true
             end
         end
@@ -4285,7 +4303,7 @@ do  -- FocusSolver (Run something when being hovered long enough)
 
     function FocusSolverMixin:OnUpdate(elapsed)
         self.t = self.t + elapsed;
-        if self.t > 0.05 then
+        if self.t > self.delay then
             self.t = nil;
             self:SetScript("OnUpdate", nil);
             if self:IsObjectFocused() then

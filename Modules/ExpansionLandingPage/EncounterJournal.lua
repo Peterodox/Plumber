@@ -274,13 +274,7 @@ do
 		if ( IsModifiedClick("CHATLINK") ) then
 			local achievementLink = GetAchievementLink(self.achievementID);
 			if achievementLink then
-				local handled = ChatEdit_InsertLink(achievementLink);
-				if ( not handled and SocialPostFrame and Social_IsShown() ) then
-                    handled = true;
-					Social_InsertLink(achievementLink);
-				end
-
-                if handled then
+                if API.ChatInsertLink(achievementLink) then
                     return
                 end
 			end
