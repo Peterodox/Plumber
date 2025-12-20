@@ -450,7 +450,12 @@ L["SoftTargetName QuestObjective"] = "Afficher les objectifs de quête";
 L["SoftTargetName QuestObjective Tooltip"] = "Affiche les objectifs de quête (le cas échéant) sous le nom.";
 L["SoftTargetName QuestObjective Alert"] = "Cette fonctionnalité nécessite d'activer |cffffffffAfficher la bulle d'aide de la cible|r dans Options du jeu > Accessibilité > Général.";
 L["SoftTargetName ShowNPC"] = "Inclure les PNJ";
-L["SoftTargetName ShowNPC Tooltip"] = "Si cette option est désactivée, le nom n'apparaîtra que sur les objets interactifs.";
+L["SoftTargetName ShowNPC Tooltip"] = "Si cette option est désactivée, le nom n'apparaîtra que sur les objets de jeu interactifs.";
+L["SoftTargetName HideIcon"] = "Masquer l'icône d'interaction";
+L["SoftTargetName HideIcon Tooltip"] = "Masquer l'icône d'interaction et la barre de lancement radiale lorsque vous êtes dans une maison.";
+L["SoftTargetName HideName"] = "Masquer le nom de l'objet";
+L["SoftTargetName HideName Tooltip"] = "Masquer le nom de l'objet cible lorsque vous êtes dans une maison."
+
 
 
 --LegionRemix
@@ -723,6 +728,8 @@ L["ModuleName TooltipDyeDeez"] = "Infobulle : Pigment de teinture";
 L["ModuleDescription TooltipDyeDeez"] = "Affiche le nom des couleurs de teinture dans l'infobulle des pigments de logis.";
 L["Instruction Show More Info"] = "<Appuyez sur Alt pour afficher plus d'informations>";
 L["Instruction Show Less Info"] = "<Appuyez sur Alt pour afficher moins d'informations>";
+L["ModuleName Housing_ItemAcquiredAlert"] = "Alerte Décoration collectée";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permet de cliquer avec le bouton gauche sur l'alerte « Décoration collectée » pour prévisualiser son modèle.;
 
 
 --Housing Clock
@@ -730,6 +737,7 @@ L["ModuleName Housing_Clock"] = "Éditeur : Horloge";
 L["ModuleDescription Housing_Clock"] = "Lors de l'utilisation de l'éditeur de maison, afficher une horloge en haut de l'écran.";
 L["Time Spent In Editor"] = "Temps passé dans l'éditeur";
 L["This Session Colon"] = "Cette session : ";
+L["Time Spent Total Colon"] = "Total : ";
 L["Right Click Show Settings"] = "Clic droit pour afficher les paramètres.";
 L["Plumber Clock"] = "Horloge de Plumber";
 L["Clock Type"] = "Type d'horloge";
@@ -813,7 +821,7 @@ L["Devourer Attack"] = "Attaque de dévoreur";
 L["Restored Coffer Key"] = "Clé de coffret réparée";
 L["Coffer Key Shard"] = "Fragment de clé de coffre";
 L["Epoch Mementos"] = "Souvenir d'époque";     --See currency:3293
-L["Timeless Scrolls"] = "Parchemin intemporel";
+L["Timeless Scrolls"] = "Parchemin intemporel"; --item: 217605
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Souhaitez-vous vraiment échanger %s contre l'objet suivant ?\n\n|cffff2020Votre achat ne pourra pas être remboursé.|r\n %s";
 
