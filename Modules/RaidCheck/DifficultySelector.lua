@@ -401,7 +401,7 @@ do  --SelectorUI
         TitleButton:OnLoad();
         TitleButton:SetPoint("CENTER", Title, "CENTER", 0, 0);
         TitleButton:SetSize(32, 24);
-        TitleButton:SetHitRectInsets(0, 0, -4, 0);
+        TitleButton:SetHitRectInsets(0, 0, -8, 0);
 
 
         local InaccuracyAlert = OpaqueFrame:CreateFontString(nil, "OVERLAY");

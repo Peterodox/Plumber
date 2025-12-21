@@ -1683,6 +1683,18 @@ do  -- Chat Message
     end
 
     function API.ChatLinkItem(itemID, itemLink)
+        if not itemID then return end;
+        if not itemLink then
+            itemLink = select(2, C_Item.GetItemInfo(itemID));
+        end
+
+        if itemLink then
+            return API.ChatInsertLink(itemLink)
+        end
+    end
+
+    function API.ChatForceLinkItem(itemID, itemLink)
+        --This set chat box focus
         if not itemLink then
             itemLink = select(2, C_Item.GetItemInfo(itemID));
         end
@@ -3669,24 +3681,43 @@ do  -- Container Item Processor
 end
 
 do  -- Chat Message
-    local ADDON_ICON = "|TInterface\\AddOns\\Plumber\\Art\\Logo\\PlumberLogo32:0:0|t";
+    local CM = {};
+    CM.iconMarkup = "|TInterface\\AddOns\\Plumber\\Art\\Logo\\PlumberLogo32:0:0|t";
+    CM.errorCounter = 0;
+    CM.errorTime = 0;
+
     local function PrintMessage(msg)
         if not msg then
             msg = "";
         end
-        print(ADDON_ICON.." |cffb8c8d1Plumber:|r "..msg);
+        print(CM.iconMarkup.." |cffb8c8d1Plumber:|r "..msg);
     end
     API.PrintMessage = PrintMessage;
 
     function API.DisplayErrorMessage(msg)
         if not msg then return end;
         local messageType = 0;
-        UIErrorsFrame:TryDisplayMessage(messageType, (ADDON_ICON.." |cffb8c8d1Plumber:|r ")..msg, RED_FONT_COLOR:GetRGB());
+        UIErrorsFrame:TryDisplayMessage(messageType, (CM.iconMarkup.." |cffb8c8d1Plumber:|r ")..msg, RED_FONT_COLOR:GetRGB());
     end
 
     function API.CheckAndDisplayErrorIfInCombat()
         if InCombatLockdown() then
-            API.DisplayErrorMessage(L["Error Show UI In Combat"]);
+            local timeStamp = GetTime();
+            if timeStamp > CM.errorTime + 2 then
+                CM.errorCounter = 0;
+            else
+                CM.errorCounter = CM.errorCounter + 1;
+            end
+            CM.errorTime = timeStamp;
+
+            if CM.errorCounter < 2 then
+                API.DisplayErrorMessage(L["Error Show UI In Combat"]);
+            elseif CM.errorCounter < 4 then
+                API.DisplayErrorMessage(L["Error Show UI In Combat 1"]);
+            elseif CM.errorCounter < 5 then
+                API.DisplayErrorMessage(L["Error Show UI In Combat 2"]);
+            end
+
             return true
         else
             return false

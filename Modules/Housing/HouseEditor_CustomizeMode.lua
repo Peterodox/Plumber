@@ -26,6 +26,25 @@ Instructions.IsModifierPressed = IsControlKeyDown;
 
 local CustomizeModeCallbacks = {};
 do
+    local function IsDyeRecipeTracked(dyeColorID)
+        local recipeID = Housing.GetDyeRecipeID(dyeColorID);
+        if recipeID then
+            local isRecraft = false;
+            local tracked = C_TradeSkillUI.IsRecipeTracked(recipeID, isRecraft);
+            return tracked, recipeID
+        end
+    end
+
+    local function ToggleTrackingDyeRecipe(dyeColorID)
+        local tracked, recipeID = IsDyeRecipeTracked(dyeColorID);
+        if recipeID then
+            local newState = not tracked;
+            local isRecraft = false;
+            C_TradeSkillUI.SetRecipeTracked(recipeID, newState, isRecraft);
+            return newState
+        end
+    end
+
     local function CreateTooltipLineWithSwatch(text, dyeSlots, numSlots)
         tsort(dyeSlots, SortFunc_DyeSlots);
         local line = text.." ";
@@ -84,12 +103,75 @@ do
         end
     end
 
-    local function DyeSlotFrameSwatch_OnClick(self, button)
-        if IsModifiedClick("CHATLINK") and self.dyeColorInfo and self.dyeColorInfo.itemID then
-            --local link = string.format("|cffffffff|H:item:%d:0:|h[%s]|h|r", self.dyeColorInfo.itemID, self.dyeColorInfo.name);
-            API.ChatLinkItem(self.dyeColorInfo.itemID);
+
+    local function DyeSlotFrameSwatch_OnEnter(self) --Hook
+        if self.dyeColorInfo then
+            local itemID = self.dyeColorInfo and self.dyeColorInfo.itemID;
+            if itemID then
+                C_Item.GetItemInfo(itemID);
+
+                local dyeColorID = self.dyeColorInfo.ID;
+                if dyeColorID and ContentTrackingUtil.IsContentTrackingEnabled() and GameTooltip:GetOwner() == self then
+                    if IsDyeRecipeTracked(dyeColorID) then
+                        local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-untracked", 16, 16, -3, 0);
+                        GameTooltip_AddColoredLine(GameTooltip, atlasMarkup..CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
+                    else
+                        local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-tracked", 16, 16, -3, 0);
+                        GameTooltip_AddInstructionLine(GameTooltip, atlasMarkup..CONTENT_TRACKING_TRACKABLE_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
+                    end
+                    GameTooltip:Show();
+                end
+            end
         end
     end
+
+    local function DyeSlotFrameSwatch_OnClick(self, button) --Override
+        if Handler:IsEnabled() then
+            local itemID = self.dyeColorInfo and self.dyeColorInfo.itemID;
+            if itemID then
+                if IsModifiedClick("CHATLINK") then
+                    if API.ChatLinkItem(self.dyeColorInfo.itemID) then
+                        return
+                    end
+                end
+            end
+
+            if IsModifiedClick("QUESTWATCHTOGGLE") and self.dyeColorInfo and self.dyeColorInfo.ID then
+                local tracked = ToggleTrackingDyeRecipe(self.dyeColorInfo.ID);
+                if tracked ~= nil then
+                    if tracked == true then
+                        PlaySound(SOUNDKIT.CONTENT_TRACKING_START_TRACKING);
+                    else
+                        PlaySound(SOUNDKIT.CONTENT_TRACKING_STOP_TRACKING);
+                    end
+
+                    if self:IsMouseMotionFocus() then
+                        self:OnEnter();
+                        DyeSlotFrameSwatch_OnEnter(self);
+                    end
+                end
+                return
+            end
+
+
+            --Click the same button to close popup
+            local pane = Handler.DyePane;
+            if pane and Handler.DyePopout and Handler.DyePopout:IsShown() and pane.dyeSlotFramesByChannel and pane.currentChannel and pane.dyeSlotFramesByChannel[pane.currentChannel] == self:GetParent() then
+                Handler.DyePopout:Hide();
+                self:UpdateSelected(false)
+                return
+            end
+        end
+
+        if self.onClickCallback then
+            self.onClickCallback(self);
+
+            if not self.isCurrentSwatch then
+                PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_SELECT);
+            end
+        end
+    end
+
 
     function CustomizeModeCallbacks.DyePaneSetDecorInfo(self, decorInstanceInfo)
         if not Handler:IsEnabled() then return end;
@@ -108,7 +190,9 @@ do
 
             if not dyeSlotFrame.hookedByPlumber then
                 dyeSlotFrame.hookedByPlumber = true;
-                dyeSlotFrame.CurrentSwatch:HookScript("OnClick", DyeSlotFrameSwatch_OnClick);
+                --dyeSlotFrame.CurrentSwatch:HookScript("OnClick", DyeSlotFrameSwatch_OnClick);
+                dyeSlotFrame.CurrentSwatch:SetScript("OnClick", DyeSlotFrameSwatch_OnClick);
+                dyeSlotFrame.CurrentSwatch:HookScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
             end
         end
     end

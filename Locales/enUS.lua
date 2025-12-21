@@ -307,6 +307,8 @@ L["ModuleDescription ExpansionLandingPage"] = "Display extra info on the landing
 L["Instruction Track Reputation"] = "<Shift click to track this reputation>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
 L["Error Show UI In Combat"] = "You cannot toggle this UI while in combat.";
+L["Error Show UI In Combat 1"] = "You really cannot toggle this UI while in combat.";
+L["Error Show UI In Combat 2"] = "PLEASE STOP";
 
 
 --Landing Page Switch

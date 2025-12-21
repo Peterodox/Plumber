@@ -379,6 +379,113 @@ do  --Dye
         },
     };
 
+    local DyeRecipes = {
+        --[dyeColorID] = recipeID
+        --For Dye Station
+
+        nil,
+        nil,
+        1277207,
+        1277205,
+        1277209,
+        1277200,
+        1277215,
+        1277204,
+        1277201,
+        1277208,
+        1277206,
+        1277210,
+        1265116,
+        1265114,
+        1265119,
+        1265120,
+        1265115,
+        1265112,
+        1265117,
+        1264760,
+        1265113,
+        1265111,
+        1265091,
+        1264720,
+        1264719,
+        1264715,
+        1265106,
+        1264722,
+        1265084,
+        1264713,
+        1264885,
+        1264938,
+        1264886,
+        1265078,
+        1265079,
+        1265085,
+        1264725,
+        1264955,
+        1264891,
+        1265086,
+        1265087,
+        1264940,
+        1265080,
+        1265098,
+        1264894,
+        1264717,
+        1265107,
+        1265109,
+        1265121,
+        1265088,
+        1264942,
+        1264944,
+        1265081,
+        1265089,
+        1264945,
+        1264895,
+        1265082,
+        1265101,
+        1264914,
+        1264950,
+        1265122,
+        1265094,
+        1264889,
+        1265097,
+    };
+
+
+    local function Debug_SaveDyeRecipes()
+        --Use at Dye Station
+        local tbl = {};
+        local dyeColorXItem = {};
+
+        local ownedColorsOnly = false;
+        for _, dyeColorID in ipairs(C_DyeColor.GetAllDyeColors(ownedColorsOnly)) do
+            local info = C_DyeColor.GetDyeColorInfo(dyeColorID);
+            if info and info.itemID then
+                dyeColorXItem[info.itemID] = dyeColorID;
+            else
+                print("Missing Dye:", dyeColorID);
+            end
+        end
+
+        for _, recipeID in ipairs(C_TradeSkillUI.GetFilteredRecipeIDs()) do
+            local outputInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipeID);
+            local itemID = outputInfo and outputInfo.itemID;
+            if itemID then
+                local dyeColorID = dyeColorXItem[itemID];
+                if dyeColorID then
+                    tbl[dyeColorID] = recipeID;
+                else
+                    print("Cannot find item for dye:", dyeColorID);
+                end
+            else
+                print("Missing recipe:", recipeID);
+            end
+        end
+
+        PlumberDevData = PlumberDevData or {};
+        PlumberDevData.DyeRecipes = tbl;
+    end
+    --_G.Plumber_SaveDyeRecipes = Debug_SaveDyeRecipes;
+
+
     function Housing.GetDyesByPigmentItemID(itemID)
         if PigmentData[itemID] then
             if not PigmentNameSorted[itemID] then
@@ -415,5 +522,9 @@ do  --Dye
             end
         end
         return DyePigmentNames[dyeColorID]
+    end
+
+    function Housing.GetDyeRecipeID(dyeColorID)
+        return dyeColorID and DyeRecipes[dyeColorID]
     end
 end

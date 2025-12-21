@@ -327,7 +327,7 @@ local function ModifyContextMenu()
                 rootDescription:CreateSpacer();
 
                 local function OnClick()
-                    API.ChatLinkItem(itemID);
+                    API.ChatForceLinkItem(itemID);
                 end
 
                 local button1 = rootDescription:CreateButton(GUILD_NEWS_LINK_ITEM, OnClick);
@@ -384,8 +384,7 @@ do
             if IsInStorageView() then return end;
 
             local itemID = Housing.GetDecorItemID(catalogEntry.entryInfo.entryID.recordID);
-            local itemLink = itemID and select(2, C_Item.GetItemInfo(itemID));
-            if itemLink and API.ChatInsertLink(itemLink) then
+            if API.ChatLinkItem(itemID) then
                 return
             end
 
