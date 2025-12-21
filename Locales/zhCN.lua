@@ -307,6 +307,8 @@ L["ModuleDescription ExpansionLandingPage"] = "在概要界面上显示额外信
 L["Instruction Track Reputation"] = "<按住Shift点击追踪此声望>";
 L["Instruction Untrack Reputation"] = "<按住Shift点击停止追踪>";
 L["Error Show UI In Combat"] = "无法在战斗中打开或关闭此界面。";
+L["Error Show UI In Combat 1"] = "真的无法在战斗中打开或关闭此界面。";
+L["Error Show UI In Combat 2"] = "请不要再点啦";
 
 
 --Landing Page Switch
@@ -644,9 +646,14 @@ L["List Is Empty"] = "暂无可显示内容";
 
 
 --RaidCheck
-L["ModuleName InstanceDifficulty"] = "副本难度";
+L["ModuleName InstanceDifficulty"] = "副本难度选择器";
 L["ModuleDescription InstanceDifficulty"] = "- 在副本门口外显示难度选择界面\n\n- 当你进入副本时，在屏幕上方显示当前副本难度和进度。";
 L["Cannot Change Difficulty"] = "你暂时无法更改副本难度。";
+L["Cannot Reset Instance"] = "你暂时无法重置副本。";
+L["Difficulty Not Accurate"] = "无法准确显示难度，因为你不是队长";
+L["Instruction Click To Open Adventure Guide"] = "左键单击：|cffffffff打开冒险指南|r";
+L["Instruction Alt Click To Reset Instance"] = "按住Alt并右键单击：|cffffffff重置所有副本|r";
+L["Instruction Link Progress In Chat"] = "<按住Shift点击将副本进度链接到聊天框内>";
 
 
 --TransmogChatCommand

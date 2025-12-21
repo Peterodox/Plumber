@@ -679,13 +679,14 @@ L["List Is Empty"] = "The list is empty.";
 
 
 --RaidCheck
-L["ModuleName InstanceDifficulty"] = "Instance Difficulty";
+L["ModuleName InstanceDifficulty"] = "Instance Difficulty Selector";
 L["ModuleDescription InstanceDifficulty"] = "- Show a Difficulty Selector when you are at the entrance of a raid or dungeon.\n\n- Show the current difficulty and lockout info at the top of the screen when you enter an instance.";
 L["Cannot Change Difficulty"] = "Instance difficulty cannot be changed at this time.";
 L["Cannot Reset Instance"] = "You cannot reset instances at this time.";
 L["Difficulty Not Accurate"] = "Difficulty is inaccurate because you are not the party leader";
 L["Instruction Click To Open Adventure Guide"] = "Left-Click: |cffffffffOpen Adventure Guide|r";
 L["Instruction Alt Click To Reset Instance"] = "Alt Right-Click: |cffffffffReset all instances|r";
+L["Instruction Link Progress In Chat"] = "<Shift click to post progress in chat>";
 
 
 --TransmogChatCommand

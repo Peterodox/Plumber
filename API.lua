@@ -1674,6 +1674,13 @@ do  -- Chat Message
     API.SearchChatHistory = SearchChatHistory;
 
 
+    function API.HasActiveChatBox()
+        local activeWindow = ChatFrameUtil and ChatFrameUtil.GetActiveWindow();
+        if activeWindow and activeWindow == GetCurrentKeyBoardFocus() then
+            return true
+        end
+    end
+
     function API.ChatInsertLink(link)
         if ChatEdit_InsertLink then
             return ChatEdit_InsertLink(link)

@@ -1568,6 +1568,18 @@ do  --ChangelogTab
         Formatter:LoadUserFont();
         self.currentVersionID = versionID;
 
+
+        if not self.redactorPool then
+            local function Redactor_Create()
+                local f = addon.CreateTextRedactor(self.ChangelogTab.ScrollView);
+                f:SetColor(76/255, 69/255, 65/255);
+                return f
+            end
+            self.redactorPool = addon.LandingPageUtil.CreateObjectPool(Redactor_Create);
+        end
+        self.redactorPool:ReleaseAll();
+
+
         local top, bottom;
         local n = 0;
         local objectWidth = Formatter.ChangelogTextWidth;
@@ -1580,6 +1592,8 @@ do  --ChangelogTab
 
         for i, info in ipairs(changelog) do
             top = offsetY;
+
+            local redacted = info.redacted;
 
             if info.type == "tocVersionCheck" then
                 if not addon.IsToCVersionEqualOrNewerThan(info.minimumTocVersion) then
@@ -1639,6 +1653,13 @@ do  --ChangelogTab
                         obj:SetFontObject(Formatter.TagFonts[info.type]);
                         obj:SetText(text);
                         SetTextColor(obj, Def.TextColorReadable);
+
+                        if redacted then
+                            local redactor = self.redactorPool:Acquire();
+                            local fontObject = Formatter.TagFonts[info.type];
+                            local _, fontHeight = _G[fontObject]:GetFont();
+                            redactor:RedactFontString(obj, fontHeight, text);
+                        end
                     end;
                 };
 
@@ -1661,6 +1682,13 @@ do  --ChangelogTab
                                     obj:SetFontObject(Formatter.TagFonts["p"]);
                                     obj:SetText(text);
                                     SetTextColor(obj, Def.TextColorNonInteractable);
+
+                                    if redacted then
+                                        local redactor = self.redactorPool:Acquire();
+                                        local fontObject = Formatter.TagFonts["p"];
+                                        local _, fontHeight = _G[fontObject]:GetFont();
+                                        redactor:RedactFontString(obj, fontHeight, text);
+                                    end
                                 end,
                                 top = top,
                                 bottom = bottom,

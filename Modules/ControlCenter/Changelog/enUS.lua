@@ -13,6 +13,92 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10804] = {
     {
         type = "date",
+        versionText = "1.8.4 c",
+        timestamp = 1766320000,
+    },
+
+    {
+        type = "h1",
+        text = "Housing Modules",
+        redacted = true,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "House Editor, Customize Mode: You can Shift Click a dye swatch to track its recipe, or post it in chat.",
+        redacted = true,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Decor Catalog: You can Shift Click a decor to post it in chat if the chat edit box is active. Alternatively, from its context menu.",
+        redacted = true,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Thanks to Cabal members Keyboardturner and Ghost for the inspiration and for providing a cozy place to code.",
+        redacted = true,
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName InstanceDifficulty"],
+        dbKey = "InstanceDifficulty",
+        redacted = true,
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "InstanceDifficulty",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can now Alt Right Click on the instance name to reset all instances.",
+        redacted = true,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can now Shift Click on a difficulty button to post your raid progress in chat if you have killed any boss on that difficulty.",
+        redacted = true,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Karazhan side entrance should show the correct difficulties.",
+        redacted = true,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Thanks to the Dawnsong Twins, especially the nicer one, for testing this module multiple times and giving valuable feedback.",
+        redacted = true,
+    },
+
+    {
+        type = "br",
+    },
+    {
+        type = "br",
+    },
+
+
+
+    {
+        type = "date",
         versionText = "1.8.4 b",
         timestamp = 1766070000,
     },

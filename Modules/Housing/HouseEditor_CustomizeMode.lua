@@ -104,25 +104,44 @@ do
     end
 
 
-    local function DyeSlotFrameSwatch_OnEnter(self) --Hook
+    local function DyeSlotFrameSwatch_OnEnter(self)
+        --!! Monitor Interface/AddOns/Blizzard_HouseEditor/Blizzard_HouseEditorCustomizationDyeTemplates.lua
+
+        local tooltip = GameTooltip;
+        local offsetY = 18;     --Try avoiding tooltip/swatch overlap
+
+        if self.dyeColorInfo then
+            tooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 0, offsetY);
+            GameTooltip_AddHighlightLine(tooltip, self.dyeColorInfo.name);
+            GameTooltip_AddNormalLine(tooltip, string.format(HOUSING_DECOR_CUSTOMIZATION_DYE_NUM_OWNED, self.dyeColorInfo.numOwned))
+        else
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 0, offsetY);
+            GameTooltip_AddHighlightLine(tooltip, HOUSING_DECOR_CUSTOMIZATION_DEFAULT_COLOR);
+        end
+
+        if not self.isCurrentSwatch then
+            PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_HOVER);
+        end
+
         if self.dyeColorInfo then
             local itemID = self.dyeColorInfo and self.dyeColorInfo.itemID;
             if itemID then
                 C_Item.GetItemInfo(itemID);
 
                 local dyeColorID = self.dyeColorInfo.ID;
-                if dyeColorID and ContentTrackingUtil.IsContentTrackingEnabled() and GameTooltip:GetOwner() == self then
+                if dyeColorID and ContentTrackingUtil.IsContentTrackingEnabled() then
                     if IsDyeRecipeTracked(dyeColorID) then
                         local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-untracked", 16, 16, -3, 0);
-                        GameTooltip_AddColoredLine(GameTooltip, atlasMarkup..CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
+                        GameTooltip_AddColoredLine(tooltip, atlasMarkup..CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
                     else
                         local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-tracked", 16, 16, -3, 0);
-                        GameTooltip_AddInstructionLine(GameTooltip, atlasMarkup..CONTENT_TRACKING_TRACKABLE_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
+                        GameTooltip_AddInstructionLine(tooltip, atlasMarkup..CONTENT_TRACKING_TRACKABLE_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
                     end
-                    GameTooltip:Show();
                 end
             end
         end
+
+        tooltip:Show();
     end
 
     local function DyeSlotFrameSwatch_OnClick(self, button) --Override
@@ -190,11 +209,27 @@ do
 
             if not dyeSlotFrame.hookedByPlumber then
                 dyeSlotFrame.hookedByPlumber = true;
-                --dyeSlotFrame.CurrentSwatch:HookScript("OnClick", DyeSlotFrameSwatch_OnClick);
                 dyeSlotFrame.CurrentSwatch:SetScript("OnClick", DyeSlotFrameSwatch_OnClick);
-                dyeSlotFrame.CurrentSwatch:HookScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
+                dyeSlotFrame.CurrentSwatch:SetScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
             end
         end
+    end
+
+
+    local function ModifySwatchPool(pool)
+        if not pool then return end;
+        for swatch in pool:EnumerateActive() do
+            if not swatch.hookedByPlumber then
+                swatch.hookedByPlumber = true;
+                swatch:SetScript("OnClick", DyeSlotFrameSwatch_OnClick);
+                swatch:SetScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
+            end
+        end
+    end
+
+    function CustomizeModeCallbacks.DyePopoutSetDyeSlotInfo(self)
+        ModifySwatchPool(self.recentSwatchPool);
+        ModifySwatchPool(self.dyeSwatchPool);
     end
 end
 
@@ -213,6 +248,7 @@ do
         hooksecurefunc(CustomizeModeFrame, "ShowDecorInstanceTooltip", CustomizeModeCallbacks.ShowDecorInstanceTooltip);
         --hooksecurefunc(CustomizeModeFrame, "ShowSelectedDecorInfo", CustomizeModeCallbacks.ShowSelectedDecorInfo);
         hooksecurefunc(self.DyePane, "SetDecorInfo", CustomizeModeCallbacks.DyePaneSetDecorInfo);
+        hooksecurefunc(self.DyePopout, "SetDyeSlotInfo", CustomizeModeCallbacks.DyePopoutSetDyeSlotInfo);
 
 
         --Fixed an issue where tooltip doesn't update when closing DyePane while the cursor hovers on the same decor

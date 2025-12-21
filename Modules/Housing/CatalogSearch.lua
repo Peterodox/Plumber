@@ -362,7 +362,7 @@ local function ModifyContextMenu()
                     rootDescription:CreateSpacer();
 
                     local function OnClick()
-                        API.ChatLinkItem(itemID);
+                        API.ChatForceLinkItem(itemID);
                     end
 
                     local button1 = rootDescription:CreateButton(GUILD_NEWS_LINK_ITEM, OnClick);

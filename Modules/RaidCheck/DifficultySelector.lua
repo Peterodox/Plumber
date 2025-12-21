@@ -79,6 +79,7 @@ local function ShowLockoutTooltip(self, instanceName, difficultyName, instanceID
     tooltip:SetPoint("TOP", self, "BOTTOM", 0, -6);
     tooltip:AddDoubleLine(instanceName, difficultyName);
     tooltip:SetCustomLineSpacing(4);
+
     for i, v in ipairs(self.encounters) do
         local hasDefeated = v.dungeonEncounterID and IsEncounterComplete(instanceID, v.dungeonEncounterID, v.difficultyID);
         if i % 5 == 1 then
@@ -95,6 +96,11 @@ local function ShowLockoutTooltip(self, instanceName, difficultyName, instanceID
         if not CanChangeDifficulty() then
             tooltip:AddLine(" ");
             tooltip:AddLine(L["Cannot Change Difficulty"], 1, 0.125, 0.125, true);
+        end
+
+        if SelectorUI.isRaid and API.HasActiveChatBox() and SelectorUI:CanLinkProgress(self.encounters[1].difficultyID) then
+            tooltip:AddLine(" ");
+            tooltip:AddLine(L["Instruction Link Progress In Chat"], 0.098, 1.000, 0.098, true);
         end
     end
 
@@ -139,11 +145,8 @@ do
 
     function DifficultyButtonMixin:OnClick()
         if IsModifiedClick("CHATLINK") then
-            local index = GetSavedInstanceIndex(SelectorUI.instanceID, self.difficultyID);
-            if index then
-                API.ChatInsertLink(GetSavedInstanceChatLink(index));  --Sent as plain text for some reason?
-                return
-            end
+            SelectorUI:LinkProgressInChat(self.difficultyID);
+            return
         end
 
         if SelectorUI:TrySelectDiffulty(self.difficultyID) then
@@ -325,6 +328,10 @@ do
 
     function TitleButtonMixin:OnClick(button)
         if button == "LeftButton" then
+            if IsModifiedClick("CHATLINK") then
+                SelectorUI:LinkProgressInChat(self.difficultyID);
+                return
+            end
             SelectorUI:OpenEncounterJournal();
             GameTooltip:Hide();
         elseif button == "RightButton" and IsAltKeyDown() then
@@ -748,6 +755,31 @@ do  --SelectorUI
                 end
                 EncounterJournal_OpenJournal(difficultyID, self.journalInstanceID);
             end
+        end
+    end
+
+    function SelectorUI:GetSavedInstanceIndex(difficultyID)
+        if not difficultyID then
+            difficultyID = self.selectedDifficulty;
+        end
+
+        if not self.isValidDifficulty[difficultyID] then
+            difficultyID = self.fallbackDifficultyID;
+        end
+
+        return GetSavedInstanceIndex(self.instanceID, difficultyID);
+    end
+
+    function SelectorUI:CanLinkProgress(difficultyID)
+        return self:GetSavedInstanceIndex(difficultyID) ~= nil
+    end
+
+    function SelectorUI:LinkProgressInChat(difficultyID)
+        --Dungeon progress sent as plain text for some reason?
+
+        local index = self:GetSavedInstanceIndex(difficultyID);
+        if index then
+            return API.ChatInsertLink(GetSavedInstanceChatLink(index));  --Dungeon progress sent as plain text for some reason?
         end
     end
 end
