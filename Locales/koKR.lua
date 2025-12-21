@@ -680,6 +680,10 @@ L["List Is Empty"] = "목록이 비어 있습니다.";
 L["ModuleName InstanceDifficulty"] = "인스턴스 난이도";
 L["ModuleDescription InstanceDifficulty"] = "- 공격대나 던전 입구에 있을 때 난이도 선택기를 표시합니다.\n\n- 인스턴스에 입장하면 화면 상단에 현재 난이도와 귀속 정보를 표시합니다.";
 L["Cannot Change Difficulty"] = "현재는 인스턴스 난이도를 변경할 수 없습니다.";
+L["Cannot Reset Instance"] = "지금은 인스턴스를 초기화할 수 없습니다.";
+L["Difficulty Not Accurate"] = "파티장이 아니어서 난이도 정보가 정확하지 않을 수 있습니다.";
+L["Instruction Click To Open Adventure Guide"] = "좌클릭: |cffffffff모험 안내서 열기|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt+우클릭: |cffffffff모든 인스턴스 초기화|r";
 
 
 --TransmogChatCommand
@@ -702,7 +706,7 @@ L["ModuleDescription CraftSearchExtended"] = "특정 단어를 검색할 때 더
 
 
 --DecorModelScaleRef
-L["ModuleName DecorModelScaleRef"] = "장식품: 크기 비교용 바나나";
+L["ModuleName DecorModelScaleRef"] = "장식품: 크기 비교용 바나나"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- 장식 미리보기 창에 크기 참조용 바나나를 추가하여 오브젝트의 크기를 가늠할 수 있습니다.\n\n- 또한 왼쪽 버튼을 누른 채 수직으로 이동하여 카메라 각도를 변경할 수 있습니다.";
 
 
@@ -746,8 +750,8 @@ L["Clock Type Digital"] = "디지털";
 
 
 --CatalogExtendedSearch
-L["ModuleName Housing_CatalogSearch"] = "장식 카탈로그: 검색 결과 확장";
-L["ModuleDescription Housing_CatalogSearch"] = "장식 목록과 창고 탭의 검색창을 강화하여 업적, 판매자, 지역 또는 화폐로 아이템을 검색할 수 있습니다.\n\n카테고리 옆에 일치하는 항목의 수를 표시합니다.";
+L["ModuleName Housing_CatalogSearch"] = "장식 카탈로그";
+L["ModuleDescription Housing_CatalogSearch"] = "- 장식 목록과 창고 탭의 검색창을 강화하여 업적, 판매자, 지역 또는 화폐로 아이템을 검색할 수 있습니다.\n\n- 카테고리 옆에 일치하는 항목의 수를 표시합니다.\n\n- 채팅에 장식을 링크할 수 있습니다.";
 L["Match Sources"] = "출처 일치";
 
 
