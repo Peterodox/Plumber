@@ -307,6 +307,8 @@ L["ModuleDescription ExpansionLandingPage"] = "Afficher des informations supplé
 L["Instruction Track Reputation"] = "<Maj + clic pour suivre cette réputation>";
 L["Instruction Untrack Reputation"] = "<Maj + clic pour arrêter le suivi>";
 L["Error Show UI In Combat"] = "Vous ne pouvez pas afficher / masquer ceci en combat.";
+L["Error Show UI In Combat 1"] = "Il est impossible de modifier cette interface utilisateur pendant un combat.";
+L["Error Show UI In Combat 2"] = "ARRÊTEZ S'IL VOUS PLAÎT";
 
 
 --Landing Page Switch
@@ -680,6 +682,11 @@ L["List Is Empty"] = "La liste est vide.";
 L["ModuleName InstanceDifficulty"] = "Difficulté de l'instance";
 L["ModuleDescription InstanceDifficulty"] = "- Afficher un sélecteur de difficulté lorsque vous vous trouvez à l'entrée d'un raid ou d'un donjon.\n\n- Afficher la difficulté actuelle et les informations de verrouillage en haut de l'écran lorsque vous entrez dans une instance.";
 L["Cannot Change Difficulty"] = "La difficulté de l'instance ne peut pas être modifiée pour le moment.";
+L["Cannot Reset Instance"] = "Vous ne pouvez pas réinitialiser les instances pour le moment.";
+L["Difficulty Not Accurate"] = "La difficulté est inexacte car vous n'êtes pas le chef du groupe.";
+L["Instruction Click To Open Adventure Guide"] = "Clic gauche : |cffffffffGuide de l'aventurier|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt + Clic droit : |cffffffffRéinitialiser toutes les instances|r";
+L["Instruction Link Progress In Chat"] = "<Maj + Clic pour poster la progression dans le chat>";
 
 
 --TransmogChatCommand
