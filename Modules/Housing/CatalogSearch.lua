@@ -122,7 +122,7 @@ do
         searchText = strtrim(searchText);
 
         local useAdvancedSearch = searchText and strlenutf8(searchText) >= 3;
-        if not (ShouldShowDecor(self.searcher) and useAdvancedSearch and self.catalogEntries and self.optionsContainer:IsShown())  then
+        if not (self.anyExtraMatch and ShouldShowDecor(self.searcher) and useAdvancedSearch and self.catalogEntries and self.optionsContainer:IsShown())  then
             self:Wipe();
             return
         end
@@ -192,7 +192,7 @@ do
         end
 
         if self.ResultCount and self.n > 1 then
-            self.ResultCount:SetText(self.n - 1);
+            self.ResultCount:SetText(self.n - 1);   --Minus one header
         end
     end
 

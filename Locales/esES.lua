@@ -9,6 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber Addon";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Mostrar/ocultar resumen de la expansión";   --Show/hide Expansion Summary UI
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Enfocarse en la próxima misión";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Enfocarse en la misión anterior";
 
 
 --Module Control Panel
@@ -38,6 +40,8 @@ L["Version"] = "Versión";
 L["New Features"] = "Nuevas funciones";
 L["New Feature Abbr"] = "Nuevo";
 L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
+L["Always On Module"] = "Este módulo está siempre activado.";
+L["Return To Module List"] = "Volver a la lista";
 
 
 --Settings Category
@@ -54,6 +58,7 @@ L["SC Profession"] = "Profesiones";
 L["SC Quest"] = "Misiones";
 L["SC UnitFrame"] = "Marco de unidad";
 L["SC Old"] = "Contenido de legado";
+L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "Hogar";
 L["SC Uncategorized"] = "Sin categoría";
 
 --Settings Search Keywords, Search Tags
@@ -62,6 +67,9 @@ L["KW Transmog"] = "Transfiguración";
 L["KW Vendor"] = "Vendedor";
 L["KW LegionRemix"] = "Legion Remix";
 L["KW Housing"] = "Hogar del jugador";
+L["KW Combat"] = "Combate";
+L["KW ActionBar"] = "Barras de acción";
+L["KW Console"] = "Mando para consola";
 
 --Filter Sort Method
 L["SortMethod 1"] = "Nombre";  --Alphabetical Order
@@ -263,9 +271,9 @@ L["Collected Items"] = "Items conocidos";
 
 
 --Tooltip Housing
-L["ModuleName TooltipHousing"] = "Housing";
-L["ModuleDescription TooltipHousing"] = "Housing";
-L["Instruction View In Dressing Room"] = "<Ctrl Click to View in Dressing Room>";  --VIEW_IN_DRESSUP_FRAME
+L["ModuleName TooltipHousing"] = "Hogar";
+L["ModuleDescription TooltipHousing"] = "Hogar";
+L["Instruction View In Dressing Room"] = "<Ctrl Click para ver en el probador>";  --VIEW_IN_DRESSUP_FRAME
 L["Data Loading In Progress"] = "Plumber está cargando datos";
 
 
@@ -299,6 +307,8 @@ L["ModuleDescription ExpansionLandingPage"] = "Muestra información adicional en
 L["Instruction Track Reputation"] = "<Shift click para rastrear esta reputación>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click para detener el seguimiento>";
 L["Error Show UI In Combat"] = "No puedes alternar esta interfaz de usuario mientras estás en combate.";
+L["Error Show UI In Combat 1"] = "Realmente no puedes alternar esta interfaz de usuario mientras estás en combate.";
+L["Error Show UI In Combat 2"] = "POR FAVOR, DETENTE";
 
 
 --Landing Page Switch
@@ -443,6 +453,11 @@ L["SoftTargetName QuestObjective Tooltip"] = "Muestra los objetivos de la misió
 L["SoftTargetName QuestObjective Alert"] = "Esta función requiere ser habilitada |cffffffffShow Target Tooltip|r en Opciones> Accesibilidad> General.";   --See globals: TARGET_TOOLTIP_OPTION
 L["SoftTargetName ShowNPC"] = "Incluir NPC";
 L["SoftTargetName ShowNPC Tooltip"] = "Si está desactivado, el nombre solo aparecerá en los objetos del juego con los que se pueda interactuar";
+L["SoftTargetName HideIcon"] = "Hide Interact Icon";
+L["SoftTargetName HideIcon Tooltip"] = "Hide the interact icon and the radial cast bar when you are in a house.";
+L["SoftTargetName HideName"] = "Hide Object Name";
+L["SoftTargetName HideName Tooltip"] = "Hide the soft target object name when you are in a house."
+
 
 
 --LegionRemix
@@ -559,32 +574,36 @@ L["QuickSlot Error 3"] = "Quick Slot: A controller with the same key \"%s\" alre
 
 
 --Plumber Macro
-L["PlumberMacro Drive"] = "Plumber C.A.R.R.O. Macro";
-L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
-L["PlumberMacro DrawerFlag Combat"] = "The drawer will be updated after leaving combat.";
+L["PlumberMacro Drive"] = "Plumber macro C.A.R.R.O.";
+L["PlumberMacro Drawer"] = "Plumber macro de cajón";
+L["PlumberMacro Housing"] = "Plumber macro de hogar";
+L["PlumberMacro Torch"] = "Plumber macro de antorcha";
+L["PlumberMacro DrawerFlag Combat"] = "El cajón se actualizará después de salir de combate.";
 L["PlumberMacro DrawerFlag Stuck"] = "Algo salió mal al actualizar el cajón.";
 L["PlumberMacro Error Combat"] = "No disponible en combate";
-L["PlumberMacro Error NoAction"] = "No usable actions";
+L["PlumberMacro Error NoAction"] = "No hay acciones utilizables";
 L["PlumberMacro Error EditMacroInCombat"] = "No se pueden editar macros durante en combate";
 L["Random Favorite Mount"] = "Montura favorita aleatoria"; --A shorter version of MOUNT_JOURNAL_SUMMON_RANDOM_FAVORITE_MOUNT
 L["Dismiss Battle Pet"] = "Retirar mascota";
-L["Drag And Drop Item Here"] = "Drag and drop an item here.";
-L["Drag To Reorder"] = "Left click and drag to reorder";
-L["Click To Set Macro Icon"] = "Ctrl click to set as macro icon";
-L["Unsupported Action Type Format"] = "Unsupported action type: %s";
-L["Drawer Add Action Format"] = "Add |cffffffff%s|r";
+L["Drag And Drop Item Here"] = "Arrastra y suelta un elemento aquí.";
+L["Drag To Reorder"] = "Has click y arrastrar para reordenar";
+L["Click To Set Macro Icon"] = "Ctrl click para establecer como icono de macro";
+L["Unsupported Action Type Format"] = "Tipo de acción no compatible: %s";
+L["Drawer Add Action Format"] = "Añadir |cffffffff%s|r";
 L["Drawer Add Profession1"] = "Primera profesión";
 L["Drawer Add Profession2"] = "Segunda profesión";
-L["Drawer Option Global Tooltip"] = "This setting is shared across all drawer macros.";
-L["Drawer Option CloseAfterClick"] = "Close After Clicks";
-L["Drawer Option CloseAfterClick Tooltip"] = "Close the drawer after clicking any button in it, regardless of successful or not.";
-L["Drawer Option SingleRow"] = "Single Row";
-L["Drawer Option SingleRow Tooltip"] = "If checked, align all buttons on the same row instead of 4 items per row.";
-L["Drawer Option Hide Unusable"] = "Hide Unusable Actions";
-L["Drawer Option Hide Unusable Tooltip"] = "Hide unowned items and unlearned spells.";
-L["Drawer Option Hide Unusable Tooltip 2"] = "Consumable items like potions will always be shown."
+L["Drawer Option Global Tooltip"] = "Esta configuración se comparte entre todas las macros de cajón.";
+L["Drawer Option CloseAfterClick"] = "Cerrar después de hacer click";
+L["Drawer Option CloseAfterClick Tooltip"] = "Cierra el cajón después de hacer clic en cualquier botón del mismo, independientemente de si ha tenido éxito o no.";
+L["Drawer Option SingleRow"] = "Fila única";
+L["Drawer Option SingleRow Tooltip"] = "Si está marcado, alinea todos los botones en la misma fila en lugar de 4 elementos por fila.";
+L["Drawer Option Hide Unusable"] = "Ocultar acciones inutilizables";
+L["Drawer Option Hide Unusable Tooltip"] = "Ocultar objetos no utilizados y hechizos no aprendidos.";
+L["Drawer Option Hide Unusable Tooltip 2"] = "Los artículos consumibles, como las pociones, siempre se mostrarán."
 L["Drawer Option Update Frequently"] = "Actualizar frecuentemente";
-L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
+L["Drawer Option Update Frequently Tooltip"] = "Intenta actualizar el estado de los botones cada vez que haya un cambio en las bolsas o en el libro de hechizos. Activar esta opción puede aumentar ligeramente el uso de recursos.";
+L["ModuleName DrawerMacro"] = "Macro de cajón";
+L["ModuleDescription DrawerMacro"] = "Crea un menú desplegable personalizado para administrar tus items, hechizos, mascotas, monturas y juguetes.\n\nPara crear una macro de cajón, primero crea una nueva macro y luego ingresa |cffd7c0a3#plumber:drawer|r en el cuadro de edición de comandos.";
 
 
 --New Expansion Landing Page
@@ -663,6 +682,11 @@ L["List Is Empty"] = "La lista está vacía.";
 L["ModuleName InstanceDifficulty"] = "Dificultad de la estancia";
 L["ModuleDescription InstanceDifficulty"] = "- Muestra un selector de dificultad cuando estés en la entrada de una banda o mazmorra.\n\n- Muestra la dificultad actual y la información de bloqueo en la parte superior de la pantalla cuando ingresas a una estancia.";
 L["Cannot Change Difficulty"] = "La dificultad de la estancia no se puede cambiar en este momento.";
+L["Cannot Reset Instance"] = "No puedes restablecer estancias en este momento.";
+L["Difficulty Not Accurate"] = "La dificultad es inexacta porque tú no eres el líder del grupo";
+L["Instruction Click To Open Adventure Guide"] = "Left-Click: |cffffffffAbrir guía de aventuras|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt Right-Click: |cffffffffReiniciar todas las estancias|r";
+L["Instruction Link Progress In Chat"] = "<Shift click para publicar el progreso en el chat>";
 
 
 --TransmogChatCommand
@@ -674,9 +698,70 @@ L["Missing Appearances Format"] = "%d |4appearance:appearances; missing";
 L["Press Key To Copy Format"] = "Presiona |cffffd100%s|r para copiar";
 
 
+--QuestWatchCycle
+L["ModuleName QuestWatchCycle"] = "Atajos de teclado: Enfocarse en la misión";
+L["ModuleDescription QuestWatchCycle"] = "Te permite presionar teclas de acceso rápido para enfocarse en la siguiente/anterior misión en el rastreador de objetivos.\n\n|cffd4641cSet your hotkeys in Keybindings> Plumber Addon.|r";
+
+
+--CraftSearchExtended
+L["ModuleName CraftSearchExtended"] = "Ampliar los resultados de búsqueda";
+L["ModuleDescription CraftSearchExtended"] = "Muestra más resultados al buscar determinadas palabras.\n\n- Alquimia e inscripción: encuentra recetas de pigmentos para viviendas buscando colores de tintes.";
+
+
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "Catálogo de decoración: Plátano para escala"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Añade una referencia de tamaño (un plátano) a la ventana de vista previa de la decoración, lo que te permitirá calcular el tamaño de los objetos.\n\n- También te permite cambiar el ángulo de la cámara manteniendo pulsado el botón izquierdo y moviéndolo verticalmente.";
+
+
+--Player Housing
+L["ModuleName Housing_Macro"] = "Macros hogar";
+L["ModuleDescription Housing_Macro"] = "Puedes crear una macro de Teletransporte a casa: primero crea una nueva macro y a continuación introduce |cffd7c0a3#plumber:home|r en el cuadro de edición de comandos.";
+L["Teleport Home"] = "Teletransporte a casa";
+L["Instruction Drag To Action Bar"] = "<Has click y arrástralo a tus barras de acción>";
+L["Toggle Torch"] = "Cambiar a antorcha";
+L["ModuleName Housing_DecorHover"] = "Editor: 1 Modo decoración";
+L["ModuleDescription Housing_DecorHover"] = "En el modo decoración:\n\n- Pasa el cursor sobre un adorno para mostrar su costo de colocación, nombre y cantidad que hay en el almacenamiento.\n\n- Te permite \"duplicar\" un adorno presionando Alt.\n\nEl nuevo objeto no heredará los ángulos y escalas actuales.";
+L["Duplicate"] = "Duplicar";
+L["Duplicate Decor Key"] = "\"Duplicar\" Tecla";
+L["Enable Duplicate"] = "Enable \"Duplicate\"";
+L["Enable Duplicate tooltip"] = "Mientras estés en el modo decoración, puedes pasar el cursor sobre un adorno y luego presionar una tecla para colocar una copia de ese objeto.";
+L["ModuleName Housing_CustomizeMode"] = "Editor: 3 Modo personalización";
+L["ModuleDescription Housing_CustomizeMode"] = "En el modo personalización:\n\n- Permite copiar tintes de un adorno a otro.\n\n- Cambia el nombre de la ranura de tinte del índice al nombre del color.\n\n- Puedes hacer shift click a una muestra de tinte para rastrear la receta.";
+L["Copy Dyes"] = "Copiar";
+L["Dyes Copied"] = "Tintes copiados";
+L["Apply Dyes"] = "Aplicar";
+L["Preview Dyes"] = "Vista previa";
+L["ModuleName TooltipDyeDeez"] = "Información emergente: Dye Pigment";
+L["ModuleDescription TooltipDyeDeez"] = "Muestra los nombres de los colores de los tintes en los pigmentos de la carcasa.";
+L["Instruction Show More Info"] = "<Presiona Alt para mostrar más información>";
+L["Instruction Show Less Info"] = "<Presiona Alt para mostrar menos información>";
+L["ModuleName Housing_ItemAcquiredAlert"] = "Alerta de adorno conseguido";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permite hacer click en la alerta de adorno conseguido para obtener una vista previa del objeto.";
+
+
+--Housing Clock
+L["ModuleName Housing_Clock"] = "Editor: Reloj";
+L["ModuleDescription Housing_Clock"] = "Mientras se utiliza el editor de la casa, muestra un reloj en la parte superior de la pantalla.\n\nTambién realiza un seguimiento del tiempo que pasas editando la casa.";
+L["Time Spent In Editor"] = "Tiempo gastado editando:";
+L["This Session Colon"] = "En esta sesión: ";
+L["Time Spent Total Colon"] = "En total: ";
+L["Right Click Show Settings"] = "Click derecho para mostrar la configuración.";
+L["Plumber Clock"] = "Plumber reloj";
+L["Clock Type"] = "Tipo de reloj";
+L["Clock Type Analog"] = "Analógico";
+L["Clock Type Digital"] = "Digital";
+
+
+--CatalogExtendedSearch
+L["ModuleName Housing_CatalogSearch"] = "Catálogo de adornos";
+L["ModuleDescription Housing_CatalogSearch"] = "- Mejora el cuadro de búsqueda en el catálogo de adornos y la pestaña de almacenamiento, lo que te permite encontrar artículos por logro, vendedor, zona o moneda.\n\n- Muestra el número de coincidencias junto a la categoría.\n\n- Permite vincular la decoración en el chat.";
+L["Match Sources"] = "Fuentes coincidentes";
+
+
+--SourceAchievementLink
+L["ModuleName SourceAchievementLink"] = "Información interactiva sobre la fuente";
+L["ModuleDescription SourceAchievementLink"] = "Hace que en la mayoría de los nombres de logros en la siguiente interfaz de usuario se puedan hacer click, permitiéndote ver sus detalles o rastrearlos.\n\n- Catálogo de adornos\n\n- Diario de monturas";
+
 
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
@@ -692,6 +777,13 @@ L["Level Maxed"] = "(Máximo)";   --Reached max level
 L["Current Colon"] = "Actual:";
 L["Unclaimed Reward Alert"] = "Tienes recompensas sin reclamar";
 L["Uncollected Set Counter Format"] = "Tienes |cffffffff%d|r uncollected transmog |4set:sets;.";
+L["InstructionFormat Left Click"] = "Click para %s";
+L["InstructionFormat Right Click"] = "Click derecho para %s";
+L["InstructionFormat Ctrl Left Click"] = "Ctrl click para %s";
+L["InstructionFormat Ctrl Right Click"] = "Ctrl click derecho para %s";
+L["InstructionFormat Alt Left Click"] = "Alt click para %s";
+L["InstructionFormat Alt Right Click"] = "Alt click derecho para %s";
+L["Close Frame Format"]= "|cff808080(Cerrar %s)|r";
 
 
 --Plumber AddOn Settings
