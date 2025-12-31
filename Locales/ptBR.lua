@@ -307,6 +307,8 @@ L["ModuleDescription ExpansionLandingPage"] = "Exibe informações extras na pá
 L["Instruction Track Reputation"] = "<Shift+cliq. para rastrear a reputação>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift-cliq. para parar de rastrear>";
 L["Error Show UI In Combat"] = "Você não pode exibir essa interface enquanto estiver em combate.";
+L["Error Show UI In Combat 1"] = "Você realmente não pode exibir essa interface em combate.";
+L["Error Show UI In Combat 2"] = "POR FAVOR, PARE.";
 
 
 --Landing Page Switch
@@ -414,8 +416,8 @@ L["Unspent Knowledge Tooltip Format"] = "Você tem |cffffffff%s|r Conhecimentos 
 
 
 --TooltipProfessionKnowledge
-L["ModuleName TooltipProfessionKnowledge"] = L["ModuleName ProfessionsBook"];
-L["ModuleDescription TooltipProfessionKnowledge"] = "Mostra o número de seus Conhecimentos de Especialização de Profissão não gastos.";
+L["ModuleName TooltipProfessionKnowledge"] = "Dica de ferramenta: conhecimento não gasto";
+L["ModuleDescription TooltipProfessionKnowledge"] = "Exibe o número de seus Conhecimentos de Especialização de Profissão não gastos na dica de ferramenta.";
 L["Available Knowledge Format"] = "Conhecimento Disponível: |cffffffff%s|r";
 
 
@@ -649,7 +651,7 @@ L["TrackerTypePlural Instance"] = "Instâncias";
 L["TrackerTypePlural Quest"] = "Missões";
 L["TrackerTypePlural Rare"] = "Criaturas raras";
 L["Accountwide"] = "Para a conta";
-L["Flag Quest"] = "Flag Quest";
+L["Flag Quest"] = "Marcar missão";
 L["Boss Name"] = "Nome do chefe";
 L["Instance Or Boss Name"] = "Nome de chefe ou instância";
 L["Name EditBox Disabled Reason Format"] = "Essa caixa será preenchida automaticamente quando você inserir um %s válido.";
@@ -680,6 +682,11 @@ L["List Is Empty"] = "Essa lista está vazia.";
 L["ModuleName InstanceDifficulty"] = "Dificuldade da instância";
 L["ModuleDescription InstanceDifficulty"] = "- Mostra um seletor de dificuldade quando você está numa entrada de masmorra ou raide.\n\n- Mostra a dificuldade atual e informações do vínculo de raide no topo da tela quando você entra em uma instância.";
 L["Cannot Change Difficulty"] = "A dificuldade da instância não pode ser alterada neste momento.";
+L["Cannot Reset Instance"] = "Você não pode reiniciar instâncias neste momento.";
+L["Difficulty Not Accurate"] = "Dificuldade da instância imprecisa pois você não é o líder do grupo.";
+L["Instruction Click To Open Adventure Guide"] = "Cliq. esquerdo: |cffffffffAbrir guia da aventura|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt+Cliq. direito: |cffffffffReiniciar todas as instâncias|r";
+L["Instruction Link Progress In Chat"] = "<Shift+cliq. para compartilhar o progresso no chat>";
 
 
 --TransmogChatCommand
