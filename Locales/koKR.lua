@@ -307,6 +307,8 @@ L["ModuleDescription ExpansionLandingPage"] = "시작 화면에 부가 정보 �
 L["Instruction Track Reputation"] = "<Shift 클릭으로 이 평판을 추적>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift 클릭으로 추적 중지>";
 L["Error Show UI In Combat"] = "전투 중에는 이 UI를 전환할 수 없습니다.";
+L["Error Show UI In Combat 1"] = "전투 중에는 이 UI를 전환할 수 없습니다.";
+L["Error Show UI In Combat 2"] = "제발 그만해";
 
 
 --Landing Page Switch
@@ -684,6 +686,7 @@ L["Cannot Reset Instance"] = "지금은 인스턴스를 초기화할 수 없습�
 L["Difficulty Not Accurate"] = "파티장이 아니어서 난이도 정보가 정확하지 않을 수 있습니다.";
 L["Instruction Click To Open Adventure Guide"] = "좌클릭: |cffffffff모험 안내서 열기|r";
 L["Instruction Alt Click To Reset Instance"] = "Alt+우클릭: |cffffffff모든 인스턴스 초기화|r";
+L["Instruction Link Progress In Chat"] = "<채팅에 진행 상황을 공유하려면 Shift 키를 누른 상태로 클릭하세요>";
 
 
 --TransmogChatCommand
@@ -723,7 +726,7 @@ L["Duplicate Decor Key"] = "\"복제\" 키";
 L["Enable Duplicate"] = "\"복제\" 활성화";
 L["Enable Duplicate tooltip"] = "장식 모드에서는 커서를 장식 위에 올려놓은 후 키를 눌러 해당 객체의 다른 인스턴스를 배치할 수 있습니다.";
 L["ModuleName Housing_CustomizeMode"] = "편집기: 사용자 정의 모드";
-L["ModuleDescription Housing_CustomizeMode"] = "사용자 정의 모드:\n\n- 한 장식에서 다른 장식으로 염료를 복사할 수 있습니다.\n\n- 염료 이름을 색상 이름으로 변경합니다.";
+L["ModuleDescription Housing_CustomizeMode"] = "사용자 정의 모드:\n\n- 한 장식에서 다른 장식으로 염료를 복사할 수 있습니다.\n\n- 염료 이름을 색상 이름으로 변경합니다.\n\n- 레시피를 추적하려면 염료를 Shift 키를 누른 상태로 클릭하세요.";
 L["Copy Dyes"] = "염색 복사";
 L["Dyes Copied"] = "염색 설정이 복사되었습니다";
 L["Apply Dyes"] = "염색 적용";
