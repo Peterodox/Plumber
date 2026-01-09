@@ -308,7 +308,7 @@ L["Instruction Track Reputation"] = "<Shift 클릭으로 이 평판을 추적>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift 클릭으로 추적 중지>";
 L["Error Show UI In Combat"] = "전투 중에는 이 UI를 전환할 수 없습니다.";
 L["Error Show UI In Combat 1"] = "전투 중에는 이 UI를 전환할 수 없습니다.";
-L["Error Show UI In Combat 2"] = "제발 그만해";
+L["Error Show UI In Combat 2"] = "그만하세요";
 
 
 --Landing Page Switch
