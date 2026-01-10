@@ -311,6 +311,8 @@ L["ModuleDescription ExpansionLandingPage"] = "Zeigt zusätzliche Informationen 
 L["Instruction Track Reputation"] = "<Umschaltklick, um diesen Ruf zu verfolgen>";
 L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Umschaltklick, um die Verfolgung zu beenden>";
 L["Error Show UI In Combat"] = "Ihr könnt dieses Fenster im Kampf nicht aufrufen.";
+L["Error Show UI In Combat 1"] = "Nein wirklich, Ihr könnt dieses Fenster im Kampf nicht aufrufen.";
+L["Error Show UI In Combat 2"] = "ES IST VERBOTEN!";
 
 
 --Landing Page Switch
@@ -683,6 +685,11 @@ L["List Is Empty"] = "Die Liste ist leer.";
 L["ModuleName InstanceDifficulty"] = "Schwierigkeitsgrad von Instanzen";
 L["ModuleDescription InstanceDifficulty"] = "Zeigt ein Menü am oberen Bildschirmrand an. Es zeigt den vom Schlachtzugsleiter ausgewählten Schwierigkeitsgrad an.\nIhr könnt den Schwierigkeitsgrad ändern, indem Ihr mit der Maus auf einen der angezeigten Felder klickt.\n\nDarüber hinaus zeigt das Menü die bereits besiegten Bosse des jeweiligen Schwierigkeitsgrads an. Eine detaillierte Liste wird via Mouseover angezeigt.";
 L["Cannot Change Difficulty"] = "Der Schwierigkeitsgrad dieser Instanz kann momentan nicht geändert werden.";
+L["Cannot Reset Instance"] = "Die Instanz kann momentan nicht zurückgesetzt werden.";
+L["Difficulty Not Accurate"] = "Dein Schwierigkeitsgrad stimmt nicht mit dem der Instanz überein, weil du nicht der Schlachtzugsleiter bist.";
+L["Instruction Click To Open Adventure Guide"] = "Linksklick: |cffffffffAbenteuerführer Öffnen|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt + Rechtsklick: |cffffffffAlle Instanzen zurücksetzen|r";
+L["Instruction Link Progress In Chat"] = "<Shift + Klick, um den Status der momentanen Instanz im Chat zu posten>";
 
 
 --TransmogChatCommand
@@ -705,7 +712,7 @@ L["ModuleDescription CraftSearchExtended"] = "Es werden mehr Ergebnisse für die
 
 
 --DecorModelScaleRef
-L["ModuleName DecorModelScaleRef"] = "Dekorationskatalog: Banane zum Vergleich anzeigen";    --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
+L["ModuleName DecorModelScaleRef"] = "Dekorationsvorschau: Banane zum Vergleich anzeigen";    --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Eine Banane wird in in der Vorschau eines Dekorationsgegenstandes angezeigt. Sodurch kann man die Größe eines Gegenstandes in Relation sehen.\n\n- Ihr könnt außerdem noch den Kamerawinkel des Gegenstandes in der Vorschau via Linksklick verändern.";
 
 
@@ -722,7 +729,7 @@ L["Duplicate Decor Key"] = "\'Duplizieren\' Tastaturkürzel";
 L["Enable Duplicate"] = "\'Duplizieren\' Funktion aktivieren";
 L["Enable Duplicate tooltip"] = "Im Dekorationsmodus kann eine platzierte Dekoration über einen Tastaturkürzel dupliziert werden.";
 L["ModuleName Housing_CustomizeMode"] = "Editor: 3 Anpassungsmodus";
-L["ModuleDescription Housing_CustomizeMode"] = "Folgende Veränderungen werden am Anpassungsmodus vorgenommen:\n\n- Die Farbe einer Dekoration kann auf eine andere angewendet werden, ohne dass man diese vorher extra auswählen muss.\n\n- Der Name des Farbstoffplatzes kann von der Indexnummer zum Namen der Farbe geändert werden.";
+L["ModuleDescription Housing_CustomizeMode"] = "Folgende Veränderungen werden am Anpassungsmodus vorgenommen:\n\n- Die Farbe einer Dekoration kann auf eine andere angewendet werden, ohne dass man diese vorher auswählen muss.\n\n- Der Name des Farbstoffplatzes kann von der Indexnummer zum Namen der Farbe geändert werden.\n\n- Das Rezept der Farbe kann via Shift-Klick verfolgt werden.";
 L["Copy Dyes"] = "Kopieren";
 L["Dyes Copied"] = "Farbstoff kopiert";
 L["Apply Dyes"] = "Übernehmen";
@@ -750,7 +757,7 @@ L["Clock Type Digital"] = "Digital";
 
 --CatalogExtendedSearch
 L["ModuleName Housing_CatalogSearch"] = "Dekorationskatalog: Mehr Suchergebnisse";
-L["ModuleDescription Housing_CatalogSearch"] = "Verbessert die Suchanfrage des Katalogs. Es werden jetzt nach Dekorationen anhand des Namens von Errungenschaften, Händlern, Bereichen und Währungen angezeigt.\n\nDie Anzahl der Suchtreffer wird neben dem Kategorienamen angezeigt.";
+L["ModuleDescription Housing_CatalogSearch"] = "- Verbessert die Suchanfrage des Katalogs. Es werden jetzt nach Dekorationen anhand des Namens von Errungenschaften, Händlern, Bereichen und Währungen angezeigt.\n\n- Die Anzahl der Suchtreffer wird neben dem Kategorienamen angezeigt.\n\n- Die Dekoration kann im Chat verlinkt werden.";
 L["Match Sources"] = "Übereinstimmende Quellen";
 
 
