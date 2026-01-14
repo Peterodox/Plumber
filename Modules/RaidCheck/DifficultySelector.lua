@@ -19,9 +19,7 @@ local SelectorUI = CreateFrame("Frame", nil, UIParent);             --Show diffi
 RaidCheck.SelectorUI = SelectorUI;
 DifficultyAnnouncer:Hide();
 SelectorUI:Hide();
-
-
-local TOP_OFFSET = -40;
+local DummyFrame;   --Edit Mode: For Reposition
 
 
 local function SetupFont(fontString, fontHeight)
@@ -42,6 +40,20 @@ local MapThemes = {
     [118] = 1,  --Icecrown
     --[646] = 2,  --Broken Shore
     --[885] = 2,  --Antoran Wastes
+};
+
+
+local Def = {
+    ButtonMinWidth = 128,
+    ButtonHeight = 32,
+    ButtonGap = 4,
+    BarTextureHeight = 48,
+    BarSidePadding = 20,
+
+    DefaultTopOffset = -40,
+    SnapRangeX = 48,
+
+    TextureFile = "Interface/AddOns/Plumber/Art/RaidCheck/DifficultySelector.png",
 };
 
 
@@ -120,6 +132,67 @@ local function GetSavedInstanceIndex(_instanceID, _difficultyID)
 end
 
 
+local function SetupFrameClamp(frame)
+    frame:SetClampedToScreen(true);
+    local offset = 8;
+    frame:SetClampRectInsets(-offset, offset, offset, -offset);
+end
+
+
+local function LoadFramePosition()
+    local setupFunc;
+    local pos = PlumberDB and PlumberDB.InstanceDifficulty_Position;
+    if pos and pos.x and pos.y then
+        if math.abs(pos.x) < Def.SnapRangeX then
+            pos.x = 0;
+        end
+        function setupFunc(f)
+            f:SetPoint("TOP", UIParent, "TOP", pos.x, pos.y);
+        end
+    end
+
+    if not setupFunc then
+        function setupFunc(f)
+            f:SetPoint("TOP", UIParent, "TOP", 0, Def.DefaultTopOffset);
+        end
+    end
+
+    local frames = {DifficultyAnnouncer, SelectorUI, DummyFrame};
+    for _, frame in ipairs(frames) do
+        frame:ClearAllPoints();
+        setupFunc(frame);
+    end
+end
+RaidCheck.LoadFramePosition = LoadFramePosition;
+
+
+local function SaveFramePosition()
+    if not DummyFrame then return end;
+
+    local x = DummyFrame:GetCenter();
+    local y = DummyFrame:GetTop();
+
+    if x and y then
+        local x0 = UIParent:GetCenter();
+        local y0 = UIParent:GetTop();
+        x = x - x0;
+        y = y - y0;
+        if math.abs(x) < Def.SnapRangeX then
+            x = 0;
+        end
+        if PlumberDB then
+            PlumberDB.InstanceDifficulty_Position = {x = x, y = y};
+        end
+    else
+        if PlumberDB then
+            PlumberDB.InstanceDifficulty_Position = nil;
+        end
+    end
+
+    LoadFramePosition();
+end
+
+
 local DifficultyButtonMixin = {};
 do
     function DifficultyButtonMixin:OnEnter()
@@ -179,6 +252,15 @@ do
         end
     end
 
+    function DifficultyButtonMixin:FormatButtonText(text, complete, total)
+        local colorIndex;
+        if complete < total then
+            colorIndex = 1;
+        else
+            colorIndex = 2;
+        end
+        self.ButtonText:SetText(string.format("%s  |cff%s(%d/%d)|r", text, ColorCodes[colorIndex], complete, total));
+    end
 
     function DifficultyButtonMixin:UpdateProgress()
         local total = self.encounters and #self.encounters or 0;
@@ -190,13 +272,7 @@ do
                 end
             end
         end
-        local colorIndex;
-        if complete < total then
-            colorIndex = 1;
-        else
-            colorIndex = 2;
-        end
-        self.ButtonText:SetText(string.format("%s  |cff%s(%d/%d)|r", self.name, ColorCodes[colorIndex], complete, total));
+        self:FormatButtonText(self.name, complete, total);
     end
 
     local function ButtonBackground_OnUpdate(self, elapsed)
@@ -352,48 +428,30 @@ end
 
 
 do  --SelectorUI
-    local BUTTON_WIDTH = 32 * 4;
     local BAR_IDLE_ALPHA = 0.5;
 
-    function SelectorUI:Init()
-        self.Init = nil;
-        local texture = "Interface/AddOns/Plumber/Art/RaidCheck/DifficultySelector.png";
-        local barTextureHeight = 48;
-
-
-        self:SetSize(96, 64);
-        self:SetPoint("TOP", UIParent, "TOP", 0, TOP_OFFSET);
-        self:SetAlpha(0);
-        self:SetFrameStrata("HIGH");
-
+    function SelectorUI:CreateBasicElements()
+        local texture = Def.TextureFile;
 
         local OpaqueFrame = CreateFrame("Frame", nil, self);
         self.OpaqueFrame = OpaqueFrame;
 
+
         local Bar = CreateFrame("Frame", nil, self);
         self.Bar = Bar;
-        Bar:SetSize(128, barTextureHeight);
+        Bar:SetSize(128, Def.BarTextureHeight);
         Bar:SetPoint("BOTTOM", self, "BOTTOM", 0, 0);
-        Bar:SetAlpha(BAR_IDLE_ALPHA);
 
 
         local disableSharpenging = true;
-        local BarBGs = API.CreateThreeSliceTextures(Bar, "BORDER", 20, barTextureHeight, 0, texture, disableSharpenging);
+        local BarBGs = API.CreateThreeSliceTextures(self.Bar, "BORDER", 20, Def.BarTextureHeight, 0, texture, disableSharpenging);
         self.BarBGs = BarBGs;
         BarBGs[1]:SetTexCoord(0/1024, 40/1024, 0/1024, 96/1024);
         BarBGs[2]:SetTexCoord(40/1024, 216/1024, 0/1024, 96/1024);
         BarBGs[3]:SetTexCoord(216/1024, 256/1024, 0/1024, 96/1024);
 
 
-        local Shadow = Bar:CreateTexture(nil, "BACKGROUND");
-        Shadow:SetTexture(texture);
-        Shadow:SetTexCoord(768/1024, 1024/1024, 0/1024, 256/1024)
-        Shadow:SetPoint("CENTER", self, "CENTER", 0, 0);
-        Shadow:SetSize(1200, 400);
-        Shadow:SetAlpha(0.65);
-
-
-        local Title = OpaqueFrame:CreateFontString(nil, "OVERLAY");
+        local Title = self.OpaqueFrame:CreateFontString(nil, "OVERLAY");
         self.Title = Title;
         SetupFont(Title);
         Title:SetJustifyH("CENTER");
@@ -402,20 +460,54 @@ do  --SelectorUI
         --Title:SetShadowOffset(1, -1);
 
 
+        local ButtonBackground = CreateFrame("Frame", nil, self.Bar);
+        self.ButtonBackground = ButtonBackground;
+        ButtonBackground:SetUsingParentLevel(true);
+        ButtonBackground:SetSize(Def.ButtonMinWidth, Def.ButtonHeight);
+        local ButtonBGs = API.CreateThreeSliceTextures(ButtonBackground, "ARTWORK", 16, Def.BarTextureHeight, 6, texture, disableSharpenging);
+        self.ButtonBGs = ButtonBGs;
+        ButtonBGs[1]:SetTexCoord(264/1024, 296/1024, 0/1024, 96/1024);
+        ButtonBGs[2]:SetTexCoord(296/1024, 392/1024, 0/1024, 96/1024);
+        ButtonBGs[3]:SetTexCoord(392/1024, 424/1024, 0/1024, 96/1024);
+        ButtonBackground:SetPoint("CENTER", self.Bar, "CENTER", 0, 0);
+    end
+
+    function SelectorUI:Init()
+        self.Init = nil;
+        local texture = Def.TextureFile;
+
+
+        self:SetSize(96, 64);
+        self:SetPoint("TOP", UIParent, "TOP", 0, Def.DefaultTopOffset);
+        self:SetAlpha(0);
+        self:SetFrameStrata("HIGH");
+        SetupFrameClamp(self);
+        self:CreateBasicElements();
+        self.Bar:SetAlpha(BAR_IDLE_ALPHA);
+
+
+        local Shadow = self.Bar:CreateTexture(nil, "BACKGROUND");
+        Shadow:SetTexture(texture);
+        Shadow:SetTexCoord(768/1024, 1024/1024, 0/1024, 256/1024)
+        Shadow:SetPoint("CENTER", self, "CENTER", 0, 0);
+        Shadow:SetSize(1200, 400);
+        Shadow:SetAlpha(0.65);
+
+
         local TitleButton = CreateFrame("Button", nil, self);
         self.TitleButton = TitleButton;
         Mixin(TitleButton, TitleButtonMixin);
         TitleButton:OnLoad();
-        TitleButton:SetPoint("CENTER", Title, "CENTER", 0, 0);
+        TitleButton:SetPoint("CENTER", self.Title, "CENTER", 0, 0);
         TitleButton:SetSize(32, 24);
         TitleButton:SetHitRectInsets(0, 0, -8, 0);
 
 
-        local InaccuracyAlert = OpaqueFrame:CreateFontString(nil, "OVERLAY");
+        local InaccuracyAlert = self.OpaqueFrame:CreateFontString(nil, "OVERLAY");
         self.InaccuracyAlert = InaccuracyAlert;
         SetupFont(InaccuracyAlert, 12);
         InaccuracyAlert:SetJustifyH("CENTER");
-        InaccuracyAlert:SetPoint("TOP", Bar, "BOTTOM", 0, -4);
+        InaccuracyAlert:SetPoint("TOP", self.Bar, "BOTTOM", 0, -4);
         InaccuracyAlert:SetSpacing(4);
         InaccuracyAlert:SetWidth(256);
         InaccuracyAlert:SetTextColor(1.000, 0.125, 0.125);
@@ -423,21 +515,9 @@ do  --SelectorUI
         InaccuracyAlert:Hide();
 
 
-        local ButtonBackground = CreateFrame("Frame", nil, Bar);
-        self.ButtonBackground = ButtonBackground;
-        ButtonBackground:SetUsingParentLevel(true);
-        ButtonBackground:SetSize(BUTTON_WIDTH, 32);
-        local ButtonBGs = API.CreateThreeSliceTextures(ButtonBackground, "ARTWORK", 16, barTextureHeight, 6, texture, disableSharpenging);
-        self.ButtonBGs = ButtonBGs;
-        ButtonBGs[1]:SetTexCoord(264/1024, 296/1024, 0/1024, 96/1024);
-        ButtonBGs[2]:SetTexCoord(296/1024, 392/1024, 0/1024, 96/1024);
-        ButtonBGs[3]:SetTexCoord(392/1024, 424/1024, 0/1024, 96/1024);
-        ButtonBackground:SetPoint("CENTER", Bar, "CENTER", 0, 0);
-
-
-        local ButtonHighlight = Bar:CreateTexture(nil, "OVERLAY");
+        local ButtonHighlight = self.Bar:CreateTexture(nil, "OVERLAY");
         self.ButtonHighlight = ButtonHighlight;
-        ButtonHighlight:SetSize(BUTTON_WIDTH, barTextureHeight);
+        ButtonHighlight:SetSize(Def.ButtonMinWidth, Def.BarTextureHeight);
         ButtonHighlight:SetTexture(texture);
         ButtonHighlight:SetTexCoord(432/1024, 560/1024, 0/1024, 96/1024);
         ButtonHighlight:SetBlendMode("ADD");
@@ -446,8 +526,8 @@ do  --SelectorUI
 
 
         local function DifficultyButton_Create()
-            local obj = CreateFrame("Button", nil, Bar);
-            obj:SetSize(BUTTON_WIDTH, 32);
+            local obj = CreateFrame("Button", nil, self.Bar);
+            obj:SetSize(Def.ButtonMinWidth, Def.ButtonHeight);
             Mixin(obj, DifficultyButtonMixin);
             obj:OnLoad();
             return obj
@@ -474,7 +554,7 @@ do  --SelectorUI
         end);
 
 
-        local LoadingIndicator = CreateFrame("Frame", nil, OpaqueFrame, "PlumberLoadingIndicatorTemplate");
+        local LoadingIndicator = CreateFrame("Frame", nil, self.OpaqueFrame, "PlumberLoadingIndicatorTemplate");
         self.LoadingIndicator = LoadingIndicator;
         LoadingIndicator.autoHide = true;
         LoadingIndicator:Hide();
@@ -488,6 +568,8 @@ do  --SelectorUI
         self:SetScript("OnShow", self.OnShow);
         self:SetScript("OnHide", self.OnHide);
         self:SetScript("OnEvent", self.OnEvent);
+
+        LoadFramePosition();
     end
 
     function SelectorUI:OnShow()
@@ -575,6 +657,10 @@ do  --SelectorUI
     end
 
     function SelectorUI:ShowInstance(journalInstanceID, uiMapID)
+        if self.inEditMode then
+            return
+        end
+
         if journalInstanceID ~= self.journalInstanceID then
             local themeID = uiMapID and MapThemes[uiMapID] or 0;
 
@@ -594,11 +680,9 @@ do  --SelectorUI
                 self.isValidDifficulty = {};
                 self.instanceName = instanceInfo.name;
                 self.Title:SetText(instanceInfo.name);
-                self.TitleButton:SetWidth(math.max(API.Round(self.Title:GetWrappedWidth() + 8), BUTTON_WIDTH));
+                self.TitleButton:SetWidth(math.max(API.Round(self.Title:GetWrappedWidth() + 8), Def.ButtonMinWidth));
 
                 self.difficultyButtonPool:ReleaseAll();
-                local buttonGap = 4;
-                local sidePadding = 20;
                 local textWidth = 0;
                 local maxTextWidth = 0;
 
@@ -611,15 +695,15 @@ do  --SelectorUI
                     self.isValidDifficulty[v.difficultyID] = true;
                 end
 
-                local buttonWidth = math.max(API.Round(maxTextWidth + 32), BUTTON_WIDTH);
-                local barWidth = 2 * sidePadding + #difficulties * (buttonWidth + buttonGap) - buttonGap;
+                local buttonWidth = math.max(Def.ButtonMinWidth, API.Round(maxTextWidth + Def.ButtonHeight));
+                local barWidth = 2 * Def.BarSidePadding + #difficulties * (buttonWidth + Def.ButtonGap) - Def.ButtonGap;
                 self.Bar:SetWidth(barWidth);
                 self.ButtonBackground:SetWidth(buttonWidth);
                 self.ButtonHighlight:SetWidth(buttonWidth);
                 self.MotionFrame:SetWidth(barWidth + 64);
 
                 for i, obj in self.difficultyButtonPool:EnumerateActive() do
-                    obj:SetPoint("LEFT", self.Bar, "LEFT", sidePadding + (i - 1) * (buttonWidth + buttonGap), 0);
+                    obj:SetPoint("LEFT", self.Bar, "LEFT", Def.BarSidePadding + (i - 1) * (buttonWidth + Def.ButtonGap), 0);
                     obj:SetWidth(buttonWidth);
                 end
 
@@ -650,6 +734,7 @@ do  --SelectorUI
     end
 
     function SelectorUI:SetTheme(themeID)
+        if not themeID then themeID = 0 end;
         if themeID == self.themeID then return end;
         self.themeID = themeID;
         if self.Init then return end;
@@ -662,7 +747,9 @@ do  --SelectorUI
         self.ButtonBGs[1]:SetTexCoord(264/1024, 296/1024, top, bottom);
         self.ButtonBGs[2]:SetTexCoord(296/1024, 392/1024, top, bottom);
         self.ButtonBGs[3]:SetTexCoord(392/1024, 424/1024, top, bottom);
-        self.ButtonHighlight:SetTexCoord(432/1024, 560/1024, top, bottom);
+        if self.ButtonHighlight then
+            self.ButtonHighlight:SetTexCoord(432/1024, 560/1024, top, bottom);
+        end
     end
 
     function SelectorUI:UpdateDifficulty(playAnimation)
@@ -793,8 +880,9 @@ do  --DifficultyAnnouncer
         self.Init = nil;
 
         self:SetSize(128, 32);
-        self:SetPoint("TOP", UIParent, "TOP", 0, TOP_OFFSET);
+        self:SetPoint("TOP", UIParent, "TOP", 0, Def.DefaultTopOffset);
         self:SetFrameStrata("HIGH");
+        SetupFrameClamp(self);
 
         local Text1 = self:CreateFontString(nil, "OVERLAY");
         self.Text1 = Text1;
@@ -830,6 +918,8 @@ do  --DifficultyAnnouncer
         self:SetScript("OnEnter", self.OnEnter);
         self:SetScript("OnLeave", self.OnLeave);
         self:SetScript("OnMouseDown", self.OnMouseDown);
+
+        LoadFramePosition();
     end
 
     function DifficultyAnnouncer:Enable(state)
@@ -1000,4 +1090,212 @@ do  --DifficultyAnnouncer
             DifficultyAnnouncer:Refresh();
         end
     end);
+end
+
+
+do  --Edit Mode Reposition
+    local DummyFrameMixin = {};
+
+    function RaidCheck.ExitEditMode()
+        if DummyFrame then
+            DummyFrame:ExitEditMode();
+        end
+        SelectorUI.inEditMode = nil;
+    end
+
+    function DummyFrameMixin:OnDragStart()
+        local scale = self:GetEffectiveScale();
+        local x0, y0 = self:GetCenter();
+        local x1, y1 = GetCursorPosition();
+        local deltaX = (x0 * scale) - x1;
+        local deltaY = (y0 * scale) - y1;
+
+        self.centerX = UIParent:GetCenter();
+        self.snapLeft = self.centerX - 0.5*Def.SnapRangeX;
+        self.snapRight = self.centerX + 0.5*Def.SnapRangeX;
+
+        self.positionGetter = function()
+            local x, y = GetCursorPosition();
+            return (x + deltaX) / scale, (y + deltaY) / scale;
+        end
+
+        self.t = 0;
+        self:ClearAllPoints();
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function DummyFrameMixin:OnDragStop()
+        self.t = nil;
+        self.centerX = nil;
+        self.snapLeft = nil;
+        self.snapRight = nil;
+        self.positionGetter = nil;
+        self:SetScript("OnUpdate", nil);
+        if self:IsShown() then
+            SaveFramePosition();
+        end
+    end
+
+    function DummyFrameMixin:OnHide()
+        self:Hide();
+        self:OnDragStop();
+        self.Selection:Hide();
+    end
+
+    function DummyFrameMixin:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t > 0.016 then
+            self.t = 0;
+            local x, y = self.positionGetter();
+            if x > self.snapLeft and x < self.snapRight then
+                x = self.centerX;
+            end
+            self:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
+            self:UpdateInstructionPosition();
+        end
+    end
+
+    function DummyFrameMixin:IsFocused()
+        return self:IsVisible() and self:IsMouseOver();
+    end
+
+    function DummyFrameMixin:ShowOptions(state)
+        self.Instruction:SetShown(state);
+    end
+
+    function DummyFrameMixin:UpdateInstructionPosition()
+        local bottom = self:GetBottom();
+        local position;
+        if bottom - self.instructionHeight < 0 then
+            position = 1;
+        else
+            position = -1;
+        end
+        if position ~= self.instructionPos then
+            self.instructionPos = position;
+            self.Instruction:ClearAllPoints();
+            if position > 0 then
+                self.Instruction:SetPoint("BOTTOM", self, "TOP", 0, 12);
+            else
+                self.Instruction:SetPoint("TOP", self, "BOTTOM", 0, -12);
+            end
+        end
+    end
+
+    function DummyFrameMixin:ExitEditMode()
+        self:Hide();
+        SelectorUI.inEditMode = nil;
+        addon.CallbackRegistry:Trigger("SettingsPanel.ModuleOptionClosed");
+    end
+
+    function DummyFrameMixin:OnRightButtonDown()
+        self:ResetPosition();
+    end
+
+    function DummyFrameMixin:ResetPosition()
+        self:SetPoint("TOP", UIParent, "TOP", 0, Def.DefaultTopOffset);
+        if PlumberDB and PlumberDB.InstanceDifficulty_Position then
+            PlumberDB.InstanceDifficulty_Position = nil;
+        end
+        LoadFramePosition();
+    end
+
+    local function DummyFrame_Init()
+        if DummyFrame then return end;
+
+        DummyFrame = CreateFrame("Frame", nil, UIParent);
+        local self = DummyFrame;
+        self:SetSize(96, 64);
+        self:SetPoint("TOP", UIParent, "TOP", 0, Def.DefaultTopOffset);
+        self:SetFrameStrata("HIGH");
+        SetupFrameClamp(self);
+        Mixin(self, DummyFrameMixin);
+
+        SelectorUI.CreateBasicElements(self);
+        SelectorUI.SetTheme(self);
+
+        self.Title:SetText(L["Instance Name"]);
+
+        local function CreateButton(text, selected)
+            local f = CreateFrame("Frame", nil, self.Bar);
+            f:SetSize(Def.ButtonMinWidth, Def.ButtonHeight);
+            f.ButtonText = f:CreateFontString(nil, "OVERLAY", nil, 5);
+            SetupFont(f.ButtonText);
+            f.ButtonText:SetJustifyH("CENTER");
+            f.ButtonText:SetPoint("CENTER", f, "CENTER", 0, 0);
+            DifficultyButtonMixin.FormatButtonText(f, text, 0, 8);
+            if selected then
+                self.ButtonBackground:SetPoint("CENTER", f, "CENTER", 0, 0);
+                f.ButtonText:SetTextColor(1, 1, 1);
+            else
+                f.ButtonText:SetTextColor(1, 0.82, 0);
+            end
+            return f
+        end
+
+        local Instruction = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        self.Instruction = Instruction;
+
+        Instruction:Hide();
+        Instruction:SetWidth(240);
+        Instruction:SetPoint("TOP", self, "BOTTOM", 0, -12);
+        Instruction:SetTextColor(1, 1, 1);
+        Instruction:SetSpacing(2);
+        Instruction:SetText(L["EditMode Instruction InstanceDifficulty"]);
+        self.instructionHeight = math.ceil(Instruction:GetHeight() + 12);
+        self:UpdateInstructionPosition();
+
+        local buttonTexts = {PLAYER_DIFFICULTY1, PLAYER_DIFFICULTY2};
+        local numButtons = #buttonTexts;
+        local maxTextWidth = 0;
+        local buttons = {};
+
+        for i, text in ipairs(buttonTexts) do
+            local button = CreateButton(text, i == 1);
+            buttons[i] = button;
+            local textWidth = button.ButtonText:GetWrappedWidth();
+            if textWidth > maxTextWidth then
+                maxTextWidth = textWidth;
+            end
+        end
+
+        local buttonWidth = math.max(Def.ButtonMinWidth, API.Round(maxTextWidth + Def.ButtonHeight));
+        local barWidth = 2 * Def.BarSidePadding + numButtons * (buttonWidth + Def.ButtonGap) - Def.ButtonGap;
+        self.Bar:SetWidth(barWidth);
+        self.ButtonBackground:SetWidth(buttonWidth);
+        self:SetWidth(barWidth);
+
+        for i, obj in ipairs(buttons) do
+            obj:SetPoint("LEFT", self.Bar, "LEFT", Def.BarSidePadding + (i - 1) * (buttonWidth + Def.ButtonGap), 0);
+            obj:SetWidth(buttonWidth);
+        end
+
+
+        self.selectionOffsetTop = 4;
+        local uiName = L["ModuleName InstanceDifficulty"];
+        local hideLabel = true;
+        self.Selection = addon.CreateEditModeSelection(self, uiName, hideLabel);
+
+        addon.AddModuleOptionExitMethod(self, RaidCheck.ExitEditMode);
+
+        LoadFramePosition();
+    end
+
+
+    function RaidCheck.EnterEditMode()
+        DummyFrame_Init();
+        DummyFrame:Show();
+        DummyFrame.Selection:Show();
+        SelectorUI:HideUI(true);
+        SelectorUI.inEditMode = true;
+    end
+
+    function RaidCheck.ToggleEditMode()
+        local newState = not (DummyFrame and DummyFrame:IsVisible());
+        if newState then
+            RaidCheck.EnterEditMode();
+        else
+            RaidCheck.ExitEditMode();
+        end
+    end
 end

@@ -500,7 +500,7 @@ function NewTalkingHead:EnterEditMode()
     self:Init();
 
     if not self.Selection then
-        local uiName = "Simple Talking Head";
+        local uiName = L["ModuleName TalkingHead"];
         local hideLabel = true;
         self.Selection = addon.CreateEditModeSelection(self, uiName, hideLabel);
     end
@@ -618,7 +618,7 @@ local function Options_ResetPosition_OnClick(self)
 end
 
 local OPTIONS_SCHEMATIC = {
-    title = L["EditMode TalkingHead"],
+    title = L["Addon Name Colon"]..L["ModuleName TalkingHead"],
     widgets = {
         {type = "Checkbox", label = L["TalkingHead Option InstantText"], onClickFunc = Options_InstantText_OnClick, dbKey = "TalkingHead_InstantText"},
         {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "TalkingHead_TextOutline"},
@@ -763,9 +763,9 @@ do
     end
 
     local moduleData = {
-        name = addon.L["ModuleName TalkingHead"],
+        name = L["ModuleName TalkingHead"],
         dbKey = "TalkingHead_MasterSwitch",
-        description = addon.L["ModuleDescription TalkingHead"],
+        description = L["ModuleDescription TalkingHead"],
         toggleFunc = EnableModule,
         categoryID = 2,
         uiOrder = 3,

@@ -47,10 +47,12 @@ do
 
     function StaticPopupMixin:OnShow()
         API.AddFrameToUISpecialFrames(self, true);
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPEN);
     end
 
     function StaticPopupMixin:OnHide()
         API.AddFrameToUISpecialFrames(self, false);
+        PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE);
     end
 
     function StaticPopupMixin:OnLoad()

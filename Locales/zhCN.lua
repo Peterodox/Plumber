@@ -14,6 +14,7 @@ BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "设上一个任务为焦点";
 
 
 --Module Control Panel
+L["Addon Name Colon"] =  "Plumber：";
 L["Module Control"] = "功能选项";
 L["Quick Slot Generic Description"] = "\n\n*快捷按钮是一组在特定情形下出现的、可交互的按钮。";
 L["Quick Slot Edit Mode"] = "更改布局";
@@ -25,7 +26,7 @@ L["Quick Slot Layout Radial"] = "环形";
 L["Restriction Combat"] = "战斗中不可用";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*如需更改标记大小，请打开 世界地图 - 地图筛选 - Plumber";
 L["Toggle Plumber UI"] = "Plumber界面可见性";
-L["Toggle Plumber UI Tooltip"] = "在编辑模式中显示以下Plumber界面：\n%s\n\n此选项仅控制它们在编辑模式下是否可见，并不会启用或禁用这些功能。";
+L["Toggle Plumber UI Tooltip"] = "在编辑模式中显示以下Plumber界面：\n\n%s\n\n此选项仅控制它们在编辑模式下是否可见，并不会启用或禁用这些功能。";
 L["Remove New Feature Marker"] = "移除新功能标记";
 L["Remove New Feature Marker Tooltip"] = "新功能标记 %s 通常在一周后消失，你也可以现在就移除它们。";
 L["Modules"] = "模块控制";
@@ -178,7 +179,6 @@ L["ModuleDescription BlizzFixEventToast"] = "让事件通知不挡住你的鼠�
 --Talking Head
 L["ModuleName TalkingHead"] = "对话特写头像";
 L["ModuleDescription TalkingHead"] = "用简洁的界面取代默认的对话特写头像。";
-L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "立即显示文本";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "文字描边";
 L["TalkingHead Option Condition Header"] = "隐藏来自以下情形的文字：";
@@ -530,7 +530,6 @@ L["Sample Item 4"] = "炫酷的史诗物品";
 L["Sample Item 3"] = "超棒的精良物品";
 L["Sample Item 2"] = "不错的优秀物品";
 L["Sample Item 1"] = "一般的普通物品";
-L["EditMode LootUI"] =  "Plumber: 拾取窗口";
 L["Manual Loot Instruction Format"] = "如想暂时取消一次自动拾取，请按住|cffffffff%s|r键直到拾取窗口出现。";
 L["LootUI Option Hide Window"] = "隐藏Plumber拾取窗口";
 L["LootUI Option Hide Window Tooltip"] = "隐藏Plumber拾取物品提示窗口，但仍然在后台执行其他功能例如强制自动拾取。";
@@ -654,6 +653,8 @@ L["Difficulty Not Accurate"] = "无法准确显示难度，因为你不是队长
 L["Instruction Click To Open Adventure Guide"] = "左键单击：|cffffffff打开冒险指南|r";
 L["Instruction Alt Click To Reset Instance"] = "按住Alt并右键单击：|cffffffff重置所有副本|r";
 L["Instruction Link Progress In Chat"] = "<按住Shift点击将副本进度链接到聊天框内>";
+L["Instance Name"] = "副本名称";
+L["EditMode Instruction InstanceDifficulty"] = "此窗口的实际宽度由选项数量决定。";
 
 
 --TransmogChatCommand

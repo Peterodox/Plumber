@@ -1555,7 +1555,7 @@ do  --Edit Mode
         self:ShowSampleItems();
 
         if not self.Selection then
-            local uiName = "Loot Window";
+            local uiName = L["ModuleName LootUI"];
             local hideLabel = true;
             self.Selection = addon.CreateEditModeSelection(self, uiName, hideLabel);
         end
@@ -1710,7 +1710,7 @@ do  --Edit Mode
     end
 
     local OPTIONS_SCHEMATIC = {
-        title = L["EditMode LootUI"],
+        title = L["Addon Name Colon"]..L["ModuleName LootUI"],
         widgets = {
             {type = "Slider", label = L["Font Size"], minValue = 10, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueMethod = "Decimal1", dbKey = "LootUI_FontSize"},
             {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueMethod = "Decimal2", dbKey = "LootUI_FadeDelayPerItem"},
@@ -1996,9 +1996,9 @@ do  --Module Registry
     end
 
     local moduleData = {
-        name = addon.L["ModuleName LootUI"],
+        name = L["ModuleName LootUI"],
         dbKey = "LootUI",
-        description = addon.L["ModuleDescription LootUI"],
+        description = L["ModuleDescription LootUI"],
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 0,

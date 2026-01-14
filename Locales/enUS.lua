@@ -14,6 +14,7 @@ BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Focus On Previous Quest";
 
 
 --Module Control Panel
+L["Addon Name Colon"] =  "Plumber: ";
 L["Module Control"] = "Module Control";
 L["Quick Slot Generic Description"] = "\n\n*Quick Slot is a set of clickable buttons that appear under certain conditions.";
 L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Edit Mode";
@@ -25,7 +26,7 @@ L["Quick Slot Layout Radial"] = "Radial";
 L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map> Map Filter> Plumber";
 L["Toggle Plumber UI"] = "Toggle Plumber UI";
-L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
+L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
 L["Remove New Feature Marker"] = "Remove New Feature Marker";
 L["Remove New Feature Marker Tooltip"] = "New Feature Markers %s disappear after a week. But you can click this button to remove them now.";
 L["Modules"] = "Modules";
@@ -178,7 +179,6 @@ L["ModuleDescription BlizzFixEventToast"] = "Modify the behavior of Event Toasts
 --Talking Head
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Talking Head";
 L["ModuleDescription TalkingHead"] = "Replace the default Talking Head UI with a clean, headless one.";
-L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Instant Text";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Text Outline";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "Hide Texts From Source:";
@@ -531,7 +531,6 @@ L["Sample Item 4"] = "Awesome Epic Item";
 L["Sample Item 3"] = "Awesome Rare Item";
 L["Sample Item 2"] = "Awesome Uncommon Item";
 L["Sample Item 1"] = "Common Item";
-L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
 L["Manual Loot Instruction Format"] = "To temporarily cancel auto loot on a specific pickup, press and hold |cffffffff%s|r key until the loot window appears.";
 L["LootUI Option Hide Window"] = "Hide Plumber Loot Window";
 L["LootUI Option Hide Window Tooltip"] = "Hide Plumber Loot Notification Window, but still enable any features such as Force Auto Loot in the background.";
@@ -687,6 +686,8 @@ L["Difficulty Not Accurate"] = "Difficulty is inaccurate because you are not the
 L["Instruction Click To Open Adventure Guide"] = "Left-Click: |cffffffffOpen Adventure Guide|r";
 L["Instruction Alt Click To Reset Instance"] = "Alt Right-Click: |cffffffffReset all instances|r";
 L["Instruction Link Progress In Chat"] = "<Shift click to post progress in chat>";
+L["Instance Name"] = "Instance Name";   --Dungeon/Raid Name
+L["EditMode Instruction InstanceDifficulty"] = "The frame width is affected by the number of available options.";
 
 
 --TransmogChatCommand

@@ -17,6 +17,14 @@ do
 
         RaidCheck.LocationTracker:Enable(state);
         RaidCheck.DifficultyAnnouncer:Enable(state);
+
+        if state then
+            RaidCheck.LoadFramePosition();
+        end
+    end
+
+    local function OptionToggle_OnClick(self, button)
+        RaidCheck.ToggleEditMode();
     end
 
     local moduleData = {
@@ -28,6 +36,12 @@ do
         uiOrder = 1200,
         moduleAddedTime = 1763100000,
         categoryKeys = {"Signature", "Instance"},
+
+        optionToggleFunc = OptionToggle_OnClick,
+        hasMovableWidget = true,
+        visibleInEditMode = true,
+        enterEditMode = RaidCheck.EnterEditMode,
+        exitEditMode = RaidCheck.ExitEditMode,
     };
 
     addon.ControlCenter:AddModule(moduleData);

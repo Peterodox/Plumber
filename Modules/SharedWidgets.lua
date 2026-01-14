@@ -4731,6 +4731,7 @@ do  --EditMode
         self.isSelected = true;
         self.Background:SetTexture("Interface/AddOns/Plumber/Art/Frame/EditModeSelected");
         self:Show();
+        GameTooltip:Hide();
 
         if not self.hideLabel then
             self.Label:Show();
@@ -4738,7 +4739,7 @@ do  --EditMode
     end
 
     function EditModeSelectionMixin:OnShow()
-        local offset = API.GetPixelForWidget(self, 6);
+        local offset = 8; --API.GetPixelForWidget(self, 6);
         self.Background:SetPoint("TOPLEFT", self, "TOPLEFT", -offset, offset);
         self.Background:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", offset, -offset);
         self:RegisterEvent("GLOBAL_MOUSE_DOWN");
@@ -4746,6 +4747,18 @@ do  --EditMode
 
     function EditModeSelectionMixin:OnHide()
         self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+    end
+
+    function EditModeSelectionMixin:OnEnter()
+        if (not self.isSelected) and self.uiName then
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR");
+            GameTooltip:SetText(L["Addon Name Colon"]..self.uiName, 1, 0.82, 0, 1, true);
+            GameTooltip:Show();
+        end
+    end
+
+    function EditModeSelectionMixin:OnLeave()
+        GameTooltip:Hide();
     end
 
     local function IsMouseOverOptionToggle()
@@ -4761,7 +4774,9 @@ do  --EditMode
         if event == "GLOBAL_MOUSE_DOWN" then
             if self:IsShown() and not(self.parent:IsFocused() or IsMouseOverOptionToggle()) then
                 self:ShowHighlighted();
-                self.parent:ShowOptions(false);
+                if self.parent.ShowOptions then
+                    self.parent:ShowOptions(false);
+                end
 
                 if self.parent.ExitEditMode and not API.IsInEditMode() then
                     self.parent:ExitEditMode();
@@ -4770,12 +4785,20 @@ do  --EditMode
         end
     end
 
-    function EditModeSelectionMixin:OnMouseDown()
+    function EditModeSelectionMixin:OnMouseDown(button)
         self:ShowSelected();
-        self.parent:ShowOptions(true);
+        if self.parent.ShowOptions then
+            self.parent:ShowOptions(true);
+        end
 
         if EditModeManagerFrame and EditModeManagerFrame.ClearSelectedSystem then
-            EditModeManagerFrame:ClearSelectedSystem()
+            EditModeManagerFrame:ClearSelectedSystem();
+        end
+
+        if button == "RightButton" then
+            if self.parent.OnRightButtonDown then
+                self.parent:OnRightButtonDown();
+            end
         end
     end
 
@@ -4783,7 +4806,19 @@ do  --EditMode
     local function CreateEditModeSelection(parent, uiName, hideLabel)
         local f = CreateFrame("Frame", nil, parent);
         f:Hide();
-        f:SetAllPoints(true);
+
+        local offsetH = parent.selectionOffsetH;
+        local offsetTop = parent.selectionOffsetTop;
+        local offsetBottom = parent.selectionOffsetBottom;
+
+        if offsetH or offsetTop or offsetBottom then
+            offsetH = offsetH or 0;
+            f:SetPoint("TOPLEFT", parent, "TOPLEFT", -offsetH, offsetTop or 0);
+            f:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", offsetH, offsetBottom or 0);
+        else
+            f:SetAllPoints(true);
+        end
+
         f:SetFrameStrata(parent:GetFrameStrata());
         f:SetToplevel(true);
         f:SetFrameLevel(999);
@@ -4795,6 +4830,7 @@ do  --EditMode
         f.Label:SetText(uiName);
         f.Label:SetJustifyH("CENTER");
         f.Label:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.Label:Hide();
 
         f.Background = f:CreateTexture(nil, "BACKGROUND");
         f.Background:SetTexture("Interface/AddOns/Plumber/Art/Frame/EditModeHighlighted");
@@ -4807,6 +4843,8 @@ do  --EditMode
 
         f:SetScript("OnShow", f.OnShow);
         f:SetScript("OnHide", f.OnHide);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
         f:SetScript("OnEvent", f.OnEvent);
         f:SetScript("OnMouseDown", f.OnMouseDown);
         f:SetScript("OnDragStart", f.OnDragStart);
@@ -4814,6 +4852,7 @@ do  --EditMode
 
         parent.Selection = f;
         f.parent = parent;
+        f.uiName = uiName;
         f.hideLabel = hideLabel;
 
         return f
