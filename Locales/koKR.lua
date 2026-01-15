@@ -14,6 +14,7 @@ BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "이전 퀘스트에 포커스";
 
 
 --Module Control Panel
+L["Addon Name Colon"] =  "Plumber: ";
 L["Module Control"] = "애드온 설정 관리";
 L["Quick Slot Generic Description"] = "\n\n*단축 버튼 칸은 사용자의 현재 상태에 따라 자동 표시.";
 L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "편집 모드";
@@ -25,7 +26,7 @@ L["Quick Slot Layout Radial"] = "원형";
 L["Restriction Combat"] = "전투 중에는 작동하지 않습니다.";  --Indicate a feature can only work when out of combat
 L["Map Pin Change Size Method"] = "\n\n*세계 지도 > 지도 필터 > Plumber에서 핀 크기를 변경";
 L["Toggle Plumber UI"] = "Plumber UI 전환";
-L["Toggle Plumber UI Tooltip"] = "편집 모드에서 다음 Plumber UI를 표시합니다:\n%s\n\n이 체크박스는 편집 모드에서의 UI 표시 여부만 제어합니다.\n이 모듈들을 활성화하거나 비활성화하지는 않습니다.";
+L["Toggle Plumber UI Tooltip"] = "편집 모드에서 다음 Plumber UI를 표시합니다:\n\n%s\n\n이 체크박스는 편집 모드에서의 UI 표시 여부만 제어합니다.\n이 모듈들을 활성화하거나 비활성화하지는 않습니다.";
 L["Remove New Feature Marker"] = "새 기능 표시 제거";
 L["Remove New Feature Marker Tooltip"] = "새 기능 표시 %s는 일주일 후 사라집니다. 이 버튼을 클릭하면 지금 바로 제거할 수 있습니다.";
 L["Modules"] = "모듈";
@@ -178,7 +179,6 @@ L["ModuleDescription BlizzFixEventToast"] = "이벤트 알림이 마우스 클�
 --Talking Head
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "말머리";
 L["ModuleDescription TalkingHead"] = "기본 말머리 UI를 깔끔한 얼굴 없는 형태로 교체.";
-L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "대화 글자 즉시 표시";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "글자 외곽선";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "출처 글자 숨기기:";
@@ -531,7 +531,6 @@ L["Sample Item 4"] = "영웅 아이템";
 L["Sample Item 3"] = "희귀 아이템";
 L["Sample Item 2"] = "고급 아이템";
 L["Sample Item 1"] = "일반 아이템";
-L["EditMode LootUI"] = "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "아이템");
 L["Manual Loot Instruction Format"] = "특정 아이템을 획득할 때 자동 전리품을 일시적으로 취소하려면 전리품 창이 나타날 때까지 |cffffffff%s|r 키를 길게 누르세요.";
 L["LootUI Option Hide Window"] = "Plumber 전리품 창 숨기기";
 L["LootUI Option Hide Window Tooltip"] = "Plumber 전리품 알림 창을 숨기되, 강제 자동 획득 등 기능은 백그라운드에서 계속 작동합니다.";
@@ -687,6 +686,8 @@ L["Difficulty Not Accurate"] = "파티장이 아니어서 난이도 정보가 �
 L["Instruction Click To Open Adventure Guide"] = "좌클릭: |cffffffff모험 안내서 열기|r";
 L["Instruction Alt Click To Reset Instance"] = "Alt+우클릭: |cffffffff모든 인스턴스 초기화|r";
 L["Instruction Link Progress In Chat"] = "<채팅에 진행 상황을 공유하려면 Shift 키를 누른 상태로 클릭하세요>";
+L["Instance Name"] = "인스턴스 이름";   --Dungeon/Raid Name
+L["EditMode Instruction InstanceDifficulty"] = "프레임 너비는 사용 가능한 옵션의 수에 따라 달라집니다.";
 
 
 --TransmogChatCommand
