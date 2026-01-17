@@ -284,7 +284,9 @@ end
 
 do  --Process Loot Message
     function EL:IsMessageSenderPlayer_Retail(text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid)
-        return guid == self.playerGUID
+        if Secret_CanAccess(guid) then
+            return guid == self.playerGUID
+        end
     end
     EL.IsMessageSenderPlayer = EL.IsMessageSenderPlayer_Retail;
 
@@ -353,6 +355,8 @@ do  --Process Loot Message
     end
 
     function EL:ProcessMessageCurrency(text)
+        if not Secret_CanAccess(text) then return end;
+
         local currencyID = match(text, "currency:(%d+)", 1);
         if currencyID then
             currencyID = tonumber(currencyID);
@@ -639,14 +643,12 @@ do  --Event Handler
             end
             self:RegisterEvent("CHAT_MSG_LOOT");
             self:RegisterEvent("CHAT_MSG_CURRENCY");
-            self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE");
             self:RegisterEvent("PLAYER_MONEY");
             self.t = 0;
             self:SetScript("OnUpdate", nil);
         else
             self:UnregisterEvent("CHAT_MSG_LOOT");
             self:UnregisterEvent("CHAT_MSG_CURRENCY");
-            self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE");
             self:UnregisterEvent("PLAYER_MONEY");
         end
     end
@@ -821,7 +823,7 @@ do  --Event Handler
                     MainFrame:OnErrored(errorType);
                 end
             end
-        elseif event == "CHAT_MSG_LOOT" or event == "CHAT_MSG_CURRENCY" or event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
+        elseif event == "CHAT_MSG_LOOT" or event == "CHAT_MSG_CURRENCY" then
             --This is the most robust way to determine what's been looted.
             --Less responsive and more costly
             if (not IsMerchantFrameVisible()) and (self.currentLoots) then
@@ -831,8 +833,6 @@ do  --Event Handler
                     end
                 elseif event == "CHAT_MSG_CURRENCY" then    --guid is nil. Appear later than other chat events (~0.8s delay)
                     self:ProcessMessageCurrency(...);
-                elseif event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
-                    self:ProcessMessageFaction(...);
                 end
             end
         elseif event == "PLAYER_MONEY" then
@@ -2048,8 +2048,35 @@ do  --Use Loot UI as Notification Center
 			showGlow = true,
 			tooltipMethod = "SetSpellByID",
             isNotification = true,
+            slotIndex = 0,
 		};
 
 		self:QueueDisplayLoot(data);
+    end
+
+
+    local function TooltipFunc_Reputation(tooltip, factionID)
+        local text, factionName = API.GetFactionStatusText(factionID, true, true);
+        if text then
+            tooltip:SetText(factionName, 1, 0.82, 0);
+            tooltip:AddLine(text, 1, 1, 1);
+            tooltip:Show();
+        end
+    end
+
+    function MainFrame:QueueDisplayReputation(factionID, name, quantity)
+        if EL.enabled then
+            local data = {
+                slotType = Defination.SLOT_TYPE_REP,
+                id = factionID,
+                quality = 1,
+                quantity = quantity,
+                name = name,
+                hideCount = true,
+                tooltipFunc = TooltipFunc_Reputation,
+                slotIndex = 0,
+            };
+            self:QueueDisplayLoot(data);
+        end
     end
 end

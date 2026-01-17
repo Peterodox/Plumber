@@ -9,8 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber Addon";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Mostrar/ocultar resumen de la expansión";   --Show/hide Expansion Summary UI
-BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Enfocarse en la próxima misión";
-BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Enfocarse en la misión anterior";
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Centrarse en la próxima misión";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Centrarse en la misión anterior";
 
 
 --Module Control Panel
@@ -699,8 +699,8 @@ L["Press Key To Copy Format"] = "Presiona |cffffd100%s|r para copiar";
 
 
 --QuestWatchCycle
-L["ModuleName QuestWatchCycle"] = "Atajos de teclado: Enfocarse en la misión";
-L["ModuleDescription QuestWatchCycle"] = "Te permite presionar teclas de acceso rápido para enfocarse en la siguiente/anterior misión en el rastreador de objetivos.\n\n|cffd4641cSet your hotkeys in Keybindings> Plumber Addon.|r";
+L["ModuleName QuestWatchCycle"] = "Atajos de teclado: Centrarse en la misión";
+L["ModuleDescription QuestWatchCycle"] = "Te permite presionar teclas de acceso rápido para centrarse en la siguiente/anterior misión en el rastreador de objetivos.\n\n|cffd4641cSet your hotkeys in Keybindings> Plumber Addon.|r";
 
 
 --CraftSearchExtended

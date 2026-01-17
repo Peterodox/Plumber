@@ -813,14 +813,18 @@ do  --UI ItemButton
 
         elseif self.enableState == 2 then   --Auto Loot
             local hyperLink = self.data.mergedData and self.data.mergedData[1].link or self.data.link;
+            local width = self:GetWidth();
+            local textWidth = self.Text:GetWrappedWidth();
+            local offset = -(width - textWidth - (self.textOffset or 0));
             if hyperLink then
-                local width = self:GetWidth();
-                local textWidth = self.Text:GetWrappedWidth();
-                tooltip:SetOwner(self, "ANCHOR_RIGHT", -(width - textWidth - (self.textOffset or 0)), 0);
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", offset, 0);
                 tooltip:SetHyperlink(hyperLink);
             elseif self.data.tooltipMethod then
-                tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", offset, 0);
                 tooltip[self.data.tooltipMethod](tooltip, self.data.id);
+            elseif self.data.tooltipFunc then
+                tooltip:SetOwner(self, "ANCHOR_RIGHT", offset, 0);
+                self.data.tooltipFunc(tooltip, self.data.id, self.data);
             end
         end
     end

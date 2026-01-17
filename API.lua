@@ -2042,7 +2042,7 @@ do  -- Reputation
 		    factionStandingtext = GetReputationStandingText(standingID);
         end
 
-        if isParagon then
+        if isParagon and isCapped then
             local totalEarned, threshold, rewardQuestID, hasRewardPending = GetFactionParagonInfo(factionID);
             if totalEarned and threshold and threshold ~= 0 then
                 local paragonLevel = floor(totalEarned / threshold);
