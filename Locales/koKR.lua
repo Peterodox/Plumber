@@ -563,6 +563,8 @@ L["LootUI Option Combine Items"] = "유사 아이템 통합 표시";
 L["LootUI Option Combine Items Tooltip"] = "유사한 아이템을 하나의 행에 묶어 표시합니다. 지원되는 카테고리:\n\n- 잡동사니 아이템\n- 시대의 기념품 (군단 리믹스)";
 L["LootUI Option Low Frame Strata"] = "뒤로 보내기";
 L["LootUI Option Low Frame Strata Tooltip"] = "전리품 알림 모드에서 전리품 창을 다른 UI 뒤로 배치합니다.\n\n이 옵션은 수동 전리품 모드에는 영향을 주지 않습니다.";
+L["LootUI Option Show Reputation"] = "평판 변화 표시";
+L["LootUI Option Show Reputation Tooltip"] = "전리품 창에 평판 증가량을 표시합니다.\n\n전투 중 또는 PvP에서 획득한 평판은 이후에 표시됩니다.";
 
 
 --Quick Slot For Third-party Dev
@@ -607,7 +609,7 @@ L["ModuleDescription DrawerMacro"] = "아이템, 주문, 애완동물, 탈것, �
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "확장팩 개요";
-L["ModuleDescription NewExpansionLandingPage"] = "진영, 주간 활동, 공격대 귀속 정보를 표시하는 UI입니다. 다음 방법으로 열 수 있습니다:\n\n- 미니맵에 있는 '카즈 알가르 요약' 버튼을 클릭하세요.\n\n- 게임 설정의 단축키 메뉴에서 단축키를 설정할 수 있습니다.";
+L["ModuleDescription NewExpansionLandingPage"] = "진영, 주간 활동, 공격대 귀속 정보를 표시하는 UI입니다. 다음 방법으로 열 수 있습니다:\n\n- 게임 설정 > 단축키 > Plumber 애드온에서 단축키를 설정하세요.\n\n- 달력 버튼 아래에 있는 애드온 항목을 사용하세요.";
 L["Reward Available"] = "보상 가능";
 L["Paragon Reward Available"] = "불멸의 동맹 평판 보상 가능";
 L["Until Next Level Format"] = "%d 다음 레벨까지";   --Earn x reputation to reach the next level
