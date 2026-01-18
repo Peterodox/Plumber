@@ -4,12 +4,11 @@ local API = addon.API;
 
 local GetMapID = API.GetMapID;
 local StripHyperlinks = API.StripHyperlinks;
+local Secret_CanAccess = API.Secret_CanAccess;
 local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local GetItemName = C_Item.GetItemNameByID;
 local GetItemCount = C_Item.GetItemCount;
 local GetItemIcon = C_Item.GetItemIconByID;
-local find = string.find;
-local GetMinimapZoneText = GetMinimapZoneText;
 
 local KEY_QUANTITY_FORMAT = "%d / %d |T%s:16:16|t";
 
@@ -108,7 +107,7 @@ local function Post_GetWorldCursor(tooltip, tooltipData)
     if not (MODULE_ENABLED and IN_VALID_ZONE) then return end;
 
     local name = tooltipData.lines and tooltipData.lines[1] and tooltipData.lines[1].leftText;
-    if name and name ~= "" then
+    if Secret_CanAccess(name) and name and name ~= "" then
         name = StripHyperlinks(name);
 
         if NAME_KEYS[name] then

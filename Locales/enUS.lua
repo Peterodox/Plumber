@@ -563,6 +563,8 @@ L["LootUI Option Combine Items"] = "Combine Similar Items";
 L["LootUI Option Combine Items Tooltip"] = "Display similar items on a single row. Supported Categories:\n\n- Junk Items\n- Epoch Mementos (Legion Remix)";
 L["LootUI Option Low Frame Strata"] = "Send to Back";
 L["LootUI Option Low Frame Strata Tooltip"] = "While in Loot Notification Mode, place the loot window behind other UI.\n\nThis option doesn't affect Manual Loot Mode.";
+L["LootUI Option Show Reputation"] = "Show Reputation Changes";
+L["LootUI Option Show Reputation Tooltip"] = "Display any reputation increases in the loot window.\n\nReputations received during combat or in PvP instances will be displayed afterwards.";
 
 
 --Quick Slot For Third-party Dev
@@ -607,7 +609,7 @@ L["ModuleDescription DrawerMacro"] = "Create a custom flyout menu to manage your
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Expansion Summary";
-L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Click Khaz Algar Summary button on the minimap.\n\n- Set a hotkey in Game Setting> Keybindings.";
+L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Set a hotkey in Game Setting> Keybindings> Plumber Addon.\n\n- Use the Addon Compartment under the Calendar button.";
 L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level

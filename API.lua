@@ -2068,7 +2068,11 @@ do  -- Reputation
             rolloverText = format("(%s/%s)", barValue - barMin, barMax - barMin);
             if simplified then
                 factionStandingtext = isFriendship and repInfo.reaction or factionStandingtext or "";
-                return (factionStandingtext.." "..rolloverText), factionName
+                local text = factionStandingtext.." "..rolloverText
+                if cappedAlert then
+                    text = text.."\n"..cappedAlert;
+                end
+                return text, factionName
             end
         end
 

@@ -4895,6 +4895,7 @@ do  --EditMode
         self.texturePool:ReleaseAll();
         self.fontStringPool:ReleaseAll();
         self.keybindButtonPool:ReleaseAll();
+        self.newFeatureLabelPool:ReleaseAll();
     end
 
     function EditModeSettingsDialogMixin:Layout()
@@ -5106,6 +5107,11 @@ do  --EditMode
                             local enabled = (widgetData.shouldEnableOption == nil) or (widgetData.shouldEnableOption and widgetData.shouldEnableOption());
                             widget:SetEnabled(enabled);
                         end
+                        if widgetData.newFeature then
+                            local label = self.newFeatureLabelPool:Acquire();
+                            label:SetPoint("LEFT", widget.Label, "RIGHT", -12, 0);
+                            label:Show();
+                        end
                     end
                 end
             end
@@ -5234,6 +5240,11 @@ do  --EditMode
                 return addon.CreateKeybindButton(f);
             end
             f.keybindButtonPool = API.CreateObjectPool(CreateKeybindButton);
+
+            local function CreateNewFeatureLabel()
+                return CreateFrame("Frame", nil, f, "NewFeatureLabelNoAnimateTemplate");
+            end
+            f.newFeatureLabelPool = API.CreateObjectPool(CreateNewFeatureLabel);
         end
 
         if EditModeSettingsDialog:IsShown() and not EditModeSettingsDialog:IsOwner(parent) then
