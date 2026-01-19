@@ -34,7 +34,7 @@ L["Release Notes"] = "Release Notes";
 L["Option AutoShowChangelog"] = "Auto Show Release Notes";
 L["Option AutoShowChangelog Tooltip"] = "Automatically show release notes after an update.";
 L["Category Colon"] = (CATEGORY or "Category")..": ";
-L["Module Wrong Game Version"] = "This module is ineffective for your current game version.";
+L["Module Wrong Game Version"] = "This feature is ineffective for your current game version.";
 L["Changelog Wrong Game Version"] = "The following changes do not apply to your current game version.";
 L["Settings Panel"] = "Settings Panel";
 L["Version"] = "Version";
@@ -459,7 +459,6 @@ L["SoftTargetName HideName"] = "Hide Object Name";
 L["SoftTargetName HideName Tooltip"] = "Hide the soft target object name when you are in a house."
 
 
-
 --LegionRemix
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Automatically learn traits.\n\n- Add a widget to the Paper Doll that provides various types of info. You can click this widget to open a new Artifact UI.";
@@ -564,7 +563,7 @@ L["LootUI Option Combine Items Tooltip"] = "Display similar items on a single ro
 L["LootUI Option Low Frame Strata"] = "Send to Back";
 L["LootUI Option Low Frame Strata Tooltip"] = "While in Loot Notification Mode, place the loot window behind other UI.\n\nThis option doesn't affect Manual Loot Mode.";
 L["LootUI Option Show Reputation"] = "Show Reputation Changes";
-L["LootUI Option Show Reputation Tooltip"] = "Display any reputation increases in the loot window.\n\nReputations received during combat or in PvP instances will be displayed afterwards.";
+L["LootUI Option Show Reputation Tooltip"] = "Display any reputation increases in the loot window.\n\nReputations earned during combat or in PvP instances will be displayed afterwards.";
 
 
 --Quick Slot For Third-party Dev
@@ -609,7 +608,7 @@ L["ModuleDescription DrawerMacro"] = "Create a custom flyout menu to manage your
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Expansion Summary";
-L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Set a hotkey in Game Setting> Keybindings> Plumber Addon.\n\n- Use the Addon Compartment under the Calendar button.";
+L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Set a hotkey in Game Settings> Keybindings> Plumber Addon.\n\n- Use the Addon Compartment under the Calendar button.";
 L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level

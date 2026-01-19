@@ -10,6 +10,120 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10805] = {
+    {
+        type = "date",
+        versionText = "1.8.5",
+        timestamp = 1768800000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName InstanceDifficulty"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can now adjust this UI's position in Edit Mode.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "tocVersionCheck",
+        minimumTocVersion = 120000,
+        breakpoint = false,
+    },
+
+
+    {
+        type = "h1",
+        text = L["ModuleName LootUI"],
+        dbKey = "LootUI",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "LootUI",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Added a new option to display reputations earned from all sources in the loot window.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Hover the cursor over the notification to show the reputation's progress.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Reputations earned during combat or in PvP instances will be displayed afterwards.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName NewExpansionLandingPage"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "The Khaz Algar landing page button has been removed. To open Plumber Expansion Summary, set a hotkey in Game Settings> Keybindings> Plumber Addon, or use the Addon Compartment under the Calendar button.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Retired Features",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Teleport Home Macro",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = L["ModuleName SpellcastingInfo"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = L["ModuleName Delves_SeasonProgress"]..": ".."Blizzard has redesigned this UI. Your Delves Progress is now shown in Adventure Guide> Journeys.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = L["ModuleName SoftTargetName"]..": ".."The radial cast bar on nameplates has been removed.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = L["ModuleName TransmogChatCommand"]..": ".."This module has been removed. Features like \"using outfit slash commands to load available items to the Transmog UI\" will be migrated to the Narcissus addon.",
+    },
+};
+
+
 changelogs[10804] = {
     {
         type = "date",
@@ -20,28 +134,24 @@ changelogs[10804] = {
     {
         type = "h1",
         text = "Housing Modules",
-        redacted = true,
     },
 
     {
         type = "p",
         bullet = true,
         text = "House Editor, Customize Mode: You can Shift Click a dye swatch to track its recipe, or post it in chat.",
-        redacted = true,
     },
 
     {
         type = "p",
         bullet = true,
         text = "Decor Catalog: You can Shift Click a decor to post it in chat if the chat edit box is active. Alternatively, from its context menu.",
-        redacted = true,
     },
 
     {
         type = "p",
         bullet = true,
         text = "Thanks to Cabal members Keyboardturner and Ghost for the inspiration and for providing a cozy place to code.",
-        redacted = true,
     },
 
     {
@@ -52,7 +162,6 @@ changelogs[10804] = {
         type = "h1",
         text = L["ModuleName InstanceDifficulty"],
         dbKey = "InstanceDifficulty",
-        redacted = true,
     },
 
     {
@@ -64,28 +173,24 @@ changelogs[10804] = {
         type = "p",
         bullet = true,
         text = "You can now Alt Right Click on the instance name to reset all instances.",
-        redacted = true,
     },
 
     {
         type = "p",
         bullet = true,
         text = "You can now Shift Click on a difficulty button to post your raid progress in chat if you have killed any boss on that difficulty.",
-        redacted = true,
     },
 
     {
         type = "p",
         bullet = true,
         text = "Karazhan side entrance should show the correct difficulties.",
-        redacted = true,
     },
 
     {
         type = "p",
         bullet = true,
         text = "Thanks to the Dawnsong Twins, especially the nicer one, for testing this module multiple times and giving valuable feedback.",
-        redacted = true,
     },
 
     {

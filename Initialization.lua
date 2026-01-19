@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.8.4 c";
-local VERSION_DATE = 1766300000;
+local VERSION_TEXT = "1.8.5";
+local VERSION_DATE = 1768800000;
 
 
 local addonName, addon = ...
@@ -207,7 +207,6 @@ local DefaultValues = {
         SoftTarget_Objectives = false,
         SoftTarget_House_HideIcon = false,
         SoftTarget_House_HideName = false,
-
     AppearanceTab = false,              --Adjust Appearance Tab models to reduce GPU usage spike
         AppearanceTab_ModelCount = 1,
     ItemUpgradeUI = true,
@@ -354,7 +353,7 @@ local NeverEnableByDefault = {
 
 local function LoadDatabase()
     PlumberDB = PlumberDB or {};
-    PlumberStorage = PlumberStorage or {};  --Save large data (Spell)
+    PlumberStorage = PlumberStorage or {};
     PlumberDB_PC = PlumberDB_PC or {};
 
     DB = PlumberDB;
@@ -394,6 +393,9 @@ local function LoadDatabase()
 
     CallbackRegistry:Trigger("NewDBKeysAdded", newDBKeys);
     CallbackRegistry:Trigger("DBLoaded", DB);
+
+
+    PlumberStorage.CreatureSpells = nil;    --Store SpellcastingInfo, retired in  Midnight
 end
 
 

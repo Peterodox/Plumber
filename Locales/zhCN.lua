@@ -34,7 +34,7 @@ L["Release Notes"] = "版本说明";
 L["Option AutoShowChangelog"] = "自动显示版本说明";
 L["Option AutoShowChangelog Tooltip"] = "在插件更新后自动打开版本说明。";
 L["Category Colon"] = "类别：";
-L["Module Wrong Game Version"] = "此模块对当前游戏版本无效。";
+L["Module Wrong Game Version"] = "此功能对当前游戏版本无效。";
 L["Changelog Wrong Game Version"] = "以下更新对当前游戏版本无效。";
 L["Settings Panel"] = "设置界面";
 L["Version"] = "版本";
@@ -562,6 +562,8 @@ L["LootUI Option Combine Items"] = "合并相似物品";
 L["LootUI Option Combine Items Tooltip"] = "在同一行显示相似物品。目前支持的分类为：\n\n- 垃圾物品\n- 纪元纪念品（军团再临：幻境新生）";
 L["LootUI Option Low Frame Strata"] = "置于底层";
 L["LootUI Option Low Frame Strata Tooltip"] = "在处于通知模式时，将拾取窗口置于其他界面的后方。\n\n此选项不影响手动拾取模式。";
+L["LootUI Option Show Reputation"] = "显示声望变化";
+L["LootUI Option Show Reputation Tooltip"] = "在拾取窗口内显示获得的声望。\n\n在战斗中或是战场内获得的声望将在结束后合并显示。";
 
 
 --Quick Slot For Third-party Dev
@@ -630,6 +632,7 @@ L["Warband Weekly Reward Tooltip"] = "你的战团每周只能获取一次此奖
 L["Completed"] = "已完成";
 L["Filter Hide Completed Format"] = "隐藏已完成的条目 (%d)";
 L["Weekly Reset Format"] = "周常重置：%s";
+L["Daily Reset Format"] = "日常重置：%s";
 L["Ready To Turn In Tooltip"] = "可以上交任务。";
 L["Weekly Coffer Key Tooltip"] = "每周获得的前四个周常宝箱里有一把修复的宝匣钥匙。";
 L["Weekly Coffer Key Shards Tooltip"] = "每周获得的前四个周常宝箱里有宝匣钥匙碎片。";
@@ -686,6 +689,7 @@ L["ModuleName Housing_Macro"] = "房屋宏";
 L["ModuleDescription Housing_Macro"] = "要创建一个回家宏：请先创建一个新宏，然后在宏编辑框中输入 |cffd7c0a3#plumber:home|r";
 L["Teleport Home"] = "传送到房屋";
 L["Instruction Drag To Action Bar"] = "<可点击并拖动到技能栏>";
+L["Teleport Home Temp Disabled"] = "“房屋宏”已失效";
 L["Toggle Torch"] = "勾选火把";
 L["ModuleName Housing_DecorHover"] = "编辑器：1 装饰模式";
 L["ModuleDescription Housing_DecorHover"] = "装饰模式下：\n\n- 将光标悬停在装饰物上，可显示其占用空间、名称以及库存数量。\n\n- 允许你按下Alt键来摆放一个同样的物体。\n\n新物体不会继承当前的选择角度和缩放比例。";

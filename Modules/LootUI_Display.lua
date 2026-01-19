@@ -1709,6 +1709,14 @@ do  --Edit Mode
         end
     end
 
+    local function Tooltip_ShowReputation()
+        local tooltip = L["LootUI Option Show Reputation Tooltip"];
+        if not C_EventUtils.IsEventValid("FACTION_STANDING_CHANGED") then
+            tooltip = tooltip.."\n\n|cffd4641c"..L["Module Wrong Game Version"].."|r";
+        end
+        return tooltip
+    end
+
     local OPTIONS_SCHEMATIC = {
         title = L["Addon Name Colon"]..L["ModuleName LootUI"],
         widgets = {
@@ -1723,7 +1731,7 @@ do  --Edit Mode
             {type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return C_ColorOverrides and ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
             {type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
             {type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItems"},
-            {newFeature = true, type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = L["LootUI Option Show Reputation Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = function() return C_EventUtils.IsEventValid("FACTION_STANDING_CHANGED") end},
+            {newFeature = true, type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = Tooltip_ShowReputation, onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = Validation_IsRetail},
             {type = "Checkbox", label = L["LootUI Option Low Frame Strata"], tooltip = L["LootUI Option Low Frame Strata Tooltip"], onClickFunc = nil, dbKey = "LootUI_LowFrameStrata"},
 
             {type = "Divider"},
