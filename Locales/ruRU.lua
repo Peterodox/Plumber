@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.8.4 c
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.8.5
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -14,6 +14,7 @@ BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Фокус на предыдущем
 
 
 --Module Control Panel
+L["Addon Name Colon"] =  "Plumber: ";
 L["Module Control"] = "Управление модулем";
 L["Quick Slot Generic Description"] = "\n\n*Быстрый слот - это набор интерактивных кнопок, которые появляются при определенных условиях.";
 L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Режим редактирования";
@@ -178,7 +179,6 @@ L["ModuleDescription BlizzFixEventToast"] = "Измените поведение
 --Talking Head
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Говорящая голова";
 L["ModuleDescription TalkingHead"] = "Замените стандартный пользовательский интерфейс Говорящей головы на чистый, безголовый.";
-L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Мгновенный текст";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Текстовый контур";
 L["TalkingHead Option Condition Header"] = "Скрыть тексты из источника:";
@@ -459,7 +459,6 @@ L["SoftTargetName HideName"] = "Скрыть название объекта";
 L["SoftTargetName HideName Tooltip"] = "Скрывать название объекта мягкой цели в доме."
 
 
-
 --LegionRemix
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Автоматическое изучение черт.\n\n- Добавление виджета на панель персонажа, предоставляющего различную информацию. Вы можете кликнуть по этому виджету, чтобы открыть новый интерфейс артефакта.";
@@ -531,7 +530,6 @@ L["Sample Item 4"] = "Потрясающий эпический предмет";
 L["Sample Item 3"] = "Потрясающий редкий предмет";
 L["Sample Item 2"] = "Потрясающий необычный предмет";
 L["Sample Item 1"] = "Обычный предмет";
-L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Окно добычи");
 L["Manual Loot Instruction Format"] = "Чтобы временно отменить автоматическую добычу определенного предмета, нажмите и удерживайте |cffffffff%s|r клавишу, пока не появится окно добычи.";
 L["LootUI Option Hide Window"] = "Скрывать окно добычи Plumber";
 L["LootUI Option Hide Window Tooltip"] = "Скрывает уведомление о добыче от Plumber, но все функции (например, принудительный автолут) продолжают работать в фоновом режиме.";
@@ -564,6 +562,8 @@ L["LootUI Option Combine Items"] = "Объединять похожие пред
 L["LootUI Option Combine Items Tooltip"] = "Отображать похожие предметы в одной строке. Поддерживаемые категории:\n\n- Мусорные предметы\n- Осколки времени (Legion Remix)";
 L["LootUI Option Low Frame Strata"] = "Отправить на задний план";
 L["LootUI Option Low Frame Strata Tooltip"] = "В режиме уведомления о добыче поместите окно добычи за другим элементом пользовательского интерфейса.\n\nЭта опция не влияет на режим ручной добычи.";
+L["LootUI Option Show Reputation"] = "Показать изменения репутации";
+L["LootUI Option Show Reputation Tooltip"] = "Отображайте любые повышения репутации в окне добычи.\n\nРепутация, заработанная во время боя или в PvP-сражениях, будет отображена позже.";
 
 
 --Quick Slot For Third-party Dev
@@ -687,6 +687,8 @@ L["Difficulty Not Accurate"] = "Сложность отображается не
 L["Instruction Click To Open Adventure Guide"] = "ЛКМ: |cffffffffОткрыть Путеводитель по приключениям|r";
 L["Instruction Alt Click To Reset Instance"] = "Alt + ПКМ: |cffffffffОбновить все подземелья|r";
 L["Instruction Link Progress In Chat"] = "<Shift + клик, чтобы отправить прогресс в чат>";
+L["Instance Name"] = "Название подземелья";   --Dungeon/Raid Name
+L["EditMode Instruction InstanceDifficulty"] = "Ширина рамки зависит от количества доступных опций.";
 
 
 --TransmogChatCommand
@@ -718,6 +720,7 @@ L["ModuleName Housing_Macro"] = "Макросы для дома";
 L["ModuleDescription Housing_Macro"] = "Вы можете создать макрос Телепортация домой: создайте новый макрос, затем введите в поле ввода команду |cffd7c0a3#plumber:home|r.";
 L["Teleport Home"] = "Телепортация домой";
 L["Instruction Drag To Action Bar"] = "<Кликните и перетащите на панель команд>";
+L["Teleport Home Temp Disabled"] = "\"Телепортация домой\" Макрос больше недоступен";
 L["Toggle Torch"] = "Включить/выключить факел";
 L["ModuleName Housing_DecorHover"] = "Редактор: название объекта и дублирование";
 L["ModuleDescription Housing_DecorHover"] = "В режиме украшения (Decorate Mode):\n\n- При наведении курсора на предмет декора будет отображаться его название и количество в хранилище.\n\n- Удерживая Alt, можно дублировать выбранный декор.\n\nНовый объект не унаследует текущие углы поворота и масштаб.";
