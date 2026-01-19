@@ -721,6 +721,7 @@ L["ModuleName Housing_Macro"] = "Housing Macros";
 L["ModuleDescription Housing_Macro"] = "You can create a Teleport Home macro: create a new macro first, then enter |cffd7c0a3#plumber:home|r in the command editbox.";
 L["Teleport Home"] = "Teleport Home";
 L["Instruction Drag To Action Bar"] = "<Click and Drag this to your Action Bars>";
+L["Teleport Home Temp Disabled"] = "\"Teleport Home\" Macro is no longer usable";
 L["Toggle Torch"] = "Toggle Torch";
 L["ModuleName Housing_DecorHover"] = "Editor: 1 Decorate Mode";
 L["ModuleDescription Housing_DecorHover"] = "In Decorate Mode:\n\n- Hover the cursor over a decor to display its placement cost, name, and its item count in storage.\n\n- Allows you to \"duplicate\" a decor by pressing Alt.\n\nThe new object will not inherit the current angles and scales.";

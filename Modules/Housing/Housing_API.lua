@@ -245,6 +245,11 @@ do  --House Level / Info / Teleport
                 local uiMapID = C_Housing.GetUIMapIDForNeighborhood(info.neighborhoodGUID);
                 local mapIndex = uiMapID and NeighborhoodMapIndex[uiMapID] or 1;
                 local teleportFunc = function()
+                    if addon.IS_MIDNIGHT then
+                        addon.API.DisplayErrorMessage(L["Teleport Home Temp Disabled"]);
+                        return
+                    end
+
                     if DataProvider:CheckTeleportInCooldown() or InCombatLockdown() then
                         return
                     end

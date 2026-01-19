@@ -154,6 +154,9 @@ end
 local function Blizzard_HousingDashboard_OnLoaded()
     if not Flags.TeleportToHouseButton then
         Flags.TeleportToHouseButton = true;
+
+        if addon.IS_MIDNIGHT then return end;
+
         local TeleportButton = API.GetGlobalObject("HousingDashboardFrame.HouseInfoContent.ContentFrame.HouseUpgradeFrame.TeleportToHouseButton");
         if TeleportButton then
             TeleportButton:RegisterForDrag("LeftButton");
