@@ -1056,13 +1056,13 @@ do  --MacroInterpreter
 
             if not processed then
                 if find(line, "/home") then
-                    processed = true;
-                    icon = 7252953;
-                    name = L["Teleport Home"];
-                    id = -1;
-                    actionType = "teleportHome";
-                    macroText = "/script if Plumber_TeleportHome then Plumber_TeleportHome() end";
-                    usable = true;
+                    if addon.Housing then
+                        processed = true;
+                        icon, macroText, name = addon.Housing.GetDynamicTeleportAction();
+                        id = -1;
+                        actionType = "teleportHome";
+                        usable = true;
+                    end
                 end
             end
 

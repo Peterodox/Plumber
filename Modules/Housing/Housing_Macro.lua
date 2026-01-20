@@ -14,15 +14,31 @@ end
 
 
 local Flags = {};
+local Commands = {};
 
 
 do  --Teleport Home Macro    #plumber:home
     local COMMAND_HOME = "home";    --Teleport Home
 
+    local function GetDynamicTeleportAction()
+        local icon, macro, tooltip;
+        if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+            icon = 236350;
+            macro = Housing.GetLeaveHomeMacro();
+            tooltip = L["Leave Home"];
+        else
+            icon = 7252953;
+            macro = Housing.GetTeleportHomeMacro();
+            tooltip = L["Teleport Home"];
+        end
+        return icon, macro, tooltip
+    end
+    Housing.GetDynamicTeleportAction = GetDynamicTeleportAction;
+
     local function WriteFunc_home(body)
         local header = "#plumber:"..COMMAND_HOME;
-        local icon = 7252953;
-        local body = header.."\n/script if Plumber_TeleportHome then Plumber_TeleportHome() end";
+        local icon, macro = GetDynamicTeleportAction();
+        local body = header.."\n"..macro;
         return body, icon
     end
 
@@ -44,6 +60,7 @@ do  --Teleport Home Macro    #plumber:home
         command = COMMAND_HOME,
         name = L["PlumberMacro Housing"],
         modifyType = "Overwrite",
+        conditionFunc = IsInHousingZone,
 
         events = {
             "HOUSE_PLOT_ENTERED",
@@ -53,9 +70,7 @@ do  --Teleport Home Macro    #plumber:home
         writeFunc = WriteFunc_home,
     };
 
-    addon.CallbackRegistry:Register("DBLoaded", function()
-        addon.AddPlumberMacro(TeleportHomeCommand);
-    end);
+    table.insert(Commands, TeleportHomeCommand);
 end
 
 
@@ -126,7 +141,6 @@ do  --Toggle Torch Macro    #plumber:torch
         return name, icon, body
     end
 
-
     function Housing.AcquireTorchMacro()
         return addon.AcquireCharacterMacro(COMMAND_TORCH, Generator_torch)
     end
@@ -144,18 +158,20 @@ do  --Toggle Torch Macro    #plumber:torch
         writeFunc = WriteFunc_torch,
     };
 
-    addon.CallbackRegistry:Register("DBLoaded", function()
-        ItemInfo:LoadItemName();
-        addon.AddPlumberMacro(ToggleTorchCommand);
-    end);
+    table.insert(Commands, ToggleTorchCommand);
 end
+
+
+addon.CallbackRegistry:Register("DBLoaded", function()
+    for _, command in ipairs(Commands) do
+        addon.AddPlumberMacro(command);
+    end
+end);
 
 
 local function Blizzard_HousingDashboard_OnLoaded()
     if not Flags.TeleportToHouseButton then
         Flags.TeleportToHouseButton = true;
-
-        if addon.IS_MIDNIGHT then return end;
 
         local TeleportButton = API.GetGlobalObject("HousingDashboardFrame.HouseInfoContent.ContentFrame.HouseUpgradeFrame.TeleportToHouseButton");
         if TeleportButton then
@@ -187,7 +203,6 @@ end
 
 local function EnableModule(state)
     state = true;   --Always ON
-
     Housing.RequestUpdateHouseInfo();
     if state then
         Flags.macroEnabled = true;
@@ -219,6 +234,4 @@ local moduleData = {
     },
 };
 
-if not addon.IS_MIDNIGHT then
-    addon.ControlCenter:AddModule(moduleData);
-end
+addon.ControlCenter:AddModule(moduleData);

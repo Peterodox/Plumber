@@ -4,6 +4,7 @@
 
 	<Script file="ModelScaleReference.lua"/>
 	<Script file="CatalogSearch.lua"/>
+	<Script file="Housing_ActionButton.lua"/>
 	<Script file="Housing_Macro.lua"/>
 	<Script file="ItemAcquiredAlert.lua"/>
 

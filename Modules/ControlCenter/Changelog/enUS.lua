@@ -14,7 +14,7 @@ changelogs[10805] = {
     {
         type = "date",
         versionText = "1.8.5",
-        timestamp = 1768800000,
+        timestamp = 1768900000,
     },
 
     {
@@ -74,6 +74,27 @@ changelogs[10805] = {
 
     {
         type = "h1",
+        text = L["ModuleName Housing_Macro"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "The Teleport Home macro will be automatically changed to Return to Previous Location when eligible.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Shout-outs to ConsolePort dev Munk, and a mysterious helper that works in extreme weather, and of course myelf for reviving the Teleport Home macro in Midnight.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
         text = L["ModuleName NewExpansionLandingPage"],
     },
 
@@ -90,12 +111,6 @@ changelogs[10805] = {
     {
         type = "h1",
         text = "Retired Features",
-    },
-
-    {
-        type = "p",
-        bullet = true,
-        text = "Teleport Home Macro",
     },
 
     {

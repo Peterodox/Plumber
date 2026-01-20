@@ -148,21 +148,6 @@ end
 
 
 do  --House Level / Info / Teleport
-    --local SecureButton_Home1 = CreateFrame("Button", "PLMR_HOME1", nil, "SecureActionButtonTemplate");
-    --SecureButton_Home1:SetSize(1, 1);
-    --SecureButton_Home1:SetPoint("BOTTOMRIGHT", UIParent, "TOPLEFT", 0, 0);
-
-    local function SetAction_TeleportHome(neighborhoodGUID, houseGUID, plotID)
-        if not InCombatLockdown() then
-            SecureButton_Home1:RegisterForClicks("AnyDown", "AnyUp");
-            SecureButton_Home1:SetAttribute("type", "teleporthome");
-            SecureButton_Home1:SetAttribute("house-neighborhood-guid", neighborhoodGUID);
-            SecureButton_Home1:SetAttribute("house-guid", houseGUID);
-            SecureButton_Home1:SetAttribute("house-plot-id", plotID);
-        end
-    end
-
-
     function DataProvider:GetMaxHousePlayerCanOwn()
         return 2
     end
@@ -210,24 +195,6 @@ do  --House Level / Info / Teleport
         end
     end
 
-    function DataProvider:CheckTeleportInCooldown()
-        local timeString = self:GetTeleportCooldownText();
-        if timeString then
-            local messageType = 0;
-            UIErrorsFrame:TryDisplayMessage(messageType, ITEM_COOLDOWN_TIME:format("|cffffffff"..timeString.."|r"), RED_FONT_COLOR:GetRGB());
-            return true
-        end
-    end
-
-    function Housing.SetupTeleportTooltip(tooltip)
-        tooltip:SetText(L["Teleport Home"]);
-        local timeString = DataProvider:GetTeleportCooldownText();
-        if timeString then
-            tooltip:AddLine(ITEM_COOLDOWN_TIME:format(timeString), 1, 1, 1, true);
-        end
-        tooltip:Show();
-    end
-
     function DataProvider:ProcessHouseInfoList()
         self.teleportHomeInfo = {};
         _G.Plumber_TeleportHome = nil;
@@ -238,32 +205,28 @@ do  --House Level / Info / Teleport
 
         local faction = UnitFactionGroup("player");
         local factionMapIndex = faction == "Horde" and 2 or 1;
+        local TeleportHomeButtons = Housing.TeleportHomeButtons;
 
         for i = 1, self:GetMaxHousePlayerCanOwn() do
             local info = self.houseInfoList[i];
             if info then
                 local uiMapID = C_Housing.GetUIMapIDForNeighborhood(info.neighborhoodGUID);
                 local mapIndex = uiMapID and NeighborhoodMapIndex[uiMapID] or 1;
-                local teleportFunc = function()
-                    if addon.IS_MIDNIGHT then
-                        addon.API.DisplayErrorMessage(L["Teleport Home Temp Disabled"]);
-                        return
-                    end
 
-                    if DataProvider:CheckTeleportInCooldown() or InCombatLockdown() then
-                        return
-                    end
-                    C_Housing.TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);     --C_Housing.ReturnAfterVisitingHouse
-                end
                 if i == 1 or mapIndex == factionMapIndex then
-                    _G.Plumber_TeleportHome = teleportFunc;
-                    --SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
+                    TeleportHomeButtons.CurrentFaction:SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
                 end
+
+                if mapIndex == 1 then
+                    TeleportHomeButtons.Alliance:SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
+                elseif mapIndex == 2 then
+                    TeleportHomeButtons.Horde:SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
+                end
+
                 self.teleportHomeInfo[i] = {
                     ownerName = info.ownerName,
                     houseName = info.houseName,
                     mapIndex = mapIndex,
-                    func = teleportFunc,
                 };
             end
         end
@@ -275,6 +238,28 @@ do  --House Level / Info / Teleport
         self:ProcessHouseInfoList();
     end
 
+
+    function Housing.CheckTeleportInCooldown()
+        local timeString = DataProvider:GetTeleportCooldownText();
+        if timeString then
+            local messageType = 0;
+            UIErrorsFrame:TryDisplayMessage(messageType, ITEM_COOLDOWN_TIME:format("|cffffffff"..timeString.."|r"), RED_FONT_COLOR:GetRGB());
+            return true
+        end
+    end
+
+    function Housing.SetupTeleportTooltip(tooltip)
+        if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+            tooltip:SetText(L["Leave Home"]);
+        else
+            tooltip:SetText(L["Teleport Home"]);
+            local timeString = DataProvider:GetTeleportCooldownText();
+            if timeString then
+                tooltip:AddLine(ITEM_COOLDOWN_TIME:format(timeString), 1, 1, 1, true);
+            end
+            tooltip:Show();
+        end
+    end
 
     function Housing.RequestUpdateHouseInfo()
         if not Housing.isUpdatingHouseInfo then

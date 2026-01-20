@@ -62,7 +62,7 @@ function ControlCenter:InitializeModules()
     for _, moduleData in pairs(self.modules) do
         isForceEnabled = false;
         if (not moduleData.validityCheck) or (moduleData.validityCheck()) then
-            enabled = db[moduleData.dbKey];
+            enabled = db[moduleData.dbKey] or moduleData.virtual;
             moduleData.isValid = true;
 
             if (not enabled) and (self.newDBKeys[moduleData.dbKey]) then
