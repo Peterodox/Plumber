@@ -57,7 +57,7 @@ do  --Basic
     function Housing.GetDecorSourceText(decorID, ownedOnly)
         if ownedOnly then
             local info = GetCatalogEntryInfoByRecordID(1, decorID, true);
-            return info and info.numStored > 0 and info.sourceText
+            return info and info.quantity and info.quantity > 0 and info.sourceText
         else
             local info = GetCatalogEntryInfoByRecordID(1, decorID, false);
             return info and info.sourceText
