@@ -34,7 +34,7 @@ L["Release Notes"] = "업데이트 내역";
 L["Option AutoShowChangelog"] = "업데이트 내역 자동 표시";
 L["Option AutoShowChangelog Tooltip"] = "업데이트 내역을 자동으로 표시합니다.";
 L["Category Colon"] = (CATEGORY or "카테고리")..": ";
-L["Module Wrong Game Version"] = "이 모듈은 현재 게임 버전에서 작동하지 않습니다.";
+L["Module Wrong Game Version"] = "이 기능은 현재 게임 버전에서 작동하지 않습니다.";
 L["Changelog Wrong Game Version"] = "다음 변경 사항은 현재 게임 버전에 적용되지 않습니다.";
 L["Settings Panel"] = "설정 패널";
 L["Version"] = "버전";
@@ -459,7 +459,6 @@ L["SoftTargetName HideName"] = "오브젝트 이름 숨기기";
 L["SoftTargetName HideName Tooltip"] = "내부에 있을 때 오브젝트 이름을 숨깁니다."
 
 
-
 --LegionRemix
 L["ModuleName LegionRemix"] = "군단 리믹스";
 L["ModuleDescription LegionRemix"] = "- 특성을 자동으로 배웁니다.\n\n- 캐릭터 창에 다양한 정보를 제공하는 위젯을 추가합니다. 이 위젯을 클릭하면 새 유물 UI가 열립니다.";
@@ -721,6 +720,7 @@ L["ModuleName Housing_Macro"] = "하우징 매크로";
 L["ModuleDescription Housing_Macro"] = "하우징 순간이동 매크로를 생성할 수 있습니다: 먼저 새 매크로를 생성한 후, 명령어 입력창에 |cffd7c0a3#plumber:home|r 을 입력하세요.";
 L["Teleport Home"] = "집으로 순간이동";
 L["Instruction Drag To Action Bar"] = "<클릭하고 드래그하여 행동 단축바로 이동>";
+L["Leave Home"] = HOUSING_DASHBOARD_RETURN or "이전 위치로 돌아가기";
 L["Toggle Torch"] = "횃불 전환";
 L["ModuleName Housing_DecorHover"] = "편집기: 객체 이름 및 복제";
 L["ModuleDescription Housing_DecorHover"] = "장식 모드:\n\n- 커서를 장식 위에 올려놓으면 해당 장식 이름과 저장된 아이템 수가 표시됩니다.\n\n- Alt를 눌러 장식을 \"복제\"할 수 있습니다.\n\n새로 생성된 오브젝트는 현재 각도와 크기를 상속받지 않습니다.";
