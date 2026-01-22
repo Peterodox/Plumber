@@ -704,7 +704,8 @@ L["Press Key To Copy Format"] = "|cffffd100%s|r 키를 눌러 복사";
 
 --TransmogOutfitSelect
 L["ModuleName TransmogOutfitSelect"] = "의상 컬렉션: 빠른 접근";
-L["ModuleDescription TransmogOutfitSelect"] = "어디서나 의상 컬렉션을 열고 저장된 의상을 활성화할 수 있습니다.\n\n사용법: 형상변환 UI를 열고 의상 목록 위의 |cffd7c0a3빠른 접근|r 버튼을 행동 단축바로 드래그하세요.";
+L["ModuleDescription1 TransmogOutfitSelect"] = "어디서나 의상 컬렉션을 열고 저장된 의상을 활성화할 수 있습니다.";
+L["ModuleDescription2 TransmogOutfitSelect"] = "사용법: 형상변환 UI를 열고 의상 목록 위의 |cffd7c0a3빠른 접근|r 버튼을 행동 단축바로 드래그하세요.";
 L["Outfit Collection"] = "의상 컬렉션";
 L["Quick Access Outfit Button"] = "빠른 접근";
 L["Quick Access Outfit Button Tooltip"] = "의상을 어디서나 변경할 수 있도록 이 버튼을 행동 단축바로 클릭하여 드래그하세요.";
