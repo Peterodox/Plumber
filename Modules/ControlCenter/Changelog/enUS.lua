@@ -52,13 +52,19 @@ changelogs[10805] = {
 
     {
         type = "h1",
-        text = "Bug Fix",
+        text = "Bug Fixes",
     },
 
     {
         type = "p",
         bullet = true,
-        text = "Fixed an error when using the decor search box in house editing mode.",
+        text = "Decor Catalog: Fixed an error when using the decor search box in house editing mode.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Expansion Summary: The UI should no longer display the paragon progress for factions that haven't reach maxmimum renown.",
     },
 
     {
