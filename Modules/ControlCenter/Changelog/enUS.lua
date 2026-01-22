@@ -64,7 +64,7 @@ changelogs[10805] = {
     {
         type = "p",
         bullet = true,
-        text = "Expansion Summary: The UI should no longer display the paragon progress for factions that haven't reach maxmimum renown.",
+        text = "Expansion Summary: The UI should no longer display the paragon progress for factions that haven't reached maximum renown.",
     },
 
     {
