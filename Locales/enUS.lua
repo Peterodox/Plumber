@@ -704,7 +704,8 @@ L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
 
 --TransmogOutfitSelect
 L["ModuleName TransmogOutfitSelect"] = "Outfit Collection: Quick Access";
-L["ModuleDescription TransmogOutfitSelect"] = "Allows you open the outfit collection and enable saved appearance anywhere.\n\nTo do this: open the Transmog UI, then drag the |cffd7c0a3Quick Access|r button above the outfit list to your action bars.";
+L["ModuleDescription1 TransmogOutfitSelect"] = "Allows you open the outfit collection and enable saved appearance anywhere.";
+L["ModuleDescription2 TransmogOutfitSelect"] = "To do this: open the Transmog UI, then drag the |cffd7c0a3Quick Access|r button above the outfit list to your action bars.";
 L["Outfit Collection"] = "Outfit Collection";
 L["Quick Access Outfit Button"] = "Quick Access";
 L["Quick Access Outfit Button Tooltip"] = "Click and drag this button to your action bars so you can change outfits anywhere.";

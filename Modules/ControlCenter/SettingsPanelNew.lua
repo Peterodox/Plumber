@@ -26,6 +26,7 @@ local Def = {
     ChangelogLineBreakHeight = 32,
     ChangelogIndent = 16,   --22 to match Checkbox Label
     ChangelogImageSize = 240,
+    ChangelogImageSizeLarge = 300,
 
 
     TextColorNormal = {215/255, 192/255, 163/255},
@@ -1748,9 +1749,25 @@ do  --ChangelogTab
                 bottom = bottom + Def.ChangelogLineBreakHeight;
 
             elseif info.type == "img" then
-                if info.dbKey then
+                if info.dbKey or info.fileName then
+                    local file;
+                    if info.dbKey then
+                        file = "Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..info.dbKey;
+                    else
+                        file = "Interface/AddOns/Plumber/Art/ControlCenter/"..info.fileName;
+                    end
+
+                    local width, height;
+                    if info.large then
+                        width = Def.ChangelogImageSizeLarge;
+                        height = Def.ChangelogImageSizeLarge;
+                    else
+                        width = Def.ChangelogImageSize;
+                        height = Def.ChangelogImageSize;
+                    end
+
                     n = n + 1;
-                    bottom = top + Def.ChangelogImageSize + Def.ChangelogParagraphSpacing;
+                    bottom = top + height + Def.ChangelogParagraphSpacing;
                     content[n] = {
                         dataIndex = n,
                         templateKey = "Texture",
@@ -1760,10 +1777,10 @@ do  --ChangelogTab
                         relativePoint = "TOPLEFT",
                         offsetX = leftOffset,
                         setupFunc = function(obj)
-                            obj:SetSize(Def.ChangelogImageSize, Def.ChangelogImageSize);
+                            obj:SetSize(width, height);
                             obj:SetTexCoord(0, 1, 0, 1);
                             obj:SetVertexColor(1, 1, 1);
-                            obj:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..info.dbKey);
+                            obj:SetTexture(file);
                         end;
                     };
                 end

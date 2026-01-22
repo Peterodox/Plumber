@@ -1870,7 +1870,7 @@ do  -- Reputation
         if not factionID then return end;
 
         local level, isFull, currentValue, maxValue, name, reputationType, isUnlocked, reaction;
-
+        local isMajorFaction;
         local repInfo = GetFriendshipReputation(factionID);
         local paragonRepEarned, paragonThreshold, rewardQuestID, hasRewardPending = GetFactionParagonInfo(factionID);
 
@@ -1899,6 +1899,7 @@ do  -- Reputation
         if C_Reputation.IsMajorFaction and C_Reputation.IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID);
             if majorFactionData then
+                isMajorFaction = true;
                 reputationType = 3;
                 maxValue = majorFactionData.renownLevelThreshold;
                 local isCapped = C_MajorFactions.HasMaximumRenown(factionID);
@@ -1936,12 +1937,14 @@ do  -- Reputation
         end
 
         if C_Reputation.IsFactionParagon and C_Reputation.IsFactionParagon(factionID) then
-            isFull = true;
-            if paragonRepEarned and paragonThreshold and paragonThreshold ~= 0 then
-                local paragonLevel = floor(paragonRepEarned / paragonThreshold);
-                currentValue = paragonRepEarned - paragonLevel * paragonThreshold;
-                maxValue = paragonThreshold;
-                level = paragonLevel;
+            if not isMajorFaction or C_MajorFactions.HasMaximumRenown(factionID) then
+                isFull = true;
+                if paragonRepEarned and paragonThreshold and paragonThreshold ~= 0 then
+                    local paragonLevel = floor(paragonRepEarned / paragonThreshold);
+                    currentValue = paragonRepEarned - paragonLevel * paragonThreshold;
+                    maxValue = paragonThreshold;
+                    level = paragonLevel;
+                end
             end
         end
 
