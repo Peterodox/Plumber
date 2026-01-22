@@ -219,6 +219,7 @@ local DefaultValues = {
     TransmogChatCommand = false,        --Adjust /outfit command behavior
     CraftSearchExtended = false,        --Show more search result, custom keywords
     SourceAchievementLink = true,       --Make Achievement name in MountJournal, DecorCatalog interactable
+    TransmogOutfitSelect = true,        --Show Minimized Transmog Outfit Collection
 
 
     --Tooltip

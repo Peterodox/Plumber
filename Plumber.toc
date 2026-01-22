@@ -87,6 +87,7 @@ Modules\TransmogUtil.lua
 Modules\QuestWatchCycle.lua
 Modules\CraftSearchExtended.lua
 Modules\SourceAchievementLink.lua
+Modules\OutfitSelect.lua
 
 #Modules\MerchantUI\MerchantUI.xml
 

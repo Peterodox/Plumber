@@ -126,7 +126,7 @@ function ControlCenter:AddModule(moduleData)
     if not moduleData.categoryID then
         moduleData.categoryID = 0;
         moduleData.uiOrder = 0;
-        print("Plumber Debug:", moduleData.name, "No Category");
+        --print("Plumber Debug:", moduleData.name, "No Category");
     end
 
     table.insert(self.modules, moduleData);

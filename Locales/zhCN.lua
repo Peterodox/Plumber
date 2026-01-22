@@ -578,6 +578,7 @@ L["PlumberMacro Drive"] = "Plumber赛车坐骑宏";
 L["PlumberMacro Drawer"] = "Plumber技能收纳宏";
 L["PlumberMacro Housing"] = "Plumber房屋宏";
 L["PlumberMacro Torch"] = "Plumber火把宏";
+L["PlumberMacro Outfit"] = "Plumber幻化外观宏";
 L["PlumberMacro DrawerFlag Combat"] = "技能收纳宏将在你离开战斗后更新。";
 L["PlumberMacro DrawerFlag Stuck"] = "更新技能收纳宏时遇到了错误。";
 L["PlumberMacro Error Combat"] = "战斗中不可用";
@@ -604,6 +605,7 @@ L["Drawer Option Update Frequently"] = "频繁更新";
 L["Drawer Option Update Frequently Tooltip"] = "在你背包或法术书发生变化时更新所有收纳宏。启用此选项可能会略微增加运算量。";
 L["ModuleName DrawerMacro"] = "技能收纳宏";
 L["ModuleDescription DrawerMacro"] = "创建自定义弹出菜单来整理你的物品、法术、宠物、坐骑、玩具。\n\n要创建技能收纳宏, 请先创建一个新宏，然后在宏编辑框中输入 |cffd7c0a3#plumber:drawer|r";
+L["No Slot For New Character Macro Alert"] = "需要一个空的角色专用宏栏位来完成此操作。";
 
 
 --New Expansion Landing Page
@@ -667,6 +669,14 @@ L["Copy To Clipboard"] = "复制到剪贴板";
 L["Copy Current Outfit Tooltip"] = "复制当前外观方案以在网上分享。";
 L["Missing Appearances Format"] = "%d个外观缺失";
 L["Press Key To Copy Format"] = "按|cffffd100%s|r来复制";
+
+
+--TransmogOutfitSelect
+L["ModuleName TransmogOutfitSelect"] = "快捷访问外观列表";
+L["ModuleDescription TransmogOutfitSelect"] = "允许你随时随地打开外观列表并切换已保存的外观。\n\n要实现这个功能：首先打开幻化界面，然后将|cffd7c0a3“快捷访问”|r按钮拖动到技能栏上。";
+L["Outfit Collection"] = "外观列表";
+L["Quick Access Outfit Button"] = "快捷访问";
+L["Quick Access Outfit Button Tooltip"] = "点击并拖动此按钮到技能栏上，以便随时随地访问外观列表。";
 
 
 --QuestWatchCycle

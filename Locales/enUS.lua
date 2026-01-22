@@ -578,6 +578,7 @@ L["PlumberMacro Drive"] = "Plumber D.R.I.V.E. Macro";
 L["PlumberMacro Drawer"] = "Plumber Drawer Macro";
 L["PlumberMacro Housing"] = "Plumber Housing Macro";
 L["PlumberMacro Torch"] = "Plumber Torch Macro";
+L["PlumberMacro Outfit"] = "Plumber Outfit Macro";
 L["PlumberMacro DrawerFlag Combat"] = "The drawer will be updated after leaving combat.";
 L["PlumberMacro DrawerFlag Stuck"] = "Something went wrong when updating the drawer.";
 L["PlumberMacro Error Combat"] = "Unavailable in combat";
@@ -604,6 +605,7 @@ L["Drawer Option Update Frequently"] = "Update Frequently";
 L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
 L["ModuleName DrawerMacro"] = "Drawer Macro";
 L["ModuleDescription DrawerMacro"] = "Create a custom flyout menu to manage your items, spells, pets, mounts, toys.\n\nTo make a Drawer Macro, create a new macro first, then enter |cffd7c0a3#plumber:drawer|r in the command editbox.";
+L["No Slot For New Character Macro Alert"] = "You need to have a spare Character Specific Macro slot to complete this action.";
 
 
 --New Expansion Landing Page
@@ -698,6 +700,14 @@ L["Copy To Clipboard"] = "Copy To Clipboard";
 L["Copy Current Outfit Tooltip"] = "Copy the current outfit to share online.";
 L["Missing Appearances Format"] = "%d |4appearance:appearances; missing";
 L["Press Key To Copy Format"] = "Press |cffffd100%s|r to Copy";
+
+
+--TransmogOutfitSelect
+L["ModuleName TransmogOutfitSelect"] = "Outfit Collection: Quick Access";
+L["ModuleDescription TransmogOutfitSelect"] = "Allows you open the outfit collection and enable saved appearance anywhere.\n\nTo do this: open the Transmog UI, then drag the |cffd7c0a3Quick Access|r button above the outfit list to your action bars.";
+L["Outfit Collection"] = "Outfit Collection";
+L["Quick Access Outfit Button"] = "Quick Access";
+L["Quick Access Outfit Button Tooltip"] = "Click and drag this button to your action bars so you can change outfits anywhere.";
 
 
 --QuestWatchCycle

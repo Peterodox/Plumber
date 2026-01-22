@@ -300,8 +300,3 @@ do
         addon.ControlCenter:AddModule(moduleData);
     end
 end
-
-
-
-
---/script Transmog_LoadUI();ShowUIPanel(TransmogFrame)

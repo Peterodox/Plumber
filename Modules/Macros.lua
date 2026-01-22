@@ -1922,6 +1922,33 @@ do  --For other modules like Legion Remix
         return success, reason
     end
 
+
+    local function CanPickupOrCreateCommand(command)
+        if not command then return end;
+
+        local _, numCharacterMacros = GetNumMacros();
+        local fromIndex = EL.macroIndexMin2;
+        local toIndex = fromIndex + numCharacterMacros - 1;
+        local body, _command;
+        local macroID;
+
+        if toIndex >= fromIndex then
+            for index = fromIndex, toIndex do
+                body = GetMacroBody(index);
+                if body then
+                    _command = match(body, "#plumber:(%w+)");
+                    if _command == command then
+                        return true
+                    end
+                end
+            end
+        end
+
+        return not IsCharacterMarcoFull()
+    end
+    addon.CanPickupOrCreateCommand = CanPickupOrCreateCommand;
+
+
     local function AcquireCharacterMacro(command, generatorFunc)
         if not command then return end;
         local _, numCharacterMacros = GetNumMacros();
