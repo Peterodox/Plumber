@@ -384,6 +384,11 @@ L["ModuleName NameplateWidget"] = "Nameplate: Keyflame";
 L["ModuleDescription NameplateWidget"] = "Show the number of owned Radiant Remnant on the nameplate.";
 
 
+--NameplateQuestIndicator
+L["ModuleName NameplateQuestIndicator"] = "Nameplate: Quest Indicator";
+L["ModuleDescription NameplateQuestIndicator"] = "Show a quest icon on nameplates for units that are part of your active quests.\n\n|cffd4641cOnly works outside of instances.|r";
+
+
 --PartyInviterInfo
 L["ModuleName PartyInviterInfo"] = "Group Inviter Info";
 L["ModuleDescription PartyInviterInfo"] = "Show the inviter's level and class when you are invited to a group or a guild.";
