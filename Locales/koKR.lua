@@ -578,6 +578,7 @@ L["PlumberMacro Drive"] = "Plumber 고.속.주.행. 매크로";
 L["PlumberMacro Drawer"] = "Plumber 패널 매크로";
 L["PlumberMacro Housing"] = "Plumber 하우징 매크로";
 L["PlumberMacro Torch"] = "Plumber 횃불 매크로";
+L["PlumberMacro Outfit"] = "Plumber 의상 매크로";
 L["PlumberMacro DrawerFlag Combat"] = "전투 종료 시 서랍이 갱신됩니다.";
 L["PlumberMacro DrawerFlag Stuck"] = "패널 갱신에 실패했습니다.";
 L["PlumberMacro Error Combat"] = "전투 중 제한됨";
@@ -604,6 +605,7 @@ L["Drawer Option Update Frequently"] = "항상 최신 상태 유지";
 L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경이 있을 때마다 버튼 상태를 갱신합니다. 이 옵션을 켜면 시스템 자원을 약간 더 사용할 수 있습니다";
 L["ModuleName DrawerMacro"] = "패널 매크로";
 L["ModuleDescription DrawerMacro"] = "아이템, 주문, 애완동물, 탈것, 장난감을 관리할 수 있는 맞춤형 확장 메뉴를 생성하세요.\n\n패널 매크로를 만들려면 먼저 새 매크로를 생성한 후 명령어 편집창에 |cffd7c0a3#plumber:drawer|r 입력하세요.";
+L["No Slot For New Character Macro Alert"] = "이 작업을 완료하려면 여분의 캐릭터 전용 매크로 슬롯이 필요합니다.";
 
 
 --New Expansion Landing Page
@@ -698,6 +700,15 @@ L["Copy To Clipboard"] = "클립보드에 복사";
 L["Copy Current Outfit Tooltip"] = "현재 의상을 온라인으로 공유하기 위해 복사합니다.";
 L["Missing Appearances Format"] = "%d개 외형 누락";
 L["Press Key To Copy Format"] = "|cffffd100%s|r 키를 눌러 복사";
+
+
+--TransmogOutfitSelect
+L["ModuleName TransmogOutfitSelect"] = "의상 컬렉션: 빠른 접근";
+L["ModuleDescription1 TransmogOutfitSelect"] = "어디서나 의상 컬렉션을 열고 저장된 의상을 활성화할 수 있습니다.";
+L["ModuleDescription2 TransmogOutfitSelect"] = "사용법: 형상변환 UI를 열고 의상 목록 위의 |cffd7c0a3빠른 접근|r 버튼을 행동 단축바로 드래그하세요.";
+L["Outfit Collection"] = "의상 컬렉션";
+L["Quick Access Outfit Button"] = "빠른 접근";
+L["Quick Access Outfit Button Tooltip"] = "의상을 어디서나 변경할 수 있도록 이 버튼을 행동 단축바로 클릭하여 드래그하세요.";
 
 
 --QuestWatchCycle
