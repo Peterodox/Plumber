@@ -13,6 +13,64 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10805] = {
     {
         type = "date",
+        versionText = "1.8.5 b",
+        timestamp = 1769050000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName TransmogOutfitSelect"],
+        dbKey = "TransmogOutfitSelect",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "TransmogOutfitSelect",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = L["ModuleDescription1 TransmogOutfitSelect"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = L["ModuleDescription2 TransmogOutfitSelect"],
+    },
+
+    {
+        type = "img",
+        fileName = "Changelog_TransmogOutfitSelect",
+        large = true,
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Bug Fix",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Fixed an error when using the decor search box in house editing mode.",
+    },
+
+    {
+        type = "br",
+    },
+    {
+        type = "br",
+    },
+
+
+    {
+        type = "date",
         versionText = "1.8.5",
         timestamp = 1768900000,
     },

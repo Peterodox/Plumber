@@ -250,18 +250,16 @@ do  --SecureHandler
 
     local HANDLER_ONCLICK = [=[
         local frame = self:GetFrameRef("TransmogFrame");
+        if not frame then return end;
+
         local show = (not frame:IsShown()) and not PlayerInCombat();
         if show then
-            if frame then
-                local UIParent = self:GetFrameRef("UIParent");
-                frame:ClearAllPoints();
-                frame:SetPoint("CENTER", UIParent, "CENTER", -480, 0);
-                frame:Show();
-            end
+            local UIParent = self:GetFrameRef("UIParent");
+            frame:ClearAllPoints();
+            frame:SetPoint("CENTER", UIParent, "CENTER", -480, 0);
+            frame:Show();
         else
-            if frame then
-                frame:Hide();
-            end
+            frame:Hide();
         end
     ]=];
 
@@ -355,9 +353,9 @@ do  --Module Registry
     end
 
     local moduleData = {
-        name = addon.L["ModuleName TransmogOutfitSelect"],
+        name = L["ModuleName TransmogOutfitSelect"],
         dbKey = "TransmogOutfitSelect",
-        description = addon.L["ModuleDescription TransmogOutfitSelect"],
+        description = L["ModuleDescription1 TransmogOutfitSelect"].."\n\n"..L["ModuleDescription2 TransmogOutfitSelect"],
         toggleFunc = EnableModule,
         moduleAddedTime = 1769000000,
         categoryKeys = {"Collection"},
