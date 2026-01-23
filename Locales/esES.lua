@@ -14,6 +14,7 @@ BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Centrarse en la misión anterior";
 
 
 --Module Control Panel
+L["Addon Name Colon"] =  "Plumber: ";
 L["Module Control"] = "Módulo de control";
 L["Quick Slot Generic Description"] = "\n\n*Ranura rápida es un conjunto de botones en los que se puede hacer click y que aparecen bajo ciertas condiciones.";
 L["Quick Slot Edit Mode"] = HUD_EDIT_MODE_MENU or "Modo de edición";
@@ -178,7 +179,6 @@ L["ModuleDescription BlizzFixEventToast"] = "Modifica el comportamiento de los m
 --Talking Head
 L["ModuleName TalkingHead"] = HUD_EDIT_MODE_TALKING_HEAD_FRAME_LABEL or "Busto parlante";
 L["ModuleDescription TalkingHead"] = "Reemplaza la interfaz de usuario predeterminada del busto parlante por una más limpia.";
-L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Texto instantáneo";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Esquema de texto";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "Ocultar textos desde la fuente:";
@@ -459,7 +459,6 @@ L["SoftTargetName HideName"] = "Hide Object Name";
 L["SoftTargetName HideName Tooltip"] = "Hide the soft target object name when you are in a house."
 
 
-
 --LegionRemix
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Aprende rasgos automáticamente.\n\n- Añade una miniaplicación a la información del personaje que proporciona varios tipos de información. Puedes hacer click en esta miniaplicación para abrir una nueva interfaz del Arma Artefacto.";
@@ -531,7 +530,6 @@ L["Sample Item 4"] = "Awesome Epic Item";
 L["Sample Item 3"] = "Awesome Rare Item";
 L["Sample Item 2"] = "Awesome Uncommon Item";
 L["Sample Item 1"] = "Common Item";
-L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window");
 L["Manual Loot Instruction Format"] = "To temporarily cancel auto loot on a specific pickup, press and hold |cffffffff%s|r key until the loot window appears.";
 L["LootUI Option Hide Window"] = "Hide Plumber Loot Window";
 L["LootUI Option Hide Window Tooltip"] = "Hide Plumber Loot Notification Window, but still enable any features such as Force Auto Loot in the background.";
@@ -564,6 +562,8 @@ L["LootUI Option Combine Items"] = "Combinar items similares";
 L["LootUI Option Combine Items Tooltip"] = "Mostrar items similares en una sola fila. Categorías admitidas:\n\n- Items basura\n- Recuerdos de época (Legion Remix)";
 L["LootUI Option Low Frame Strata"] = "Send to Back";
 L["LootUI Option Low Frame Strata Tooltip"] = "While in Loot Notification Mode, place the loot window behind other UI.\n\nThis option doesn't affect Manual Loot Mode.";
+L["LootUI Option Show Reputation"] = "Show Reputation Changes";
+L["LootUI Option Show Reputation Tooltip"] = "Display any reputation increases in the loot window.\n\nReputations earned during combat or in PvP instances will be displayed afterwards.";
 
 
 --Quick Slot For Third-party Dev
@@ -687,6 +687,8 @@ L["Difficulty Not Accurate"] = "La dificultad es inexacta porque tú no eres el 
 L["Instruction Click To Open Adventure Guide"] = "Left-Click: |cffffffffAbrir guía de aventuras|r";
 L["Instruction Alt Click To Reset Instance"] = "Alt Right-Click: |cffffffffReiniciar todas las estancias|r";
 L["Instruction Link Progress In Chat"] = "<Shift click para publicar el progreso en el chat>";
+L["Instance Name"] = "Nombre de la estancia";   --Dungeon/Raid Name
+L["EditMode Instruction InstanceDifficulty"] = "El ancho del marco se ve afectado por la cantidad de opciones disponibles.";
 
 
 --TransmogChatCommand
@@ -718,6 +720,7 @@ L["ModuleName Housing_Macro"] = "Macros hogar";
 L["ModuleDescription Housing_Macro"] = "Puedes crear una macro de Teletransporte a casa: primero crea una nueva macro y a continuación introduce |cffd7c0a3#plumber:home|r en el cuadro de edición de comandos.";
 L["Teleport Home"] = "Teletransporte a casa";
 L["Instruction Drag To Action Bar"] = "<Has click y arrástralo a tus barras de acción>";
+L["Leave Home"] = HOUSING_DASHBOARD_RETURN or "Regresar a la ubicación anterior";
 L["Toggle Torch"] = "Cambiar a antorcha";
 L["ModuleName Housing_DecorHover"] = "Editor: 1 Modo decoración";
 L["ModuleDescription Housing_DecorHover"] = "En el modo decoración:\n\n- Pasa el cursor sobre un adorno para mostrar su costo de colocación, nombre y cantidad que hay en el almacenamiento.\n\n- Te permite \"duplicar\" un adorno presionando Alt.\n\nEl nuevo objeto no heredará los ángulos y escalas actuales.";
