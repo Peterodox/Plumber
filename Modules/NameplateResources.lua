@@ -5,9 +5,8 @@ local API = addon.API;
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
 local UnitWidgetSet = UnitWidgetSet;
 local GetStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo;
---local UnitGUID = UnitGUID;
---local UnitDistanceSquared = UnitDistanceSquared;
 local pairs = pairs;
+local Secret_CanAccess = API.Secret_CanAccess;
 
 
 local EL = CreateFrame("Frame");
@@ -111,8 +110,10 @@ function EL:ProcessExistingNameplates()
 end
 
 function EL:SetupNameplateWidget(unit, widgetInfo)
+    if not Secret_CanAccess(unit) then return end;
+
     local nameplate = GetNamePlateForUnit(unit);
-    if nameplate then
+    if nameplate and not nameplate:IsForbidden() then
         local widget = self:AcquireWidget();
         self.unitWidgets[unit] = widget;
         widget:SetParent(nameplate);

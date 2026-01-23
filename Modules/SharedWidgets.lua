@@ -26,6 +26,7 @@ local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local CreateFrame = CreateFrame;
 local UIParent = UIParent;
 local GameTooltip = GameTooltip;
+local Secret_CanAccess = API.Secret_CanAccess;
 
 
 local function DisableSharpening(texture)
@@ -5881,7 +5882,12 @@ do  --Displayed required items on nameplate widget set
             self.Count:SetTextColor(0.5, 0.5, 0.5);
         end
         if self.dynamicSize then
-            self:SetWidth(self.Count:GetWidth() + self.sizeConstant);
+            local textWidth = self.Count:GetWidth();
+            if Secret_CanAccess(textWidth) then
+                self:SetWidth(textWidth + self.sizeConstant);
+            else
+                self:SetWidth(20 + self.sizeConstant);
+            end
         end
     end
 
@@ -5902,12 +5908,12 @@ do  --Displayed required items on nameplate widget set
     end
 
     function NameplateTokenMixin:OnEnter()
-        NamePlateTooltip:Hide();
+        GameTooltip:Hide();
         DelayedTooltip:OnObjectEnter(self);
     end
 
     function NameplateTokenMixin:OnLeave()
-        NamePlateTooltip:Hide();
+        GameTooltip:Hide();
         DelayedTooltip:OnObjectLeave(self);
     end
 
@@ -5923,10 +5929,11 @@ do  --Displayed required items on nameplate widget set
         end
 
         if method then
-            --Anchor the GameTooltip to nameplate nullify its "clampedToScreen"
-            --Blizzard_NamePlates use NamePlateTooltip, so we'll do that too.
-            local tooltip = NamePlateTooltip;
-            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            -- Anchor the GameTooltip to nameplate nullify its "clampedToScreen"
+            -- Blizzard_NamePlates use NamePlateTooltip, so we'll do that too.
+            -- NameplateTooltip removed in Midnight
+            local tooltip = GameTooltip;
+            tooltip:SetOwner(UIParent, "ANCHOR_CURSOR_RIGHT", 4, 8);
             tooltip[method](tooltip, self.id);
         end
     end
