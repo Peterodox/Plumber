@@ -13,8 +13,8 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10805] = {
     {
         type = "date",
-        versionText = "1.8.5 b",
-        timestamp = 1769050000,
+        versionText = "1.8.5 b-c",
+        timestamp = 1769170000,
     },
 
     {
@@ -38,6 +38,12 @@ changelogs[10805] = {
         type = "p",
         bullet = true,
         text = L["ModuleDescription2 TransmogOutfitSelect"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can drag the top area of this window to move it.",
     },
 
     {
@@ -65,6 +71,18 @@ changelogs[10805] = {
         type = "p",
         bullet = true,
         text = "Expansion Summary: The UI should no longer display the paragon progress for factions that haven't reached maximum renown.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Appearances Tab: Fixed an error when Ctrl-clicking an appearance.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Nameplate: Keyflame: Fixed an error when you were in specific areas in Hallowfall.",
     },
 
     {
