@@ -53,7 +53,7 @@ do
         if (IsModifiedClick("DRESSUP")) and API.CheckAndDisplayErrorIfInCombat() then
             return
         end
-        WardrobeItemsModelMixin.OnMouseDown(self, button);
+        WardrobeItemModelMixin.OnMouseDown(self, button);
     end
 end
 
