@@ -29,14 +29,20 @@ local Def = {
     ClickHandlerName = "PLMR_OUTFIT",
     MacroIcon = 2869702,
     PlumberMacroCommand = "outfit",
+
+    DefaultOffsetX = -480,
+    DefaultOffsetY = 0,
 };
 
 
 local EL = CreateFrame("Frame");
 local Mod = {};
 local AcquireOutfitMacro;
+local ClickHandler;
 local ExtraFrame;
 local CreateExtraFrame;
+local RepositionFrame;
+local CreateRepositionFrame;
 
 
 do  -- DragButton On TransmogFrame
@@ -96,7 +102,7 @@ do  -- DragButton On TransmogFrame
     function CreateExtraFrame(parent)
         local f = CreateFrame("Frame", nil, parent);
         ExtraFrame = f;
-        f:SetSize(312, 40);
+        f:SetSize(308, 34);
         f:SetFrameLevel(128);
 
         local file = "Interface/AddOns/Plumber/Art/Frame/TransmogUI.png";
@@ -141,6 +147,90 @@ do  -- DragButton On TransmogFrame
         DragButton:SetScript("OnLeave", DragButton.OnLeave);
         DragButton:SetScript("OnDragStart", DragButton.OnDragStart);
         DragButton:RegisterForDrag("LeftButton");
+
+        f:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 4, -21);
+    end
+end
+
+
+do  -- Drag to repostion TransmogFrame (For Minimized Mode)
+    local RepositionFrameMixin = {};
+
+    function RepositionFrameMixin:OnDragStart()
+        if InCombatLockdown() then return end;
+
+        self.isDragging = true;
+        self:RegisterEvent("PLAYER_REGEN_DISABLED");
+        self:SetScript("OnEvent", self.OnEvent);
+
+        if self.isFrameMovable == nil then
+            self.isFrameMovable = TransmogFrame:IsMovable();
+        end
+
+        TransmogFrame:SetClampedToScreen(true);
+        TransmogFrame:SetMovable(true);
+        TransmogFrame:StartMoving(true);
+    end
+
+    function RepositionFrameMixin:OnDragStop()
+        self:StopDragging();
+    end
+
+    function RepositionFrameMixin:OnHide()
+        self:Hide();
+        if self.isDragging then
+            self:StopDragging();
+        end
+    end
+
+    function RepositionFrameMixin:StopDragging()
+        self.isDragging = nil;
+        self:UnregisterEvent("PLAYER_REGEN_DISABLED");
+        self:SetScript("OnEvent", nil);
+        TransmogFrame:SetMovable(self.isFrameMovable);
+
+        if not InCombatLockdown() then
+            TransmogFrame:StopMovingOrSizing();
+            local x0, y0 = UIParent:GetCenter();
+            local x1, y1 = TransmogFrame:GetCenter();
+            if x0 and y0 and x1 and y1 then
+                local x = API.Round(x1 - x0);
+                local y = API.Round(y1 - y0);
+                ClickHandler:SetFramePosition(x, y);
+                PlumberDB.TransmogOutfitSelect_Position = {x, y};
+            end
+        end
+    end
+
+    function RepositionFrameMixin:OnEvent()
+        self:StopDragging();
+    end
+
+    function RepositionFrameMixin:OnEnter()
+        if not InCombatLockdown() then
+            SetCursor("Interface/CURSOR/UI-Cursor-Move.blp");
+        end
+    end
+
+    function RepositionFrameMixin:OnLeave()
+        ResetCursor();
+    end
+
+    function CreateRepositionFrame(parent)
+        local f = CreateFrame("Button", nil, parent);
+        RepositionFrame = f;
+
+        f:SetSize(Def.MainFrame.MinimizedWidth - 48, 24);
+        f:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0);
+        f:SetFrameLevel(parent.NineSlice:GetFrameLevel() + 1);
+
+        Mixin(f, RepositionFrameMixin);
+        f:SetScript("OnDragStart", f.OnDragStart);
+        f:SetScript("OnDragStop", f.OnDragStop);
+        f:SetScript("OnHide", f.OnHide);
+        f:SetScript("OnEnter", f.OnEnter);
+        f:SetScript("OnLeave", f.OnLeave);
+        f:RegisterForDrag("LeftButton");
     end
 end
 
@@ -208,9 +298,18 @@ do  -- Blizzard Frame Modification
         TransmogFrame.OutfitCollection:SetHeight(Def.OutfitCollection.MinimizedHeight);
         TransmogFrame:SetSize(Def.MainFrame.MinimizedWidth, Def.MainFrame.MinimizedHeight);
 
+        if not InCombatLockdown() then
+            TransmogFrame:SetClampedToScreen(true);
+        end
+
         if ExtraFrame then
             ExtraFrame:Hide();
         end
+
+        if not RepositionFrame then
+            CreateRepositionFrame(TransmogFrame);
+        end
+        RepositionFrame:Show();
 
         EL:ListenEvents(true);
     end
@@ -223,10 +322,12 @@ do  -- Blizzard Frame Modification
 
         if not ExtraFrame then
             CreateExtraFrame(TransmogFrame);
-            ExtraFrame:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 4, -21);
-            ExtraFrame:SetSize(308, 34);
         end
         ExtraFrame:Show();
+
+        if RepositionFrame then
+            RepositionFrame:Hide();
+        end
 
         EL:ListenEvents(false);
     end
@@ -242,11 +343,10 @@ end
 
 
 do  --SecureHandler
-    local Handler = CreateFrame("Button", Def.ClickHandlerName, nil, "SecureHandlerClickTemplate");
-    Handler:RegisterForClicks("AnyUp");
-    Handler:SetFrameRef("UIParent", UIParent);
-    Handler:SetSize(1, 1);
-    --Handler:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", 0, 0);
+    ClickHandler = CreateFrame("Button", Def.ClickHandlerName, nil, "SecureHandlerClickTemplate");
+    ClickHandler:RegisterForClicks("AnyUp");
+    ClickHandler:SetFrameRef("UIParent", UIParent);
+    ClickHandler:SetSize(1, 1);
 
     local HANDLER_ONCLICK = [=[
         local frame = self:GetFrameRef("TransmogFrame");
@@ -256,16 +356,22 @@ do  --SecureHandler
         if show then
             local UIParent = self:GetFrameRef("UIParent");
             frame:ClearAllPoints();
-            frame:SetPoint("CENTER", UIParent, "CENTER", -480, 0);
+            frame:SetPoint("CENTER", UIParent, "CENTER", %d, %d);
             frame:Show();
         else
             frame:Hide();
         end
     ]=];
 
-    Handler:SetAttribute("_onclick", HANDLER_ONCLICK);
+    function ClickHandler:SetFramePosition(x, y)
+        if type(x) == "number" and type(y) == "number" then
+            self:SetAttribute("_onclick", HANDLER_ONCLICK:format(x, y));
+        end
+    end
 
-    Handler:SetScript("PreClick", function(self)
+    ClickHandler:SetFramePosition(Def.DefaultOffsetX, Def.DefaultOffsetY);
+
+    ClickHandler:SetScript("PreClick", function(self)
         if API.CheckAndDisplayErrorIfInCombat() then
             return
         end
@@ -286,6 +392,32 @@ do  --SecureHandler
             self:SetFrameRef("TransmogFrame", TransmogFrame);
         end
     end);
+
+    function ClickHandler:InitializePosition()
+        local db = PlumberDB.TransmogOutfitSelect_Position;
+        if db and db[1] and db[2] then
+            ClickHandler:SetFramePosition(db[1], db[2]);
+        end
+    end
+
+    ClickHandler:SetScript("OnEvent", function(self, event)
+        --Load Initial Position
+        if event == "PLAYER_ENTERING_WORLD" then
+            self:UnregisterEvent(event);
+            if InCombatLockdown() then
+                self:RegisterEvent("PLAYER_REGEN_ENABLED");
+            else
+                self:SetScript("OnEvent", nil);
+                self:InitializePosition();
+            end
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            self:UnregisterEvent(event);
+            self:SetScript("OnEvent", nil);
+            self:InitializePosition();
+        end
+    end);
+
+    ClickHandler:RegisterEvent("PLAYER_ENTERING_WORLD");
 end
 
 
