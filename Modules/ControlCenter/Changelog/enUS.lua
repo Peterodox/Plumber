@@ -13,8 +13,8 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10805] = {
     {
         type = "date",
-        versionText = "1.8.5 b-c",
-        timestamp = 1769170000,
+        versionText = "1.8.5 b-d",
+        timestamp = 1769340000,
     },
 
     {
@@ -59,6 +59,12 @@ changelogs[10805] = {
     {
         type = "h1",
         text = "Bug Fixes",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Drawer Macros should be able to work in combat again.",
     },
 
     {
