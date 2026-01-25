@@ -203,8 +203,7 @@ do  --House Level / Info / Teleport
             return
         end
 
-        local faction = UnitFactionGroup("player");
-        local factionMapIndex = faction == "Horde" and 2 or 1;
+        local factionMapIndex = addon.API.GetPlayerFactionIndex();
         local TeleportHomeButtons = Housing.TeleportHomeButtons;
 
         for i = 1, self:GetMaxHousePlayerCanOwn() do

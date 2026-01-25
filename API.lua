@@ -2133,6 +2133,15 @@ do  -- Reputation
             return renownLevelsInfo[#renownLevelsInfo].level
         end
     end
+
+    function API.GetPlayerFactionIndex()
+        local englishFaction = UnitFactionGroup("player");
+        if englishFaction == "Horde" then
+            return 2
+        else
+            return 1
+        end
+    end
 end
 
 do  -- Spell
