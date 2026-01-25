@@ -146,7 +146,9 @@ do
             tooltip:AddLine(" ");
             tooltip:AddLine(description, 1, 0.82, 0, true);
 
-            GameTooltip_AddQuestRewardsToTooltip(tooltip, rewardQuestID);
+            if rewardQuestID then
+                GameTooltip_AddQuestRewardsToTooltip(tooltip, rewardQuestID);
+            end
         end
 
         ReputationTooltipScripts.AppendClickInstruction(tooltip, factionID, true);
