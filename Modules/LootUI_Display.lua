@@ -2017,7 +2017,9 @@ do  --Module Registry
         hasMovableWidget = true,
         visibleInEditMode = true,
         enterEditMode = function()
-            MainFrame:EnterEditMode();
+            if ENABLE_MODULE then
+                MainFrame:EnterEditMode();
+            end
         end,
         exitEditMode = function()
             MainFrame:ExitEditMode();
