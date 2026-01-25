@@ -22,12 +22,12 @@ Modules\SharedData.lua
 Modules\SharedFonts.xml
 Modules\SharedWidgets.xml
 Modules\SharedTooltip.lua
+Modules\CooldownUtil.lua
 Modules\BlizzardEditMode.lua
 
 Modules\ControlCenter\ControlCenter.xml
 
 Modules\LootUI.xml
-Modules\QuickSlot.xml
 Modules\SpellFlyout_Secure.lua
 Modules\Macros.lua
 

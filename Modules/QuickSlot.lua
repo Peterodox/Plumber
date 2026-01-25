@@ -3,6 +3,7 @@ local L = addon.L;
 local API = addon.API;
 local UIFrameFade = API.UIFrameFade;
 local GetDBBool = addon.GetDBBool;
+local CooldownUtil = addon.CooldownUtil;
 
 
 local ACTION_BUTTON_SIZE = 46;
@@ -10,7 +11,6 @@ local ACTION_BUTTON_GAP = 4;
 local REPOSITION_BUTTON_OFFSET = 46;
 
 
-local GetItemCooldown = C_Container.GetItemCooldown;
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local InCombatLockdown = InCombatLockdown;
@@ -1172,21 +1172,7 @@ function QuickSlot:UseHighContrast(state)
 end
 
 function QuickSlot:UpdateItemCooldowns()
-    if self.ItemButtons then
-        local startTime, duration, enable;
-        for _, button in ipairs(self.ItemButtons) do
-            if button.id and button.actionType == "item" then
-                startTime, duration, enable = GetItemCooldown(button.id);
-                if enable == 1 and startTime and startTime > 0 and duration and duration > 0 then
-                    button.Cooldown:SetCooldown(startTime, duration);
-                    button.Cooldown:Show();
-                    button.Cooldown:SetHideCountdownNumbers(false);
-                else
-                    button.Cooldown:Hide();
-                end
-            end
-        end
-    end
+    CooldownUtil.UpdateItemButtonCooldowns(self.ItemButtons);
 end
 
 function QuickSlot:ExitEditMode()
@@ -1198,9 +1184,6 @@ end
 addon.AddModuleOptionExitMethod(QuickSlot, QuickSlot.ExitEditMode);
 
 do  --Spell Cooldown
-    local GetSpellCooldown = API.GetSpellCooldown;
-    local GetSpellCharges = API.GetSpellCharges;
-
     local Throttler = CreateFrame("Frame", nil, QuickSlot);
     QuickSlot.Throttler = Throttler;
     Throttler:SetScript("OnHide", function(self)
@@ -1229,44 +1212,7 @@ do  --Spell Cooldown
     end
 
     function QuickSlot:UpdateSpellCooldowns()
-        if not self.SpellButtons then return end;
-        local cooldownInfo, chargeInfo, startTime, duration, modRate, fromChargeCooldown;
-        for _, button in ipairs(self.SpellButtons) do
-            if button.id and button.actionType == "spell" then
-                startTime, duration, modRate, fromChargeCooldown = nil, nil, nil, nil;
-
-                chargeInfo = GetSpellCharges(button.id);
-                if chargeInfo and chargeInfo.currentCharges > 0 then
-                    if chargeInfo.cooldownStartTime > 0 and chargeInfo.cooldownDuration > 0 then
-                        startTime = chargeInfo.cooldownStartTime;
-                        duration = chargeInfo.cooldownDuration;
-                        modRate = chargeInfo.chargeModRate;
-                        fromChargeCooldown = true;
-                    end
-                end
-
-                if not (startTime and duration) then
-                    cooldownInfo = GetSpellCooldown(button.id);
-                    if cooldownInfo and cooldownInfo.isEnabled and cooldownInfo.startTime > 0 and cooldownInfo.duration > 0 then
-                        startTime = cooldownInfo.startTime;
-                        duration = cooldownInfo.duration;
-                        modRate = cooldownInfo.modRate
-                    end
-                end
-
-                if startTime and duration then
-                    button.Cooldown:SetCooldown(startTime, duration, modRate);
-                    button.Cooldown:Show();
-                    if fromChargeCooldown then
-                        button.Cooldown:SetHideCountdownNumbers(true);
-                    else
-                        button.Cooldown:SetHideCountdownNumbers(false);
-                    end
-                else
-                    button.Cooldown:Hide();
-                end
-            end
-        end
+        CooldownUtil.UpdateSpellButtonCooldowns(self.SpellButtons);
     end
 end
 
