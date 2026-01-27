@@ -324,8 +324,8 @@ L["ModuleDescription WorldMapPin_TWW"] = "카즈 알가르 전역에 걸쳐 추�
 
 
 --Delves
-L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "등급 %s";
-L["Great Vault World Activity Tooltip"] = "1등급 및 글로벌 활동";
+L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "%s 단계";
+L["Great Vault World Activity Tooltip"] = "1단계 및 글로벌 활동";
 L["Item Level Format"] = ITEM_LEVEL or "아이템 레벨 %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "아이템 레벨";
 L["Delves Reputation Name"] = "구렁 탐험가의 여정";
