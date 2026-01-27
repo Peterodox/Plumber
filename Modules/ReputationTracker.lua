@@ -21,6 +21,10 @@ EL.staticEvents = {
     "PLAYER_ENTERING_WORLD",
 };
 
+EL.factionRemap = {
+    -- When one of Severed Threads rep changes, it triggers the major faction standing changed 3 times
+    [2600] = {2601, 2605, 2607},
+};
 
 function EL:CacheDefaultReputations()
     -- Include major factions and the currently watched faction
@@ -66,6 +70,15 @@ function EL:CalculateMajorFactionEffectiveStanding(factionID)
     end
 end
 
+function EL:TryAddParagonStanding(factionID, baseStanding)
+    if not baseStanding then return end;
+    if C_Reputation.IsFactionParagon(factionID) then
+        local extra = C_Reputation.GetFactionParagonInfo(factionID);
+        return baseStanding + extra;
+    end
+    return baseStanding
+end
+
 function EL:CacheMajorFaction(factionID)
     if not self.factionCache[factionID] then
         local data = C_MajorFactions.GetMajorFactionData(factionID);
@@ -77,6 +90,7 @@ function EL:CacheMajorFaction(factionID)
                     standing = standing,
                     isMajorFaction = true,
                 };
+                --print(factionID, data.name, standing)
             end
         end
     end
@@ -86,10 +100,12 @@ function EL:CacheStandardFaction(factionID)
     if not self.factionCache[factionID] then
         local data = GetFactionDataByID(factionID);
         if data then
+            local standing = self:TryAddParagonStanding(factionID, data.currentStanding);
             self.factionCache[factionID] = {
                 name = data.name,
-                standing = data.currentStanding,
+                standing = standing,
             };
+            --print(factionID, data.name, standard)
         end
     end
 end
@@ -98,11 +114,13 @@ function EL:CacheFriendshipFaction(factionID)
     if not self.factionCache[factionID] then
         local data = GetFriendshipReputation(factionID);
         if data then
+            local standing = self:TryAddParagonStanding(factionID, data.standing);
             self.factionCache[factionID] = {
                 name = data.name,
-                standing = data.standing,
+                standing = standing,
                 isFriendship = true,
             };
+            --print(factionID, data.name, standing)
         end
     end
 end
@@ -135,6 +153,12 @@ function EL:SetFactionStanding(factionID, updatedStanding)
         return
     end
 
+    if self.factionRemap[factionID] then
+        for _, _factionID in ipairs(self.factionRemap[factionID]) do
+            self:SetFactionStanding(_factionID);
+        end
+    end
+
     local info = self.factionCache[factionID];
     if info then
         if self.suppressed then
@@ -157,12 +181,14 @@ function EL:SetFactionStanding(factionID, updatedStanding)
             if not updatedStanding then
                 local data = GetFriendshipReputation(factionID);
                 updatedStanding = data and data.standing;
+                updatedStanding = self:TryAddParagonStanding(factionID, updatedStanding);
             end
             newStanding = updatedStanding;
         else
             if not updatedStanding then
                 local data = GetFactionDataByID(factionID);
                 updatedStanding = data and data.currentStanding;
+                updatedStanding = self:TryAddParagonStanding(factionID, updatedStanding);
             end
             newStanding = updatedStanding;
         end
@@ -171,6 +197,8 @@ function EL:SetFactionStanding(factionID, updatedStanding)
             delta = newStanding - info.standing;
             info.standing = newStanding;
         end
+
+        --print(factionID, info.name, newStanding, delta);
 
         if delta and delta > 0 then
             addon.LootWindow:QueueDisplayReputation(factionID, info.name, delta);
