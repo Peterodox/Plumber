@@ -298,7 +298,8 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
         if self.info.type == Enum.WeeklyRewardChestThresholdType.World then
             tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
             API.DisplayDelvesGreatVaultTooltip(self, tooltip, self.col, self.info.level, self.info.id, self.progressDelta);
-            if API.AddRecentDelvesRecordsToTooltip(tooltip, self.info.threshold) then
+            if API.AddGreatVaultWorldProgressToTooltip(tooltip, self.info.threshold) then
+                --Use new Blizzard API instead of our local AddRecentDelvesRecordsToTooltip()
                 tooltip:Show();
             end
         else

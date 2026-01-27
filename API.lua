@@ -4308,6 +4308,53 @@ do  -- Delves
         tooltip:Show();
     end
 
+    function API.AddGreatVaultWorldProgressToTooltip(tooltip, threshold)
+        local combineSharedDifficulty = true;
+        local activityTierProgress = C_WeeklyRewards.GetSortedProgressForActivity(Enum.WeeklyRewardChestThresholdType.World, combineSharedDifficulty);
+        local total = 0;
+
+        if activityTierProgress then
+            for _, tierProgress in ipairs(activityTierProgress) do
+                total = total + tierProgress.numPoints;
+            end
+        else
+            return false
+        end
+
+        if total > 0 then
+            tooltip:AddLine(" ");
+
+            if total < threshold then
+                local pattern = WEEKLY_REWARDS_MYTHIC_TOP_RUNS:gsub("%%d", "%%s");
+                tooltip:AddLine(pattern:format(total.."/"..threshold), 1, 1, 1);
+            else
+                tooltip:AddLine(WEEKLY_REWARDS_MYTHIC_TOP_RUNS:format(threshold), 1, 1, 1);
+            end
+
+            local desiredRuns = threshold;
+            local tierFormat = "|cff808080-|r |cffffffff%d|r  %s";
+
+            for _, tierProgress in ipairs(activityTierProgress) do
+                local numRuns = math.min(tierProgress.numPoints, desiredRuns);
+                if numRuns <= 0 then
+                    break
+                end
+
+                desiredRuns = desiredRuns - numRuns;
+
+                local text;
+                if tierProgress.difficulty > 1 then
+                    text = L["Great Vault Tier Format"]:format(tierProgress.difficulty);
+                else
+                    text = L["Great Vault World Activity Tooltip"];
+                end
+                tooltip:AddLine(tierFormat:format(numRuns, text), 0.098, 1.000, 0.098);
+            end
+        end
+
+        return true
+    end
+
     if C_EventUtils.IsEventValid("WALK_IN_DATA_UPDATE") then
         local EL = CreateFrame("Frame");
         EL:RegisterEvent("PLAYER_ENTERING_WORLD");

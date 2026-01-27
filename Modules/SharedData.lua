@@ -133,19 +133,19 @@ do  --Weekly Caches (Meta quest rewards)
 
         DelvesGreatVaultItemLevel = {
             --Hardcode this because BLZ API is unreliable in 11.2.0
-            668,
-            671,
-            675,
-            678,
-            681,
+            108,
+            111,
+            115,
+            118,
+            121,
 
-            688,
-            691,
-            694,    --Tier 8 Max
-            694,
-            694,
+            128,
+            131,
+            134,    --Tier 8 Max
+            134,
+            134,
 
-            694,
+            134,
         },
     };
 

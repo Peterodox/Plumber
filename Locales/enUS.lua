@@ -325,6 +325,7 @@ L["ModuleDescription WorldMapPin_TWW"] = "Show additional pins on Khaz Algar con
 
 --Delves
 L["Great Vault Tier Format"] = GREAT_VAULT_WORLD_TIER or "Tier %s";
+L["Great Vault World Activity Tooltip"] = "Tier 1 and World Activities";
 L["Item Level Format"] = ITEM_LEVEL or "Item Level %d";
 L["Item Level Abbr"] = ITEM_LEVEL_ABBR or "iLvl";
 L["Delves Reputation Name"] = "Delver's Journey";
