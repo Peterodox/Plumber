@@ -13,8 +13,35 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10805] = {
     {
         type = "date",
-        versionText = "1.8.5 b-d",
-        timestamp = 1769340000,
+        versionText = "1.8.5 b-e",
+        timestamp = 1769530000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName LootUI"],
+        dbKey = "LootUI",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "LootUI",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Added an option to display money earned from all sources, not just loot.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Money earned while interacting with mailbox or NPC will be displayed afterwards.",
+    },
+
+    {
+        type = "br",
     },
 
     {
@@ -59,6 +86,18 @@ changelogs[10805] = {
     {
         type = "h1",
         text = "Bug Fixes",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Expansion Summary, Great Vault: World Activities should show the correct, post-stat-squished item levels.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Loot UI, Reputations: Fixed an issue that prevents the changes to Weaver, General, and Vizier from showing.",
     },
 
     {
