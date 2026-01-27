@@ -29,6 +29,7 @@ local IsModifiedClick = IsModifiedClick;
 local GetCVarBool = C_CVar.GetCVarBool;
 local GetCurrencyIDFromLink = C_CurrencyInfo.GetCurrencyIDFromLink;
 local GetCurrencyInfoFromLink = C_CurrencyInfo.GetCurrencyInfoFromLink;
+local IsInteractingWithNpcOfType = C_PlayerInteractionManager.IsInteractingWithNpcOfType;
 local Secret_CanAccess = API.Secret_CanAccess;
 
 
@@ -67,6 +68,7 @@ local LOOT_UNDER_MOUSE = false;
 local USE_STOCK_UI = false;
 local MERGE_SIMILAR_ITEMS = true;
 local LOW_FRAME_STRATA = false;
+local SHOW_ALL_MONEY_CHANGE = false;
 ------------------
 
 local CLASS_SORT_ORDER = {
@@ -643,7 +645,9 @@ do  --Event Handler
             end
             self:RegisterEvent("CHAT_MSG_LOOT");
             self:RegisterEvent("CHAT_MSG_CURRENCY");
-            self:RegisterEvent("PLAYER_MONEY");
+            if not SHOW_ALL_MONEY_CHANGE then
+                self:RegisterEvent("PLAYER_MONEY");
+            end
             self.t = 0;
             self:SetScript("OnUpdate", nil);
         else
@@ -836,27 +840,12 @@ do  --Event Handler
                 end
             end
         elseif event == "PLAYER_MONEY" then
-            if self.playerMoney then
-                local money = GetMoney();
-                local delta = money - self.playerMoney;
-                if delta > 0 then
-                    local data = {
-                        slotType = Defination.SLOT_TYPE_MONEY,
-                        quantity = delta,
-                        name = tostring(money),
-                    };
-                    MainFrame:QueueDisplayLoot(data);
-                end
-                if MainFrame:IsVisible() then
-                    self.playerMoney = money;
-                else
-                    self.playerMoney = nil;
-                end
+            if not SHOW_ALL_MONEY_CHANGE then
+                self:ProcessMoneyFromLoot();
             end
         elseif event == "LOOT_SLOT_CHANGED" then
             --Can happen during AoE Loot
             self:OnLootSlotChanged(...);
-
         elseif event == "LOOT_SLOT_CLEARED" then
             self:OnLootSlotCleared(...);
         --elseif event == "SHOW_LOOT_TOAST" then
@@ -864,6 +853,26 @@ do  --Event Handler
         --    self:OnLootToast(...);
         end
         --print(event, GetTimePreciseSec(), ...)  --
+    end
+
+    function EL:ProcessMoneyFromLoot()
+        if self.playerMoney then
+            local money = GetMoney();
+            local delta = money - self.playerMoney;
+            if delta > 0 then
+                local data = {
+                    slotType = Defination.SLOT_TYPE_MONEY,
+                    quantity = delta,
+                    name = tostring(money),
+                };
+                MainFrame:QueueDisplayLoot(data);
+            end
+            if MainFrame:IsVisible() then
+                self.playerMoney = money;
+            else
+                self.playerMoney = nil;
+            end
+        end
     end
 end
 
@@ -1217,6 +1226,82 @@ do  --UI Notification Mode
         EL.playerMoney = nil;
     end
     MainFrame:SetScript("OnHide", MainFrame.OnHide);
+end
+
+
+do  --Money Change Handler
+    local MoneyListener = CreateFrame("Frame", nil, EL);
+    EL.MoneyListener = MoneyListener;
+
+    function MoneyListener:OnSettingsChanged()
+        if addon.GetDBBool("LootUI") and addon.GetDBBool("LootUI_ShowAllMoneyChange") then
+            self:RegisterEvent("PLAYER_MONEY");
+            self:SetScript("OnEvent", self.OnEvent);
+            self.playerMoney = GetMoney();
+        else
+            self:UnregisterEvent("PLAYER_MONEY");
+            self:UnregisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE");
+            self:SetScript("OnEvent", nil);
+        end
+    end
+
+    function MoneyListener:OnEvent(event, ...)
+        if event == "PLAYER_MONEY" then
+            self.t = - 0.2;
+            self:SetScript("OnUpdate", self.OnUpdate);
+        elseif event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" then
+            self.t = -0.8;
+            self:SetScript("OnUpdate", self.OnUpdate);
+        end
+    end
+
+    MoneyListener.interactionTypes = {
+        --Enum.PlayerInteractionType
+        3, 4,   --Gossip, QuestGiver
+        8, 10,  --Banker, GuildBanker
+        5, 12,  --Merchant, Vendor
+        17,     --MailInfo
+    };
+
+    function MoneyListener:IsInteracting()
+        --Defer and merge changes when interacting with certain NPCs
+        for _, id in ipairs(self.interactionTypes) do
+            if IsInteractingWithNpcOfType(id) then
+                return true
+            end
+        end
+        return false
+    end
+
+    function MoneyListener:OnUpdate(elapsed)
+        self.t = self.t + elapsed;
+        if self.t >= 0 then
+            self.t = 0;
+            self:SetScript("OnUpdate", nil);
+            if self:IsInteracting() then
+                self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE");
+            else
+                self:UnregisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE");
+                self:ProcessMoneyFromAllSources();
+            end
+        end
+    end
+
+    function MoneyListener:ProcessMoneyFromAllSources()
+        local money = GetMoney();
+        if self.playerMoney then
+            local delta = money - self.playerMoney;
+            if delta > 0 then
+                local data = {
+                    slotType = Defination.SLOT_TYPE_MONEY,
+                    quantity = delta,
+                    name = tostring(money),
+                };
+                MainFrame:QueueDisplayLoot(data);
+            end
+        end
+        self.playerMoney = money;
+    end
 end
 
 
@@ -1731,13 +1816,16 @@ do  --Edit Mode
             {type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return C_ColorOverrides and ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
             {type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
             {type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItems"},
-            {newFeature = true, type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = Tooltip_ShowReputation, onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = Validation_IsRetail},
             {type = "Checkbox", label = L["LootUI Option Low Frame Strata"], tooltip = L["LootUI Option Low Frame Strata Tooltip"], onClickFunc = nil, dbKey = "LootUI_LowFrameStrata"},
+
+            {type = "Divider"},
+            {newFeature = true, type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = Tooltip_ShowReputation, onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = Validation_IsRetail},
+            {newFeature = true, type = "Checkbox", label = L["LootUI Option Show All Money"], tooltip = L["LootUI Option Show All Money Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowAllMoneyChange"},
+            {type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"], validityCheckFunc = Validation_IsRetail},
 
             {type = "Divider"},
             {type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = Options_ForceAutoLoot_OnClick, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
             {type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
-            {type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"], validityCheckFunc = Validation_IsRetail},
             {type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = Options_UseHotkey_OnClick, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
             {type = "Keybind", label = L["Take All"], dbKey = "LootUI_HotkeyName", tooltip = L["LootUI Option Use Hotkey Tooltip"], defaultKey = "E"},
 
@@ -1862,17 +1950,21 @@ do  --Edit Mode
         LOW_FRAME_STRATA = state;
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_LowFrameStrata", SettingChanged_LowFrameStrata);
-	
+
 	local function SettingChanged_WindowDisabled(state, userInput)
-    LootUI_WindowHide = state;
+        LootUI_WindowHide = state;
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_WindowHide", SettingChanged_WindowDisabled);
+
+    local function SettingChanged_ShowAllMoneyChange(state, userInput)
+        SHOW_ALL_MONEY_CHANGE = state;
+        EL.MoneyListener:OnSettingsChanged();
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowAllMoneyChange", SettingChanged_ShowAllMoneyChange);
 end
 
 
 do  --Dynamic Frame Strata
-    local IsInteractingWithNpcOfType = C_PlayerInteractionManager.IsInteractingWithNpcOfType;
-
     function MainFrame:UpdateFrameStrata()
         if IsInteractingWithNpcOfType(40) then
             --Lower frame strata when using Scrapping Machine so our window appear behind bag UI
@@ -1980,9 +2072,13 @@ do  --Module Registry
             else
                 SettingChanged_UseStockUI(false);
             end
+
+            EL.MoneyListener:OnSettingsChanged();
+
         elseif ENABLE_MODULE then
             ENABLE_MODULE = false;
             EL.enabled = false;
+            EL.playerMoney = nil;
             EL:ListenStaticEvent(false);
             EL:ListenDynamicEvents(false);
             EL:SetScript("OnEvent", nil);
@@ -1990,6 +2086,7 @@ do  --Module Registry
             MainFrame:Disable();
 
             EL:ListenAlertSystemEvent(false);
+            EL.MoneyListener:OnSettingsChanged();
             SettingChanged_UseStockUI(true);
         end
     end

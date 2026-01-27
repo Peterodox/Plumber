@@ -325,6 +325,7 @@ L["ModuleDescription WorldMapPin_TWW"] = "在卡兹阿加地图上显示额外�
 
 --Delves
 L["Great Vault Tier Format"] = "难度 %s";
+L["Great Vault World Activity Tooltip"] = "难度1和世界活动";
 L["Item Level Format"] = "物品等级%d";
 L["Item Level Abbr"] = "装等";
 L["Delves Reputation Name"] = "地下堡赛季进度";
@@ -564,6 +565,8 @@ L["LootUI Option Low Frame Strata"] = "置于底层";
 L["LootUI Option Low Frame Strata Tooltip"] = "在处于通知模式时，将拾取窗口置于其他界面的后方。\n\n此选项不影响手动拾取模式。";
 L["LootUI Option Show Reputation"] = "显示声望变化";
 L["LootUI Option Show Reputation Tooltip"] = "在拾取窗口内显示获得的声望。\n\n在战斗中或是战场内获得的声望将在结束后合并显示。";
+L["LootUI Option Show All Money"] = "显示任何金钱变动";
+L["LootUI Option Show All Money Tooltip"] = "显示从任何来源获得的金钱，而不仅限于从战利品中拾取到的。";
 
 
 --Quick Slot For Third-party Dev

@@ -565,6 +565,8 @@ L["LootUI Option Low Frame Strata"] = "Send to Back";
 L["LootUI Option Low Frame Strata Tooltip"] = "While in Loot Notification Mode, place the loot window behind other UI.\n\nThis option doesn't affect Manual Loot Mode.";
 L["LootUI Option Show Reputation"] = "Show Reputation Changes";
 L["LootUI Option Show Reputation Tooltip"] = "Display any reputation increases in the loot window.\n\nReputations earned during combat or in PvP instances will be displayed afterwards.";
+L["LootUI Option Show All Money"] = "Show Any Money Changes";
+L["LootUI Option Show All Money Tooltip"] = "Show money earned from all sources, not just loot.";
 
 
 --Quick Slot For Third-party Dev
