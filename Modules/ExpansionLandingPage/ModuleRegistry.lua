@@ -97,7 +97,7 @@ function EL.EnableModule(state)
             _G.ToggleExpansionLandingPage = ToggleExpansionLandingPage_New;     --Override Default API
             EL:RegisterEvent("QUEST_ACCEPTED");
             EL:RegisterEvent("QUEST_TURNED_IN");
-            API.AddButtonToAddonCompartment(IDENTIFIER, L["ModuleName NewExpansionLandingPage"], nil, AddonCompartment_OnClick, AddonCompartment_OnEnter, AddonCompartment_OnLeave);
+            API.AddButtonToAddonCompartment(IDENTIFIER, L["Abbr NewExpansionLandingPage"], nil, AddonCompartment_OnClick, AddonCompartment_OnEnter, AddonCompartment_OnLeave);
         end
     else
         if EL.enabled then

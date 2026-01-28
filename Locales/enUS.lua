@@ -614,6 +614,7 @@ L["No Slot For New Character Macro Alert"] = "You need to have a spare Character
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Expansion Summary";
 L["ModuleDescription NewExpansionLandingPage"] = "A UI that displays factions, weekly activities, and raid lockouts. You can open it by:\n\n- Set a hotkey in Game Settings> Keybindings> Plumber Addon.\n\n- Use the Addon Compartment under the Calendar button.";
+L["Abbr NewExpansionLandingPage"] = "Expansion Summary";    --An abbreviated version of the same phrase. Affects German.
 L["Reward Available"] = "Reward Available";  --As brief as possible
 L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
@@ -727,6 +728,7 @@ L["ModuleDescription CraftSearchExtended"] = "Shows more results when searching 
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "Decor Preview: Banana For Scale"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- Add a size reference (a banana) to the decor preview window, allowing you to gauge the size of the objects.\n\n- Also allow you to change the camera pitch by holding down the Left Button and moving vertically.";
+L["Toggle Banana"] = "Toggle Banana";
 
 
 --Player Housing

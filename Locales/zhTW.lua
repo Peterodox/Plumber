@@ -397,6 +397,7 @@ L["Drawer Option Update Frequently Tooltip"] = "在你背包或法術書發生�
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "資料片總覽";
 L["ModuleDescription NewExpansionLandingPage"] = "一個顯示聲望、每週事件和團隊副本進度的介面。你可從以下方式打開：\n\n- 點擊小地圖上的卡茲阿加概要按鈕。\n\n- 在遊戲設定-快捷鍵中設定一個快捷鍵。";
+L["Abbr NewExpansionLandingPage"] = "資料片總覽";
 L["Reward Available"] = "獎勵待領取";  --As brief as possible
 L["Paragon Reward Available"] = "巔峰獎勵待領取";
 L["Until Next Level Format"] = "離下一級還有 %d";   --Earn x reputation to reach the next level

@@ -614,6 +614,7 @@ L["No Slot For New Character Macro Alert"] = "需要一个空的角色专用宏�
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "资料片概要";
 L["ModuleDescription NewExpansionLandingPage"] = "一个显示声望、每周事件和团本进度的界面。你可从以下方式访问：\n\n- 点击小地图上的卡兹阿加概要按钮。\n\n- 在游戏设置-快捷键中设置一个快捷键。";
+L["Abbr NewExpansionLandingPage"] = "资料片概要";
 L["Reward Available"] = "奖励待领取";  --As brief as possible
 L["Paragon Reward Available"] = "巅峰奖励待领取";
 L["Until Next Level Format"] = "离下一级还有 %d";   --Earn x reputation to reach the next level
@@ -695,6 +696,7 @@ L["ModuleDescription CraftSearchExtended"] = "在搜索某些词语时显示更�
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "装饰品: 参照物";
 L["ModuleDescription DecorModelScaleRef"] = "- 为装饰品预览窗口增加一个参照物（一根香蕉），帮助你理解物体的大小。\n\n- 允许你按住鼠标左键并在模型上上下拖动来改变镜头的俯仰角。";
+L["Toggle Banana"] = "勾选香蕉";
 
 
 --Player Housing

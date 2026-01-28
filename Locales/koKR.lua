@@ -612,6 +612,7 @@ L["No Slot For New Character Macro Alert"] = "이 작업을 완료하려면 여�
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "확장팩 개요";
 L["ModuleDescription NewExpansionLandingPage"] = "진영, 주간 활동, 공격대 귀속 정보를 표시하는 UI입니다. 다음 방법으로 열 수 있습니다:\n\n- 게임 설정 > 단축키 > Plumber 애드온에서 단축키를 설정하세요.\n\n- 달력 버튼 아래에 있는 애드온 항목을 사용하세요.";
+L["Abbr NewExpansionLandingPage"] = "확장팩 개요";
 L["Reward Available"] = "보상 가능";
 L["Paragon Reward Available"] = "불멸의 동맹 평판 보상 가능";
 L["Until Next Level Format"] = "%d 다음 레벨까지";   --Earn x reputation to reach the next level

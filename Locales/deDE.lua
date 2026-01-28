@@ -612,6 +612,7 @@ L["ModuleDescription DrawerMacro"] = "Wenn Ihr |cffd7c0a3#plumber:drawer|r in ei
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Erweiterungszusammenfassung";
 L["ModuleDescription NewExpansionLandingPage"] = "Dies ist ein neues Menü, welches Informationen über die verschiedenen Fraktionen, wöchentlichen Aktivitäten und Schlachtzugs-Lockouts anzeigt.\n\nDas Menü kann mit einem Klick auf das Symbol an der Minimap angezeigt werden.\nDarüber hinaus gibt es einen Tastenkürzel, den man unter \'Optionen> Tastaturbelegung\' festlegen kann.";
+L["Abbr NewExpansionLandingPage"] = "Erw.-Übersicht";
 L["Reward Available"] = "Belohnung verfügbar";    --As brief as possible
 L["Paragon Reward Available"] = "Paragon-Belohnung verfügbar";
 L["Until Next Level Format"] = "%d bis zum nächsten Level";    --Earn x reputation to reach the next level

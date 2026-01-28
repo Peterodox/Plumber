@@ -169,7 +169,7 @@ local BananaButtonMixin = {};
 do
     function BananaButtonMixin:OnEnter()
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("Toggle Banana");
+        GameTooltip:SetText(addon.L["Toggle Banana"]);
         GameTooltip:Show();
         self:GetParent():UpdateAlpha();
     end

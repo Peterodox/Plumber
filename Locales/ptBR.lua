@@ -609,6 +609,7 @@ L["ModuleDescription DrawerMacro"] = "Cria um menu flutuante personalizado para 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Sumário da expansão";
 L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode acessá-la ao:\n\n- Clicar no botão Sumário de Khaz Algar no minimapa.\n\n- Usar a tecla de atalho atribuída em Opções do jogo > Atalhos do teclado.";
+L["Abbr NewExpansionLandingPage"] = "Sumário da expansão";
 L["Reward Available"] = "Recompensa Disponível";
 L["Paragon Reward Available"] = "Recompensa de paragão disponível";
 L["Until Next Level Format"] = "%d até o próximo nível";
