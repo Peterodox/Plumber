@@ -565,6 +565,8 @@ L["LootUI Option Low Frame Strata"] = "뒤로 보내기";
 L["LootUI Option Low Frame Strata Tooltip"] = "전리품 알림 모드에서 전리품 창을 다른 UI 뒤로 배치합니다.\n\n이 옵션은 수동 전리품 모드에는 영향을 주지 않습니다.";
 L["LootUI Option Show Reputation"] = "평판 변화 표시";
 L["LootUI Option Show Reputation Tooltip"] = "전리품 창에 평판 증가량을 표시합니다.\n\n전투 중 또는 PvP에서 획득한 평판은 이후에 표시됩니다.";
+L["LootUI Option Show All Money"] = "모든 화폐 변동 사항 표시";
+L["LootUI Option Show All Money Tooltip"] = "전리품뿐만 아니라 모든 출처에서 얻은 화폐를 표시해줍니다.";
 
 
 --Quick Slot For Third-party Dev
