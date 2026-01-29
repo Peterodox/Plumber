@@ -43,6 +43,7 @@ L["New Feature Abbr"] = "신규";
 L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "이 모듈은 항상 활성화되어 있습니다.";
 L["Return To Module List"] = "목록으로 돌아가기";
+L["Generic Addon Conflict"] = "이 모듈은 유사한 기능을 가진 다른 애드온과 호환되지 않을 수 있습니다.";
 
 
 --Settings Category
@@ -383,6 +384,11 @@ L["Click To Disable"] = "클릭하여 비활성화";
 --NameplateWidget
 L["ModuleName NameplateWidget"] = "이름표: 열쇠창";
 L["ModuleDescription NameplateWidget"] = "광휘의 잔재 보유 수 이름표에 표시.";
+
+
+--NameplateQuestIndicator
+L["ModuleName NameplateQuest"] = "이름표: 퀘스트 표시기r";
+L["ModuleDescription NameplateQuest"] = "";
 
 
 --PartyInviterInfo
@@ -728,6 +734,7 @@ L["ModuleDescription CraftSearchExtended"] = "특정 단어를 검색할 때 더
 --DecorModelScaleRef
 L["ModuleName DecorModelScaleRef"] = "장식품: 크기 비교용 바나나"; --See HOUSING_DASHBOARD_CATALOG_TOOLTIP
 L["ModuleDescription DecorModelScaleRef"] = "- 장식 미리보기 창에 크기 참조용 바나나를 추가하여 오브젝트의 크기를 가늠할 수 있습니다.\n\n- 또한 왼쪽 버튼을 누른 채 수직으로 이동하여 카메라 각도를 변경할 수 있습니다.";
+L["Toggle Banana"] = "바나나 전환";
 
 
 --Player Housing
