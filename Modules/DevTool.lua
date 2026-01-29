@@ -21,6 +21,7 @@ local function IsEnabled(key)
     end
 end
 
+
 if IsEnabled("AuraWather") then  --Aura Watcher
     local GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex;
     local GetAuraDataByAuraInstanceID = C_UnitAuras.GetAuraDataByAuraInstanceID;

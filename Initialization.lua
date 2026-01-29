@@ -337,6 +337,10 @@ local DefaultValues = {
     Housing_ItemAcquiredAlert = true,       --Click AlertFrame to view decor model
 
 
+    --Namaplte: Quest Indicator
+    NameplateQuest = false,
+
+
     --Declared elsewhere:
         --DreamseedChestABTesting = math.random(100) >= 50
 

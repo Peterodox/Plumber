@@ -2512,6 +2512,10 @@ do  -- ObjectPool
         return ipairs(self.activeObjects)
     end
 
+    function ObjectPoolMixin:DebugPrint()
+        print(#self.objects, self.numUnused, #self.activeObjects)
+    end
+
     local function CreateObjectPool(createObjectFunc, onRemovedFunc, onAcquiredFunc)
         local pool = {};
         API.Mixin(pool, ObjectPoolMixin);
