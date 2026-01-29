@@ -43,6 +43,7 @@ L["New Feature Abbr"] = "新";
 L["Format Month Day"] = "%s%d日";
 L["Always On Module"] = "此模块将被一直启用。";
 L["Return To Module List"] = "返回模块列表";
+L["LootUI Addon Conflict"] = "此模块可能与以下功能类似的插件不兼容：";
 
 
 --Settings Category

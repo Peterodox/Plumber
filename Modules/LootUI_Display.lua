@@ -2102,10 +2102,34 @@ do  --Module Registry
         end
     end
 
+    local function GetModuleConflictWarning()
+        local names = {
+            "SpeedyAutoLoot", "XLoot",
+        };
+
+        local name;
+
+        for _, addonName in ipairs(names) do
+            if C_AddOns.IsAddOnLoaded(addonName) then
+                name = addonName;
+                break
+            end
+        end
+
+        if LeaPlusDB and LeaPlusDB.FasterLooting == "On" then
+            name = "Leatrix Plus: Faster auto loot";
+        end
+
+        if name then
+            return string.format("|cffd4641c%s\n\n- %s|r", L["Generic Addon Conflict"], name);
+        end
+    end
+
     local moduleData = {
         name = L["ModuleName LootUI"],
         dbKey = "LootUI",
         description = L["ModuleDescription LootUI"],
+        descriptionFunc = GetModuleConflictWarning,
         toggleFunc = EnableModule,
         categoryID = 1,
         uiOrder = 0,
