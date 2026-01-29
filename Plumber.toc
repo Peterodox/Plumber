@@ -72,6 +72,7 @@ Modules\UnderlightAngler.lua
 Modules\SpellcastInfo.lua
 Modules\ChatOptions.lua
 Modules\NameplateResources.lua
+Modules\NameplateQuestIndicator.lua
 Modules\StaticPopupEnhancement.xml
 Modules\PlayerTitleUI.lua
 Modules\BlizzardSuperTrack.lua
