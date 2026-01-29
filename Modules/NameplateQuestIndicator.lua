@@ -3,10 +3,11 @@ local _, addon = ...
 
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
 local GetNamePlates = C_NamePlate.GetNamePlates;
---local UnitIsRelatedToActiveQuest = C_QuestLog.UnitIsRelatedToActiveQuest;
+local UnitIsRelatedToActiveQuest = C_QuestLog.UnitIsRelatedToActiveQuest;
 local GetUnitTooltipInfo = C_TooltipInfo.GetUnit;
 local UnitIsPlayer = UnitIsPlayer;
 local UnitIsUnit = UnitIsUnit;
+local GetInstanceInfo = GetInstanceInfo;
 
 
 local LineType = {
@@ -17,8 +18,10 @@ local LineType = {
 
 
 local Def = {
-    IconSize = 20,
+    IconSize = 18,
     ShowPartyProgress = true,
+    AnchorToHealthBar = true,
+    Align = "right",
 };
 
 
@@ -50,72 +53,81 @@ do  --Widget
         self.questID = nil;
 
         if self.unit then
-            local tooltipInfo = GetUnitTooltipInfo(self.unit);
-            local lines = tooltipInfo and tooltipInfo.lines;
-
-            if lines then
-                local l;
-                local allCompleted = true;
-                local questID;
-                local i = 3;
-                local numLines = #lines;
-                local objectiveText;
-                local fromAnotherPlayer;
-
-                while i <= numLines do
-                    l = lines[i];
-                    if l.type == LineType.QuestTitle then
-                        questID = l.id;
-                        allCompleted = true;
-                        i = i + 1;
-                    elseif l.type == LineType.QuestPlayer then
-                        local isPlayer = l.leftText == PLAYER_NAME;
-                        i = i + 1;
-                        l = lines[i];
-                        if l then
-                            while l and l.type == LineType.QuestObjective do
-                                if (not l.completed) and (isPlayer or Def.ShowPartyProgress) then
-                                    allCompleted = false;
-                                    objectiveText = l.leftText;
-                                    if not isPlayer then
-                                        fromAnotherPlayer = true;
-                                    end
-                                    break
-                                end
-                                i = i + 1;
-                                l = lines[i];
-                            end
-                        end
-                    elseif l.type == LineType.QuestObjective then
-                        if not l.completed then
-                            allCompleted = false;
-                            objectiveText = l.leftText;
-                            break
-                        end
-                        i = i + 1;
-                    else
-                        i = i + 1;
-                    end
-                end
-
-                self.questID = questID;
-
-                if not allCompleted then
-                    local text = GetProgressText(objectiveText);
-                    self.ProgressText:SetText(text);
-                    self.hasProgress = text ~= nil;
-
-                    if fromAnotherPlayer then
-                        --self.Icon:SetTexCoord(0.25, 0.5, 0, 0.25);
-                        self.Icon:SetTexCoord(0.5, 1, 0, 0.5);
-                        self.ProgressText:SetTextColor(0.67, 0.67, 0.67);
-                    else
-                        --self.Icon:SetTexCoord(0, 0.25, 0, 0.25);
-                        self.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
-                        self.ProgressText:SetTextColor(1, 1, 1);
-                    end
-
+            if EL.inInstance then
+                self.hasProgress = false;
+                self.ProgressText:SetText(nil);
+                if UnitIsRelatedToActiveQuest(self.unit) then
+                    self.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
                     return
+                end
+            else
+                local tooltipInfo = GetUnitTooltipInfo(self.unit);
+                local lines = tooltipInfo and tooltipInfo.lines;
+
+                if lines then
+                    local l;
+                    local allCompleted = true;
+                    local questID;
+                    local i = 3;
+                    local numLines = #lines;
+                    local objectiveText;
+                    local fromAnotherPlayer;
+
+                    while i <= numLines do
+                        l = lines[i];
+                        if l.type == LineType.QuestTitle then
+                            questID = l.id;
+                            allCompleted = true;
+                            i = i + 1;
+                        elseif l.type == LineType.QuestPlayer then
+                            local isPlayer = l.leftText == PLAYER_NAME;
+                            i = i + 1;
+                            l = lines[i];
+                            if l then
+                                while l and l.type == LineType.QuestObjective do
+                                    if (not l.completed) and (isPlayer or Def.ShowPartyProgress) then
+                                        allCompleted = false;
+                                        objectiveText = l.leftText;
+                                        if not isPlayer then
+                                            fromAnotherPlayer = true;
+                                        end
+                                        break
+                                    end
+                                    i = i + 1;
+                                    l = lines[i];
+                                end
+                            end
+                        elseif l.type == LineType.QuestObjective then
+                            if not l.completed then
+                                allCompleted = false;
+                                objectiveText = l.leftText;
+                                break
+                            end
+                            i = i + 1;
+                        else
+                            i = i + 1;
+                        end
+                    end
+
+                    self.questID = questID;
+
+                    if not allCompleted then
+                        local text = GetProgressText(objectiveText);
+                        self.ProgressText:SetText(text);
+                        self.hasProgress = text ~= nil;
+
+                        if fromAnotherPlayer then
+                            --self.Icon:SetTexCoord(0.25, 0.5, 0, 0.25);
+                            self.Icon:SetTexCoord(0.5, 1, 0, 0.5);
+                            self.ProgressText:SetTextColor(0.67, 0.67, 0.67);
+                        else
+                            --self.Icon:SetTexCoord(0, 0.25, 0, 0.25);
+                            self.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
+                            self.ProgressText:SetTextColor(1, 1, 1);
+                        end
+
+                        return
+                    end
                 end
             end
         end
@@ -155,10 +167,27 @@ do  --Widget
         end
     end
 
+    function QuestWidgetMixin:SetOrientation(orientation)
+        if orientation ~= self.orientation then
+            self.orientation = orientation;
+            self.ProgressText:ClearAllPoints();
+            if orientation == "left" then
+                self.ProgressText:SetPoint("RIGHT", self, "RIGHT", -2, 0);
+            else
+                self.ProgressText:SetPoint("LEFT", self, "LEFT", 0, 0);
+            end
+        end
+    end
+
+    function QuestWidgetMixin:SetIconSize(size)
+        self:SetWidth(size * 0.5);
+        self.Icon:SetSize(size, size);
+    end
+
 
     function CreateQuestWidget()
         local f = CreateFrame("Frame", nil, EL);
-        f:SetSize(Def.IconSize, Def.IconSize);
+        f:SetSize(16, 16);
         Mixin(f, QuestWidgetMixin);
         f:SetScript("OnHide", f.OnHide);
 
@@ -168,6 +197,8 @@ do  --Widget
         f.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
         f.Icon:SetTexCoord(0, 0.25, 0, 0.25);
         addon.API.DisableSharpening(f.Icon);
+
+        f:SetIconSize(Def.IconSize);
 
         f.ProgressText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
         f.ProgressText:SetPoint("LEFT", f, "LEFT", 4, 0);
@@ -224,11 +255,16 @@ do  --Event Listener
         widget:SetOwnerInfo(UnitFrame, unit);
         widget:SetParent(nameplate);
         widget:UpdateQuest();
+        widget:ClearAllPoints();
 
-        if UnitFrame.HealthBarsContainer and UnitFrame.HealthBarsContainer:IsShown() and UnitFrame.HealthBarsContainer.healthBar then
-            widget:SetPoint("LEFT", UnitFrame.HealthBarsContainer.healthBar, "RIGHT", 0, 0);
+        if Def.AnchorToHealthBar then
+            local relativeTo = UnitFrame.AurasFrame.CrowdControlListFrame;
+            --local relativeTo = UnitFrame.HealthBarsContainer.healthBar;
+            widget:SetPoint("LEFT", relativeTo, "RIGHT", -2, 0);
+            widget:SetOrientation("right");
         else
-            widget:SetPoint("LEFT", UnitFrame, "RIGHT", 0, 0);
+            widget:SetPoint("RIGHT", UnitFrame, "LEFT", 0, 0);
+            widget:SetOrientation("left");
         end
 
         widget:Show();
@@ -285,6 +321,44 @@ do  --Event Listener
             self:OnTargetChanged();
         elseif event == "UNIT_QUEST_LOG_CHANGED" or event == "GROUP_ROSTER_UPDATE" then
             self:RequestUpdateQuest();
+        elseif event == "PLAYER_ENTERING_WORLD" then
+            self:UpdateZone();
+        end
+    end
+
+    function EL:UpdateAnchorForAddOns()
+        local addonNames = {"Platynator", "Plater"};
+
+        for _, name in ipairs(addonNames) do
+            if C_AddOns.IsAddOnLoaded(name) then
+                Def.AnchorToHealthBar = false;
+                break
+            end
+        end
+    end
+
+    local DangerousInstanceType = {
+        party = true,
+        raid = true,
+        arena = true,
+        pvp = true,
+    };
+
+    function EL:UpdateZone()
+        local _, instanceType = GetInstanceInfo();
+        local inInstance = instanceType and DangerousInstanceType[instanceType] or false;
+        if inInstance ~= self.inInstance then
+            self.inInstance = inInstance;
+            self:UnregisterEvent("UNIT_QUEST_LOG_CHANGED");
+            if inInstance then
+                self:UnregisterEvent("PLAYER_TARGET_CHANGED");
+                self:UnregisterEvent("GROUP_ROSTER_UPDATE");
+                self:RegisterUnitEvent("UNIT_QUEST_LOG_CHANGED", "player");
+            else
+                self:RegisterEvent("PLAYER_TARGET_CHANGED");
+                self:RegisterEvent("GROUP_ROSTER_UPDATE");
+                self:RegisterEvent("UNIT_QUEST_LOG_CHANGED");
+            end
         end
     end
 end
@@ -297,19 +371,21 @@ function EL:EnableModule(state)
             InitializeWidgetPool();
         end
         self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
-        self:RegisterEvent("PLAYER_TARGET_CHANGED");
-        self:RegisterEvent("UNIT_QUEST_LOG_CHANGED");
-        self:RegisterEvent("GROUP_ROSTER_UPDATE");
+        self:RegisterEvent("PLAYER_ENTERING_WORLD");
+        self:UpdateZone();
         self:SetScript("OnEvent", self.OnEvent);
+        self:UpdateAnchorForAddOns();
         self:UpdateAllNameplates();
     elseif self.enabled then
         self.enabled = nil;
+        self.inInstance = nil;
         if WidgetPool then
             for widget in pairs(WidgetPool) do
                 widget:Hide();
             end
         end
         self:UnregisterEvent("NAME_PLATE_UNIT_ADDED");
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD");
         self:UnregisterEvent("PLAYER_TARGET_CHANGED");
         self:UnregisterEvent("UNIT_QUEST_LOG_CHANGED");
         self:UnregisterEvent("GROUP_ROSTER_UPDATE");
