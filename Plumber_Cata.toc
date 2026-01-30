@@ -1,7 +1,7 @@
 ## X-Flavor: classic
 ## X-Expansion: CATA
 ## Interface: 40402
-## Version: 1.8.5
+## Version: 1.8.6
 
 ## Title: Plumber
 

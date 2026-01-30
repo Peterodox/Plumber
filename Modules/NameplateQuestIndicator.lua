@@ -891,7 +891,7 @@ do
         toggleFunc = function(state)
             EL:EnableModule(state)
         end,
-        moduleAddedTime = 1769700000,
+        moduleAddedTime = 1769800000,
         optionToggleFunc = OptionToggle_OnClick,
         hasMovableWidget = true,
         categoryKeys = {

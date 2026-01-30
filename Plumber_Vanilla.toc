@@ -1,7 +1,7 @@
 ## X-Flavor: era
 ## X-Expansion: VANILLA
 ## Interface: 11508
-## Version: 1.8.5
+## Version: 1.8.6
 
 ## Title: Plumber
 

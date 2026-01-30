@@ -10,6 +10,64 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10806] = {
+    {
+        type = "date",
+        versionText = "1.8.6",
+        timestamp = 1769800000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName NameplateQuest"],
+        dbKey = "NameplateQuest",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "NameplateQuest",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Show quest indicator on nameplates. This indicator is customizable.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "(Optional) Show quest objective progress for your target.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "(Optional) Show quest indicator if your party members haven't completed the objective.",
+    },
+
+    {
+        type = "img",
+        dbKey = "NameplateQuest",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = MISCELLANEOUS,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Loot Window: Added an option to hide the \"You received\" text.",
+    },
+};
+
+
 changelogs[10805] = {
     {
         type = "date",
