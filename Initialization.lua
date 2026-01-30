@@ -339,7 +339,11 @@ local DefaultValues = {
 
     --Namaplte: Quest Indicator
     NameplateQuest = false,
-
+        NameplateQuest_IconSize = 2,
+        NameplateQuest_ShowPartyQuest = false,
+        NameplateQuest_ShowTargetProgress = false,
+        NameplateQuest_ProgressTextAlignToCenter = false,
+        
 
     --Declared elsewhere:
         --DreamseedChestABTesting = math.random(100) >= 50

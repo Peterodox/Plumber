@@ -24,6 +24,7 @@ L["Quick Slot Layout"] = "Layout";
 L["Quick Slot Layout Linear"] = "Linear";
 L["Quick Slot Layout Radial"] = "Radial";
 L["Restriction Combat"] = "Does not work in combat";    --Indicate a feature can only work when out of combat
+L["Restriction Instance"] = "This feature does not work in instances.";
 L["Map Pin Change Size Method"] = "\n\n*You can change the pin size in World Map> Map Filter> Plumber";
 L["Toggle Plumber UI"] = "Toggle Plumber UI";
 L["Toggle Plumber UI Tooltip"] = "Show the following Plumber UI in the Edit Mode:\n\n%s\n\nThis checkbox only controls their visibility in the Edit Mode. It will not enable or disable these modules.";
@@ -389,6 +390,11 @@ L["ModuleDescription NameplateWidget"] = "Show the number of owned Radiant Remna
 --NameplateQuestIndicator
 L["ModuleName NameplateQuest"] = "Nameplate: Quest Indicator";
 L["ModuleDescription NameplateQuest"] = "";
+L["NameplateQuest ShowPartyQuest"] = "Show Party Member's Quest";
+L["NameplateQuest ShowPartyQuest Tooltip"] = "Show a marker %s if one of your party members hasn't completed the quest objective.";
+L["NameplateQuest ShowTargetProgress"] = "Show Target Progress";
+L["NameplateQuest ShowTargetProgress Tooltip"] = "Show the quest objective progress on your target's nameplate.";
+L["NameplateQuest ProgressTextAlignToCenter"] = "Align to Center";
 
 
 --PartyInviterInfo

@@ -298,11 +298,13 @@ do  -- Checkbox
             f:Hide();
             f:SetOwner(self, "ANCHOR_RIGHT");
             f:SetText(self.Label:GetText(), 1, 1, 1, 1, true);
+
             if type(self.tooltip) == "function" then
                 f:AddLine(self.tooltip(), 1, 0.82, 0, true);
             else
                 f:AddLine(self.tooltip, 1, 0.82, 0, true);
             end
+
             if self.tooltip2 then
                 local tooltip2;
                 if type(self.tooltip2) == "function" then
@@ -315,6 +317,12 @@ do  -- Checkbox
                     f:AddLine(tooltip2, 1, 0.82, 0, true);
                 end
             end
+
+            if self.restrictionInstance then
+                f:AddLine(" ");
+                f:AddLine(L["Restriction Instance"], 1, 0.282, 0, true);
+            end
+
             f:Show();
         end
     end
@@ -433,6 +441,7 @@ do  -- Checkbox
         self.onEnterFunc = data.onEnterFunc;
         self.onLeaveFunc = data.onLeaveFunc;
         self.keepTooltipAfterClicks = data.keepTooltipAfterClicks;
+        self.restrictionInstance = data.restrictionInstance;
 
         if data.label then
             return self:SetLabel(data.label)
