@@ -24,6 +24,7 @@ L["Quick Slot Layout"] = "배치 방식";
 L["Quick Slot Layout Linear"] = "직선형";
 L["Quick Slot Layout Radial"] = "원형";
 L["Restriction Combat"] = "전투 중에는 작동하지 않습니다.";  --Indicate a feature can only work when out of combat
+L["Restriction Instance"] = "이 기능은 인스턴스에서는 작동하지 않습니다.";
 L["Map Pin Change Size Method"] = "\n\n*세계 지도 > 지도 필터 > Plumber에서 핀 크기를 변경";
 L["Toggle Plumber UI"] = "Plumber UI 전환";
 L["Toggle Plumber UI Tooltip"] = "편집 모드에서 다음 Plumber UI를 표시합니다:\n\n%s\n\n이 체크박스는 편집 모드에서의 UI 표시 여부만 제어합니다.\n이 모듈들을 활성화하거나 비활성화하지는 않습니다.";
@@ -389,6 +390,11 @@ L["ModuleDescription NameplateWidget"] = "광휘의 잔재 보유 수 이름표�
 --NameplateQuestIndicator
 L["ModuleName NameplateQuest"] = "이름표: 퀘스트 표시기r";
 L["ModuleDescription NameplateQuest"] = "";
+L["NameplateQuest ShowPartyQuest"] = "파티원 퀘스트 표시";
+L["NameplateQuest ShowPartyQuest Tooltip"] = "파티원 중 퀘스트 목표를 완료하지 않은 사람이 있을 경우 %s 표시기 표시.";
+L["NameplateQuest ShowTargetProgress"] = "목표 진행률 표시";
+L["NameplateQuest ShowTargetProgress Tooltip"] = "대상 이름표에 퀘스트 목표 진행 상황을 표시합니다.";
+L["NameplateQuest ProgressTextAlignToCenter"] = "가운데 정렬";
 
 
 --PartyInviterInfo
