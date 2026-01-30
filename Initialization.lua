@@ -267,6 +267,7 @@ local DefaultValues = {
         LootUI_LowFrameStrata = false,
         LootUI_ShowReputation = false,
         LootUI_ShowAllMoneyChange = false,
+        LootUI_HideTitle = false,
 
 
     --Unified Map Pin System

@@ -568,6 +568,8 @@ L["LootUI Option Show Reputation"] = "显示声望变化";
 L["LootUI Option Show Reputation Tooltip"] = "在拾取窗口内显示获得的声望。\n\n在战斗中或是战场内获得的声望将在结束后合并显示。";
 L["LootUI Option Show All Money"] = "显示任何金钱变动";
 L["LootUI Option Show All Money Tooltip"] = "显示从任何来源获得的金钱，而不仅限于从战利品中拾取到的。";
+L["LootUI Option Hide Title"] = "隐藏“你获得了”标题";
+L["LootUI Option Hide Title Tooltip"] = "隐藏拾取窗口上方显示的“你获得了”标题。";
 
 
 --Quick Slot For Third-party Dev

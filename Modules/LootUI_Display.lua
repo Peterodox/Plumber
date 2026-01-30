@@ -1154,7 +1154,11 @@ do  --UI Notification Mode
                 if anyNotification then
                     AUTO_HIDE_DELAY = AUTO_HIDE_DELAY + 2.0;
                 end
-                self.Header:SetText(L["You Received"]);
+                if addon.GetDBBool("LootUI_HideTitle") then
+                    self.Header:SetText(nil);
+                else
+                    self.Header:SetText(L["You Received"]);
+                end
             end
 
             self:LayoutActiveFrames();
@@ -1817,6 +1821,7 @@ do  --Edit Mode
             {type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
             {type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItems"},
             {type = "Checkbox", label = L["LootUI Option Low Frame Strata"], tooltip = L["LootUI Option Low Frame Strata Tooltip"], onClickFunc = nil, dbKey = "LootUI_LowFrameStrata"},
+            {type = "Checkbox", label = L["LootUI Option Hide Title"], tooltip = L["LootUI Option Hide Title Tooltip"], onClickFunc = nil, dbKey = "LootUI_HideTitle"},
 
             {type = "Divider"},
             {newFeature = true, type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = Tooltip_ShowReputation, onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = Validation_IsRetail},
