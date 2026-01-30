@@ -392,9 +392,9 @@ L["ModuleName NameplateQuest"] = "이름표: 퀘스트 표시기r";
 L["ModuleDescription NameplateQuest"] = "";
 L["NameplateQuest ShowPartyQuest"] = "파티원 퀘스트 표시";
 L["NameplateQuest ShowPartyQuest Tooltip"] = "파티원 중 퀘스트 목표를 완료하지 않은 사람이 있을 경우 %s 표시기 표시.";
-L["NameplateQuest ShowTargetProgress"] = "목표 진행률 표시";
+L["NameplateQuest ShowTargetProgress"] = "목표 진행 상황 표시";
 L["NameplateQuest ShowTargetProgress Tooltip"] = "대상 이름표에 퀘스트 목표 진행 상황을 표시합니다.";
-L["NameplateQuest ProgressTextAlignToCenter"] = "가운데 정렬";
+L["NameplateQuest Instruction Find Nameplate"] = "아이콘 위치를 조정하려면 NPC 이름표가 보이는 장소로 이동하세요.";
 
 
 --PartyInviterInfo
