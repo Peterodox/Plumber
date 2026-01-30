@@ -72,6 +72,10 @@ EL.extraPins = {
     [55] = {
         {position = {x = 0.25667, y = 0.50933}, journalInstanceID = 63},    --Deadmines
     },
+
+    [1528] = {
+        {position = {x = 0.47607, y = 0.32849}, journalInstanceID = 1179},    --The Eternal Palace (not shown on map)
+    },
 };
 
 EL.ignoredMap = {
