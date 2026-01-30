@@ -20,10 +20,11 @@ local LineType = {
 
 local Def = {
     IconSize = 18,
-    ShowPartyQuest = true,
+    ShowPartyQuest = false,
     ShowTargetProgress = false,
+
     AnchorToHealthBar = true,
-    Align = "right",
+    Side = "RIGHT",
 };
 
 
@@ -53,8 +54,33 @@ do  --Widget
     local QuestWidgetMixin = {};
     local PLAYER_NAME = UnitName("player");
 
+    function QuestWidgetMixin:ShowNormalIcon()
+        --self.Icon:SetTexCoord(0, 0.25, 0, 0.25);
+        self.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
+        self.ProgressText:SetTextColor(1, 1, 1);
+    end
+
+    function QuestWidgetMixin:ShowPartyIcon()
+        --self.Icon:SetTexCoord(0.25, 0.5, 0, 0.25);
+        self.Icon:SetTexCoord(0.5, 1, 0, 0.5);
+        self.ProgressText:SetTextColor(0.67, 0.67, 0.67);
+    end
+
+    function QuestWidgetMixin:ResetVisual()
+        self.hasProgress = nil;
+        self.ProgressText:SetText(nil);
+        self.Icon:SetTexCoord(0.75, 1, 0.75, 1);
+    end
+
     function QuestWidgetMixin:UpdateQuest()
         self.questID = nil;
+
+        if Def.isEditMode then
+            self:ShowNormalIcon();
+            self.hasProgress = true;
+            self.ProgressText:SetText("6/7");
+            return
+        end
 
         if self.unit then
             if EL.inInstance then
@@ -136,8 +162,7 @@ do  --Widget
             end
         end
 
-        self.ProgressText:SetText(nil);
-        self.Icon:SetTexCoord(0.75, 1, 0.75, 1);
+        self:ResetVisual();
     end
 
     function QuestWidgetMixin:UpdateTarget()
@@ -171,18 +196,6 @@ do  --Widget
         end
     end
 
-    function QuestWidgetMixin:SetOrientation(orientation)
-        if orientation ~= self.orientation then
-            self.orientation = orientation;
-            self.ProgressText:ClearAllPoints();
-            if orientation == "left" then
-                self.ProgressText:SetPoint("RIGHT", self, "RIGHT", -2, 0);
-            else
-                self.ProgressText:SetPoint("LEFT", self, "LEFT", 0, 0);
-            end
-        end
-    end
-
     function QuestWidgetMixin:SetIconSize(size)
         self:SetWidth(size * 0.5);
         self.Icon:SetSize(size, size);
@@ -190,6 +203,12 @@ do  --Widget
 
     function QuestWidgetMixin:UpdateLayout()
         self:SetIconSize(Def.IconSize);
+        self.ProgressText:ClearAllPoints();
+        if Def.Side == "LEFT" then
+            self.ProgressText:SetPoint("RIGHT", self, "RIGHT", -1, 0);
+        else
+            self.ProgressText:SetPoint("LEFT", self, "LEFT", 1, 0);
+        end
     end
 
 
@@ -205,8 +224,6 @@ do  --Widget
         f.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
         f.Icon:SetTexCoord(0, 0.25, 0, 0.25);
         addon.API.DisableSharpening(f.Icon);
-
-        f:SetIconSize(Def.IconSize);
 
         f.ProgressText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
         f.ProgressText:SetPoint("LEFT", f, "LEFT", 4, 0);
@@ -266,13 +283,19 @@ do  --Event Listener
         widget:ClearAllPoints();
 
         if Def.AnchorToHealthBar then
-            local relativeTo = UnitFrame.AurasFrame.CrowdControlListFrame;
-            --local relativeTo = UnitFrame.HealthBarsContainer.healthBar;
-            widget:SetPoint("LEFT", relativeTo, "RIGHT", -2, 0);
-            widget:SetOrientation("right");
+            if Def.Side == "LEFT" then
+                local relativeTo = UnitFrame.HealthBarsContainer.healthBar;
+                widget:SetPoint("RIGHT", relativeTo, "LEFT", -2, 0);
+            else
+                local relativeTo = UnitFrame.AurasFrame.CrowdControlListFrame;
+                widget:SetPoint("LEFT", relativeTo, "RIGHT", -4, 0);
+            end
         else
-            widget:SetPoint("RIGHT", UnitFrame, "LEFT", 0, 0);
-            widget:SetOrientation("left");
+            if Def.Side == "LEFT" then
+                widget:SetPoint("RIGHT", UnitFrame, "LEFT", 0, 0);
+            else
+                widget:SetPoint("LEFT", UnitFrame, "RIGHT", 0, 0);
+            end
         end
 
         widget:UpdateLayout();
@@ -335,17 +358,6 @@ do  --Event Listener
         end
     end
 
-    function EL:UpdateAnchorForAddOns()
-        local addonNames = {"Platynator", "Plater"};
-
-        for _, name in ipairs(addonNames) do
-            if C_AddOns.IsAddOnLoaded(name) then
-                Def.AnchorToHealthBar = false;
-                break
-            end
-        end
-    end
-
     local DangerousInstanceType = {
         party = true,
         raid = true,
@@ -378,35 +390,221 @@ end
 
 local AcquireEditorFrame;
 do  --Editor
+    local DragFrame;    --Drag this to reposition marker
+
+
+    local HitAreaMixin = {};
+
+    function HitAreaMixin:OnMouseDown()
+        self.isDragging = true;
+        self:LockHighlight();
+        self:UpdateVisual();
+    end
+
+    function HitAreaMixin:OnMouseUp()
+        self.isDragging = false;
+        self:UnlockHighlight();
+        self:UpdateVisual();
+    end
+
+    function HitAreaMixin:OnUpdate()
+
+    end
+
+    function HitAreaMixin:UpdateVisual()
+        if self.isDragging then
+            self.Border:SetVertexColor(1, 0.82, 0, 1);
+        else
+            self.Border:SetVertexColor(0.294, 0.721, 0.914, 0.72);
+        end
+    end
+
+    function HitAreaMixin:OnLoad()
+        self:UpdateVisual();
+        self:SetScript("OnHide", self.OnHide);
+        self:SetScript("OnMouseDown", self.OnMouseDown);
+        self:SetScript("OnMouseUp", self.OnMouseUp);
+    end
+
+
+    local DragFrameMixin = {};
+
+    function DragFrameMixin:UpdateIconSize()
+        local iconSize = Def.IconSize;
+        local visualOffset = 8;
+        self.Icon:SetSize(iconSize, iconSize);
+        self:SetSize(0.5 * iconSize + visualOffset, iconSize);
+
+        local size = math.max(iconSize, 24);
+        self.HitArea:SetSize(size, size);
+    end
+
+    function DragFrameMixin:UpdateBaseAnchor()
+        self:ClearAllPoints();
+        if Def.Side == "LEFT" then
+            DragFrame:SetPoint("RIGHT", self.relativeTo, "LEFT", 0, 0);
+            self.nodes[1]:Hide();
+            self.nodes[2]:Show();
+        else
+            DragFrame:SetPoint("LEFT", self.relativeTo, "RIGHT", 0, 0);
+            self.nodes[1]:Show();
+            self.nodes[2]:Hide();
+        end
+    end
+
+
     local EditorFrameMixin = {};
 
     function EditorFrameMixin:OnShow()
+        Def.isEditMode = true;
+        EL:UpdateAllNameplates();
+        self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
+        self:RegisterEvent("NAME_PLATE_UNIT_REMOVED");
+        self:SetScript("OnEvent", self.OnEvent);
+        self:CheckNameplates();
         self:Update();
     end
 
     function EditorFrameMixin:OnHide()
+        Def.isEditMode = nil;
         self.t = 0;
+        self:UnregisterEvent("NAME_PLATE_UNIT_ADDED");
+        self:UnregisterEvent("NAME_PLATE_UNIT_REMOVED");
         self:SetScript("OnUpdate", nil);
+        self:SetScript("OnEvent", nil);
+
+        if EL.enabled then
+            EL:UpdateAllNameplates();
+        end
+    end
+
+    function EditorFrameMixin:OnEvent(event, ...)
+        self.t = 0;
+        self:SetScript("OnUpdate", self.OnUpdate);
+    end
+
+    function EditorFrameMixin:CheckNameplates()
+        local anyNameplate = false;
+        local nameplates = GetNamePlates(false);
+        if nameplates and #nameplates > 0 then
+            anyNameplate = true;
+        end
+
+        if anyNameplate ~= self.anyNameplate then
+            self.anyNameplate = anyNameplate;
+            self.InstructionFrame:SetShown(not anyNameplate);
+            self.PreviewFrame:SetShown(anyNameplate);
+        end
     end
 
     function EditorFrameMixin:OnUpdate(elapsed)
-
+        self.t = self.t + elapsed;
+        if self.t >= 0.1 then
+            self.t = 0;
+            self:CheckNameplates();
+        end
     end
 
     function EditorFrameMixin:Update()
-
+        self.DragFrame:UpdateIconSize();
+        self.DragFrame:UpdateBaseAnchor();
     end
 
     function AcquireEditorFrame()
-        if not EditorFrame then
-            EditorFrame = CreateFrame("Frame");
-            Mixin(EditorFrame, EditorFrameMixin);
-            EditorFrame:SetSize(192, 96);
+        if EditorFrame then return EditorFrame end;
 
-            EditorFrame:SetScript("OnShow", EditorFrame.OnShow);
-            EditorFrame:SetScript("OnHide", EditorFrame.OnHide);
-            EditorFrame:OnShow();
+        local f = CreateFrame("Frame");
+        EditorFrame = f;
+        Mixin(f, EditorFrameMixin);
+        f:SetSize(384, 96);
+
+        f.Background = f:CreateTexture(nil, "BACKGROUND");
+        f.Background:SetAllPoints(true);
+        f.Background:SetColorTexture(0.08, 0.08, 0.08);
+
+
+        f.InstructionFrame = CreateFrame("Frame", nil, f);
+
+        local fs1 = f.InstructionFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        fs1:SetJustifyH("CENTER");
+        fs1:SetSpacing(4);
+        fs1:SetPoint("TOPLEFT", f, "TOPLEFT", 32, 0);
+        fs1:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -32, 0);
+        fs1:SetTextColor(0.5, 0.5, 0.5);
+        fs1:SetText(L["NameplateQuest Instruction Find Nameplate"]);
+
+
+        local texture = "Interface/AddOns/Plumber/Art/Frame/NameplateQuestEditor.png";
+        local scale = 0.75;
+
+        f.PreviewFrame = CreateFrame("Frame", nil, f);
+        f.PreviewFrame:EnableMouse(true);
+        f.PreviewFrame:EnableMouseMotion(true);
+        f.PreviewFrame:SetAllPoints(true);
+
+        local Bar = f.PreviewFrame:CreateTexture(nil, "ARTWORK");
+        Bar:SetSize(256*scale, 48*scale);
+        Bar:SetPoint("CENTER", f, "CENTER", 0, 0);
+        Bar:SetTexture(texture);
+        Bar:SetTexCoord(0, 0.5, 0, 48/512);
+
+        local Area = f.PreviewFrame:CreateTexture(nil, "OVERLAY");
+        Area:SetSize(192*scale, 24*scale);
+        Area:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+        DragFrame = CreateFrame("Frame", nil, f.PreviewFrame);
+        EditorFrame.DragFrame = DragFrame;
+        Mixin(DragFrame, DragFrameMixin);
+        DragFrame.Icon = DragFrame:CreateTexture(nil, "OVERLAY");
+        DragFrame.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
+        DragFrame.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
+        DragFrame.Icon:SetPoint("CENTER", DragFrame, "CENTER", 0, 0);
+        addon.API.DisableSharpening(DragFrame.Icon);
+
+        DragFrame.HitArea = CreateFrame("Button", nil, DragFrame);
+        DragFrame.HitArea:SetPoint("CENTER", DragFrame, "CENTER", 0, 0);
+        Mixin(DragFrame.HitArea, HitAreaMixin);
+
+        local Border = DragFrame.HitArea:CreateTexture(nil, "HIGHLIGHT");
+        DragFrame.HitArea.Border = Border;
+        Border:SetTexture("Interface/AddOns/Plumber/Art/LootUI/IconBorder-Square.png");
+        Border:SetTextureSliceMode(0);
+        Border:SetTextureSliceMargins(4, 4, 4, 4);
+        Border:SetAllPoints(true);
+
+        DragFrame.HitArea:OnLoad();
+        DragFrame.relativeTo = Area;
+
+
+        local nodeFrameLevel = DragFrame.HitArea:GetFrameLevel() + 10;
+        local nodes = {};
+        DragFrame.nodes = nodes;
+
+        for i = 1, 2 do
+            nodes[i] = addon.CreateEditModeControlNode(f.PreviewFrame);
+            nodes[i]:SetFrameLevel(nodeFrameLevel);
+            if i == 1 then
+                nodes[i]:SetPoint("RIGHT", Area, "LEFT", 0, 0);
+                nodes[i].onClickFunc = function()
+                    addon.SetDBValue("NameplateQuest_Side", "LEFT");
+                    LoadSettings();
+                end
+            else
+                nodes[i]:SetPoint("LEFT", Area, "RIGHT", 0, 0);
+                nodes[i].onClickFunc = function()
+                    addon.SetDBValue("NameplateQuest_Side", "RIGHT");
+                    LoadSettings();
+                end
+            end
         end
+
+        DragFrame:UpdateIconSize();
+        DragFrame:UpdateBaseAnchor();
+
+
+        f:SetScript("OnShow", f.OnShow);
+        f:SetScript("OnHide", f.OnHide);
+        f:OnShow();
 
         return EditorFrame
     end
@@ -428,8 +626,26 @@ do  --Options
         Def.IconSize = size;
 
 
-        Def.ShowPartyQuest = addon.GetDBBool("NameplateQuest_ShowPartyQuest");
-        Def.ShowTargetProgress = addon.GetDBBool("NameplateQuest_ShowTargetProgress");
+        local dbKeys = {"ShowPartyQuest", "ShowTargetProgress"};
+        for _, dbKey in ipairs(dbKeys) do
+            Def[dbKey] = addon.GetDBBool("NameplateQuest_"..dbKey);
+        end
+
+
+        local addonNames = {"Platynator", "Plater"};
+
+        for _, name in ipairs(addonNames) do
+            if C_AddOns.IsAddOnLoaded(name) then
+                Def.AnchorToHealthBar = false;
+                if not PlumberDB.NameplateQuest_Side then
+                    PlumberDB.NameplateQuest_Side = "LEFT";
+                end
+                break
+            end
+        end
+
+        Def.Side = addon.GetDBValue("NameplateQuest_Side") == "LEFT" and "LEFT" or "RIGHT";
+
 
         EL:UpdateZone();
         EL:UpdateAllNameplates();
@@ -440,6 +656,7 @@ do  --Options
     end
 
     local function Checkbox_OnClick()
+        addon.UpdateSettingsDialog();
         LoadSettings();
     end
 
@@ -462,10 +679,10 @@ do  --Options
         title = L["ModuleName NameplateQuest"],
         widgets = {
             {type = "Custom", onAcquire = AcquireEditorFrame, align = "center"},
+            {type = "Divider"},
             {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Options.IconSize, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_IconSizeSlider_FormatValue, dbKey = "NameplateQuest_IconSize"},
             {type = "Checkbox", label = L["NameplateQuest ShowPartyQuest"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowPartyQuest", tooltip = Tooltip_ShowPartyQuest, restrictionInstance = true},
             {type = "Checkbox", label = L["NameplateQuest ShowTargetProgress"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowTargetProgress", tooltip = L["NameplateQuest ShowTargetProgress Tooltip"], restrictionInstance = true},
-            {type = "Checkbox", label = L["NameplateQuest ProgressTextAlignToCenter"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ProgressTextAlignToCenter"},
         },
     };
 
@@ -487,7 +704,6 @@ function EL:EnableModule(state)
         self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
         self:RegisterEvent("PLAYER_ENTERING_WORLD");
         self:SetScript("OnEvent", self.OnEvent);
-        self:UpdateAnchorForAddOns();
         LoadSettings();
     elseif self.enabled then
         self.enabled = nil;

@@ -342,8 +342,8 @@ local DefaultValues = {
         NameplateQuest_IconSize = 2,
         NameplateQuest_ShowPartyQuest = false,
         NameplateQuest_ShowTargetProgress = false,
-        NameplateQuest_ProgressTextAlignToCenter = false,
-        
+        --NameplateQuest_Side = "RIGHT",    --Initial value dedfined by detecting addon
+
 
     --Declared elsewhere:
         --DreamseedChestABTesting = math.random(100) >= 50

@@ -18,13 +18,7 @@ Initialization.lua
 Locales\Localization.xml
 API.lua
 
-Modules\SharedData.lua
-Modules\SharedFonts.xml
-Modules\SharedWidgets.xml
-Modules\SharedTooltip.lua
-Modules\CooldownUtil.lua
-Modules\BlizzardEditMode.lua
-
+Modules\Shared\Load.xml
 Modules\ControlCenter\ControlCenter.xml
 
 Modules\LootUI.xml

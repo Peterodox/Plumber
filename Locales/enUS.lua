@@ -392,9 +392,9 @@ L["ModuleName NameplateQuest"] = "Nameplate: Quest Indicator";
 L["ModuleDescription NameplateQuest"] = "";
 L["NameplateQuest ShowPartyQuest"] = "Show Party Member's Quest";
 L["NameplateQuest ShowPartyQuest Tooltip"] = "Show a marker %s if one of your party members hasn't completed the quest objective.";
-L["NameplateQuest ShowTargetProgress"] = "Show Target Progress";
+L["NameplateQuest ShowTargetProgress"] = "Show Progress on Target";
 L["NameplateQuest ShowTargetProgress Tooltip"] = "Show the quest objective progress on your target's nameplate.";
-L["NameplateQuest ProgressTextAlignToCenter"] = "Align to Center";
+L["NameplateQuest Instruction Find Nameplate"] = "To adjust the icon position, go to a place with visibile NPC nameplates.";
 
 
 --PartyInviterInfo

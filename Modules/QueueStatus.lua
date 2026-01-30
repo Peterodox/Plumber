@@ -453,25 +453,13 @@ do
             NodeContainer:SetAlpha(DemoFrame.unfocusedAlpha);
 
 
-            local nodeTexture = "Interface/AddOns/Plumber/Art/ControlCenter/EditModeControlPoint.png";
             local nodes = {};
             DemoFrame.nodes = nodes;
 
             for i = 1, 5 do
-                local node = CreateFrame("Button", nil, NodeContainer);
+                local node = addon.CreateEditModeControlNode(NodeContainer);
                 nodes[i] = node;
                 node.index = i - 1;
-                node:SetSize(20, 20);
-                node.Texture = node:CreateTexture(nil, "ARTWORK");
-                node.Texture:SetSize(12, 12);
-                node.Texture:SetPoint("CENTER", node, "CENTER", 0, 0);
-                node.Texture:SetTexture(nodeTexture, nil, nil, "TRILINEAR");
-                node.Texture:SetTexCoord(0, 0.25, 0, 0.25);
-                node.Highlight = node:CreateTexture(nil, "HIGHLIGHT");
-                node.Highlight:SetSize(32, 32);
-                node.Highlight:SetPoint("CENTER", node, "CENTER", 0, 0);
-                node.Highlight:SetTexture(nodeTexture, nil, nil, "TRILINEAR");
-                node.Highlight:SetTexCoord(0.5, 1, 0, 0.5);
                 node:SetScript("OnClick", NodeButton_OnClick);
                 SetTextPositionByIndex(node, NodeContainer, node.index);
             end
