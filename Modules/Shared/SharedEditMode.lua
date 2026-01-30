@@ -1,4 +1,5 @@
 local _, addon = ...
+local L = addon.L;
 local API = addon.API;
 
 local GetMouseFocus = API.GetMouseFocus;
@@ -601,4 +602,81 @@ do  --EditModeSettingsDialog
         end
     end
     addon.UpdateSettingsDialog = UpdateSettingsDialog;
+end
+
+do  --ControlNode
+    local NodeButtonMixin = {};
+
+    function NodeButtonMixin:OnClick()
+        if self.owner then
+            self.owner:SelectNode(self);
+        end
+        if self.onClickFunc then
+            self.onClickFunc(self);
+        end
+    end
+
+    function NodeButtonMixin:OnEnter()
+        if self.tooltip then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            GameTooltip:SetText(self.tooltip, 1, 1, 1, 1, true);
+            GameTooltip:Show();
+        end
+    end
+
+    function NodeButtonMixin:OnLeave()
+        GameTooltip:Hide();
+    end
+
+    function NodeButtonMixin:SetSelected(selected)
+
+    end
+
+    local function CreateNode(parent)
+        local node = CreateFrame("Button", nil, parent);
+        local nodeTexture = "Interface/AddOns/Plumber/Art/ControlCenter/EditModeControlPoint.png";
+        node:SetSize(20, 20);
+
+        node.Texture = node:CreateTexture(nil, "ARTWORK");
+        node.Texture:SetSize(12, 12);
+        node.Texture:SetPoint("CENTER", node, "CENTER", 0, 0);
+        node.Texture:SetTexture(nodeTexture, nil, nil, "TRILINEAR");
+        node.Texture:SetTexCoord(0, 0.25, 0, 0.25);
+
+        node.Highlight = node:CreateTexture(nil, "HIGHLIGHT");
+        node.Highlight:SetSize(32, 32);
+        node.Highlight:SetPoint("CENTER", node, "CENTER", 0, 0);
+        node.Highlight:SetTexture(nodeTexture, nil, nil, "TRILINEAR");
+        node.Highlight:SetTexCoord(0.5, 1, 0, 0.5);
+
+        Mixin(node, NodeButtonMixin);
+        node:SetScript("OnClick", node.OnClick);
+        node:SetScript("OnEnter", node.OnEnter);
+        node:SetScript("OnLeave", node.OnLeave);
+
+        return node
+    end
+    addon.CreateEditModeControlNode = CreateNode;
+
+    local function NodePool_SelectNode(self, node)
+        for _, _node in ipairs(self.activeWidgets) do
+            _node:SetSelected(_node == node);
+        end
+    end
+
+    local function CreateEditModeNodePool(parent, on)
+        local pool;
+
+        local function Create()
+            local node = CreateNode(parent);
+            node.owner = pool;
+            return node
+        end
+
+        pool = API.CreateObjectPool(Create);
+        pool.SelectNode = NodePool_SelectNode;
+
+        return pool
+    end
+    addon.CreateEditModeNodePool = CreateEditModeNodePool;
 end
