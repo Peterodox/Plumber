@@ -1,4 +1,5 @@
 local _, addon = ...
+local L = addon.L;
 
 
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
@@ -19,7 +20,8 @@ local LineType = {
 
 local Def = {
     IconSize = 18,
-    ShowPartyProgress = true,
+    ShowPartyQuest = true,
+    ShowTargetProgress = false,
     AnchorToHealthBar = true,
     Align = "right",
 };
@@ -31,6 +33,8 @@ local EL = CreateFrame("Frame", nil, UIParent);
 local WidgetPool;
 local CreateQuestWidget;
 local InitializeWidgetPool;
+local EditorFrame;
+local LoadSettings;
 
 
 local match = string.match;
@@ -85,7 +89,7 @@ do  --Widget
                             l = lines[i];
                             if l then
                                 while l and l.type == LineType.QuestObjective do
-                                    if (not l.completed) and (isPlayer or Def.ShowPartyProgress) then
+                                    if (not l.completed) and (isPlayer or Def.ShowPartyQuest) then
                                         allCompleted = false;
                                         objectiveText = l.leftText;
                                         if not isPlayer then
@@ -112,7 +116,7 @@ do  --Widget
                     self.questID = questID;
 
                     if not allCompleted then
-                        local text = GetProgressText(objectiveText);
+                        local text = Def.ShowTargetProgress and GetProgressText(objectiveText) or nil;
                         self.ProgressText:SetText(text);
                         self.hasProgress = text ~= nil;
 
@@ -137,7 +141,7 @@ do  --Widget
     end
 
     function QuestWidgetMixin:UpdateTarget()
-        if UnitIsUnit("target", self.unit) then
+        if UnitIsUnit("target", self.unit) and Def.ShowTargetProgress then
             self:UpdateQuest();
             if self.hasProgress then
                 self.Icon:Hide();
@@ -182,6 +186,10 @@ do  --Widget
     function QuestWidgetMixin:SetIconSize(size)
         self:SetWidth(size * 0.5);
         self.Icon:SetSize(size, size);
+    end
+
+    function QuestWidgetMixin:UpdateLayout()
+        self:SetIconSize(Def.IconSize);
     end
 
 
@@ -267,6 +275,7 @@ do  --Event Listener
             widget:SetOrientation("left");
         end
 
+        widget:UpdateLayout();
         widget:Show();
         WidgetPool[widget] = true;
     end
@@ -347,18 +356,123 @@ do  --Event Listener
     function EL:UpdateZone()
         local _, instanceType = GetInstanceInfo();
         local inInstance = instanceType and DangerousInstanceType[instanceType] or false;
-        if inInstance ~= self.inInstance then
-            self.inInstance = inInstance;
-            self:UnregisterEvent("UNIT_QUEST_LOG_CHANGED");
-            if inInstance then
-                self:UnregisterEvent("PLAYER_TARGET_CHANGED");
-                self:UnregisterEvent("GROUP_ROSTER_UPDATE");
-                self:RegisterUnitEvent("UNIT_QUEST_LOG_CHANGED", "player");
-            else
-                self:RegisterEvent("PLAYER_TARGET_CHANGED");
-                self:RegisterEvent("GROUP_ROSTER_UPDATE");
-                self:RegisterEvent("UNIT_QUEST_LOG_CHANGED");
-            end
+        self.inInstance = inInstance;
+        self:UnregisterEvent("UNIT_QUEST_LOG_CHANGED");
+
+        if (not inInstance) and Def.ShowTargetProgress then
+            self:RegisterEvent("PLAYER_TARGET_CHANGED");
+        else
+            self:UnregisterEvent("PLAYER_TARGET_CHANGED");
+        end
+
+        if (not inInstance) and Def.ShowPartyQuest then
+            self:RegisterEvent("UNIT_QUEST_LOG_CHANGED");
+            self:RegisterEvent("GROUP_ROSTER_UPDATE");
+        else
+            self:RegisterUnitEvent("UNIT_QUEST_LOG_CHANGED", "player");
+            self:UnregisterEvent("GROUP_ROSTER_UPDATE");
+        end
+    end
+end
+
+
+local AcquireEditorFrame;
+do  --Editor
+    local EditorFrameMixin = {};
+
+    function EditorFrameMixin:OnShow()
+        self:Update();
+    end
+
+    function EditorFrameMixin:OnHide()
+        self.t = 0;
+        self:SetScript("OnUpdate", nil);
+    end
+
+    function EditorFrameMixin:OnUpdate(elapsed)
+
+    end
+
+    function EditorFrameMixin:Update()
+
+    end
+
+    function AcquireEditorFrame()
+        if not EditorFrame then
+            EditorFrame = CreateFrame("Frame");
+            Mixin(EditorFrame, EditorFrameMixin);
+            EditorFrame:SetSize(192, 96);
+
+            EditorFrame:SetScript("OnShow", EditorFrame.OnShow);
+            EditorFrame:SetScript("OnHide", EditorFrame.OnHide);
+            EditorFrame:OnShow();
+        end
+
+        return EditorFrame
+    end
+end
+
+
+local OptionToggle_OnClick;
+do  --Options
+    local Options = {
+        IconSize = {16, 18, 20, 22, 24, 28, 32};
+    };
+
+    function LoadSettings()
+        local sizeIndex = addon.GetDBValue("NameplateQuest_IconSize");
+        if not (sizeIndex and Options.IconSize[sizeIndex]) then
+            sizeIndex = 2;
+        end
+        local size = Options.IconSize[sizeIndex]
+        Def.IconSize = size;
+
+
+        Def.ShowPartyQuest = addon.GetDBBool("NameplateQuest_ShowPartyQuest");
+        Def.ShowTargetProgress = addon.GetDBBool("NameplateQuest_ShowTargetProgress");
+
+        EL:UpdateZone();
+        EL:UpdateAllNameplates();
+
+        if EditorFrame and EditorFrame:IsShown() then
+            EditorFrame:Update();
+        end
+    end
+
+    local function Checkbox_OnClick()
+        LoadSettings();
+    end
+
+    local function Tooltip_ShowPartyQuest()
+        local icon = "|TInterface/AddOns/Plumber/Art/Frame/NameplateQuest.png:24:24:0:0:128:128:32:64:0:32|t";
+        return L["NameplateQuest ShowPartyQuest Tooltip"]:format(icon);
+    end
+
+
+    local function Options_IconSizeSlider_FormatValue(value)
+        return Options.IconSize[value] or Def.IconSize
+    end
+
+    local function Options_IconSizeSlider_OnValueChanged(value)
+        addon.SetDBValue("NameplateQuest_IconSize", value);
+        LoadSettings();
+    end
+
+    local OPTIONS_SCHEMATIC = {
+        title = L["ModuleName NameplateQuest"],
+        widgets = {
+            {type = "Custom", onAcquire = AcquireEditorFrame, align = "center"},
+            {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Options.IconSize, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_IconSizeSlider_FormatValue, dbKey = "NameplateQuest_IconSize"},
+            {type = "Checkbox", label = L["NameplateQuest ShowPartyQuest"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowPartyQuest", tooltip = Tooltip_ShowPartyQuest, restrictionInstance = true},
+            {type = "Checkbox", label = L["NameplateQuest ShowTargetProgress"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowTargetProgress", tooltip = L["NameplateQuest ShowTargetProgress Tooltip"], restrictionInstance = true},
+            {type = "Checkbox", label = L["NameplateQuest ProgressTextAlignToCenter"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ProgressTextAlignToCenter"},
+        },
+    };
+
+    function OptionToggle_OnClick(self, button)
+        OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
+        if OptionFrame then
+            OptionFrame:ConvertAnchor();
         end
     end
 end
@@ -372,10 +486,9 @@ function EL:EnableModule(state)
         end
         self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
         self:RegisterEvent("PLAYER_ENTERING_WORLD");
-        self:UpdateZone();
         self:SetScript("OnEvent", self.OnEvent);
         self:UpdateAnchorForAddOns();
-        self:UpdateAllNameplates();
+        LoadSettings();
     elseif self.enabled then
         self.enabled = nil;
         self.inInstance = nil;
@@ -404,6 +517,8 @@ do
             EL:EnableModule(state)
         end,
         moduleAddedTime = 1769700000,
+        optionToggleFunc = OptionToggle_OnClick,
+        hasMovableWidget = true,
         categoryKeys = {
             "UnitFrame",
         },
