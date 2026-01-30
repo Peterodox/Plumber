@@ -22,9 +22,11 @@ local Def = {
     IconSize = 18,
     ShowPartyQuest = false,
     ShowTargetProgress = false,
+    WidgetOffsetX = 0,
+    WidgetOffsetY = 0,
+    Side = "RIGHT",
 
     AnchorToHealthBar = true,
-    Side = "RIGHT",
 };
 
 
@@ -205,10 +207,15 @@ do  --Widget
         self:SetIconSize(Def.IconSize);
         self.ProgressText:ClearAllPoints();
         if Def.Side == "LEFT" then
-            self.ProgressText:SetPoint("RIGHT", self, "RIGHT", -1, 0);
+            self.ProgressText:SetPoint("RIGHT", self.Ref, "CENTER", 0.25*Def.IconSize, 0);
         else
-            self.ProgressText:SetPoint("LEFT", self, "LEFT", 1, 0);
+            self.ProgressText:SetPoint("LEFT", self.Ref, "CENTER", -0.25*Def.IconSize, 0);
         end
+        self:UpdateOffset();
+    end
+
+    function QuestWidgetMixin:UpdateOffset()
+        self.Ref:SetPoint("CENTER", self, "CENTER", Def.WidgetOffsetX, Def.WidgetOffsetY);
     end
 
 
@@ -218,15 +225,20 @@ do  --Widget
         Mixin(f, QuestWidgetMixin);
         f:SetScript("OnHide", f.OnHide);
 
+        local Ref = CreateFrame("Frame", nil, f);
+        Ref:SetSize(1, 1);
+        Ref:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.Ref = Ref;
+
         f.Icon = f:CreateTexture(nil, "OVERLAY");
-        f.Icon:SetPoint("CENTER", f, "CENTER", 0, 0);
+        f.Icon:SetPoint("CENTER", Ref, "CENTER", 0, 0);
         f.Icon:SetSize(Def.IconSize, Def.IconSize);
         f.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
         f.Icon:SetTexCoord(0, 0.25, 0, 0.25);
         addon.API.DisableSharpening(f.Icon);
 
         f.ProgressText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-        f.ProgressText:SetPoint("LEFT", f, "LEFT", 4, 0);
+        f.ProgressText:SetPoint("CENTER", Ref, "CENTER", 0, 0);
         f.ProgressText:SetTextColor(1, 1, 1);
         f.ProgressText:Hide();
 
@@ -324,6 +336,22 @@ do  --Event Listener
         end
     end
 
+    function EL:UpdateWidgetOffset()
+        for widget, shown in pairs(WidgetPool) do
+            if shown then
+                widget:UpdateOffset();
+            end
+        end
+    end
+
+    function EL:ResetWidgetOffset()
+        Def.WidgetOffsetX = 0;
+        Def.WidgetOffsetY = 0;
+        addon.SetDBValue("NameplateQuest_WidgetOffsetX", 0);
+        addon.SetDBValue("NameplateQuest_WidgetOffsetY", 0);
+        self:UpdateWidgetOffset();
+    end
+
     function EL:OnTargetChanged()
         for widget, shown in pairs(WidgetPool) do
             if shown then
@@ -388,23 +416,148 @@ do  --Event Listener
 end
 
 
+local AcquireDragController;
+do  --DragController (TODO: wrap into an API)
+    local DragController;
+    local DragControllerMixin = {};
+
+    local GetCursorPosition = addon.API.GetScaledCursorPosition;
+    local Clamp = addon.API.Clamp;
+
+    function DragControllerMixin:SetDraggedObject(object)
+        self.draggedObject = object;
+    end
+
+    function DragControllerMixin:SnapshotCursorPosition()
+        local x, y = GetCursorPosition();
+        self.x, self.y = x, y;
+        self.x0, self.y0 = x, y;
+    end
+
+    function DragControllerMixin:PreDragStart()
+        self:SnapshotCursorPosition();
+        self.t = 0;
+        self.stage = 1;
+        self:SetScript("OnUpdate", self.OnUpdate_PreDrag);
+    end
+
+    function DragControllerMixin:OnUpdate_PreDrag(elapsed)
+        self.x, self.y = GetCursorPosition();
+        if (self.x - self.x0) ^ 2 + (self.y - self.y0) ^ 2 >= 8 then
+            self:DraggingStart();
+        end
+    end
+
+    function DragControllerMixin:DraggingStart()
+        self:SnapshotCursorPosition();
+
+        local x, y = self.draggedObject:GetCenter();
+        self.dx = x - self.x;
+        self.dy = y - self.y;
+
+        --Boundary (Temp Hack)
+        local safeOffset = 24;
+        local left = EditorFrame:GetLeft();
+        local right = EditorFrame:GetRight();
+        local top = EditorFrame:GetTop();
+        local bottom = EditorFrame:GetBottom();
+        local dxMin = left - x + safeOffset;
+        local dxMax = right - x - safeOffset;
+        local dyMin = bottom - y + safeOffset;
+        local dyMax = top - y - safeOffset;
+
+        local point, relativeTo, relativePoint, fromX, fromY = self.draggedObject:GetPoint(1);
+        local scalar = 1.0;
+
+        local function SetObjectPosition(dx, dy)
+            dx = dx * scalar;
+            dy = dy * scalar;
+
+            dx = Clamp(dx, dxMin, dxMax);
+            dy = Clamp(dy, dyMin, dyMax);
+
+            self.draggedObject:SetPoint(point, relativeTo, relativePoint, fromX + dx, fromY + dy);
+            Def.WidgetOffsetX = fromX + dx;
+            Def.WidgetOffsetY = fromY + dy;
+        end
+        self.SetObjectPosition = SetObjectPosition;
+
+        if self.onDragStartCallback then
+            self.onDragStartCallback();
+        end
+
+        self.t = 1;
+        self.stage = 2;
+        self:SetScript("OnUpdate", self.OnUpdate_Dragging);
+    end
+
+    function DragControllerMixin:OnUpdate_Dragging(elapsed)
+        self.x, self.y = GetCursorPosition();
+        self.SetObjectPosition(self.x - self.x0, self.y - self.y0);
+        self.t = self.t + elapsed;
+        if self.t > 0.016 then
+            self.t = 0;
+            EL:UpdateWidgetOffset();
+        end
+    end
+
+    function DragControllerMixin:Stop()
+        self:SetScript("OnUpdate", nil);
+        self.x, self.y = 0, 0;
+        self.x0, self.y0 = 0, 0;
+        self.dx, self.dy = 0, 0;
+        self.t = 0;
+        if self.stage == 2 then
+            addon.SetDBValue("NameplateQuest_WidgetOffsetX", Def.WidgetOffsetX);
+            addon.SetDBValue("NameplateQuest_WidgetOffsetY", Def.WidgetOffsetY);
+        end
+        self.stage = nil;
+    end
+
+    function DragControllerMixin:OnHide()
+        self:Stop();
+    end
+
+    function AcquireDragController(parent)
+        if DragController then return DragController end;
+
+        local f = CreateFrame("Frame", nil, parent);
+        DragController = f;
+        Mixin(f, DragControllerMixin);
+        f:SetScript("OnHide", f.OnHide);
+
+        return DragController
+    end
+end
+
+
 local AcquireEditorFrame;
 do  --Editor
-    local DragFrame;    --Drag this to reposition marker
+    local MarkerWidget;    --Drag this to reposition marker
 
 
     local HitAreaMixin = {};
 
-    function HitAreaMixin:OnMouseDown()
+    function HitAreaMixin:OnMouseDown(button)
         self.isDragging = true;
         self:LockHighlight();
         self:UpdateVisual();
+        if button == "LeftButton" then
+            local controller = AcquireDragController(self);
+            controller:SetDraggedObject(self:GetParent());
+            controller:PreDragStart();
+        else
+            EL:ResetWidgetOffset();
+            LoadSettings();
+        end
     end
 
     function HitAreaMixin:OnMouseUp()
         self.isDragging = false;
         self:UnlockHighlight();
         self:UpdateVisual();
+        local controller = AcquireDragController(self);
+        controller:Stop();
     end
 
     function HitAreaMixin:OnUpdate()
@@ -427,9 +580,9 @@ do  --Editor
     end
 
 
-    local DragFrameMixin = {};
+    local MarkerWidgetMixin = {};
 
-    function DragFrameMixin:UpdateIconSize()
+    function MarkerWidgetMixin:UpdateIconSize()
         local iconSize = Def.IconSize;
         local visualOffset = 8;
         self.Icon:SetSize(iconSize, iconSize);
@@ -439,14 +592,14 @@ do  --Editor
         self.HitArea:SetSize(size, size);
     end
 
-    function DragFrameMixin:UpdateBaseAnchor()
+    function MarkerWidgetMixin:UpdateBaseAnchor()
         self:ClearAllPoints();
         if Def.Side == "LEFT" then
-            DragFrame:SetPoint("RIGHT", self.relativeTo, "LEFT", 0, 0);
+            MarkerWidget:SetPoint("RIGHT", self.relativeTo, "LEFT", Def.WidgetOffsetX, Def.WidgetOffsetY);
             self.nodes[1]:Hide();
             self.nodes[2]:Show();
         else
-            DragFrame:SetPoint("LEFT", self.relativeTo, "RIGHT", 0, 0);
+            MarkerWidget:SetPoint("LEFT", self.relativeTo, "RIGHT", Def.WidgetOffsetX, Def.WidgetOffsetY);
             self.nodes[1]:Show();
             self.nodes[2]:Hide();
         end
@@ -506,8 +659,8 @@ do  --Editor
     end
 
     function EditorFrameMixin:Update()
-        self.DragFrame:UpdateIconSize();
-        self.DragFrame:UpdateBaseAnchor();
+        self.MarkerWidget:UpdateIconSize();
+        self.MarkerWidget:UpdateBaseAnchor();
     end
 
     function AcquireEditorFrame()
@@ -516,7 +669,7 @@ do  --Editor
         local f = CreateFrame("Frame");
         EditorFrame = f;
         Mixin(f, EditorFrameMixin);
-        f:SetSize(384, 96);
+        f:SetSize(384, 192);
 
         f.Background = f:CreateTexture(nil, "BACKGROUND");
         f.Background:SetAllPoints(true);
@@ -542,64 +695,66 @@ do  --Editor
         f.PreviewFrame:EnableMouseMotion(true);
         f.PreviewFrame:SetAllPoints(true);
 
-        local Bar = f.PreviewFrame:CreateTexture(nil, "ARTWORK");
-        Bar:SetSize(256*scale, 48*scale);
+        local BarTexture = f.PreviewFrame:CreateTexture(nil, "ARTWORK");
+        BarTexture:SetSize(256*scale, 48*scale);
+        BarTexture:SetPoint("CENTER", f, "CENTER", 0, 0);
+        BarTexture:SetTexture(texture);
+        BarTexture:SetTexCoord(0, 0.5, 0, 48/512);
+
+        local Bar = f.PreviewFrame:CreateTexture(nil, "OVERLAY");
+        Bar:SetSize(192*scale, 24*scale);
         Bar:SetPoint("CENTER", f, "CENTER", 0, 0);
-        Bar:SetTexture(texture);
-        Bar:SetTexCoord(0, 0.5, 0, 48/512);
 
-        local Area = f.PreviewFrame:CreateTexture(nil, "OVERLAY");
-        Area:SetSize(192*scale, 24*scale);
-        Area:SetPoint("CENTER", f, "CENTER", 0, 0);
+        MarkerWidget = CreateFrame("Frame", nil, f.PreviewFrame);
+        EditorFrame.MarkerWidget = MarkerWidget;
+        Mixin(MarkerWidget, MarkerWidgetMixin);
+        MarkerWidget.Icon = MarkerWidget:CreateTexture(nil, "OVERLAY");
+        MarkerWidget.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
+        MarkerWidget.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
+        MarkerWidget.Icon:SetPoint("CENTER", MarkerWidget, "CENTER", 0, 0);
+        addon.API.DisableSharpening(MarkerWidget.Icon);
 
-        DragFrame = CreateFrame("Frame", nil, f.PreviewFrame);
-        EditorFrame.DragFrame = DragFrame;
-        Mixin(DragFrame, DragFrameMixin);
-        DragFrame.Icon = DragFrame:CreateTexture(nil, "OVERLAY");
-        DragFrame.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
-        DragFrame.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
-        DragFrame.Icon:SetPoint("CENTER", DragFrame, "CENTER", 0, 0);
-        addon.API.DisableSharpening(DragFrame.Icon);
+        MarkerWidget.HitArea = CreateFrame("Button", nil, MarkerWidget);
+        MarkerWidget.HitArea:SetPoint("CENTER", MarkerWidget, "CENTER", 0, 0);
+        Mixin(MarkerWidget.HitArea, HitAreaMixin);
 
-        DragFrame.HitArea = CreateFrame("Button", nil, DragFrame);
-        DragFrame.HitArea:SetPoint("CENTER", DragFrame, "CENTER", 0, 0);
-        Mixin(DragFrame.HitArea, HitAreaMixin);
-
-        local Border = DragFrame.HitArea:CreateTexture(nil, "HIGHLIGHT");
-        DragFrame.HitArea.Border = Border;
+        local Border = MarkerWidget.HitArea:CreateTexture(nil, "HIGHLIGHT");
+        MarkerWidget.HitArea.Border = Border;
         Border:SetTexture("Interface/AddOns/Plumber/Art/LootUI/IconBorder-Square.png");
         Border:SetTextureSliceMode(0);
         Border:SetTextureSliceMargins(4, 4, 4, 4);
         Border:SetAllPoints(true);
 
-        DragFrame.HitArea:OnLoad();
-        DragFrame.relativeTo = Area;
+        MarkerWidget.HitArea:OnLoad();
+        MarkerWidget.relativeTo = Bar;
 
 
-        local nodeFrameLevel = DragFrame.HitArea:GetFrameLevel() + 10;
+        local nodeFrameLevel = MarkerWidget.HitArea:GetFrameLevel() + 10;
         local nodes = {};
-        DragFrame.nodes = nodes;
+        MarkerWidget.nodes = nodes;
 
         for i = 1, 2 do
             nodes[i] = addon.CreateEditModeControlNode(f.PreviewFrame);
             nodes[i]:SetFrameLevel(nodeFrameLevel);
             if i == 1 then
-                nodes[i]:SetPoint("RIGHT", Area, "LEFT", 0, 0);
+                nodes[i]:SetPoint("RIGHT", Bar, "LEFT", 0, 0);
                 nodes[i].onClickFunc = function()
                     addon.SetDBValue("NameplateQuest_Side", "LEFT");
+                    EL:ResetWidgetOffset();
                     LoadSettings();
                 end
             else
-                nodes[i]:SetPoint("LEFT", Area, "RIGHT", 0, 0);
+                nodes[i]:SetPoint("LEFT", Bar, "RIGHT", 0, 0);
                 nodes[i].onClickFunc = function()
                     addon.SetDBValue("NameplateQuest_Side", "RIGHT");
+                    EL:ResetWidgetOffset();
                     LoadSettings();
                 end
             end
         end
 
-        DragFrame:UpdateIconSize();
-        DragFrame:UpdateBaseAnchor();
+        MarkerWidget:UpdateIconSize();
+        MarkerWidget:UpdateBaseAnchor();
 
 
         f:SetScript("OnShow", f.OnShow);
@@ -645,6 +800,10 @@ do  --Options
         end
 
         Def.Side = addon.GetDBValue("NameplateQuest_Side") == "LEFT" and "LEFT" or "RIGHT";
+
+
+        Def.WidgetOffsetX = addon.GetDBValue("NameplateQuest_WidgetOffsetX") or 0;
+        Def.WidgetOffsetY = addon.GetDBValue("NameplateQuest_WidgetOffsetY") or 0;
 
 
         EL:UpdateZone();

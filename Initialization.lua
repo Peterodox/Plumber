@@ -343,6 +343,8 @@ local DefaultValues = {
         NameplateQuest_IconSize = 2,
         NameplateQuest_ShowPartyQuest = false,
         NameplateQuest_ShowTargetProgress = false,
+        NameplateQuest_WidgetOffsetX = 0,
+        NameplateQuest_WidgetOffsetY = 0,
         --NameplateQuest_Side = "RIGHT",    --Initial value dedfined by detecting addon
 
 

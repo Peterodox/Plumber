@@ -386,6 +386,16 @@ L["ModuleName NameplateWidget"] = "姓名板: 钥焰";
 L["ModuleDescription NameplateWidget"] = "在钥焰的姓名板进度条上显示你拥有的光耀残渣的数量。";
 
 
+--NameplateQuestIndicator
+L["ModuleName NameplateQuest"] = "姓名板: 任务标记";
+L["ModuleDescription NameplateQuest"] = "在姓名板上显示任务标记。\n\n-（可选）在目标姓名板上显示任务进度。\n\n-（可选）如果你的队友还没有完成任务，在姓名板上显示任务标记。";
+L["NameplateQuest ShowPartyQuest"] = "显示队友任务";
+L["NameplateQuest ShowPartyQuest Tooltip"] = "如果你的队友还没有完成任务目标，在姓名板上显示 %s 图标。";
+L["NameplateQuest ShowTargetProgress"] = "显示目标进度";
+L["NameplateQuest ShowTargetProgress Tooltip"] = "在目标姓名板上显示任务进度";
+L["NameplateQuest Instruction Find Nameplate"] = "请前往一个有NPC姓名板的地方来调整图标位置。";
+
+
 --PartyInviterInfo
 L["ModuleName PartyInviterInfo"] = "队伍邀请人信息";
 L["ModuleDescription PartyInviterInfo"] = "显示队伍以及公会邀请人的等级、职业等信息。";
