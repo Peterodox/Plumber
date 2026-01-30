@@ -1,0 +1,9 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <Include file="SharedData.lua"/>
+    <Include file="SharedFonts.xml"/>
+    <Include file="SharedWidgets.xml"/>
+    <Include file="SharedTooltip.lua"/>
+    <Include file="SharedEditMode.lua"/>
+    <Include file="CooldownUtil.lua"/>
+    <Include file="BlizzardEditMode.lua"/>
+</Ui>
