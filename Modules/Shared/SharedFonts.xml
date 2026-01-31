@@ -52,9 +52,13 @@
         </Member>
     </FontFamily>
 
-    <Font name="PlumberFont_StatusBarValue" virtual="true" font="Fonts\FRIZQT__.TTF" height="12" outline="NORMAL">
+    <Font name="PlumberFont_StatusBarValue" font="Fonts\FRIZQT__.TTF" height="12" outline="NORMAL" virtual="true">
         <Shadow x="1" y="-1">
             <Color r="1" g="1" b="1"/>
         </Shadow>
+    </Font>
+
+    <Font name="PlumberFont_Nameplate_Small" inherits="GameFontNormalSmall" virtual="true">
+        <Color r="1" g="1" b="1"/>
     </Font>
 </Ui>

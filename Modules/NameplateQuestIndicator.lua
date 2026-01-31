@@ -1,5 +1,6 @@
 local _, addon = ...
 local L = addon.L;
+local API = addon.API;
 
 
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
@@ -9,6 +10,7 @@ local GetUnitTooltipInfo = C_TooltipInfo.GetUnit;
 local UnitIsPlayer = UnitIsPlayer;
 local UnitIsUnit = UnitIsUnit;
 local GetInstanceInfo = GetInstanceInfo;
+local Secret_CanAccess = API.Secret_CanAccess;
 
 
 local LineType = {
@@ -22,6 +24,7 @@ local Def = {
     IconSize = 18,
     ShowPartyQuest = false,
     ShowTargetProgress = false,
+    TextOutline = false,
     WidgetOffsetX = 0,
     WidgetOffsetY = 0,
     Side = "RIGHT",
@@ -42,7 +45,7 @@ local LoadSettings;
 
 local match = string.match;
 local function GetProgressText(str)
-    if str then
+    if Secret_CanAccess(str) then
         local text = match(str, "%d+/%d+");
         if not text then
             text = match(str, "%d+%%");
@@ -89,7 +92,7 @@ do  --Widget
                 self.hasProgress = false;
                 self.ProgressText:SetText(nil);
                 if UnitIsRelatedToActiveQuest(self.unit) then
-                    self.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
+                    self:ShowNormalIcon();
                     return
                 end
             else
@@ -104,38 +107,47 @@ do  --Widget
                     local numLines = #lines;
                     local objectiveText;
                     local fromAnotherPlayer;
+                    local noSecret = true;
 
-                    while i <= numLines do
+                    while i <= numLines and noSecret do
                         l = lines[i];
                         if l.type == LineType.QuestTitle then
                             questID = l.id;
                             allCompleted = true;
                             i = i + 1;
                         elseif l.type == LineType.QuestPlayer then
-                            local isPlayer = l.leftText == PLAYER_NAME;
-                            i = i + 1;
-                            l = lines[i];
-                            if l then
-                                while l and l.type == LineType.QuestObjective do
-                                    if (not l.completed) and (isPlayer or Def.ShowPartyQuest) then
-                                        allCompleted = false;
-                                        objectiveText = l.leftText;
-                                        if not isPlayer then
-                                            fromAnotherPlayer = true;
+                            if Secret_CanAccess(l.leftText) then
+                                local isPlayer = l.leftText == PLAYER_NAME;
+                                i = i + 1;
+                                l = lines[i];
+                                if l then
+                                    while l and l.type == LineType.QuestObjective and Secret_CanAccess(l.completed) do
+                                        if (not l.completed) and (isPlayer or Def.ShowPartyQuest) then
+                                            allCompleted = false;
+                                            objectiveText = l.leftText;
+                                            if not isPlayer then
+                                                fromAnotherPlayer = true;
+                                            end
+                                            break
                                         end
-                                        break
+                                        i = i + 1;
+                                        l = lines[i];
                                     end
-                                    i = i + 1;
-                                    l = lines[i];
                                 end
+                            else
+                                noSecret = false;
                             end
                         elseif l.type == LineType.QuestObjective then
-                            if not l.completed then
-                                allCompleted = false;
-                                objectiveText = l.leftText;
-                                break
+                            if Secret_CanAccess(l.completed) then
+                                if not l.completed then
+                                    allCompleted = false;
+                                    objectiveText = l.leftText;
+                                    break
+                                end
+                                i = i + 1;
+                            else
+                                noSecret = false;
                             end
-                            i = i + 1;
                         else
                             i = i + 1;
                         end
@@ -143,19 +155,22 @@ do  --Widget
 
                     self.questID = questID;
 
+                    if not noSecret then
+                        if UnitIsRelatedToActiveQuest(self.unit) then
+                            self:ShowNormalIcon();
+                        end
+                        return
+                    end
+
                     if not allCompleted then
                         local text = Def.ShowTargetProgress and GetProgressText(objectiveText) or nil;
                         self.ProgressText:SetText(text);
                         self.hasProgress = text ~= nil;
 
                         if fromAnotherPlayer then
-                            --self.Icon:SetTexCoord(0.25, 0.5, 0, 0.25);
-                            self.Icon:SetTexCoord(0.5, 1, 0, 0.5);
-                            self.ProgressText:SetTextColor(0.67, 0.67, 0.67);
+                            self:ShowPartyIcon();
                         else
-                            --self.Icon:SetTexCoord(0, 0.25, 0, 0.25);
-                            self.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
-                            self.ProgressText:SetTextColor(1, 1, 1);
+                            self:ShowNormalIcon();
                         end
 
                         return
@@ -168,7 +183,7 @@ do  --Widget
     end
 
     function QuestWidgetMixin:UpdateTarget()
-        if UnitIsUnit("target", self.unit) and Def.ShowTargetProgress then
+        if (not EL.inInstance) and UnitIsUnit("target", self.unit) and Def.ShowTargetProgress then
             self:UpdateQuest();
             if self.hasProgress then
                 self.Icon:Hide();
@@ -235,9 +250,9 @@ do  --Widget
         f.Icon:SetSize(Def.IconSize, Def.IconSize);
         f.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
         f.Icon:SetTexCoord(0, 0.25, 0, 0.25);
-        addon.API.DisableSharpening(f.Icon);
+        API.DisableSharpening(f.Icon);
 
-        f.ProgressText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+        f.ProgressText = f:CreateFontString(nil, "OVERLAY", "PlumberFont_Nameplate_Small");
         f.ProgressText:SetPoint("CENTER", Ref, "CENTER", 0, 0);
         f.ProgressText:SetTextColor(1, 1, 1);
         f.ProgressText:Hide();
@@ -254,20 +269,6 @@ end
 
 
 do  --Event Listener
-    function EL:GetUnitQuestObjectiveFromTooltip(unit)
-        local tooltipInfo = GetUnitTooltipInfo(unit);
-        local lines = tooltipInfo and tooltipInfo.lines;
-        if lines then
-            local line;
-            for i = 3, #lines do
-                line = lines[i];
-                if line.type == LineType.QuestObjective and not line.completed then
-                    return GetProgressText(line.leftText);
-                end
-            end
-        end
-    end
-
     function EL:UpdateNameplateForUnit(unit)
         if not unit then return end;
         if UnitIsPlayer(unit) then return end;
@@ -296,8 +297,13 @@ do  --Event Listener
 
         if Def.AnchorToHealthBar then
             if Def.Side == "LEFT" then
-                local relativeTo = UnitFrame.HealthBarsContainer.healthBar;
-                widget:SetPoint("RIGHT", relativeTo, "LEFT", -2, 0);
+                local relativeTo = UnitFrame.ClassificationFrame;
+                if relativeTo:IsShown() then    --Could this be protected?
+                    widget:SetPoint("RIGHT", relativeTo, "LEFT", -1, 0);
+                else
+                    relativeTo = UnitFrame.HealthBarsContainer.healthBar;
+                    widget:SetPoint("RIGHT", relativeTo, "LEFT", -2, 0);
+                end
             else
                 local relativeTo = UnitFrame.AurasFrame.CrowdControlListFrame;
                 widget:SetPoint("LEFT", relativeTo, "RIGHT", -4, 0);
@@ -421,8 +427,8 @@ do  --DragController (TODO: wrap into an API)
     local DragController;
     local DragControllerMixin = {};
 
-    local GetCursorPosition = addon.API.GetScaledCursorPosition;
-    local Clamp = addon.API.Clamp;
+    local GetCursorPosition = API.GetScaledCursorPosition;
+    local Clamp = API.Clamp;
 
     function DragControllerMixin:SetDraggedObject(object)
         self.draggedObject = object;
@@ -666,6 +672,9 @@ do  --Editor
     function AcquireEditorFrame()
         if EditorFrame then return EditorFrame end;
 
+        local texture = "Interface/AddOns/Plumber/Art/Frame/NameplateQuestEditor.png";
+        local textureScale = 0.75;
+
         local f = CreateFrame("Frame");
         EditorFrame = f;
         Mixin(f, EditorFrameMixin);
@@ -673,7 +682,8 @@ do  --Editor
 
         f.Background = f:CreateTexture(nil, "BACKGROUND");
         f.Background:SetAllPoints(true);
-        f.Background:SetColorTexture(0.08, 0.08, 0.08);
+        f.Background:SetTexture(texture);
+        f.Background:SetTexCoord(0, 0.5, 64/512, 192/512);
 
 
         f.InstructionFrame = CreateFrame("Frame", nil, f);
@@ -687,22 +697,19 @@ do  --Editor
         fs1:SetText(L["NameplateQuest Instruction Find Nameplate"]);
 
 
-        local texture = "Interface/AddOns/Plumber/Art/Frame/NameplateQuestEditor.png";
-        local scale = 0.75;
-
         f.PreviewFrame = CreateFrame("Frame", nil, f);
         f.PreviewFrame:EnableMouse(true);
         f.PreviewFrame:EnableMouseMotion(true);
         f.PreviewFrame:SetAllPoints(true);
 
         local BarTexture = f.PreviewFrame:CreateTexture(nil, "ARTWORK");
-        BarTexture:SetSize(256*scale, 48*scale);
+        BarTexture:SetSize(256*textureScale, 48*textureScale);
         BarTexture:SetPoint("CENTER", f, "CENTER", 0, 0);
         BarTexture:SetTexture(texture);
         BarTexture:SetTexCoord(0, 0.5, 0, 48/512);
 
         local Bar = f.PreviewFrame:CreateTexture(nil, "OVERLAY");
-        Bar:SetSize(192*scale, 24*scale);
+        Bar:SetSize(192*textureScale, 24*textureScale);
         Bar:SetPoint("CENTER", f, "CENTER", 0, 0);
 
         MarkerWidget = CreateFrame("Frame", nil, f.PreviewFrame);
@@ -712,7 +719,7 @@ do  --Editor
         MarkerWidget.Icon:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateQuest.png", nil, nil, "TRILINEAR");
         MarkerWidget.Icon:SetTexCoord(0, 0.5, 0.25, 0.75);
         MarkerWidget.Icon:SetPoint("CENTER", MarkerWidget, "CENTER", 0, 0);
-        addon.API.DisableSharpening(MarkerWidget.Icon);
+        API.DisableSharpening(MarkerWidget.Icon);
 
         MarkerWidget.HitArea = CreateFrame("Button", nil, MarkerWidget);
         MarkerWidget.HitArea:SetPoint("CENTER", MarkerWidget, "CENTER", 0, 0);
@@ -781,7 +788,7 @@ do  --Options
         Def.IconSize = size;
 
 
-        local dbKeys = {"ShowPartyQuest", "ShowTargetProgress"};
+        local dbKeys = {"ShowPartyQuest", "ShowTargetProgress", "TextOutline"};
         for _, dbKey in ipairs(dbKeys) do
             Def[dbKey] = addon.GetDBBool("NameplateQuest_"..dbKey);
         end
@@ -804,6 +811,15 @@ do  --Options
 
         Def.WidgetOffsetX = addon.GetDBValue("NameplateQuest_WidgetOffsetX") or 0;
         Def.WidgetOffsetY = addon.GetDBValue("NameplateQuest_WidgetOffsetY") or 0;
+
+
+        local fontFile, fontHeight = GameFontNormalSmall:GetFont();
+        local nameplateFont = PlumberFont_Nameplate_Small;
+        if Def.TextOutline then
+            nameplateFont:SetFont(fontFile, fontHeight, "OUTLINE");
+        else
+            nameplateFont:SetFont(fontFile, fontHeight, "");
+        end
 
 
         EL:UpdateZone();
@@ -842,6 +858,7 @@ do  --Options
             {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Options.IconSize, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_IconSizeSlider_FormatValue, dbKey = "NameplateQuest_IconSize"},
             {type = "Checkbox", label = L["NameplateQuest ShowPartyQuest"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowPartyQuest", tooltip = Tooltip_ShowPartyQuest, restrictionInstance = true},
             {type = "Checkbox", label = L["NameplateQuest ShowTargetProgress"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowTargetProgress", tooltip = L["NameplateQuest ShowTargetProgress Tooltip"], restrictionInstance = true},
+            {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_TextOutline", isSubOption = true, parentDBKey = "NameplateQuest_ShowTargetProgress"},
         },
     };
 

@@ -29,7 +29,7 @@ local canaccessvalue = canaccessvalue or function(_) return true end;
 API.Secret_IsSecret = issecretvalue;
 
 function API.Secret_CanAccess(v)
-    return canaccessvalue(v) and v
+    return canaccessvalue(v) and v ~= nil
 end
 
 
