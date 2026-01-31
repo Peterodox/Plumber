@@ -283,20 +283,20 @@ do  --GameTooltipManager
     end
 
     function GameTooltipManager:GetItemManager()
-        return self:GetHandler(0)   ----Enum.TooltipDataType.Item
+        return self:GetHandler(Enum.TooltipDataType.Item)
     end
 
     function GameTooltipManager:GetSpellManager()
-        return self:GetHandler(1)   ----Enum.TooltipDataType.Spell
+        return self:GetHandler(Enum.TooltipDataType.Spell)
     end
 
     function GameTooltipManager:GetCurrencyManager()
-        return self:GetHandler(5)   ----Enum.TooltipDataType.Currency
+        return self:GetHandler(Enum.TooltipDataType.Currency)
     end
 
     function GameTooltipManager:GetMinimapManager()
         local useLeftTextAsArgument = true;
-        return self:GetHandler(21, useLeftTextAsArgument)   ----Enum.TooltipDataType.MinimapMouseover
+        return self:GetHandler(Enum.TooltipDataType.MinimapMouseover, useLeftTextAsArgument)
     end
 end
 

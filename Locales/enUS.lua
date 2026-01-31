@@ -394,6 +394,8 @@ L["NameplateQuest ShowPartyQuest"] = "Show Party Member's Quest";
 L["NameplateQuest ShowPartyQuest Tooltip"] = "Show a marker %s if one of your party members hasn't completed the quest objective.";
 L["NameplateQuest ShowTargetProgress"] = "Show Progress on Target";
 L["NameplateQuest ShowTargetProgress Tooltip"] = "Show the quest objective progress on your target's nameplate.";
+L["NameplateQuest ShowProgressOnHover"] = "Show Progress on Hover";
+L["NameplateQuest ShowProgressOnHover Tooltip"] = "Show the quest objective progress when you hover the cursor over a nameplate or a unit.";
 L["NameplateQuest Instruction Find Nameplate"] = "To adjust the icon position, go to a place with visible NPC nameplates.";
 
 

@@ -11,6 +11,7 @@ local UnitIsPlayer = UnitIsPlayer;
 local UnitIsUnit = UnitIsUnit;
 local GetInstanceInfo = GetInstanceInfo;
 local Secret_CanAccess = API.Secret_CanAccess;
+local ipairs = ipairs;
 
 
 local LineType = {
@@ -24,12 +25,14 @@ local Def = {
     IconSize = 18,
     ShowPartyQuest = false,
     ShowTargetProgress = false,
+    ShowProgressOnHover = false,
     TextOutline = false,
     WidgetOffsetX = 0,
     WidgetOffsetY = 0,
     Side = "RIGHT",
 
     AnchorToHealthBar = true,
+    TooltipPostCallAdded = false,
 };
 
 
@@ -41,6 +44,7 @@ local CreateQuestWidget;
 local InitializeWidgetPool;
 local EditorFrame;
 local LoadSettings;
+local LastMouseOverWidget;
 
 
 local match = string.match;
@@ -71,7 +75,7 @@ do  --Widget
         self.ProgressText:SetTextColor(0.67, 0.67, 0.67);
     end
 
-    function QuestWidgetMixin:ResetVisual()
+    function QuestWidgetMixin:ShowNoQuest()
         self.hasProgress = nil;
         self.ProgressText:SetText(nil);
         self.Icon:SetTexCoord(0.75, 1, 0.75, 1);
@@ -163,7 +167,7 @@ do  --Widget
                     end
 
                     if not allCompleted then
-                        local text = Def.ShowTargetProgress and GetProgressText(objectiveText) or nil;
+                        local text = (Def.ShowTargetProgress or Def.ShowProgressOnHover) and GetProgressText(objectiveText) or nil;
                         self.ProgressText:SetText(text);
                         self.hasProgress = text ~= nil;
 
@@ -179,35 +183,133 @@ do  --Widget
             end
         end
 
-        self:ResetVisual();
+        self:ShowNoQuest();
     end
 
     function QuestWidgetMixin:UpdateTarget()
-        if (not EL.inInstance) and UnitIsUnit("target", self.unit) and Def.ShowTargetProgress then
-            self:UpdateQuest();
-            if self.hasProgress then
+        self.isTarget = nil;
+
+        if not EL.inInstance and Def.ShowTargetProgress then
+            local isTarget = UnitIsUnit("target", self.unit);
+            if Secret_CanAccess(isTarget) and isTarget then
+                self.isTarget = true;
+                self:UpdateQuest();
+                self:UpdateProgressVisibility();
+                return true
+            end
+        end
+
+        self:UpdateProgressVisibility();
+
+        return false
+    end
+
+    function QuestWidgetMixin:UpdateAlpha()
+        self.ProgressText:SetAlpha(self.alpha);
+        self.Icon:SetAlpha(1 - self.alpha);
+    end
+
+    do  --OnUpdate Funcs
+        function QuestWidgetMixin:OnUpdate_ShowProgress(elapsed)
+            self.alpha = self.alpha + 5 * elapsed;
+            self.isFadingIn = true;
+            if self.alpha >= 1 then
+                self.alpha = 1;
+                self.isFadingIn = nil;
+                self:SetScript("OnUpdate", nil);
+                if self.hideAfterFadingIn then
+                    self.hideAfterFadingIn = nil;
+                    self:SetScript("OnUpdate", self.OnUpdate_HideProgressAfterDelay);
+                end
+            end
+            self:UpdateAlpha();
+        end
+
+        function QuestWidgetMixin:OnUpdate_HideProgress(elapsed)
+            self.alpha = self.alpha - 5 * elapsed;
+            if self.alpha <= 0 then
+                self.alpha = 0;
+                self:SetScript("OnUpdate", nil);
+                self.ProgressText:Hide();
+            end
+            self:UpdateAlpha();
+        end
+
+        function QuestWidgetMixin:OnUpdate_HideProgressAfterDelay(elapsed)
+            self.t = self.t + elapsed;
+            if self.t >= 1 then
+                self.t = 0;
+                self:SetScript("OnUpdate", self.OnUpdate_HideProgress);
+            end
+        end
+    end
+
+    function QuestWidgetMixin:UpdateProgressVisibility(animating)
+        self.hideAfterFadingIn = nil;
+        if self.hasProgress and (self.isMouseOver or self.isTarget or self.isWorldCursor) then
+            if animating then
+                self.Icon:Show();
+                self.ProgressText:Show();
+                self:SetScript("OnUpdate", self.OnUpdate_ShowProgress);
+            else
                 self.Icon:Hide();
                 self.ProgressText:Show();
+                self.alpha = 1;
+                self:UpdateAlpha();
+                self:SetScript("OnUpdate", nil);
             end
-            return true
+        else
+            if animating then
+                self.Icon:Show();
+                self.ProgressText:Show();
+                self.t = 0;
+                if self.isFadingIn then
+                    self.hideAfterFadingIn = true;
+                else
+                    self:SetScript("OnUpdate", self.OnUpdate_HideProgressAfterDelay);
+                end
+            else
+                self.Icon:Show();
+                self.ProgressText:Hide();
+                self.alpha = 0;
+                self:UpdateAlpha();
+                self:SetScript("OnUpdate", nil);
+            end
         end
-        self.Icon:Show();
-        self.ProgressText:Hide();
-        return false
     end
 
     function QuestWidgetMixin:OnHide()
         self.questID = nil;
         self.unit = nil;
+        self.isMouseOver = nil;
+        self.isTarget = nil;
+        self.isWorldCursor = nil;
+        self.alpha = 0;
+        self.isFadingIn = nil;
+        self.hideAfterFadingIn = nil;
         self:Hide();
         self:ClearAllPoints();
+        self.MouseOverFrame:ClearAllPoints();
+        self.MouseOverFrame:Hide();
+        self.ProgressText:Hide();
         self:SetParent(EL);
+        self:SetScript("OnUpdate", nil);
         WidgetPool[self] = false;
     end
 
     function QuestWidgetMixin:SetOwnerInfo(owner, unit)
         self.unit = unit or owner.unit;
         self.owner = owner;
+
+        self.MouseOverFrame:ClearAllPoints();
+        if Def.ShowProgressOnHover then
+            self.MouseOverFrame:Show();
+            self.MouseOverFrame:SetPoint("TOPLEFT", owner, "TOPLEFT", 0, 0);
+            self.MouseOverFrame:SetPoint("BOTTOMRIGHT", owner, "BOTTOMRIGHT", 0, 0);
+        else
+            self.MouseOverFrame:Hide();
+        end
+
         if not self:UpdateTarget() then
             self:UpdateQuest();
         end
@@ -233,12 +335,23 @@ do  --Widget
         self.Ref:SetPoint("CENTER", self, "CENTER", Def.WidgetOffsetX, Def.WidgetOffsetY);
     end
 
+    local function MouseOverFrame_OnEnter(self)
+        self.parentWidget.isMouseOver = true;
+        self.parentWidget:UpdateProgressVisibility(true);
+    end
+
+    local function MouseOverFrame_OnLeave(self)
+        self.parentWidget.isMouseOver = nil;
+        self.parentWidget.isWorldCursor = nil;
+        self.parentWidget:UpdateProgressVisibility(true);
+    end
 
     function CreateQuestWidget()
         local f = CreateFrame("Frame", nil, EL);
-        f:SetSize(16, 16);
         Mixin(f, QuestWidgetMixin);
+        f:SetSize(16, 16);
         f:SetScript("OnHide", f.OnHide);
+        f.alpha = 0;
 
         local Ref = CreateFrame("Frame", nil, f);
         Ref:SetSize(1, 1);
@@ -256,6 +369,11 @@ do  --Widget
         f.ProgressText:SetPoint("CENTER", Ref, "CENTER", 0, 0);
         f.ProgressText:SetTextColor(1, 1, 1);
         f.ProgressText:Hide();
+
+        f.MouseOverFrame = CreateFrame("Frame", nil, f, "PlumberPropagateMouseTemplate");
+        f.MouseOverFrame:SetScript("OnEnter", MouseOverFrame_OnEnter);
+        f.MouseOverFrame:SetScript("OnLeave", MouseOverFrame_OnLeave);
+        f.MouseOverFrame.parentWidget = f;
 
         WidgetPool[f] = false;
 
@@ -322,6 +440,12 @@ do  --Event Listener
     end
 
     function EL:UpdateAllNameplates()
+        for widget, shown in pairs(WidgetPool) do
+            if shown then
+                widget:Hide();
+            end
+        end
+
         local nameplates = GetNamePlates(false);
         if nameplates then
             for _, nameplate in ipairs(nameplates) do
@@ -779,6 +903,30 @@ do  --Options
         IconSize = {16, 18, 20, 22, 24, 28, 32};
     };
 
+    local function OnTooltipSetUnit(tooltip)
+        if EL.inInstance or not Def.ShowProgressOnHover then return end;
+
+        if LastMouseOverWidget then
+            LastMouseOverWidget.isWorldCursor = nil;
+            LastMouseOverWidget:UpdateProgressVisibility(true)
+        end
+
+		local _, unit = tooltip:GetUnit();
+
+        if Secret_CanAccess(unit) then
+            for widget, shown in pairs(WidgetPool) do
+                if shown then
+                    if widget.unit == unit then
+                        LastMouseOverWidget = widget;
+                        widget.isWorldCursor = true;
+                        widget:UpdateProgressVisibility(true);
+                        break
+                    end
+                end
+            end
+        end
+	end
+
     function LoadSettings()
         local sizeIndex = addon.GetDBValue("NameplateQuest_IconSize");
         if not (sizeIndex and Options.IconSize[sizeIndex]) then
@@ -788,7 +936,7 @@ do  --Options
         Def.IconSize = size;
 
 
-        local dbKeys = {"ShowPartyQuest", "ShowTargetProgress", "TextOutline"};
+        local dbKeys = {"ShowPartyQuest", "ShowTargetProgress", "ShowProgressOnHover", "TextOutline"};
         for _, dbKey in ipairs(dbKeys) do
             Def[dbKey] = addon.GetDBBool("NameplateQuest_"..dbKey);
         end
@@ -822,6 +970,12 @@ do  --Options
         end
 
 
+        if Def.ShowProgressOnHover and not Def.TooltipPostCallAdded then
+            Def.TooltipPostCallAdded = true;
+            TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit);
+        end
+
+
         EL:UpdateZone();
         EL:UpdateAllNameplates();
 
@@ -850,6 +1004,10 @@ do  --Options
         LoadSettings();
     end
 
+    local function Options_TextOutline_ShouldEnable()
+        return addon.GetDBBool("NameplateQuest_ShowTargetProgress") or addon.GetDBBool("NameplateQuest_ShowProgressOnHover")
+    end
+
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName NameplateQuest"],
         widgets = {
@@ -858,7 +1016,8 @@ do  --Options
             {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Options.IconSize, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_IconSizeSlider_FormatValue, dbKey = "NameplateQuest_IconSize"},
             {type = "Checkbox", label = L["NameplateQuest ShowPartyQuest"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowPartyQuest", tooltip = Tooltip_ShowPartyQuest, restrictionInstance = true},
             {type = "Checkbox", label = L["NameplateQuest ShowTargetProgress"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowTargetProgress", tooltip = L["NameplateQuest ShowTargetProgress Tooltip"], restrictionInstance = true},
-            {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_TextOutline", isSubOption = true, parentDBKey = "NameplateQuest_ShowTargetProgress"},
+            {type = "Checkbox", label = L["NameplateQuest ShowProgressOnHover"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowProgressOnHover", tooltip = L["NameplateQuest ShowProgressOnHover Tooltip"], restrictionInstance = true},
+            {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_TextOutline", shouldEnableOption = Options_TextOutline_ShouldEnable},
         },
     };
 

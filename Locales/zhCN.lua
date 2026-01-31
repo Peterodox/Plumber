@@ -391,8 +391,10 @@ L["ModuleName NameplateQuest"] = "姓名板: 任务标记";
 L["ModuleDescription NameplateQuest"] = "在姓名板上显示任务标记。\n\n-（可选）在目标姓名板上显示任务进度。\n\n-（可选）如果你的队友还没有完成任务，在姓名板上显示任务标记。";
 L["NameplateQuest ShowPartyQuest"] = "显示队友任务";
 L["NameplateQuest ShowPartyQuest Tooltip"] = "如果你的队友还没有完成任务目标，在姓名板上显示 %s 图标。";
-L["NameplateQuest ShowTargetProgress"] = "显示目标进度";
-L["NameplateQuest ShowTargetProgress Tooltip"] = "在目标姓名板上显示任务进度";
+L["NameplateQuest ShowTargetProgress"] = "显示当前目标进度";
+L["NameplateQuest ShowTargetProgress Tooltip"] = "在当前目标姓名板上显示任务进度";
+L["NameplateQuest ShowProgressOnHover"] = "显示鼠标经过的单位进度";
+L["NameplateQuest ShowProgressOnHover Tooltip"] = "在鼠标经过的单位姓名板上显示任务进度。";
 L["NameplateQuest Instruction Find Nameplate"] = "请前往一个有NPC姓名板的地方来调整图标位置。";
 
 
