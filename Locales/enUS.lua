@@ -389,12 +389,12 @@ L["ModuleDescription NameplateWidget"] = "Show the number of owned Radiant Remna
 
 --NameplateQuestIndicator
 L["ModuleName NameplateQuest"] = "Nameplate: Quest Indicator";
-L["ModuleDescription NameplateQuest"] = "";
+L["ModuleDescription NameplateQuest"] = "Show quest indicator on nameplates.\n\n- (Optional) Show quest objective progress for your target.\n\n- (Optional) Show quest indicator if your party members haven't completed the objective.";
 L["NameplateQuest ShowPartyQuest"] = "Show Party Member's Quest";
 L["NameplateQuest ShowPartyQuest Tooltip"] = "Show a marker %s if one of your party members hasn't completed the quest objective.";
 L["NameplateQuest ShowTargetProgress"] = "Show Progress on Target";
 L["NameplateQuest ShowTargetProgress Tooltip"] = "Show the quest objective progress on your target's nameplate.";
-L["NameplateQuest Instruction Find Nameplate"] = "To adjust the icon position, go to a place with visibile NPC nameplates.";
+L["NameplateQuest Instruction Find Nameplate"] = "To adjust the icon position, go to a place with visible NPC nameplates.";
 
 
 --PartyInviterInfo
@@ -579,6 +579,8 @@ L["LootUI Option Show Reputation"] = "Show Reputation Changes";
 L["LootUI Option Show Reputation Tooltip"] = "Display any reputation increases in the loot window.\n\nReputations earned during combat or in PvP instances will be displayed afterwards.";
 L["LootUI Option Show All Money"] = "Show Any Money Changes";
 L["LootUI Option Show All Money Tooltip"] = "Show money earned from all sources, not just loot.";
+L["LootUI Option Hide Title"] = "Hide \"You Received\" Text";
+L["LootUI Option Hide Title Tooltip"] = "Hide the \"You received\" text on the top of the loot window.";
 
 
 --Quick Slot For Third-party Dev

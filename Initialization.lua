@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.8.5 e";
-local VERSION_DATE = 1769500000;
+local VERSION_TEXT = "1.8.6";
+local VERSION_DATE = 1769800000;
 
 
 local addonName, addon = ...
@@ -267,6 +267,7 @@ local DefaultValues = {
         LootUI_LowFrameStrata = false,
         LootUI_ShowReputation = false,
         LootUI_ShowAllMoneyChange = false,
+        LootUI_HideTitle = false,
 
 
     --Unified Map Pin System
@@ -342,6 +343,8 @@ local DefaultValues = {
         NameplateQuest_IconSize = 2,
         NameplateQuest_ShowPartyQuest = false,
         NameplateQuest_ShowTargetProgress = false,
+        NameplateQuest_WidgetOffsetX = 0,
+        NameplateQuest_WidgetOffsetY = 0,
         --NameplateQuest_Side = "RIGHT",    --Initial value dedfined by detecting addon
 
 
@@ -358,6 +361,7 @@ local DefaultValues = {
 
 local NeverEnableByDefault = {
     AppearanceTab = true,
+    NameplateQuest = true,
 };
 
 

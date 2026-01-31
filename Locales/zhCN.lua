@@ -386,6 +386,16 @@ L["ModuleName NameplateWidget"] = "姓名板: 钥焰";
 L["ModuleDescription NameplateWidget"] = "在钥焰的姓名板进度条上显示你拥有的光耀残渣的数量。";
 
 
+--NameplateQuestIndicator
+L["ModuleName NameplateQuest"] = "姓名板: 任务标记";
+L["ModuleDescription NameplateQuest"] = "在姓名板上显示任务标记。\n\n-（可选）在目标姓名板上显示任务进度。\n\n-（可选）如果你的队友还没有完成任务，在姓名板上显示任务标记。";
+L["NameplateQuest ShowPartyQuest"] = "显示队友任务";
+L["NameplateQuest ShowPartyQuest Tooltip"] = "如果你的队友还没有完成任务目标，在姓名板上显示 %s 图标。";
+L["NameplateQuest ShowTargetProgress"] = "显示目标进度";
+L["NameplateQuest ShowTargetProgress Tooltip"] = "在目标姓名板上显示任务进度";
+L["NameplateQuest Instruction Find Nameplate"] = "请前往一个有NPC姓名板的地方来调整图标位置。";
+
+
 --PartyInviterInfo
 L["ModuleName PartyInviterInfo"] = "队伍邀请人信息";
 L["ModuleDescription PartyInviterInfo"] = "显示队伍以及公会邀请人的等级、职业等信息。";
@@ -568,6 +578,8 @@ L["LootUI Option Show Reputation"] = "显示声望变化";
 L["LootUI Option Show Reputation Tooltip"] = "在拾取窗口内显示获得的声望。\n\n在战斗中或是战场内获得的声望将在结束后合并显示。";
 L["LootUI Option Show All Money"] = "显示任何金钱变动";
 L["LootUI Option Show All Money Tooltip"] = "显示从任何来源获得的金钱，而不仅限于从战利品中拾取到的。";
+L["LootUI Option Hide Title"] = "隐藏“你获得了”标题";
+L["LootUI Option Hide Title Tooltip"] = "隐藏拾取窗口上方显示的“你获得了”标题。";
 
 
 --Quick Slot For Third-party Dev
