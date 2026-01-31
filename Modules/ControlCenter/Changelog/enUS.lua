@@ -14,7 +14,7 @@ changelogs[10806] = {
     {
         type = "date",
         versionText = "1.8.6",
-        timestamp = 1769800000,
+        timestamp = 1769870000,
     },
 
     {
@@ -37,7 +37,7 @@ changelogs[10806] = {
     {
         type = "p",
         bullet = true,
-        text = "(Optional) Show quest objective progress for your target.",
+        text = "(Optional) Show quest objective progress on your target or mouseover.",
     },
 
     {
@@ -64,6 +64,12 @@ changelogs[10806] = {
         type = "p",
         bullet = true,
         text = "Loot Window: Added an option to hide the \"You received\" text.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Fixed several secret-related errors. \"Trust me, bro.\"",
     },
 };
 
