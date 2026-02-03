@@ -196,6 +196,7 @@ do  --EditModeSettingsDialog
         self.texturePool:ReleaseAll();
         self.fontStringPool:ReleaseAll();
         self.keybindButtonPool:ReleaseAll();
+        self.dropdownFramePool:ReleaseAll();
         self.newFeatureLabelPool:ReleaseAll();
     end
 
@@ -269,6 +270,8 @@ do  --EditModeSettingsDialog
             widget.matchParentWidth = true;
         elseif type == "Keybind" then
             widget = self.keybindButtonPool:Acquire();
+        elseif type == "Dropdown" then
+            widget = self.dropdownFramePool:Acquire();
         end
 
         return widget
@@ -367,15 +370,33 @@ do  --EditModeSettingsDialog
         return button
     end
 
+    function EditModeSettingsDialogMixin:CreateDropdownFrame(widgetData)
+        local f = self:AcquireWidgetByType("Dropdown");
+        f.dbKey = widgetData.dbKey;
+        f.tooltip = widgetData.tooltip;
+        f.matchParentWidth = false;
+        f:SetLabel(widgetData.label);
+        f:SetMenuData(widgetData.menuData);
+        return f
+    end
+
     function EditModeSettingsDialogMixin:UpdateWidgetEnabledState(widget)
         if not widget.SetEnabled then return end;
+
+        if widget.widgetType == "Dropdown" then
+            widget:UpdateEnabledState();
+            return
+        end
+
         local enabled = true;
+
         if widget.shouldEnableOption and not widget.shouldEnableOption() then
             enabled = false;
         end
         if widget.parentDBKey and not addon.GetDBBool(widget.parentDBKey) then
             enabled = false;
         end
+
         widget:SetEnabled(enabled);
     end
 
@@ -402,6 +423,8 @@ do  --EditModeSettingsDialog
                         widget = self:CreateHeader(widgetData);
                     elseif widgetData.type == "Keybind" then
                         widget = self:CreateKeybindButton(widgetData);
+                    elseif widgetData.type == "Dropdown" then
+                        widget = self:CreateDropdownFrame(widgetData);
                     elseif widgetData.type == "Custom" then
                         widget = widgetData.onAcquire();
                         if widget then
@@ -439,6 +462,10 @@ do  --EditModeSettingsDialog
                 end
             end
         end
+    end
+
+    function EditModeSettingsDialogMixin:UpdateWidgetBy()
+        
     end
 
     function EditModeSettingsDialogMixin:OnDragStart()
@@ -553,6 +580,11 @@ do  --EditModeSettingsDialog
             end
             f.keybindButtonPool = API.CreateObjectPool(CreateKeybindButton);
 
+            local function CreateDropdownFrame()
+                return addon.CreateDropdownFrame(f);
+            end
+            f.dropdownFramePool = API.CreateObjectPool(CreateDropdownFrame);
+
             local function CreateNewFeatureLabel()
                 return CreateFrame("Frame", nil, f, "NewFeatureLabelNoAnimateTemplate");
             end
@@ -598,6 +630,10 @@ do  --EditModeSettingsDialog
         if EditModeSettingsDialog and EditModeSettingsDialog.activeWidgets then
             for _, widget in ipairs(EditModeSettingsDialog.activeWidgets) do
                 EditModeSettingsDialog:UpdateWidgetEnabledState(widget);
+
+                if widget.widgetType == "Dropdown" then
+                    widget:UpdateSelectedText();
+                end
             end
         end
     end

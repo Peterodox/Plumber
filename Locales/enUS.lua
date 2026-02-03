@@ -397,6 +397,11 @@ L["NameplateQuest ShowTargetProgress Tooltip"] = "Show the quest objective progr
 L["NameplateQuest ShowProgressOnHover"] = "Show Progress on Hover";
 L["NameplateQuest ShowProgressOnHover Tooltip"] = "Show the quest objective progress when you hover the cursor over a nameplate or a unit.";
 L["NameplateQuest Instruction Find Nameplate"] = "To adjust the icon position, go to a place with visible NPC nameplates.";
+L["NameplateQuest Progress Format"] = "Progress Format";
+L["Progress Show Icon"] = "Show Icon";
+L["Progress Format Completed"] = "Completed/Required";
+L["Progress Format Remaining"] = "Remaining";
+
 
 
 --PartyInviterInfo

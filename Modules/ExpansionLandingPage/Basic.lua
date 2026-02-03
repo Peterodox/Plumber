@@ -712,6 +712,12 @@ do  --Dropdown Menu
         f.RightTexture:SetSize(18, 18);
         f.RightTexture:SetPoint("RIGHT", f, "RIGHT", -f.paddingH, 0);
 
+        f.RightText = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        f.RightText:SetPoint("LEFT", f, "LEFT", f.paddingH, 0);
+        f.RightText:SetJustifyH("LEFT");
+        f.RightText:SetTextColor(0.922, 0.871, 0.761);
+        f.RightText:Hide();
+
         f:SetScript("OnEnter", f.OnEnter);
         f:SetScript("OnLeave", f.OnLeave);
         f:SetScript("OnClick", f.OnClick);
@@ -853,6 +859,7 @@ do  --Dropdown Menu
                 if v.type == "Checkbox" or v.type == "Radio" or v.type == "Button" or v.type == "Header" then
                     widget = self.buttonPool:Acquire();
                     widget:SetRightTexture(v.rightTexture);
+                    
                     if numWidgets == 1 then
                         widget:SetPoint("CENTER", f, "CENTER", 0, 0);
                     else
@@ -927,6 +934,17 @@ do  --Dropdown Menu
                 self.Frame:Show();
                 self.visible = true;
             end
+        end
+
+
+        -- We also use this for EditModeDropdownFrame, whose border is greyscale
+        -- Desaturated to match color
+
+        local desaturateBorder = menuInfo and menuInfo.desaturateBorder;
+        local a = desaturateBorder and 0.9 or 1;
+        for _, p in ipairs(self.Frame.Background.pieces) do
+            p:SetDesaturated(desaturateBorder);
+            p:SetVertexColor(a, a, a);
         end
     end
 

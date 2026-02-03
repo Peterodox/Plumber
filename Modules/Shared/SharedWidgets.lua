@@ -26,6 +26,11 @@ local UIParent = UIParent;
 local GameTooltip = GameTooltip;
 local Secret_CanAccess = API.Secret_CanAccess;
 
+local Def = {
+    CheckboxTexture = "Interface/AddOns/Plumber/Art/Frame/EditModeCheckbox.png",
+    SliderTexture = "Interface/AddOns/Plumber/Art/Frame/EditModeSlider.png",
+    DropdownTexture = "Interface/AddOns/Plumber/Art/Frame/EditModeDropdown.png",
+};
 
 local function DisableSharpening(texture)
     texture:SetTexelSnappingBias(0);
@@ -461,14 +466,14 @@ do  -- Checkbox
         b.Label:SetPoint("LEFT", b, "LEFT", LABEL_OFFSET, 0);
 
         b.Border = b:CreateTexture(nil, "ARTWORK");
-        b.Border:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+        b.Border:SetTexture(Def.CheckboxTexture);
         b.Border:SetTexCoord(0, 0.5, 0, 0.5);
         b.Border:SetPoint("CENTER", b, "LEFT", 8, 0);
         b.Border:SetSize(32, 32);
         DisableSharpening(b.Border);
 
         b.CheckedTexture = b:CreateTexture(nil, "OVERLAY");
-        b.CheckedTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+        b.CheckedTexture:SetTexture(Def.CheckboxTexture);
         b.CheckedTexture:SetTexCoord(0.5, 0.75, 0.5, 0.75);
         b.CheckedTexture:SetPoint("CENTER", b.Border, "CENTER", 0, 0);
         b.CheckedTexture:SetSize(16, 16);
@@ -476,11 +481,12 @@ do  -- Checkbox
         b.CheckedTexture:Hide();
 
         b.Highlight = b:CreateTexture(nil, "HIGHLIGHT");
-        b.Highlight:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+        b.Highlight:SetTexture(Def.CheckboxTexture);
         b.Highlight:SetTexCoord(0, 0.5, 0.5, 1);
         b.Highlight:SetPoint("CENTER", b.Border, "CENTER", 0, 0);
         b.Highlight:SetSize(32, 32);
-        --b.Highlight:Hide();
+        b.Highlight:SetBlendMode("ADD");
+        b.Highlight:SetVertexColor(0.5, 0.5, 0.5);
         DisableSharpening(b.Highlight);
 
         Mixin(b, CheckboxMixin);
@@ -3604,12 +3610,11 @@ do  --Shared Context Menu
             return
         end
 
-
         if not self.Tex1 then
             self.Tex1 = self:CreateTexture(nil, "ARTWORK");
             self.Tex1:SetSize(32, 32);
             self.Tex1:SetPoint("CENTER", self, "LEFT", MENU_BUTTON_TEXT_OFFSET + 6, 0);
-            self.Tex1:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+            self.Tex1:SetTexture(Def.CheckboxTexture);
             self.Tex1:SetTexCoord(0, 0.5, 0, 0.5);
             DisableSharpening(self.Tex1);
         end
@@ -3617,14 +3622,14 @@ do  --Shared Context Menu
             self.Tex2 = self:CreateTexture(nil, "OVERLAY");
             self.Tex2:SetSize(16, 16);
             self.Tex2:SetPoint("CENTER", self.Tex1, "CENTER", 0, 0);
-            self.Tex2:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+            self.Tex2:SetTexture(Def.CheckboxTexture);
             self.Tex2:SetTexCoord(0.5, 0.75, 0.5, 0.75);
             DisableSharpening(self.Tex2);
         end
 
         if self.buttonType == "checkbox" then
-            self.Tex1:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
-            self.Tex2:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+            self.Tex1:SetTexture(Def.CheckboxTexture);
+            self.Tex2:SetTexture(Def.CheckboxTexture);
         elseif self.buttonType == "radio" then
             self.Tex1:SetTexture("Interface/AddOns/Plumber/Art/Button/RadioButton");
             self.Tex2:SetTexture("Interface/AddOns/Plumber/Art/Button/RadioButton");
@@ -4115,7 +4120,6 @@ end
 do  --Slider
     local SliderFrameMixin = {};
 
-    local TEXTURE_FILE = "Interface/AddOns/Plumber/Art/Frame/Slider";
     local TEX_COORDS = {
         Thumb_Nomral = {0, 0.5, 0, 0.25},
         Thumb_Disable = {0.5, 1, 0, 0.25},
@@ -4239,26 +4243,33 @@ do  --Slider
         self.Back:SetScript("OnClick", BackForwardButton_OnClick);
         self.Forward:SetScript("OnClick", BackForwardButton_OnClick);
 
-        self.Slider.Left:SetTexture(TEXTURE_FILE);
-        self.Slider.Middle:SetTexture(TEXTURE_FILE);
-        self.Slider.Right:SetTexture(TEXTURE_FILE);
-        self.Slider.ThumbTexture:SetTexture(TEXTURE_FILE);
-        self.Slider.ThumbHighlight:SetTexture(TEXTURE_FILE);
+        self.Slider.Left:SetTexture(Def.SliderTexture);
+        self.Slider.Middle:SetTexture(Def.SliderTexture);
+        self.Slider.Right:SetTexture(Def.SliderTexture);
+        self.Slider.ThumbTexture:SetTexture(Def.SliderTexture);
+        self.Slider.ThumbHighlight:SetTexture(Def.SliderTexture);
+        self.Slider.ThumbHighlight:SetBlendMode("ADD");
+        self.Slider.ThumbHighlight:SetVertexColor(0.5, 0.5, 0.5);
+
         SetTextureCoord(self.Slider.Left, "Slider_Left");
         SetTextureCoord(self.Slider.Middle, "Slider_Middle");
         SetTextureCoord(self.Slider.Right, "Slider_Right");
         SetTextureCoord(self.Slider.ThumbTexture, "Thumb_Nomral");
         SetTextureCoord(self.Slider.ThumbHighlight, "Thumb_Highlight");
 
-        self.Back.Texture:SetTexture(TEXTURE_FILE);
-        self.Back.Highlight:SetTexture(TEXTURE_FILE);
+        self.Back.Texture:SetTexture(Def.SliderTexture);
+        self.Back.Highlight:SetTexture(Def.SliderTexture);
         SetTextureCoord(self.Back.Texture, "Back_Nomral");
         SetTextureCoord(self.Back.Highlight, "Back_Highlight");
+        self.Back.Highlight:SetBlendMode("ADD");
+        self.Back.Highlight:SetVertexColor(0.5, 0.5, 0.5);
 
-        self.Forward.Texture:SetTexture(TEXTURE_FILE);
-        self.Forward.Highlight:SetTexture(TEXTURE_FILE);
+        self.Forward.Texture:SetTexture(Def.SliderTexture);
+        self.Forward.Highlight:SetTexture(Def.SliderTexture);
         SetTextureCoord(self.Forward.Texture, "Forward_Nomral");
         SetTextureCoord(self.Forward.Highlight, "Forward_Highlight");
+        self.Forward.Highlight:SetBlendMode("ADD");
+        self.Forward.Highlight:SetVertexColor(0.5, 0.5, 0.5);
 
         self:SetMinMaxValues(0, 100);
         self:SetValueStep(10);
@@ -4436,6 +4447,179 @@ do  --Slider
         return f
     end
     addon.CreateSlider = CreateSlider;
+end
+
+do  --DropdownFrame--
+    local DropdownFrameMixin = {};
+
+    function DropdownFrameMixin:SetLabel(label)
+        self.Label:SetText(label);
+    end
+
+    function DropdownFrameMixin:SetButtonText(text)
+        self.Button.Text:SetText(text);
+    end
+
+    function DropdownFrameMixin:SetPushed(pushed)
+        if pushed then
+            self.Textures[3]:SetTexCoord(176/256, 1, 80/256, 160/256);
+        else
+            self.Textures[3]:SetTexCoord(176/256, 1, 0, 80/256);
+        end
+    end
+
+    function DropdownFrameMixin:SetLabelWidth(width)
+        self.Label:SetWidth(width);
+        self:SetWidth(242 + width);
+        self.Button:SetPoint("LEFT", self, "LEFT", 14 + width, 0);
+    end
+
+    function DropdownFrameMixin:UpdateSelectedText()
+        if self.menuData and self.menuData.GetSelectedText then
+            self:SetButtonText(self.menuData.GetSelectedText());
+        else
+            self:SetButtonText(nil);
+        end
+    end
+
+    function DropdownFrameMixin:UpdateEnabledState()
+        local enabled = self.menuData and self.menuData.ShouldEnable and self.menuData.ShouldEnable();
+        self:SetEnabled(enabled);
+    end
+
+    function DropdownFrameMixin:SetMenuData(menuData)
+        self.menuData = menuData;
+        self:UpdateSelectedText();
+        self:UpdateEnabledState();
+    end
+
+    function DropdownFrameMixin:IsEnabled()
+        return self.enabled
+    end
+
+    function DropdownFrameMixin:SetEnabled(enabled)
+        if enabled then
+            self:Enable();
+        else
+            self:Disable();
+        end
+    end
+
+    function DropdownFrameMixin:Enable()
+        if self.enabled then return end;
+        self.enabled = true;
+        self.Button:Enable();
+        self.Label:SetTextColor(1, 1, 1);
+        self.Button.Text:SetTextColor(1, 1, 1);
+        for _, tex in ipairs(self.Textures) do
+            tex:SetDesaturated(false);
+            tex:SetVertexColor(1, 1, 1);
+        end
+    end
+
+    function DropdownFrameMixin:Disable()
+        if not self.enabled then return end;
+        self.enabled = false;
+        self.Button:Disable();
+        self.Label:SetTextColor(0.5, 0.5, 0.5);
+        self.Button.Text:SetTextColor(0.5, 0.5, 0.5);
+        for _, tex in ipairs(self.Textures) do
+            tex:SetDesaturated(true);
+            tex:SetVertexColor(0.5, 0.5, 0.5);
+        end
+    end
+
+    function DropdownFrameMixin:ToggleMenu()
+        local menuInfoGetter = self.menuData and self.menuData.MenuInfoGetter or nil;
+        addon.LandingPageUtil.DropdownMenu:ToggleMenu(self.Button, menuInfoGetter);
+    end
+
+
+    local DropdownButtonMixin = {};
+
+    function DropdownButtonMixin:OnEnter()
+        if self.Text:IsTruncated() then
+            local tooltip = GameTooltip;
+            tooltip:SetOwner(self, "ANCHOR_RIGHT");
+            tooltip:SetText(self.Text:GetText(), 1, 1, 1);
+            tooltip:Show();
+        end
+    end
+
+    function DropdownButtonMixin:OnLeave()
+        GameTooltip:Hide();
+    end
+
+    function DropdownButtonMixin:OnMouseDown()
+        if self:IsEnabled() then
+            self:GetParent():SetPushed(true);
+        end
+    end
+
+    function DropdownButtonMixin:OnMouseUp()
+        self:GetParent():SetPushed(false);
+    end
+
+    function DropdownButtonMixin:OnClick()
+        self:GetParent():ToggleMenu();
+    end
+
+
+    addon.CreateDropdownFrame = function(parent)
+        local f = CreateFrame("Frame", nil, parent);
+        Mixin(f, DropdownFrameMixin);
+        f:SetSize(342, 36);
+
+        local Label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightMedium");
+        f.Label = Label;
+        Label:SetJustifyH("LEFT");
+        Label:SetPoint("LEFT", f, "LEFT", 0, 0);
+
+
+        local Button = CreateFrame("Button", nil, f);
+        f.Button = Button;
+
+        f.Textures = API.CreateThreeSliceTextures(Button, "BACKGROUND", 16, 40, 8, Def.DropdownTexture, true);
+        f.Textures[1]:SetTexCoord(0, 32/256, 0, 80/256);
+        f.Textures[2]:SetTexCoord(32/256, 176/256, 0, 80/256);
+        f.Textures[3]:SetTexCoord(176/256, 1, 0, 80/256);
+        f.Textures[3]:SetSize(40, 40);
+
+        f.HighlightTextures = API.CreateThreeSliceTextures(Button, "HIGHLIGHT", 16, 40, 8, Def.DropdownTexture, true);
+        f.HighlightTextures[1]:SetTexCoord(0, 32/256, 160/256, 240/256);
+        f.HighlightTextures[2]:SetTexCoord(32/256, 176/256, 160/256, 240/256);
+        f.HighlightTextures[3]:SetTexCoord(176/256, 1, 160/256, 240/256);
+        f.HighlightTextures[3]:SetSize(40, 40);
+
+        local a = 0.25;
+        for _, tex in ipairs(f.HighlightTextures) do
+            tex:SetVertexColor(a, a, a);
+            tex:SetBlendMode("ADD");
+        end
+
+        Button:SetSize(240, 26);
+        Button:SetPoint("RIGHT", f, "RIGHT", -18, 0);
+
+        Button.Text = Button:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+        Button.Text:SetPoint("LEFT", Button, "LEFT", 8, 0);
+        Button.Text:SetPoint("RIGHT", Button, "RIGHT", -46, 0);
+        Button.Text:SetMaxLines(1);
+        Button.Text:SetJustifyH("LEFT");
+
+        Mixin(Button, DropdownButtonMixin);
+        Button:SetScript("OnEnter", Button.OnEnter);
+        Button:SetScript("OnLeave", Button.OnLeave);
+        Button:SetScript("OnClick", Button.OnClick);
+        Button:SetScript("OnMouseDown", Button.OnMouseDown);
+        Button:SetScript("OnMouseUp", Button.OnMouseUp);
+        Button:SetMotionScriptsWhileDisabled(true);
+
+
+        f:SetLabelWidth(144);
+        f:Enable();
+
+        return f
+    end
 end
 
 do  --UIPanelButton

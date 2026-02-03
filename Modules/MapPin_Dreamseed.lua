@@ -1006,7 +1006,7 @@ function FilterFrame:AcquireOptionButton(i)
         button.Text:SetPoint("LEFT", button.Reference, "LEFT", 20, 0);
 
         button.CheckedTexture = button:CreateTexture(nil, "OVERLAY");
-        button.CheckedTexture:SetTexture("Interface/AddOns/Plumber/Art/Button/Checkbox");
+        button.CheckedTexture:SetTexture("Interface/AddOns/Plumber/Art/Frame/EditModeCheckbox.png");
         button.CheckedTexture:SetTexCoord(0.5, 0.75, 0.5, 0.75);
         button.CheckedTexture:SetSize(16, 16);
         button.CheckedTexture:SetPoint("LEFT", button, "LEFT", 0, 0);
