@@ -151,36 +151,6 @@ changelogs[10800] = {
         dbKey = "TooltipTransmogEnsemble",
     },
 
-
-    {
-        type = "br",
-    },
-
-    {
-        type = "h1",
-        isNewFeature = true,
-        text = L["ModuleName TransmogChatCommand"],
-        dbKey = "TransmogChatCommand",
-    },
-
-    {
-        type = "Checkbox",
-        dbKey = "TransmogChatCommand",
-    },
-
-    {
-        type = "p",
-        bullet = true,
-        text = "When using a transmog chat command (which starts with /outfit), undress your character first so the old items won't be carried over into the new outfit.",
-    },
-
-    {
-        type = "p",
-        bullet = true,
-        text = "使用幻化聊天命令（以 /outfit 开头）时，自动移除角色身上已有的装备，以免旧物品被继承到新服装中。",
-    },
-
-
     {
         type = "br",
     },

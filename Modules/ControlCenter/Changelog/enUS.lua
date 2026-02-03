@@ -13,6 +13,52 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10806] = {
     {
         type = "date",
+        versionText = "1.8.6 b",
+        timestamp = 1770130000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName LootUI"],
+        dbKey = "LootUI",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "LootUI",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Added an option to show currencies earned from all sources, not just loot.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName NameplateQuest"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can now customize the progress text format to show Completed/Required or Remaining quantity, and keep the quest icon visible.",
+    },
+
+    {
+        type = "br",
+    },
+    {
+        type = "br",
+    },
+
+
+    {
+        type = "date",
         versionText = "1.8.6",
         timestamp = 1769870000,
     },
@@ -161,7 +207,7 @@ changelogs[10805] = {
     {
         type = "p",
         bullet = true,
-        text = "Loot UI, Reputations: Fixed an issue that prevents the changes to Weaver, General, and Vizier from showing.",
+        text = "Loot Window, Reputations: Fixed an issue that prevents the changes to Weaver, General, and Vizier from showing.",
     },
 
     {
@@ -1001,35 +1047,6 @@ changelogs[10800] = {
         dbKey = "TooltipTransmogEnsemble",
     },
 
-
-    {
-        type = "br",
-    },
-
-    {
-        type = "h1",
-        text = L["ModuleName TransmogChatCommand"],
-        dbKey = "TransmogChatCommand",
-    },
-
-    {
-        type = "Checkbox",
-        dbKey = "TransmogChatCommand",
-    },
-
-    {
-        type = "p",
-        bullet = true,
-        text = "When using a transmog chat command (which starts with /outfit), undress your character first so the old items won't be carried over into the new outfit.",
-    },
-
-    {
-        type = "p",
-        bullet = true,
-        text = "When at the Transmogrifier, using a chat command automatically loads all available items to the Transmog UI instead of opening the Dressing Room.",
-    },
-
-
     {
         type = "br",
     },
@@ -1048,7 +1065,7 @@ changelogs[10800] = {
     {
         type = "p",
         bullet = true,
-        text = "Loot UI, Link Item: You can link an item in chat by Shift + clicking an item in Manual Loot mode.",
+        text = "Loot Window, Link Item: You can link an item in chat by Shift + clicking an item in Manual Loot mode.",
     },
 };
 
