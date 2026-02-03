@@ -23,7 +23,8 @@ L["Quick Slot Reposition"] = "调整位置";
 L["Quick Slot Layout"] = "布局";
 L["Quick Slot Layout Linear"] = "线性";
 L["Quick Slot Layout Radial"] = "环形";
-L["Restriction Combat"] = "战斗中不可用";    --Indicate a feature can only work when out of combat
+L["Restriction Combat"] = "战斗中不可用";
+L["Restriction Instance"] = "此功能在副本内无效。";
 L["Map Pin Change Size Method"] = "\n\n*如需更改标记大小，请打开 世界地图 - 地图筛选 - Plumber";
 L["Toggle Plumber UI"] = "Plumber界面可见性";
 L["Toggle Plumber UI Tooltip"] = "在编辑模式中显示以下Plumber界面：\n\n%s\n\n此选项仅控制它们在编辑模式下是否可见，并不会启用或禁用这些功能。";
@@ -396,6 +397,10 @@ L["NameplateQuest ShowTargetProgress Tooltip"] = "在当前目标姓名板上显
 L["NameplateQuest ShowProgressOnHover"] = "显示鼠标经过的单位进度";
 L["NameplateQuest ShowProgressOnHover Tooltip"] = "在鼠标经过的单位姓名板上显示任务进度。";
 L["NameplateQuest Instruction Find Nameplate"] = "请前往一个有NPC姓名板的地方来调整图标位置。";
+L["NameplateQuest Progress Format"] = "任务进度格式";
+L["Progress Show Icon"] = "显示任务图标";
+L["Progress Format Completed"] = "已完成数量/总数";
+L["Progress Format Remaining"] = "待完成数量";
 
 
 --PartyInviterInfo

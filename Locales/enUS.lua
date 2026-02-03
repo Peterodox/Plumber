@@ -403,7 +403,6 @@ L["Progress Format Completed"] = "Completed/Required";
 L["Progress Format Remaining"] = "Remaining";
 
 
-
 --PartyInviterInfo
 L["ModuleName PartyInviterInfo"] = "Group Inviter Info";
 L["ModuleDescription PartyInviterInfo"] = "Show the inviter's level and class when you are invited to a group or a guild.";

@@ -26,6 +26,8 @@ local Def = {
     ShowPartyQuest = false,
     ShowTargetProgress = false,
     ShowProgressOnHover = false,
+    ProgressShowIcon = false,
+    ProgressShowRemaining = false,
     TextOutline = false,
     WidgetOffsetX = 0,
     WidgetOffsetY = 0,
@@ -48,13 +50,28 @@ local LastMouseOverWidget;
 
 
 local match = string.match;
+local format = string.format;
 local function GetProgressText(str)
     if Secret_CanAccess(str) then
-        local text = match(str, "%d+/%d+");
-        if not text then
-            text = match(str, "%d+%%");
+        if Def.ProgressShowRemaining then
+            local completed, required = match(str, "(%d+)/(%d+)");
+            if completed and required then
+                if completed < required then
+                    return format("%.0f", required - completed);
+                end
+            else
+                local percent = match(str, "%d+%%");
+                if percent and percent < 100 then
+                    return format("%.0f%%", 100 - percent);
+                end
+            end
+        else
+            local text = match(str, "%d+/%d+");
+            if not text then
+                text = match(str, "%d+%%");
+            end
+            return text
         end
-        return text
     end
 end
 
@@ -87,7 +104,7 @@ do  --Widget
         if Def.isEditMode then
             self:ShowNormalIcon();
             self.hasProgress = true;
-            self.ProgressText:SetText("6/7");
+            self.ProgressText:SetText(GetProgressText("6/7"));
             return
         end
 
@@ -206,7 +223,11 @@ do  --Widget
 
     function QuestWidgetMixin:UpdateAlpha()
         self.ProgressText:SetAlpha(self.alpha);
-        self.Icon:SetAlpha(1 - self.alpha);
+        if Def.ProgressShowIcon then
+            self.Icon:SetAlpha(1);
+        else
+            self.Icon:SetAlpha(1 - self.alpha);
+        end
     end
 
     do  --OnUpdate Funcs
@@ -248,11 +269,9 @@ do  --Widget
         self.hideAfterFadingIn = nil;
         if self.hasProgress and (self.isMouseOver or self.isTarget or self.isWorldCursor) then
             if animating then
-                self.Icon:Show();
                 self.ProgressText:Show();
                 self:SetScript("OnUpdate", self.OnUpdate_ShowProgress);
             else
-                self.Icon:Hide();
                 self.ProgressText:Show();
                 self.alpha = 1;
                 self:UpdateAlpha();
@@ -260,7 +279,6 @@ do  --Widget
             end
         else
             if animating then
-                self.Icon:Show();
                 self.ProgressText:Show();
                 self.t = 0;
                 if self.isFadingIn then
@@ -269,7 +287,6 @@ do  --Widget
                     self:SetScript("OnUpdate", self.OnUpdate_HideProgressAfterDelay);
                 end
             else
-                self.Icon:Show();
                 self.ProgressText:Hide();
                 self.alpha = 0;
                 self:UpdateAlpha();
@@ -324,9 +341,17 @@ do  --Widget
         self:SetIconSize(Def.IconSize);
         self.ProgressText:ClearAllPoints();
         if Def.Side == "LEFT" then
-            self.ProgressText:SetPoint("RIGHT", self.Ref, "CENTER", 0.25*Def.IconSize, 0);
+            if Def.ProgressShowIcon then
+                self.ProgressText:SetPoint("RIGHT", self.Ref, "CENTER", -0.25*Def.IconSize, 0);
+            else
+                self.ProgressText:SetPoint("RIGHT", self.Ref, "CENTER", 0.25*Def.IconSize, 0);
+            end
         else
-            self.ProgressText:SetPoint("LEFT", self.Ref, "CENTER", -0.25*Def.IconSize, 0);
+            if Def.ProgressShowIcon then
+                self.ProgressText:SetPoint("LEFT", self.Ref, "CENTER", 0.25*Def.IconSize, 0);
+            else
+                self.ProgressText:SetPoint("LEFT", self.Ref, "CENTER", -0.25*Def.IconSize, 0);
+            end
         end
         self:UpdateOffset();
     end
@@ -770,7 +795,14 @@ do  --Editor
         local anyNameplate = false;
         local nameplates = GetNamePlates(false);
         if nameplates and #nameplates > 0 then
-            anyNameplate = true;
+            local unit;
+            for _, nameplate in ipairs(nameplates) do
+                unit = nameplate.UnitFrame.unit;
+                if Secret_CanAccess(unit) and not UnitIsPlayer(unit) then
+                    anyNameplate = true;
+                    break
+                end
+            end
         end
 
         if anyNameplate ~= self.anyNameplate then
@@ -936,10 +968,12 @@ do  --Options
         Def.IconSize = size;
 
 
-        local dbKeys = {"ShowPartyQuest", "ShowTargetProgress", "ShowProgressOnHover", "TextOutline"};
+        local dbKeys = {"ShowPartyQuest", "ShowTargetProgress", "ShowProgressOnHover", "TextOutline", "ProgressShowIcon"};
         for _, dbKey in ipairs(dbKeys) do
             Def[dbKey] = addon.GetDBBool("NameplateQuest_"..dbKey);
         end
+
+        Def.ProgressShowRemaining = addon.GetDBValue("NameplateQuest_ProgressFormat") == 2;
 
 
         local addonNames = {"Platynator", "Plater"};
@@ -984,7 +1018,7 @@ do  --Options
         end
     end
 
-    local function Checkbox_OnClick()
+    local function GenericWidget_OnClick()
         addon.UpdateSettingsDialog();
         LoadSettings();
     end
@@ -1004,9 +1038,65 @@ do  --Options
         LoadSettings();
     end
 
-    local function Options_TextOutline_ShouldEnable()
+    local function ShouldEnableProgressOptions()
         return addon.GetDBBool("NameplateQuest_ShowTargetProgress") or addon.GetDBBool("NameplateQuest_ShowProgressOnHover")
     end
+
+    local MenuData_ProgressFormat = {
+        ShouldEnable = ShouldEnableProgressOptions,
+
+        GetSelectedText = function()
+            local selectedIndex = addon.GetDBValue("NameplateQuest_ProgressFormat") or 1;
+            if selectedIndex == 2 then
+                return L["Progress Format Remaining"]
+            else
+                return L["Progress Format Completed"]
+            end
+        end,
+
+        MenuInfoGetter = function()
+            local tbl = {
+                key = "NameplateQuestProgressFormat",
+                desaturateBorder = true,
+            };
+
+            local widgets = {};
+            tbl.widgets = widgets;
+
+            local showIcon = addon.GetDBBool("NameplateQuest_ProgressShowIcon");
+            local selectedIndex = addon.GetDBValue("NameplateQuest_ProgressFormat") or 1;
+
+            local labels = {
+                L["Progress Format Completed"],
+                L["Progress Format Remaining"],
+            };
+
+            for index, text in ipairs(labels) do
+                table.insert(widgets, {
+                    type = "Radio",
+                    text = text;
+                    closeAfterClick = true,
+                    onClickFunc = function()
+                        addon.SetDBValue("NameplateQuest_ProgressFormat", index);
+                        GenericWidget_OnClick();
+                    end,
+                    selected = index == selectedIndex,
+                });
+            end
+
+            table.insert(widgets, {type = "Divider"});
+
+            table.insert(widgets, {type = "Checkbox", text = L["Progress Show Icon"], closeAfterClick = false,
+                selected = showIcon,
+                onClickFunc = function()
+                    addon.FlipDBBool("NameplateQuest_ProgressShowIcon");
+                    GenericWidget_OnClick();
+                end,
+            });
+
+            return tbl
+        end,
+    };
 
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName NameplateQuest"],
@@ -1014,10 +1104,13 @@ do  --Options
             {type = "Custom", onAcquire = AcquireEditorFrame, align = "center"},
             {type = "Divider"},
             {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Options.IconSize, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_IconSizeSlider_FormatValue, dbKey = "NameplateQuest_IconSize"},
-            {type = "Checkbox", label = L["NameplateQuest ShowPartyQuest"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowPartyQuest", tooltip = Tooltip_ShowPartyQuest, restrictionInstance = true},
-            {type = "Checkbox", label = L["NameplateQuest ShowTargetProgress"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowTargetProgress", tooltip = L["NameplateQuest ShowTargetProgress Tooltip"], restrictionInstance = true},
-            {type = "Checkbox", label = L["NameplateQuest ShowProgressOnHover"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_ShowProgressOnHover", tooltip = L["NameplateQuest ShowProgressOnHover Tooltip"], restrictionInstance = true},
-            {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Checkbox_OnClick, dbKey = "NameplateQuest_TextOutline", shouldEnableOption = Options_TextOutline_ShouldEnable},
+            {type = "Checkbox", label = L["NameplateQuest ShowPartyQuest"], onClickFunc = GenericWidget_OnClick, dbKey = "NameplateQuest_ShowPartyQuest", tooltip = Tooltip_ShowPartyQuest, restrictionInstance = true},
+            {type = "Checkbox", label = L["NameplateQuest ShowTargetProgress"], onClickFunc = GenericWidget_OnClick, dbKey = "NameplateQuest_ShowTargetProgress", tooltip = L["NameplateQuest ShowTargetProgress Tooltip"], restrictionInstance = true},
+            {type = "Checkbox", label = L["NameplateQuest ShowProgressOnHover"], onClickFunc = GenericWidget_OnClick, dbKey = "NameplateQuest_ShowProgressOnHover", tooltip = L["NameplateQuest ShowProgressOnHover Tooltip"], restrictionInstance = true},
+
+            {type = "Divider"},
+            {type = "Dropdown", label = L["NameplateQuest Progress Format"], menuData = MenuData_ProgressFormat},
+            {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = GenericWidget_OnClick, dbKey = "NameplateQuest_TextOutline", shouldEnableOption = ShouldEnableProgressOptions},
         },
     };
 

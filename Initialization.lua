@@ -346,6 +346,8 @@ local DefaultValues = {
             NameplateQuest_TextOutline = true,
         NameplateQuest_WidgetOffsetX = 0,
         NameplateQuest_WidgetOffsetY = 0,
+        NameplateQuest_ProgressFormat = 1,
+        NameplateQuest_ProgressShowIcon = false,
         --NameplateQuest_Side = "RIGHT",    --Initial value dedfined by detecting addon
 
 
