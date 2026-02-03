@@ -22,6 +22,7 @@ local StripHyperlinks = API.StripHyperlinks;
 local time = time;
 
 local GetMoney = GetMoney;
+local GetCurrencyDisplayInfo = API.GetCurrencyDisplayInfo;
 local GetItemCraftingQuality = API.GetItemCraftingQuality;
 local GetItemInfoInstant = C_Item.GetItemInfoInstant;
 local GetItemInfo = C_Item.GetItemInfo;
@@ -69,6 +70,7 @@ local USE_STOCK_UI = false;
 local MERGE_SIMILAR_ITEMS = true;
 local LOW_FRAME_STRATA = false;
 local SHOW_ALL_MONEY_CHANGE = false;
+local SHOW_ALL_CURRENCY_CHANGE = false;
 ------------------
 
 local CLASS_SORT_ORDER = {
@@ -448,6 +450,13 @@ do  --Event Handler
                 EL:UnregisterEvent(event);
             end
         end
+
+        if state and addon.GetDBBool("LootUI_ShowAllCurrencyChange") then
+            self:RegisterEvent("CURRENCY_DISPLAY_UPDATE");
+            self:UnregisterEvent("CHAT_MSG_CURRENCY");
+        else
+            self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+        end
     end
 
     function EL:ListenAlertSystemEvent(state)
@@ -643,11 +652,19 @@ do  --Event Handler
             if not self.playerGUID then
                 self.playerGUID = UnitGUID("player");
             end
+
             self:RegisterEvent("CHAT_MSG_LOOT");
-            self:RegisterEvent("CHAT_MSG_CURRENCY");
+
+            if SHOW_ALL_CURRENCY_CHANGE then
+                self:UnregisterEvent("CHAT_MSG_CURRENCY");
+            else
+                self:RegisterEvent("CHAT_MSG_CURRENCY");
+            end
+
             if not SHOW_ALL_MONEY_CHANGE then
                 self:RegisterEvent("PLAYER_MONEY");
             end
+
             self.t = 0;
             self:SetScript("OnUpdate", nil);
         else
@@ -835,7 +852,7 @@ do  --Event Handler
                     if self:IsMessageSenderPlayer(...) then
                         self:ProcessMessageItem(...);
                     end
-                elseif event == "CHAT_MSG_CURRENCY" then    --guid is nil. Appear later than other chat events (~0.8s delay)
+                elseif event == "CHAT_MSG_CURRENCY" and not SHOW_ALL_CURRENCY_CHANGE then    --guid is nil. Appear later than other chat events (~0.8s delay)
                     self:ProcessMessageCurrency(...);
                 end
             end
@@ -843,6 +860,8 @@ do  --Event Handler
             if not SHOW_ALL_MONEY_CHANGE then
                 self:ProcessMoneyFromLoot();
             end
+        elseif event == "CURRENCY_DISPLAY_UPDATE" then
+            self:OnCurrencyDisplayUpdate(...);
         elseif event == "LOOT_SLOT_CHANGED" then
             --Can happen during AoE Loot
             self:OnLootSlotChanged(...);
@@ -1305,6 +1324,21 @@ do  --Money Change Handler
             end
         end
         self.playerMoney = money;
+    end
+end
+
+
+do  --Currency Change Handler
+    function EL:OnCurrencyDisplayUpdate(currencyID, quantity, quantityChange, quantityGainSource, destroyReason)
+        if quantityChange and quantityChange > 0 then
+            local name, icon, quality = GetCurrencyDisplayInfo(currencyID);
+            if name then
+                local link = string.format("|Hcurrency:%d|h", currencyID);
+                local slotIndex = 0;
+                local data = CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, icon, name, quantityChange, quality);
+                MainFrame:QueueDisplayLoot(data);
+            end
+        end
     end
 end
 
@@ -1826,6 +1860,7 @@ do  --Edit Mode
             {type = "Divider"},
             {newFeature = true, type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = Tooltip_ShowReputation, onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = Validation_IsRetail},
             {newFeature = true, type = "Checkbox", label = L["LootUI Option Show All Money"], tooltip = L["LootUI Option Show All Money Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowAllMoneyChange"},
+            {newFeature = true, type = "Checkbox", label = L["LootUI Option Show All Currency"], tooltip = L["LootUI Option Show All Currency Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowAllCurrencyChange"},
             {type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"], validityCheckFunc = Validation_IsRetail},
 
             {type = "Divider"},
@@ -1966,6 +2001,11 @@ do  --Edit Mode
         EL.MoneyListener:OnSettingsChanged();
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowAllMoneyChange", SettingChanged_ShowAllMoneyChange);
+
+    local function SettingChanged_ShowAllCurrencyChange(state, userInput)
+        SHOW_ALL_CURRENCY_CHANGE = state;
+    end
+    addon.CallbackRegistry:RegisterSettingCallback("LootUI_ShowAllCurrencyChange", SettingChanged_ShowAllCurrencyChange);
 end
 
 

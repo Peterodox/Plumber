@@ -1538,6 +1538,13 @@ do  -- Currency
     CurrencyDataProvider.names = {};
     CurrencyDataProvider.icons = {};
     CurrencyDataProvider.qualities = {};
+    CurrencyDataProvider.shouldDisplayForUI = {};
+
+    function CurrencyDataProvider:CacheCurrencyInfo(currencyID, info)
+        self.names[currencyID] = info.name;
+        self.qualities[currencyID] = info.quality;
+        self.icons[currencyID] = info.iconFileID;
+    end
 
     function API.GetCurrencyName(currencyID, colorized)
         local name = CurrencyDataProvider.names[currencyID];
@@ -1547,8 +1554,7 @@ do  -- Currency
             local info = GetCurrencyInfo(currencyID);
             name = info and info.name;
             if name then
-                CurrencyDataProvider.names[currencyID] = name;
-                CurrencyDataProvider.qualities[currencyID] = info.quality;
+                CurrencyDataProvider:CacheCurrencyInfo(currencyID, info);
             else
                 name = "Currency:"..currencyID;
                 quality = 1;
@@ -1559,6 +1565,27 @@ do  -- Currency
             return API.ColorizeTextByQuality(name, quality)
         else
             return name
+        end
+    end
+
+    function API.GetCurrencyDisplayInfo(currencyID)
+        if not currencyID then return end;
+
+        if CurrencyDataProvider.shouldDisplayForUI[currencyID] == nil then
+            local info = GetCurrencyInfo(currencyID);
+            local name = info and info.name;
+            if name then
+                if info.iconFileID and info.iconFileID ~= 0 and info.description and info.description ~= "" and (not find(info.description, "(Hidden)")) and (not find(info.description, "DNT")) then
+                    CurrencyDataProvider.shouldDisplayForUI[currencyID] = true;
+                    CurrencyDataProvider:CacheCurrencyInfo(currencyID, info);
+                end
+            else
+                CurrencyDataProvider.shouldDisplayForUI[currencyID] = false;
+            end
+        end
+
+        if CurrencyDataProvider.shouldDisplayForUI[currencyID] then
+            return CurrencyDataProvider.names[currencyID], CurrencyDataProvider.icons[currencyID], CurrencyDataProvider.qualities[currencyID]
         end
     end
 
