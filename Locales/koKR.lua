@@ -394,7 +394,13 @@ L["NameplateQuest ShowPartyQuest"] = "파티원 퀘스트 표시";
 L["NameplateQuest ShowPartyQuest Tooltip"] = "파티원 중 퀘스트 목표를 완료하지 않은 사람이 있을 경우 %s 표시기 표시.";
 L["NameplateQuest ShowTargetProgress"] = "목표 진행 상황 표시";
 L["NameplateQuest ShowTargetProgress Tooltip"] = "대상 이름표에 퀘스트 목표 진행 상황을 표시합니다.";
+L["NameplateQuest ShowProgressOnHover"] = "마우스 오버 시 진행도 표시";
+L["NameplateQuest ShowProgressOnHover Tooltip"] = "이름표나 유닛에 마우스 커서를 올렸을 때 퀘스트 목표 진행도를 표시합니다.";
 L["NameplateQuest Instruction Find Nameplate"] = "아이콘 위치를 조정하려면 NPC 이름표가 보이는 장소로 이동하세요.";
+L["NameplateQuest Progress Format"] = "진행도 형식";
+L["Progress Show Icon"] = "아이콘 표시";
+L["Progress Format Completed"] = "완료/요구량";
+L["Progress Format Remaining"] = "남은 양";
 
 
 --PartyInviterInfo
@@ -579,6 +585,8 @@ L["LootUI Option Show Reputation"] = "평판 변화 표시";
 L["LootUI Option Show Reputation Tooltip"] = "전리품 창에 평판 증가량을 표시합니다.\n\n전투 중 또는 PvP에서 획득한 평판은 이후에 표시됩니다.";
 L["LootUI Option Show All Money"] = "모든 화폐 변동 사항 표시";
 L["LootUI Option Show All Money Tooltip"] = "전리품뿐만 아니라 모든 출처에서 얻은 화폐를 표시해줍니다.";
+L["LootUI Option Show All Currency"] = "모든 화폐 변동 표시";
+L["LootUI Option Show All Currency Tooltip"] = "전리품뿐만 아니라 모든 출처에서 얻은 화폐를 표시합니다.\n\n|cffff4800채팅창에 표시되지 않는 화폐가 표시될 수 있습니다.|r";
 L["LootUI Option Hide Title"] = "\"획득했습니다\" 텍스트 숨기기";
 L["LootUI Option Hide Title Tooltip"] = "전리품 창 상단의 \"획득함\" 텍스트를 숨깁니다.";
 
