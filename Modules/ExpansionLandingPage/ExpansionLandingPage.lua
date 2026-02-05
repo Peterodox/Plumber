@@ -125,20 +125,13 @@ do  --TabButtonMixin
 end
 
 
-local CreateExpansionSelectButton
+local CreateExpansionSelectButton;
 do  --Expansion Select
     local ExpansionSelectButtonMixin = {};
 
-    function ExpansionSelectButtonMixin:OnMouseDown()
-        self.Name:SetPoint("RIGHT", self, "RIGHT", -Def.TabButtonTextOffset, -1);
-    end
-
-    function ExpansionSelectButtonMixin:OnMouseUp()
-        self.Name:SetPoint("RIGHT", self, "RIGHT", -Def.TabButtonTextOffset, 0);
-    end
-
     function ExpansionSelectButtonMixin:OnClick()
-
+        --We only have 2 expansions right now, click to switch directly
+        LandingPageUtil.SwitchExpansion();
     end
 
     function ExpansionSelectButtonMixin:OnEnter()
@@ -151,14 +144,26 @@ do  --Expansion Select
         self.Name:SetTextColor(1, 0.82, 0);
     end
 
-    function ExpansionSelectButtonMixin:Refresh()
-        local expansionID = 10;
-        self.Name:SetText(_G["EXPANSION_NAME"..expansionID]);
-        local width = math.floor(math.max(self.Name:GetWrappedWidth() + self.extraWidth, Def.TabButtonHeight));
-        self:SetWidth(width);
+    function ExpansionSelectButtonMixin:OnMouseDown()
+        self.Name:SetPoint("RIGHT", self, "RIGHT", -Def.TabButtonTextOffset, -1);
+    end
 
-        local numOptions = 1;
-        self:SetShown(numOptions > 1);
+    function ExpansionSelectButtonMixin:OnMouseUp()
+        self.Name:SetPoint("RIGHT", self, "RIGHT", -Def.TabButtonTextOffset, 0);
+    end
+
+    function ExpansionSelectButtonMixin:OnShow()
+        self:Refresh();
+    end
+
+    function ExpansionSelectButtonMixin:Refresh()
+        self.Name:SetText(LandingPageUtil.GetCurrentExpansionInfo());
+        local width = math.floor(math.max(self.Name:GetWrappedWidth() + self.extraWidth, Def.TabButtonHeight));
+        if width > self.minWidth then
+            self.minWidth = width;
+        end
+        self:SetWidth(self.minWidth);
+        self:SetShown(#LandingPageUtil.GetAvailableExpansions() > 1);
     end
 
     function CreateExpansionSelectButton(parent)
@@ -169,6 +174,7 @@ do  --Expansion Select
         button:SetScript("OnLeave", button.OnLeave);
         button:SetScript("OnMouseDown", button.OnMouseDown);
         button:SetScript("OnMouseUp", button.OnMouseUp);
+        button:SetScript("OnShow", button.OnShow);
         button:SetSize(Def.TabButtonHeight, Def.TabButtonHeight);
         button:SetAlpha(0.9);
 
@@ -182,6 +188,11 @@ do  --Expansion Select
         button.Arrow:SetTexCoord(0, 48/512, 208/512, 256/512);
 
         button.extraWidth = Def.TabButtonTextOffset + 18;
+        button.minWidth = 2*Def.TabButtonHeight;
+
+        CallbackRegistry:Register("LandingPage.ExpansionChanged", function(expansionID)
+            button:Refresh();
+        end);
 
         return button
     end
@@ -228,13 +239,6 @@ do
         CallbackRegistry:Register("LandingPage.UpdateNotification", self.UpdateNotification, self);
     end
 
-    addon.CallbackRegistry:Register("TimerunningSeason", function(seasonID)
-        if seasonID == 2 then
-            MainFrame.isLegionRemix = true;
-        end
-    end);
-
-
     function PlumberExpansionLandingPageMixin:OnShow()
         if self.InitLeftSection then
             self:InitLeftSection();
@@ -248,6 +252,7 @@ do
             self.loaded = true;
             local tabKey = addon.GetDBValue("LandingPage_DefaultTab");
             LandingPageUtil.SelectTab(tabKey);
+            LandingPageUtil.SelectExpansion();
         end
 
         self:UpdateTabs();    --The selected tab will be created here
@@ -362,16 +367,6 @@ do
             {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
             {name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
         };
-
-        if self.isLegionRemix then
-            table.remove(categories, 1);
-            table.remove(categories, 1);
-
-            table.insert(categories, 1, {
-                name = L["Artifact Traits"],
-                frameGetter = LandingPageUtil.LegionRemixCreateNextTraitFrame,
-            });
-        end
 
         local numCategories = #categories;
 

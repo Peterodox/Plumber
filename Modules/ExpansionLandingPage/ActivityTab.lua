@@ -513,6 +513,12 @@ LandingPageUtil.AddTab(
     }
 );
 
+CallbackRegistry:Register("LandingPage.ExpansionChanged", function(expansionID)
+    if ActivityTab and ActivityTab:IsVisible() then
+        ActivityTab:FullUpdate();
+    end
+end);
+
 
 do  --Debug
     local function Plumber_PrintWorldQuestsForMap(uiMapID)

@@ -17,12 +17,7 @@ local JournalInstanceIDs = {
     1302,   --Manaforge Omega
     1296,   --Liberation of Undermine
     1273,   --Nerub-ar Palace
-    --768,   --Debug Emerald Nightmare
 };
-
-if addon.IsToCVersionEqualOrNewerThan(110200) then
-    --For PTR
-end
 
 if addon.IS_MOP then
     JournalInstanceIDs = {
@@ -39,6 +34,8 @@ local InstanceXDungeonEncounters = {};
 
 
 addon.CallbackRegistry:Register("LandingPage.SetEncounterTabInfo", function(tabInfo)
+    if not tabInfo then return end;
+
     if tabInfo.JournalInstanceIDs then
         JournalInstanceIDs = tabInfo.JournalInstanceIDs;
         if RaidTab and RaidTab:IsShown() then

@@ -61,4 +61,5 @@ local ResourceList = {
     {faction = 1280},     --Tina Mudclaw
     --]]
 };
-LandingPageUtil.ResourceList = ResourceList;
+
+addon.CallbackRegistry:Trigger("LandingPage.SetResourceList", ResourceList);

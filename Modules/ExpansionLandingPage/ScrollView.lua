@@ -537,7 +537,8 @@ do  --ScrollView Basic Content Render
     end
 
     function ScrollViewMixin:SetContent(content, retainPosition)
-        self.content = content or {};
+        content = content or {};
+        self.content = content;
         self.numContent = #content;
 
         if self.numContent > 0 then

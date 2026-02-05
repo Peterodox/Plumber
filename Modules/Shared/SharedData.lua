@@ -22,7 +22,7 @@ do  --Item Upgrade Track
             3284,   --Weathered (LFR, H)
         },
 
-        CrestSources = {
+        CrestSources = {    --TODO: Midnight S1: Dawncrest
             (PLAYER_DIFFICULTY6 or "Mythic") .. ", +7",
             (PLAYER_DIFFICULTY2 or "Heroic") .. ", +2",
             (PLAYER_DIFFICULTY1 or "Normal"),

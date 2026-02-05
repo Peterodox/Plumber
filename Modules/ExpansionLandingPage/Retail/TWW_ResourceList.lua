@@ -50,6 +50,7 @@ end
 
 
 local ResourceList = {
+    {currencyID = 3269, shownIfOwned = true},
     {currencyID = 3028},    --Restored Coffer Key
     {itemID = 245653, isMinor = false, useActionButton = true},   --Coffer Key Shard
     {itemID = addon.ItemUpgradeConstant.RadiantEchoItemID},      --Radiant Echo
@@ -73,12 +74,5 @@ local ResourceList = {
 
     --{currencyID = 3309, conditionFunc = HasUncollectedSets, appendTooltipFunc = ShowUncollectedSets},    --Hellstone Shard (Greedy Emissary)
 };
-LandingPageUtil.ResourceList = ResourceList;
 
-
-if addon.ItemUpgradeConstant.CatalystCurrencyID then
-    table.insert(ResourceList, 1, {
-        currencyID = addon.ItemUpgradeConstant.CatalystCurrencyID,
-        shownIfOwned = true,
-    });
-end
+LandingPageUtil.AddExpansionData(11, "resource", ResourceList);

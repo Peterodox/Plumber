@@ -1112,7 +1112,7 @@ do
                 --Set EncounterJournal epansion to Legion
                 hooksecurefunc(C_EncounterJournal, "InitalizeSelectedTier", function()
                     --This API reset selected tier to Current Season, see EncounterJournal_OnShow
-                    EJ_SelectTier(7)
+                    EJ_SelectTier(7);
                 end);
             end
         end

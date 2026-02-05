@@ -25,11 +25,6 @@ local HaveQuestData = HaveQuestData;
 local GetCurrentRenownLevel = C_MajorFactions.GetCurrentRenownLevel;
 
 
-local DELVES_BOUNTIFUL = "delves-bountiful";
-local DAILY_QUEST = "quest-recurring-available";    --questlog-questtypeicon-daily;
-local WEEKLY_QUEST = "quest-wrapper-available";     --questlog-questtypeicon-weekly";
-
-
 local function ShownIfOnQuest(questID)
     return questID and IsOnQuest(questID)
 end
@@ -43,10 +38,12 @@ local function SetCategoryCollapsed(categoryID, isCollapsed)
 end
 
 
+local ActivityData = {};
 local SortedActivity;
 local MapQuestData;     --Show quests available on certain maps. The quest markers need to be visible on the world map
 
 local DELVES_REP_TOOLTIP = L["Bountiful Delves Rep Tooltip"];
+
 
 local DynamicQuestDataProvider = {};
 
@@ -63,8 +60,45 @@ do
 end
 
 
+local ShownQuestClassification = {
+    --Show these types of quests
+    [Enum.QuestClassification.Recurring] = true,
+    [Enum.QuestClassification.Meta] = true,
+    [Enum.QuestClassification.Calling] = true,
+};
+
+
+local QuestIconAtlas = {
+	[Enum.QuestClassification.Normal] = 	"QuestNormal",
+	[Enum.QuestClassification.Questline] = 	"QuestNormal",
+	[Enum.QuestClassification.Recurring] =	"quest-recurring-available",
+	[Enum.QuestClassification.Meta] = 		"quest-wrapper-available",
+	[Enum.QuestClassification.Calling] = 	"Quest-DailyCampaign-Available",
+	[Enum.QuestClassification.Campaign] = 	"Quest-Campaign-Available",
+	[Enum.QuestClassification.Legendary] =	"UI-QuestPoiLegendary-QuestBang",
+	[Enum.QuestClassification.Important] =	"importantavailablequesticon",
+
+    DELVES_BOUNTIFUL = "delves-bountiful",
+    DAILY_QUEST = "quest-recurring-available",
+    WEEKLY_QUEST = "quest-wrapper-available",
+};
+ActivityUtil.QuestIconAtlas = QuestIconAtlas;
+
+
+local InProgressQuestIconFile = {
+	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
+	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+
+    [128] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png",
+};
+
+
 local Conditions = {};
 do
+    ActivityUtil.Conditions = Conditions;
+
     Conditions.ItemReadyToTurnInWhenLooted_ItemID = {
         ShouldShowActivity = ConditionFuncs.OwnItem,
         IsReadyForTurnIn = ConditionFuncs.OwnItem,
@@ -92,6 +126,8 @@ end
 
 local TooltipFuncs = {};
 do
+    ActivityUtil.TooltipFuncs = TooltipFuncs;
+
     local function ShouldShowAdvancedTooltip()
         return GetDBBool("LandingPage_AdvancedTooltip");
     end
@@ -215,145 +251,7 @@ local function CreateChildrenFromQuestList(list)
     end
     return tbl
 end
-
-local ActivityData = {  --Constant
-    --questClassification: 5 is recurring
-
-    {isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
-        entries = {
-            {name = "The Key to Success", questID = 84370, atlas = WEEKLY_QUEST, accountwide = true},
-            {name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187, conditions = Conditions.DelversBounty},
-
-            {name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, useItemIcon = true,
-                children = CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
-            },
-
-            {name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, useItemIcon = true,
-                children = CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyShardFlags),
-            },
-        }
-    },
-
-    {isHeader = true, name = "K\'aresh", factionID = 2658, categoryID = 2658, uiMapID = 2371, --areaID = 15792 (Oasis)
-        entries = {
-            {name = "More Than Just a Phase", questID = 91093, atlas = WEEKLY_QUEST, uiMapID = 2371},
-            {name = "Ecological Succession", questID = 85460, atlas = WEEKLY_QUEST, uiMapID = 2371},
-            {name = "Anima Reclamation Program", questID = 85459, atlas = WEEKLY_QUEST, uiMapID = 2371},
-            {name = "Food Run", questID = 85461, atlas = WEEKLY_QUEST, uiMapID = 2371},
-            {name = "A Reel Problem", questID = 90545, atlas = WEEKLY_QUEST, uiMapID = 2371},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 91453, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
-
-            --{name = "Eliminate Grubber", questID = 90126, atlas = WEEKLY_QUEST, uiMapID = 2371, conditions = Conditions.KareshWarrant},   --one-time?
-
-            --the following don't reward rep
-            {name = "Funny Buzzness", questID = 89195, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Leafing Things on the Ground", questID = 89221, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Bu-zzz", questID = 89209, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Shake your Bee-hind", questID = 89194, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Who You Gonna Call?", questID = 88980, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Royal Photographer", questID = 89212, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Ray-ket Ball, Redux", questID = 89056, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Ridge Racer", questID = 85481, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Follow-up Appointment", questID = 89238, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Shutterbug", questID = 89254, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Dream-Dream-Dream-Dream-Dreameringeding!", questID = 89240, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Ray-cing for the Future", questID = 89065, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Nesting Upkeep", questID = 88981, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Not as Cute When They Are Bigger and Angrier", questID = 89297, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Pee-Yew de Foxy", questID = 89057, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Dry Cleaning", questID = 89198, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Flights of Fancy", questID = 89213, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "A Challenge for Dominance", questID = 85462, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "A Hard Day's Work", questID = 89192, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Ray Ranching", questID = 89197, shownIfOnQuest = true, uiMapID = 2371},
-            {name = "Sizing Them Up", questID = 85710, shownIfOnQuest = true, uiMapID = 2371},
-
-            --Devourer Attack
-            {name = "Devourer Attack", label = L["Devourer Attack"], uiMapID = 2371, questClassification = 5, tooltipSetter = TooltipFuncs.DevouredEnergyPod, addChildrenToTooltip = true,
-                children = {
-                    --Sorted by location: North-South
-                    {name = "Devourer Attack: The Oasis", questID = 84993, uiMapID = 2371},
-                    {name = "Devourer Attack: Eco-dome: Primus", questID = 86447, uiMapID = 2371},
-                    {name = "Devourer Attack: Atrium", questID = 86464, uiMapID = 2371},
-                    {name = "Devourer Attack: Tazavesh", questID = 86465, uiMapID = 2371},
-                },
-            },
-
-            --{name = "Making a Deposit", questID = 85722, shownIfOnQuest = true, uiMapID = 2371},
-            --{name = "Making a Deposit", questID = 89061, shownIfOnQuest = true, uiMapID = 2371},
-            --{name = "Making a Deposit", questID = 89062, shownIfOnQuest = true, uiMapID = 2371},
-            --{name = "Making a Deposit", questID = 89063, shownIfOnQuest = true, uiMapID = 2371},
-        }
-    },
-
-    {isHeader = true, name = "Council of Dornogal", factionID = 2590, categoryID = 2590, uiMapID = 2248,
-        entries = {
-            {name = "The Theater Troupe", questID = 83240, atlas = WEEKLY_QUEST, uiMapID = 2248},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83317, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
-            --{name = "Debug Quest", questID = 49738, atlas = DAILY_QUEST},
-        }
-    },
-
-    {isHeader = true, name = "The Assembly of the Deeps", factionID = 2594, categoryID = 2594, uiMapID = 2214,
-        entries = {
-            {name = "Rollin\' Down in the Deeps", questID = 82946, atlas = WEEKLY_QUEST, uiMapID = 2214},
-            {name = "Gearing Up for Trouble", questID = 83333, atlas = WEEKLY_QUEST, uiMapID = 2214}, --Awakening the Machine
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83318, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
-        }
-    },
-
-    {isHeader = true, name = "Hallowfall Arathi", factionID = 2570, categoryID = 2570, uiMapID = 2215,
-        entries = {
-            {name = "Speading the Light", questID = 76586, atlas = WEEKLY_QUEST, uiMapID = 2215},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83320, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
-        }
-    },
-
-    {isHeader = true, name = "The Severed Threads", factionID = 2600, categoryID = 2560, uiMapID = 2255,
-        entries = {
-            {name = "Forge a Pact", questID = 80592, atlas = WEEKLY_QUEST, uiMapID = 2255},
-            {name = "Blade of the General", questID = 80671, atlas = WEEKLY_QUEST, factionID = 2605, shownIfOnQuest = true, uiMapID = 2255},
-            {name = "Hand of the Vizier", questID = 80672, atlas = WEEKLY_QUEST, factionID = 2607, shownIfOnQuest = true, uiMapID = 2255},
-            {name = "Eyes of the Weaver", questID = 80670, atlas = WEEKLY_QUEST, factionID = 2601, shownIfOnQuest = true, uiMapID = 2255},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 83319, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
-        }
-    },
-
-    {isHeader = true, name = "The Cartels of Undermine", factionID = 2653, categoryID = 2553, uiMapID = 2346,
-        entries = {
-            {name = "Many Jobs, Handle It!", questID = 85869, atlas = WEEKLY_QUEST, uiMapID = 2346},
-            {name = "Urge to Surge", questID = 86775, atlas = WEEKLY_QUEST, uiMapID = 2346},
-            {name = "Reduce, Reuse, Resell", questID = 85879, atlas = WEEKLY_QUEST, uiMapID = 2346},
-            {name = "Completed C.H.E.T.T. List", itemID = 235053, localizedName = L["Completed CHETT List"], conditions = Conditions.ItemReadyToTurnInWhenLooted_ItemName,   --The incompleted and completed items have the same itemID, needs checking count by name
-                icon = 134391, tooltip = L["Ready To Turn In Tooltip"], uiMapID = 2346},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], atlas = DELVES_BOUNTIFUL, flagQuest = 87407, accountwide = true, tooltip = DELVES_REP_TOOLTIP},
-        }
-    },
-
-    {isHeader = true, name = "Flame\'s Radiance", factionID = 2688, categoryID = 2688, uiMapID = 2215,
-        entries = {
-            {name = "The Flame Burns Eternal", questID = 91173, atlas = WEEKLY_QUEST, uiMapID = 2215},
-            {name = "Sureki Incursion: The Eastern Assault", questID = 87480, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
-            {name = "Sureki Incursion: Southern Swarm", questID = 87477, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
-            {name = "Sureki Incursion: Hold the Wall", questID = 87475, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
-            {name = "Radiant Incursion: Rak-Zakaz", questID = 88945, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2215},
-            {name = "Radiant Incursion: Sureki\'s End", questID = 88916, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2255},
-            {name = "Radiant Incursion: Toxins and Pheromones", questID = 88711, atlas = DAILY_QUEST, shownIfOnQuest = true, uiMapID = 2255},
-        }
-    },
-};
-
-
-if addon.IsToCVersionEqualOrNewerThan(110200) then  --PTR debug
-    --table.insert(ActivityData, 1, {});
-end
-
-
-do  --Assign ID
-    for k, v in ipairs(ActivityData) do
-        v.headerIndex = k;
-    end
-end
+ActivityUtil.CreateChildrenFromQuestList = CreateChildrenFromQuestList;
 
 
 local SortFuncs = {};
@@ -396,33 +294,6 @@ do
 end
 
 
-local ShownQuestClassification = {
-    --Show these types of quests
-    [Enum.QuestClassification.Recurring] = true,
-    [Enum.QuestClassification.Meta] = true,
-    [Enum.QuestClassification.Calling] = true,
-};
-
-local QuestIconAtlas = {
-	[Enum.QuestClassification.Normal] = 	"QuestNormal",
-	[Enum.QuestClassification.Questline] = 	"QuestNormal",
-	[Enum.QuestClassification.Recurring] =	DAILY_QUEST,
-	[Enum.QuestClassification.Meta] = 		"quest-wrapper-available",
-	[Enum.QuestClassification.Calling] = 	"Quest-DailyCampaign-Available",
-	[Enum.QuestClassification.Campaign] = 	"Quest-Campaign-Available",
-	[Enum.QuestClassification.Legendary] =	"UI-QuestPoiLegendary-QuestBang",
-	[Enum.QuestClassification.Important] =	"importantavailablequesticon",
-};
-
-local InProgressQuestIconFile = {
-	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
-	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-
-    [128] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png",
-};
-
 local function InitQuestData(info)
     local questClassification = info.questClassification or GetQuestClassification(info.questID);
     if HaveQuestData(info.questID) then
@@ -462,7 +333,6 @@ do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, inst
     local DynamicQuestMaps = {
         --Automatically find repeatable quests from these maps
         --[uiMapID] = categoryID,
-        [2339] = "map2339",     --Dornogal
     };
 
     function DynamicQuestDataProvider:Reset()
@@ -592,6 +462,12 @@ do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, inst
     function DynamicQuestDataProvider:GetQuestsByMap(uiMapID)
         return self.questsByMap[uiMapID]
     end
+
+
+    addon.CallbackRegistry:Register("LandingPage.SetActivityQuestMaps", function(activityQuestMap)
+        DynamicQuestMaps = activityQuestMap or {};
+        DynamicQuestDataProvider:Reset();
+    end);
 end
 
 
@@ -768,6 +644,26 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
             end
 
             if showActivity then
+                if entry.isDelveReputation then
+                    if not entry.atlas then
+                        entry.atlas = QuestIconAtlas.DELVES_BOUNTIFUL;
+                    end
+
+                    if not entry.tooltip then
+                        entry.tooltip = DELVES_REP_TOOLTIP;
+                    end
+                end
+
+                if entry.isWeeklyQuest then
+                    if not entry.atlas then
+                        entry.atlas = QuestIconAtlas.WEEKLY_QUEST;
+                    end
+                elseif entry.isDailyQuest then
+                    if not entry.atlas then
+                        entry.atlas = QuestIconAtlas.DAILY_QUEST;
+                    end
+                end
+
                 if hideCompleted then
                     if entry.isHeader or (not entry.completed) then
                         numEntries = numEntries + 1;
@@ -832,7 +728,7 @@ function ActivityUtil.GetSortedActivity()
         v.dataIndex = k;
     end
 
-    SortedActivity = tbl
+    SortedActivity = tbl;
 
     return tbl, numCompleted
 end
@@ -873,6 +769,13 @@ function ActivityUtil.SetHideCompleted(state)
     ActivityUtil.hideCompleted = state;
 end
 addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", ActivityUtil.SetHideCompleted);
+
+
+addon.CallbackRegistry:Register("LandingPage.SetActivityData", function(data)
+    if data then
+        ActivityData = data;
+    end
+end);
 
 
 --[[

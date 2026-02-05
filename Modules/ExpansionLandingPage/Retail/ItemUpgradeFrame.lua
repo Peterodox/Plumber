@@ -63,4 +63,3 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
 
     return f, height
 end
-

@@ -75,7 +75,7 @@ Modules\BlizzardSuperTrack.lua
 Modules\ItemUpgradeUI.xml
 Modules\Macros.lua
 Modules\ProfessionsBook.lua
-Modules\ExpansionLandingPage\ExpansionLandingPage_TWW.xml
+Modules\ExpansionLandingPage\ExpansionLandingPage_Retail.xml
 Modules\BlizzFix_ModelLoading.lua
 Modules\Timerunning\LegionRemix.xml
 Modules\HolidayDungeon.lua

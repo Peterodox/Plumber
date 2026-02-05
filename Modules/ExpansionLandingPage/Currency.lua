@@ -7,7 +7,6 @@ local IS_MIDNIGHT = addon.IS_MIDNIGHT;
 
 
 local ipairs = ipairs;
-local pairs = pairs;
 local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local GetItemIconByID = C_Item.GetItemIconByID;
 local GetItemCount = C_Item.GetItemCount;
@@ -16,6 +15,8 @@ local BreakUpLargeNumbers = BreakUpLargeNumbers;
 
 
 local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
+local ResourceList = {};
+local MainFrame;
 
 
 local function GetResourcesQuantity(data)
@@ -311,7 +312,7 @@ do
         local objectHeight;
         local valid;
 
-        for _, v in ipairs(LandingPageUtil.ResourceList) do
+        for _, v in ipairs(ResourceList) do
             valid = true;
             if v.hidden then
                 valid = false;      --for transition between WoW content updates
@@ -430,6 +431,7 @@ end
 
 function LandingPageUtil.CreateCurrencyList(parent)
     local f = CreateFrame("Frame", nil, parent);
+    MainFrame = f;
     API.Mixin(f, CurrencyListMixin);
 
     local height = 7 * BUTTON_HEIGHT;
@@ -509,3 +511,12 @@ function LandingPageUtil.CreateCurrencyList(parent)
 
     return f, height
 end
+
+CallbackRegistry:Register("LandingPage.SetResourceList", function(list)
+    if list then
+        ResourceList = list;
+        if MainFrame and MainFrame:IsVisible() then
+            MainFrame:FullUpdate();
+        end
+    end
+end);

@@ -244,3 +244,25 @@ local function GetEJDifficultyString(difficultyID)
 	end
 end
 LandingPageUtil.GetDifficultyName = GetEJDifficultyString;
+
+
+do
+    local TWW_EncounterTabInfo = {
+        JournalInstanceIDs = {
+            1302,   --Manaforge Omega
+            1296,   --Liberation of Undermine
+            1273,   --Nerub-ar Palace
+            --768,   --Debug Emerald Nightmare
+        },
+    };
+    LandingPageUtil.AddExpansionData(11, "encounter", TWW_EncounterTabInfo);
+
+    local MID_EncounterTabInfo = {
+        JournalInstanceIDs = {
+            1314,   --The Dreamrift
+            1307,   --The Voidspire
+            1308,   --March on Quel'Danas
+        },
+    };
+    LandingPageUtil.AddExpansionData(12, "encounter", MID_EncounterTabInfo);
+end

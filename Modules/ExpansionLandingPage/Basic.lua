@@ -394,7 +394,7 @@ do  --TabUtil
     end
 
     function LandingPageUtil.AddTab(tabInfo)
-        table.insert(Tabs, tabInfo);
+        tinsert(Tabs, tabInfo);
         table.sort(Tabs, SortFunc_Tab);
     end
 
@@ -1656,6 +1656,75 @@ do  --MajorDivider
         f.Right:SetTexCoord(634/1024, 1, 0, 48/1024);
 
         return f
+    end
+end
+
+
+do  --Expansion Select
+    local ExpansionList;
+    local CurrentExpansionID;
+    local ExpansionData = {
+        [11] = {name = EXPANSION_NAME10},   --TWW
+        [12] = {name = EXPANSION_NAME11},   --MID
+        [5] = {name = EXPANSION_NAME4},     --MOP
+    };
+
+    if addon.IS_MIDNIGHT then
+        ExpansionList = {11, 12};
+    else
+        ExpansionList = {5};
+    end
+
+    function LandingPageUtil.AddExpansionData(expansionID, field, data)
+        -- index: We treat Vanilla as 1
+        if not ExpansionData[expansionID] then
+            ExpansionData[expansionID] = {};
+        end
+
+        ExpansionData[expansionID][field] = data;
+    end
+
+    function LandingPageUtil.GetCurrentExpansionInfo()
+        if CurrentExpansionID then
+            return ExpansionData[CurrentExpansionID].name
+        end
+    end
+
+    function LandingPageUtil.GetAvailableExpansions()
+        return ExpansionList
+    end
+
+    function LandingPageUtil.SelectExpansion(expansionID)
+        if not expansionID then
+            expansionID = ExpansionList[1];
+        end
+
+        if expansionID == CurrentExpansionID then return end;
+
+        local v = ExpansionData[expansionID];
+        if v then
+            CurrentExpansionID = expansionID;
+            local cb = addon.CallbackRegistry;
+            cb:Trigger("LandingPage.SetActivityData", v.activity);
+            cb:Trigger("LandingPage.SetActivityQuestMaps", v.activityQuestMap);
+            cb:Trigger("LandingPage.SetEncounterTabInfo", v.encounter);
+            cb:Trigger("LandingPage.SetResourceList", v.resource);
+            cb:Trigger("LandingPage.ExpansionChanged", expansionID);
+        end
+    end
+
+    function LandingPageUtil.SwitchExpansion()
+        if CurrentExpansionID then
+            local nextExpansionID;
+            for i, expansionID in ipairs(ExpansionList) do
+                if expansionID == CurrentExpansionID then
+                    nextExpansionID = ExpansionList[i + 1] or ExpansionList[1];
+                end
+            end
+            LandingPageUtil.SelectExpansion(nextExpansionID);
+        else
+            LandingPageUtil.SelectExpansion();
+        end
     end
 end
 
