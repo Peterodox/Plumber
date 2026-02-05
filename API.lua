@@ -1578,6 +1578,8 @@ do  -- Currency
                 if info.iconFileID and info.iconFileID ~= 0 and info.description and info.description ~= "" and (not find(info.description, "(Hidden)")) and (not find(info.description, "DNT")) then
                     CurrencyDataProvider.shouldDisplayForUI[currencyID] = true;
                     CurrencyDataProvider:CacheCurrencyInfo(currencyID, info);
+                else
+                    CurrencyDataProvider.shouldDisplayForUI[currencyID] = false;
                 end
             else
                 CurrencyDataProvider.shouldDisplayForUI[currencyID] = false;
@@ -4032,6 +4034,7 @@ do  -- Macro Util
     local WoWAPI = {
         IsPlayerSpell = IsPlayerSpell,
         PlayerHasToy = PlayerHasToy or Nop,
+        IsToyUsable = C_ToyBox and C_ToyBox.IsToyUsable or Nop,
         GetItemCount = C_Item.GetItemCount,
         GetItemCraftedQualityByItemInfo = C_TradeSkillUI and C_TradeSkillUI.GetItemCraftedQualityByItemInfo or Nop,
         GetItemReagentQualityByItemInfo = C_TradeSkillUI and C_TradeSkillUI.GetItemReagentQualityByItemInfo or Nop,
@@ -4046,7 +4049,7 @@ do  -- Macro Util
             return API.IsSpellKnown(arg1) or WoWAPI.IsPlayerSpell(arg1)
         elseif actionType == "item" then
             if API.IsToyItem(arg1) then
-                return WoWAPI.PlayerHasToy(arg1)
+                return WoWAPI.PlayerHasToy(arg1) and WoWAPI.IsToyUsable(arg1)
             else
                 local _, _, _, _, _, classID, subClassID = WoWAPI.GetItemInfoInstant(arg1);
 
