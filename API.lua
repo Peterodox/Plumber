@@ -28,8 +28,26 @@ local issecretvalue = issecretvalue or function(_) return false end;
 local canaccessvalue = canaccessvalue or function(_) return true end;
 API.Secret_IsSecret = issecretvalue;
 
-function API.Secret_CanAccess(v)
+local function Secret_CanAccess(v)
     return canaccessvalue(v) and v ~= nil
+end
+API.Secret_CanAccess = Secret_CanAccess;
+
+function API.Secret_CanAccessValues(...)
+    if select("#", ...) == 0 then
+        return false
+    end
+
+    local v;
+
+    for i = 1, select("#", ...) do
+        v = select(i, ...);
+        if not Secret_CanAccess(v) then
+            return false
+        end
+    end
+
+    return true
 end
 
 

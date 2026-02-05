@@ -787,6 +787,8 @@ do  --UI ItemButton
         self:ResetHoverVisual();
         FocusSolver:SetFocus(nil);
         MainFrame:SetFocused(false);
+        self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+        self:SetScript("OnEvent", nil);
     end
 
     function ItemFrameMixin:ShowTooltip()
@@ -795,6 +797,7 @@ do  --UI ItemButton
         if self.enableState == 1 then   --Manual Loot
             if self.data.slotType == Defination.SLOT_TYPE_ITEM then
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
+                tooltip.suppressAutomaticCompareItem = true;
                 tooltip:SetLootItem(self.data.slotIndex);
             elseif self.data.slotType == Defination.SLOT_TYPE_CURRENCY then
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", -Formatter.BUTTON_SPACING, 0);
@@ -803,11 +806,13 @@ do  --UI ItemButton
 
             local comparisonTooltip = ShoppingTooltip1;
             if comparisonTooltip and comparisonTooltip:IsShown() then
-                local left1 = tooltip:GetLeft() or 0;
-                local left2 = comparisonTooltip:GetLeft() or 0;
-                if left2 < left1 then
-                    tooltip:ClearAllPoints();
-                    tooltip:SetPoint("BOTTOMRIGHT", self, "TOPLEFT", 0, 0);
+                local left1 = tooltip:GetLeft();
+                local left2 = comparisonTooltip:GetLeft();
+                if API.Secret_CanAccessValues(left1, left2) then
+                    if left2 < left1 then
+                        tooltip:ClearAllPoints();
+                        tooltip:SetPoint("BOTTOMRIGHT", self, "TOPLEFT", 0, 0);
+                    end
                 end
             end
 
@@ -818,6 +823,7 @@ do  --UI ItemButton
             local offset = -(width - textWidth - (self.textOffset or 0));
             if hyperLink then
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", offset, 0);
+                tooltip.suppressAutomaticCompareItem = true;
                 tooltip:SetHyperlink(hyperLink);
             elseif self.data.tooltipMethod then
                 tooltip:SetOwner(self, "ANCHOR_RIGHT", offset, 0);
@@ -827,6 +833,9 @@ do  --UI ItemButton
                 self.data.tooltipFunc(tooltip, self.data.id, self.data);
             end
         end
+
+        self:RegisterEvent("MODIFIER_STATE_CHANGED");
+        self:SetScript("OnEvent", self.OnEvent);
     end
 
     function ItemFrameMixin:OnFocused()
@@ -895,8 +904,17 @@ do  --UI ItemButton
         end
     end
 
-    function ItemFrameMixin:LayoutStackedItems()
-
+    function ItemFrameMixin:OnEvent(event, ...)
+        if event == "MODIFIER_STATE_CHANGED" then
+            local key, down = ...
+            if self:IsMouseMotionFocus() then  --IsModifiedClick("COMPAREITEMS")
+                if key == "LSHIFT" or key == "RSHIFT" then
+                    self:ShowTooltip();
+                end
+            else
+                self:UnregisterEvent(event);
+            end
+        end
     end
 
     local function CreateIconFrame(itemFrame)
