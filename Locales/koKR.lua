@@ -388,7 +388,7 @@ L["ModuleDescription NameplateWidget"] = "광휘의 잔재 보유 수 이름표�
 
 
 --NameplateQuestIndicator
-L["ModuleName NameplateQuest"] = "이름표: 퀘스트 표시기r";
+L["ModuleName NameplateQuest"] = "이름표: 퀘스트 표시기";
 L["ModuleDescription NameplateQuest"] = "이름표에 퀘스트 표시기 표시\n\n- (선택 사항) 대상의 퀘스트 목표 진행도 표시\n\n- (선택 사항) 파티원이 목표를 완료하지 않은 경우 퀘스트 표시기 표시";
 L["NameplateQuest ShowPartyQuest"] = "파티원 퀘스트 표시";
 L["NameplateQuest ShowPartyQuest Tooltip"] = "파티원 중 퀘스트 목표를 완료하지 않은 사람이 있을 경우 %s 표시기 표시.";
@@ -704,6 +704,22 @@ L["Click To Switch"] = "전환하려면 클릭 |cffffffff%s|r";
 L["Click To Queue"] = "대기열에 참여하려면 클릭 |cffffffff%s|r";
 L["Click to Open Format"] = "%s 클릭 열기";
 L["List Is Empty"] = "목록이 비어 있습니다.";
+
+
+--ExpansionSummaryMinimapButton
+L["LandingButton Settings Title"] = "확장 요약: 미니맵 버튼";
+L["LandingButton Tooltip Format"] = "좌클릭: %s 전환\n우클릭: 추가 옵션";
+L["LandingButton Customize"] = "사용자 설정";
+L["LandingButtonOption ShowButton"] = "미니맵 버튼 활성화";
+L["LandingButtonOption PrimaryUI"] = "좌클릭으로 열기";   --좌클릭 시 열 UI 제어
+L["LandingButtonOption PrimaryUI Tooltip"] = "미니맵 버튼을 좌클릭했을 때 열릴 UI를 선택하세요.";
+L["LandingButtonOption SmartExpansion"] = "확장 자동 선택";
+L["LandingButtonOption SmartExpansion Tooltip 1"] = "활성화 시: 미니맵 버튼을 좌클릭하면 현재 위치에 맞는 게임 UI가 열립니다. 예: 어둠땅에 있을 때는 성약의 성소 보고서가 열립니다.";
+L["LandingButtonOption SmartExpansion Tooltip 2"] = "비활성화 시: 미니맵 버튼을 좌클릭하면 항상 %s가 열립니다.";
+L["LandingButtonOption ReduceSize"] = "버튼 크기 줄이기";
+L["LandingButtonOption DarkColor"] = "어두운 테마 사용";
+L["LandingButtonOption HideWhenIdle"] = "대기 시 숨기기";
+L["LandingButtonOption HideWhenIdle Tooltip"] = "커서를 버튼 근처로 이동하거나 알림을 받을 때까지 미니맵 버튼이 보이지 않습니다.\n\n이 옵션은 설정을 닫은 후 적용됩니다.";
 
 
 --RaidCheck
