@@ -480,6 +480,7 @@ do  --EditModeSettingsDialog
                     if widget then
                         table.insert(self.activeWidgets, widget);
                         widget.widgetKey = widgetData.widgetKey;
+                        widget.parentDBKey = widgetData.parentDBKey;
                         widget.widgetType = widgetData.type;
                         widget.isSubOption = widgetData.isSubOption;
                         self:UpdateWidgetEnabledState(widget);

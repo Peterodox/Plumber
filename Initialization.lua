@@ -250,6 +250,7 @@ local DefaultValues = {
         LandingButton_ReduceSize = false,
         LandingButton_DarkColor = false,
         LandingButton_HideWhenIdle = false,
+        --LandingButton_UseLibDBIcon = nil,     --Addon-dependant. Init on first load
 
         --LandingButton_Pos_X, LandingButton_Pos_Y
 

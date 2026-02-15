@@ -26,6 +26,7 @@ local Def = {
 
 local Options = {};
 local OrderHallUtil = {};
+local ButtonManager = {};       --For handling LibDataBroker and LibDBIcon
 
 
 do  --ButtonMixin
@@ -171,7 +172,7 @@ do  --ButtonMixin
     end
 
     function ButtonMixin:UpdateVisibility(animating)
-        self.enabled = GetDBBool("LandingButton_ShowButton") and GetDBBool("NewExpansionLandingPage");
+        self.enabled = ButtonManager:ShouldShowPlumberButton();
         if self.enabled then
             self:Show();
             if GetDBBool("LandingButton_HideWhenIdle") then
@@ -256,6 +257,7 @@ do  --Button Drag Lock / Instructions
         end
     end
 end
+
 
 do  --Button Position/Anchor
     local function MinimapButton_SetAngle(button, radian)
@@ -688,6 +690,15 @@ do  --Order Hall, RightClickMenu
             return true
         end
     end
+
+
+    function ButtonManager.OpenContextMenu(widget)
+        InitMenuSchematic();
+        local contextData = {};
+        local menu = addon.API.ShowBlizzardMenu(widget, MenuSchematc, contextData);
+        menu:ClearAllPoints();
+        menu:SetPoint("TOPLEFT", widget, "BOTTOMRIGHT", 2, -2);
+    end
 end
 
 
@@ -783,33 +794,54 @@ do  --Button Settings/Customize
         return false
     end
 
-    local OPTIONS_SCHEMATIC = {
+    local function LibCheck_True()
+        return ButtonManager.isLibFound
+    end
+
+    local function ShouldShowAppearanceSettings()
+        if ButtonManager.isLibFound then
+            return not GetDBBool("LandingButton_UseLibDBIcon")
+        else
+            return true
+        end
+    end
+
+    local OPTIONS_SCHEMATIC;
+
+    local function Checkbox_UseLibIcon_OnClick()
+        GenericWidget_OnClick();
+        addon.SetupSettingsDialog(MiniButton, OPTIONS_SCHEMATIC, true)
+    end
+
+    OPTIONS_SCHEMATIC = {
         title = L["LandingButton Settings Title"],
         widgets = {
             {type = "Checkbox", label = L["LandingButtonOption ShowButton"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_ShowButton"},
+            {type = "Divider", validityCheckFunc = LibCheck_True},
+            {newFeature = true, type = "Checkbox", label = L["LandingButtonOption UseLibDBIcon"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_UseLibDBIcon", tooltip = L["LandingButtonOption UseLibDBIcon Tooltip"], validityCheckFunc = LibCheck_True, parentDBKey = "LandingButton_ShowButton"};
             {type = "Divider"},
 
             {type = "Dropdown", label = L["LandingButtonOption PrimaryUI"], menuData = MenuData_PrimaryUI},
             {type = "Checkbox", label = L["LandingButtonOption SmartExpansion"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_SmartExpansion", tooltip = Tooltip_SmartExpansion, keepTooltipAfterClicks = true, parentDBKey = "LandingButton_ShowButton"},
 
-            {type = "Divider"},
-            {type = "Checkbox", label = L["LandingButtonOption HideWhenIdle"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_HideWhenIdle", tooltip = L["LandingButtonOption HideWhenIdle Tooltip"], parentDBKey = "LandingButton_ShowButton"},
-            {type = "Checkbox", label = L["LandingButtonOption ReduceSize"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_ReduceSize", parentDBKey = "LandingButton_ShowButton"},
-            {type = "Checkbox", label = L["LandingButtonOption DarkColor"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_DarkColor", parentDBKey = "LandingButton_ShowButton"},
+            {type = "Divider", validityCheckFunc = ShouldShowAppearanceSettings},
+            {type = "Checkbox", label = L["LandingButtonOption HideWhenIdle"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_HideWhenIdle", tooltip = L["LandingButtonOption HideWhenIdle Tooltip"], parentDBKey = "LandingButton_ShowButton", validityCheckFunc = ShouldShowAppearanceSettings},
+            {type = "Checkbox", label = L["LandingButtonOption ReduceSize"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_ReduceSize", parentDBKey = "LandingButton_ShowButton", validityCheckFunc = ShouldShowAppearanceSettings},
+            {type = "Checkbox", label = L["LandingButtonOption DarkColor"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_DarkColor", parentDBKey = "LandingButton_ShowButton", validityCheckFunc = ShouldShowAppearanceSettings},
 
-            {type = "Divider"},
-            {type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = ResetPosition_OnClick, stateCheckFunc = ResetPosition_ShouldEnable, widgetKey = "ResetButton"},
+            {type = "Divider", validityCheckFunc = ShouldShowAppearanceSettings},
+            {type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = ResetPosition_OnClick, stateCheckFunc = ResetPosition_ShouldEnable, widgetKey = "ResetButton", validityCheckFunc = ShouldShowAppearanceSettings},
         },
     };
 
     local function OnSettingsPanelClosed()
         Options.isSettingsShown = nil;
-        MiniButton:UpdateVisibility();
+        ButtonManager:UpdateVisibility();
         CallbackRegistry:UnregisterCallback("SettingsPanel.ModuleOptionClosed", OnSettingsPanelClosed, MiniButton);
     end
 
     function ButtonMixin:ToggleSettings()
-        local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
+        local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC, true);
         if OptionFrame then
             OptionFrame:ConvertAnchor();
             if OptionFrame:IsShown() then
@@ -818,7 +850,7 @@ do  --Button Settings/Customize
             else
                 Options.isSettingsShown = nil;
             end
-            self:UpdateVisibility();
+            ButtonManager:UpdateVisibility();
         end
     end
 
@@ -839,7 +871,7 @@ do  --Button Settings/Customize
             self:UpdatePosition();
         end);
 
-        self:UpdateVisibility();
+        ButtonManager:UpdateVisibility();
     end
 
 
@@ -850,9 +882,7 @@ do  --Button Settings/Customize
     end
 
     LandingPageUtil.UpdateMinimapButtonVisibility = function()
-        if MiniButton then
-            MiniButton:UpdateVisibility();
-        end
+        ButtonManager:UpdateVisibility();
     end
 
 
@@ -873,14 +903,148 @@ do  --Button Settings/Customize
 end
 
 
+do  --ButtonManager
+    ButtonManager.dataObjectName = "PlumberLandingButton";
+    ButtonManager.showPumberButton = true;
+
+    function ButtonManager:ShouldShowPlumberButton()
+        return self.showPumberButton
+    end
+
+    function ButtonManager:UpdateVisibility()
+        if GetDBBool("LandingButton_ShowButton") and GetDBBool("NewExpansionLandingPage") then
+            if self.isLibFound then
+                if GetDBBool("LandingButton_UseLibDBIcon") then
+                    self:ShowLibIcon();
+                else
+                    self:HideLibDBIcon();
+                end
+            else
+                self.showPumberButton = true;
+            end
+        else
+            self:HideLibDBIcon();
+            self.showPumberButton = false;
+        end
+
+        if MiniButton then
+            MiniButton:UpdateVisibility();
+        end
+    end
+
+    function ButtonManager.OnLeftClick(widget)
+        if OrderHallUtil.ToggleGarrisonUI() then
+            return
+        end
+
+        if Options.GetChoice_PrimaryUI() == 2 then
+            OrderHallUtil.ToggleBlizzardJourneys();
+        else
+            LandingPageUtil.ToggleUI();
+        end
+    end
+
+    function ButtonManager:InitLibIcon()
+        if self.isLibFound ~= nil then return end;
+
+        if LibStub then
+            if C_AddOns.IsAddOnLoaded("HidingBar") then
+                --Avoid showing 3 buttons by default (1 from ours, and 2 from libs)
+                --Button visibility will be handled by this addon
+                self.isLibFound = false;
+                return
+            end
+
+
+            local silent = true;
+            local LibDataBroker = LibStub("LibDataBroker-1.1", silent);
+            local LibDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", silent);
+
+            if LibDataBroker and LibDBIcon then
+                self.isLibFound = true;
+
+                if addon.GetDBValue("LandingButton_UseLibDBIcon") == nil then
+                    local mapAddOns = {"LeatrixPlus", "SexyMap"};
+                    for _, addonName in ipairs(mapAddOns) do
+                        if C_AddOns.IsAddOnLoaded(addonName) then
+                            addon.SetDBValue("LandingButton_UseLibDBIcon", true);
+                            break
+                        end
+                    end
+                end
+
+                local Plumber_LDB = LibDataBroker:NewDataObject(self.dataObjectName, {
+                    type = "launcher",
+                    text = L["Abbr NewExpansionLandingPage"],
+                    icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/LandingButtonIcon-32",
+                    OnClick = function(f, button)
+                        if button == "RightButton" then
+                            self.OpenContextMenu(f);
+                            return
+                        end
+                        self.OnLeftClick(f);
+                    end,
+                });
+
+                function Plumber_LDB:OnEnter()
+                    ButtonMixin.ShowTooltip(self);
+                end
+
+                function Plumber_LDB:OnLeave()
+                    GameTooltip:Hide();
+                end
+
+                if not PlumberDB.LibDBIconDB then
+                    PlumberDB.LibDBIconDB = {
+                        showInCompartment = false,
+                        minimapPos = 225,
+                    };
+                end
+
+                LibDBIcon:Register(self.dataObjectName, Plumber_LDB, PlumberDB.LibDBIconDB);
+
+                self.SetLibButtonShown = function(state)
+                    if state and not self.libButtonShown then
+                        self.libButtonShown = true;
+                        LibDBIcon:Show(self.dataObjectName);
+                    elseif (not state) and self.libButtonShown then
+                        self.libButtonShown = false;
+                        LibDBIcon:Hide(self.dataObjectName);
+                    end
+                end
+            else
+                self.isLibFound = false;
+            end
+        else
+            self.isLibFound = false;
+        end
+    end
+
+    function ButtonManager:ShowLibIcon()
+        if self.SetLibButtonShown then
+            self.SetLibButtonShown(true);
+            self.showPumberButton = false;
+        end
+    end
+
+    function ButtonManager:HideLibDBIcon()
+        if self.SetLibButtonShown then
+            self.SetLibButtonShown(false);
+            self.showPumberButton = true;
+        end
+    end
+end
+
+
 do  --Event Listener
     function EL:OnEvent(event, ...)
         if MiniButton then
             if event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then
                 MiniButton:UpdateResolution();
             elseif event == "PLAYER_ENTERING_WORLD" then
-                MiniButton:LoadSettings();
                 self:UnregisterEvent(event);
+                ButtonManager:InitLibIcon()
+                MiniButton:LoadSettings();
             end
         end
     end
