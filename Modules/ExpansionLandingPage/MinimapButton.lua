@@ -795,11 +795,11 @@ do  --Button Settings/Customize
     end
 
     local function LibCheck_True()
-        return ButtonManager.isLibFound
+        return ButtonManager.isLibDBIconFound
     end
 
     local function ShouldShowAppearanceSettings()
-        if ButtonManager.isLibFound then
+        if ButtonManager.isLibDBIconFound then
             return not GetDBBool("LandingButton_UseLibDBIcon")
         else
             return true
@@ -913,7 +913,7 @@ do  --ButtonManager
 
     function ButtonManager:UpdateVisibility()
         if GetDBBool("LandingButton_ShowButton") and GetDBBool("NewExpansionLandingPage") then
-            if self.isLibFound then
+            if self.isLibDBIconFound then
                 if GetDBBool("LandingButton_UseLibDBIcon") then
                     self:ShowLibIcon();
                 else
@@ -945,13 +945,13 @@ do  --ButtonManager
     end
 
     function ButtonManager:InitLibIcon()
-        if self.isLibFound ~= nil then return end;
+        if self.isLibDBIconFound ~= nil then return end;
 
         if LibStub then
             if C_AddOns.IsAddOnLoaded("HidingBar") then
                 --Avoid showing 3 buttons by default (1 from ours, and 2 from libs)
                 --Button visibility will be handled by this addon
-                self.isLibFound = false;
+                self.isLibDBIconFound = false;
                 return
             end
 
@@ -960,9 +960,7 @@ do  --ButtonManager
             local LibDataBroker = LibStub("LibDataBroker-1.1", silent);
             local LibDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", silent);
 
-            if LibDataBroker and LibDBIcon then
-                self.isLibFound = true;
-
+            if LibDataBroker then
                 if addon.GetDBValue("LandingButton_UseLibDBIcon") == nil then
                     local mapAddOns = {"LeatrixPlus", "SexyMap"};
                     for _, addonName in ipairs(mapAddOns) do
@@ -994,29 +992,33 @@ do  --ButtonManager
                     GameTooltip:Hide();
                 end
 
-                if not PlumberDB.LibDBIconDB then
-                    PlumberDB.LibDBIconDB = {
-                        showInCompartment = false,
-                        minimapPos = 225,
-                    };
-                end
+                if LibDBIcon then
+                    self.isLibDBIconFound = true;
 
-                LibDBIcon:Register(self.dataObjectName, Plumber_LDB, PlumberDB.LibDBIconDB);
+                    if not PlumberDB.LibDBIconDB then
+                        PlumberDB.LibDBIconDB = {
+                            showInCompartment = false,
+                            minimapPos = 225,
+                        };
+                    end
 
-                self.SetLibButtonShown = function(state)
-                    if state and not self.libButtonShown then
-                        self.libButtonShown = true;
-                        LibDBIcon:Show(self.dataObjectName);
-                    elseif (not state) and self.libButtonShown then
-                        self.libButtonShown = false;
-                        LibDBIcon:Hide(self.dataObjectName);
+                    LibDBIcon:Register(self.dataObjectName, Plumber_LDB, PlumberDB.LibDBIconDB);
+
+                    self.SetLibButtonShown = function(state)
+                        if state and not self.libButtonShown then
+                            self.libButtonShown = true;
+                            LibDBIcon:Show(self.dataObjectName);
+                        elseif (not state) and self.libButtonShown then
+                            self.libButtonShown = false;
+                            LibDBIcon:Hide(self.dataObjectName);
+                        end
                     end
                 end
-            else
-                self.isLibFound = false;
             end
-        else
-            self.isLibFound = false;
+        end
+
+        if not self.isLibDBIconFound then
+            self.isLibDBIconFound = false;
         end
     end
 
