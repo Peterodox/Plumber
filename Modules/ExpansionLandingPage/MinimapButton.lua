@@ -962,11 +962,12 @@ do  --ButtonManager
             local LibDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", silent);
 
             if LibDataBroker then
-                if addon.GetDBValue("LandingButton_UseLibDBIcon") == nil then
-                    local mapAddOns = {"LeatrixPlus", "SexyMap"};
+                if (addon.GetDBValue("LandingButton_UseLibDBIcon") == nil) or (addon.GetDBValue("LandingButton_UseLibDBIcon_LibCheckFlag1") == nil) then
+                    local mapAddOns = {"LeatrixPlus", "SexyMap", "BasicMinimap"};
                     for _, addonName in ipairs(mapAddOns) do
                         if C_AddOns.IsAddOnLoaded(addonName) then
                             addon.SetDBValue("LandingButton_UseLibDBIcon", true);
+                            addon.SetDBValue("LandingButton_UseLibDBIcon_LibCheckFlag1", true);
                             break
                         end
                     end
@@ -1009,7 +1010,7 @@ do  --ButtonManager
                         if state and not self.libButtonShown then
                             self.libButtonShown = true;
                             LibDBIcon:Show(self.dataObjectName);
-                        elseif (not state) and self.libButtonShown then
+                        elseif not state then
                             self.libButtonShown = false;
                             LibDBIcon:Hide(self.dataObjectName);
                         end
