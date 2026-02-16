@@ -1223,6 +1223,7 @@ do  --Options
 
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName NameplateQuest"],
+        moduleDBKey = "NameplateQuest",
         widgets = {
             {type = "Custom", onAcquire = AcquireEditorFrame, align = "center"},
             {type = "Divider"},

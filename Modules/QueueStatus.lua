@@ -483,6 +483,7 @@ do  --Options
 
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName QueueStatus"],
+        moduleDBKey = "QueueStatus",
         widgets = {
             {type = "Checkbox", label = L["QueueStatus Show Time"], onClickFunc = Checkbox_OnClick, dbKey = "QueueStatus_ShowTime", tooltip = L["QueueStatus Show Time Tooltip"]},
 

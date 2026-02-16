@@ -313,6 +313,7 @@ do  --Options
 
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName PartyInviterInfo"],
+        moduleDBKey = "PartyInviterInfo",
         widgets = {
             {type = "Header", label = L["Additional Info"]};
             {type = "Checkbox", label = L["Race"] , onClickFunc = Checkbox_OnClick, dbKey = "PartyInviter_Race", tooltip = nil},

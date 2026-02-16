@@ -1842,6 +1842,7 @@ do  --Edit Mode
 
     local OPTIONS_SCHEMATIC = {
         title = L["Addon Name Colon"]..L["ModuleName LootUI"],
+        moduleDBKey = "LootUI",
         widgets = {
             {type = "Slider", label = L["Font Size"], minValue = 10, maxValue = 16, valueStep = 2, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueMethod = "Decimal1", dbKey = "LootUI_FontSize"},
             {type = "Slider", label = L["LootUI Option Fade Delay"], minValue = 0.25, maxValue = 1.0, valueStep = 0.25, onValueChangedFunc = Options_FadeOutDelaySlider_OnValueChanged, formatValueMethod = "Decimal2", dbKey = "LootUI_FadeDelayPerItem"},

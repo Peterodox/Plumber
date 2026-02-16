@@ -815,6 +815,7 @@ do  --Button Settings/Customize
 
     OPTIONS_SCHEMATIC = {
         title = L["LandingButton Settings Title"],
+        moduleDBKey = "NewExpansionLandingPage",
         widgets = {
             {type = "Checkbox", label = L["LandingButtonOption ShowButton"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_ShowButton"},
             {type = "Divider", validityCheckFunc = LibCheck_True},

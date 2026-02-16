@@ -657,6 +657,7 @@ do
                 addon.LandingPageUtil.PlayUISound("CheckboxOn");
             else
                 addon.LandingPageUtil.PlayUISound("CheckboxOff");
+                addon.CloseSettingsDialogByModuleDBKey(self.dbKey);
             end
         end
 

@@ -178,6 +178,7 @@ do  --EditModeSettingsDialog
         self:Hide();
         self:ClearAllPoints();
         self.requireResetPosition = true;
+        self.moduleDBKey = nil;
         if self.parent then
             if self.parent.Selection then
                 self.parent.Selection:ShowHighlighted();
@@ -442,6 +443,7 @@ do  --EditModeSettingsDialog
     function EditModeSettingsDialogMixin:SetupOptions(schematic)
         self:ReleaseAllWidgets();
         self:SetTitle(schematic.title);
+        self.moduleDBKey = schematic.moduleDBKey;
 
         if schematic.widgets then
             for order, widgetData in ipairs(schematic.widgets) do
@@ -693,6 +695,14 @@ do  --EditModeSettingsDialog
         end
     end
     addon.UpdateSettingsDialog = UpdateSettingsDialog;
+
+    local function CloseSettingsDialogByModuleDBKey(moduleDBKey)
+        if EditModeSettingsDialog and EditModeSettingsDialog.moduleDBKey == moduleDBKey then
+            EditModeSettingsDialog:Hide();
+            return true
+        end
+    end
+    addon.CloseSettingsDialogByModuleDBKey = CloseSettingsDialogByModuleDBKey;
 end
 
 do  --ControlNode

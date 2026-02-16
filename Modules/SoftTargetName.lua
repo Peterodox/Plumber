@@ -697,6 +697,7 @@ do  --Options, Settings
 
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName SoftTargetName"],
+        moduleDBKey = "SoftTargetName",
         widgets = {
             {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Settings.IconSizes, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
             {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "SoftTarget_TextOutline"},
