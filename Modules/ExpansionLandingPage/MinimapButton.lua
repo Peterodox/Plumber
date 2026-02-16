@@ -12,6 +12,7 @@ local ButtonMixin = PlumberLandingPageMinimapButtonMixin;
 
 local EL = CreateFrame("Frame");
 local DragController = CreateFrame("Frame", nil, UIParent);
+local UIParentContainer = CreateFrame("Frame", nil, UIParent);
 local MiniButton;
 local MenuSchematc;
 
@@ -30,15 +31,15 @@ local ButtonManager = {};       --For handling LibDataBroker and LibDBIcon
 
 
 do  --ButtonMixin
-    local SetPoint_Original;
-
     function ButtonMixin:OnLoad()
         if not MiniButton then
             MiniButton = self;
 
-            --Some minimap addon overrides this to prevent moving
+            --Some minimap addon overrides SetPoint to prevent moving
             --We disable our drag to move feature when this API is modified
-            SetPoint_Original = self.SetPoint;
+            ButtonManager.SetPoint = self.SetPoint;
+            ButtonManager.SetParent = self.SetParent;
+            ButtonManager.SetSize = self.SetSize;
         end
 
         local f = self.VisualContainer;
@@ -86,7 +87,7 @@ do  --ButtonMixin
 
     function ButtonMixin:OnMouseDown()
         self.VisualContainer:SetScale(0.95);
-        if self:IsMovable() and self.SetPoint == SetPoint_Original then
+        if self:IsMovable() and self.SetPoint == ButtonManager.SetPoint then
             DragController:SetDraggedObject(self);
         end
     end
@@ -322,6 +323,13 @@ do  --Button Position/Anchor
         end
     end
 
+    local function GetMiniButtonAbsolutePosition()
+        local x, y = MiniButton:GetCenter();
+        if x and y then
+            return API.RoundCoord(x), API.RoundCoord(y)
+        end
+    end
+
     function DragController:DraggingStart()
         self.lastUnlockTime = time();
         self:SnapshotCursorPosition();
@@ -378,6 +386,7 @@ do  --Button Position/Anchor
             self:SetScript("OnUpdate", self.OnUpdate_PostDragging);
             if self.stage == 3 then
                 PlumberDB.LandingButton_Pos_X, PlumberDB.LandingButton_Pos_Y = GetMiniButtonRelativePosition();
+                PlumberDB.LandingButton_AbsPos_X, PlumberDB.LandingButton_AbsPos_Y = GetMiniButtonAbsolutePosition();
                 MiniButton:UpdatePosition();
                 addon.UpdateSettingsDialog();
                 self.lastUnlockTime = time();
@@ -392,6 +401,7 @@ do  --Button Position/Anchor
     end
     DragController:SetScript("OnHide", DragController.OnHide);
 
+
     function ButtonMixin:OnDragStart()
         self.VisualContainer:SetScale(1);
         self.VisualContainer.HighlightTexture:Hide();
@@ -402,11 +412,50 @@ do  --Button Position/Anchor
 
     function ButtonMixin:UpdatePosition()
         self:ClearAllPoints();
-        local x, y = PlumberDB.LandingButton_Pos_X, PlumberDB.LandingButton_Pos_Y;
-        if x and y and type(x) == "number" and type(y) == "number" then
-            self:SetPoint("CENTER", Minimap, "CENTER", PlumberDB.LandingButton_Pos_X, PlumberDB.LandingButton_Pos_Y);
+
+        local function IsCoordValid(x, y)
+            return x and y and type(x) == "number" and type(y) == "number"
+        end
+
+        if GetDBBool("LandingButton_Unaffected") then
+            local x, y = PlumberDB.LandingButton_AbsPos_X, PlumberDB.LandingButton_AbsPos_Y;
+            if not IsCoordValid(x, y) then
+                local _x, _y = PlumberDB.LandingButton_Pos_X, PlumberDB.LandingButton_Pos_Y;
+                if not IsCoordValid(_x, _y) then
+                    MinimapButton_SetAngle(self, math.rad(-140));
+                else
+                    self:SetPoint("CENTER", Minimap, "CENTER", _x, _y);
+                end
+                x, y = GetMiniButtonAbsolutePosition();
+                PlumberDB.LandingButton_AbsPos_X = x;
+                PlumberDB.LandingButton_AbsPos_Y = y;
+                self:ClearAllPoints();
+            end
+
+            if x and y then
+                self:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
+            else
+                MinimapButton_SetAngle(self, math.rad(-140));
+            end
         else
-            MinimapButton_SetAngle(self, math.rad(-140));
+            local x, y = PlumberDB.LandingButton_Pos_X, PlumberDB.LandingButton_Pos_Y;
+            if not IsCoordValid(x, y) then
+                MinimapButton_SetAngle(self, math.rad(-140));
+            else
+                self:SetPoint("CENTER", Minimap, "CENTER", x, y);
+            end
+        end
+    end
+
+
+    do  --So that when Unaffected change from false to true, HidingBar won't throw errors when hovering over the button
+        --Because HidingBar use button:GetParent() to find its bar
+        UIParentContainer.config = {};
+
+        function UIParentContainer.enter()
+        end
+
+        function UIParentContainer.leave()
         end
     end
 end
@@ -782,24 +831,22 @@ do  --Button Settings/Customize
     local function ResetPosition_OnClick()
         PlumberDB.LandingButton_Pos_X = nil;
         PlumberDB.LandingButton_Pos_Y = nil;
+        PlumberDB.LandingButton_AbsPos_X = nil;
+        PlumberDB.LandingButton_AbsPos_Y = nil;
         MiniButton:LoadSettings();
         addon.UpdateSettingsDialog();
     end
 
     local function ResetPosition_ShouldEnable()
-        if PlumberDB.LandingButton_Pos_X or PlumberDB.LandingButton_Pos_Y then
+        if PlumberDB.LandingButton_Pos_X or PlumberDB.LandingButton_Pos_Y or PlumberDB.LandingButton_AbsPos_X or PlumberDB.LandingButton_AbsPos_Y then
             return true
         end
 
         return false
     end
 
-    local function LibCheck_True()
-        return ButtonManager.isLibDBIconFound
-    end
-
     local function ShouldShowAppearanceSettings()
-        if ButtonManager.isLibDBIconFound then
+        if ButtonManager.isLibDBIconFound and not GetDBBool("LandingButton_Unaffected") then
             return not GetDBBool("LandingButton_UseLibDBIcon")
         else
             return true
@@ -813,13 +860,23 @@ do  --Button Settings/Customize
         addon.SetupSettingsDialog(MiniButton, OPTIONS_SCHEMATIC, true)
     end
 
+    local function Checkbox_UseLibIcon_ShouldShow()
+        if GetDBBool("LandingButton_Unaffected") then
+            return false
+        else
+            return ButtonManager.isLibDBIconFound
+        end
+    end
+
     OPTIONS_SCHEMATIC = {
         title = L["LandingButton Settings Title"],
         moduleDBKey = "NewExpansionLandingPage",
         widgets = {
             {type = "Checkbox", label = L["LandingButtonOption ShowButton"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_ShowButton"},
-            {type = "Divider", validityCheckFunc = LibCheck_True},
-            {newFeature = true, type = "Checkbox", label = L["LandingButtonOption UseLibDBIcon"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_UseLibDBIcon", tooltip = L["LandingButtonOption UseLibDBIcon Tooltip"], validityCheckFunc = LibCheck_True, parentDBKey = "LandingButton_ShowButton"};
+
+            {type = "Divider"},
+            {newFeature = true, type = "Checkbox", label = L["LandingButtonOption Unaffected"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_Unaffected", tooltip = L["LandingButtonOption Unaffected Tooltip"]},
+            {newFeature = true, type = "Checkbox", label = L["LandingButtonOption UseLibDBIcon"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_UseLibDBIcon", tooltip = L["LandingButtonOption UseLibDBIcon Tooltip"], validityCheckFunc = Checkbox_UseLibIcon_ShouldShow, parentDBKey = "LandingButton_ShowButton"};
             {type = "Divider"},
 
             {type = "Dropdown", label = L["LandingButtonOption PrimaryUI"], menuData = MenuData_PrimaryUI},
@@ -859,12 +916,15 @@ do  --Button Settings/Customize
         MenuSchematc = nil;
 
         self.darkMode = GetDBBool("LandingButton_DarkColor");
-        local buttonSizeIndex = GetDBBool("LandingButton_ReduceSize");
 
-        if buttonSizeIndex then
-            self:SetSize(26, 26);
+        local size = GetDBBool("LandingButton_ReduceSize") and 26 or 36;
+
+        if GetDBBool("LandingButton_Unaffected") then
+            ButtonManager.SetSize(self, size, size);
+            ButtonManager.SetParent(self, UIParentContainer);
         else
-            self:SetSize(36, 36);
+            self:SetSize(size, size);
+            self:SetParent(Minimap);
         end
 
         C_Timer.After(0, function()
@@ -915,7 +975,7 @@ do  --ButtonManager
     function ButtonManager:UpdateVisibility()
         if GetDBBool("LandingButton_ShowButton") and GetDBBool("NewExpansionLandingPage") then
             if self.isLibDBIconFound then
-                if GetDBBool("LandingButton_UseLibDBIcon") then
+                if GetDBBool("LandingButton_UseLibDBIcon") and not GetDBBool("LandingButton_Unaffected") then
                     self:ShowLibIcon();
                 else
                     self:HideLibDBIcon();
@@ -1060,4 +1120,32 @@ do  --Event Listener
     };
 
     API.RegisterFrameForEvents(EL, StaticEvents);
+end
+
+
+do  --Debug
+    local function ResetSettings()
+        local defaults = {
+            LandingButton_ShowButton = true,
+            LandingButton_Unaffected = false,
+            LandingButton_PrimaryUI = 1,
+            LandingButton_SmartExpansion = false,
+            LandingButton_ReduceSize = false,
+            LandingButton_DarkColor = false,
+            LandingButton_HideWhenIdle = false,
+            LandingButton_UseLibDBIcon = "nil",
+            LandingButton_UseLibDBIcon_LibCheckFlag1 = "nil",
+            LandingButton_Pos_X = "nil",
+            LandingButton_Pos_Y = "nil",
+            LandingButton_AbsPos_X = "nil",
+            LandingButton_AbsPos_Y = "nil",
+        };
+
+        for dbKey, value in pairs(defaults) do
+            if value == "nil" then
+                value = nil;
+            end
+            addon.SetDBValue(dbKey, value);
+        end
+    end
 end

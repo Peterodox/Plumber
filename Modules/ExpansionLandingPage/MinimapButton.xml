@@ -1,7 +1,9 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
     <Script file="MinimapButton.lua"/>
 
-	<Button name="PlumberLandingPageMinimapButton" mixin="PlumberLandingPageMinimapButtonMixin" registerForClicks="LeftButtonUp, RightButtonUp" clampedToScreen="true" movable="true" dontSavePosition="true" parent="Minimap" frameStrata="MEDIUM" hidden="true">
+	<Button name="PlumberLandingPageMinimapButton" mixin="PlumberLandingPageMinimapButtonMixin" registerForClicks="LeftButtonUp, RightButtonUp" clampedToScreen="true" movable="true" dontSavePosition="true" parent="UIParent" frameStrata="MEDIUM" hidden="true">
+		<!--Parent will be changed to Minimap unless user opt not no-->
+
 		<Size x="36" y="36"/>
 		<Frames>
 			<Frame parentKey="VisualContainer">

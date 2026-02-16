@@ -245,6 +245,7 @@ local DefaultValues = {
         LandingPage_AdvancedTooltip = true,
 
         LandingButton_ShowButton = true,
+        LandingButton_Unaffected = false,
         LandingButton_PrimaryUI = 1,
         LandingButton_SmartExpansion = false,
         LandingButton_ReduceSize = false,

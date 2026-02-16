@@ -345,7 +345,6 @@ do  --EditModeSettingsDialog
         local button = self:AcquireWidgetByType("UIPanelButton");
         button:SetButtonText(widgetData.label);
         button:SetScript("OnClick", widgetData.onClickFunc);
-        button.shouldEnableOption = widgetData.stateCheckFunc;
         if (not widgetData.stateCheckFunc) or (widgetData.stateCheckFunc()) then
             button:Enable();
         else
@@ -483,8 +482,12 @@ do  --EditModeSettingsDialog
                         table.insert(self.activeWidgets, widget);
                         widget.widgetKey = widgetData.widgetKey;
                         widget.parentDBKey = widgetData.parentDBKey;
+                        widget.shouldEnableOption = widgetData.stateCheckFunc;
                         widget.widgetType = widgetData.type;
                         widget.isSubOption = widgetData.isSubOption;
+                        if widget.SetMotionScriptsWhileDisabled then
+                            widget:SetMotionScriptsWhileDisabled(true);
+                        end
                         self:UpdateWidgetEnabledState(widget);
                         if widgetData.newFeature then
                             local label = self.newFeatureLabelPool:Acquire();
