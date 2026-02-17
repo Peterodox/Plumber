@@ -491,6 +491,10 @@ do  --Order Hall, RightClickMenu
             if frame.CovenantCallings then
                 frame.CovenantCallings:Hide();
             end
+
+            if frame.ArdenwealdGardeningPanel then
+                frame.ArdenwealdGardeningPanel:Hide();
+            end
         end
 
         ShowGarrisonLandingPage(garrTypeID);
@@ -499,7 +503,6 @@ do  --Order Hall, RightClickMenu
             local unlocked = C_CovenantCallings.AreCallingsUnlocked();
             if unlocked and frame and frame.CovenantCallings then
                 frame.CovenantCallings:Show();
-                GarrisonLandingPage:LayoutSection();
             end
         end
     end
