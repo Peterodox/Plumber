@@ -2236,7 +2236,7 @@ do  --Use Loot UI as Notification Center
 
     local function TooltipFunc_Reputation(tooltip, factionID)
         local text, factionName = API.GetFactionStatusText(factionID, true, true);
-        if text then
+        if text and factionName then
             tooltip:SetText(factionName, 1, 0.82, 0);
             tooltip:AddLine(text, 1, 1, 1);
             tooltip:Show();
