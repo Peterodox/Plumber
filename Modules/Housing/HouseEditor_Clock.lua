@@ -272,21 +272,38 @@ do
                 end,
             },
             --]]
-        };
+        },
+
+        onMenuClosedCallback = function()
+            Handler.ClockFrame.shownMenu = nil
+        end,
     };
 
     function ClockUIMixin:ShowContextMenu()
         local menu = API.ShowBlizzardMenu(self, ContextMenu);
         menu:ClearAllPoints();
         menu:SetPoint("TOP", self, "BOTTOM", 0, 0);
+        self.shownMenu = menu;
     end
 
     function ClockUIMixin:OnClick(button)
         if button == "RightButton" then
+            if self.shownMenu then
+                self.shownMenu:Hide();
+                self.shownMenu = nil;
+                if self:IsMouseMotionFocus() then
+                    self:ShowTooltip();
+                end
+                return
+            end
             GameTooltip:Hide();
             self:OnLeave();
             self:ShowContextMenu();
         end
+    end
+
+    function ClockUIMixin:HandlesGlobalMouseEvent(buttonName, event)
+        return self:IsMouseMotionFocus()
     end
 end
 
