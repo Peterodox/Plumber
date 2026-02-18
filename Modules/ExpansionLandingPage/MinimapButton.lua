@@ -230,6 +230,12 @@ do  --ButtonMixin
                 self:SetAlpha(1);
                 self.MouseoverFrame:Hide();
             end
+
+            EL:RegisterEvent("PET_BATTLE_OPENING_START");
+            EL:RegisterEvent("PET_BATTLE_CLOSE");
+        else
+            EL:UnregisterEvent("PET_BATTLE_OPENING_START");
+            EL:UnregisterEvent("PET_BATTLE_CLOSE");
         end
         self:SetShown(self.enabled);
         OrderHallUtil.EnableBlizzardButton(not self.enabled);
@@ -948,22 +954,6 @@ do  --Button Settings/Customize
     LandingPageUtil.UpdateMinimapButtonVisibility = function()
         ButtonManager:UpdateVisibility();
     end
-
-
-    local function MiniButton_Enable(state)
-        MiniButton.VisualContainer:SetShown(state);
-        MiniButton:EnableMouse(state);
-        MiniButton:SetMouseMotionEnabled(state);
-        MiniButton:SetMouseClickEnabled(state);
-    end
-
-    CallbackRegistry:Register("EditMode.Enter", function()
-        MiniButton_Enable(false);
-    end);
-
-    CallbackRegistry:Register("EditMode.Exit", function()
-        MiniButton_Enable(true);
-    end);
 end
 
 
@@ -1104,6 +1094,25 @@ end
 
 
 do  --Event Listener
+    local function MiniButton_Enable(state)
+        MiniButton.VisualContainer:SetShown(state);
+        MiniButton:EnableMouse(state);
+        MiniButton:SetMouseMotionEnabled(state);
+        MiniButton:SetMouseClickEnabled(state);
+    end
+
+    local function MiniButton_UpdateEnableState()
+        if API.IsInEditMode() or C_PetBattles.IsInBattle() then
+            MiniButton_Enable(false);
+        else
+            MiniButton_Enable(true);
+        end
+    end
+
+    CallbackRegistry:Register("EditMode.Enter", MiniButton_UpdateEnableState);
+    CallbackRegistry:Register("EditMode.Exit", MiniButton_UpdateEnableState);
+
+
     function EL:OnEvent(event, ...)
         if MiniButton then
             if event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then
@@ -1112,6 +1121,10 @@ do  --Event Listener
                 self:UnregisterEvent(event);
                 ButtonManager:InitLibIcon()
                 MiniButton:LoadSettings();
+            elseif event == "PET_BATTLE_OPENING_START" then
+                MiniButton_Enable(false);
+            elseif event == "PET_BATTLE_CLOSE" then
+                MiniButton_UpdateEnableState();
             end
         end
     end
