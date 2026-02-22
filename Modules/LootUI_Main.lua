@@ -1876,7 +1876,7 @@ do  --UI Basic
                     self:TryHide(true);
                 elseif (not (self.manualMode or self.inEditMode)) and button == "LeftButton" and not InCombatLockdown() then
                     local itemFrame = self:GetFocusedItemFrame();
-                    if itemFrame then
+                    if itemFrame and itemFrame.OnClick then
                         itemFrame:OnClick("EmulateLeftButton");
                     end
                 end
