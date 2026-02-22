@@ -344,16 +344,29 @@ do  --Button Position/Anchor
         self.dx = x - self.x;
         self.dy = y - self.y;
 
-        local scalar = UIParent:GetEffectiveScale()/Minimap:GetEffectiveScale();
-        local relativeTo = Minimap;
-        local fromX, fromY = GetMiniButtonRelativePosition();
+        if GetDBBool("LandingButton_Unaffected") then
+            local scalar = 1;
+            local relativeTo = UIParent;
+            local fromX, fromY = GetMiniButtonAbsolutePosition();
 
-        local function SetObjectPosition(dx, dy)
-            dx = dx * scalar;
-            dy = dy * scalar;
-            self.draggedObject:SetPoint("CENTER", relativeTo, "CENTER", fromX + dx, fromY + dy);
+            local function SetObjectPosition(dx, dy)
+                dx = dx * scalar;
+                dy = dy * scalar;
+                self.draggedObject:SetPoint("CENTER", relativeTo, "BOTTOMLEFT", fromX + dx, fromY + dy);
+            end
+            self.SetObjectPosition = SetObjectPosition;
+        else
+            local scalar = UIParent:GetEffectiveScale() / Minimap:GetEffectiveScale();
+            local relativeTo = Minimap;
+            local fromX, fromY = GetMiniButtonRelativePosition();
+
+            local function SetObjectPosition(dx, dy)
+                dx = dx * scalar;
+                dy = dy * scalar;
+                self.draggedObject:SetPoint("CENTER", relativeTo, "CENTER", fromX + dx, fromY + dy);
+            end
+            self.SetObjectPosition = SetObjectPosition;
         end
-        self.SetObjectPosition = SetObjectPosition;
 
         --MiniButton:ClearAllPoints();
         MiniButton:OnDragStart();
