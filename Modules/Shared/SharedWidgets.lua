@@ -4206,7 +4206,11 @@ do  --Slider
 
     function SliderScripts:OnMouseUp()
         self:UnlockHighlight();
-        self:GetParent().isDraggingThumb = false;
+        local parent = self:GetParent();
+        parent.isDraggingThumb = false;
+        if parent:IsFocused() then
+            parent:OnEnter();
+        end
         if self.onMouseUpFunc then
             self.onMouseUpFunc(self);
         end
@@ -4396,10 +4400,11 @@ do  --Slider
     end
 
     function SliderFrameMixin:OnEnter()
-        if self.tooltip then
+        if self.tooltip and not self:IsDraggingThumb() then
             local f = GameTooltip;
             f:Hide();
-            f:SetOwner(self, "ANCHOR_RIGHT");
+            f:SetOwner(self, "ANCHOR_NONE");
+            f:SetPoint("BOTTOMLEFT", self.Slider, "TOPLEFT", 0, 4);
             f:SetText(self.Label:GetText(), 1, 1, 1, 1, true);
             f:AddLine(self.tooltip, 1, 0.82, 0, true);
             if self.tooltip2 then
@@ -4438,6 +4443,10 @@ do  --Slider
         else
             self:Disable();
         end
+    end
+
+    function SliderFrameMixin:IsFocused()
+        return self:IsMouseMotionFocus() or self.Slider:IsMouseMotionFocus() or self.Back:IsMouseMotionFocus() or self.Forward:IsMouseMotionFocus()
     end
 
     local function CreateSlider(parent)
