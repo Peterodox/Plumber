@@ -7,6 +7,7 @@ local ActivityUtil = addon.ActivityUtil;
 local ActivityData = {  --Constant
     --questClassification: 5 is recurring
 
+    --[[
     {isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
         entries = {
             {name = "The Key to Success", questID = 84370, isWeeklyQuest = true, accountwide = true},
@@ -21,6 +22,7 @@ local ActivityData = {  --Constant
             },
         }
     },
+    --]]
 
     --[[
     {isHeader = true, name = "Council of Dornogal", factionID = 2590, categoryID = 2590, uiMapID = 2248,

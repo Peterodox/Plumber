@@ -1698,7 +1698,7 @@ do  --Expansion Select
     local CurrentExpansionID;
     local ExpansionData = {
         [11] = {name = EXPANSION_NAME10},   --TWW
-        [12] = {name = EXPANSION_NAME11},   --MID
+        [12] = {name = EXPANSION_NAME11, isWIP = true},   --MID
         [5] = {name = EXPANSION_NAME4},     --MOP
     };
 
@@ -1719,7 +1719,11 @@ do  --Expansion Select
 
     function LandingPageUtil.GetCurrentExpansionInfo()
         if CurrentExpansionID then
-            return ExpansionData[CurrentExpansionID].name
+            local name = ExpansionData[CurrentExpansionID].name or "Unknown Expansion";
+            if ExpansionData[CurrentExpansionID].isWIP then
+                name = name.." "..L["Work In Progress Tag"];
+            end
+            return name
         end
     end
 
@@ -1728,7 +1732,7 @@ do  --Expansion Select
     end
 
     function LandingPageUtil.SelectExpansion(expansionID)
-        if not expansionID then
+        if (not expansionID) or (not CurrentExpansionID and not ExpansionData[expansionID]) then
             expansionID = ExpansionList[1];
         end
 
@@ -1745,7 +1749,13 @@ do  --Expansion Select
             cb:Trigger("LandingPage.SetResourceList", v.resource);
             cb:Trigger("LandingPage.ExpansionChanged", expansionID);
             cb:Trigger("LandingPage.UpdateNotification");
+
+            addon.SetDBValue("LaLandingPage_DefaultExpansion", expansionID);
         end
+    end
+
+    function LandingPageUtil.GetLastSelectedExpansion()
+        return addon.GetDBValue("LaLandingPage_DefaultExpansion")
     end
 
     function LandingPageUtil.SwitchExpansion()

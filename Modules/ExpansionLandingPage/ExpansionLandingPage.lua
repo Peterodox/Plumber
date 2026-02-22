@@ -158,8 +158,7 @@ do  --Expansion Select
 
     function ExpansionSelectButtonMixin:Refresh()
         self.Name:SetText(LandingPageUtil.GetCurrentExpansionInfo());
-        self:Hide();    --TEMP disabled until Midnight
-        --self:SetShown(#LandingPageUtil.GetAvailableExpansions() > 1);
+        self:SetShown(#LandingPageUtil.GetAvailableExpansions() > 1);
     end
 
     function ExpansionSelectButtonMixin:AdjustToMaxTextWidth()
@@ -267,7 +266,7 @@ do
             self.loaded = true;
             local tabKey = addon.GetDBValue("LandingPage_DefaultTab");
             LandingPageUtil.SelectTab(tabKey);
-            LandingPageUtil.SelectExpansion();
+            LandingPageUtil.SelectExpansion(LandingPageUtil.GetLastSelectedExpansion());
         end
 
         self:UpdateTabs();    --The selected tab will be created here
