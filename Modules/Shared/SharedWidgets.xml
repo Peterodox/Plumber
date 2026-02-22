@@ -78,6 +78,12 @@
         <KeyValues>
             <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
         </KeyValues>
+        <Animations>
+            <AnimationGroup parentKey="AnimFadeIn">
+                <Alpha order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Alpha order="1" fromAlpha="0" toAlpha="1" duration="0.12" startDelay="0.08"/>
+            </AnimationGroup>
+        </Animations>
     </Cooldown>
 
     <Slider name="PlumberMinimalSliderTemplate" orientation="HORIZONTAL" enableMouse="true" virtual="true">

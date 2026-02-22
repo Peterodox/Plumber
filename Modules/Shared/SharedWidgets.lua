@@ -5883,3 +5883,91 @@ do  --Esc To Close Frame
         end
     end
 end
+
+do
+    local ClickAndHoldCounter;
+
+    function addon.InitClickAndHoldCallback()
+        --The cooldown texture may not be fully loaded on the first call
+        --So we use this to init the cooldown in advance
+
+        if ClickAndHoldCounter then return end;
+
+        ClickAndHoldCounter = CreateFrame("Cooldown", nil, UIParent, "PlumberCursorCooldownTemplate");
+        ClickAndHoldCounter:Hide();
+        ClickAndHoldCounter:SetSize(48, 48);
+        ClickAndHoldCounter:SetReverse(true);
+
+        ClickAndHoldCounter:SetScript("OnShow", function(self)
+            self:RegisterEvent("GLOBAL_MOUSE_UP");
+        end);
+
+        ClickAndHoldCounter:SetScript("OnHide", function(self)
+            self:UnregisterEvent("GLOBAL_MOUSE_UP");
+            self:SetScript("OnCooldownDone", nil);
+            self:ClearAllPoints();
+            self:Hide();
+            self:Clear();
+            self.mouseDownTime = nil;
+            if self.onStopCallback then
+                local cb = self.onStopCallback;
+                local success = self.success;
+                self.onStopCallback = nil;
+                self.success = nil;
+                cb(success);
+            end
+        end);
+
+        ClickAndHoldCounter:SetScript("OnEvent", function(self)
+            self:Hide();
+        end);
+    end
+
+
+    ---Run callback after left-click and hold for x seconds.
+    ---@param duration number Required seconds for a successful Click and Hold
+    ---@param onSuccessCallback function Call if success
+    ---@param parent any (Nilable) Parent of the swipe. No visible swipe if parent is not set.
+    ---@param relativeTo any (Nilable) For anchor. Default to parent CENTER if nil
+    ---@param onStopCallback function (Nilable) Call when stopped, including being canceled
+    function addon.SetClickAndHoldCallback(duration, onSuccessCallback, parent, relativeTo, onStopCallback)
+        addon.InitClickAndHoldCallback()
+
+        ClickAndHoldCounter:Hide();
+
+        if parent then
+            ClickAndHoldCounter:SetParent(parent);
+            ClickAndHoldCounter:SetPoint("CENTER", relativeTo or parent, "CENTER", 0, 0);
+        else
+            ClickAndHoldCounter:SetPoint("TOP", UIParent, "BOTTOM", 0, 0);
+        end
+
+        ClickAndHoldCounter:SetCooldownDuration(duration);
+        ClickAndHoldCounter:SetScript("OnCooldownDone", function(self)
+            self.success = true;
+            self:ClearAllPoints();
+            self:Hide();
+            onSuccessCallback();
+        end);
+        ClickAndHoldCounter.onStopCallback = onStopCallback;
+
+        ClickAndHoldCounter.AnimFadeIn:Stop();
+        ClickAndHoldCounter.AnimFadeIn:Play();
+        ClickAndHoldCounter:Show();
+        ClickAndHoldCounter.mouseDownTime = GetTime();
+    end
+
+    function addon.CancelClickAndHoldCallback()
+        if ClickAndHoldCounter then
+            ClickAndHoldCounter:Hide();
+        end
+    end
+
+    function addon.IsClickAndHoldInProgress()
+        if ClickAndHoldCounter and ClickAndHoldCounter.mouseDownTime then
+            return GetTime() - ClickAndHoldCounter.mouseDownTime > 0.12
+        else
+            return false
+        end
+    end
+end
