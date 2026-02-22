@@ -483,6 +483,21 @@ do  --Options
         end
     end
 
+    function Options.GetScheduleTooltip()
+        if addon.GetDBBool("BreakTime") then
+            local cycle, rest = Options.GetValidatedDurationsInMinutes();
+            local scheduleText = L["BreakTime Current Schedule Format"]:format(rest, cycle);
+            local tooltip;
+            if Controller.isCancelledForSession then
+                tooltip = scheduleText.."\n\n|cffd4641c"..L["BreakTime Announce Timer Cancelled"].."|r";
+            else
+                local nextText = L["BreakTime Announce Time Before Alert Format"]:format(Controller.GetMinutesUntilNextGoOff());
+                tooltip = scheduleText.."\n\n"..nextText;
+            end
+            return string.gsub(tooltip, "|cffffffff", "|cffd7c0a3");
+        end
+    end
+
     local DemoFrame;
 
     function AcquireDemoFrame()
@@ -502,10 +517,10 @@ do  --Options
         function Options.UpdateDemoFrame()
             local cycle, rest = Options.GetValidatedDurationsInMinutes();
             local scheduleText = L["BreakTime Current Schedule Format"]:format(rest, cycle);
-            local nextText = L["BreakTime Announce Time Before Alert Format"]:format(Controller.GetMinutesUntilNextGoOff());
             if Controller.isCancelledForSession then
                 f.Title:SetText(scheduleText.."\n|cff808080"..L["BreakTime Announce Timer Cancelled"].."|r");
             else
+                local nextText = L["BreakTime Announce Time Before Alert Format"]:format(Controller.GetMinutesUntilNextGoOff());
                 f.Title:SetText(scheduleText.."\n"..nextText);
             end
         end
@@ -577,7 +592,7 @@ do  --Options
         moduleDBKey = "BreakTime",
         widgets = {
             {type = "Custom", onAcquire = AcquireDemoFrame, align = "center"},
-            {type = "UIPanelButton", label = L["BreakTime Reset Cancellation"], tooltip = L["BreakTime Reset Cancellation Tooltip"], onClickFunc = ResetCancelledSchedule, stateCheckFunc = IsAnyScheduleCancelled, widgetKey = "ResetButton", validityCheckFunc = IsAnyScheduleCancelled},
+            {type = "UIPanelButton", label = L["BreakTime Reset Cancellation"], onClickFunc = ResetCancelledSchedule, stateCheckFunc = IsAnyScheduleCancelled, widgetKey = "ResetButton", validityCheckFunc = IsAnyScheduleCancelled},
 
             {type = "Divider"},
             {type = "Slider", label = L["BreakTime Option Rest"], tooltip = L["BreakTime Option Rest Tooltip"], minValue = Options.RestDuration.minVal, maxValue = Options.RestDuration.maxVal, valueStep = 1, onValueChangedFunc = Rest_Slider_OnValueChanged, formatValueFunc = FormatNumericValue, dbKey = "BreakTime_Rest"},
@@ -900,6 +915,7 @@ do  --Controller
             if self:GetScript("OnEvent") ~= self.OnEvent_TryShowTimer then
                 self:SetScript("OnEvent", self.OnEvent_TryShowTimer);
                 RegisterEvent(self, DeferredEvents, true);
+                API.PrintMessage(L["BreakTime Annouce Timer Deferred Combat"]);
             end
         else
             RegisterEvent(self, DeferredEvents, false);
@@ -920,6 +936,7 @@ do
         name = L["ModuleName BreakTime"],
         dbKey = "BreakTime",
         description = L["ModuleDescription BreakTime"],
+        descriptionFunc = Options.GetScheduleTooltip,
         toggleFunc = Controller.EnableModule,
         moduleAddedTime = 1704423300,
         optionToggleFunc = OptionToggle_OnClick,

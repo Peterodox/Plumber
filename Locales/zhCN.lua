@@ -796,6 +796,28 @@ L["ModuleName SourceAchievementLink"] = "可交互的来源信息";
 L["ModuleDescription SourceAchievementLink"] = "将以下界面上的成就名称变为可点击的链接，允许你查看成就详情或追踪它。\n\n- 装饰类别\n\n- 坐骑手册";
 
 
+--BreakTime
+L["ModuleName BreakTime"] = "休息提示";
+L["ModuleDescription BreakTime"] = "提醒你定期休息。";
+L["BreakTime Title AllCaps"] = "休息时间";
+L["BreakTime Delay Button"] = "推迟";
+L["BreakTime Delay Button Tooltip Format"] = "在%d分钟后通知我。";
+L["BreakTime Cancel Button"] = "取消";
+L["BreakTime Cancel Button Tooltip Format 1"] = "单击左键：取消此周期的休息时间。下一个提示将在%d分钟后到来。";
+L["BreakTime Cancel Button Tooltip 2"] = "长按左键：取消本次游戏期间的所有休息提示。";
+L["BreakTime Announce Time Before Alert Format"] = "下一个提示将在|cffffffff%d|r分钟后到来。";
+L["BreakTime Announce Timer Cancelled"] = "你已取消本次游戏期间的所有休息提示。";
+L["BreakTime Current Schedule Format"] = "当前计划为每|cffffffff%2$d|r分钟休息|cffffffff%1$d|r分钟。";
+L["BreakTime Option Cycle"] = "周期时长";
+L["BreakTime Option Cycle Tooltip"] = "每个游戏/休息周期的分钟数。";
+L["BreakTime Option Rest"] = "休息时长";
+L["BreakTime Option Rest Tooltip"] = "每周期内休息的分钟数。";
+L["BreakTime Option Delay"] = "推迟时长";
+L["BreakTime Option Delay Tooltip"] = "按下推迟按钮推迟的分钟数。";
+L["BreakTime Reset Cancellation"] = "重置已取消的休息时间";
+L["BreakTime Annouce Timer Deferred Combat"] = "战斗过后请记得休息！";
+
+
 --Generic
 L["Total Colon"] = "总计：";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally

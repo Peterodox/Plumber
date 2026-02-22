@@ -659,6 +659,13 @@ do
                 addon.LandingPageUtil.PlayUISound("CheckboxOff");
                 addon.CloseSettingsDialogByModuleDBKey(self.dbKey);
             end
+
+            if self:IsMouseMotionFocus() then
+                --Some module descriptions change with enable states
+                if not self.isChangelogButton then
+                    MainFrame:ShowFeaturePreview(self.data, self.parentDBKey);
+                end
+            end
         end
 
         MainFrame:UpdateSettingsEntries();
