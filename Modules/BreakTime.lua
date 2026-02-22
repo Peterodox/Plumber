@@ -938,7 +938,7 @@ do
         description = L["ModuleDescription BreakTime"],
         descriptionFunc = Options.GetScheduleTooltip,
         toggleFunc = Controller.EnableModule,
-        moduleAddedTime = 1704423300,
+        moduleAddedTime = 1771800000,
         optionToggleFunc = OptionToggle_OnClick,
 		categoryKeys = {
 			"Signature",

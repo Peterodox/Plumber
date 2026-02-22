@@ -10,6 +10,85 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10808] = {
+    {
+        type = "date",
+        versionText = "1.8.8",
+        timestamp = 1771800000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName BreakTime"],
+        dbKey = "BreakTime",
+    },
+
+    {
+        type = "Checkbox",
+        dbKey = "BreakTime",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Remind you to take a short break after a period of time.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "The default schedule is a 5-minute break every 30 min. You can change it in the settings.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "You can delay or cancel the break when the timer goes off.",
+    },
+
+    {
+        type = "img",
+        dbKey = "BreakTime",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = MISCELLANEOUS,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Expansion Summary: You can now switch the expansion to Midnight, but the content is still a work in progress.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Bug Fixes",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Expansion Summary Minimap Button: Fixed a reposition issue when the Minimap's scale was not 100%.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Expansion Summary Minimap Button: This button should correctly become hidden when you start pet battle.",
+    },
+};
+
+
 changelogs[10807] = {
     {
         type = "date",
