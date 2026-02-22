@@ -458,12 +458,16 @@ do  -- Time
     end
     API.SecondsToTime = SecondsToTime;
 
-    local function SecondsToClock(seconds)
+    local function SecondsToClock(seconds, alwaysTwoDigits)
         --Clock: 00:00
         if seconds >= 3600 then
             return format("%s:%02d:%02d", floor(seconds / 3600), floor((seconds - 3600 * floor(seconds / 3600)) / 60), floor(seconds % 60))
         else
-            return format("%s:%02d", floor(seconds / 60), floor(seconds % 60))
+            if alwaysTwoDigits then
+                return format("%02d:%02d", floor(seconds / 60), floor(seconds % 60))
+            else
+                return format("%s:%02d", floor(seconds / 60), floor(seconds % 60))
+            end
         end
     end
     API.SecondsToClock = SecondsToClock;
@@ -1497,6 +1501,15 @@ do  -- Instance -- Map
         return instanceID
     end
     API.GetMapID = GetMapID;
+
+
+    function API.IsInPvP()
+        if C_PvP.IsActiveBattlefield() then
+            return true
+        end
+        local _, instanceType = GetInstanceInfo();
+        return instanceType == "arena" or instanceType == "pvp"
+    end
 end
 
 do  -- Pixel
@@ -3793,10 +3806,18 @@ do  -- Chat Message
     end
     API.PrintMessage = PrintMessage;
 
-    function API.DisplayErrorMessage(msg)
+    function API.DisplayAlertMessage(msg, r, g, b)
         if not msg then return end;
         local messageType = 0;
-        UIErrorsFrame:TryDisplayMessage(messageType, (CM.iconMarkup.." |cffb8c8d1Plumber:|r ")..msg, RED_FONT_COLOR:GetRGB());
+        if not (r and g and b) then
+            r, g, b = 1, 0.82, 0;
+        end
+        UIErrorsFrame:TryDisplayMessage(messageType, (CM.iconMarkup.." |cffb8c8d1Plumber:|r ")..msg, r, g, b);
+    end
+
+    function API.DisplayErrorMessage(msg)
+        local r, g, b = RED_FONT_COLOR:GetRGB();
+        API.DisplayAlertMessage(msg, r, g, b)
     end
 
     function API.CheckAndDisplayErrorIfInCombat()

@@ -742,7 +742,6 @@ function NewTalkingHead:MuteNextLine(duration)
 end
 
 
-
 do
     local function EnableModule(state)
         if state then

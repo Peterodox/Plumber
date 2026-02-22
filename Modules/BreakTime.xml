@@ -1,0 +1,184 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <Frame name="PlumberBreakTimeReminderButtonTemplate" virtual="true">
+        <Size x="128" y="128"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Highlight" texelSnappingBias="0.0" snapToPixelGrid="false" hidden="true" alpha="0">
+                    <Size x="192" y="256"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="ButtonText" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame parentKey="TooltipContainer" useParentLevel="true">
+                <Size x="240" y="24"/>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.ButtonText" relativePoint="RIGHT" x="12"/>
+                </Anchors>
+            </Frame>
+        </Frames>
+        <Animations>
+            <AnimationGroup parentKey="AnimDiv">
+                <Scale childKey="Div" order="1" fromScaleX="1" fromScaleY="0.1" toScaleX="1" toScaleY="1" duration="0.5" smoothing="OUT"/>
+            </AnimationGroup>
+            <AnimationGroup parentKey="AnimFadeOutText">
+                <Alpha childKey="ButtonText" order="1" fromAlpha="1" toAlpha="0" duration="0.2" startDelay="0.1"/>
+                <Alpha childKey="ButtonText" order="2" fromAlpha="0" toAlpha="0" duration="0.9"/>
+            </AnimationGroup>
+        </Animations>
+    </Frame>
+
+    <Frame name="PlumberBreakTimeReminderTemplate" frameStrata="HIGH" frameLevel="40" parent="UIParent" virtual="true">
+        <Size x="400" y="200"/>
+        <Anchors>
+            <Anchor point="TOP" relativePoint="TOP" y="-132"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Title" inherits="GameFontNormal">
+                    <Color r="0.786" g="0.710" b="0.584"/>
+                    <Anchors>
+                        <Anchor point="CENTER" y="30"/>
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="TimeText" inherits="PlumberFont_Clock48" text="00:00">
+                    <Color r="1" g="0.821" b="0"/>
+                    <Anchors>
+                        <Anchor point="CENTER" y="-4"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="512" y="256"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture parentKey="Dial" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="256" y="256"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture parentKey="LeftDot" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="64" y="64"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="RightDot" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="64" y="64"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+
+            <Layer level="OVERLAY" textureSubLevel="4">
+                <Texture parentKey="CheeringFace" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="64" y="32"/>
+                    <Anchors>
+                        <Anchor point="CENTER" y="32"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="CheeringLeftArm" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="128" y="128"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="-96" y="-18"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="CheeringRightArm" texelSnappingBias="0.0" snapToPixelGrid="false">
+                    <Size x="128" y="128"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="96" y="-18"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame parentKey="ButtonContainer" hidden="true" alpha="0">
+                <Size x="256" y="256"/>
+                <Anchors>
+                    <Anchor point="CENTER"/>
+                </Anchors>
+                <Frames>
+                    <Button parentKey="DelayButton" inherits="PlumberBreakTimeReminderButtonTemplate">
+                        <Anchors>
+                            <Anchor point="RIGHT" relativeKey="$parent" relativePoint="CENTER" x="-80"/>
+                        </Anchors>
+                    </Button>
+                    <Button parentKey="CancelButton" inherits="PlumberBreakTimeReminderButtonTemplate">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeKey="$parent" relativePoint="CENTER" x="80"/>
+                        </Anchors>
+                    </Button>
+                </Frames>
+            </Frame>
+
+            <Frame parentKey="MouseoverFrame" inherits="PlumberPropagateMouseTemplate" frameLevel="50">
+                <Size x="800" y="200"/>
+                <Anchors>
+                    <Anchor point="CENTER" y="-4"/>
+                </Anchors>
+            </Frame>
+        </Frames>
+        <Animations>
+            <AnimationGroup parentKey="AnimIn" setToFinalAlpha="true">
+                <Alpha childKey="Background" order="0" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Alpha childKey="Dial" order="0" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Alpha childKey="Title" order="0" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Alpha childKey="TimeText" order="0" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Alpha childKey="LeftDot" order="0" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Alpha childKey="RightDot" order="0" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Translation childKey="LeftDot" order="0" offsetX="48" offsetY="0" duration="0" />
+                <Translation childKey="RightDot" order="0" offsetX="-48" offsetY="0" duration="0"/>
+
+                <Alpha childKey="Background" order="1" fromAlpha="0" toAlpha="1" duration="0.5"/>
+                <Scale childKey="Background" order="1" fromScaleX="0.8" fromScaleY="0.8" toScaleX="1" toScaleY="1" duration="0.4" smoothing="OUT"/>
+                <Alpha childKey="LeftDot" order="1" fromAlpha="0" toAlpha="1" duration="0.5"/>
+                <Alpha childKey="RightDot" order="1" fromAlpha="0" toAlpha="1" duration="0.5"/>
+                <Translation childKey="LeftDot" order="1" duration="0.4" offsetX="-48" offsetY="0" smoothing="OUT"/>
+                <Translation childKey="RightDot" order="1" duration="0.4" offsetX="48" offsetY="0" smoothing="OUT"/>
+
+                <Alpha childKey="Title" order="2" fromAlpha="0" toAlpha="1" duration="0.2"/>
+                <Alpha childKey="TimeText" order="2" fromAlpha="0" toAlpha="0.5" duration="0.2" startDelay="0.4"/>
+                <Alpha childKey="Dial" order="2" fromAlpha="0" toAlpha="0.5" duration="0.2" startDelay="0.4"/>
+            </AnimationGroup>
+
+            <AnimationGroup parentKey="AnimCheering" looping="REPEAT">
+                <Translation childKey="CheeringFace" order="1" offsetY="8" duration="0.5" smoothing="IN"/>
+                <Rotation childKey="CheeringLeftArm" order="1" degrees="-30" duration="0.5" smoothing="IN_OUT"/>
+                <Rotation childKey="CheeringRightArm" order="1" degrees="30" duration="0.5" smoothing="IN_OUT"/>
+                <Translation childKey="CheeringFace" order="2" offsetY="-8" duration="0.5" smoothing="OUT"/>
+                <Rotation childKey="CheeringLeftArm" order="2" degrees="30" duration="0.5" smoothing="IN_OUT"/>
+                <Rotation childKey="CheeringRightArm" order="2" degrees="-30" duration="0.5" smoothing="IN_OUT"/>
+            </AnimationGroup>
+
+            <AnimationGroup parentKey="AnimCheeringFade" setToFinalAlpha="true">
+                <Alpha childKey="LeftDot" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Alpha childKey="RightDot" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+                <Translation childKey="Title" order="1" offsetY="8" duration="0.25" smoothing="IN"/>
+                <Translation childKey="TimeText" order="1" offsetY="8" duration="0.25" smoothing="IN"/>
+                <Alpha childKey="Title" order="1" fromAlpha="1" toAlpha="0" duration="0.25"/>
+                <Alpha childKey="TimeText" order="1" fromAlpha="1" toAlpha="0" duration="0.25"/>
+                <Alpha childKey="CheeringFace" order="1" fromAlpha="0" toAlpha="1" duration="0.1"/>
+            </AnimationGroup>
+        </Animations>
+    </Frame>
+
+    <Script file="BreakTime.lua"/>
+</Ui>

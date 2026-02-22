@@ -61,4 +61,11 @@
     <Font name="PlumberFont_Nameplate_Small" inherits="GameFontNormalSmall" virtual="true">
         <Color r="1" g="1" b="1"/>
     </Font>
+
+    <Font name="PlumberFont_Clock48" font="Interface\AddOns\Plumber\Fonts\Lato-Bold.ttf" height="48" outline="NORMAL" justifyH="CENTER" virtual="true">
+        <Color r="1" g="0.82" b="0"/>
+        <Shadow x="0" y="-3">
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+    </Font>
 </Ui>

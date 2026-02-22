@@ -85,6 +85,7 @@ Modules\QuestWatchCycle.lua
 Modules\CraftSearchExtended.lua
 Modules\SourceAchievementLink.lua
 Modules\OutfitSelect.lua
+Modules\BreakTime.xml
 
 #Modules\MerchantUI\MerchantUI.xml
 

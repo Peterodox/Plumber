@@ -385,6 +385,7 @@ end
 
 if true then    --Secret Debug
     local value = IsEnabled("MaxmimumSecret") and 1 or 0;
+    print("Secrecy: ", value);
 
     local CVars = {
         "ChallengeMode",

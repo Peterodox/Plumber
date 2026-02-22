@@ -658,3 +658,13 @@ end
 function MainFrame:HandleEscape()
     self:Hide();
 end
+
+function MainFrame:OnShow()
+    addon.CallbackRegistry:Trigger("SettingsPanel.Show");
+end
+MainFrame:SetScript("OnShow", MainFrame.OnShow);
+
+function MainFrame:OnHide()
+    addon.CallbackRegistry:Trigger("SettingsPanel.Hide");
+end
+MainFrame:SetScript("OnHide", MainFrame.OnHide);

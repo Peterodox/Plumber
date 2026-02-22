@@ -828,6 +828,28 @@ L["ModuleName SourceAchievementLink"] = "Interactable Source Info";
 L["ModuleDescription SourceAchievementLink"] = "Makes most achievement names on the following UI become clickable, allowing you to see their details or track them.\n\n- Decor Catalog\n\n- Mount Journal";
 
 
+--BreakTime
+L["ModuleName BreakTime"] = "Break Time Reminder";
+L["ModuleDescription BreakTime"] = "Remind you to take a short break after a period of time.";
+L["BreakTime Title AllCaps"] = "BREAK TIME";
+L["BreakTime Delay Button"] = "Delay";
+L["BreakTime Delay Button Tooltip Format"] = "Remind me in %d min.";
+L["BreakTime Cancel Button"] = "Cancel";
+L["BreakTime Cancel Button Tooltip Format 1"] = "Left Click: Cancel the timer for this cycle. The next timer will go off in %d min.";
+L["BreakTime Cancel Button Tooltip 2"] = "Click and Hold: Cancel for this game session.";
+L["BreakTime Announce Time Before Alert Format"] = "The next timer will go off in |cffffffff%d|r min.";
+L["BreakTime Announce Timer Cancelled"] = "The timer has been cancelled for this game session.";
+L["BreakTime Current Schedule Format"] = "Current schedule is |cffffffff%1$d|r min break every |cffffffff%2$d|r min.";
+L["BreakTime Option Cycle"] = "Cycle Duration";
+L["BreakTime Option Cycle Tooltip"] = "The length of each play/break cycle.";
+L["BreakTime Option Rest"] = "Break Duration";
+L["BreakTime Option Rest Tooltip"] = "The length of a break per cycle.";
+L["BreakTime Option Delay"] = "Delay Duration";
+L["BreakTime Option Delay Tooltip"] = "Delay the timer by this amount of minutes when clicking the Delay button.";
+L["BreakTime Reset Cancellation"] = "Reset Cancelled Break";
+L["BreakTime Reset Cancellation Tooltip"] = "You have cancelled a scheduled break. Click this button to reset it.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally

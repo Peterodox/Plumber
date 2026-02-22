@@ -2016,15 +2016,16 @@ end
 do  --MainFrame Minimize UI while certain module options are shown
     function MainFrame:OnShow()
         addon.CallbackRegistry:Register("SettingsPanel.ModuleOptionClosed", self.Maximize, self);
+        addon.CallbackRegistry:Trigger("SettingsPanel.Show");
     end
     MainFrame:SetScript("OnShow", MainFrame.OnShow);
 
     function MainFrame:OnHide()
         addon.CallbackRegistry:UnregisterCallbackOwner("SettingsPanel.ModuleOptionClosed", self);
-
         if self.minimized then
             self:Maximize();
         end
+        addon.CallbackRegistry:Trigger("SettingsPanel.Hide");
     end
     MainFrame:SetScript("OnHide", MainFrame.OnHide);
 

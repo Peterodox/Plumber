@@ -866,7 +866,7 @@ do  --Button Settings/Customize
 
     local function Checkbox_UseLibIcon_OnClick()
         GenericWidget_OnClick();
-        addon.SetupSettingsDialog(MiniButton, OPTIONS_SCHEMATIC, true)
+        addon.SetupSettingsDialog(MiniButton, OPTIONS_SCHEMATIC, true);
     end
 
     local function Checkbox_UseLibIcon_ShouldShow()
