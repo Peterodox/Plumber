@@ -302,7 +302,7 @@ do
                     percentage = 0;
                     local timeInQueue = GetPVPTimeInQueue(i);
                     queueStartTime = GetTime() - timeInQueue / 1000;
-                    waitTime = GetPVPWaitTime(i);
+                    waitTime = GetPVPWaitTime(i) / 1000;
                     break
                 end
             end
