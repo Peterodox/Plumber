@@ -45,6 +45,7 @@ L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "Este módulo está siempre activado.";
 L["Return To Module List"] = "Volver a la lista";
 L["Generic Addon Conflict"] = "Este módulo podría ser incompatible con complementos de funcionalidades similares.:";
+L["Work In Progress Tag"] = "[WIP]";
 
 
 --Settings Category
@@ -713,7 +714,12 @@ L["List Is Empty"] = "La lista está vacía.";
 L["LandingButton Settings Title"] = "Resumen de la expansión: Botón del minimapa";
 L["LandingButton Tooltip Format"] = "Click para abir el %s.\nClick derecho para ver más opciones.";
 L["LandingButton Customize"] = "Personalizar";
+L["LandingButton Reposition Tooltip"] = "Presiona |cffffffffShift|r para desbloquear";
 L["LandingButtonOption ShowButton"] = "Habilitar botón del minimapa";
+L["LandingButtonOption Unaffected"] = "No afectado por los complementos del minimapa";
+L["LandingButtonOption Unaffected Tooltip"] = "Hace que este botón no se vea afectado por otros complementos del minimapa, evitando que se cambie su aspecto o su posición.\n\nUna vez habilitado, este botón ya no se moverá con el minimapa ni respetará el minimapa.\n\nEscala, y en su lugar utilizará la escala global de la interfaz de usuario.\n\n|cffff4800Es posible que tengas que volver a cargar la interfaz de usuario después de cambiar esta opción.|r";
+L["LandingButtonOption UseLibDBIcon"] = "Utilizar diseño estandarizado";
+L["LandingButtonOption UseLibDBIcon Tooltip"] = "Deja que LibDBIcon se encargue de la apariencia y la posición de este botón.";
 L["LandingButtonOption PrimaryUI"] = "Click para abrir";   --Control which UI to open on left-click
 L["LandingButtonOption PrimaryUI Tooltip"] = "Elige qué interfaz de usuario abrir al hacer click en el botón del minimapa.";
 L["LandingButtonOption SmartExpansion"] = "Selección automática de expansión";
@@ -821,6 +827,28 @@ L["Match Sources"] = "Fuentes coincidentes";
 --SourceAchievementLink
 L["ModuleName SourceAchievementLink"] = "Información interactiva sobre la fuente";
 L["ModuleDescription SourceAchievementLink"] = "Hace que en la mayoría de los nombres de logros en la siguiente interfaz de usuario se puedan hacer click, permitiéndote ver sus detalles o rastrearlos.\n\n- Catálogo de adornos\n\n- Diario de monturas";
+
+
+--BreakTime
+L["ModuleName BreakTime"] = "Recordatorio de la hora de descanso";
+L["ModuleDescription BreakTime"] = "Te recuerda que debes tomarte un breve descanso después de un período de tiempo.";
+L["BreakTime Title AllCaps"] = "HORA DE DESCANSO";
+L["BreakTime Delay Button"] = "Retrasar";
+L["BreakTime Delay Button Tooltip Format"] = "Recuérdame en: %d minutos.";
+L["BreakTime Cancel Button"] = "Cancelar";
+L["BreakTime Cancel Button Tooltip Format 1"] = "Click: Cancela el temporizador de este ciclo. El siguiente temporizador se activará en: %d minutos.";
+L["BreakTime Cancel Button Tooltip 2"] = "Click y presionar: Cancela esta sesión de juego.";
+L["BreakTime Announce Time Before Alert Format"] = "El próximo temporizador se activará en: |cffffffff%d|r minutos.";
+L["BreakTime Announce Timer Cancelled"] = "Has cancelado el temporizador para esta sesión de juego.";
+L["BreakTime Current Schedule Format"] = "El horario actual es: |cffffffff%1$d|r minutos de descanso cada: |cffffffff%2$d|r minutos.";
+L["BreakTime Option Cycle"] = "Duración del ciclo";
+L["BreakTime Option Cycle Tooltip"] = "La duración de cada ciclo de juego/descanso.";
+L["BreakTime Option Rest"] = "Duración del descanso";
+L["BreakTime Option Rest Tooltip"] = "La duración de cada descanso por ciclo.";
+L["BreakTime Option Delay"] = "Duración del retraso";
+L["BreakTime Option Delay Tooltip"] = "Retrasa el temporizador en esta cantidad de minutos al hacer click en el botón Retrasar.";
+L["BreakTime Reset Cancellation"] = "Restablecer cancelación del descanso";
+L["BreakTime Annouce Timer Deferred Combat"] = "¡Recuerda tomarte un descanso después del combate!";
 
 
 --Generic
