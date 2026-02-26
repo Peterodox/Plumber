@@ -41,7 +41,7 @@ Modules\SpellFlyout_Secure.lua
 Modules\QuestAreaTrigger.lua
 Modules\Dreamseed.lua
 #Modules\EventMap.lua
-Modules\MapPin.xml
+#Modules\MapPin.xml
 Modules\RareAnnouncement.lua
 Modules\PlayerChoiceUI.lua
 Modules\Lockpicking.lua
