@@ -14,7 +14,7 @@ changelogs[10808] = {
     {
         type = "date",
         versionText = "1.8.8",
-        timestamp = 1771800000,
+        timestamp = 1772120000,
     },
 
     {
@@ -67,6 +67,12 @@ changelogs[10808] = {
     },
 
     {
+        type = "p",
+        bullet = true,
+        text = "Map Pin modules have been retired. Displaying Bountiful Delves and Special Assignments on Quel'Thalas map is a WoW native feature now.",
+    },
+
+    {
         type = "br",
     },
 
@@ -85,6 +91,12 @@ changelogs[10808] = {
         type = "p",
         bullet = true,
         text = "Expansion Summary Minimap Button: This button should correctly become hidden when you start pet battle.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Queue Status: Fixed the timer for PvP queues.",
     },
 };
 
