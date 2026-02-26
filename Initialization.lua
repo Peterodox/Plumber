@@ -370,6 +370,7 @@ local DefaultValues = {
         BreakTime_Cycle = 30,
         BreakTime_Rest = 5,
         BreakTime_Delay = 5,
+        BreakTime_FlashTaskbar = false,
 
 
     --Declared elsewhere:

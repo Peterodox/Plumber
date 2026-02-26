@@ -848,6 +848,8 @@ L["BreakTime Option Rest"] = "Break Duration";
 L["BreakTime Option Rest Tooltip"] = "The length of a break per cycle.";
 L["BreakTime Option Delay"] = "Delay Duration";
 L["BreakTime Option Delay Tooltip"] = "Delay the timer by this amount of minutes when clicking the Delay button.";
+L["BreakTime Option FlashTaskbar"] = "Flash Taskbar Icon";
+L["BreakTime Option FlashTaskbar Tooltip"] = "Flash WoW's taskbar icon when the timer goes off.";
 L["BreakTime Reset Cancellation"] = "Reset Cancelled Break";
 L["BreakTime Annouce Timer Deferred Combat"] = "Remember to take a break after fight!";
 

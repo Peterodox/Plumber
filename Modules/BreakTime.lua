@@ -600,6 +600,7 @@ do  --Options
 
             {type = "Divider"},
             {type = "Slider", label = L["BreakTime Option Delay"], tooltip = L["BreakTime Option Delay Tooltip"], minValue = Options.DelayDuration.minVal, maxValue = Options.DelayDuration.maxVal, valueStep = 1, onValueChangedFunc = Delay_Slider_OnValueChanged, formatValueFunc = FormatNumericValue, dbKey = "BreakTime_Delay"},
+            {type = "Checkbox", label = L["BreakTime Option FlashTaskbar"], tooltip = L["BreakTime Option FlashTaskbar Tooltip"], dbKey = "BreakTime_FlashTaskbar"},
         },
     };
 
@@ -922,6 +923,9 @@ do  --Controller
             self:SetScript("OnEvent", nil);
             self:PlayIntroAnimation();
             self:UpdateSchedule();
+            if addon.GetDBBool("BreakTime_FlashTaskbar") then
+                FlashClientIcon();
+            end
         end
     end
 
