@@ -1779,6 +1779,10 @@ do  --Expansion Select
         end
         return names
     end
+
+    function LandingPageUtil.IsCurrentExpansionWIP()
+        return CurrentExpansionID and ExpansionData[CurrentExpansionID] and ExpansionData[CurrentExpansionID].isWIP;
+    end
 end
 
 

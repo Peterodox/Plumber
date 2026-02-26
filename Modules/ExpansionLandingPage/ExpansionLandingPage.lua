@@ -131,6 +131,7 @@ do  --Expansion Select
 
     function ExpansionSelectButtonMixin:OnClick()
         --We only have 2 expansions right now, click to switch directly
+        LandingPageUtil.PlayUISound("SwitchTab");
         LandingPageUtil.SwitchExpansion();
     end
 

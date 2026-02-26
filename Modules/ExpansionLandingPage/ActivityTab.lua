@@ -354,6 +354,7 @@ do
         self.ScrollView:SetContent(content, retainPosition);
 
         self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
+        self.WIPLabel:SetShown(LandingPageUtil.IsCurrentExpansionWIP());
     end
 
     function ActivityTabMixin:OnShow()
@@ -383,6 +384,14 @@ do
     function ActivityTabMixin:InitChecklist()
         local headerWidgetOffsetY = -10;
 
+        --TEMP
+        self.WIPLabel = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        self.WIPLabel:SetJustifyH("CENTER");
+        self.WIPLabel:SetText(TEMPSCENE);
+        self.WIPLabel:SetTextColor(1, 0.125, 0.125);
+        self.WIPLabel:SetHeight(24);
+        self.WIPLabel:SetPoint("TOP", self, "TOP", 0, headerWidgetOffsetY);
+        self.WIPLabel:Hide();
 
         local Checkbox_HideCompleted = LandingPageUtil.CreateCheckboxButton(self);
         self.Checkbox_HideCompleted = Checkbox_HideCompleted;
