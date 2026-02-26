@@ -646,6 +646,7 @@ L["Paragon Reward Available"] = "Paragon Reward Available";
 L["Until Next Level Format"] = "%d until next level";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d until Paragon reward";
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Click to view Renown>";
+L["Instruction Click To View Companion"] = "<Click to view Delve companion>";
 L["Not On Quest"] = "You are not on this quest";
 L["Factions"] = "Factions";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Activities";

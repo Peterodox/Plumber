@@ -646,6 +646,7 @@ L["Paragon Reward Available"] = "巅峰奖励待领取";
 L["Until Next Level Format"] = "离下一级还有 %d";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "离巅峰宝箱还有 %d";
 L["Instruction Click To View Renown"] = "<点击查看名望>";
+L["Instruction Click To View Companion"] = "<点击查看地下堡伙伴>";
 L["Not On Quest"] = "你没有接到该任务";
 L["Factions"] = "声望总览";
 L["Activities"] = "每周活动";

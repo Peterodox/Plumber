@@ -153,15 +153,15 @@ do  --Layout MID
             {factionID = 2764},     --Prey S1
             {factionID = 2742,      --Delves S1
                 subFactions = {
-                    {factionID = 2744, creatureDisplayID = 26365},     --Valeera Sanguinar
+                    {factionID = 2744, creatureDisplayID = 26365, playerCompanionID = 2},     --Valeera Sanguinar. Get playerCompanionID from C_MajorFactions.GetMajorFactionData(C_DelvesUI.GetDelvesFactionForSeason())
                 },
             },
         },
 
         [2] = {
             {factionID = 2696},     --Amani Tribe
-            {factionID = 2704},     --Hara'ti
             {factionID = 2699},     --The Singularity
+            {factionID = 2704},     --Hara'ti
             {factionID = 2710,      --Silvermoon Court
                 subFactions = { --See weekly quest https://www.wowhead.com/beta/quest=91629/high-esteem
                     {factionID = 2711, creatureDisplayID = 69626},     --Magisters Esara Verrinde
