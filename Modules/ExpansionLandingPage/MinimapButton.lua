@@ -890,6 +890,18 @@ do  --Button Settings/Customize
         end
     end
 
+    local function Checkbox_UseLibIconNoBorder_ShouldShow()
+        if Checkbox_UseLibIcon_ShouldShow() then
+            return ButtonManager.RemoveButtonBorder ~= nil;
+        else
+            return false
+        end
+    end
+
+    local function Checkbox_UseLibIconNoBorder_ShouldEnable()
+        return GetDBBool("LandingButton_UseLibDBIcon")
+    end
+
     OPTIONS_SCHEMATIC = {
         title = L["LandingButton Settings Title"],
         moduleDBKey = "NewExpansionLandingPage",
@@ -897,8 +909,9 @@ do  --Button Settings/Customize
             {type = "Checkbox", label = L["LandingButtonOption ShowButton"], onClickFunc = GenericWidget_OnClick, dbKey = "LandingButton_ShowButton"},
 
             {type = "Divider"},
-            {newFeature = true, type = "Checkbox", label = L["LandingButtonOption Unaffected"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_Unaffected", tooltip = L["LandingButtonOption Unaffected Tooltip"]},
-            {newFeature = true, type = "Checkbox", label = L["LandingButtonOption UseLibDBIcon"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_UseLibDBIcon", tooltip = L["LandingButtonOption UseLibDBIcon Tooltip"], validityCheckFunc = Checkbox_UseLibIcon_ShouldShow, parentDBKey = "LandingButton_ShowButton"};
+            {type = "Checkbox", label = L["LandingButtonOption Unaffected"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_Unaffected", tooltip = L["LandingButtonOption Unaffected Tooltip"]},
+            {type = "Checkbox", label = L["LandingButtonOption UseLibDBIcon"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_UseLibDBIcon", tooltip = L["LandingButtonOption UseLibDBIcon Tooltip"], validityCheckFunc = Checkbox_UseLibIcon_ShouldShow, parentDBKey = "LandingButton_ShowButton"};
+                {newFeature = true, isSubOption = true, type = "Checkbox", label = L["LandingButtonOption UseLibDBIcon NoBorder"], onClickFunc = Checkbox_UseLibIcon_OnClick, dbKey = "LandingButton_UseLibDBIcon_NoBorder", tooltip = L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"], validityCheckFunc = Checkbox_UseLibIconNoBorder_ShouldShow, parentDBKey = "LandingButton_ShowButton", stateCheckFunc = Checkbox_UseLibIconNoBorder_ShouldEnable};
             {type = "Divider"},
 
             {type = "Dropdown", label = L["LandingButtonOption PrimaryUI"], menuData = MenuData_PrimaryUI},
@@ -1081,6 +1094,20 @@ do  --ButtonManager
                             LibDBIcon:Hide(self.dataObjectName);
                         end
                     end
+
+                    if LibDBIcon.RemoveButtonBorder and LibDBIcon.ResetButtonBorder and LibDBIcon.RemoveButtonBackground and LibDBIcon.ResetButtonBackground and LibDBIcon.SetButtonIcon and LibDBIcon.ResetButtonIcon then
+                        self.RemoveButtonBorder = function(state)
+                            if state then
+                                LibDBIcon:RemoveButtonBorder(self.dataObjectName);
+                                LibDBIcon:RemoveButtonBackground(self.dataObjectName);
+                                LibDBIcon:SetButtonIcon(self.dataObjectName, "Interface/AddOns/Plumber/Art/ExpansionLandingPage/LandingButtonIcon-64", 42);
+                            else
+                                LibDBIcon:ResetButtonBorder(self.dataObjectName);
+                                LibDBIcon:ResetButtonBackground(self.dataObjectName);
+                                LibDBIcon:ResetButtonIcon(self.dataObjectName);
+                            end
+                        end
+                    end
                 end
             end
         end
@@ -1093,6 +1120,9 @@ do  --ButtonManager
     function ButtonManager:ShowLibIcon()
         if self.SetLibButtonShown then
             self.SetLibButtonShown(true);
+            if self.RemoveButtonBorder then
+                self.RemoveButtonBorder(GetDBBool("LandingButton_UseLibDBIcon_NoBorder"));
+            end
             self.showPumberButton = false;
         end
     end
@@ -1163,6 +1193,7 @@ do  --Debug
             LandingButton_DarkColor = false,
             LandingButton_HideWhenIdle = false,
             LandingButton_UseLibDBIcon = "nil",
+            LandingButton_UseLibDBIcon_NoBorder = true,
             LandingButton_UseLibDBIcon_LibCheckFlag1 = "nil",
             LandingButton_Pos_X = "nil",
             LandingButton_Pos_Y = "nil",

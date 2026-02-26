@@ -252,6 +252,7 @@ local DefaultValues = {
         LandingButton_DarkColor = false,
         LandingButton_HideWhenIdle = false,
         --LandingButton_UseLibDBIcon = nil,     --Addon-dependant. Init on first load
+        LandingButton_UseLibDBIcon_NoBorder = true, --Remove the golden button border if supported
 
         --LandingButton_Pos_X, LandingButton_Pos_Y
 
