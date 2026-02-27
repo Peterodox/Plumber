@@ -45,6 +45,7 @@ L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "이 모듈은 항상 활성화되어 있습니다.";
 L["Return To Module List"] = "목록으로 돌아가기";
 L["Generic Addon Conflict"] = "이 모듈은 유사한 기능을 가진 다른 애드온과 호환되지 않을 수 있습니다.";
+L["Work In Progress Tag"] = "[작업 진행 중]";
 
 
 --Settings Category
@@ -396,6 +397,9 @@ L["NameplateQuest ShowTargetProgress"] = "목표 진행 상황 표시";
 L["NameplateQuest ShowTargetProgress Tooltip"] = "대상 이름표에 퀘스트 목표 진행 상황을 표시합니다.";
 L["NameplateQuest ShowProgressOnHover"] = "마우스 오버 시 진행도 표시";
 L["NameplateQuest ShowProgressOnHover Tooltip"] = "이름표나 유닛에 마우스 커서를 올렸을 때 퀘스트 목표 진행도를 표시합니다.";
+L["NameplateQuest ShowProgressOnKeyPress"] = "키 입력 시 진행 상황 표시";
+L["NameplateQuest ShowProgressOnKeyPress Tooltip Title"] = "키 입력 시 진행 상황 표시";
+L["NameplateQuest ShowProgressOnKeyPress Tooltip Format"] = "|cffffffff%s|r 키를 누를 때 퀘스트 목표 진행 상황을 표시합니다.";
 L["NameplateQuest Instruction Find Nameplate"] = "아이콘 위치를 조정하려면 NPC 이름표가 보이는 장소로 이동하세요.";
 L["NameplateQuest Progress Format"] = "진행도 형식";
 L["Progress Show Icon"] = "아이콘 표시";
@@ -710,7 +714,14 @@ L["List Is Empty"] = "목록이 비어 있습니다.";
 L["LandingButton Settings Title"] = "확장 요약: 미니맵 버튼";
 L["LandingButton Tooltip Format"] = "좌클릭: %s 전환\n우클릭: 추가 옵션";
 L["LandingButton Customize"] = "사용자 설정";
+L["LandingButton Reposition Tooltip"] = "|cffffffffShift|r 키를 눌러 잠금 해제";
 L["LandingButtonOption ShowButton"] = "미니맵 버튼 활성화";
+L["LandingButtonOption Unaffected"] = "미니맵 애드온에 영향 없음";
+L["LandingButtonOption Unaffected Tooltip"] = "이 버튼이 다른 미니맵 애드온의 영향을 받지 않도록 하여, 다시 스킨 적용되거나 위치가 변경되지 않게 합니다.\n\n활성화하면 이 버튼은 더 이상 미니맵과 함께 움직이지 않으며 미니맵의 배율을 따르지 않고, 대신 전역 UI 배율을 사용합니다.\n\n|cffff4800이 옵션을 변경한 후에는 UI를 다시 불러와야 할 수 있습니다.|r";
+L["LandingButtonOption UseLibDBIcon"] = "LibDBIcon 사용";
+L["LandingButtonOption UseLibDBIcon Tooltip"] = "LibDBIcon이 이 버튼의 외형과 위치를 관리하도록 합니다.";
+L["LandingButtonOption UseLibDBIcon NoBorder"] = "버튼 테두리 제거";
+L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "버튼의 금색 테두리를 제거합니다.\n\n일부 미니맵 버튼 관리 애드온을 사용할 경우 이 옵션은 효과가 없을 수 있습니다.";
 L["LandingButtonOption PrimaryUI"] = "좌클릭으로 열기";   --좌클릭 시 열 UI 제어
 L["LandingButtonOption PrimaryUI Tooltip"] = "미니맵 버튼을 좌클릭했을 때 열릴 UI를 선택하세요.";
 L["LandingButtonOption SmartExpansion"] = "확장 자동 선택";
@@ -818,6 +829,30 @@ L["Match Sources"] = "출처 일치";
 --SourceAchievementLink
 L["ModuleName SourceAchievementLink"] = "상호작용 가능한 출처 정보";
 L["ModuleDescription SourceAchievementLink"] = "다음 UI의 업적 이름이 상호작용 가능해져 세부 정보 확인 또는 추적이 가능합니다.\n\n- 탈것 사전\n\n- 장식 카탈로그";
+
+
+--BreakTime
+L["ModuleName BreakTime"] = "휴식 시간 알림";
+L["ModuleDescription BreakTime"] = "일정 시간 후 짧은 휴식을 취하도록 알림.";
+L["BreakTime Title AllCaps"] = "휴식 시간";
+L["BreakTime Delay Button"] = "지연";
+L["BreakTime Delay Button Tooltip Format"] = "%d분 후에 다시 알림.";
+L["BreakTime Cancel Button"] = "취소";
+L["BreakTime Cancel Button Tooltip Format 1"] = "왼쪽 클릭: 이번 주기의 타이머를 취소합니다. 다음 타이머는 %d분 후에 울립니다.";
+L["BreakTime Cancel Button Tooltip 2"] = "클릭 후 길게 누르기: 이번 게임 세션 동안 알림 취소.";
+L["BreakTime Announce Time Before Alert Format"] = "다음 타이머는 |cffffffff%d|r분 후에 울립니다.";
+L["BreakTime Announce Timer Cancelled"] = "이번 게임 세션 동안 타이머가 취소되었습니다.";
+L["BreakTime Current Schedule Format"] = "현재 일정은 |cffffffff%1$d|r분 휴식을 |cffffffff%2$d|r분마다 취하는 것입니다.";
+L["BreakTime Option Cycle"] = "주기 시간";
+L["BreakTime Option Cycle Tooltip"] = "플레이/휴식 주기의 길이.";
+L["BreakTime Option Rest"] = "휴식 시간";
+L["BreakTime Option Rest Tooltip"] = "각 주기마다 휴식하는 시간.";
+L["BreakTime Option Delay"] = "지연 시간";
+L["BreakTime Option Delay Tooltip"] = "지연 버튼 클릭 시 타이머를 이 분량만큼 지연.";
+L["BreakTime Option FlashTaskbar"] = "작업 표시줄 아이콘 깜박임";
+L["BreakTime Option FlashTaskbar Tooltip"] = "타이머가 울릴 때 WoW 작업 표시줄 아이콘을 깜박입니다.";
+L["BreakTime Reset Cancellation"] = "취소된 휴식 초기화";
+L["BreakTime Annouce Timer Deferred Combat"] = "전투 후 휴식을 잊지 마세요!";
 
 
 --Generic
