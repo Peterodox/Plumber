@@ -820,6 +820,9 @@ L["BreakTime Option Delay"] = "推迟时长";
 L["BreakTime Option Delay Tooltip"] = "按下推迟按钮推迟的分钟数。";
 L["BreakTime Option FlashTaskbar"] = "任务栏图标闪烁";
 L["BreakTime Option FlashTaskbar Tooltip"] = "到预定休息时间时让系统任务栏里的魔兽图标闪烁。";
+L["BreakTime Option PauseWhenAFK"] = "暂离时推迟休息计划";
+L["BreakTime Option PauseWhenAFK Tooltip"] = "当你暂离时暂停距下一休息时间的倒计时。\n\n如果你单次暂离时长高于预设休息时长，则重置倒计时。";
+L["BreakTime AFK Pause"] = "由于你处于暂离状态，倒计时已暂停。";
 L["BreakTime Reset Cancellation"] = "重置已取消的休息时间";
 L["BreakTime Annouce Timer Deferred Combat"] = "战斗过后请记得休息！";
 

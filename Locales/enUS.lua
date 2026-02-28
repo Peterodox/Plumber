@@ -852,6 +852,9 @@ L["BreakTime Option Delay"] = "Delay Duration";
 L["BreakTime Option Delay Tooltip"] = "Delay the timer by this amount of minutes when clicking the Delay button.";
 L["BreakTime Option FlashTaskbar"] = "Flash Taskbar Icon";
 L["BreakTime Option FlashTaskbar Tooltip"] = "Flash WoW's taskbar icon when the timer goes off.";
+L["BreakTime Option PauseWhenAFK"] = "Postpone Schedule When AFK";
+L["BreakTime Option PauseWhenAFK Tooltip"] = "Pause the countdown to your next scheduled break when you go AFK.\n\nThe countdown will be reset if your AFK duration is longer than the planned break duration.";
+L["BreakTime AFK Pause"] = "The countdown is on hold because you are AFK.";
 L["BreakTime Reset Cancellation"] = "Reset Cancelled Break";
 L["BreakTime Annouce Timer Deferred Combat"] = "Remember to take a break after fight!";
 
