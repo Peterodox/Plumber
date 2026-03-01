@@ -63,6 +63,7 @@ local function HideClockUI(resetBreakTime)
             Controller.timeLeft = nil;
         end
     end
+    Controller.Scheduler.pauseUpdate = nil;
 end
 
 
@@ -523,7 +524,7 @@ do  --Options
                 f.Title:SetText(scheduleText.."\n|cff808080"..L["BreakTime Announce Timer Cancelled"].."|r");
             else
                 local nextText = L["BreakTime Announce Time Before Alert Format"]:format(Controller.GetMinutesUntilNextGoOff());
-                if GetDBBool("BreakTime_PauseWhenAFK") and Controller.Scheduler.isAFK then
+                if Controller.Scheduler.isAFK then
                     nextText = nextText.."\n|cff808080"..L["BreakTime AFK Pause"].."|r";
                 end
                 f.Title:SetText(scheduleText.."\n"..nextText);
@@ -586,7 +587,7 @@ do  --Options
     local function ResetCancelledSchedule()
         local current = time();
         if PlumberDB.lastLoginTime and PlumberDB.lastLoginTime > current then
-            PlumberDB.lastLoginTime = current;
+            Controller:UpdateLastLoginTime();
         end
         Controller.OnNewGameSessionBegin();
         addon.UpdateSettingsDialog();
@@ -611,7 +612,6 @@ do  --Options
             {type = "Divider"},
             {type = "Slider", label = L["BreakTime Option Delay"], tooltip = L["BreakTime Option Delay Tooltip"], minValue = Options.DelayDuration.minVal, maxValue = Options.DelayDuration.maxVal, valueStep = 1, onValueChangedFunc = Delay_Slider_OnValueChanged, formatValueFunc = FormatNumericValue, dbKey = "BreakTime_Delay"},
             {type = "Checkbox", label = L["BreakTime Option FlashTaskbar"], tooltip = L["BreakTime Option FlashTaskbar Tooltip"], dbKey = "BreakTime_FlashTaskbar"},
-            {type = "Checkbox", label = L["BreakTime Option PauseWhenAFK"], tooltip = L["BreakTime Option PauseWhenAFK Tooltip"], dbKey = "BreakTime_PauseWhenAFK", onClickFunc = PauseWhenAFK_OnClick},
         },
     };
 
@@ -639,7 +639,7 @@ do  --Controller
 
     function Scheduler:UpdateAFKStatus()
         local isAFK = UnitIsAFK("player");
-        if API.Secret_CanAccess(isAFK) and GetDBBool("BreakTime_PauseWhenAFK") then
+        if API.Secret_CanAccess(isAFK) then
             isAFK = isAFK;
         else
             isAFK = false;
@@ -648,8 +648,8 @@ do  --Controller
         if isAFK ~= self.isAFK then
             if (self.isAFK and not isAFK) and self.afkStartTime then
                 local _, restSeconds = Options.GetValidatedDurationsInSeconds();
-                if time() - self.afkStartTime > 0.95 * restSeconds then
-                    PlumberDB.lastLoginTime = time() + 1;
+                if time() - self.afkStartTime > 0.98 * restSeconds then     --2% 2s/120s
+                    Controller:UpdateLastLoginTime();
                     Controller:UpdateSchedule();
                 end
             end
@@ -792,6 +792,10 @@ do  --Controller
         self:EvaluateCountdown();
     end
 
+    function Controller:UpdateLastLoginTime()
+        PlumberDB.lastLoginTime = time() + 1;
+    end
+
     function Controller.GetDefaultDelayInMinutes()
         return Options.GetValidatedDelay()
     end
@@ -853,7 +857,7 @@ do  --Controller
         local nextGoOff = addon.GetLastLoginTime() + cycleSeconds;
         local current = time();
 
-        while nextGoOff < current do
+        while nextGoOff < current + 1 do
             nextGoOff = nextGoOff + cycleSeconds;
         end
 
@@ -898,7 +902,7 @@ do  --Controller
                         end
                     end
 
-                    if f.isAFK then
+                    if f.isAFK or f.pauseUpdate then
                         return
                     end
 
@@ -948,6 +952,7 @@ do  --Controller
         if ClockUI:IsShown() then
             ClockUI.MouseoverFrame:Hide();
             ClockUI.ButtonContainer:Hide();
+            Scheduler.pauseUpdate = true;
             self:PlayCheeringAnimation();
             for event in pairs(AutoCloseEvents) do
                 self:RegisterEvent(event);
@@ -981,7 +986,9 @@ do  --Controller
             RegisterEvent(self, DeferredEvents, false);
             self:SetScript("OnEvent", nil);
             self:PlayIntroAnimation();
+            self:UpdateLastLoginTime();
             self:UpdateSchedule();
+            Scheduler.pauseUpdate = nil;
             if GetDBBool("BreakTime_FlashTaskbar") then
                 FlashClientIcon();
             end
