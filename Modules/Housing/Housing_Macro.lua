@@ -100,7 +100,7 @@ do  --Toggle Torch Macro    #plumber:torch
     end
 
     local function ConditionFunc_torch()
-        --Return Action:   true(use torch)   false(cancel torch)
+        --Return Action:   true(use torch)   false(cancel torch)    nil(don't change macro)
 
         if IsInHousingZone() then
             local aura = GetUnitAuraBySpellID("player", ItemInfo.spellID);
@@ -113,7 +113,7 @@ do  --Toggle Torch Macro    #plumber:torch
                 return true
             end
         else
-            return true
+            return nil
         end
     end
 

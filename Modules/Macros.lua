@@ -41,6 +41,7 @@ local GetMountInfoByID = C_MountJournal and C_MountJournal.GetMountInfoByID or A
 local FindSpellOverrideByID = FindSpellOverrideByID;
 local GetActionInfo = GetActionInfo;
 local GetCursorInfo = GetCursorInfo;
+local GetCurrentKeyBoardFocus = GetCurrentKeyBoardFocus;
 local CreateFrame = CreateFrame;
 
 local DoesItemReallyExist = API.DoesItemReallyExist;
@@ -279,6 +280,10 @@ function EL:OnUpdate_UpdateMacroByEvent(elapsed)
 end
 
 function EL:UpdateMacroByEvent(event)
+    if GetCurrentKeyBoardFocus() ~= nil and EditorUI:IsEditBoxFocused() then
+        return
+    end
+
     local commands = {};
 
     for _, info in ipairs(self.macroEvents[event]) do
@@ -289,14 +294,6 @@ function EL:UpdateMacroByEvent(event)
     end
 
     self:UpdateMacros(commands);
-end
-
-local function GetBestDefaultIcon(body)
-    if body then
-        if find(body, "C_MountJournal.SummonByID(0)") then
-            return 413588
-        end
-    end
 end
 
 function EL:UpdateMacros(commands)
@@ -712,6 +709,10 @@ do  --EditorUI  --MacroForge
             EL:RequestUpdateMacros(0.0);
         end
     end
+
+    function EditorUI:IsEditBoxFocused()
+        return self.SourceEditBox and self.SourceEditBox.HasFocus and self.SourceEditBox:HasFocus()
+    end
 end
 
 
@@ -792,6 +793,7 @@ local function CreateEditorUI_Blizzard()
         --]]
 
         if frame.SelectMacro then
+            --SelectMacro triggered by "UPDATE_MACROS"
             hooksecurefunc(frame, "SelectMacro", function()
                 EL:RequestCheckMacros();
             end);
