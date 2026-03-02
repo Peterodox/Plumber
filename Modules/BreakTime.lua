@@ -744,6 +744,10 @@ do  --Controller
     function Controller:PlayIntroAnimation()
         InitClockUI();
 
+        if ClockUI:IsShown() and ClockUI.AnimIn:IsPlaying() then
+            return
+        end
+
         self:Stop();
         self.radian = 0;
         self.second = 0;
@@ -793,7 +797,7 @@ do  --Controller
     end
 
     function Controller:UpdateLastLoginTime()
-        PlumberDB.lastLoginTime = time() + 1;
+        PlumberDB.lastLoginTime = time();
     end
 
     function Controller.GetDefaultDelayInMinutes()
@@ -803,16 +807,15 @@ do  --Controller
     function Controller.DelayCurrentTimer()
         HideClockUI();
         local delay = Controller.GetDefaultDelayInMinutes();
+        local delaySeconds = 60 * delay;
         API.DisplayAlertMessage(L["BreakTime Announce Time Before Alert Format"]:format(delay));
 
         --Extend remainingTime if the delay is longer
-        if Scheduler.remainingTime and Scheduler.remainingTime < 60 * delay then
-            local diff = 60 * delay - Scheduler.remainingTime;
-            if PlumberDB.lastLoginTime then
-                PlumberDB.lastLoginTime = PlumberDB.lastLoginTime + diff;
-            end
-            Scheduler.remainingTime = 60 * delay;
+        if Scheduler.remainingTime and Scheduler.remainingTime < delaySeconds then
+            Scheduler.remainingTime = delaySeconds;
         end
+
+        PlumberDB.lastLoginTime = time() - delaySeconds;
 
         Options.TryUpdateDemoFrame();
     end
@@ -824,11 +827,6 @@ do  --Controller
         HideClockUI(true);
 
         if Scheduler.remainingTime then
-            local cycleSeconds = Options.GetValidatedDurationsInSeconds();
-            Scheduler.remainingTime = Scheduler.remainingTime + cycleSeconds;
-            if PlumberDB.lastLoginTime then
-                PlumberDB.lastLoginTime = PlumberDB.lastLoginTime + cycleSeconds;
-            end
             API.DisplayAlertMessage(L["BreakTime Announce Time Before Alert Format"]:format(Controller.GetMinutesUntilNextGoOff()));
         end
 
@@ -857,7 +855,7 @@ do  --Controller
         local nextGoOff = addon.GetLastLoginTime() + cycleSeconds;
         local current = time();
 
-        while nextGoOff < current + 1 do
+        while nextGoOff <= current + 1 do
             nextGoOff = nextGoOff + cycleSeconds;
         end
 
@@ -894,6 +892,7 @@ do  --Controller
                 Scheduler.remainingTime = remainingTime;
 
                 Scheduler:SetScript("OnUpdate", function(f, elapsed)
+                    --elapsed = elapsed * 100;  --Debug Time multiplier
                     if f.afkUpdateElapsed then
                         f.afkUpdateElapsed = f.afkUpdateElapsed + elapsed;
                         if f.afkUpdateElapsed >= 1 then
