@@ -57,9 +57,7 @@ local function HideClockUI(resetBreakTime)
     if ClockUI then
         ClockUI:Hide();
         if resetBreakTime then
-            if Controller:GetScript("OnUpdate") == OnUpdate.Counting then
-                Controller:SetScript("OnUpdate", nil);
-            end
+            Controller:DisableCounting();
             Controller.timeLeft = nil;
         end
     end
@@ -395,6 +393,8 @@ do  --OnUpdate Funcs
     end
 
     function OnUpdate.Counting(self, elapsed)
+        --elapsed = elapsed * 50;  --Debug Time multiplier
+
         self.radian = self.radian + 0.1*elapsed * self.pi2;
         if self.radian > self.pi2 then
             self.radian = self.radian - self.pi2;
@@ -750,7 +750,7 @@ do  --Controller
 
         self:Stop();
         self.radian = 0;
-        self.second = 0;
+        self.second = self.second or 0;
 
         ClockUI:StopAnimating();
         ClockUI:SetScript("OnUpdate", nil);
@@ -804,18 +804,21 @@ do  --Controller
         return Options.GetValidatedDelay()
     end
 
+    function Controller:DisableCounting()
+        if self:GetScript("OnUpdate") == OnUpdate.Counting then
+            self:SetScript("OnUpdate", nil);
+        end
+    end
+
     function Controller.DelayCurrentTimer()
         HideClockUI();
         local delay = Controller.GetDefaultDelayInMinutes();
         local delaySeconds = 60 * delay;
         API.DisplayAlertMessage(L["BreakTime Announce Time Before Alert Format"]:format(delay));
-
-        --Extend remainingTime if the delay is longer
-        if Scheduler.remainingTime and Scheduler.remainingTime < delaySeconds then
-            Scheduler.remainingTime = delaySeconds;
-        end
-
-        PlumberDB.lastLoginTime = time() - delaySeconds;
+        local cycleSeconds = Options.GetValidatedDurationsInSeconds();
+        PlumberDB.lastLoginTime = time() - (cycleSeconds - delaySeconds);
+        Controller:DisableCounting();
+        Controller:UpdateSchedule();
 
         Options.TryUpdateDemoFrame();
     end
@@ -825,6 +828,7 @@ do  --Controller
             return
         end
         HideClockUI(true);
+        Controller.second = 0;
 
         if Scheduler.remainingTime then
             API.DisplayAlertMessage(L["BreakTime Announce Time Before Alert Format"]:format(Controller.GetMinutesUntilNextGoOff()));
@@ -837,6 +841,7 @@ do  --Controller
         Controller.isCancelledForSession = true;
         addon.SetDBValue("BreakTimeFlag_Cancelled", true);
         HideClockUI(true);
+        Controller.second = 0;
         API.DisplayErrorMessage(L["BreakTime Announce Timer Cancelled"]);
         Options.TryUpdateDemoFrame();
     end
@@ -892,7 +897,8 @@ do  --Controller
                 Scheduler.remainingTime = remainingTime;
 
                 Scheduler:SetScript("OnUpdate", function(f, elapsed)
-                    --elapsed = elapsed * 100;  --Debug Time multiplier
+                    --elapsed = elapsed * 50;  --Debug Time multiplier
+
                     if f.afkUpdateElapsed then
                         f.afkUpdateElapsed = f.afkUpdateElapsed + elapsed;
                         if f.afkUpdateElapsed >= 1 then
@@ -913,7 +919,8 @@ do  --Controller
                         if self.isCancelledForSession then return end;
 
                         local _, restSeconds = Options.GetValidatedDurationsInSeconds();
-                        if (not Controller.timeLeft) or Controller.timeLeft < restSeconds then
+                        if (not Controller.timeLeft) or Controller.timeLeft > restSeconds then
+                            print(Controller.timeLeft, restSeconds)
                             Controller.timeLeft = restSeconds;
                         end
                         Controller.lastCycleComplete = false;
@@ -947,6 +954,7 @@ do  --Controller
 
     function Controller:OnCountdownComplete()
         self.lastCycleComplete = true;
+        self.second = 0;
         self:Stop();
         if ClockUI:IsShown() then
             ClockUI.MouseoverFrame:Hide();
