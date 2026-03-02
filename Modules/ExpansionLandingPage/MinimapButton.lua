@@ -451,8 +451,6 @@ do  --Button Position/Anchor
                     self:SetPoint("CENTER", Minimap, "CENTER", _x, _y);
                 end
                 x, y = GetMiniButtonAbsolutePosition();
-                PlumberDB.LandingButton_AbsPos_X = x;
-                PlumberDB.LandingButton_AbsPos_Y = y;
                 self:ClearAllPoints();
             end
 
