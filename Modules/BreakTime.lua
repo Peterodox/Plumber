@@ -1024,6 +1024,16 @@ do
 end
 
 
+do
+    function addon.TryAddBreakTimeToTooltip(tooltip)
+        if GetDBBool("BreakTime") then
+            tooltip:AddLine(" ");
+            tooltip:AddLine(L["BreakTime Shared Countdown Tooltip Format"]:format(Controller.GetMinutesUntilNextGoOff()), 1, 0.82, 0, false);
+        end
+    end
+end
+
+
 do  --Debug
     --function Plumber_TriggerTimer()
     --    Controller.Scheduler.remainingTime = 1;

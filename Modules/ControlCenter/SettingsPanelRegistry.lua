@@ -85,6 +85,11 @@ do  --Globals, AddOn Compartment
         tooltip:SetPoint("TOPRIGHT", menuButton, "TOPLEFT", -12, 0);
         tooltip:SetText(L["Module Category Plumber"], 1, 1, 1);
         tooltip:AddLine(L["Click To Show Settings"], 1, 0.82, 0, true);
+
+        if addon.TryAddBreakTimeToTooltip then
+            addon.TryAddBreakTimeToTooltip(tooltip);
+        end
+
         tooltip:Show();
     end
 

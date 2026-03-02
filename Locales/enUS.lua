@@ -855,6 +855,7 @@ L["BreakTime Option FlashTaskbar Tooltip"] = "Flash WoW's taskbar icon when the 
 L["BreakTime AFK Pause"] = "The countdown is on hold because you are AFK.";
 L["BreakTime Reset Cancellation"] = "Reset Cancelled Break";
 L["BreakTime Annouce Timer Deferred Combat"] = "Remember to take a break after fight!";
+L["BreakTime Shared Countdown Tooltip Format"] = "Scheduled break in |cffffffff%d|r min.";
 
 
 --Generic

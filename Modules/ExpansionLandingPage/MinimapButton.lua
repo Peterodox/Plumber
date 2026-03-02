@@ -169,6 +169,11 @@ do  --ButtonMixin
         tooltip:SetOwner(self, "ANCHOR_LEFT", 4, -2);
         tooltip:SetText(LandingPageUtil.GetModuleNameWithHotkey(), 1, 1, 1);
         tooltip:AddLine(L["LandingButton Tooltip Format"]:format(OrderHallUtil.GetCurrentBestUIName(), 1, 0.82, 0, false));
+
+        if addon.TryAddBreakTimeToTooltip then
+            addon.TryAddBreakTimeToTooltip(tooltip);
+        end
+
         tooltip:Show();
     end
 
