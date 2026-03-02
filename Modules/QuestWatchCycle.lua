@@ -58,6 +58,10 @@ local function FocusQuestByDelta(delta)
 	end
     table.sort(infos, CompareQuestWatchInfos);
 
+    if not infos[1] then
+        return
+    end
+
     local firstQuestID = infos[1].questID;
     local lastQuestID = infos[#infos].questID;
     local newQuestID;
