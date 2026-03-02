@@ -264,7 +264,7 @@ do  --Widget
 
         function QuestWidgetMixin:OnUpdate_HideProgressAfterDelay(elapsed)
             self.t = self.t + elapsed;
-            if self.t >= 1 then
+            if self.t >= 1.5 then     --AutoFadeOutDelay
                 self.t = 0;
                 self:SetScript("OnUpdate", self.OnUpdate_HideProgress);
             end
