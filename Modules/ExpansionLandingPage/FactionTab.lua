@@ -569,6 +569,7 @@ local function FactionButton_OnClickFunc(self, button)
     if self.playerCompanionID and not InCombatLockdown() then
         local f = DelvesCompanionConfigurationFrame;
         if not f:IsShown() then
+            f.playerCompanionID = self.playerCompanionID;
             ShowUIPanel(f);
         else
             HideUIPanel(f);
