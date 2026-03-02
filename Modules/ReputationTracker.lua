@@ -26,6 +26,8 @@ EL.factionRemap = {
     [2600] = {2601, 2605, 2607},
 };
 
+local MAJOR_FACTION_THRESHOLD = 2500;
+
 function EL:CacheDefaultReputations()
     -- Include major factions and the currently watched faction
 
@@ -58,8 +60,8 @@ end
 function EL:CalculateMajorFactionEffectiveStanding(factionID)
     local data = C_MajorFactions.GetMajorFactionRenownInfo(factionID);
     if data then
-        local threshold = 2500; --Assumption
-        local value = data.renownLevel * threshold + data.renownReputationEarned;
+        --renownLevel may still be the old value when it just levels up
+        local value = data.renownLevel * MAJOR_FACTION_THRESHOLD + (data.renownReputationEarned or 0);
 
         if C_MajorFactions.HasMaximumRenown(factionID) then
             local extra = C_Reputation.GetFactionParagonInfo(factionID);
@@ -196,6 +198,10 @@ function EL:SetFactionStanding(factionID, updatedStanding)
         if newStanding then
             delta = newStanding - info.standing;
             info.standing = newStanding;
+            if info.isMajorFaction and delta > MAJOR_FACTION_THRESHOLD then
+                --Assume rep granted one time can't exceed 2500
+                delta = delta - MAJOR_FACTION_THRESHOLD;
+            end
         end
 
         --print(factionID, info.name, newStanding, delta);
