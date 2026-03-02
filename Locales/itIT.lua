@@ -36,6 +36,13 @@ L["Special Assignment"] = "Incarico speciale";
 L["Match Pattern Rep 1"] = "La reputazione della Brigata con \"(.+)\" è aumentata di ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "La reputazione con \"(.+)\" è aumentata di ([%d%,]+)";   --FACTION_STANDING_INCREASED
 
+L["Upgrade Track 1"] = "Avventuriero";
+L["Upgrade Track 2"] = "Explorer";  --unused
+L["Upgrade Track 3"] = "Veterano";
+L["Upgrade Track 4"] = "Campione";
+L["Upgrade Track 5"] = "Eroe";
+L["Upgrade Track 6"] = "Mito";
+
 L["Match Pattern Transmog Set Partially Known"] = "^Contiene (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
 L["DyeColorNameAbbr Black"] = "Nero";

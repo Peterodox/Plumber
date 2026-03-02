@@ -889,6 +889,13 @@ L["Match Pattern Copper"] = "([%d]+) 铜";
 L["Match Pattern Rep 1"] = "你的战团在(.+)中的声望值提高了([%d%,]+)点";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "你在(.+)中的声望值提高了([%d%,]+)点";   --FACTION_STANDING_INCREASED
 
+L["Upgrade Track 1"] = "冒险者";
+L["Upgrade Track 2"] = "探险者";
+L["Upgrade Track 3"] = "老兵";
+L["Upgrade Track 4"] = "勇士";
+L["Upgrade Track 5"] = "英雄";
+L["Upgrade Track 6"] = "神话";
+
 L["Match Pattern Transmog Set Partially Known"] = "^包含(%d)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
 L["DyeColorNameAbbr Black"] = "黑色";

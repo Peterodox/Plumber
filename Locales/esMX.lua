@@ -35,6 +35,15 @@ L["Special Assignment"] = "Asignación especial";
 L["Match Pattern Rep 1"] = "La reputación de tu tropa con (.+) ha aumentado ([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "Tu reputación con (.+) ha aumentado ([%d%,]+)";   --FACTION_STANDING_INCREASED
 
+L["Match Pattern Item Level"] = "^Nivel de objeto (%d+)";
+L["Match Pattern Item Upgrade Tooltip"] = "^Nivel de mejora: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Upgrade Track 1"] = "Aventurero";
+L["Upgrade Track 2"] = "Explorador";
+L["Upgrade Track 3"] = "Veterano";
+L["Upgrade Track 4"] = "Campeón";
+L["Upgrade Track 5"] = "Héroe";
+L["Upgrade Track 6"] = "Mítico";
+
 L["Match Pattern Transmog Set Partially Known"] = "^Contiene (%d+) ";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
 L["DyeColorNameAbbr Black"] = "Negro";

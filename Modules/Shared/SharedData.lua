@@ -1,13 +1,14 @@
 local _, addon = ...
+local L = addon.L;
 local API = addon.API;
 
 
 do  --Item Upgrade Track
     local ItemUpgradeConstant = {
-        BaseCurrencyID = 3008,      --Flightstones
-        CatalystCurrencyID = 3269;  --Item conversion   /dump ItemInteractionFrame.currencyTypeId
-        DelveWeeklyStashCurrencyID = 3290,
-        RadiantEchoItemID = 246771,
+        BaseCurrencyID = 3008,      --Flightstones (This type of currency is retired in Midnight)
+        CatalystCurrencyID = 3378;  --Item conversion   /dump ItemInteractionFrame.currencyTypeId
+        DelveWeeklyStashCurrencyID = 3347,
+        RadiantEchoItemID = 246771, --Retired in Midnight
 
         Crests = {
             --Universal Upgrade System (Crests)
@@ -15,23 +16,32 @@ do  --Item Upgrade Track
             --CategoryID ~= 142
             --From high tier to low
 
-            --11.2.0
-            3290,   --Gilded    (M, M7+)
-            3288,   --Runed     (H, M2)
-            3286,   --Carved    (N, M0)
-            3284,   --Weathered (LFR, H)
+            --12.0.1
+            3347,   --Myth
+            3345,   --Hero    (M, M7+)
+            3343,   --Champion     (H, M2)
+            3341,   --Veteran    (N, M0)
+            3383,   --Adventurer (LFR, H)
         },
 
         CrestSources = {    --TODO: Midnight S1: Dawncrest
-            (PLAYER_DIFFICULTY6 or "Mythic") .. ", +7",
-            (PLAYER_DIFFICULTY2 or "Heroic") .. ", +2",
-            (PLAYER_DIFFICULTY1 or "Normal"),
+            (PLAYER_DIFFICULTY6 or "Mythic") .. ", +9",
+            (PLAYER_DIFFICULTY2 or "Heroic") .. ", +4",
+            (PLAYER_DIFFICULTY1 or "Normal") .. ", +2",
             (PLAYER_DIFFICULTY3 or "Raid Finder"),
+            " ",
         };
     };
 
 
     addon.ItemUpgradeConstant = ItemUpgradeConstant;
+
+
+    L["currency-3347"] = L["Upgrade Track 6"];
+    L["currency-3345"] = L["Upgrade Track 5"];
+    L["currency-3343"] = L["Upgrade Track 4"];
+    L["currency-3341"] = L["Upgrade Track 3"];
+    L["currency-3383"] = L["Upgrade Track 1"];
 end
 
 

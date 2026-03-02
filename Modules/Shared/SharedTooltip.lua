@@ -720,8 +720,8 @@ do
                 self:SetGridLine(1, 3, L["Numbers To Earn"], 0.5, 0.5, 0.5, 3, 3);
             end
 
-            --Show Valorstone
-            self:AppendCurrency(IUC.BaseCurrencyID, true);
+            --Show Valorstone (Retired in Midnight)
+            --self:AppendCurrency(IUC.BaseCurrencyID, true);
 
             --Catalyst Charges
             if showExtraInfo and IUC.CatalystCurrencyID then

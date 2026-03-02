@@ -34,6 +34,8 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
     local f = CreateFrame("Frame", nil, parent);
     ItemUpgradeFrame = f;
 
+    local buttonGap = 2;
+
     local n = 0;
     local buttons = {};
 
@@ -43,17 +45,19 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
         n = n + 1;
         local button = CreateButton(parent);
         buttons[n] = button;
-        button:SetPoint("TOPRIGHT", f, "TOPRIGHT", (1 - i) * BUTTON_WIDTH, 0);
+        button:SetPoint("TOPRIGHT", f, "TOPRIGHT", (1 - i) * (BUTTON_WIDTH + buttonGap), 0);
         button.currencyID = currencyID;
         button.displayedMax = 999;
     end
 
+    --[[    --Valorstones Removed. Replaced by 5 tiers of crests in Midnight
     local button = CreateButton(parent);
     table.insert(buttons, button);
     button:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
     button.currencyID = ItemUpgradeConstant.BaseCurrencyID;
+    --]]
 
-    local width = 5.5 * BUTTON_WIDTH;
+    local width = #buttons * (BUTTON_WIDTH + buttonGap) - buttonGap;
     local height = BUTTON_HEIGHT;
 
     f:SetSize(width, height);

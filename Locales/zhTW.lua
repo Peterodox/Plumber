@@ -476,6 +476,13 @@ L["Special Assignment"] = "特殊任務";
 L["Match Pattern Rep 1"] = "戰隊的(.+)聲望提高([%d%,]+)";   --FACTION_STANDING_INCREASED_ACCOUNT_WIDE
 L["Match Pattern Rep 2"] = "你於(.+)的聲望提高了([%d%,]+)";   --FACTION_STANDING_INCREASED
 
+L["Upgrade Track 1"] = "冒險者";
+L["Upgrade Track 2"] = "Explorer";
+L["Upgrade Track 3"] = "精兵";
+L["Upgrade Track 4"] = "勇士";
+L["Upgrade Track 5"] = "英雄";
+L["Upgrade Track 6"] = "傳奇";
+
 L["Match Pattern Transmog Set Partially Known"] = "^包含(%d)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
 L["DyeColorNameAbbr Black"] = "黑色";

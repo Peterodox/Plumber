@@ -53,12 +53,15 @@ do  --MID
         {currencyID = 3028},    --Restored Coffer Key
         {currencyID = 3310},    --Coffer Key Shard
         {currencyID = 3316},    --Voidlight Marl
+        {currencyID = 3376, shownIfOwned = true},   --Shard of Dundun
 
-        {currencyID = 1602, shownIfOwned = true},    --Conquest
-        {currencyID = 1792, shownIfOwned = true},    --Honor
+        {currencyID = 1602, shownIfOwned = true},   --Conquest
+        {currencyID = 1792, shownIfOwned = true},   --Honor
 
         {currencyID = 2803},    --Undercoin
 
+        {currencyID = 2123, shownIfOwned = true},   --Bloody Tokens
+        {currencyID = 2797, shownIfOwned = true},   --Trophy of Strife
     };
 
     if addon.ItemUpgradeConstant.CatalystCurrencyID then
