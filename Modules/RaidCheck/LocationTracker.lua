@@ -38,6 +38,8 @@ EL.instancePos = {
     --Hardcode XY for certain instance whose entrance position doesn't match the pin
     --Some map pins don't show on map until you complete relevant quests or discover the map
     --[journalInstanceID] = {x, y, indoors}
+    [285] = {0.57287, 0.46811, true},   --Utgarde Keep
+    [286] = {0.57252, 0.46620, false},  --Utgarde Pinnacle
     [786] = {0.44148, 0.59743, true},   --Nighthold
     [726] = {0.41068, 0.61744, true},   --The Arcway
     [187] = {0.61534, 0.26397},         --Dragon Soul
