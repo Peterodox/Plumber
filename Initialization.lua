@@ -372,6 +372,8 @@ local DefaultValues = {
         BreakTime_Rest = 5,
         BreakTime_Delay = 5,
         BreakTime_FlashTaskbar = false,
+        BreakTime_DNDCombat = true,
+        BreakTime_DNDInstances = false,
 
 
     --Declared elsewhere:

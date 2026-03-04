@@ -593,10 +593,6 @@ do  --Options
         addon.UpdateSettingsDialog();
     end
 
-    local function PauseWhenAFK_OnClick(self)
-        Controller.Scheduler.afkUpdateElapsed = 0;
-        addon.UpdateSettingsDialog();
-    end
 
     local OPTIONS_SCHEMATIC = {
         title = L["ModuleName BreakTime"],
@@ -612,6 +608,11 @@ do  --Options
             {type = "Divider"},
             {type = "Slider", label = L["BreakTime Option Delay"], tooltip = L["BreakTime Option Delay Tooltip"], minValue = Options.DelayDuration.minVal, maxValue = Options.DelayDuration.maxVal, valueStep = 1, onValueChangedFunc = Delay_Slider_OnValueChanged, formatValueFunc = FormatNumericValue, dbKey = "BreakTime_Delay"},
             {type = "Checkbox", label = L["BreakTime Option FlashTaskbar"], tooltip = L["BreakTime Option FlashTaskbar Tooltip"], dbKey = "BreakTime_FlashTaskbar"},
+
+            {type = "Divider"},
+            {type = "Header", label = L["BreakTime Option DND"]};
+            {type = "Checkbox", label = L["BreakTime Option DNDCombat"], tooltip = L["BreakTime Option DNDCombat Tooltip"], dbKey = "BreakTime_DNDCombat", stateCheckFunc = function() return false end},   --This option is always enabled
+            {type = "Checkbox", label = L["BreakTime Option DNDInstances"], tooltip = L["BreakTime Option DNDInstances Tooltip"], dbKey = "BreakTime_DNDInstances"},
         },
     };
 
@@ -805,8 +806,13 @@ do  --Controller
     end
 
     function Controller:DisableCounting()
-        if self:GetScript("OnUpdate") == OnUpdate.Counting then
+        if self:GetScript("OnUpdate") == OnUpdate.Counting or self:GetScript("OnUpdate") == OnUpdate.PauseCountdown then
             self:SetScript("OnUpdate", nil);
+            RegisterEvent(self, HealthyEvents, false);
+            RegisterEvent(self, UnhealthyEvents, false);
+            if self:GetScript("OnEvent") == self.OnEvent_ClockReady then
+                self:SetScript("OnEvent", nil);
+            end
         end
     end
 
@@ -864,6 +870,15 @@ do  --Controller
             nextGoOff = nextGoOff + cycleSeconds;
         end
 
+
+        --debug
+        --[[
+        if not self.firstGoOffModified then
+            self.firstGoOffModified = true;
+            nextGoOff = current + 5;
+        end
+        --]]
+
         return nextGoOff, nextGoOff - current
     end
 
@@ -920,7 +935,6 @@ do  --Controller
 
                         local _, restSeconds = Options.GetValidatedDurationsInSeconds();
                         if (not Controller.timeLeft) or Controller.timeLeft > restSeconds then
-                            print(Controller.timeLeft, restSeconds)
                             Controller.timeLeft = restSeconds;
                         end
                         Controller.lastCycleComplete = false;
@@ -970,10 +984,12 @@ do  --Controller
 
 
     local InCombatLockdown = InCombatLockdown;
+    local IsInInstance = IsInInstance;
 
     local DeferredEvents = {
         PLAYER_REGEN_ENABLED = true,
         LOADING_SCREEN_DISABLED = true,
+        PLAYER_MAP_CHANGED = true,
     };
 
     function Controller:OnEvent_TryShowTimer(event)
@@ -983,7 +999,7 @@ do  --Controller
     end
 
     function Controller:TryShowTimer()
-        if API.IsInPvP() or InCombatLockdown() then
+        if API.IsInPvP() or InCombatLockdown() or (GetDBBool("BreakTime_DNDInstances") and IsInInstance()) then
             if self:GetScript("OnEvent") ~= self.OnEvent_TryShowTimer then
                 self:SetScript("OnEvent", self.OnEvent_TryShowTimer);
                 RegisterEvent(self, DeferredEvents, true);
