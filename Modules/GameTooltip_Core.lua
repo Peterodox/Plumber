@@ -89,8 +89,6 @@ do
     end
 
     function HandlerMixin:CallSubModules(tooltip, id, hyperlink)
-        if not Secret_CanAccess(id) then return end;
-
         self.hasAltMode = nil;
         self.currentTooltip = tooltip;
 
@@ -252,7 +250,7 @@ do  --GameTooltipManager
                     local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
                     if tooltipData and tooltipData.type == tooltipDataType then
                         local leftText = tooltipData.lines and tooltipData.lines[1] and tooltipData.lines[1].leftText;
-                        if leftText then
+                        if Secret_CanAccess(leftText) then
                             leftText = gsub(leftText, "|T.+|t", "");
                             leftText = gsub(leftText, "%\n.+", "");
                             leftText = gsub(leftText, "|cff%w%w%w%w%w%w", "");
@@ -266,9 +264,9 @@ do  --GameTooltipManager
                     local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
                     if tooltipData and tooltipData.type == tooltipDataType then
                         local arg1 = tooltipData.id;
-                        if arg1 then
+                        if Secret_CanAccess(arg1) then
                             local hyperlink;
-                            if handler.isItemHandler and tooltipData.guid then
+                            if handler.isItemHandler and Secret_CanAccess(tooltipData.guid) then
                                 hyperlink = GetItemLinkByGUID(tooltipData.guid);
                             else
                                 hyperlink = tooltipData.hyperlink;
