@@ -45,7 +45,7 @@ Modules\Dreamseed.lua
 Modules\RareAnnouncement.lua
 Modules\PlayerChoiceUI.lua
 Modules\Lockpicking.lua
-Modules\BlizzFix_EventToast.lua
+#Modules\BlizzFix_EventToast.lua
 Modules\TalkingHead.lua
 Modules\AzerothianArchives.lua
 Modules\MerchantPrice.lua
