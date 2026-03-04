@@ -872,6 +872,7 @@ L["Font Size"] = FONT_SIZE or "Font Size";
 L["Icon Size"] = "Icon Size";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Reset To Default Position";
 L["Renown Level Label"] = "Renown ";  --There is a space
+L["Progress Label"] = "Progress";  --There is a space
 L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maxed)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Current:";

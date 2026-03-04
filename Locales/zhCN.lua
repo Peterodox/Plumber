@@ -840,6 +840,7 @@ L["Font Size"] = "字体大小";
 L["Icon Size"] = "图标大小";
 L["Reset To Default Position"] = "重置到默认位置";
 L["Renown Level Label"] = "名望 ";  --There is a space
+L["Progress Label"] = "进度 ";  --There is a space
 L["Paragon Reputation"] = "巅峰";
 L["Level Maxed"] = "已满级";   --Reached max level
 L["Current Colon"] = "当前：";
