@@ -13,13 +13,19 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10808] = {
     {
         type = "date",
-        versionText = "1.8.8 c",
-        timestamp = 1772460000,
+        versionText = "1.8.8 c-d",
+        timestamp = 1772630000,
     },
 
     {
         type = "h1",
         text = "Bug Fixes",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Event Toast: This module has been retired because most event toasts already support \"right click to close\" without using addons. Additionally, this module may have prevented you from viewing Abundance completion details.",
     },
 
     {
@@ -32,6 +38,12 @@ changelogs[10808] = {
         type = "p",
         bullet = true,
         text = "Expansion Summary: Clicking Valeera should show her abilities instead of Brann's.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Expansion Summary: To address the taint errors, the renown progress on the faction tooltip has been changed from a progress bar to text.",
     },
 
     {
@@ -59,6 +71,12 @@ changelogs[10808] = {
     {
         type = "h1",
         text = "Added",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Break Time Reminder: Added an option to postpone the alert when you are in instance.",
     },
 
     {
