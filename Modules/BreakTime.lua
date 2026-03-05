@@ -1050,7 +1050,7 @@ end
 
 do
     function addon.TryAddBreakTimeToTooltip(tooltip)
-        if GetDBBool("BreakTime") then
+        if GetDBBool("BreakTime") and not GetDBBool("BreakTimeFlag_Cancelled") then
             tooltip:AddLine(" ");
             tooltip:AddLine(L["BreakTime Shared Countdown Tooltip Format"]:format(Controller.GetMinutesUntilNextGoOff()), 1, 0.82, 0, false);
         end
