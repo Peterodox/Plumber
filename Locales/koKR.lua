@@ -646,6 +646,7 @@ L["Paragon Reward Available"] = "불멸의 동맹 평판 보상 가능";
 L["Until Next Level Format"] = "%d 다음 레벨까지";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d 불멸의 동맹 평판 보상까지";
 L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<클릭하여 평판 보기>";
+L["Instruction Click To View Companion"] = "<탐험 동료 보기 클릭>";
 L["Not On Quest"] = "이 퀘스트를 진행 중이지 않음";
 L["Factions"] = "평판";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "활동";
@@ -851,8 +852,15 @@ L["BreakTime Option Delay"] = "지연 시간";
 L["BreakTime Option Delay Tooltip"] = "지연 버튼 클릭 시 타이머를 이 분량만큼 지연.";
 L["BreakTime Option FlashTaskbar"] = "작업 표시줄 아이콘 깜박임";
 L["BreakTime Option FlashTaskbar Tooltip"] = "타이머가 울릴 때 WoW 작업 표시줄 아이콘을 깜박입니다.";
+L["BreakTime Option DND"] = "방해 금지";
+L["BreakTime Option DNDCombat"] = "전투 또는 PvP";
+L["BreakTime Option DNDCombat Tooltip"] = "전투, 전장, 투기장에 있을 때 시계 UI를 표시하지 않습니다.\n\n이 옵션은 항상 활성화되어 있습니다.";
+L["BreakTime Option DNDInstances"] = "인스턴스";
+L["BreakTime Option DNDInstances Tooltip"] = "던전, 공격대, 탐험 중에는 시계 UI를 표시하지 않습니다.";
+L["BreakTime AFK Pause"] = "당신이 자리 비움 상태이므로 카운트다운이 일시 중지되었습니다.";
 L["BreakTime Reset Cancellation"] = "취소된 휴식 초기화";
 L["BreakTime Annouce Timer Deferred Combat"] = "전투 후 휴식을 잊지 마세요!";
+L["BreakTime Shared Countdown Tooltip Format"] = "|cffffffff%d|r분 후 예정된 휴식.";
 
 
 --Generic
@@ -864,6 +872,7 @@ L["Font Size"] = FONT_SIZE or "글꼴 크기";
 L["Icon Size"] = "아이콘 크기";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "기본 위치로 초기화";
 L["Renown Level Label"] = "평판 ";  --There is a space
+L["Progress Label"] = "진행 상황 ";  --There is a space
 L["Paragon Reputation"] = "불멸의 동맹 평판";
 L["Level Maxed"] = "(최대)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "현재:";
