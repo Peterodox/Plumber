@@ -24,14 +24,18 @@ local ActivityData = {  --Constant
     },
     --]]
 
-    --[[
-    {isHeader = true, name = "Council of Dornogal", factionID = 2590, categoryID = 2590, uiMapID = 2248,
+    {isHeader = true, name = "Silvermoon Court", factionID = 2710, categoryID = 2710, uiMapID = 2395,
         entries = {
-            {name = "The Theater Troupe", questID = 83240, isWeeklyQuest = true, uiMapID = 2248},
-            {name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
-        }
+            {name = "Fortify the Runestones: Magisters", questID = 90573, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
+            {name = "Fortify the Runestones: Blood Knights", questID = 90574, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
+            {name = "Fortify the Runestones: Farstriders", questID = 90575, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
+            {name = "Fortify the Runestones: Shades of the Row", questID = 90576, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
+            --{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
+        },
+        questLines = {
+            5841,
+        },
     },
-    --]]
 };
 
 LandingPageUtil.AddExpansionData(12, "activity", ActivityData);
@@ -39,5 +43,6 @@ LandingPageUtil.AddExpansionData(12, "activity", ActivityData);
 
 local DynamicQuestMaps = {
     [2393] = "map2393",     --Silvermoon
+    [2395] = 2710,
 };
 LandingPageUtil.AddExpansionData(12, "activityQuestMap", DynamicQuestMaps);

@@ -1720,9 +1720,6 @@ do  --Expansion Select
     function LandingPageUtil.GetCurrentExpansionInfo()
         if CurrentExpansionID then
             local name = ExpansionData[CurrentExpansionID].name or "Unknown Expansion";
-            if ExpansionData[CurrentExpansionID].isWIP then
-                name = name.." "..L["Work In Progress Tag"];
-            end
             return name
         end
     end

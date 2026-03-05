@@ -53,6 +53,9 @@ do  --MID
         {currencyID = 3028},    --Restored Coffer Key
         {currencyID = 3310},    --Coffer Key Shard
         {currencyID = 3316},    --Voidlight Marl
+        
+        {itemID = 242241, uiMapID = 2395},   --Brimming Arcana
+        {currencyID = 3379, shownIfOwned = true},   --Brimming Arcana
         {currencyID = 3376, shownIfOwned = true},   --Shard of Dundun
 
         {currencyID = 1602, shownIfOwned = true},   --Conquest
