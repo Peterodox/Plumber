@@ -320,6 +320,7 @@ do
         local top, bottom;
         local objectHeight;
         local valid;
+        local uiMapID;
 
         for _, v in ipairs(ResourceList) do
             valid = true;
@@ -329,6 +330,15 @@ do
                 valid = API.IsInDelves();
             elseif v.conditionFunc then
                 valid = v.conditionFunc();
+            elseif v.uiMapID then
+                if not uiMapID then
+                    uiMapID = C_Map.GetBestMapForUnit("player");
+                end
+                if uiMapID and uiMapID == v.uiMapID then
+                    valid = true;
+                else
+                    valid = false;
+                end
             elseif v.shownIfOwned then
                 valid = GetResourcesQuantity(v) > 0;
             end
