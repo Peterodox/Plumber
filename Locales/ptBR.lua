@@ -891,6 +891,7 @@ L["Restored Coffer Key"] = "Chave de Cofre Restaurada";
 L["Coffer Key Shard"] = "Estilhaço de Chave de Cofre";
 L["Epoch Mementos"] = "Lembrança das Eras";
 L["Timeless Scrolls"] = "Pergaminho Perene";
+L["Prey System"] = "Presa";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Tem certeza de que deseja trocar %s pelo item a seguir?\n\n|cffff2020Esta compra não é reembolsável.|r\n %s";
 

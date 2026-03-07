@@ -918,6 +918,7 @@ L["Coffer Key Shard"] = "Fragmento de llave de arca";
 L["Epoch Mementos"] = "Recuerdo de época";
 L["Timeless Scrolls"] = "Pergamino intemporal";
 L["QuestName Runestone"] = "Fortificación de piedras rúnicas";    --4 Mutually exclusive quests: 90575
+L["Prey System"] = "Presa";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "¿Seguro que quieres intercambiar %s por el siguiente objeto?\n\n|cffff2020El importe de esta compra no se podrá reembolsar.|r\n %s";
 

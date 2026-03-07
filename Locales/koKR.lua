@@ -931,6 +931,7 @@ L["Coffer Key Shard"] = "보관함 열쇠 파편";
 L["Epoch Mementos"] = "시대의 기념품";     --See currency:3293
 L["Timeless Scrolls"] = "영원 두루마리"; --item: 217605
 L["QuestName Runestone"] = "Fortify the Runestones";    --[MISSING] 4 Mutually exclusive quests: 90575
+L["Prey System"] = "사냥감";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "%s : 정말로 다음 아이템으로 교환하시겠습니까?\n\n|cffff2020아이템은 환불받을 수 없습니다.|r\n %s";
 
