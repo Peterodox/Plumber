@@ -13,6 +13,36 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10808] = {
     {
         type = "date",
+        versionText = "1.8.8 e",
+        timestamp = 1772900000,
+    },
+
+    {
+        type = "h1",
+        text = "Added",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Expansion Summary: The Activities tab now supports Saltheril's Soiree and Prey.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Choice UI Item Cost: Shows the number of owned Latent Arcana on the \"Runic Shield Charge\" UI.",
+    },
+
+    {
+        type = "br",
+    },
+    {
+        type = "br",
+    },
+
+    {
+        type = "date",
         versionText = "1.8.8 c-d",
         timestamp = 1772630000,
     },
