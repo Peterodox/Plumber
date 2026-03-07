@@ -49,6 +49,7 @@ EL.instancePos = {
     [255] = {0.35972, 0.83893},         --The Black Morass
     [279] = {0.57488, 0.82711},         --The Culling of Stratholme
     [1023]= {0.71979, 0.15423},         --Siege of Boralus (Alliance)
+    [1304]= {0.56979, 0.61049, false},  --Murder Row (Outdoor only)
 };
 
 EL.instancePos_Horde = {
@@ -255,7 +256,7 @@ function EL:OnUpdate(elapsed)
                 for i = 1, self.total do
                     local d = self:GetMapPointsDistanceSquare(self.x, self.y, self.entranceInfo[i].x, self.entranceInfo[i].y);
                     if d < self.closestDistance then
-                        if (not self.entranceInfo[i].indoorsOnly) or IsIndoors() then
+                        if not (self.entranceInfo[i].indoorsOnly ~= nil and self.entranceInfo[i].indoorsOnly ~= IsIndoors()) then
                             self.closestDistance = d;
                             self.closestIndex = i;
                         end
