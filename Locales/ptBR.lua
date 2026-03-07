@@ -45,6 +45,7 @@ L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "Este módulo está sempre ativado.";
 L["Return To Module List"] = "Retornar ao addon";
 L["Generic Addon Conflict"] = "Esse módulo pode ser incompatível com addons de funcionalidades semelhantes:";
+L["Work In Progress Tag"] = "[WIP]";
 
 
 --Settings Category
@@ -169,8 +170,8 @@ L["ModuleDescription AlternativePlayerChoiceUI"] = "Substitui a interface padrã
 
 --HandyLockpick (Right-click a lockbox in your bag to unlock when you are not in combat. Available to rogues and mechagnomes)
 L["ModuleName HandyLockpick"] = "Bater carteira prático";
-L["ModuleDescription HandyLockpick"] = "Cliq. direito em uma caixa trancada na sua bolsa ou na interface de Troca para destrancá-la.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Não pode destrancar diretamente um item do banco\n- Que esteja afetado pela seleção de alvo de ação.";
-L["Instruction Pick Lock"] = "<Cliq. direito para arrombar>";
+L["ModuleDescription HandyLockpick"] = "Clique direito em uma caixa trancada na sua bolsa ou na interface de Troca para destrancá-la.\n\n|cffd4641c- " ..L["Restriction Combat"].. "\n- Não pode destrancar diretamente um item do banco\n- Que esteja afetado pela seleção de alvo de ação.";
+L["Instruction Pick Lock"] = "<Clique direito para arrombar>";
 
 
 --BlizzFixEventToast (Make the toast banner (Level-up, Weekly Reward Unlocked, etc.) non-interactable so it doesn't block your mouse clicks)
@@ -179,9 +180,8 @@ L["ModuleDescription BlizzFixEventToast"] = "Modifica o comportamento dos Banner
 
 
 --Talking Head
-L["ModuleName TalkingHead"] = "Cabeça falante";
+L["ModuleName TalkingHead"] = "Cabeça Falante";
 L["ModuleDescription TalkingHead"] = "Substitui a interface padrão da Cabeça Falante por uma limpa, sem cabeça.";
-L["EditMode TalkingHead"] = "Plumber: "..L["ModuleName TalkingHead"];
 L["TalkingHead Option InstantText"] = "Texto instantâneo";   --Should texts immediately, no gradual fading
 L["TalkingHead Option TextOutline"] = "Contorno do texto";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "Ocultar textos de origem:";
@@ -205,13 +205,13 @@ L["Priority"] = "Prioridade";
 L["Priority Default"] = "Padrão";  --WoW's default waypoint priority: Corpse, Quest, Scenario, Content
 L["Priority Default Tooltip"] = "Segue as configurações padrão do WoW. Prioriza missões, cadáveres, locais de vendedores, se possível. Caso contrário, começa a rastrear sementes ativas.";
 L["Stop Tracking"] = "Parar de rastrear";
-L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "Cliq. esquerdo para rastrear locais";
-L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "Cliq. esquerdo para rastrear no TomTom";
+L["Click To Track Location"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-SuperTrack:0:0:0:0|t " .. "Clique para rastrear locais";
+L["Click To Track In TomTom"] = "|TInterface/AddOns/Plumber/Art/SuperTracking/TooltipIcon-TomTom:0:0:0:0|t " .. "Clique para rastrear no TomTom";
 
 
 --Navigator_Dreamseed (Use Super Tracking to navigate players)
 L["ModuleName Navigator_Dreamseed"] = "Navegador: Sementes do Sonho";
-L["ModuleDescription Navigator_Dreamseed"] = "Usa o sistema de Marcador de Mapa para guiá-lo até as Sementes do Sonho.\n\n*Cliq. direito no indicador de localização (se houver um) para mais opções.\n\n|cffd4641cOs marcadores de mapa padrão do jogo serão substituídos enquanto você estiver no Sonho Esmeralda.\n\nO indicador de localização de sementes pode ser substituído por missões.|r";
+L["ModuleDescription Navigator_Dreamseed"] = "Usa o sistema de Marcador de Mapa para guiá-lo até as Sementes do Sonho.\n\n*Clique direito no indicador de localização (se houver um) para mais opções.\n\n|cffd4641cOs marcadores de mapa padrão do jogo serão substituídos enquanto você estiver no Sonho Esmeralda.\n\nO indicador de localização de sementes pode ser substituído por missões.|r";
 L["Priority New Seeds"] = "Encontrando novas sementes";
 L["Priority Rewards"] = "Coletando recompensas";
 L["Stop Tracking Dreamseed Tooltip"] = "Para de rastrear sementes até que você clique com o botão esquerdo em um marcador no mapa.";
@@ -263,8 +263,8 @@ L["You Have Received Weekly Item Format"] = "Você recebeu %s essa semana.";
 
 --Tooltip ItemQuest
 L["ModuleName TooltipItemQuest"] = "Itens que iniciam missões";
-L["ModuleDescription TooltipItemQuest"] = "Se um item em suas bolsas começar uma missão, exibe os detalhes dessa missão.\n\nVocê pode usar ctrl+cliq. esquerdo no item para visualizá-la no registro de missões, caso a missão já esteja em andamento.";
-L["Instruction Show In Quest Log"] = "<Ctrl+cliq. para ver no registro de missões>";
+L["ModuleDescription TooltipItemQuest"] = "Se um item em suas bolsas começar uma missão, exibe os detalhes dessa missão.\n\nVocê pode usar ctrl + clique no item para visualizá-la no registro de missões, caso a missão já esteja em andamento.";
+L["Instruction Show In Quest Log"] = "<Ctrl + clique> para ver no registro de missões>";
 
 
 L["ModuleName TooltipTransmogEnsemble"] = "Indumentárias";
@@ -273,10 +273,10 @@ L["Collected Appearances"] = "Aparências coletadas";
 L["Collected Items"] = "Itens coletados";
 
 
---Tooltip 
-L["ModuleName Tooltip"] = "Moradia";
+--Tooltip Housing
+L["ModuleName TooltipHousing"] = "Moradia";
 L["ModuleDescription TooltipHousing"] = "Moradia";
-L["Instruction View In Dressing Room"] = "<Ctrl+cliq. para ver no Guarda‑roupa>";  --VIEW_IN_DRESSUP_FRAME
+L["Instruction View In Dressing Room"] = "<Ctrl + clique> para ver no Guarda‑roupa>";  --VIEW_IN_DRESSUP_FRAME
 L["Data Loading In Progress"] = "Plumber está carregando dados";
 
 
@@ -307,8 +307,8 @@ L["QueueStatus Show Time Tooltip"] = "Mostra a diferença entre o tempo médio d
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = "Sumário de Khaz Algar";
 L["ModuleDescription ExpansionLandingPage"] = "Exibe informações extras na página de resumo:\n\n- Progresso de Paragão\n\n- Nível de Pacto de Fios Cortados\n\n- Relações com os Cartéis da Inframina";
-L["Instruction Track Reputation"] = "<Shift+cliq. para rastrear a reputação>";
-L["Instruction Untrack Reputation"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift-cliq. para parar de rastrear>";
+L["Instruction Track Reputation"] = "<Shift + clique para rastrear>";
+L["Instruction Untrack Reputation"] ="<Shift + clique para parar de rastrear>";
 L["Error Show UI In Combat"] = "Você não pode exibir essa interface enquanto estiver em combate.";
 L["Error Show UI In Combat 1"] = "Você realmente não pode exibir essa interface em combate.";
 L["Error Show UI In Combat 2"] = "POR FAVOR, PARE.";
@@ -421,7 +421,7 @@ L["Player Not Found"] = ERR_FRIEND_NOT_FOUND or "Jogador não encontrado.";
 --PlayerTitleUI
 L["ModuleName PlayerTitleUI"] = "Gerenciador de títulos";
 L["ModuleDescription PlayerTitleUI"] = "Adiciona uma caixa de pesquisa e um filtro ao painel de personagem padrão.";
-L["Right Click To Reset Filter"] = "Cliq. direito para redefinir.";
+L["Right Click To Reset Filter"] = "Clique direito para redefinir.";
 L["Earned"] = ACHIEVEMENTFRAME_FILTER_COMPLETED or "Conquistado";
 L["Unearned"] = "Não Conquistado";
 L["Unearned Filter Tooltip"] = "Você pode ver títulos duplicados que não estão disponíveis para sua facção.";
@@ -446,7 +446,7 @@ L["Available Knowledge Format"] = "Conhecimento Disponível: |cffffffff%s|r";
 
 --MinimapMouseover (click to /tar creature on the minimap)
 L["ModuleName MinimapMouseover"] = "Alvo no Minimapa";
-L["ModuleDescription MinimapMouseover"] = "Alt + Cliq. em uma criatura no Minimapa para defini-la como seu alvo.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+L["ModuleDescription MinimapMouseover"] = "Alt + Clique em uma criatura no Minimapa para defini-la como seu alvo.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
 
 
 --BossBanner
@@ -500,7 +500,7 @@ L["Rank Increased"] = "Ranque aumentado";
 L["Infinite Knowledge Tooltip"] = "Você pode obter Conhecimento Infinito ao receber certas conquistas do Legion Remix.";
 L["Stat Bonuses"] = "Bônus de atributos";
 L["Bonus Traits"] = "Características bônus:";
-L["Instruction Open Artifact UI"] = "Cliq. esquerdo para exibir a interface de Artefato.\nCliq. direito para exibir as configurações.";
+L["Instruction Open Artifact UI"] = "Clique para exibir a interface de Artefato.\nClique direito para exibir as configurações.";
 L["LegionRemix Widget Title"] = "Widget do Plumber";
 L["Trait Icon Mode"] = "Modo de ícone de características:";
 L["Trait Icon Mode Hidden"] = "Não exibir";
@@ -553,7 +553,6 @@ L["Sample Item 4"] = "Item Épico Incrível";
 L["Sample Item 3"] = "Item Raro Incrível";
 L["Sample Item 2"] = "Item Incomum Incrível";
 L["Sample Item 1"] = "Item Comum";
-L["EditMode LootUI"] =  "Plumber: "..(HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Janela de Saque");
 L["Manual Loot Instruction Format"] = "Para cancelar temporariamente o saque automático em um saque específico, pressione e segure a tecla |cffffffff%s|r até que a janela de saque apareça.";
 L["LootUI Option Hide Window"] = "Ocultar janela de saque do Plumber";
 L["LootUI Option Hide Window Tooltip"] = "Oculta a janela de saque do Plumber, mas os outros recursos permanecem habilitados, como o Forçar Saque Automático.";
@@ -584,7 +583,7 @@ L["LootUI Option Grow Direction Tooltip 2"] = "Quando desabilitado: a parte supe
 L["Junk Items"] = "Lixo";
 L["LootUI Option Combine Items"] = "Combinar itens similares";
 L["LootUI Option Combine Items Tooltip"] = "Exibe itens similares em uma linha única. Categorias suportadas:\n\n- Lixo\n\n- Lembrança das Eras (Legion Remix).";
-L["LootUI Option Low Frame Strata"] = "Pôr no fundo";
+L["LootUI Option Low Frame Strata"] = "Colocar no fundo";
 L["LootUI Option Low Frame Strata Tooltip"] = "Quando estiver no modo de Notificação de Saque, coloque a janela atrás de outras interfaces.\n\nEssa opção não afeta o modo de saque manual.";
 L["LootUI Option Show Reputation"] = "Exibir mudanças de reputação";
 L["LootUI Option Show Reputation Tooltip"] = "Exibe qualquer aumento de reputação na janela de saque.\n\nReputações ganhas durante combate ou em instâncias PvP serão exibidas posteriormente.";
@@ -618,7 +617,7 @@ L["Random Favorite Mount"] = "Montaria favorita aleatória";
 L["Dismiss Battle Pet"] = "Dispensar mascote de batalha";
 L["Drag And Drop Item Here"] = "Arraste e solte um item aqui.";
 L["Drag To Reorder"] = "Clique e arraste para reordenar";
-L["Click To Set Macro Icon"] = "Ctrl+cliq. para definir como ícone de macro";
+L["Click To Set Macro Icon"] = "Ctrl + clique para definir como ícone de macro";
 L["Unsupported Action Type Format"] = "Tipo de ação não suportado: %s";
 L["Drawer Add Action Format"] = "Adicionar |cffffffff%s|r";
 L["Drawer Add Profession1"] = "Primeira Profissão";
@@ -639,20 +638,21 @@ L["No Slot For New Character Macro Alert"] = "Você precisa ter um slot de macro
 
 
 --New Expansion Landing Page
-L["ModuleName NewExpansionLandingPage"] = "Sumário da expansão";
-L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode acessá-la ao:\n\n- Clicar no botão Sumário de Khaz Algar no minimapa.\n\n- Usar a tecla de atalho atribuída em Opções do jogo > Atalhos do teclado.";
-L["Abbr NewExpansionLandingPage"] = "Sumário da expansão";
+L["ModuleName NewExpansionLandingPage"] = "Sumário da Expansão";
+L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode acessá-la ao:\n\n- Habilitar o botão do minimapa.\n\n- Usar a tecla de atalho atribuída em Opções do jogo > Atalhos do teclado > Plumber.\n\n- Usar o compartimento de addons abaixo do botão do calendário.";
+L["Abbr NewExpansionLandingPage"] = "Sumário da Expansão";
 L["Reward Available"] = "Recompensa Disponível";
 L["Paragon Reward Available"] = "Recompensa de paragão disponível";
 L["Until Next Level Format"] = "%d até o próximo nível";
 L["Until Paragon Reward Format"] = "%d até a recompensa Paragão";
-L["Instruction Click To View Renown"] = REPUTATION_BUTTON_TOOLTIP_VIEW_RENOWN_INSTRUCTION or "<Clique para ver Renome>";
+L["Instruction Click To View Renown"] = "<Clique para ver seu Renome>";
+L["Instruction Click To View Companion"] = "<Clique para ver companheiro de Imersão>";
 L["Not On Quest"] = "Você não está nesta missão";
 L["Factions"] = "Facções";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Atividades";
 L["Raids"] = RAIDS or "Raides";
-L["Instruction Track Achievement"] = "<Shift+cliq. para rastrear essa conquista>";
-L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift+cliq. para parar de rastrear>";
+L["Instruction Track Achievement"] = "<Shift + clique para rastrear essa conquista>";
+L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift + clique para parar de rastrear>";
 L["No Data"] = "Sem dados";
 L["No Raid Boss Selected"] = "Nenhum chefe selecionado";
 L["Your Class"] = "(Sua Classe)";
@@ -702,7 +702,7 @@ L["Weekly Coffer Key Tooltip"] = "Os primeiros quatro baús semanais que você r
 L["Weekly Coffer Key Shards Tooltip"] = "Os primeiros quatro baús semanais que você receber cada semana contêm Estilhaços de Chave de Cofre.";
 L["Weekly Cap"] = "Limite semanal.";
 L["Weekly Cap Reached"] = "Limite semanal atingido.";
-L["Instruction Right Click To Use"] = "<Cliq. direito para usar>";
+L["Instruction Right Click To Use"] = "<Clique direito para usar>";
 L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Entrar na fila";
 L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "Na fila";
 L["Click To Switch"] = "Clique para trocar para |cffffffff%s|r";
@@ -713,9 +713,16 @@ L["List Is Empty"] = "Essa lista está vazia.";
 
 --ExpansionSummaryMinimapButton
 L["LandingButton Settings Title"] = "Sumário da Expansão: Botão do minimapa";
-L["LandingButton Tooltip Format"] = "Cliq. esquerdo para exibir o %s.\nCliq. direito para mais opções.";
+L["LandingButton Tooltip Format"] = "Clique: Exibir o %s.\nClique direito: Exibir opções.";
 L["LandingButton Customize"] = "Personalizar";
+L["LandingButton Reposition Tooltip"] = "Aperte |cffffffffShift|r para destravar";
 L["LandingButtonOption ShowButton"] = "Habilitar botão do minimapa";
+L["LandingButtonOption Unaffected"] = "Não afetado por addons de minimapa";
+L["LandingButtonOption Unaffected Tooltip"] = "Faz com que esse botão não seja afetado por outros addons do minimapa, impedindo que ele seja reestilizado ou reposicionado.\n\nUma vez ativado, esse botão não irá mais se mover com o Minimapa ou respeitar a escala do Minimapa, e em vez disso, usará a escala global da interface.\n\n|cffff4800Talvez seja necessário recarregar a interface após alterar essa opção.|r";
+L["LandingButtonOption UseLibDBIcon"] = "Usar LibDBIcon";
+L["LandingButtonOption UseLibDBIcon Tooltip"] = "Permite que LibDBIcon gerencie a aparência e posição deste botão.";
+L["LandingButtonOption UseLibDBIcon NoBorder"] = "Remover borda do botão";
+L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "Remove a borda dourada do botão.\n\nEssa opção pode não ter efeito ao usar certos addons de gerenciamento de botões do minimapa.";
 L["LandingButtonOption PrimaryUI"] = "Clique para abrir:";   --Control which UI to open on left-click
 L["LandingButtonOption PrimaryUI Tooltip"] = "Escolha qual interface abrir ao clicar no botão do minimapa.";
 L["LandingButtonOption SmartExpansion"] = "Escolher expansão automaticamente";
@@ -733,9 +740,9 @@ L["ModuleDescription InstanceDifficulty"] = "- Exibe um seletor de dificuldade q
 L["Cannot Change Difficulty"] = "A dificuldade da instância não pode ser alterada neste momento.";
 L["Cannot Reset Instance"] = "Você não pode reiniciar instâncias neste momento.";
 L["Difficulty Not Accurate"] = "Dificuldade da instância imprecisa pois você não é o líder do grupo.";
-L["Instruction Click To Open Adventure Guide"] = "Cliq. esquerdo: |cffffffffAbrir guia da aventura|r";
-L["Instruction Alt Click To Reset Instance"] = "Alt+Cliq. direito: |cffffffffReiniciar todas as instâncias|r";
-L["Instruction Link Progress In Chat"] = "<Shift+cliq. para compartilhar o progresso no chat>";
+L["Instruction Click To Open Adventure Guide"] = "Clique: |cffffffffAbrir guia da aventura.|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt + clique direito: |cffffffffReiniciar todas as instâncias.|r";
+L["Instruction Link Progress In Chat"] = "<Shift + clique para compartilhar o progresso no chat>";
 L["Instance Name"] = "Nome da instância";   --Dungeon/Raid Name
 L["EditMode Instruction InstanceDifficulty"] = "A largura do quadro é afetada pelo número de opções disponíveis.";
 
@@ -778,7 +785,7 @@ L["Toggle Banana"] = "Exibir banana";
 L["ModuleName Housing_Macro"] = "Macros de moradia";
 L["ModuleDescription Housing_Macro"] = "Você pode criar um macro de Teleporte pra Casa:\n\n- Primeiro crie um macro, então digite |cffd7c0a3#plumber:home|r na caixa de texto.";
 L["Teleport Home"] = "Teleportar pra Casa";
-L["Instruction Drag To Action Bar"] = "<Cliq. e arraste para as suas barras de ações>";
+L["Instruction Drag To Action Bar"] = "<Clique e arraste para as suas barras de ações>";
 L["Leave Home"] = HOUSING_DASHBOARD_RETURN or "Return to Previous Location";
 L["Toggle Torch"] = "Exibir tocha";
 L["ModuleName Housing_DecorHover"] = "Editor: Nome do objeto e duplicatas";
@@ -795,8 +802,8 @@ L["Apply Dyes"] = "Aplicar";
 L["Preview Dyes"] = "Pré-visualização";
 L["ModuleName TooltipDyeDeez"] = "Dica: Pigmentos de tinta";
 L["ModuleDescription TooltipDyeDeez"] = "Exibe o nome da cor dos pigmentos na dica de ferramenta de corantes.";
-L["Instruction Show More Info"] = "<Alt+cliq. para exibir mais informações>";
-L["Instruction Show Less Info"] = "<Alt+cliq. para exibir menos informações>";
+L["Instruction Show More Info"] = "<Alt + clique> para exibir mais informações>";
+L["Instruction Show Less Info"] = "<Alt + clique> para exibir menos informações>";
 L["ModuleName Housing_ItemAcquiredAlert"] = "Alerta de decoração coletada";
 L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permite que você clique com o botão esquerdo no aviso de decoração coletada para visualizar seu modelo.";
 
@@ -807,7 +814,7 @@ L["ModuleDescription Housing_Clock"] = "Quando estiver no modo de edição, exib
 L["Time Spent In Editor"] = "Tempo gasto no editor";
 L["This Session Colon"] = "Essa sessão: ";
 L["Time Spent Total Colon"] = "Total: ";
-L["Right Click Show Settings"] = "Cliq. direito para exibir as configurações.";
+L["Right Click Show Settings"] = "Clique direito para exibir as configurações.";
 L["Plumber Clock"] = "Relógio do Plumber";
 L["Clock Type"] = "Tipo de Relógio";
 L["Clock Type Analog"] = "Analógico";
@@ -825,6 +832,37 @@ L["ModuleName SourceAchievementLink"] = "Conquista de origem interativa";
 L["ModuleDescription SourceAchievementLink"] = "Faz com que a maioria das conquistas nas interfaces a seguir se tornem clicáveis, permitindo que você veja detalhes ou as rastreie.\n\n- Catálogo de decoração\n\n- Jornal de montarias";
 
 
+--BreakTime
+L["ModuleName BreakTime"] = "Lembrete de Intervalo";
+L["ModuleDescription BreakTime"] = "Lembra a você de dar uma pausinha depois de algum tempo.";
+L["BreakTime Title AllCaps"] = "HORA DO INTERVALO";
+L["BreakTime Delay Button"] = "Mais tarde";
+L["BreakTime Delay Button Tooltip Format"] = "Lembre-me em %d min.";
+L["BreakTime Cancel Button"] = "Cancelar";
+L["BreakTime Cancel Button Tooltip Format 1"] = "Clique: Cancelar o temporizador para esse ciclo. O próximo temporizador irá tocar em %d min.";
+L["BreakTime Cancel Button Tooltip 2"] = "Clique e segure: Cancelar para esta sessão de jogo.";
+L["BreakTime Announce Time Before Alert Format"] = "O próximo temporizador irá tocar em |cffffffff%d|r min.";
+L["BreakTime Announce Timer Cancelled"] = "Você cancelou o temporizador para esta sessão de jogo.";
+L["BreakTime Current Schedule Format"] = "A programação atual é: |cffffffff%1$d|r min. de intervalo a cada |cffffffff%2$d|r min.";
+L["BreakTime Option Cycle"] = "Duração do ciclo";
+L["BreakTime Option Cycle Tooltip"] = "A duração de cada ciclo de jogo/pausa.";
+L["BreakTime Option Rest"] = "Duração do intervalo";
+L["BreakTime Option Rest Tooltip"] = "A duração de um intervalo por ciclo.";
+L["BreakTime Option Delay"] = "Duração do atraso";
+L["BreakTime Option Delay Tooltip"] = "Atrasa o temporizador por esse número de minutos ao clicar no botão 'Mais tarde'.";
+L["BreakTime Option FlashTaskbar"] = "Piscar ícone da barra de tarefas";
+L["BreakTime Option FlashTaskbar Tooltip"] = "Pisca o ícone da barra de tarefas do WoW quando o temporizador tocar.";
+L["BreakTime Option DND"] = "Não perturbe";
+L["BreakTime Option DNDCombat"] = "Combate ou PvP";
+L["BreakTime Option DNDCombat Tooltip"] = "Não exibe a interface do relógio enquanto estiver em combate, campo de batalha ou arena.\n\nEssa opção está sempre ativada.";
+L["BreakTime Option DNDInstances"] = "Instâncias";
+L["BreakTime Option DNDInstances Tooltip"] = "Não exibe a interface do relógio enquanto estiver em uma masmorra, raide ou imersão.";
+L["BreakTime AFK Pause"] = "A contagem regressiva está pausada porque você está AFK.";
+L["BreakTime Reset Cancellation"] = "Redefinir intervalo cancelado";
+L["BreakTime Annouce Timer Deferred Combat"] = "Lembre-se de dar uma pausinha depois de uma luta!";
+L["BreakTime Shared Countdown Tooltip Format"] = "Intervalo programado em |cffffffff%d|r min.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Mover horizontalmente";
@@ -834,17 +872,18 @@ L["Font Size"] = FONT_SIZE or "Tamanho da Fonte";
 L["Icon Size"] = "Tamanho do ícone";
 L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Redefinir para a Posição Padrão";
 L["Renown Level Label"] = "Renome";
+L["Progress Label"] = "Progresso";  --There is a space
 L["Paragon Reputation"] = "Paragão";
 L["Level Maxed"] = "(Máximo)";
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Atual:";
 L["Unclaimed Reward Alert"] = WEEKLY_REWARDS_UNCLAIMED_TITLE or "Você tem recompensas não reivindicadas";
 L["Uncollected Set Counter Format"] = "Você possui |4conjunto:conjuntos; |cffffffff%d|r de aparência não coletado(s).";
-L["InstructionFormat Left Click"] = "Cliq. esquerdo para %s";
-L["InstructionFormat Right Click"] = "Cliq. direito para %s";
-L["InstructionFormat Ctrl Left Click"] = "Ctrl+Cliq. esquerdo para %s";
-L["InstructionFormat Ctrl Right Click"] = "Ctrl+Cliq. direito para %s";
-L["InstructionFormat Alt Left Click"] = "Alt+Cliq. esquerdo para %s";
-L["InstructionFormat Alt Right Click"] = "Alt+Cliq. direito para %s";
+L["InstructionFormat Left Click"] = "Clique para %s";
+L["InstructionFormat Right Click"] = "Clique direito para %s";
+L["InstructionFormat Ctrl Left Click"] = "Ctrl+Clique esquerdo para %s";
+L["InstructionFormat Ctrl Right Click"] = "Ctrl+Clique direito para %s";
+L["InstructionFormat Alt Left Click"] = "Alt+Clique esquerdo para %s";
+L["InstructionFormat Alt Right Click"] = "Alt+Clique direito para %s";
 L["Close Frame Format"]= "|cff808080(Fechar %s)|r";
 
 
@@ -907,7 +946,7 @@ L["Match Pattern Rep 1"] = "A Reputação do seu Bando de Guerra com (.+) aument
 L["Match Pattern Rep 2"] = "Reputação com (.+) aumentou em ([%d%,]+)";   --FACTION_STANDING_INCREASED
 
 L["Match Pattern Item Level"] = "^Nível de item (%d+)";
-L["Match Pattern Item Upgrade Tooltip"] = "^Upgrade Level: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Match Pattern Item Upgrade Tooltip"] = "^Nível de aprimoramento: (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
 L["Upgrade Track 1"] = "Aventureiro";
 L["Upgrade Track 2"] = "Explorador";
 L["Upgrade Track 3"] = "Veterano";
