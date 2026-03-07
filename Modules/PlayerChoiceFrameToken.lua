@@ -9,20 +9,24 @@ local TimerFrame;
 
 local PlayerChoiceXCurrency = {
     --[choiceID] = {type, id}     --type: 0(currency) 1(item)
-    [832] = {1, addon.ItemUpgradeConstant.RadiantEchoItemID},    --Radian Echo (change every season), Worldsoul Memory: The Worldcarvers
     [838] = {1, 212493},    --
     [841] = {0, 3090},      --Flame-Blessed Iron (Siren Isle Command Map)
 };
 
 do  --Radian Echo
-    local target = PlayerChoiceXCurrency[832];
-    PlayerChoiceXCurrency[827] = target;    --Worldsoul Memory: Primal Predators
-    PlayerChoiceXCurrency[829] = target;    --Worldsoul Memory: A Wounded Soul
-    PlayerChoiceXCurrency[830] = target;    --Worldsoul Memory: Old Gods Forsaken
-    PlayerChoiceXCurrency[831] = target;    --Worldsoul Memory: Ancient Explorers
-    PlayerChoiceXCurrency[833] = target;    --Worldsoul Memory: Descendants of Distant Waters
-    PlayerChoiceXCurrency[854] = target;    --Worldsoul Memory: Early Cartel Wars
-    PlayerChoiceXCurrency[855] = target;    --Worldsoul Memory: Kaja'mite Contact
+    local RadiantEcho = {1, 246771};    --Worldsoul Memory
+    local ChoiceIDs = {827, 829, 830, 831, 832, 833, 854, 855};
+    for _, choiceID in ipairs(ChoiceIDs) do
+        PlayerChoiceXCurrency[choiceID] = RadiantEcho;
+    end
+end
+
+do  --Latent Arcana
+    local Runestone = {1, 242241};
+    local ChoiceIDs = {890, 897, 896, 905, 910};
+    for _, choiceID in ipairs(ChoiceIDs) do
+        PlayerChoiceXCurrency[choiceID] = Runestone;
+    end
 end
 
 
