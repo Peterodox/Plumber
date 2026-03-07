@@ -709,6 +709,7 @@ L["Click To Switch"] = "Click to switch to |cffffffff%s|r";
 L["Click To Queue"] = "Click to queue for |cffffffff%s|r";
 L["Click to Open Format"] = "Click to open %s";
 L["List Is Empty"] = "The list is empty.";
+L["Prey No Data"] = "Prey Progress Unavailable";
 
 
 --ExpansionSummaryMinimapButton
@@ -930,6 +931,8 @@ L["Restored Coffer Key"] = "Restored Coffer Key";
 L["Coffer Key Shard"] = "Coffer Key Shard";
 L["Epoch Mementos"] = "Epoch Mementos";     --See currency:3293
 L["Timeless Scrolls"] = "Timeless Scrolls"; --item: 217605
+L["QuestName Runestone"] = "Fortify the Runestones";    --4 Mutually exclusive quests: 90575
+L["Prey System"] = "Prey";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Are you sure you wish to exchange %s for the following item?\n\n|cffff2020Your purchase is not refundable.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 

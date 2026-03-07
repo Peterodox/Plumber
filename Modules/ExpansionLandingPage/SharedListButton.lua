@@ -94,7 +94,7 @@ do  --ScrollViewListButton
         self.Icon:SetPoint("CENTER", self, "LEFT", 16, 0);
         self.Icon:SetTexCoord(0, 1, 0, 1);
         self.Name:SetTextColor(0.88, 0.88, 0.88);
-        self.Name:SetWidth(240);
+        self.Name:SetWidth(256);
         self.Name:SetMaxLines(2);
     end
 

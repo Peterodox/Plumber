@@ -38,6 +38,17 @@ do  --Checklist Button
             else
                 LandingPageUtil.PlayUISound("CheckboxOn");
             end
+        else
+            local data = ActivityUtil.GetActivityData(self.dataIndex);
+            if data then
+                if data.openMap then
+                    local questID = data.questID or (self.type == "Quest" and self.id);
+                    local mapID = questID and GetQuestUiMapID(questID);
+                    if mapID and not InCombatLockdown() then
+                        C_Map.OpenWorldMap(mapID);
+                    end
+                end
+            end
         end
     end
 
@@ -50,6 +61,7 @@ do  --Checklist Button
             self.completed = data.completed;
             self.flagQuest = data.flagQuest or data.questID;
             self.conditions = data.conditions;
+            self.Icon:Show();
 
             if self.completed then
                 self.Icon:SetAtlas("checkmark-minimal-disabled");
@@ -75,7 +87,11 @@ do  --Checklist Button
             else
                 self.type = nil;
                 self.id = nil;
-                self.Name:SetText(ActivityUtil.GetActivityName(dataIndex));
+                if data.setupFunc then
+                    data.setupFunc(self);
+                else
+                    self.Name:SetText(ActivityUtil.GetActivityName(dataIndex));
+                end
             end
 
             self:UpdateProgress();
@@ -156,13 +172,13 @@ do  --Checklist Button
 
             self.Text1:SetText(nil);
 
-            local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex);
+            local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex, questID);
             self.Name:SetText(name);
             if not isLocalized then
                 CallbackRegistry:LoadQuest(questID, function(_questID)
                     if questID == self.id then
                         local name = API.GetQuestName(_questID);
-                        ActivityUtil.StoreQuestActivityName( _questID, name);
+                        ActivityUtil.StoreQuestActivityName(_questID, name);
                         self.Name:SetText(name);
                         self:UpdateProgress();
                         if self:IsMouseMotionFocus() then

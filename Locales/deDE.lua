@@ -833,6 +833,7 @@ L["Restored Coffer Key"] = "Restaurierter Kastenschlüssel";
 L["Coffer Key Shard"] = "Kastenschlüsselsplitter";
 L["Epoch Mementos"] = "Epochenandenken";    --See currency:3293
 L["Timeless Scrolls"] = "Zeitlose Schriftrolle";    --item: 217605
+L["QuestName Runestone"] = "Die Runensteine verstärken";    --4 Mutually exclusive quests: 90575
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Seid Ihr sicher, dass Ihr %s gegen den folgenden Gegenstand eintauschen möchtet?\n\n|cffff2020Dieser Tausch kann nicht rückgängig gemacht werden.|r\n %s";    --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 
