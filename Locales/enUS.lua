@@ -281,7 +281,7 @@ L["Data Loading In Progress"] = "Plumber is loading data";
 
 
 --Tooltip RichSoil
-L["ModuleName TooltipRichSoil"] = "Quick Slot: Rich Soil";
+L["ModuleName TooltipRichSoil"] = "Quick Slot: Resilient Seeds";
 L["ModuleDescription TooltipRichSoil"] = "For Herbalists: Show a list of Resilient Seeds when double-clicking on Rich Soil."..L["Quick Slot Generic Description"];
 L["Instruction Show Resilient Seeds"] = "<Double click to show Resilient Seeds>";
 L["No Resilient Seed"] = "No Resilient Seeds";

@@ -281,7 +281,7 @@ L["Data Loading In Progress"] = "Plumber正在加载数据";
 
 
 --Tooltip RichSoil
-L["ModuleName TooltipRichSoil"] = "快捷按钮：肥沃的土壤";
+L["ModuleName TooltipRichSoil"] = "快捷按钮：坚韧之种";
 L["ModuleDescription TooltipRichSoil"] = "对采药专业生效：鼠标左键双击肥沃的土壤可显示坚韧之种快捷按钮。"..L["Quick Slot Generic Description"];
 L["Instruction Show Resilient Seeds"] = "<双击左键来显示坚韧之种>";
 L["No Resilient Seed"] = "你身上没有携带坚韧之种";

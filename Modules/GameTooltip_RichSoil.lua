@@ -197,7 +197,7 @@ do
         dbKey = "TooltipRichSoil",
         description = addon.L["ModuleDescription TooltipRichSoil"],
         toggleFunc = EnableModule,
-        moduleAddedTime = 1718500000,
+        moduleAddedTime = 1773000000,
 		categoryKeys = {
 			"Profession",
 		},
