@@ -802,7 +802,12 @@ do  --SpecialGameObjects
             local numOwned = currencyInfo.quantity;
             local icon = currencyInfo.iconFileID;
             local maxQuantity = useMaxQuantity and currencyInfo.maxQuantity or requiredNumber;
-            local subtext = string.format("%d / %d |T%s:16:16|t", numOwned, maxQuantity, icon);
+            local subtext;
+            if maxQuantity then
+                subtext = string.format("%d / %d |T%s:16:16|t", numOwned, maxQuantity, icon);
+            else
+                subtext = string.format("%d |T%s:16:16|t", numOwned, icon);
+            end
             local color;
             if (useMaxQuantity and numOwned >= currencyInfo.maxQuantity) or (requiredNumber and requiredNumber > numOwned) then
                 color = Colors.Red;
@@ -812,6 +817,28 @@ do  --SpecialGameObjects
             return subtext, color
         end
     end
+
+    local function SubtextFunc_Item(itemID, requiredNumber)
+        local numOwned = C_Item.GetItemCount(itemID);
+        local icon = C_Item.GetItemIconByID(itemID);
+        if numOwned and icon then
+            local subtext;
+            local color;
+            if requiredNumber then
+                subtext = string.format("%d / %d |T%s:16:16|t", numOwned, requiredNumber, icon);
+                if numOwned < requiredNumber then
+                    color = Colors.Red;
+                else
+                    color = Colors.White;
+                end
+            else
+                subtext = string.format("%d |T%s:16:16|t", numOwned, icon);
+                color = Colors.White;
+            end
+            return subtext, color
+        end
+    end
+
 
     local function SubtextFunc_RestoredCofferKey()
         return SubtextFunc_Currency(3028, false, 1)
@@ -825,4 +852,10 @@ do  --SpecialGameObjects
     SpecialGameObjects[252408] = SubtextFunc_AncientMana;   --Ancient Mana Shard +15
     SpecialGameObjects[252772] = SubtextFunc_AncientMana;   --Ancient Mana Shard +30
     SpecialGameObjects[252774] = SubtextFunc_AncientMana;   --Ancient Mana Shard +50 (item)
+
+
+    local function SubtextFunc_MisplacedTome()
+        return SubtextFunc_Item(242241)
+    end
+    SpecialGameObjects[531478] = SubtextFunc_MisplacedTome;
 end
