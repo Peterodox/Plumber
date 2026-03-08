@@ -457,6 +457,8 @@ L["currency-2915"] = "雕刻";
 L["currency-2916"] = "符文";
 L["currency-2917"] = "鍍金";
 
+L["GameObject Rich Soil"] = "肥沃土壤";
+
 L["Season Maximum Colon"] = "賽季上限：";
 L["Item Changed"] = "已改為";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "完成的C.H.E.T.T.清單";

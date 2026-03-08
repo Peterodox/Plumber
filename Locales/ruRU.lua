@@ -853,6 +853,7 @@ L["currency-2917"] = "Позолоченный";
 L["Scenario Delves"] = "Вылазка";
 L["GameObject Door"] = "Дверь";
 L["Delve Chest 1 Rare"] = "Богатый сундук";   --We'll use the GameObjectID once it shows up in the database
+L["GameObject Rich Soil"] = "Плодородная земля";
 
 L["Season Maximum Colon"] = "Максимум за сезон:";
 L["Item Changed"] = "в предмет";   --CHANGED_OWN_ITEM

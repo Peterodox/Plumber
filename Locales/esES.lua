@@ -908,6 +908,7 @@ L["currency-2917"] = "dorado";
 L["Scenario Delves"] = "Profundidades";
 L["GameObject Door"] = "Puerta";
 L["Delve Chest 1 Rare"] = "Arca pródiga";
+L["GameObject Rich Soil"] = "Terreno rico";
 
 L["Season Maximum Colon"] = "Máximo de la temporada:";
 L["Item Changed"] = "ha cambiado";   --CHANGED_OWN_ITEM

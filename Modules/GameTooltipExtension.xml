@@ -1,18 +1,17 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-    <Script file="GameTooltip_Key.lua"/>
-
     <!--This one controls all modules involving Enum.TooltipDataType.Item/Spell-->
     <Script file="GameTooltip_Core.lua"/>
 
     <!--Item Modules-->
+    <Script file="GameTooltip_Key.lua"/>
     <Script file="GameTooltip_ReputationItem_Data.lua"/>
-	<Script file="GameTooltip_ReputationItem.lua"/>
+    <Script file="GameTooltip_ReputationItem.lua"/>
     <Script file="GameTooltip_ItemReagents.lua"/>
     <Script file="GameTooltip_ItemQuest.lua"/>
     <Script file="GameTooltip_DelvesItem.lua"/>
     <Script file="GameTooltip_TransmogEnsemble.lua"/>
-
     <Script file="GameTooltip_DyeDeez.lua"/>
+    <Script file="GameTooltip_RichSoil.lua"/>
 
 
     <!--No Longer Relevant-->

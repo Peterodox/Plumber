@@ -31,7 +31,7 @@ do
     end
     --]]
 
-    function SetupFuncs.PreyTitle(listButton)
+    function SetupFuncs.PreyProgress(listButton)
         local activeQuestID = C_QuestLog.GetActivePreyQuest();
         if activeQuestID then
             listButton:SetQuest(activeQuestID);
@@ -86,6 +86,23 @@ do
         listButton.Icon:Hide();
         listButton.Name:SetText(progressText);
     end
+
+    function SetupFuncs.GetPreyHeader()
+        local mapName;
+        local activeQuestID = C_QuestLog.GetActivePreyQuest();
+        if activeQuestID then
+            local uiMapID = GetQuestUiMapID(activeQuestID);
+            if uiMapID then
+                mapName = addon.API.GetMapName(uiMapID);
+            end
+        end
+
+        if mapName then
+            return L["Prey System"].." - "..mapName
+        else
+            return L["Prey System"]
+        end
+    end
 end
 
 
@@ -109,9 +126,9 @@ local ActivityData = {  --Constant
     },
     --]]
 
-    {isHeader = true, name = "Prey", localizedName = L["Prey System"], categoryID = 120000,
+    {isHeader = true, name = "Prey", localizedName = L["Prey System"], categoryID = 120000, nameGetter = SetupFuncs.GetPreyHeader,
         entries = {
-            {name = "Prey Progress", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png", sortToTop = true, setupFunc = SetupFuncs.PreyTitle, removeSharedPrefix = true, openMap = true},
+            {name = "Prey Progress", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png", sortToTop = true, setupFunc = SetupFuncs.PreyProgress, removeSharedPrefix = true},
         },
     },
 
@@ -160,8 +177,6 @@ do  --Add Prey Quests
             questID = questID,
             shownIfActive = true,
             removeSharedPrefix = true,
-            showMapName = true,
-            openMap = true,
         };
     end
 

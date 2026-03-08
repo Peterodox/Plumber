@@ -6,9 +6,10 @@ local After = C_Timer.After;
 local C_TooltipInfo = C_TooltipInfo;
 local GetItemIconByID = C_Item.GetItemIconByID;
 local GetItemLinkByGUID = C_Item.GetItemLinkByGUID;
-local gsub = string.gsub;
+--local gsub = string.gsub;
 local match = string.match;
 local Secret_CanAccess = addon.API.Secret_CanAccess;
+local StripHyperlinks = addon.API.StripHyperlinks;
 
 
 local ItemIconInfoTable = {
@@ -71,6 +72,31 @@ local function ToggleModuleAltMode(module)
     if key then
         addon.FlipDBBool(key);
         LoadModuleAltMode(module);
+    end
+end
+
+
+local SubModuleMixin = {};
+do
+    function SubModuleMixin:ProcessData(tooltip, itemID)
+        if self.enabled then
+
+        else
+            return false
+        end
+    end
+
+    function SubModuleMixin:GetDBKey()
+        return "dbkey"
+    end
+
+    function SubModuleMixin:SetEnabled(enabled)
+        self.enabled = enabled == true
+        self.parentManager:RequestUpdate();
+    end
+
+    function SubModuleMixin:IsEnabled()
+        return self.enabled == true
     end
 end
 
@@ -188,6 +214,17 @@ do
         end
     end
 
+    function HandlerMixin:CreateSubModule(dbKey)
+        local module = Mixin({}, SubModuleMixin);
+
+        module.parentManager = self;
+        module.dbKey = dbKey;
+
+        self:AddSubModule(module);
+
+        return module
+    end
+
     function HandlerMixin:DebugAddField(tooltip, tbl, field, label, enumLookup)
         local leftText, rightText;
         if label then
@@ -251,12 +288,15 @@ do  --GameTooltipManager
                     if tooltipData and tooltipData.type == tooltipDataType then
                         local leftText = tooltipData.lines and tooltipData.lines[1] and tooltipData.lines[1].leftText;
                         if Secret_CanAccess(leftText) then
-                            leftText = gsub(leftText, "|T.+|t", "");
-                            leftText = gsub(leftText, "%\n.+", "");
-                            leftText = gsub(leftText, "|cff%w%w%w%w%w%w", "");
-                            leftText = gsub(leftText, "|r", "");
+                            --leftText = gsub(leftText, "|T.+|t", "");
+                            --leftText = gsub(leftText, "%\n.+", "");
+                            --leftText = gsub(leftText, "|cff%w%w%w%w%w%w", "");
+                            --leftText = gsub(leftText, "|r", "");
+                            leftText = StripHyperlinks(leftText);
+                            if leftText then
+                                handler:CallSubModules(tooltip, leftText);
+                            end
                         end
-                        handler:CallSubModules(tooltip, leftText);
                     end
                 end
             else
@@ -296,34 +336,11 @@ do  --GameTooltipManager
         local useLeftTextAsArgument = true;
         return self:GetHandler(Enum.TooltipDataType.MinimapMouseover, useLeftTextAsArgument)
     end
-end
 
-
-do  --SubModuleMixin
---[[
-    local SubModule = {};
-
-    function SubModule:ProcessData(tooltip, itemID)
-        if self.enabled then
-
-        else
-            return false
-        end
+    function GameTooltipManager:GetWorldObjectManager()
+        local useLeftTextAsArgument = true;
+        return self:GetHandler(Enum.TooltipDataType.Object, useLeftTextAsArgument)
     end
-
-    function SubModule:GetDBKey()
-        return "dbkey"
-    end
-
-    function SubModule:SetEnabled(enabled)
-        self.enabled = enabled == true
-        GameTooltipManager:RequestUpdate();
-    end
-
-    function SubModule:IsEnabled()
-        return self.enabled == true
-    end
---]]
 end
 
 

@@ -824,6 +824,7 @@ L["currency-2917"] = "Vergoldetes";
 L["Scenario Delves"] = "Tiefen";
 L["GameObject Door"] = "Tür";
 L["Delve Chest 1 Rare"] = "Großzügiger Kasten";    --We'll use the GameObjectID once it shows up in the database
+L["GameObject Rich Soil"] = "Fruchtbarer Boden";
 
 L["Season Maximum Colon"] = "Saisonmaximum:";    --CURRENCY_SEASON_TOTAL_MAXIMUM
 L["Item Changed"] = "hat sich verändert zu";    --CHANGED_OWN_ITEM

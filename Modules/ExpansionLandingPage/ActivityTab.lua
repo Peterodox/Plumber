@@ -41,6 +41,7 @@ do  --Checklist Button
         else
             local data = ActivityUtil.GetActivityData(self.dataIndex);
             if data then
+                --[[    --Disabled because the API cause errors
                 if data.openMap then
                     local questID = data.questID or (self.type == "Quest" and self.id);
                     local mapID = questID and GetQuestUiMapID(questID);
@@ -48,6 +49,7 @@ do  --Checklist Button
                         C_Map.OpenWorldMap(mapID);
                     end
                 end
+                --]]
             end
         end
     end

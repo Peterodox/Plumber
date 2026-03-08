@@ -529,6 +529,10 @@ function ActivityUtil.GetActivityName(dataIndex, questID)
     --2nd arg: isLocalized
     local v = SortedActivity[dataIndex];
     if v then
+        if v.nameGetter then
+            return v.nameGetter(), true
+        end
+
         if v.localizedName then
             return v.localizedName, true
         end
@@ -539,13 +543,6 @@ function ActivityUtil.GetActivityName(dataIndex, questID)
             if name and name ~= "" then
                 if v.removeSharedPrefix then
                     name = API.RemoveTextBeforeColon(name);
-                end
-
-                if v.showMapName and v.uiMapID then
-                    local mapName = API.GetMapName(v.uiMapID);
-                    if mapName then
-                        name = mapName.." - "..name;
-                    end
                 end
                 v.localizedName = name;
                 return name, true
@@ -808,9 +805,9 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
             end
         else
             if true then
-                n = n + 1;
-                outputTbl[n] = category;
                 if numEntries > 0 then
+                    n = n + 1;
+                    outputTbl[n] = category;
                     tsort(entries, SortFuncs.IncompleteFirst);
                     for _, entry in ipairs(entries) do
                         n = n + 1;

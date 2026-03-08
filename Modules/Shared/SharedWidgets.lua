@@ -2095,6 +2095,7 @@ do  --(In)Secure Button Pool
 
         button:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonDown", "RightButtonUp");
         button:SetScript("OnHide", SecureActionButton_OnHide);
+        button:SetAttribute("useOnKeyDown", false);
 
         SecureButtonContainer:RegisterEvent("PLAYER_REGEN_DISABLED");
         --SecureButtonContainer:RegisterEvent("PLAYER_REGEN_ENABLED");

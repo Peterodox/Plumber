@@ -921,6 +921,7 @@ L["currency-2917"] = "금빛";
 L["Scenario Delves"] = "구렁";
 L["GameObject Door"] = "문";
 L["Delve Chest 1 Rare"] = "풍요로운 금고";   --We'll use the GameObjectID once it shows up in the database
+L["GameObject Rich Soil"] = "비옥한 토양";
 
 L["Season Maximum Colon"] = "시즌 상한선:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
 L["Item Changed"] = "다음으로 변경됨:";--CHANGED_OWN_ITEM

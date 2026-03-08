@@ -17,6 +17,8 @@ L["currency-2915"] = "Intagliato";
 L["currency-2916"] = "Runico";
 L["currency-2917"] = "Dorato";
 
+L["GameObject Rich Soil"] = "Zolla di Terreno Fertile";
+
 L["Season Maximum Colon"] = "Limite stagionale:";
 L["Item Changed"] = "stato cambiato";   --CHANGED_OWN_ITEM
 L["Completed CHETT List"] = "Lista C.I.H.T.T. Completa";

@@ -280,6 +280,13 @@ L["Instruction View In Dressing Room"] = "<按住Ctrl点击在试衣间中查看
 L["Data Loading In Progress"] = "Plumber正在加载数据";
 
 
+--Tooltip RichSoil
+L["ModuleName TooltipRichSoil"] = "快捷按钮：肥沃的土壤";
+L["ModuleDescription TooltipRichSoil"] = "对采药专业生效：鼠标左键双击肥沃的土壤可显示坚韧之种快捷按钮。"..L["Quick Slot Generic Description"];
+L["Instruction Show Resilient Seeds"] = "<双击左键来显示坚韧之种>";
+L["No Resilient Seed"] = "你身上没有携带坚韧之种";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "霸业风暴：珍宝商店";
 L["ModuleDescription Plunderstore"] = "调整从队伍查找器界面打开的珍宝商店：\n\n- 允许仅显示未收集物品。\n\n- 在类别按钮上显示未收集物品的数量。\n\n- 在武器和护甲的鼠标提示上显示其穿戴位置。\n\n- 允许你在试衣间里显示可穿戴的物品。";
@@ -871,6 +878,7 @@ L["currency-2917"] = "鎏金";
 L["Scenario Delves"] = "地下堡";
 L["GameObject Door"] = "门";
 L["Delve Chest 1 Rare"] = "丰裕宝匣";
+L["GameObject Rich Soil"] = "肥沃的土壤";
 
 L["Season Maximum Colon"] = "赛季上限："
 L["Item Changed"] = "已被替换为";   --CHANGED_OWN_ITEM

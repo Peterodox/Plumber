@@ -230,6 +230,7 @@ local DefaultValues = {
     TooltipDelvesItem = true,           --Show weekly Coffer Key cap on chest tooltip
     TooltipItemQuest = true,            --Show the quest of quest starting items in bags
     TooltipTransmogEnsemble = true,     --A Raid Ensemble now unlocks outfits (tints) from 4 difficulties, but the default UI only gives one
+    TooltipRichSoil = true,             --Show QuickSlot for seeds when double click on Rich Soil (Midnight Herbalism)
 
 
     --Reduction

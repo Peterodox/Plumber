@@ -1,20 +1,16 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local GameTooltipWorldObjectManager = addon.GameTooltipManager:GetWorldObjectManager();
 
 local GetMapID = API.GetMapID;
 local StripHyperlinks = API.StripHyperlinks;
-local Secret_CanAccess = API.Secret_CanAccess;
 local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local GetItemName = C_Item.GetItemNameByID;
 local GetItemCount = C_Item.GetItemCount;
 local GetItemIcon = C_Item.GetItemIconByID;
 
 local KEY_QUANTITY_FORMAT = "%d / %d |T%s:16:16|t";
-
-local POSTCALL_ADDED = false;
-local MODULE_ENABLED = false;
-local IN_VALID_ZONE = false;
 
 local NAME_KEYS = {
     --Name = {type, id, requiredQuantity}     --type: 0(currency) 1(item) (get object name from itemID)
@@ -26,13 +22,6 @@ for _, data in pairs(NAME_KEYS) do
         GetItemName(data[4]);
     end
 end
-
-local DOOR = L["GameObject Door"];
-
-local ZONE_DOORS = {
-    --Some objects have genric names like "door"
-    --We use the minimap zone text to determine if it's the door we want
-};
 
 local SUPPORTED_MAPS = {};
 
@@ -63,88 +52,49 @@ do
 end
 
 
-local EL = CreateFrame("Frame");
+local SubModule = GameTooltipWorldObjectManager:CreateSubModule("TooltipChestKeys");
+do
+    function SubModule:ProcessData(tooltip, name)
+        if self.enabled and self.inValidZone then
+            if NAME_KEYS[name] then
+                local data = NAME_KEYS[name];
+                local type = data[1];
+                local id = data[2];
+                local numRequired = data[3];
+                local keyName, numOwned, icon;
 
-local REQUEST_COUNTER = 0;
+                if type == 0 then
+                    local currencyInfo = GetCurrencyInfo(id);
+                    if currencyInfo then
+                        keyName = currencyInfo.name;
+                        numOwned = currencyInfo.quantity;
+                        icon = currencyInfo.iconFileID;
+                    end
+                elseif type == 1 then
+                    keyName = GetItemName(id)
+                    numOwned = GetItemCount(id);
+                    icon = GetItemIcon(id);
+                end
 
-local function LocalizeNames()
-    REQUEST_COUNTER = REQUEST_COUNTER + 1;
-    if REQUEST_COUNTER > 3 then
-        return
-    end
+                if numOwned then
+                    if numOwned < numRequired then
+                        tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numOwned, numRequired, icon), 1.000, 0.125, 0.125, 1.000, 0.125, 0.125);
+                    else
+                        tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numOwned, numRequired, icon));
+                    end
+                    return true
+                end
+            end
 
-    local ZskeraVault = {
-        72953, 72954, 72955,
-    };
-
-    local ZskeraVaultKey = {1, 202196, 1};
-
-    local GetTitleForQuestID = C_QuestLog.GetTitleForQuestID;
-    local reload = false;
-
-    for _, questID in ipairs(ZskeraVault) do
-        local name = GetTitleForQuestID(questID);
-        if name and name ~= "" then
-            ZONE_DOORS[name] = ZskeraVaultKey;
+            return false
         else
-            reload = true;
-        end
-    end
-
-    if reload then
-        C_Timer.After(0.25, function()
-            LocalizeNames();
-        end);
-    end
-
-    if MODULE_ENABLED and IN_VALID_ZONE then
-        EL:UpdateZone();
-    end
-end
-
-
-local function Post_GetWorldCursor(tooltip, tooltipData)
-    if not (MODULE_ENABLED and IN_VALID_ZONE) then return end;
-
-    local name = tooltipData.lines and tooltipData.lines[1] and tooltipData.lines[1].leftText;
-    if Secret_CanAccess(name) and name and name ~= "" then
-        name = StripHyperlinks(name);
-
-        if NAME_KEYS[name] then
-            local data = NAME_KEYS[name];
-            local type = data[1];
-            local id = data[2];
-            local numRequired = data[3];
-            local keyName, numOwned, icon;
-
-            if type == 0 then
-                local currencyInfo = GetCurrencyInfo(id);
-                if currencyInfo then
-                    keyName = currencyInfo.name;
-                    numOwned = currencyInfo.quantity;
-                    icon = currencyInfo.iconFileID;
-                end
-            elseif type == 1 then
-                keyName = GetItemName(id)
-                numOwned = GetItemCount(id);
-                icon = GetItemIcon(id);
-            end
-
-            if numOwned then
-                if numOwned < numRequired then
-                    tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numOwned, numRequired, icon), 1.000, 0.125, 0.125, 1.000, 0.125, 0.125);
-                else
-                    tooltip:AddDoubleLine(keyName, string.format(KEY_QUANTITY_FORMAT, numOwned, numRequired, icon));
-                end
-
-                tooltip:Show();
-            end
+            return false
         end
     end
 end
 
 
-
+local EL = CreateFrame("Frame");
 
 EL:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_MAP_CHANGED" then
@@ -156,43 +106,26 @@ end);
 function EL:UpdateZone(newMapID)
     local mapID = newMapID or GetMapID();
     if mapID and SUPPORTED_MAPS[mapID] then
-        IN_VALID_ZONE = true;
+        SubModule.inValidZone = true;
     else
-        IN_VALID_ZONE = false;
+        SubModule.inValidZone = false;
     end
 end
 
 
-
-
 local function EnableModule(state)
+    SubModule:SetEnabled(state);
+
     if state then
-        MODULE_ENABLED = true;
-
-        if not POSTCALL_ADDED then
-            POSTCALL_ADDED = true;
-            if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
-                local tooltipType = 4;  --World Object
-                TooltipDataProcessor.AddTooltipPostCall(tooltipType, Post_GetWorldCursor);
-            else
-                print("Plumber: WoW API Changed (TooltipDataProcessor.AddTooltipPostCall)");
+        for localeKey, data in pairs(NAME_KEYS) do
+            local name = GetItemName(228942) or L[localeKey];
+            if name then
+                NAME_KEYS[name] = data;
             end
-
-            for localeKey, data in pairs(NAME_KEYS) do
-                local name = GetItemName(228942) or L[localeKey];
-                if name then
-                    NAME_KEYS[name] = data;
-                end
-            end
-
-            LocalizeNames();
-            --]]
         end
-
         EL:RegisterEvent("PLAYER_MAP_CHANGED");
         EL:UpdateZone();
     else
-        MODULE_ENABLED = false;
         EL:UnregisterEvent("PLAYER_MAP_CHANGED");
     end
 end

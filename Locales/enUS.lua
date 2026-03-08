@@ -280,6 +280,13 @@ L["Instruction View In Dressing Room"] = "<Ctrl Click to View in Dressing Room>"
 L["Data Loading In Progress"] = "Plumber is loading data";
 
 
+--Tooltip RichSoil
+L["ModuleName TooltipRichSoil"] = "Quick Slot: Rich Soil";
+L["ModuleDescription TooltipRichSoil"] = "For Herbalists: Show a list of Resilient Seeds when double-clicking on Rich Soil."..L["Quick Slot Generic Description"];
+L["Instruction Show Resilient Seeds"] = "<Double click to show Resilient Seeds>";
+L["No Resilient Seed"] = "No Resilient Seeds";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
 L["ModuleDescription Plunderstore"] = "Modify the store opened via Group Finder:\n\n- Added a checkbox to hide collected items.\n\n- Display the number of uncollected items on the category buttons.\n\n- Added weapon and armor equip location to their tooltips.\n\n- Allow you to view equippable items in the Dressing Room.";
@@ -922,6 +929,7 @@ L["currency-2917"] = "Gilded";
 L["Scenario Delves"] = "Delves";
 L["GameObject Door"] = "Door";
 L["Delve Chest 1 Rare"] = "Bountiful Coffer";   --We'll use the GameObjectID once it shows up in the database
+L["GameObject Rich Soil"] = "Rich Soil";
 
 L["Season Maximum Colon"] = "Season Maximum:";  --CURRENCY_SEASON_TOTAL_MAXIMUM
 L["Item Changed"] = "was changed to";   --CHANGED_OWN_ITEM

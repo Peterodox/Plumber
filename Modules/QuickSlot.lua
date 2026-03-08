@@ -332,9 +332,13 @@ local function ItemButton_OnEnter(self)
         QuickSlot:SetHeaderText(self.overrideName);
     else
         if self.actionType == "item" then
-            QuickSlot:SetHeaderText(API.GetColorizedItemName(self.id));
+            if self.overrideColor then
+                QuickSlot:SetHeaderText(C_Item.GetItemNameByID(self.id), nil, self.overrideColor);
+            else
+                QuickSlot:SetHeaderText(API.GetColorizedItemName(self.id));
+            end
         elseif self.actionType == "spell" then
-            QuickSlot:SetHeaderText(C_Spell.GetSpellName(self.id));
+            QuickSlot:SetHeaderText(C_Spell.GetSpellName(self.id), nil, self.overrideColor);
         end
     end
 
@@ -435,27 +439,34 @@ function QuickSlot:Init()
     --]]
 
     local HeaderShadow = self:CreateTexture(nil, "ARTWORK");
-    HeaderShadow:SetTexture("Interface/AddOns/Plumber/Art/Frame/SubtitleShadow_NineSlice_Darker");
-    HeaderShadow:SetTextureSliceMargins(30, 30, 30, 30);
+    HeaderShadow:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateTextShadow");
+    HeaderShadow:SetTextureSliceMargins(40, 24, 40, 24);
     HeaderShadow:SetTextureSliceMode(0);
     HeaderShadow:Hide();
     HeaderShadow:SetAlpha(0);
-    HeaderShadow:SetPoint("TOPLEFT", Header, "TOPLEFT", -20, 20);
-    HeaderShadow:SetPoint("BOTTOMRIGHT", Header, "BOTTOMRIGHT", 20, -20);
+    HeaderShadow:SetPoint("TOPLEFT", Header, "TOPLEFT", -20, 16);
+    HeaderShadow:SetPoint("BOTTOMRIGHT", Header, "BOTTOMRIGHT", 20, -16);
 
-    function QuickSlot:SetHeaderText(text, transparentText)
+    function QuickSlot:SetHeaderText(text, transparentText, overrideColor)
         if self:IsInEditMode() then return end;
 
         if text then
             Header:SetSize(0, 0);
             Header:SetText(text);
+
+            if overrideColor then
+                Header:SetTextColor(overrideColor.r, overrideColor.g, overrideColor.b);
+            else
+                Header:SetTextColor(1, 1, 1);
+            end
+
             if transparentText then
                 local toAlpha = self.highContrastMode and 1.0 or 0.6;
                 UIFrameFade(Header, 0.5, toAlpha);
                 UIFrameFade(HeaderShadow, 0.25, 0);
             else
                 API.UIFrameFadeIn(Header, 0.25);
-                UIFrameFade(HeaderShadow, 0.25, 1);
+                UIFrameFade(HeaderShadow, 0.25, 0.4);
             end
 
             local textWidth = Header:GetWrappedWidth() - 2;
@@ -561,6 +572,7 @@ function QuickSlot:SetButtonData(buttonData)
             button.positionIndex = positionIndex;
             button.trackIndex = trackIndex;
             button.overrideName = info.name;
+            button.overrideColor = info.overrideColor;
             button.macroText = info.macroText;
             button.onClickFunc = info.onClickFunc;
             button.tooltipLines = info.tooltipLines;
