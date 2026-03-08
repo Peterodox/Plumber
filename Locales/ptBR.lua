@@ -276,8 +276,15 @@ L["Collected Items"] = "Itens coletados";
 --Tooltip Housing
 L["ModuleName TooltipHousing"] = "Moradia";
 L["ModuleDescription TooltipHousing"] = "Moradia";
-L["Instruction View In Dressing Room"] = "<Ctrl + clique> para ver no Guarda‑roupa>";  --VIEW_IN_DRESSUP_FRAME
+L["Instruction View In Dressing Room"] = "<Ctrl + clique para ver no Guarda‑roupa>";  --VIEW_IN_DRESSUP_FRAME
 L["Data Loading In Progress"] = "Plumber está carregando dados";
+
+
+--Tooltip RichSoil
+L["ModuleName TooltipRichSoil"] = "Atalho rápido: Sementes Resilientes";
+L["ModuleDescription TooltipRichSoil"] = "Para herbalistas: Exibe uma lista de Sementes Resilientes ao clicar duas vezes em uma Terra Fértil."..L["Quick Slot Generic Description"];
+L["Instruction Show Resilient Seeds"] = "<Clique duplo para mostrar Sementes Resilientes>";
+L["No Resilient Seed"] = "Sem Sementes Resilientes";
 
 
 --Plunderstore
@@ -709,6 +716,7 @@ L["Click To Switch"] = "Clique para trocar para |cffffffff%s|r";
 L["Click To Queue"] = "Clique para entrar na fila para |cffffffff%s|r";
 L["Click to Open Format"] = "Clique para abrir %s";
 L["List Is Empty"] = "Essa lista está vazia.";
+L["Prey No Data"] = "Progresso de Presa Indisponível";
 
 
 --ExpansionSummaryMinimapButton
@@ -921,6 +929,7 @@ L["currency-2917"] = "Dourado";
 L["Scenario Delves"] = "Imersões";
 L["GameObject Door"] = "Porta";
 L["Delve Chest 1 Rare"] = "Cofre Abundante";   --We'll use the GameObjectID once it shows up in the database
+L["GameObject Rich Soil"] = "Terra fértil";
 
 L["Season Maximum Colon"] = "Máximo da série:";
 L["Item Changed"] = "mudou para";   --CHANGED_OWN_ITEM
@@ -930,6 +939,7 @@ L["Restored Coffer Key"] = "Chave de Cofre Restaurada";
 L["Coffer Key Shard"] = "Estilhaço de Chave de Cofre";
 L["Epoch Mementos"] = "Lembrança das Eras";
 L["Timeless Scrolls"] = "Pergaminho Perene";
+L["QuestName Runestone"] = "Fortificar as pedras rúnicas";    --4 Mutually exclusive quests: 90575
 L["Prey System"] = "Presa";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Tem certeza de que deseja trocar %s pelo item a seguir?\n\n|cffff2020Esta compra não é reembolsável.|r\n %s";
