@@ -265,6 +265,7 @@ L["You Have Received Weekly Item Format"] = "You have received %s this week.";
 L["ModuleName TooltipItemQuest"] = "Quest Starting Items";
 L["ModuleDescription TooltipItemQuest"] = "If an item in your bag starts a quest, show the quest details.\n\nYou can Ctrl Left Click the item to view it in the quest log if you are already on the quest.";
 L["Instruction Show In Quest Log"] = "<Ctrl Click to View in Quest Log>";
+L["QuestID"] = "QuestID";
 
 
 L["ModuleName TooltipTransmogEnsemble"] = "Transmog Ensembles";
