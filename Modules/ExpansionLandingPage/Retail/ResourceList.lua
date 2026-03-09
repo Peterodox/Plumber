@@ -55,9 +55,12 @@ do  --MID
         {currencyID = 3316},    --Voidlight Marl
 
         {itemID = 242241, uiMapID = 2395},   --Latent Arcana
+        {itemID = 246951, uiMapID = 2405},   --Stormarion Core
+
         {currencyID = 3379, shownIfOwned = true},   --Brimming Arcana
         {currencyID = 3392, shownIfOwned = true},   --Remnant of Anguish
         {currencyID = 3376, shownIfOwned = true},   --Shard of Dundun
+        {currencyID = 3377, shownIfOwned = true},   --Unalloyed Abundance
 
         {currencyID = 1602, shownIfOwned = true},   --Conquest
         {currencyID = 1792, shownIfOwned = true},   --Honor

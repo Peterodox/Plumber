@@ -5,6 +5,24 @@ local ActivityUtil = addon.ActivityUtil;
 
 --C_QuestLog.GetActivePreyQuest()
 --/dump C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(7515).barValue
+--C_AreaPoiInfo.GetEventsForMap(2537)
+--Abun Harandar 8676
+--C_AreaPoiInfo.GetEventsForMap(2537)
+
+
+local AbundantHarvest = {
+    poiMap = {
+        --On Quel'Thalas map
+        --[poiID] = uiMapID
+        [8672] = 2395,     --Eversong Enchanting Crypt
+        [8671] = 2437,     --Zul'Aman Skinning Den
+        [8676] = 2413,     --Harandar Herbalism Grotto
+        [8675] = 2405,     --Voidstorm Voidburrow
+    },
+
+    continentUiMapID = 2537,
+    ticketCurrency = 3376,      --Shard of Dundun
+};
 
 
 local SetupFuncs = {};
@@ -83,7 +101,6 @@ do
             progressText = L["Prey No Data"];
         end
 
-        listButton.Icon:Hide();
         listButton.Name:SetText(progressText);
     end
 
@@ -101,6 +118,35 @@ do
             return L["Prey System"].." - "..mapName
         else
             return L["Prey System"]
+        end
+    end
+
+
+    local function GetActiveAbundance()
+        local pois = C_AreaPoiInfo.GetEventsForMap(AbundantHarvest.continentUiMapID);
+        if pois then
+            for _, poiID in ipairs(pois) do
+                if AbundantHarvest.poiMap[poiID] then
+                    return poiID, AbundantHarvest.poiMap[poiID]
+                end
+            end
+        end
+    end
+
+    function SetupFuncs.ShouldShowAbundance()
+        return GetActiveAbundance() ~= nil
+    end
+
+    function SetupFuncs.AbundanceEvent(listButton)
+        local activePoiID, activeUiMapID = GetActiveAbundance();
+
+        if activePoiID then
+            local info = C_AreaPoiInfo.GetAreaPOIInfo(AbundantHarvest.continentUiMapID, activePoiID);
+            local mapName = addon.API.GetMapName(activeUiMapID);
+            listButton.Name:SetText(mapName.." "..info.name);
+        else
+            --Normally it won't come to this
+            listButton.Name:SetText(L["Abundance No Data"]);
         end
     end
 end
@@ -134,18 +180,64 @@ local ActivityData = {  --Constant
 
     {isHeader = true, name = "Silvermoon Court", factionID = 2710, categoryID = 2710, uiMapID = 2395,
         entries = {
-            {name = L["QuestName Runestone"], localizedName = L["QuestName Runestone"], isWeeklyQuest = true, sortToTop = true,
+            {name = L["QuestName Runestone"], localizedName = L["QuestName Runestone"], isWeeklyQuest = true, uiMapID = 2395, sortToTop = true, useActiveQuestTitle = true,
                 questPool = {
-                    {name = "Fortify the Runestones: Magisters", questID = 90573, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
-                    {name = "Fortify the Runestones: Blood Knights", questID = 90574, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
-                    {name = "Fortify the Runestones: Farstriders", questID = 90575, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
-                    {name = "Fortify the Runestones: Shades of the Row", questID = 90576, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
+                    {name = "Fortify the Runestones: Magisters", questID = 90573, isWeeklyQuest = true, uiMapID = 2395},
+                    {name = "Fortify the Runestones: Blood Knights", questID = 90574, isWeeklyQuest = true, uiMapID = 2395},
+                    {name = "Fortify the Runestones: Farstriders", questID = 90575, isWeeklyQuest = true, uiMapID = 2395},
+                    {name = "Fortify the Runestones: Shades of the Row", questID = 90576, isWeeklyQuest = true, uiMapID = 2395},
                 },
             },
 
             --{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
         },
         questLines = {5841},
+    },
+
+    {isHeader = true, name = "Amani Tribe", factionID = 2696, categoryID = 2696, uiMapID = 2437,
+        entries = {
+            {name = "Abundant Offerings", questID = 89507, sortToTop = true},
+            {name = "Abundance", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Abundance.png", shouldShow = SetupFuncs.ShouldShowAbundance, setupFunc = SetupFuncs.AbundanceEvent},
+
+            --{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
+        },
+    },
+
+    {isHeader = true, name = "Harandar", factionID = 2704, categoryID = 2704, uiMapID = 2413,
+        entries = {
+            --{name = "Lost Legends", questID = 89268, isWeeklyQuest = true, uiMapID = 2413, sortToTop = true},
+
+            {name = L["QuestName HarandarRelic"], localizedName = L["QuestName HarandarRelic"], isWeeklyQuest = true, uiMapID = 2413, sortToTop = true, useActiveQuestTitle = true,
+                questPool = {
+                    {name = "Wey'nan's Ward", questID = 88993, isWeeklyQuest = true, uiMapID = 2413},
+                    {name = "The Cauldron of Echoes", questID = 88994, isWeeklyQuest = true, uiMapID = 2413},
+                    {name = "The Echoless Flame", questID = 88996, isWeeklyQuest = true, uiMapID = 2413},
+                    {name = "Russula's Outreach", questID = 88997, isWeeklyQuest = true, uiMapID = 2413},
+                    {name = "Aln'hara's Bloom", questID = 88995, isWeeklyQuest = true, uiMapID = 2413},
+                },
+            },
+
+            {name = "WANTED: Dionaea's Thorntusks", questID = 92013, uiMapID = 2413, shownIfActive = true},
+            {name = "WANTED: Gelatonius", questID = 91970, uiMapID = 2413, shownIfActive = true},
+            {name = "WANTED: Gorebarb's Pincers", questID = 92012, uiMapID = 2413, shownIfActive = true},
+            {name = "WANTED: Hellebora's Thorn", questID = 91980, uiMapID = 2413, shownIfActive = true},
+            {name = "WANTED: Muckmire's Choking Vines", questID = 91998, uiMapID = 2413, shownIfActive = true},
+            {name = "WANTED: Slewstalk's Stalks", questID = 92010, uiMapID = 2413, shownIfActive = true},
+            {name = "WANTED: Toadshade's Petals", questID = 91982, uiMapID = 2413, shownIfActive = true},
+
+            --{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
+        },
+    },
+
+    {isHeader = true, name = "The Singularity", factionID = 2699, categoryID = 2699, uiMapID = 2405,
+        entries = {
+            {name = "Stand Your Ground", questID = 94581, uiMapID = 2405, shownIfActive = true, sortToTop = true, showIfCompleted = true},
+
+            {name = "Darkness Unmade", questID = 91700, uiMapID = 2405, shownIfActive = true},  --Kill 2 Rare creatures
+            {name = "Hidey-Hole", questID = 92407, uiMapID = 2405, shownIfActive = true},
+
+            --{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
+        },
     },
 };
 
@@ -191,5 +283,6 @@ LandingPageUtil.AddExpansionData(12, "activity", ActivityData);
 
 local DynamicQuestMaps = {
     [2393] = "map2393",     --Silvermoon
+    --[2413] = "map2413",     --Harandar
 };
 LandingPageUtil.AddExpansionData(12, "activityQuestMap", DynamicQuestMaps);

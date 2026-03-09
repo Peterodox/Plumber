@@ -409,6 +409,10 @@ do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, inst
         end
     end
 
+    function DynamicQuestDataProvider:IsQuestActive(questID)
+        return self.addedQuests[questID]
+    end
+
     function DynamicQuestDataProvider:AddQuestsFromMap(uiMapID, categoryID)
         C_QuestLine.RequestQuestLinesForMap(uiMapID);
 
@@ -525,15 +529,20 @@ local QuestNames = {};
 local ItemNames = {};
 
 
+--- GetActivityName
+--- @param dataIndex number
+--- @param questID any
+--- @return string name
+--- @return boolean isLocalized
 function ActivityUtil.GetActivityName(dataIndex, questID)
-    --2nd arg: isLocalized
     local v = SortedActivity[dataIndex];
     if v then
         if v.nameGetter then
             return v.nameGetter(), true
         end
 
-        if v.localizedName then
+        if v.localizedName and ((not questID) or (questID and v.questID and questID == v.questID)) then
+            --Entry's questID may change, in this case don't use cache
             return v.localizedName, true
         end
 
@@ -722,9 +731,11 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                     showActivity = true;
                     entry.uiMapID = C_TaskQuest.GetQuestZoneID(entry.questID);
                 else
-                    --Do not count this quest toward completed
-                    showActivity = false;
-                    entry.completed = false;
+                    if entry.showIfCompleted and entry.completed and (not hideCompleted) then
+                        showActivity = true;
+                    else
+                        showActivity = false;
+                    end
                 end
             end
 
@@ -732,6 +743,10 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
                 numCompleted = numCompleted + 1;
             elseif showActivity then
                 anyIncomplted = true;
+            end
+
+            if entry.shouldShow then
+                showActivity = entry.shouldShow();
             end
 
             if showActivity then
