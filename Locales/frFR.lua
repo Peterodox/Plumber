@@ -832,6 +832,7 @@ L["Coffer Key Shard"] = "Fragment de clé de coffre";
 L["Epoch Mementos"] = "Souvenir d'époque";     --See currency:3293
 L["Timeless Scrolls"] = "Parchemin intemporel"; --item: 217605
 L["QuestName Runestone"] = "Renforcement des pierres runiques";    --4 Mutually exclusive quests: 90575
+L["QuestName HarandarRelic"] = "Légendes des Haranir";
 L["Prey System"] = "Traque";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Souhaitez-vous vraiment échanger %s contre l'objet suivant ?\n\n|cffff2020Votre achat ne pourra pas être remboursé.|r\n %s";

@@ -940,6 +940,7 @@ L["Coffer Key Shard"] = "Estilhaço de Chave de Cofre";
 L["Epoch Mementos"] = "Lembrança das Eras";
 L["Timeless Scrolls"] = "Pergaminho Perene";
 L["QuestName Runestone"] = "Fortificar as pedras rúnicas";    --4 Mutually exclusive quests: 90575
+L["QuestName HarandarRelic"] = "Lendas dos Haranir";
 L["Prey System"] = "Presa";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Tem certeza de que deseja trocar %s pelo item a seguir?\n\n|cffff2020Esta compra não é reembolsável.|r\n %s";

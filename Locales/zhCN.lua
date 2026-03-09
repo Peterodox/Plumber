@@ -889,6 +889,7 @@ L["Coffer Key Shard"] = "宝匣钥匙碎片";
 L["Epoch Mementos"] = "纪元纪念品";
 L["Timeless Scrolls"] = "越时卷轴";
 L["QuestName Runestone"] = "加固符文石";    --4 Mutually exclusive quests: 90575
+L["QuestName HarandarRelic"] = "哈籁尼尔的传说";
 L["Prey System"] = "狩猎";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "你确定要将%s兑换为下列物品吗？\n\n|cffff2020本次购买将无法退还。|r\n %s";

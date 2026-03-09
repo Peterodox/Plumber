@@ -864,6 +864,7 @@ L["Coffer Key Shard"] = "Осколок ключа от сундука";
 L["Epoch Mementos"] = "Сокровище эпох";
 L["Timeless Scrolls"] = "Вневременный свиток"; --item: 217605
 L["QuestName Runestone"] = "Укрепление рунических камней";    --4 Mutually exclusive quests: 90575
+L["QuestName HarandarRelic"] = "Легенды хараниров";
 L["Prey System"] = "Добыча";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Вы действительно хотите обменять %s на следующий предмет?\n\n|cffff2020Покупка невозвратная.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
