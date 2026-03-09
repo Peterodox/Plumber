@@ -265,6 +265,7 @@ L["You Have Received Weekly Item Format"] = "你本周已获得%s。";
 L["ModuleName TooltipItemQuest"] = "任务起始物品";
 L["ModuleDescription TooltipItemQuest"] = "在任务起始物品的鼠标提示上显示任务详情。\n\n如果你已经接受了相关任务，你可以按住Ctrl并左键点击此物品来在浏览任务日志。";
 L["Instruction Show In Quest Log"] = "<按住Ctrl点击浏览任务日志>";
+L["QuestID"] = "任务ID";
 
 
 L["ModuleName TooltipTransmogEnsemble"] = "团本外观套装";
