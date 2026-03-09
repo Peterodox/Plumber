@@ -89,7 +89,7 @@ do
 
                                 if IsShiftKeyDown() then
                                     tooltip:AddLine(" ");
-                                    tooltip:AddDoubleLine("QuestID", questID, 1, 0.82, 0, 1, 1, 1);
+                                    tooltip:AddDoubleLine(L["QuestID"], questID, 1, 0.82, 0, 1, 1, 1);
                                 end
 
                                 if C_QuestLog.GetLogIndexForQuestID(questID) and not InCombatLockdown() then
