@@ -2,7 +2,7 @@ local _, addon = ...
 local L = addon.L;
 local GameTooltipWorldObjectManager = addon.GameTooltipManager:GetWorldObjectManager();
 local QuickSlot = addon.QuickSlot;
-local GetMouseFocus = addon.API.GetMouseFocus;
+local IsWorldFrameFocused = addon.API.IsWorldFrameFocused;
 local Secret_CanAccess = addon.API.Secret_CanAccess;
 local GetItemCount = C_Item.GetItemCount;
 
@@ -139,7 +139,7 @@ do
     end
 
     function EL:ProcessDoubleClick()
-        if GetMouseFocus() == nil then
+        if IsWorldFrameFocused() then
             local isGliding = C_PlayerInfo.GetGlidingInfo();
             if isGliding then
                 return

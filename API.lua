@@ -2295,16 +2295,19 @@ do  -- Spell
 end
 
 do  -- System
-    if true then    --IS_TWW
-        local GetMouseFoci = GetMouseFoci;
+    local GetMouseFoci = GetMouseFoci;
 
-        local function GetMouseFocus()
-            local objects = GetMouseFoci();
-            return objects and objects[1]
-        end
-        API.GetMouseFocus = GetMouseFocus;
-    else
-        API.GetMouseFocus = GetMouseFocus;
+    local function GetMouseFocus()
+        local objects = GetMouseFoci();
+        return objects and objects[1]
+    end
+    API.GetMouseFocus = GetMouseFocus;
+
+
+    local WorldFrame = WorldFrame;
+    function API.IsWorldFrameFocused()
+        local obj = GetMouseFocus();
+        return obj == nil or obj == WorldFrame
     end
 
 
