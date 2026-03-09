@@ -103,7 +103,9 @@ function Positioner:GetFromRadian()
 end
 
 function Positioner:SetFromRadian(radian)
-    if not radian then return end;
+    if type(radian) ~= "number" then
+        radian = 0;
+    end
 
     local snappedRadian = math.rad(45);
 

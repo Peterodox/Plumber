@@ -38,9 +38,18 @@ local function DoesPlayerHaveSeeds()
     end
 end
 
+local function IsHerbalism(index)
+    if index then
+        local skillLine1 = select(7, GetProfessionInfo(index));
+        if skillLine1 == 182 then
+            return true
+        end
+    end
+end
+
 local function IsPlayerHerbalist()
     local prof1, prof2 = GetProfessions();
-    return prof1 == 6 or prof2 == 6
+    return IsHerbalism(prof1) or IsHerbalism(prof2)
 end
 
 
@@ -187,6 +196,12 @@ end
 
 
 do
+    local function AlertForNonHerbalist()
+        if not IsPlayerHerbalist() or true then
+            return "|cffd4641c"..UNIT_SKINNABLE_HERB.."|r"
+        end
+    end
+
     local function EnableModule(state)
         EL:SetEnabled(state);
         SubModule:SetEnabled(state);
@@ -196,6 +211,7 @@ do
         name = addon.L["ModuleName TooltipRichSoil"],
         dbKey = "TooltipRichSoil",
         description = addon.L["ModuleDescription TooltipRichSoil"],
+        descriptionFunc = AlertForNonHerbalist,
         toggleFunc = EnableModule,
         moduleAddedTime = 1773000000,
 		categoryKeys = {

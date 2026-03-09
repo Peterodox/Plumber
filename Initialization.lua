@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.8.9";
-local VERSION_DATE = 1773000000;
+local VERSION_TEXT = "1.8.9 a";
+local VERSION_DATE = 1773020000;
 
 
 local addonName, addon = ...
@@ -313,6 +313,7 @@ local DefaultValues = {
 
     --QuickSlot
         QuickSlotHighContrastMode = false,
+        quickslotFromRadian = 0,
 
 
     --SpellFlyout DrawerMacro
