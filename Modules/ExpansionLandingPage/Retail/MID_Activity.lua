@@ -144,10 +144,31 @@ do
             local info = C_AreaPoiInfo.GetAreaPOIInfo(AbundantHarvest.continentUiMapID, activePoiID);
             local mapName = addon.API.GetMapName(activeUiMapID);
             listButton.Name:SetText(mapName.." "..info.name);
+            listButton.tooltipWidgetSet = info.tooltipWidgetSet;
         else
             --Normally it won't come to this
             listButton.Name:SetText(L["Abundance No Data"]);
         end
+    end
+
+    function SetupFuncs.AbundanceTooltip(tooltip)
+        local loaded, keepUpdating = true, false;
+        local activePoiID, activeUiMapID = GetActiveAbundance();
+
+        if activePoiID then
+            local info = C_AreaPoiInfo.GetAreaPOIInfo(AbundantHarvest.continentUiMapID, activePoiID);
+            if info.tooltipWidgetSet then
+                local anyChange, isRetrievingData = addon.API.AddWidgetSetToTooltip(tooltip, info.tooltipWidgetSet);
+                if anyChange and isRetrievingData then
+                    keepUpdating = true;
+                end
+                return loaded, keepUpdating
+            end
+        end
+
+        tooltip:AddLine(L["Abundance No Data"], 0.5, 0.5, 0.5, false);
+
+        return loaded, keepUpdating
     end
 end
 
@@ -197,7 +218,7 @@ local ActivityData = {  --Constant
     {isHeader = true, name = "Amani Tribe", factionID = 2696, categoryID = 2696, uiMapID = 2437,
         entries = {
             {name = "Abundant Offerings", questID = 89507, sortToTop = true},
-            {name = "Abundance", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Abundance.png", shouldShow = SetupFuncs.ShouldShowAbundance, setupFunc = SetupFuncs.AbundanceEvent},
+            {name = "Abundance", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Abundance.png", shouldShow = SetupFuncs.ShouldShowAbundance, setupFunc = SetupFuncs.AbundanceEvent, tooltipSetter = SetupFuncs.AbundanceTooltip},
 
             --{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
         },

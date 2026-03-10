@@ -239,7 +239,7 @@ do  --Checklist Button
         else
             local data = ActivityUtil.GetActivityData(self.dataIndex);
             if data then
-                if data.tooltip or data.children then
+                if data.tooltip or data.children or data.tooltipSetter then
                     TooltipUpdator:SetFocusedObject(self);
                     TooltipUpdator:SetHeaderText(self.Name:GetText());
                     local tooltipLines = {};
@@ -455,8 +455,9 @@ do
         local function ChecklistButton_OnAcquired(button)
 
         end
-        local function ChecklistButton_OnRemoved(button)
 
+        local function ChecklistButton_OnRemoved(button)
+            button.tooltipWidgetSet = nil;
         end
 
         ScrollView:AddTemplate("ChecklistButton", ChecklistButton_Create, ChecklistButton_OnAcquired, ChecklistButton_OnRemoved);
