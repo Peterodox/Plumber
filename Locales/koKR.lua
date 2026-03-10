@@ -939,7 +939,7 @@ L["Restored Coffer Key"] = "복원된 보관함 열쇠";
 L["Coffer Key Shard"] = "보관함 열쇠 파편";
 L["Epoch Mementos"] = "시대의 기념품";     --See currency:3293
 L["Timeless Scrolls"] = "영원 두루마리"; --item: 217605
-L["QuestName Runestone"] = "Fortify the Runestones";    --[MISSING] 4 Mutually exclusive quests: 90575
+L["QuestName Runestone"] = "룬석을 강화하라";    --[MISSING] 4 Mutually exclusive quests: 90575
 L["QuestName HarandarRelic"] = "하라니르의 전설";
 L["Prey System"] = "사냥감";
 
