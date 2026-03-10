@@ -2306,8 +2306,9 @@ do  -- System
 
     local WorldFrame = WorldFrame;
     function API.IsWorldFrameFocused()
+        --Some addons may create a frame with propagateMouseInput over the WorldFrame
         local obj = GetMouseFocus();
-        return obj == nil or obj == WorldFrame
+        return obj == nil or obj == WorldFrame or (obj:CanPropagateMouseMotion() or obj:CanPropagateMouseClicks())
     end
 
 
