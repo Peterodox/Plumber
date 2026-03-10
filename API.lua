@@ -1510,6 +1510,19 @@ do  -- Instance -- Map
         local _, instanceType = GetInstanceInfo();
         return instanceType == "arena" or instanceType == "pvp"
     end
+
+
+    function API.IsPlayerInInstance()
+        local state = IsInInstance();
+        if state then
+            return true
+        end
+
+        local _, instanceType = GetInstanceInfo();
+        if instanceType == "scenario" then
+            return true
+        end
+    end
 end
 
 do  -- Pixel

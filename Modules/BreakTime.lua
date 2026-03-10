@@ -984,12 +984,13 @@ do  --Controller
 
 
     local InCombatLockdown = InCombatLockdown;
-    local IsInInstance = IsInInstance;
+    local IsPlayerInInstance = API.IsPlayerInInstance;
 
     local DeferredEvents = {
         PLAYER_REGEN_ENABLED = true,
         LOADING_SCREEN_DISABLED = true,
         PLAYER_MAP_CHANGED = true,
+        SCENARIO_COMPLETED = true,
     };
 
     function Controller:OnEvent_TryShowTimer(event)
@@ -999,7 +1000,7 @@ do  --Controller
     end
 
     function Controller:TryShowTimer()
-        if API.IsInPvP() or InCombatLockdown() or (GetDBBool("BreakTime_DNDInstances") and IsInInstance()) then
+        if API.IsInPvP() or InCombatLockdown() or (GetDBBool("BreakTime_DNDInstances") and IsPlayerInInstance()) then
             if self:GetScript("OnEvent") ~= self.OnEvent_TryShowTimer then
                 self:SetScript("OnEvent", self.OnEvent_TryShowTimer);
                 RegisterEvent(self, DeferredEvents, true);
