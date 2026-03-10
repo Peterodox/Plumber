@@ -322,8 +322,8 @@ L["Error Show UI In Combat 2"] = "ARRÊTEZ S'IL VOUS PLAÎT";
 
 
 --Landing Page Switch
-L["ModuleName LandingPageSwitch"] = "Rapport de mission sur la minicarte";
-L["ModuleDescription LandingPageSwitch"] = "Accéder aux Rapports du fief et Rapport de domaine en faisant Clic droit sur le Résumé de Renom, sur la minicarte.";
+L["ModuleName LandingPageSwitch"] = "Rapport de mission sur la mini-carte";
+L["ModuleDescription LandingPageSwitch"] = "Accéder aux Rapports du fief et Rapport de domaine en faisant Clic droit sur le Résumé de Renom, sur la mini-carte.";
 L["Mission Complete Count Format"] = "%d Prêt à terminer";
 L["Open Mission Report Tooltip"] = "Clic droit pour ouvrir les rapports de mission.";
 
@@ -452,8 +452,8 @@ L["Available Knowledge Format"] = "Connaissances disponibles : |cffffffff%s|r";
 
 
 --MinimapMouseover (click to /tar creature on the minimap)
-L["ModuleName MinimapMouseover"] = "Cible de la minicarte";
-L["ModuleDescription MinimapMouseover"] = "Alt + Clic sur une créature sur la minicarte pour la définir comme cible.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
+L["ModuleName MinimapMouseover"] = "Cible de la mini-carte";
+L["ModuleDescription MinimapMouseover"] = "Alt + Clic sur une créature sur la mini-carte pour la définir comme cible.".."\n\n|cffd4641c- " ..L["Restriction Combat"].."|r";
 
 
 --BossBanner
@@ -493,7 +493,7 @@ L["SoftTargetName HideName Tooltip"] = "Masque le nom de l'objet cible lorsque v
 L["ModuleName LegionRemix"] = "Legion Remix";
 L["ModuleDescription LegionRemix"] = "- Apprend automatiquement les traits.\n\n- Ajoute un widget à la feuille de personnage affichant diverses informations. Vous pouvez cliquer sur ce widget pour ouvrir une nouvelle interface d'artefact.";
 L["ModuleName LegionRemix_HideWorldTier"] = "Masquer l'icône de palier mondial";
-L["ModuleDescription LegionRemix_HideWorldTier"] = "Masque l'icône du palier mondial héroïque située sous la minicarte.";
+L["ModuleDescription LegionRemix_HideWorldTier"] = "Masque l'icône du palier mondial héroïque située sous la mini-carte.";
 L["ModuleName LegionRemix_LFGSpam"] = "Spam de la Recherche de raid";
 L["ModuleDescription LegionRemix_LFGSpam"] = "Supprimer le message indésirable suivant :\n\n"..ERR_LFG_PROPOSAL_FAILED;
 L["Artifact Weapon"] = "Arme prodigieuse";
@@ -646,7 +646,7 @@ L["No Slot For New Character Macro Alert"] = "Vous devez disposer d'un emplaceme
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Résumé de l'extension";
-L["ModuleDescription NewExpansionLandingPage"] = "Interface affichant les factions, les activités hebdomadaires et les verrouillages de raids. Vous pouvez l'ouvrir de la manière suivante :\n\nCliquez sur le bouton Résumé de Khaz Algar sur la minicarte.\n\n- Attribuer un raccourci dans Options > Raccourcis clavier."
+L["ModuleDescription NewExpansionLandingPage"] = "Interface affichant les factions, les activités hebdomadaires et les verrouillages de raids. Vous pouvez l'ouvrir de la manière suivante :\n\nCliquez sur le bouton Résumé de Khaz Algar sur la mini-carte.\n\n- Attribuer un raccourci dans Options > Raccourcis clavier."
 L["Abbr NewExpansionLandingPage"] = "Résumé de l'extension";
 L["Reward Available"] = "Récompense disponible";  --As brief as possible
 L["Paragon Reward Available"] = "Récompense de Paragon disponible";
@@ -721,26 +721,26 @@ L["Abundance No Data"] = "Aucun événement d'abondance actif";
 
 
 --ExpansionSummaryMinimapButton
-L["LandingButton Settings Title"] = "Résumé d'extension : bouton de la minicarte";
+L["LandingButton Settings Title"] = "Résumé d'extension : bouton de la mini-carte";
 L["LandingButton Tooltip Format"] = "Clic gauche pour afficher / masquer %s.\nClic droit pour plus d'options.";
 L["LandingButton Customize"] = "Personnaliser";
 L["LandingButton Reposition Tooltip"] = "Maintenez |cffffffffMaj|r pour déverrouiller";
-L["LandingButtonOption ShowButton"] = "Activer le bouton de la minicarte";
-L["LandingButtonOption Unaffected"] = "Ignorer les addons de la minicarte";
-L["LandingButtonOption Unaffected Tooltip"] = "Empêche ce bouton d'être modifié par d'autres addons de la minicarte (apparence ou position).\n\nUne fois activé, ce bouton ne suivra plus la minicarte ni son échelle, et utilisera à la place l'échelle globale de l'interface.\n\n|cffff4800Vous devrez peut-être recharger l'interface après avoir modifié cette option.|r";
+L["LandingButtonOption ShowButton"] = "Activer le bouton de la mini-carte";
+L["LandingButtonOption Unaffected"] = "Ignorer les addons de la mini-carte";
+L["LandingButtonOption Unaffected Tooltip"] = "Empêche ce bouton d'être modifié par d'autres addons de la mini-carte (apparence ou position).\n\nUne fois activé, ce bouton ne suivra plus la mini-carte ni son échelle, et utilisera à la place l'échelle globale de l'interface.\n\n|cffff4800Vous devrez peut-être recharger l'interface après avoir modifié cette option.|r";
 L["LandingButtonOption UseLibDBIcon"] = "Utiliser LibDBIcon";
 L["LandingButtonOption UseLibDBIcon Tooltip"] = "Laisse LibDBIcon gérer l'apparence et la position de ce bouton.";
 L["LandingButtonOption UseLibDBIcon NoBorder"] = "Supprimer la bordure du bouton";
-L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "Supprime la bordure dorée du bouton.\n\nCette option peut ne pas fonctionner avec certains addons de gestion des boutons de la minicarte.";
+L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "Supprime la bordure dorée du bouton.\n\nCette option peut ne pas fonctionner avec certains addons de gestion des boutons de la mini-carte.";
 L["LandingButtonOption PrimaryUI"] = "Clic gauche : ouvrir";
-L["LandingButtonOption PrimaryUI Tooltip"] = "Choisir quelle interface ouvrir avec un clic gauche sur le bouton de la minicarte.";
+L["LandingButtonOption PrimaryUI Tooltip"] = "Choisir quelle interface ouvrir avec un clic gauche sur le bouton de la mini-carte.";
 L["LandingButtonOption SmartExpansion"] = "Choix automatique de l'extension";
-L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activé : clic gauche sur le bouton de la minicarte ouvre l'interface adaptée à votre zone actuelle, par exemple le rapport du Sanctum de congrégation lorsque vous êtes en Ombreterre.";
-L["LandingButtonOption SmartExpansion Tooltip 2"] = "Si désactivé : clic gauche sur le bouton de la minicarte ouvre toujours %s.";
+L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activé : clic gauche sur le bouton de la mini-carte ouvre l'interface adaptée à votre zone actuelle, par exemple le rapport du Sanctum de congrégation lorsque vous êtes en Ombreterre.";
+L["LandingButtonOption SmartExpansion Tooltip 2"] = "Si désactivé : clic gauche sur le bouton de la mini-carte ouvre toujours %s.";
 L["LandingButtonOption ReduceSize"] = "Réduire la taille du bouton";
 L["LandingButtonOption DarkColor"] = "Utiliser le thème sombre";
 L["LandingButtonOption HideWhenIdle"] = "Masquer en cas d'inactivité";
-L["LandingButtonOption HideWhenIdle Tooltip"] = "Le bouton de la minicarte restera invisible jusqu'à ce que vous déplaciez le curseur à proximité ou receviez une notification.\n\nCette option prendra effet après la fermeture des paramètres.";
+L["LandingButtonOption HideWhenIdle Tooltip"] = "Le bouton de la mini-carte restera invisible jusqu'à ce que vous déplaciez le curseur à proximité ou receviez une notification.\n\nCette option prendra effet après la fermeture des paramètres.";
 
 
 --RaidCheck
