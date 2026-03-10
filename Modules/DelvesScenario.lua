@@ -3,11 +3,8 @@ local _, addon = ...
 local L = addon.L;
 local API = addon.API;
 local UIFrameFade = API.UIFrameFade;
-local TimeLeftTextToSeconds = API.TimeLeftTextToSeconds;
 local IsInDelves = API.IsInDelves;
 
-local GetDelvesForMap = C_AreaPoiInfo.GetDelvesForMap;  --Fail to obtain Bountiful Delves (Bountiful Delves use AreaPOIPinTemplate, Other Delves use DelveEntrancePinTemplate)
-local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo;
 local C_UIWidgetManager = C_UIWidgetManager;
 local GetMajorFactionRenownInfo = C_MajorFactions.GetMajorFactionRenownInfo;
 local GetStepInfo = C_Scenario.GetStepInfo;
@@ -64,6 +61,7 @@ local BonusObjectiveTrackerMixin = {};
 do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
     local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 
+    local NEMESIS_SPELL_ID = 1270179;   --/dump GetMouseFoci()[1].spellID
     local CURRENCY_AFFIX_ACTIVE = 3103;
     local CURRENCY_AFFIX_MAXIMUM = 3104;
 
@@ -126,14 +124,13 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
 
         if not widgetID then return end;
 
-        local SPELL_ID = 1239535;    --Nemisis Strongbox    /dump GetMouseFoci()[1].spellID
         local spellIndex;
 
         local widgetInfo = C_UIWidgetManager.GetScenarioHeaderDelvesWidgetVisualizationInfo(widgetID);
 
         if widgetInfo and widgetInfo.shownState == 1 and widgetInfo.spells then
             for i, spellInfo in ipairs(widgetInfo.spells) do
-                if spellInfo.spellID == SPELL_ID then
+                if spellInfo.spellID == NEMESIS_SPELL_ID then
                     if spellInfo.shownState == 1 then
                         spellIndex = i;
                     end
@@ -207,7 +204,7 @@ do  --Seasonal Journey Progress
     --Currently can't track it on the ReputationBar by C_Reputation.SetWatchedFactionByID (C_Reputation.IsMajorFaction returns true but no C_MajorFactions.GetMajorFactionData)
 
     local FADEOUT_DELAY = 4;
-    local MAPID_DORNOGAL = 2339;    --Only listen UPDATE_FACTION in Delves and Dornogal (Weekly Quest Turn-in)
+    local MAJOR_CITY_MAP_ID = 2393;    --Only listen FACTION_STANDING_CHANGED in Delves and Dornogal (Weekly Quest Turn-in)
 
     local ProgressBar;
     local BonusObjectiveTracker;
@@ -365,7 +362,7 @@ do  --Seasonal Journey Progress
 
     local function UpdateInDelveStatus()
         --Seasonal Progress changes after looting a chest in the end
-        --To reduce usage, we start listening UPDATE_FACTION after the scenario is completed (the event fires after killing the final boss) (Companion level is also a faction)
+        --To reduce usage, we start listening FACTION_STANDING_CHANGED after the scenario is completed (the event fires after killing the final boss) (Companion level is also a faction)
         --If player resets UI after scenario completion, we won't show the progress bar
         --C_DelvesUI.HasActiveDelve doesn't change immediately after PLAYER_MAP_CHANGED
         if IsInDelves() then
@@ -378,7 +375,7 @@ do  --Seasonal Journey Progress
         else
             EL:UnregisterEvent("SCENARIO_COMPLETED");
             EL:UnregisterEvent("PLAYER_MAP_CHANGED");
-            EL:UnregisterEvent("UPDATE_FACTION");
+            EL:UnregisterEvent("FACTION_STANDING_CHANGED");
             BonusObjectiveTracker_Hide();
             --print("NOT in Delve");
             return false
@@ -398,14 +395,18 @@ do  --Seasonal Journey Progress
     end);
 
     local function OnScenarioCompleted()
-        EL:RegisterEvent("UPDATE_FACTION");
+        EL:RegisterEvent("FACTION_STANDING_CHANGED");
     end
     EL:AddHandler("SCENARIO_COMPLETED", OnScenarioCompleted);
 
     local function OnFactionUpdated()
-        EL:RegisterEvent("UPDATE_FACTION");
         local anyChange, level, earned, threshold, deltaEarned, levelUp, reachMaxLevel = SeasonTracker:SnapShotSeasonalProgress();
         if anyChange then
+            if addon.GetDBBool("LootUI") and addon.GetDBBool("LootUI_ShowReputation") then
+                --Suppress this UI if Loot Window: Show Reputation Changes is enabled
+                return
+            end
+
             ProgressBar:FadeIn();
             ProgressBar:SetValue(earned, levelUp);
             ProgressBar:AnimateDeltaValue(deltaEarned);
@@ -414,22 +415,24 @@ do  --Seasonal Journey Progress
             ProgressBar:StartFadeOutCountdown(0);
         end
     end
-    EL:AddHandler("UPDATE_FACTION", function()
-        EL:ProcessOnNextCycle(OnFactionUpdated);
+    EL:AddHandler("FACTION_STANDING_CHANGED", function(factionID, updatedStanding)
+        if factionID == DELVES_SEASON_FACTION then
+            EL:ProcessOnNextCycle(OnFactionUpdated);
+        end
     end);
 
 
     local function ZoneTriggerModule_Enable(state)
         if state then
             if not ZoneTriggerModule then
-                local module = API.CreateZoneTriggeredModule("dornogal");
+                local module = API.CreateZoneTriggeredModule("silvermoon");
                 ZoneTriggerModule = module;
-                module:SetValidZones(MAPID_DORNOGAL);
+                module:SetValidZones(MAJOR_CITY_MAP_ID);
 
                 local function OnEnterZoneCallback()
                     SeasonTracker:SnapShotSeasonalProgress();
                     ProgressBar_Init();
-                    EL:RegisterEvent("UPDATE_FACTION");
+                    EL:RegisterEvent("FACTION_STANDING_CHANGED");
                 end
 
                 local function OnLeaveZoneCallback()
@@ -457,7 +460,7 @@ do  --Seasonal Journey Progress
             EL:UnregisterEvent("WALK_IN_DATA_UPDATE");
             EL:UnregisterEvent("PLAYER_MAP_CHANGED");
             EL:UnregisterEvent("SCENARIO_COMPLETED");
-            EL:UnregisterEvent("UPDATE_FACTION");
+            EL:UnregisterEvent("FACTION_STANDING_CHANGED");
         end
         ZoneTriggerModule_Enable(state);
     end
