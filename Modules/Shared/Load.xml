@@ -6,4 +6,5 @@
     <Include file="SharedEditMode.lua"/>
     <Include file="CooldownUtil.lua"/>
     <Include file="BlizzardEditMode.lua"/>
+    <Include file="WidgetSetUtil.lua"/> 
 </Ui>
