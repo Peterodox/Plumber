@@ -1746,8 +1746,21 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
         self:SetIcon(icon);
         self.id = item;
         self.actionType = "item";
-        local stackSize = GetItemMaxStackSizeByID(item)
-        self.stackable = stackSize and stackSize > 1;
+        local stackSize = GetItemMaxStackSizeByID(item);
+
+        if not stackSize then
+            self.stackable = false;
+            addon.CallbackRegistry:LoadItem(item, function(_itemID)
+                if _itemID == self.id and self.actionType == "item" then
+                    local stackSize = GetItemMaxStackSizeByID(item);
+                    self.stackable = stackSize and stackSize > 1;
+                    self:UpdateCount();
+                end
+            end);
+        else
+            self.stackable = stackSize > 1;
+        end
+
         self:UpdateCount();
     end
 
