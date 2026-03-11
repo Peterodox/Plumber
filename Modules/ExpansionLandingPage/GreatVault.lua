@@ -149,11 +149,14 @@ do
                 for i = 1, 3 do
                     n = n + 1;
                     activityInfo = activities[i];
+                    button = self.buttons[n];
+                    button.info = activityInfo;
+
                     if activityInfo then
                         itemLevel, upgradeItemLevel, itemLink = nil, nil, nil;
 
                         if row == 3 then
-                            itemLevel = API.GetDelvesGreatVaultItemLevel(activityInfo.level);
+                            --itemLevel = API.GetDelvesGreatVaultItemLevel(activityInfo.level); --[TEMP] disabled because we don't have S1 Data yet
                         end
 
                         if not itemLevel then
@@ -168,9 +171,6 @@ do
 
                         progressDelta = activityInfo.threshold - activityInfo.progress;
 
-                        button = self.buttons[n];
-                        button.info = activityInfo;
-
                         if progressDelta <= 0 then
                             button:SetUnlockedState();
                             button.Text:SetText(itemLevel);
@@ -184,7 +184,10 @@ do
                             button.progressDelta = progressDelta;
                         end
                     else
-                        --No activityInfo
+                        --No activityInfo. It shouldn't have reached here.
+                        button:SetLockedState();
+                        button.Text:SetText("0/0");
+                        button.progressDelta = 0;
                     end
                 end
             end
@@ -293,6 +296,8 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
     };
 
     local function ShowTooltip(self)
+        if not self.info then return end;
+
         local tooltip = GameTooltip;
 
         if self.info.type == Enum.WeeklyRewardChestThresholdType.World then
