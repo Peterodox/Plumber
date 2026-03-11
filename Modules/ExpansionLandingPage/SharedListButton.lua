@@ -78,9 +78,9 @@ do  --ScrollViewListButton
         self.Text1:SetText(nil);
 
         if self.isCollapsed then
-            self.Icon:SetTexCoord(0, 48/512, 208/512, 256/512);
+            self.Icon:SetTexCoord(336/512, 384/512, 208/512, 256/512);
         else
-            self.Icon:SetTexCoord(0, 48/512, 256/512, 208/512);
+            self.Icon:SetTexCoord(0, 48/512, 208/512, 256/512);
         end
 
         self:Layout();
