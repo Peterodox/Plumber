@@ -930,6 +930,7 @@ do
         ScrollView:Hide();
         ScrollView:SetPoint("TOPLEFT", f, "TOPLEFT", 8, -40);
         ScrollView:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -8, 8);
+        ScrollView:MinimizeScrollBar(true);
         ScrollView:OnSizeChanged();
         ScrollView:SetAlwaysShowScrollBar(false);
         ScrollView:SetSmartClipsChildren(true);

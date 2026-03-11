@@ -18,6 +18,18 @@ local EncounterData = {
     --https://wago.tools/db2/JournalEncounter?page=1
     --/dump GetMouseFoci()[1].icon:GetTexture()
 
+    [2795] = {icon = 7448202, achv = {61487, 61488, 61489, 61454}},      --Chimaerus
+
+    [2733] = {icon = 7448209, achv = {61372, 62106}},      --Imperator Averzian
+    [2734] = {icon = 7448210, achv = {61373, 62058}},      --Vorasius
+    [2736] = {icon = 7448212, achv = {61374, 61514}},      --Fallen-King Salhadaar
+    [2735] = {icon = 7448207, achv = {61375, 61911}},      --Vaelgor & Ezzorak
+    [2737] = {icon = 7448211, achv = {61376, 61936}},      --Lightblinded Vanguard
+    [2738] = {icon = 7448205, achv = {61637, 61377, 61346}},      --Crown of the Cosmos
+
+    [2739] = {icon = 7448203, achv = {61378, 61381}},      --Belo'ren
+    [2740] = {icon = 7448204, achv = {61379, 62406}},      --Midnight Falls
+
 
     --Manaforge Omega
     [2684] = {icon = 6922080, achv = {41604, 42118}},      --Plexus Sentinel
