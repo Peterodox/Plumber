@@ -982,6 +982,13 @@ do
 
             RenownItemScrollView:AddTemplate("LevelText", LevelText_Create);
         end
+
+
+        addon.CallbackRegistry:Register("LandingPage.ExpansionChanged", function(expansionID)
+            if DetailFrame:IsVisible() then
+                FactionTab:DisplayOverview();
+            end
+        end);
     end
 
     function FactionTabMixin:UpdateLeftWidgets()
