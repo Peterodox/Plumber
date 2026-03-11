@@ -66,10 +66,13 @@ do
     function EL:SetEnabled(state)
         if state then
             self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+            self:RegisterEvent("LOADING_SCREEN_DISABLED");
             self:SetScript("OnEvent", self.OnEvent);
             self:UpdateZone();
         else
             self.isConditionMet = false;
+            self:UnregisterEvent("ZONE_CHANGED_NEW_AREA");
+            self:UnregisterEvent("LOADING_SCREEN_DISABLED");
             self:ListenAutoCloseEvents(false);
             self:ListenMouseEvent(false);
         end
@@ -109,7 +112,7 @@ do
                 end
                 self.lastTime = t;
             end
-        elseif event == "ZONE_CHANGED_NEW_AREA" then
+        elseif event == "ZONE_CHANGED_NEW_AREA" or event == "LOADING_SCREEN_DISABLED" then
             self:UpdateZone();
         elseif self.AutoCloseEvents[event] then
             self:ShowQuickSlot(false);
