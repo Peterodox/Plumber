@@ -24,6 +24,7 @@ local GetItemCount = C_Item.GetItemCount;
 local HaveQuestData = HaveQuestData;
 local GetCurrentRenownLevel = C_MajorFactions.GetCurrentRenownLevel;
 local IsWorldQuestActive = C_TaskQuest.IsActive;
+local ReadyForTurnIn = API.IsQuestReadyForTurnIn;
 
 
 local function ShownIfOnQuest(questID)
@@ -279,6 +280,10 @@ do
             return b.isOnQuest
         end
 
+        if (a.readyForTurnIn ~= nil) and (b.readyForTurnIn ~= nil) and a.readyForTurnIn ~= b.readyForTurnIn then
+            return b.readyForTurnIn
+        end
+
         if a.sortToTop ~= b.sortToTop then
             return a.sortToTop
         end
@@ -306,6 +311,7 @@ end
 
 local function InitQuestData(info)
     local questClassification = info.questClassification or GetQuestClassification(info.questID);
+
     if HaveQuestData(info.questID) then
         info.questClassification = questClassification;
     end
@@ -315,6 +321,9 @@ local function InitQuestData(info)
     if info.isOnQuest then
         --print(API.GetQuestName(info.questID), info.questID, questClassification);
         info.icon = questClassification and InProgressQuestIconFile[questClassification];
+        info.readyForTurnIn = ReadyForTurnIn(info.questID);
+    else
+        info.readyForTurnIn = false;
     end
 
     if not info.atlas then
@@ -580,6 +589,8 @@ function ActivityUtil.GetActivityName(dataIndex, questID)
 
         return v.name, false
     end
+
+    return "", true
 end
 
 

@@ -10,7 +10,7 @@ local ActivityData = {  --Constant
     {isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
         entries = {
             {name = "The Key to Success", questID = 84370, isWeeklyQuest = true, accountwide = true},
-            {name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187, conditions = ActivityUtil.Conditions.DelversBounty},
+            {name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187, conditions = ActivityUtil.Conditions.DelversBounty, tooltipItem = 233071},
 
             {name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, useItemIcon = true,
                 children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
