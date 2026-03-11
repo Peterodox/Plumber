@@ -2697,6 +2697,7 @@ do  -- Quest
     local GetRegularQuestTitle = C_QuestLog.GetTitleForQuestID or C_QuestLog.GetQuestInfo;
     local RequestLoadQuest = C_QuestLog.RequestLoadQuestByID or Nop;
     local GetLogIndexForQuestID = C_QuestLog.GetLogIndexForQuestID or GetQuestLogIndexByID or Nop;
+    API.IsQuestReadyForTurnIn = C_QuestLog.ReadyForTurnIn or IsQuestComplete;
 
     local function GetQuestName(questID)
         local questName = C_TaskQuest.GetQuestInfoByQuestID(questID);
@@ -3411,6 +3412,7 @@ do  -- Tooltip
         if data and data.lines then
             local lineText;
             for i, line in ipairs(data.lines) do
+                --print(i, line.type, line.leftText);
                 lineText = line.leftText;
                 if i == 1 and lineText == "" then
                     lineText = nil;

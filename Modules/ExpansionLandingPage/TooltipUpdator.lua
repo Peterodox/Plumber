@@ -35,6 +35,7 @@ function TooltipUpdator:StopUpdating()
     self.tooltipLines = nil;
     self.tooltipSetter = nil;
     self.entryChildren = nil;
+    self.itemID = nil;
 end
 
 function TooltipUpdator:SetFocusedObject(obj)
@@ -86,6 +87,10 @@ end
 
 function TooltipUpdator:RequestEntryChildren(entryChildren)
     self.entryChildren = entryChildren;
+end
+
+function TooltipUpdator:RequestItemID(itemID)
+    self.itemID = itemID;
 end
 
 function TooltipUpdator:OnUpdate(elapsed)
@@ -156,6 +161,10 @@ function TooltipUpdator:OnUpdate(elapsed)
                 end
             end
 
+            if self.itemID then
+                anyContent = true;
+            end
+
             if anyContent and self.headerText then
                 local tooltip = GameTooltip;
                 --tooltip:SetOwner(self.obj, "ANCHOR_CURSOR_RIGHT", 8, 8);
@@ -221,6 +230,12 @@ function TooltipUpdator:OnUpdate(elapsed)
                     if keepUpdating then
                         self.keepUpdating = true;
                     end
+                end
+
+                if self.itemID then
+                    local text = API.ConvertTooltipInfoToOneString(" ", "GetItemByID", self.itemID);
+                    tooltip:AddLine(text, 1, 1, 1, true);
+                    self.keepUpdating = true;
                 end
 
                 if isRetrievingData then
