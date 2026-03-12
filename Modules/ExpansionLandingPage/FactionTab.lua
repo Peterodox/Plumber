@@ -387,6 +387,7 @@ do
         if not factionID then return end;
 
         local progress = API.GetReputationProgress(factionID);
+
         if progress then
             self.reputationType = progress.reputationType;
             local currentValue, maxValue;
@@ -742,6 +743,9 @@ do
     end
 
     function FactionTabMixin:OnShow()
+        if self.isLayoutDirty then
+            FactionTab:OnLayoutChanged();
+        end
         self:Refresh();
         API.RegisterFrameForEvents(self, DynamicEvents);
         LandingPageUtil.ShowLeftFrame(self.isOverview);
@@ -1156,7 +1160,9 @@ do
 
         for row, rowInfo in ipairs(FactionUtil.ActiveFactionLayout) do
             for _, factionInfo in ipairs(rowInfo) do
-                table.insert(factionList, factionInfo.factionID);
+                if not factionInfo.shownAsSubfaction then
+                    table.insert(factionList, factionInfo.factionID);
+                end
             end
         end
 
@@ -1190,6 +1196,7 @@ do
     end
 
     function FactionTabMixin:OnLayoutChanged()
+        self.isLayoutDirty = nil;
         self.factionButtonPool:ReleaseAll();
 
         local index = 0;
@@ -1204,10 +1211,22 @@ do
                 index = index + 1;
                 local f = self.factionButtonPool:Acquire();
                 local majorFactionID = factionInfo.factionID;
-                f:SetMinimized(false);
+
                 f:ClearAllPoints();
-                f:SetPoint("TOPLEFT", self.OverviewFrame, "TOPLEFT", offsetX, offsetY);
+                if factionInfo.shownAsSubfaction then
+                    f:SetMinimized(true);
+                    local childOffsetY = offsetY - 0.5 * (FACTION_BUTTON_SIZE - SUBFACTION_BUTTON_SIZE);
+                    f:SetPoint("TOPRIGHT", self.OverviewFrame, "TOPRIGHT", 0, childOffsetY);
+                else
+                    f:SetMinimized(false);
+                    f:SetPoint("TOPLEFT", self.OverviewFrame, "TOPLEFT", offsetX, offsetY);
+                end
+
                 f:SetFaction(majorFactionID);
+
+                if factionInfo.shownAsSubfaction then
+                    f:SetIconByFileID(factionInfo.iconFileID);
+                end
 
                 if factionInfo.subFactions then
                     offsetX = offsetX + FACTION_BUTTON_SIZE + 0.5 * FACTION_BUTTON_GAP_H;
@@ -1231,12 +1250,13 @@ do
                 else
                     offsetX = offsetX + (FACTION_BUTTON_SIZE + FACTION_BUTTON_GAP_H);
                 end
-
             end
+
             local spanX = offsetX - FACTION_BUTTON_GAP_H;
             if spanX > maxSpanX then
                 maxSpanX = spanX;
             end
+
             offsetY = offsetY - (FACTION_BUTTON_SIZE + FACTION_BUTTON_GAP_V);
         end
 
@@ -1322,8 +1342,12 @@ addon.CallbackRegistry:Register("LandingPage.SetFactionLayout", function(faction
 
     FactionUtil.ActiveFactionLayout = factionLayout;
 
-    if FactionTab and FactionTab:IsShown() then
-        FactionTab:OnLayoutChanged();
-        FactionTab:RequestFullUpdate(true);
+    if FactionTab then
+        if FactionTab:IsShown() then
+            FactionTab:OnLayoutChanged();
+            FactionTab:RequestFullUpdate(true);
+        else
+            FactionTab.isLayoutDirty = true;
+        end
     end
 end);

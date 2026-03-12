@@ -866,6 +866,9 @@ L["Timeless Scrolls"] = "Вневременный свиток"; --item: 217605
 L["QuestName Runestone"] = "Укрепление рунических камней";    --4 Mutually exclusive quests: 90575
 L["QuestName HarandarRelic"] = "Легенды хараниров";
 L["Prey System"] = "Добыча";
+L["Prey Difficulty Normal"] = "Обычная";
+L["Prey Difficulty Hard"] = "Высокая";
+L["Prey Difficulty Nightmare"] = "Кошмарная";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Вы действительно хотите обменять %s на следующий предмет?\n\n|cffff2020Покупка невозвратная.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 

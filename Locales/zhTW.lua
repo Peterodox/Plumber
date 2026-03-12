@@ -947,6 +947,9 @@ L["Timeless Scrolls"] = "永恆卷軸";
 L["QuestName Runestone"] = "強化符石";    --4 Mutually exclusive quests: 90575
 L["QuestName HarandarRelic"] = "哈拉尼爾的傳說";
 L["Prey System"] = "狩獵";
+L["Prey Difficulty Normal"] = "普通";
+L["Prey Difficulty Hard"] = "困難";
+L["Prey Difficulty Nightmare"] = "夢魘";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "你確定要用%s來兌換下列物品嗎？\n\n|cffff2020這筆交易無法退款。|r\n %s";
 

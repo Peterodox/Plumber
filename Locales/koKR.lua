@@ -942,6 +942,9 @@ L["Timeless Scrolls"] = "영원 두루마리"; --item: 217605
 L["QuestName Runestone"] = "룬석을 강화하라";    --[MISSING] 4 Mutually exclusive quests: 90575
 L["QuestName HarandarRelic"] = "하라니르의 전설";
 L["Prey System"] = "사냥감";
+L["Prey Difficulty Normal"] = "일반";
+L["Prey Difficulty Hard"] = "어려움";
+L["Prey Difficulty Nightmare"] = "악몽";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "%s : 정말로 다음 아이템으로 교환하시겠습니까?\n\n|cffff2020아이템은 환불받을 수 없습니다.|r\n %s";
 

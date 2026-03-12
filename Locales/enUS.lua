@@ -718,6 +718,7 @@ L["Click to Open Format"] = "Click to open %s";
 L["List Is Empty"] = "The list is empty.";
 L["Prey No Data"] = "Prey Progress Unavailable";
 L["Abundance No Data"] = "No Active Abundance Event";
+L["Defeated Prey"] = "Defeated Prey Targets";
 
 
 --ExpansionSummaryMinimapButton
@@ -943,6 +944,9 @@ L["Timeless Scrolls"] = "Timeless Scrolls"; --item: 217605
 L["QuestName Runestone"] = "Fortify the Runestones";    --4 Mutually exclusive quests: 90575
 L["QuestName HarandarRelic"] = "Legends of the Harandar";
 L["Prey System"] = "Prey";
+L["Prey Difficulty Normal"] = "Normal";
+L["Prey Difficulty Hard"] = "Hard";
+L["Prey Difficulty Nightmare"] = "Nightmare";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Are you sure you wish to exchange %s for the following item?\n\n|cffff2020Your purchase is not refundable.|r\n %s";  --Base: CONFIRM_PURCHASE_NONREFUNDABLE_ITEM Change the warning's color and added a new line.
 

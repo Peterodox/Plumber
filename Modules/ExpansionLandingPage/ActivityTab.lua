@@ -241,7 +241,7 @@ do  --Checklist Button
             if data then
                 if data.tooltip or data.children or data.tooltipSetter or data.tooltipItem then
                     TooltipUpdator:SetFocusedObject(self);
-                    TooltipUpdator:SetHeaderText(self.Name:GetText());
+                    TooltipUpdator:SetHeaderText(data.tooltipHeader or self.Name:GetText());
                     local tooltipLines = {};
 
                     if data.children and data.addChildrenToTooltip then

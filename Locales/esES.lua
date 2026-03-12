@@ -921,6 +921,9 @@ L["Timeless Scrolls"] = "Pergamino intemporal";
 L["QuestName Runestone"] = "Fortificación de piedras rúnicas";    --4 Mutually exclusive quests: 90575
 L["QuestName HarandarRelic"] = "Leyendas de los haranir";
 L["Prey System"] = "Presa";
+L["Prey Difficulty Normal"] = "Normal";
+L["Prey Difficulty Hard"] = "Difícil";
+L["Prey Difficulty Nightmare"] = "Pesadilla";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "¿Seguro que quieres intercambiar %s por el siguiente objeto?\n\n|cffff2020El importe de esta compra no se podrá reembolsar.|r\n %s";
 

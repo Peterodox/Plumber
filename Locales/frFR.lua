@@ -881,7 +881,7 @@ L["Font Size"] = "Taille de la police";
 L["Icon Size"] = "Taille de l'icône";
 L["Reset To Default Position"] = "Réinitialiser à la position par défaut";
 L["Renown Level Label"] = "Renom ";  --There is a space
-L["Progress Label"] = "Progrès";  --There is a space
+L["Progress Label"] = "Progrès ";  --There is a space
 L["Paragon Reputation"] = "Paragon";
 L["Level Maxed"] = "(Maximum)";   --Reached max level
 L["Current Colon"] = "Actuel :";
@@ -943,6 +943,9 @@ L["Timeless Scrolls"] = "Parchemin intemporel"; --item: 217605
 L["QuestName Runestone"] = "Renforcement des pierres runiques";    --4 Mutually exclusive quests: 90575
 L["QuestName HarandarRelic"] = "Légendes des Haranir";
 L["Prey System"] = "Traque";
+L["Prey Difficulty Normal"] = "Normal";
+L["Prey Difficulty Hard"] = "Difficile";
+L["Prey Difficulty Nightmare"] = "Cauchemar";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Souhaitez-vous vraiment échanger %s contre l'objet suivant ?\n\n|cffff2020Votre achat ne pourra pas être remboursé.|r\n %s";
 

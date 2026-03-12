@@ -66,6 +66,10 @@ local OverrideFactionInfo = {
         barColor = {242/255, 141/255, 152/255},
     },
 
+    [2770] = {  --Slayer's Duellum
+        barColor = {56/255, 184/255, 255/255},
+    },
+
 
     ---- TWW ----
     [2570] = {  --Hallowfall Arathi
@@ -156,6 +160,7 @@ do  --Layout MID
                     {factionID = 2744, creatureDisplayID = 26365, playerCompanionID = 2},     --Valeera Sanguinar. Get playerCompanionID from C_MajorFactions.GetMajorFactionData(C_DelvesUI.GetDelvesFactionForSeason())
                 },
             },
+            {factionID = 2770, shownAsSubfaction = true, iconFileID = 7448209},     --Slayer's Duellum
         },
 
         [2] = {
