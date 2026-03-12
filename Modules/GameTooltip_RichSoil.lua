@@ -200,7 +200,7 @@ end
 
 do
     local function AlertForNonHerbalist()
-        if not IsPlayerHerbalist() or true then
+        if not IsPlayerHerbalist() then
             return "|cffd4641c"..UNIT_SKINNABLE_HERB.."|r"
         end
     end
