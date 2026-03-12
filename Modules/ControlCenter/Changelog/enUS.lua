@@ -13,7 +13,65 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10809] = {
     {
         type = "date",
-        versionText = "1.8.9",
+        versionText = "1.8.9 d",
+        timestamp = 1773300000,
+    },
+
+    {
+        type = "h1",
+        text = L["ModuleName NewExpansionLandingPage"],
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Fixed an error when hovering over the Great Vault button.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Added faction Slayer\'s Duellum.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Raids Tab: Updated Midnight Raid Achievements.",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Activities Tab now shows how many prey targets you have defeated in each difficulty.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = MISCELLANEOUS,
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "We temporarily disabled the Boss Loot Banner module. This module hides the loot banner when you are solo.";
+    },
+
+    {
+        type = "br",
+    },
+    {
+        type = "br",
+    },
+
+
+    {
+        type = "date",
+        versionText = "1.8.9 a-c",
         timestamp = 1773000000,
     },
 
