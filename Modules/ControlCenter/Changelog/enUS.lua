@@ -13,8 +13,8 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10809] = {
     {
         type = "date",
-        versionText = "1.8.9 d",
-        timestamp = 1773300000,
+        versionText = "1.8.9 d-e",
+        timestamp = 1773700000,
     },
 
     {
@@ -47,18 +47,30 @@ changelogs[10809] = {
     },
 
     {
-        type = "br",
-    },
-
-    {
-        type = "h1",
-        text = MISCELLANEOUS,
+        type = "p",
+        bullet = true,
+        text = "Added Delves weekly quest and Trovehunter's Bounty to Activities.",
     },
 
     {
         type = "p",
         bullet = true,
-        text = "We temporarily disabled the Boss Loot Banner module. This module hides the loot banner when you are solo.";
+        text = "Special thanks to Lazey for providing hidden quest data.",
+    },
+
+    {
+        type = "br",
+    },
+
+    {
+        type = "h1",
+        text = "Bug Fixes",
+    },
+
+    {
+        type = "p",
+        bullet = true,
+        text = "Quick Slot: Resilient Seeds: Fixed an issue where this feature stopped working when you teleported to Harandar.",
     },
 
     {
