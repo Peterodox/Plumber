@@ -282,7 +282,7 @@ L["Data Loading In Progress"] = "Plumber загружает данные";
 
 --Tooltip RichSoil
 L["ModuleName TooltipRichSoil"] = "Быстрый слот: Крепкое семя";
-L["ModuleDescription TooltipRichSoil"] = "Для травников: показывать список крепких семян при двойном клике на плодородную почву. " .. L["Общее описание быстрого слота"];
+L["ModuleDescription TooltipRichSoil"] = "Для травников: показывать список крепких семян при двойном клике на плодородную почву."..L["Quick Slot Generic Description"];
 L["Instruction Show Resilient Seeds"] = "<Двойной клик, чтобы показать крепкие семена>";
 L["No Resilient Seed"] = "Нет крепких семян";
 
