@@ -61,18 +61,26 @@ do
         PLAYER_IS_GLIDING_CHANGED = true,
         PLAYER_STARTED_MOVING = true,
         LOOT_OPENED = true,
-    }
+    };
+
+    EL.ZoneChangeEvents = {
+        ZONE_CHANGED_NEW_AREA = true,
+        LOADING_SCREEN_DISABLED = true,
+        ZONE_CHANGED = true,
+    };
 
     function EL:SetEnabled(state)
         if state then
-            self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
-            self:RegisterEvent("LOADING_SCREEN_DISABLED");
+            for event in pairs(self.ZoneChangeEvents) do
+                self:RegisterEvent(event);
+            end
             self:SetScript("OnEvent", self.OnEvent);
             self:UpdateZone();
         else
             self.isConditionMet = false;
-            self:UnregisterEvent("ZONE_CHANGED_NEW_AREA");
-            self:UnregisterEvent("LOADING_SCREEN_DISABLED");
+            for event in pairs(self.ZoneChangeEvents) do
+                self:UnregisterEvent(event);
+            end
             self:ListenAutoCloseEvents(false);
             self:ListenMouseEvent(false);
         end
@@ -112,7 +120,7 @@ do
                 end
                 self.lastTime = t;
             end
-        elseif event == "ZONE_CHANGED_NEW_AREA" or event == "LOADING_SCREEN_DISABLED" then
+        elseif self.ZoneChangeEvents[event] then
             self:UpdateZone();
         elseif self.AutoCloseEvents[event] then
             self:ShowQuickSlot(false);
