@@ -256,6 +256,11 @@ do  --ValuableLoot
         [243306] = true,
         [243308] = true,
         [243307] = true,
+        [249920] = true,
+        [249368] = true,
+        [260231] = true,
+        [262914] = true,
+
         [206955] = true,
         [208216] = true,
         [210536] = true,
