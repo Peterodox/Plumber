@@ -9,8 +9,8 @@ local L = addon.L;
 --Globals
 BINDING_HEADER_PLUMBER = "Addon Plumber";
 BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Activer / désactiver le résumé de l'extension";   --Show/hide Expansion Summary UI
-BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Passer à la quête suivante";
-BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Passer à la quête précédente";
+BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Se concentrer sur la prochaine quête";
+BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Se concentrer sur la quête précédente";
 
 
 --Module Control Panel
@@ -429,9 +429,9 @@ L["Player Not Found"] = "Joueur introuvable.";
 L["ModuleName PlayerTitleUI"] = "Gestionnaire de Titres";
 L["ModuleDescription PlayerTitleUI"] = "Ajouter une zone de recherche et un filtre au volet du personnage par défaut.";
 L["Right Click To Reset Filter"] = "Clic droit pour réinitialiser.";
-L["Earned"] = "Gagné";
-L["Unearned"] = "Non gagné";
-L["Unearned Filter Tooltip"] = "Vous pouvez voir des Titres en double qui ne sont pas disponibles pour votre faction.";
+L["Earned"] = "Obtenus";
+L["Unearned"] = "Manquants";
+L["Unearned Filter Tooltip"] = "Vous pourriez voir des titres en double qui ne sont pas disponibles pour votre faction.";
 
 
 --BlizzardSuperTrack
@@ -441,13 +441,13 @@ L["ModuleDescription BlizzardSuperTrack"] = "Ajouter un minuteur sur votre point
 
 --ProfessionsBook
 L["ModuleName ProfessionsBook"] = "Connaissances non dépensées";
-L["ModuleDescription ProfessionsBook"] = "Afficher le nombre de points de connaissance de spécialisation de profession non utilisés dans l'interface des métiers.";
-L["Unspent Knowledge Tooltip Format"] = "Vous avez |cffffffff%s|r Connaissances de spécialisation de profession non dépensées."  --see PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
+L["ModuleDescription ProfessionsBook"] = "Afficher le nombre de points de connaissance des métiers non utilisés dans l'interface des métiers.";
+L["Unspent Knowledge Tooltip Format"] = "Vous avez |cffffffff%s|r connaissances de spécialisation de profession non dépensées."  --see PROFESSIONS_UNSPENT_SPEC_POINTS_REMINDER
 
 
 --TooltipProfessionKnowledge
-L["ModuleName TooltipProfessionKnowledge"] = L["ModuleName ProfessionsBook"];
-L["ModuleDescription TooltipProfessionKnowledge"] = "Affiche le nombre de vos Connaissances de spécialisation non dépensées.";
+L["ModuleName TooltipProfessionKnowledge"] = "Infobulle : Connaissances non dépensées";
+L["ModuleDescription TooltipProfessionKnowledge"] = "Affiche le nombre de vos connaissances de spécialisation non dépensées.";
 L["Available Knowledge Format"] = "Connaissances disponibles : |cffffffff%s|r";
 
 
@@ -532,7 +532,7 @@ L["Infinite Knowledge Bonus Next Format"] = "Prochain rang : %s";
 
 --ItemUpgradeUI
 L["ModuleName ItemUpgradeUI"] = "Améliorations d'objets : afficher la fiche du personnage";
-L["ModuleDescription ItemUpgradeUI"] = "Ouvre automatiquement la fiche de votre personnage lorsque vous interagissez avec un PNJ d'améliorations d'objets.";
+L["ModuleDescription ItemUpgradeUI"] = "Ouvre automatiquement la fiche de votre personnage lorsque vous interagissez avec un PNJ proposant des améliorations d'objets.";
 
 
 --HolidayDungeon
@@ -546,8 +546,8 @@ L["ModuleDescription PlayerPing"] = "Mettre en surbrillance l'emplacement du jou
 
 
 --StaticPopup_Confirm
-L["ModuleName StaticPopup_Confirm"] = "Alerte achat non remboursable";
-L["ModuleDescription StaticPopup_Confirm"] = "Ajuste la boîte de dialogue de confirmation qui apparaît lors de l'achat d'un objet non remboursable, en ajoutant un bref verrouillage au bouton « Oui » et en mettant en évidence les mots clés en rouge.\n\nCe module réduit également de moitié le délai de conversion des ensembles de classes.";
+L["ModuleName StaticPopup_Confirm"] = "Alerte « Achat non remboursable »";
+L["ModuleDescription StaticPopup_Confirm"] = "Ajuste la boîte de dialogue de confirmation qui apparaît lors de l'achat d'un objet non remboursable, en ajoutant un bref verrouillage sur le bouton « Oui » et en met en évidence les mots clés en rouge.\n\nCe module réduit également de moitié le délai de conversion des ensembles de classes.";
 
 
 --Loot UI
@@ -674,9 +674,9 @@ L["Filter Hide Completed Format"] = "Masquer complété (%d)";
 L["Weekly Reset Format"] = "Réinitialisation hebdomadaire : %s";
 L["Daily Reset Format"] = "Réinitialisation quotidienne : %s";
 L["Ready To Turn In Tooltip"] = "Prêt à être remis.";
-L["Trackers"] = "Traqueurs";
-L["New Tracker Title"] = "Nouveau traqueur";     --Create a new Tracker
-L["Edit Tracker Title"] = "Modifier traqueur";
+L["Trackers"] = "Suivis";
+L["New Tracker Title"] = "Nouveau suivi";     --Create a new Tracker
+L["Edit Tracker Title"] = "Modifier le suivi";
 L["Type"] = "Type";
 L["Select Instruction"] = "Sélectionner";
 L["Name"] = "Nom";
@@ -696,7 +696,7 @@ L["Boss Name"] = "Nom du boss";
 L["Instance Or Boss Name"] = "Instance ou nom du boss";
 L["Name EditBox Disabled Reason Format"] = "Cette case sera remplie automatiquement lorsque vous saisirez un %s valide.";
 L["Search No Matches"] = "Aucune correspondance";
-L["Create New Tracker"] = "Nouveau traqueur";
+L["Create New Tracker"] = "Nouveau suivi";
 L["FailureReason Already Exist"] = "Cette entrée existe déjà.";
 L["Quest ID"] = "ID de quête";
 L["Creature ID"] = "ID de créature";
@@ -718,6 +718,7 @@ L["Click to Open Format"] = "Cliquer pour ouvrir %s";
 L["List Is Empty"] = "La liste est vide.";
 L["Prey No Data"] = "Progression de la proie indisponible";
 L["Abundance No Data"] = "Aucun événement d'abondance actif";
+L["Defeated Prey"] = "Cibles de Proie vaincues";
 
 
 --ExpansionSummaryMinimapButton
@@ -804,7 +805,7 @@ L["Duplicate Decor Key"] = "Touche « Dupliquer »";
 L["Enable Duplicate"] = "Activer « Dupliquer »";
 L["Enable Duplicate tooltip"] = "En mode Décoration, vous pouvez survoler un décor puis appuyer sur une touche pour placer un autre exemplaire de cet objet.";
 L["ModuleName Housing_CustomizeMode"] = "Éditeur : 3 mode de personnalisation";
-L["ModuleDescription Housing_CustomizeMode"] = "En mode Personnalisation :\n\n- Permet de copier les teintures d'un décor à un autre.\n\n- Modifie le nom de l'emplacement de teinture : remplace l'index par le nom de la couleur.";
+L["ModuleDescription Housing_CustomizeMode"] = "En mode personnalisation :\n\n- Permet de copier les teintures d'un décor à un autre.\n\n- Modifie le nom de l'emplacement de teinture : remplace l'index par le nom de la couleur.";
 L["Copy Dyes"] = "Copier";
 L["Dyes Copied"] = "Teintures copiées";
 L["Apply Dyes"] = "Appliquer";
@@ -813,8 +814,8 @@ L["ModuleName TooltipDyeDeez"] = "Infobulle : Pigment de teinture";
 L["ModuleDescription TooltipDyeDeez"] = "Affiche le nom des couleurs de teinture dans l'infobulle des pigments de logis.";
 L["Instruction Show More Info"] = "<Appuyez sur Alt pour afficher plus d'informations>";
 L["Instruction Show Less Info"] = "<Appuyez sur Alt pour afficher moins d'informations>";
-L["ModuleName Housing_ItemAcquiredAlert"] = "Alerte Décoration collectée";
-L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permet de cliquer avec le bouton gauche sur l'alerte « Décoration collectée » pour prévisualiser son modèle.";
+L["ModuleName Housing_ItemAcquiredAlert"] = "Alerte « Décoration collectée »";
+L["ModuleDescription Housing_ItemAcquiredAlert"] = "Clic gauche sur l'alerte « Décoration collectée » pour prévisualiser son modèle.";
 
 
 --Housing Clock
@@ -842,11 +843,11 @@ L["ModuleDescription SourceAchievementLink"] = "Rend la plupart des noms de haut
 
 
 --BreakTime
-L["ModuleName BreakTime"] = "Rappel de pause";
-L["ModuleDescription BreakTime"] = "Vous rappelle de prendre une courte pause après un certain temps.";
+L["ModuleName BreakTime"] = "Faire une pause";
+L["ModuleDescription BreakTime"] = "N'oubliez pas de faire une pause après un certain temps de jeu.";
 L["BreakTime Title AllCaps"] = "PAUSE";
 L["BreakTime Delay Button"] = "Délai";
-L["BreakTime Delay Button Tooltip Format"] = "Me rappeler dans %d min.";
+L["BreakTime Delay Button Tooltip Format"] = "Me le rappeler dans %d min.";
 L["BreakTime Cancel Button"] = "Annuler";
 L["BreakTime Cancel Button Tooltip Format 1"] = "Clic gauche : annuler le minuteur pour ce cycle. Le prochain minuteur se déclenchera dans %d min.";
 L["BreakTime Cancel Button Tooltip 2"] = "Cliquer et maintenir : annuler pour cette session de jeu.";
