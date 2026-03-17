@@ -196,7 +196,7 @@ do
         f.Background = Background;
         Background:SetPoint("TOPLEFT", f.pieces[1], "TOPLEFT", 4, -4);
         Background:SetPoint("BOTTOMRIGHT", f.pieces[9], "BOTTOMRIGHT", -4, 4);
-        Background:SetColorTexture(0.067, 0.040, 0.024);    --0.082, 0.047, 0.027
+        Background:SetColorTexture(0.067, 0.040, 0.024);    --3/255, 5/255, 16/255
 
         f:SetTexture(tex);
         f.pieces[1]:SetTexCoord(0/1024, 128/1024, 0/1024, 128/1024);
@@ -321,6 +321,7 @@ do
         f.Name:SetPoint("CENTER", f, "CENTER", 0, 0);
         f.Name:SetJustifyH("CENTER");
         f.Name:SetTextColor(0.804, 0.667, 0.498);
+        --f.Name:SetTextColor(176/255, 174/255, 208/255);
 
         SetupThreeSliceBackground(f, TEXTURE_FILE, -3, 3);
         f.Left:SetSize(20, 32);

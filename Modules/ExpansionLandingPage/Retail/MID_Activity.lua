@@ -266,7 +266,7 @@ end
 
 
 local ActivityData = {
-    --[[    --Enable After S1
+        --Enable After S1
     {isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
         entries = {
             {name = "A Gnawing Void of Curiosity", questID = 93784, isWeeklyQuest = true, accountwide = true},
@@ -281,7 +281,6 @@ local ActivityData = {
             --},
         }
     },
-    --]]
 
     {isHeader = true, name = "Prey", localizedName = L["Prey System"], categoryID = 120000, nameGetter = SetupFuncs.GetPreyHeader,
         entries = {
@@ -344,10 +343,13 @@ local ActivityData = {
 
     {isHeader = true, name = "The Singularity", factionID = 2699, categoryID = 2699, uiMapID = 2405,
         entries = {
-            {name = "Stand Your Ground", questID = 94581, uiMapID = 2405, shownIfActive = true, sortToTop = true, showIfCompleted = true},
+            {name = "Stormarion Assault", isWeeklyQuest = true, questID = 90962, uiMapID = 2405, sortToTop = true}, --This Weekly World Quest seems to only appear on the map when you are in the surrounding area
+            {name = "Stand Your Ground", questID = 94581, uiMapID = 2405, shownIfOnQuest = true},    --Replace the quest above after completion
 
-            {name = "Darkness Unmade", questID = 91700, uiMapID = 2405, shownIfActive = true},  --Kill 2 Rare creatures
-            {name = "Hidey-Hole", questID = 92407, uiMapID = 2405, shownIfActive = true},
+            --The following quests reward no rep but Stormarion Core
+            {name = "Darkness Unmade", questID = 91700, uiMapID = 2405, shownIfOnQuest = true},  --Kill 2 Rare creatures
+            {name = "Harvesting the Void", questID = 86810, uiMapID = 2405, shownIfOnQuest = true},
+            {name = "Hidey-Hole", questID = 92407, uiMapID = 2405, shownIfOnQuest = true},
 
             --{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
         },

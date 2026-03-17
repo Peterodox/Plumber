@@ -236,6 +236,8 @@ do
             NineSlice.Background:SetAtlas("thewarwithin-landingpage-background", false);
             local a = 0.25;
             NineSlice.Background:SetVertexColor(a, a, a);
+            --NineSlice.Background:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionBackgroundMidnight");
+            --NineSlice.Background:SetTexCoord(0, 732/1024, 0, 550/1024);
         end
 
         local Divider = LandingPageUtil.CreateMajorDivider(self.RightSection.Header);
@@ -431,6 +433,7 @@ do
             return
         end
         local a = state and 0.25 or 0.4;
+        --local a = state and 0.5 or 1.0;
         self.RightSection.NineSlice.Background:SetVertexColor(a, a, a);
     end
     function LandingPageUtil.DimBackground(state)

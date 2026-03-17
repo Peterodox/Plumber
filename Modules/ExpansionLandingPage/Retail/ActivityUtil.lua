@@ -97,10 +97,11 @@ ActivityUtil.QuestIconAtlas = QuestIconAtlas;
 
 
 local InProgressQuestIconFile = {
-	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
-	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+    [Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
+    [Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+    [Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+    [Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+    [Enum.QuestClassification.WorldQuest] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
 
     [128] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png",
 };
@@ -319,7 +320,6 @@ local function InitQuestData(info)
     info.isOnQuest = IsOnQuest(info.questID);
 
     if info.isOnQuest then
-        --print(API.GetQuestName(info.questID), info.questID, questClassification);
         info.icon = questClassification and InProgressQuestIconFile[questClassification];
         info.readyForTurnIn = ReadyForTurnIn(info.questID);
     else
