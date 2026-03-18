@@ -1,0 +1,30 @@
+---
+name: Workflow Test
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Run Luacheck
+        uses: nebularg/actions-luacheck@v1
+        with:
+          args: --no-color -q
+          files: $(git ls-files '*.lua' ':!:Locales')
+          annotate: warning
+
+      - name: Run editorconfig-checker
+        uses: wow-rp-addons/actions-editorconfig-check@v1.0.2
+        with:
+          args: -no-color
+          files: $(git ls-files '*.lua' '*.xml' ':!:Locales' ':!:_Dev')
