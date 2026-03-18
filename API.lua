@@ -212,24 +212,24 @@ end
 
 do  -- DEBUG
     local function CreateSaveDB(key)
-        if not PlumberDevOutput then
-            PlumberDevOutput = {};
+        if not PlumberDevData then
+            PlumberDevData = {};
         end
-        if not PlumberDevOutput[key] then
-            PlumberDevOutput[key] = {};
+        if not PlumberDevData[key] then
+            PlumberDevData[key] = {};
         end
     end
 
     local function SaveLocalizedText(localizedText, englishText)
         local locale = GetLocale();
         CreateSaveDB(locale);
-        PlumberDevOutput[locale][localizedText] = englishText or true;
+        PlumberDevData[locale][localizedText] = englishText or true;
     end
     API.SaveLocalizedText = SaveLocalizedText;
 
     local function SaveDataUnderKey(key, ...)
         CreateSaveDB(key);
-        PlumberDevOutput[key] = {...}
+        PlumberDevData[key] = {...}
     end
     API.SaveDataUnderKey = SaveDataUnderKey;
 end
@@ -848,15 +848,15 @@ do  -- Holiday
                         isEventActive = false;
                     end
                 end
-        
+
                 if isEventActive and holidayName then
                     local mixin = API.CreateFromMixins(HolidayInfoMixin);
-        
+
                     mixin.name = holidayName;
                     mixin.key = holidayKey;
                     mixin.endTimeString = endTimeString;
                     mixin.endTime = endTime;
-        
+
                     if not activeHolidayData then
                         activeHolidayData = {};
                     end
@@ -873,7 +873,6 @@ end
 
 do  -- Fade Frame
     local abs = math.abs;
-    local tinsert = table.insert;
     local wipe = wipe;
 
     local fadeInfo = {};
@@ -981,7 +980,7 @@ do  -- Fade Frame
         if duration <= 0 then
             return;
         end
-        
+
         self:Add(frame, duration, alpha, toAlpha, alterShownState, true);
     end
 
@@ -1241,7 +1240,7 @@ do  -- Map
             if posVector then
                 x, y = posVector:GetXY();
                 print(continentMapID, x, y);
-                
+
                 if not PlumberDevData then
                     PlumberDevData = {};
                 end
@@ -1249,7 +1248,7 @@ do  -- Map
                 if not PlumberDevData.POIPositions then
                     PlumberDevData.POIPositions = {};
                 end
-    
+
                 if poiID then
                     x = API.RoundCoord(x);
                     y = API.RoundCoord(y);
@@ -1450,7 +1449,7 @@ do  -- Map
 
 
     local MAP_PIN_HYPERLINK = MAP_PIN_HYPERLINK or "|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a Map Pin Location";
-    local FORMAT_USER_WAYPOINT = "|cffffff00|Hworldmap:%d:%.0f:%.0f|h["..MAP_PIN_HYPERLINK.."]|h|r";    --Message will be blocked by the server if you changing the map pin's name 
+    local FORMAT_USER_WAYPOINT = "|cffffff00|Hworldmap:%d:%.0f:%.0f|h["..MAP_PIN_HYPERLINK.."]|h|r";    --Message will be blocked by the server if you changing the map pin's name
 
     local function CreateWaypointHyperlink(uiMapID, normalizedX, normalizedY)
         if uiMapID and normalizedX and normalizedY then
@@ -2930,7 +2929,7 @@ do  -- Quest
             if questLogIndex and questLogIndex ~= 0 then
                 tbl.isOnQuest = true;
                 tbl.readyForTurnIn = C_QuestLog.ReadyForTurnIn(questID);
- 
+
                 if not (tbl.readyForTurnIn and hideFinishedObjectives) then
                     local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
                     tbl.numObjectives = numObjectives;
@@ -3868,16 +3867,16 @@ do  -- Custom Hyperlink ItemRef
 
     --[[--Example
         local CustomLink = {};
-    
+
         CustomLink.typeName = "Test";
         CustomLink.colorCode = "66bbff";	--LINK_FONT_COLOR
-    
+
         function CustomLink.callback(arg1, arg2, arg3)
             print(arg1, arg2, arg3);
         end
-    
+
         API.AddCustomLinkType(CustomLink.typeName, CustomLink.callback, CustomLink.colorCode);
-    
+
         function CustomLink.GenerateLink(arg1, arg2, arg3)
             return API.GenerateCustomLink(CustomLink.typeName, L["Click To See Details"], arg1, arg2, arg3);
         end
