@@ -503,7 +503,7 @@ do  --Options
 
     local DemoFrame;
 
-    function AcquireDemoFrame()
+    local function AcquireDemoFrame()
         if DemoFrame then return DemoFrame end;
 
         local f = CreateFrame("Frame");
@@ -617,7 +617,7 @@ do  --Options
     };
 
     function OptionToggle_OnClick(self, button)
-        OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC, true);
+        local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC, true);
         if OptionFrame then
             OptionFrame:ConvertAnchor();
         end
@@ -723,7 +723,7 @@ do  --Controller
 
     function Controller:EvaluateCountdown()
         if IsMouselooking() or IsPlayerMoving() then
-            
+			return
         else
             self:StartCoundown();
         end
@@ -1059,8 +1059,8 @@ do
 end
 
 
-do  --Debug
+--do  --Debug
     --function Plumber_TriggerTimer()
     --    Controller.Scheduler.remainingTime = 1;
     --end
-end
+--end

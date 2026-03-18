@@ -94,7 +94,6 @@ Modules\BreakTime.xml
 #Modules\QuestSpecialItemCooldown.lua
 #Modules\SecretOfAzeroth.lua
 #Modules\AddonList.lua
-#Modules\BlizzFix_WardrobeTrackingHelpTip.lua
 #Modules\WoWAnniversary.lua
 #Modules\Navigator_Dreamseed.lua
 #Modules\AccountStore.lua

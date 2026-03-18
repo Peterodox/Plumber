@@ -64,7 +64,6 @@ function EL:SetupZoneTrigger(maps)
         module:SetLeaveZoneCallback(OnLeaveZoneCallback);
     end
 
-    
     ZoneTriggerModule:SetEnabled(true);
     ZoneTriggerModule:Update();
 end

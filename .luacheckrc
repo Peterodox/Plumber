@@ -10,6 +10,7 @@ ignore = {
 	-- "Plumber_". This is the standard prefix for all of our global frame names
 	-- and mixins.
 	"11./^Plumber_",
+	"11./^PlumberFont_",
 
 	-- Ignore unused self. This would popup for Mixins and Objects
 	"212/self",
@@ -56,6 +57,8 @@ stds.wow = {
 		ChatFrameUtil = {
 			fields = {
 				"GetActiveWindow",
+				"InsertLink",
+				"LinkItem",
 				"ShowChatChannelContextMenu",
 			},
 		},
@@ -86,6 +89,7 @@ stds.wow = {
 		C_AddOns = {
 			fields = {
 				"GetNumAddOns",
+				"GetAddOnInfo",
 				"GetAddOnMetadata",
 				"IsAddOnLoaded",
 				"LoadAddOn",
@@ -151,6 +155,17 @@ stds.wow = {
 			},
 		},
 
+		C_GossipInfo = {
+			fields = {
+				"GetActiveQuests",
+				"GetAvailableQuests",
+				"GetFriendshipReputation",
+				"GetFriendshipReputationRanks",
+				"GetOptions",
+				"SelectOption",
+			},
+		},
+
 		C_Item = {
 			fields = {
 				"DoesItemExistByID",
@@ -164,6 +179,7 @@ stds.wow = {
 				"GetItemLinkByGUID",
 				"GetItemMaxStackSizeByID",
 				"GetItemNameByID",
+				"GetItemQualityByID",
 				"GetItemQualityColor",
 				"GetItemSpell",
 				"GetItemSubClassInfo",
@@ -248,6 +264,7 @@ stds.wow = {
 		C_Spell = {
 			fields = {
 				"DoesSpellExist",
+				"GetSpellCharges",
 				"GetSpellCooldown",
 				"GetSpellCooldownDuration",
 				"GetSpellInfo",
@@ -273,6 +290,26 @@ stds.wow = {
 			},
 		},
 
+		C_SuperTrack = {
+			fields = {
+				"GetHighestPrioritySuperTrackingType",
+				"GetSuperTrackedMapPin",
+				"GetSuperTrackedQuestID",
+				"IsSuperTrackingAnything",
+				"SetSuperTrackedUserWaypoint",
+			},
+		},
+
+		C_TaskQuest = {
+			fields = {
+				"GetQuestsForPlayerByMapID",
+				"GetQuestInfoByQuestID",
+				"GetQuestLocation",
+				"GetQuestsOnMap",
+				"IsActive",
+			},
+		},
+
 		C_Timer = {
 			fields = {
 				"After",
@@ -282,6 +319,21 @@ stds.wow = {
 		C_Transmog = {
 			fields = {
 				"SetPending",
+			},
+		},
+
+		C_TransmogCollection = {
+			fields = {
+				"GetAllAppearanceSources",
+				"GetAppearanceSourceInfo",
+				"GetAppearanceSources",
+				"GetCategoryInfo",
+				"GetItemInfo",
+				"GetSourceInfo",
+				"GetSourceItemID",
+				"GetValidAppearanceSourcesForClass",
+				"IsSearchInProgress",
+				"PlayerHasTransmogItemModifiedAppearance",
 			},
 		},
 
@@ -407,6 +459,13 @@ stds.wow = {
 					},
 				},
 
+				SpellBookSpellBank = {
+					fields = {
+						"Pet",
+						"Player",
+					},
+				},
+
 				TransmogPendingType = {
 					fields = {
 						"Apply",
@@ -508,6 +567,14 @@ stds.wow = {
 			},
 		},
 
+		EventRegistry = {
+			fields = {
+				"RegisterCallback",
+				"TriggerEvent",
+				"UnregisterCallback",
+			},
+		},
+
 		EventUtil = {
 			fields = {
 				"ContinueOnAddOnLoaded",
@@ -562,6 +629,31 @@ stds.wow = {
 		"CreateVector2D",
 		"UnitPosition",
 		"IsInInstance",
+		"GetLocale",
+		"GetInstanceInfo",
+		"GetPhysicalScreenSize",
+		"BreakUpLargeNumbers",
+		"GetCurrentKeyBoardFocus",
+		"ChatEdit_InsertLink",
+		"GetCursorPosition",
+		"GetText",
+		"IsSpellKnownOrOverridesKnown",
+		"IsSpellKnown",
+		"GetMouseFoci",
+		"IsMacClient",
+		"InCombatLockdown",
+		"GetServerExpansionLevel",
+		"GetBuildInfo",
+		"HasOverrideActionBar",
+		"GetOverrideBarSkin",
+		"UnitPowerBarID",
+		"IsFlying",
+		"IsMouselooking",
+		"IsPlayerMoving",
+		"hooksecurefunc",
+		"GetNumGroupMembers",
+		"TopBannerManager_Show",
+		"BossBanner_OnEvent",
 
 
 		-- Global Fonts
@@ -578,11 +670,22 @@ stds.wow = {
 		"GameFontRed",
 
 		-- Global Frames
+		"AddonCompartmentFrame",
+		"BossBanner",
+		"ChatFrame1",
+		"EventToastManagerFrame",
+		"ExpansionLandingPageMinimapButton",
+		"GossipFrame",
 		"UIErrorsFrame",
 		"UIParent",
 		"UISpecialFrames",
 		"WorldFrame",
 		"WorldMapFrame",
+		"SuperTrackedFrame",
+		"GameTooltip",
+
+		-- Global Mixins
+		"EventToastManagerFrameMixin",
 
 		-- Global Constants
 		"ITEM_QUALITY_COLORS",
@@ -596,5 +699,12 @@ stds.wow = {
 		"SECONDS_ABBR",
 		"DAYS_ABBR",
 		"CALENDAR_FULLDATE_MONTH_NAMES",
+		"MISCELLANEOUS",
+		"MAP_PIN_HYPERLINK",
+		"ACCOUNT_STORE_NONREFUNDABLE_TOOLTIP",
+		"AUCTION_HOUSE_FILTER_UNCOLLECTED_ONLY",
+		"YES",
+		"NO",
+
 	},
 };
