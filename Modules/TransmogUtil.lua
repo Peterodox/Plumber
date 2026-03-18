@@ -109,9 +109,7 @@ local function DressUpItemTransmogInfoList_Callback(itemTransmogInfoList, showOu
                     for _, v in ipairs(sources) do
                         if v.isCollected then
                             numFound = numFound + 1;
-                            if categoryXSourceID[v.categoryID] then
-                                --print("DUPE", v.categoryID, v.name);
-                            else
+                            if not categoryXSourceID[v.categoryID] then
                                 categoryXSourceID[v.categoryID] = v.sourceID;
                             end
                             itemTransmogInfo.transmogCategoryID = v.categoryID;

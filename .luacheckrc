@@ -14,6 +14,9 @@ ignore = {
 
 	-- Ignore unused self. This would popup for Mixins and Objects
 	"212/self",
+
+	-- Ignore empty if branch
+	"542",
 };
 
 globals = {
@@ -23,6 +26,8 @@ globals = {
 	"PlumberDevData",
 	"PlumberStorage",
 	"PlumberDB_PC",
+
+	"NarciPaperDollWidgetController",
 };
 
 read_globals = {
@@ -307,6 +312,7 @@ stds.wow = {
 				"IsOnQuest",
 				"IsQuestFlaggedCompleted",
 				"IsQuestFlaggedCompletedOnAccount",
+				"IsQuestTask",
 				"IsWorldQuest",
 				"ReadyForTurnIn",
 				"RequestLoadQuestByID",
@@ -334,7 +340,7 @@ stds.wow = {
 
 		C_SpecializationInfo = {
 			fields = {
-				"GetSpecializatio",
+				"GetSpecialization",
 				"GetSpecializationInfo",
 			},
 		},
@@ -412,6 +418,15 @@ stds.wow = {
 				"GetDefinitionInfo",
 				"GetConfigIDByTreeID",
 				"CommitConfig",
+				"GetNodeCost",
+				"PurchaseRank",
+				"GetConfigInfo",
+				"GetIncreasedTraitData",
+				"TryPurchaseToNode",
+				"SetSelection",
+				"ResetTree",
+				"ConfigHasStagedChanges",
+				"RollbackConfig",
 			},
 		},
 
@@ -831,6 +846,13 @@ stds.wow = {
 		"PlayerGetTimerunningSeasonID",
 		"DressUpItemLocation",
 		"DressUpLink",
+		"DressUpItemTransmogInfoList",
+		"PickupMacro",
+		"IsInventoryItemLocked",
+		"PickupInventoryItem",
+		"CalculateTotalNumberOfFreeBagSlots",
+		"GetInventoryItemLink",
+
 
 
 		-- Global Fonts
@@ -880,6 +902,8 @@ stds.wow = {
 		"WorldFrame",
 		"WorldMapFrame",
 		"WhoFrame",
+		"WardrobeCollectionFrame",
+
 
 		-- Global Mixins
 		"EventToastManagerFrameMixin",
@@ -961,11 +985,14 @@ stds.wow = {
 		"QUEST_TOOLTIP_REQUIREMENTS",
 		"QUEST_COMPLETE",
 		"ITEM_OPENABLE",
+		"TALENT_BUTTON_TOOLTIP_NEXT_RANK",
+		"SPEC_ACTIVE",
 
 
 		-- Other Addons
 		"Narci_Attribute",
 		"NarciPaperDollWidgetController",
+		"BetterWardrobeCollectionFrame",
 		"EditModeManagerExpandedFrame",		--EditModeExpanded
 		"EditModeExpandedWarningFrame",
 		"ElvUI",

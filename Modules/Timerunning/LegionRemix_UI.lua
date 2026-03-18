@@ -275,8 +275,6 @@ do
                 end
             end
             self.RankText:SetTextColor(1, 0.82, 0);
-        else
-
         end
         self.RankText:SetText(rankText);
     end
@@ -293,12 +291,10 @@ do
 
         local isEntryCommitted = false;
         if nodeInfo.entryIDsWithCommittedRanks then
-            for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
-                committedEntryID = id;
-                activeEntryID = id;
-                isEntryCommitted = true;
-                break
-            end
+			local id = nodeInfo.entryIDsWithCommittedRanks[1];
+			committedEntryID = id;
+			activeEntryID = id;
+			isEntryCommitted = id and true;
         end
 
         if not isEntryCommitted then
@@ -1046,7 +1042,7 @@ do
         self:SetTooltip(icon, name, description, updateTooltipFunc);
     end
 
-    function Tooltip_Show_OnUpdate(self, elapsed)
+    local function Tooltip_Show_OnUpdate(self, elapsed)
         self.t = self.t + elapsed;
         if self.t > 0.5 then
             self.t = 0;
@@ -1407,22 +1403,22 @@ do
         f.owner = nodeButton;
 
         local duration = 0.2;
-        local function FlyoutFrame_OnUpdate(self, elapsed)
-            self.t = self.t + elapsed;
+        local function FlyoutFrame_OnUpdate(_self, elapsed)
+            _self.t = _self.t + elapsed;
             local scale;
-            if self.t < duration then
-                scale = Easing_OutQuart(self.t, 1.0, 1.6, duration);
+            if _self.t < duration then
+                scale = Easing_OutQuart(_self.t, 1.0, 1.6, duration);
             else
                 scale = 1.6;
-                self:SetScript("OnUpdate", nil);
+                _self:SetScript("OnUpdate", nil);
             end
-            self:SetScale(scale);
+            _self:SetScale(scale);
 
-            local alpha = self.t * 8;
+            local alpha = _self.t * 8;
             if alpha > 1 then
                 alpha = 1;
             end
-            self:SetAlpha(alpha);
+            _self:SetAlpha(alpha);
         end
 
         f:Show();
@@ -1452,7 +1448,7 @@ do
             end
 
             if nodeButton then
-                if not self.NodeFlyoutFrame.owner == nodeButton then
+                if not (self.NodeFlyoutFrame.owner == nodeButton) then
                     return false
                 end
             end
@@ -1523,8 +1519,6 @@ do
         local playAnimation;
         if success then
             playAnimation = true;
-        else
-
         end
         self:Refresh(playAnimation);
     end
@@ -1751,9 +1745,9 @@ local function CreateMainUI()
         bg:SetTextureSliceMargins(40, 24, 40, 24);
         bg:SetTextureSliceMode(0);
         bg:SetHeight(height);
-        local offsetY = 0;
-        bg:SetPoint("LEFT", fontString, "LEFT", -extensionX, offsetY);
-        bg:SetPoint("RIGHT", fontString, "RIGHT", extensionX, offsetY);
+        local _offsetY = 0;
+        bg:SetPoint("LEFT", fontString, "LEFT", -extensionX, _offsetY);
+        bg:SetPoint("RIGHT", fontString, "RIGHT", extensionX, _offsetY);
         bg:SetAlpha(0.5);
         return bg
     end

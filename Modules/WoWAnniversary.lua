@@ -15,7 +15,6 @@ local VoteCounter;
 --local MOUNT_MANIAC_WIDGET_SET = 1329;       --widgetType: 13 (Enum.UIWidgetVisualizationType.SpellDisplay)
 local WIDGET_ID_MOUNT_MANIAC_MOUNT = 6023;      --C_UIWidgetManager.GetSpellDisplayVisualizationInfo(6023).spellInfo.spellID
 local WIDGET_ID_MOUNT_MANIAC_ACTIVE = 6339;     --
-local WIDGET_ID_FASHION_ACTIVE = 6345;
 local SPELL_ID_RIBBON = 452010;
 
 local GetSpellDisplayVisualizationInfo = C_UIWidgetManager.GetSpellDisplayVisualizationInfo;
@@ -23,8 +22,6 @@ local GetTextWithStateWidgetVisualizationInfo = C_UIWidgetManager.GetTextWithSta
 local GetMountFromSpell = C_MountJournal.GetMountFromSpell;
 local GetMountInfoByID = C_MountJournal.GetMountInfoByID;
 local GetMountInfoExtraByID = C_MountJournal.GetMountInfoExtraByID;
-local GetBuffDataByIndex = C_UnitAuras.GetBuffDataByIndex;
-local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo;
 local time = time;
 
 local QUICKSLOT_NAME = "mount_maniac";
@@ -153,20 +150,6 @@ function EL:ShowQuickSlot(state)
     end
 end
 
-function EL:ListenCombatLog(state)
-    if state then
-        if not self.combatListened then
-            self.combatListened = true;
-            self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-        end
-    else
-        if self.combatListened then
-            self.combatListened = false;
-            self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-        end
-    end
-end
-
 function EL:OnUpdate(elapsed)
     self.t = self.t + elapsed;
     if self.t > 0.5 then
@@ -174,21 +157,12 @@ function EL:OnUpdate(elapsed)
         self.eventIndex = self:GetPlayerEventArea();
         if self.eventIndex == 1 then
             self:ShowVoteCounter(false);
-            self:ListenCombatLog(false);
             if self:IsEventActive(WIDGET_ID_MOUNT_MANIAC_ACTIVE) then
                 self:ShowQuickSlot(true);
             else
                 self:ShowQuickSlot(false);
             end
-        elseif self.eventIndex == 2 then
-            self:ShowVoteCounter(false);
-            self:ListenCombatLog(false);
-            self:ShowQuickSlot(false);
-        elseif self.eventIndex == 3 then
-            self:ListenCombatLog(self:IsEventActive(WIDGET_ID_FASHION_ACTIVE));
-            self:ShowQuickSlot(false);
         else
-            self:ListenCombatLog(false);
             self:ShowVoteCounter(false);
             self:ShowQuickSlot(false);
         end
@@ -205,38 +179,22 @@ function EL:WatchPlayerLocation(state)
     end
 end
 
-function EL:ProcessCombatLog(timestamp, subevent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellID, spellName)
-    if subevent ~= "SPELL_CAST_SUCCESS" then return end;
-
-    if spellID == SPELL_ID_RIBBON then
-        self:ShowVoteCounter(true);
-        VoteCounter:AddEntry(destGUID, destName);
-    end
-end
-
 function EL:OnEvent(event, ...)
     if event == "UPDATE_UI_WIDGET" then
         local widgetInfo = ...
         if widgetInfo.widgetID == WIDGET_ID_MOUNT_MANIAC_MOUNT then
             self:UpdateMountButton();
         end
-    elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
-
-    elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-        self:ProcessCombatLog( CombatLogGetCurrentEventInfo() );
     end
 end
 
 function EL:ListenEvents(state)
     if state then
         --self:RegisterEvent("UPDATE_UI_WIDGET");
-        --self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         self:SetScript("OnEvent", self.OnEvent);
         self:WatchPlayerLocation(true);
     else
         self:UnregisterEvent("UPDATE_UI_WIDGET");
-        self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-        self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         self:SetScript("OnEvent", nil);
         self:WatchPlayerLocation(false);
     end
@@ -593,7 +551,6 @@ do  --Vote Counter
 
     function VoteCounterMixin:Layout()
         local playerFound;
-        local button;
         local numButtons = 0;
 
         for _, button in pairs(self.guidButton) do
@@ -615,10 +572,8 @@ do  --Vote Counter
                 playerFound = true;
             end
 
-            button = self.guidButton[data.guid];
-            if button then
-                
-            else
+            local button = self.guidButton[data.guid];
+            if not button then
                 button = self.entryButtonPool:Acquire();
                 if data.isPlayer then
                     button.Name:SetText(UNIT_YOU or "You");
@@ -709,7 +664,7 @@ do  --Vote Counter
         addon.SetDBValue("VotingResultsExpanded", newState);
     end
 
-    do  --Debug
+    --do  --Debug
         --[[
         C_Timer.After(1, function()
             function VoteCounterMixin:AddPlayerEntry()
@@ -731,7 +686,7 @@ do  --Vote Counter
             VT = VoteCounter;
         end)
         --]]
-    end
+    --end
 end
 
 

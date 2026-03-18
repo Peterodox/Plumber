@@ -340,32 +340,6 @@ do	--DataProvider
 		return 0
 	end
 
-	function DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, newTrackIndex)
-		if true then return false end;	--Debug Maybe no longer an issue in live?
-
-		local tbl;
-		if (not activeTrackIndex) or (activeTrackIndex == newTrackIndex) then
-			tbl = {newTrackIndex};
-		else
-			tbl = {activeTrackIndex, newTrackIndex};
-		end
-
-		for _, artifactTrackIndex in ipairs(tbl) do
-			if self.ForbiddenNodes[artifactTrackIndex] then
-				for _, v in ipairs(self.ForbiddenNodes[artifactTrackIndex]) do
-					local nodeID, entryID = v[1], v[2];
-					local nodeInfo = self:GetNodeInfo(nodeID);
-					local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
-					if increasedRanks > 0 and nodeInfo.entryIDsWithCommittedRanks and #nodeInfo.entryIDsWithCommittedRanks > 0 then	--In question
-						return true
-					end
-				end
-			end
-		end
-
-		return false
-	end
-
 	function DataProvider:GetItemNameByID(itemID)
 		--Cache jewelry name
 		if not self.itemNameCache then
@@ -1394,37 +1368,35 @@ do	--CommitUtil
 
 		local activeTrackIndex = DataProvider:GetActiveArtifactTrackIndex();
 
-		if DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, index) then
-			local items = DataProvider:GetForbiddenSelectionNodeItems();
-			if items then
-				--print("Unequip these items before changing traits:")
-				--for _, v in ipairs(items) do
-				--	print(v.slotID, v.coloredItemName);
-				--end
+		local items = DataProvider:GetForbiddenSelectionNodeItems();
+		if items then
+			--print("Unequip these items before changing traits:")
+			--for _, v in ipairs(items) do
+			--	print(v.slotID, v.coloredItemName);
+			--end
 
-				--Auto unequip/re-equip
-				local total = #items;
-				local numFound = 0;
-				if CalculateTotalNumberOfFreeBagSlots() > total then
-					local itemIDxData = {};
-					for _, v in ipairs(items) do
-						local hyperlink = GetInventoryItemLink("player", v.slotID);
-						if hyperlink then
-							numFound = numFound + 1;
-							itemIDxData[v.itemID] = {
-								hyperlink = hyperlink,
-								slotID = v.slotID
-							};
-						end
+			--Auto unequip/re-equip
+			local total = #items;
+			local numFound = 0;
+			if CalculateTotalNumberOfFreeBagSlots() > total then
+				local itemIDxData = {};
+				for _, v in ipairs(items) do
+					local hyperlink = GetInventoryItemLink("player", v.slotID);
+					if hyperlink then
+						numFound = numFound + 1;
+						itemIDxData[v.itemID] = {
+							hyperlink = hyperlink,
+							slotID = v.slotID
+						};
 					end
-
-					if numFound == total then
-						self:SetReplacedEquipment(itemIDxData);
-					end
-				else
-					API.DisplayErrorMessage(L["Require More Bag Slot Alert"]);
-					return
 				end
+
+				if numFound == total then
+					self:SetReplacedEquipment(itemIDxData);
+				end
+			else
+				API.DisplayErrorMessage(L["Require More Bag Slot Alert"]);
+				return
 			end
 		end
 
@@ -1843,7 +1815,7 @@ end
 			local coloredItemName = qualityColor:WrapTextInColorCode(increasedTraitData.itemNameIncreasing);
 			local wrapText = true;
 			GameTooltip_AddColoredLine(tooltip, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName), GREEN_FONT_COLOR, wrapText);
-		end	
+		end
 	end
 
 	C_Traits.GetTreeCurrencyInfo(configID, treeID, excludeStagedChanges)
