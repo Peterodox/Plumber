@@ -92,6 +92,15 @@ stds.wow = {
 			},
 		},
 
+		C_Calendar = {
+			fields = {
+				"GetHolidayInfo",
+				"GetNumDayEvents",
+				"OpenCalendar",
+				"SetAbsMonth",
+			},
+		},
+
 		C_ChatInfo = {
 			fields = {
 				"GetChannelInfoFromIdentifier",
@@ -108,12 +117,31 @@ stds.wow = {
 			},
 		},
 
+		C_CurrencyInfo = {
+			fields = {
+				"GetCurrencyContainerInfo",
+				"GetCurrencyIDFromLink",
+				"GetCurrencyInfo",
+				"GetCurrencyInfoFromLink",
+				"GetCurrencyLink",
+				"GetFactionGrantedByCurrency",
+			},
+		},
+
 		C_CVar = {
 			fields = {
 				"GetCVar",
 				"GetCVarBool",
 				"SetCVar",
 				"SetCVarBitfield",
+			},
+		},
+
+		C_DateAndTime = {
+			fields = {
+				"GetCurrentCalendarTime",
+				"GetSecondsUntilWeeklyReset",
+				"GetWeeklyResetStartTime",
 			},
 		},
 
@@ -211,6 +239,12 @@ stds.wow = {
 			},
 		},
 
+		C_QuestOffer = {
+			fields = {
+				"GetQuestRewardCurrencyInfo",
+			},
+		},
+
 		C_Spell = {
 			fields = {
 				"DoesSpellExist",
@@ -230,6 +264,12 @@ stds.wow = {
 				"GetSpellBookItemType",
 				"IsSpellKnown",
 				"IsSpellInSpellBook",
+			},
+		},
+
+		C_StringUtil = {
+			fields = {
+				"StripHyperlinks",
 			},
 		},
 
@@ -263,6 +303,13 @@ stds.wow = {
 				"GetUnitBuffByAuraInstanceID",
 				"GetWorldCursor",
 
+			},
+		},
+
+		C_ToyBox = {
+			fields = {
+				"GetToyInfo",
+				"IsToyUsable",
 			},
 		},
 
@@ -427,6 +474,12 @@ stds.wow = {
 					},
 				},
 
+				UIMapType = {
+					fields = {
+						"Continent",
+					},
+				},
+
 				UIWidgetVisualizationType = {
 					fields = {
 						"Disabled",
@@ -482,12 +535,15 @@ stds.wow = {
 		"CreateFrame",
 		"CreateFromMixins",
 		"FlashClientIcon",
+		"FormatShortDate",
 		"issecretvalue",
 		"Mixin",
 		"ResetCursor",
+		"securecallfunction",
 		"SetCursor",
 		"SetItemRef",
 		"ShowUIPanel",
+		"StripHyperlinks",
 		"UnitClass",
 		"UnitExists",
 		"UnitFactionGroup",
@@ -502,6 +558,10 @@ stds.wow = {
 		"UnitName",
 		"UnitPVPName",
 		"UnitRace",
+		"GameTime_GetFormattedTime",
+		"CreateVector2D",
+		"UnitPosition",
+		"IsInInstance",
 
 
 		-- Global Fonts
@@ -525,6 +585,16 @@ stds.wow = {
 		"WorldMapFrame",
 
 		-- Global Constants
-
+		"ITEM_QUALITY_COLORS",
+		"D_DAYS",
+		"D_HOURS",
+		"D_MINUTES",
+		"D_SECONDS",
+		"DAYS_ABBR",
+		"HOURS_ABBR",
+		"MINUTES_ABBR",
+		"SECONDS_ABBR",
+		"DAYS_ABBR",
+		"CALENDAR_FULLDATE_MONTH_NAMES",
 	},
 };

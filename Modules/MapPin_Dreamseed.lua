@@ -53,22 +53,22 @@ PinController.isRelavantVignetteGUID = {};
 PinController.chestOwnerCreatureID = nil;     --Construct when required
 
 local function Debug_SaveCreatureLocation(objectGUID, x, y)
-    if not PlumberDevOutput then
-        PlumberDevOutput = {};
+    if not PlumberDevData then
+        PlumberDevData = {};
     end
-    if not PlumberDevOutput.CreatureLocations then
-        PlumberDevOutput.CreatureLocations = {};
+    if not PlumberDevData.CreatureLocations then
+        PlumberDevData.CreatureLocations = {};
     end
 
     local creatureID = API.GetCreatureIDFromGUID(objectGUID);
 
-    if not PlumberDevOutput.CreatureLocations[creatureID] then
+    if not PlumberDevData.CreatureLocations[creatureID] then
         local total = 0;
-        for k, v in pairs(PlumberDevOutput.CreatureLocations) do
+        for k, v in pairs(PlumberDevData.CreatureLocations) do
             total = total + 1;
         end
         print(string.format("#%d NEW POSITION ADDED", total + 1));
-        PlumberDevOutput.CreatureLocations[creatureID] = {x, y};
+        PlumberDevData.CreatureLocations[creatureID] = {x, y};
     end
 end
 
@@ -552,7 +552,7 @@ end
 
 function WorldMapDataProvider:OnEvent(event, ...)
     --This significantly increase RAM usage count
-    --So we monitor Events using another frame (PinController) 
+    --So we monitor Events using another frame (PinController)
 end
 
 function WorldMapDataProvider:RemoveAllIfNeeded()
