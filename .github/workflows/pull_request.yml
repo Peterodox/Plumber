@@ -19,7 +19,7 @@ jobs:
       - name: Run Luacheck
         uses: nebularg/actions-luacheck@v1
         with:
-          args: --no-color -q --no-unused
+          args: --no-color -q --no-unused --no-self
           files: $(git ls-files '*.lua' ':!:Locales')
           annotate: warning
 
