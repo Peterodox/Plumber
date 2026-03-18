@@ -5,7 +5,7 @@ local QuickSlot = addon.QuickSlot;
 local GetMinimapZoneText = GetMinimapZoneText;
 local GetUnitCreatureID = API.GetUnitCreatureID;
 local GetItemSpellID = API.GetItemSpellID;
-local GetItemCount = C_Item.GetItemCount or GetItemCount;
+local GetItemCount = C_Item.GetItemCount;
 local GetBuffDataByIndex = C_UnitAuras.GetBuffDataByIndex;
 
 local RANCH_NAME = API.GetZoneName(6039);
@@ -202,21 +202,4 @@ do
     };
 
     addon.ControlCenter:AddModule(moduleData);
-end
-
-
-function GetEndingTime()
-    --132726
-    local aura = C_UnitAuras.GetBuffDataByIndex("target", 1, "HELPFUL");
-    if aura and aura.spellId == 132726 then
-        local currentTime = GetTime();
-        local endTime = aura.expirationTime;
-        print(API.SecondsToTime(endTime - currentTime));
-    end
-end
-
-do
-    --C_TradeSkillUI.GetRecipeRequirements(124052)
-    --/dump ProfessionsFrame.CraftingPage.SchematicForm.currentRecipeInfo.recipeID
-    --124052
 end

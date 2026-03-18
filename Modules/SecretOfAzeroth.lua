@@ -15,11 +15,6 @@ local QuestData = {
 
 local function OnQuestAreaChanged(questID, isInside)
     print(API.GetQuestName(questID), questID, isInside);
-    if isInside then
-        
-    else
-
-    end
 end
 
 for questID in pairs(QuestData) do

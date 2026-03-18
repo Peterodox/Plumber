@@ -6,7 +6,7 @@ local L = addon.L;
 
 local tinsert = table.insert;
 local InCombatLockdown = InCombatLockdown;
-local IsPlayerSpell = IsPlayerSpell;
+local IsPlayerSpell = C_SpellBook.IsSpellKnown;
 local CreateFrame = CreateFrame;
 local UIParent = UIParent;
 
@@ -242,7 +242,6 @@ do --SpellFlyout Main
             if InCombatLockdown() then
                 self:DisplayNote(L["PlumberMacro Error Combat"], false);
             end
-            
             if anySpell then
                 self:UpdateSpellCooldowns();
             end

@@ -22,9 +22,9 @@ function EL:OnEvent(event, ...)
             local Old_GetArtifactTier = C_ArtifactUI.GetArtifactTier;
 
             local function New_GetArtifactTier()
-                local itemID = GetArtifactItemID();
+                local _itemID = GetArtifactItemID();
                 local tier = Old_GetArtifactTier();
-                if itemID == 133755 then
+                if _itemID == 133755 then
                     return math.max(tier, 1)
                 else
                     return tier

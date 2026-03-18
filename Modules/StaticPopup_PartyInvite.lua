@@ -39,7 +39,7 @@ function EL:GUILD_INVITE_REQUEST(inviter, guildName, guildAchievementPoints, old
             self.pauseUpdate = nil;
 
             if not (GuildInviteFrame and GuildInviteFrame:IsVisible()) then
-                --Not a StaticPopup, see GuildInviteFrame.lua 
+                --Not a StaticPopup, see GuildInviteFrame.lua
                 return
             end
 

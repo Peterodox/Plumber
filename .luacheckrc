@@ -96,6 +96,13 @@ stds.wow = {
 			},
 		},
 
+		C_ArtifactUI = {
+			fields = {
+				"GetArtifactItemID",
+				"GetArtifactTier",
+			},
+		},
+
 		C_Calendar = {
 			fields = {
 				"GetHolidayInfo",
@@ -118,6 +125,17 @@ stds.wow = {
 				"GetContainerItemID",
 				"GetContainerItemInfo",
 				"GetContainerNumSlots",
+				"GetItemCooldown",
+				"PickupContainerItem",
+			},
+		},
+
+		C_ContentTracking = {
+			fields = {
+				"StartTracking",
+				"StopTracking",
+				"IsTracking",
+				"GetTrackedIDs",
 			},
 		},
 
@@ -152,6 +170,15 @@ stds.wow = {
 		C_EventUtils = {
 			fields = {
 				"IsEventValid",
+			},
+		},
+
+		C_FriendList = {
+			fields = {
+				"SetWhoToUi",
+				"SendWho",
+				"GetWhoInfo",
+				"GetNumWhoResults",
 			},
 		},
 
@@ -229,6 +256,22 @@ stds.wow = {
 			},
 		},
 
+		C_Navigation = {
+			fields = {
+				"WasClampedToScreen",
+				"GetTargetState",
+				"HasValidScreenPosition",
+				"GetDistance",
+				"GetDistance",
+			},
+		},
+
+		C_PaperDollInfo = {
+			fields = {
+				"CanCursorCanGoInSlot",
+			},
+		},
+
 		C_PetJournal = {
 			fields = {
 				"FindPetIDByName",
@@ -255,9 +298,43 @@ stds.wow = {
 			},
 		},
 
+		C_QuestLog = {
+			fields = {
+				"GetActivePreyQuest",
+				"GetNumQuestWatches",
+				"GetTitleForQuestID",
+				"GetQuestInfo",
+				"IsOnQuest",
+				"IsQuestFlaggedCompleted",
+				"IsQuestFlaggedCompletedOnAccount",
+				"IsWorldQuest",
+				"ReadyForTurnIn",
+				"GetLogIndexForQuestID",
+				"UnitIsRelatedToActiveQuest",
+				"GetQuestRewardCurrencyInfo",
+			},
+		},
+
 		C_QuestOffer = {
 			fields = {
 				"GetQuestRewardCurrencyInfo",
+			},
+		},
+
+		C_RemixArtifactUI = {
+			fields = {
+				"ClearRemixArtifactItem",
+				"GetCurrTraitTreeID",
+				"GetCurrArtifactItemID",
+				"GetCurrItemSpecIndex",
+				"ItemInSlotIsRemixArtifact",
+			},
+		},
+
+		C_SpecializationInfo = {
+			fields = {
+				"GetSpecializatio",
+				"GetSpecializationInfo",
 			},
 		},
 
@@ -267,11 +344,13 @@ stds.wow = {
 				"GetSpellCharges",
 				"GetSpellCooldown",
 				"GetSpellCooldownDuration",
+				"GetSpellDescription",
 				"GetSpellInfo",
 				"GetSpellLink",
 				"GetSpellName",
 				"GetSpellTexture",
 				"IsSpellDataCached",
+				"PickupSpell",
 				"RequestLoadSpellData",
 			},
 		},
@@ -300,6 +379,12 @@ stds.wow = {
 			},
 		},
 
+		C_TalkingHead = {
+			fields = {
+				"GetCurrentLineInfo",
+			},
+		},
+
 		C_TaskQuest = {
 			fields = {
 				"GetQuestsForPlayerByMapID",
@@ -316,8 +401,22 @@ stds.wow = {
 			},
 		},
 
+		C_Traits = {
+			fields = {
+				"GetTreeCurrencyInfo",
+				"GetEntryInfo",
+				"GetNodeInfo",
+				"GetTreeNodes",
+				"CanPurchaseRank",
+				"GetDefinitionInfo",
+				"GetConfigIDByTreeID",
+				"CommitConfig",
+			},
+		},
+
 		C_Transmog = {
 			fields = {
+				"IsAtTransmogNPC",
 				"SetPending",
 			},
 		},
@@ -345,6 +444,7 @@ stds.wow = {
 				"GetInventoryItem",
 				"GetItemByGUID",
 				"GetItemByID",
+				"GetMerchantCostItem",
 				"GetMerchantItem",
 				"GetQuestCurrency",
 				"GetQuestItem",
@@ -354,7 +454,6 @@ stds.wow = {
 				"GetUnit",
 				"GetUnitBuffByAuraInstanceID",
 				"GetWorldCursor",
-
 			},
 		},
 
@@ -362,6 +461,19 @@ stds.wow = {
 			fields = {
 				"GetToyInfo",
 				"IsToyUsable",
+			},
+		},
+
+		C_UIWidgetManager = {
+			fields = {
+				"GetAllWidgetsBySetID",
+				"GetStatusBarWidgetVisualizationInfo",
+				"GetTextWithStateWidgetVisualizationInfo",
+				"GetHorizontalCurrenciesWidgetVisualizationInfo",
+				"GetSpacerVisualizationInfo",
+				"GetItemDisplayVisualizationInfo",
+				"GetSpellDisplayVisualizationInfo",
+				"GetScenarioHeaderDelvesWidgetVisualizationInfo",
 			},
 		},
 
@@ -380,6 +492,12 @@ stds.wow = {
 					fields = {
 						"Achievement",
 						"Decor",
+					},
+				},
+
+				ContentTrackingStopType = {
+					fields = {
+						"Manual",
 					},
 				},
 
@@ -562,6 +680,19 @@ stds.wow = {
 				WidgetEnabledState = {
 					fields = {
 						"Disabled",
+						"Red",
+						"White",
+						"Green",
+						"Artifact",
+						"Black",
+						"BrightBlue",
+					},
+				},
+
+				WidgetShownState = {
+					fields = {
+						"Hidden",
+						"Shown",
 					},
 				},
 			},
@@ -610,6 +741,7 @@ stds.wow = {
 		"SetCursor",
 		"SetItemRef",
 		"ShowUIPanel",
+		"HideUIPanel",
 		"StripHyperlinks",
 		"UnitClass",
 		"UnitExists",
@@ -625,6 +757,7 @@ stds.wow = {
 		"UnitName",
 		"UnitPVPName",
 		"UnitRace",
+		"UnitSex",
 		"GameTime_GetFormattedTime",
 		"CreateVector2D",
 		"UnitPosition",
@@ -633,6 +766,7 @@ stds.wow = {
 		"GetInstanceInfo",
 		"GetPhysicalScreenSize",
 		"BreakUpLargeNumbers",
+		"AbbreviateNumbers",
 		"GetCurrentKeyBoardFocus",
 		"ChatEdit_InsertLink",
 		"GetCursorPosition",
@@ -654,6 +788,41 @@ stds.wow = {
 		"GetNumGroupMembers",
 		"TopBannerManager_Show",
 		"BossBanner_OnEvent",
+		"GetCursorInfo",
+		"PlaySound",
+		"StopSound",
+		"IsGamePadFreelookEnabled",
+		"EquipmentManager_GetItemInfoByLocation",
+		"EquipmentManager_RunAction",
+		"EquipmentManager_UnequipItemInSlot",
+		"GetTime",
+		"GetInventoryItemID",
+		"GetInventoryItemTexture",
+		"CursorHasItem",
+		"ClearCursor",
+		"GetMinimapZoneText",
+		"GetNumQuestLeaderBoards",
+		"GetQuestLogLeaderBoard",
+		"GetPlayerInfoByGUID",
+		"UnitIsBossMob",
+		"UnitCastingInfo",
+		"UnitChannelInfo",
+		"IsModifiedClick",
+		"GetAchievementInfo",
+		"GetAchievementLink",
+		"GetNumFilteredAchievements",
+		"GetFilteredAchievementID",
+		"SetAchievementSearchString",
+		"OpenAchievementFrameToAchievement",
+		"HandleModifiedItemClick",
+		"MountJournal_UpdateMountDisplay",
+		"AchievementFrameAchievements_ForceUpdate",
+		"strtrim",
+		"SetUnitCursorTexture",
+		"UnitIsGameObject",
+		"CreateKeyChordStringUsingMetaKeyState",
+		"GetMoney",
+		"IsMouseButtonDown",
 
 
 		-- Global Fonts
@@ -668,27 +837,55 @@ stds.wow = {
 		"GameFontHighlight_NoShadow",
 		"GameFontDisable",
 		"GameFontRed",
+		"QuestFont",
 
 		-- Global Frames
 		"AddonCompartmentFrame",
+		"ArtifactFrame",
 		"BossBanner",
+		"CharacterFrame",
+		"CharacterStatsPane",
 		"ChatFrame1",
+		"DressUpFrame",
+		"EditModeManagerFrame",
+		"EquipmentFlyoutFrame",
 		"EventToastManagerFrame",
 		"ExpansionLandingPageMinimapButton",
+		"GameTooltip",
 		"GossipFrame",
+		"GuildInviteFrame",
+		"MountJournal",
+		"PaperDollFrame",
+		"PaperDollItemsFrame",
+		"HousingDashboardFrame",
+		"SideDressUpFrame",
+		"SuperTrackedFrame",
+		"TalkingHeadFrame",
+		"TransmogAndMountDressupFrame",
 		"UIErrorsFrame",
 		"UIParent",
 		"UISpecialFrames",
+		"WardrobeTransmogFrame",
 		"WorldFrame",
 		"WorldMapFrame",
-		"SuperTrackedFrame",
-		"GameTooltip",
+		"WhoFrame",
 
 		-- Global Mixins
 		"EventToastManagerFrameMixin",
 
 		-- Global Constants
 		"ITEM_QUALITY_COLORS",
+		"RAID_CLASS_COLORS",
+		"YELLOW_FONT_COLOR",
+		"HIGHLIGHT_FONT_COLOR",
+		"NORMAL_FONT_COLOR",
+		"RED_FONT_COLOR",
+		"DISABLED_FONT_COLOR",
+		"BRIGHTBLUE_FONT_COLOR",
+		"GREEN_FONT_COLOR",
+		"ARTIFACT_GOLD_COLOR",
+		"BLACK_FONT_COLOR",
+		"NORMAL_FONT_COLOR",
 		"D_DAYS",
 		"D_HOURS",
 		"D_MINUTES",
@@ -705,6 +902,50 @@ stds.wow = {
 		"AUCTION_HOUSE_FILTER_UNCOLLECTED_ONLY",
 		"YES",
 		"NO",
+		"UNIT_YOU",
+		"INVSLOT_MAINHAND",
+		"RETRIEVING_DATA",
+		"TALENT_BUTTON_TOOLTIP_RANK_FORMAT",
+		"TALENT_SPEC_ACTIVATE",
+		"EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION",
+		"ERR_LFG_PROPOSAL_FAILED",
+		"ACCOUNT_COMPLETED_QUEST_NOTICE",
+		"TOOLTIP_UNIT_LEVEL",
+		"FACTION_ALLIANCE",
+		"FACTION_HORDE",
+		"EMOTE",
+		"SUMMON_RANDOM_PET",
+		"OBJECTIVES_STOP_TRACKING",
+		"TRACK_ACHIEVEMENT",
+		"OBJECTIVES_VIEW_ACHIEVEMENT",
+		"COLLECTIONS",
+		"SOUNDKIT",
+		"TRANSMOG_OUTFIT_COPY_TO_CLIPBOARD_NOTICE",
+		"NOT_BOUND",
+		"GOLD_AMOUNT_SYMBOL",
+		"SILVER_AMOUNT_SYMBOL",
+		"COPPER_AMOUNT_SYMBOL",
+		"ERR_ITEM_NOT_FOUND",
+		"SELL_PRICE",
+		"TYPE",
+		"SOURCES",
+		"PLAYER_DIFFICULTY1",
+		"PLAYER_DIFFICULTY2",
+		"PLAYER_DIFFICULTY3",
+		"PLAYER_DIFFICULTY6",
+		"WEEKLY_REWARDS_MYTHIC_TOP_RUNS",
+		"UNKNOWN",
 
+
+		-- Other Addons
+		"Narci_Attribute",
+		"NarciPaperDollWidgetController",
+		"EditModeManagerExpandedFrame",		--EditModeExpanded
+		"EditModeExpandedWarningFrame",
+		"ElvUI",
+		"CSPilvl",				--Chonky Character Sheet
+		"GwDressingRoom",		--GW2 UI
+		"GwDressingRoomGear",
+		"ConsolePort",
 	},
 };
