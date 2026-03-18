@@ -105,33 +105,33 @@ LandingPageUtil.RaidDifficulties = Difficulties;
 
 
 local PlayerClassList_Modern = {
-    1,  --WARRIOR 	
-    2,  --PALADIN 	
-    3,  --HUNTER 	
-    4,  --ROGUE 	
-    5,  --PRIEST 	
+    1,  --WARRIOR
+    2,  --PALADIN
+    3,  --HUNTER
+    4,  --ROGUE
+    5,  --PRIEST
     6,  --DEATHKNIGHT
-    7,  --SHAMAN 	
-    8,  --MAGE 	
-    9,  --WARLOCK 	
+    7,  --SHAMAN
+    8,  --MAGE
+    9,  --WARLOCK
     10, --MONK
-    11, --DRUID 	
+    11, --DRUID
     12, --DEMONHUNTER
     13, --EVOKER
 };
 
 local PlayerClassList_MOP = {
-    1,  --WARRIOR 	
-    2,  --PALADIN 	
-    3,  --HUNTER 	
-    4,  --ROGUE 	
-    5,  --PRIEST 	
+    1,  --WARRIOR
+    2,  --PALADIN
+    3,  --HUNTER
+    4,  --ROGUE
+    5,  --PRIEST
     6,  --DEATHKNIGHT
-    7,  --SHAMAN 	
-    8,  --MAGE 	
-    9,  --WARLOCK 	
+    7,  --SHAMAN
+    8,  --MAGE
+    9,  --WARLOCK
     10, --MONK
-    11, --DRUID 	
+    11, --DRUID
 };
 
 if addon.IS_MOP then
