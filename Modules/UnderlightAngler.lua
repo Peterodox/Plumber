@@ -1,5 +1,6 @@
 -- Fix Underlight Angler traits not showing bug
 -- The Cause: Artifact power and link's visiblity is determined by C_ArtifactUI.GetArtifactTier(), it wrongfully returns 0 for Underlight Angler
+-- Our fix overrides this API
 
 local _, addon = ...
 local GetArtifactItemID = C_ArtifactUI.GetArtifactItemID;
@@ -8,78 +9,78 @@ local GetArtifactItemID = C_ArtifactUI.GetArtifactItemID;
 local EL = CreateFrame("Frame");
 
 EL.events = {
-    "ARTIFACT_UPDATE",
+	"ARTIFACT_UPDATE",
 };
 
 function EL:OnEvent(event, ...)
-    if event == "ARTIFACT_UPDATE" then
-        local itemID = GetArtifactItemID();
-        if (not self.apiModified) and itemID == 133755 then
-            self.apiModified = true;
-            self.OnEvent = nil;
-            self:ListenEvents(false);
+	if event == "ARTIFACT_UPDATE" then
+		local itemID = GetArtifactItemID();
+		if (not self.apiModified) and itemID == 133755 then
+			self.apiModified = true;
+			self.OnEvent = nil;
+			self:ListenEvents(false);
 
-            local Old_GetArtifactTier = C_ArtifactUI.GetArtifactTier;
+			local Old_GetArtifactTier = C_ArtifactUI.GetArtifactTier;
 
-            local function New_GetArtifactTier()
-                local _itemID = GetArtifactItemID();
-                local tier = Old_GetArtifactTier();
-                if _itemID == 133755 then
-                    return math.max(tier, 1)
-                else
-                    return tier
-                end
-            end
-            C_ArtifactUI.GetArtifactTier = New_GetArtifactTier;
+			local function New_GetArtifactTier()
+				local _itemID = GetArtifactItemID();
+				local tier = Old_GetArtifactTier();
+				if _itemID == 133755 then
+					return math.max(tier, 1)
+				else
+					return tier
+				end
+			end
+			C_ArtifactUI.GetArtifactTier = New_GetArtifactTier;		-- luacheck: ignore 122 -- Setting a read-only field of a global variable
 
 
-            ArtifactFrame.PerksTab:Refresh();
-        end
-    end
+			ArtifactFrame.PerksTab:Refresh();
+		end
+	end
 end
 
 function EL:ListenEvents(state)
-    if state then
-        if not self.listened then
-            self.listened = true;
-            for _, event in ipairs(self.events) do
-                self:RegisterEvent(event);
-            end
-            self:SetScript("OnEvent", self.OnEvent);
-        end
-    elseif self.listened then
-        self.listened = nil;
-        for _, event in ipairs(self.events) do
-            self:UnregisterEvent(event);
-        end
-        self:SetScript("OnEvent", nil);
-    end
+	if state then
+		if not self.listened then
+			self.listened = true;
+			for _, event in ipairs(self.events) do
+				self:RegisterEvent(event);
+			end
+			self:SetScript("OnEvent", self.OnEvent);
+		end
+	elseif self.listened then
+		self.listened = nil;
+		for _, event in ipairs(self.events) do
+			self:UnregisterEvent(event);
+		end
+		self:SetScript("OnEvent", nil);
+	end
 end
 
 do
-    local function EnableModule(state)
-        if state then
-            EL:ListenEvents(true);
-        else
-            EL:ListenEvents(false);
-        end
-    end
+	local function EnableModule(state)
+		if state then
+			EL:ListenEvents(true);
+		else
+			EL:ListenEvents(false);
+		end
+	end
 
-    local moduleData = {
-        name = addon.L["ModuleName BlizzFixFishingArtifact"],
-        dbKey = "BlizzFixFishingArtifact",
-        description = addon.L["ModuleDescription BlizzFixFishingArtifact"],
-        toggleFunc = EnableModule,
-        categoryID = 2,
-        uiOrder = 15,
-        moduleAddedTime = 1728990000,
+	local moduleData = {
+		name = addon.L["ModuleName BlizzFixFishingArtifact"],
+		dbKey = "BlizzFixFishingArtifact",
+		description = addon.L["ModuleDescription BlizzFixFishingArtifact"],
+		toggleFunc = EnableModule,
+		categoryID = 2,
+		uiOrder = 15,
+		moduleAddedTime = 1728990000,
 
 		categoryKeys = {
 			"Profession",
 		},
-    };
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end
 
 --[[

@@ -44,91 +44,91 @@ local CursorProgressIndicator;
 
 
 local function HideActionButton()
-    if ActiveActionButton then
-        ActiveActionButton:Release();
-    end
+	if ActiveActionButton then
+		ActiveActionButton:Release();
+	end
 end
 
 local function HideProgressIndicator()
-    if CursorProgressIndicator then
-        CursorProgressIndicator:ClearWatch();
-    end
+	if CursorProgressIndicator then
+		CursorProgressIndicator:ClearWatch();
+	end
 end
 
 function Processor:OnUpdate_ProcessAfter(elapsed)
-    self.t = self.t + elapsed;
-    if self.t >= 0.0 then
-        self:SetScript("OnUpdate", nil);
-        self:ProcessItem();
-    end
+	self.t = self.t + elapsed;
+	if self.t >= 0.0 then
+		self:SetScript("OnUpdate", nil);
+		self:ProcessItem();
+	end
 end
 
 function Processor:OnUpdate_CheckOwnerVisibility(elapsed)
-    self.t = self.t + elapsed;
-    if self.t >= 0.05 then
-        self.t = 0;
-        if (not self.owner) or (not self.owner:IsVisible()) then
-            self:SetScript("OnUpdate", nil);
-            HideActionButton();
-            HideProgressIndicator();
-        end
-    end
+	self.t = self.t + elapsed;
+	if self.t >= 0.05 then
+		self.t = 0;
+		if (not self.owner) or (not self.owner:IsVisible()) then
+			self:SetScript("OnUpdate", nil);
+			HideActionButton();
+			HideProgressIndicator();
+		end
+	end
 end
 
 function Processor:OnEvent(event, ...)
-    if event == "CURSOR_CHANGED" then   --Unused Event
-        HideActionButton();
-        self:UnregisterEvent(event);
-    elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
-        local _, _, spellID = ...
-        if spellID == SPELL_ID_PICK_LOCK then
-            self:UnregisterEvent(event);
-            local bag, slot = OLD_BAG_ID, OLD_SLOT_ID;
-            HideActionButton();
-            OLD_BAG_ID, OLD_SLOT_ID = bag, slot;    --Item doesn't change status imediately so we pause our processing
-            C_Timer.After(1, function()
-                OLD_BAG_ID, OLD_SLOT_ID = nil, nil;
-            end);
-        end
-    elseif event == "PLAYER_REGEN_DISABLED" then
-        self:UnregisterEvent(event);
-        self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-        self:SetScript("OnUpdate", nil);
-        OLD_BAG_ID, OLD_SLOT_ID = nil, nil;
-    elseif event == "TRADE_TARGET_ITEM_CHANGED" then
-        local tradeSlotIndex = ...
-        if tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
-            HideActionButton();
-        end
-    end
+	if event == "CURSOR_CHANGED" then   --Unused Event
+		HideActionButton();
+		self:UnregisterEvent(event);
+	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
+		local _, _, spellID = ...
+		if spellID == SPELL_ID_PICK_LOCK then
+			self:UnregisterEvent(event);
+			local bag, slot = OLD_BAG_ID, OLD_SLOT_ID;
+			HideActionButton();
+			OLD_BAG_ID, OLD_SLOT_ID = bag, slot;    --Item doesn't change status imediately so we pause our processing
+			C_Timer.After(1, function()
+				OLD_BAG_ID, OLD_SLOT_ID = nil, nil;
+			end);
+		end
+	elseif event == "PLAYER_REGEN_DISABLED" then
+		self:UnregisterEvent(event);
+		self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
+		self:SetScript("OnUpdate", nil);
+		OLD_BAG_ID, OLD_SLOT_ID = nil, nil;
+	elseif event == "TRADE_TARGET_ITEM_CHANGED" then
+		local tradeSlotIndex = ...
+		if tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
+			HideActionButton();
+		end
+	end
 end
 
 Processor:SetScript("OnEvent", Processor.OnEvent);
 
 function Processor:Initiate(customDelay)
-    if customDelay then
-        self.t = -customDelay;
-    else
-        self.t = 0;
-    end
-    self:SetScript("OnUpdate", self.OnUpdate_ProcessAfter);
+	if customDelay then
+		self.t = -customDelay;
+	else
+		self.t = 0;
+	end
+	self:SetScript("OnUpdate", self.OnUpdate_ProcessAfter);
 end
 
 local function IsPlayerInteracingBank()
-    --Merchant is checked by another function
-    --Banker, GuildBanker, MailInfo, CharacterBanker, AccountBanker
-    return IsInteractingWithNpcOfType(8) or IsInteractingWithNpcOfType(10) or IsInteractingWithNpcOfType(17) or IsInteractingWithNpcOfType(67) or IsInteractingWithNpcOfType(68)
+	--Merchant is checked by another function
+	--Banker, GuildBanker, MailInfo, CharacterBanker, AccountBanker
+	return IsInteractingWithNpcOfType(8) or IsInteractingWithNpcOfType(10) or IsInteractingWithNpcOfType(17) or IsInteractingWithNpcOfType(67) or IsInteractingWithNpcOfType(68)
 end
 
 local function ShouldShowOverlay()
-    return (not InCombatLockdown()) and (not GetCursorInfo()) and (not SpellIsTargeting()) and IsSpellKnown(SPELL_ID_PICK_LOCK) and (not(MerchantFrame and MerchantFrame:IsShown()))
+	return (not InCombatLockdown()) and (not GetCursorInfo()) and (not SpellIsTargeting()) and IsSpellKnown(SPELL_ID_PICK_LOCK) and (not(MerchantFrame and MerchantFrame:IsShown()))
 end
 
 local function GetUnlockSpellName()
-    if not SPELL_NAME_PICK_LOCK then
-        SPELL_NAME_PICK_LOCK = GetSpellInfo(SPELL_ID_PICK_LOCK);
-    end
-    return SPELL_NAME_PICK_LOCK or ""
+	if not SPELL_NAME_PICK_LOCK then
+		SPELL_NAME_PICK_LOCK = GetSpellInfo(SPELL_ID_PICK_LOCK);
+	end
+	return SPELL_NAME_PICK_LOCK or ""
 end
 
 
@@ -151,7 +151,7 @@ local function GameTooltip_AddColoredDoubleLine(tooltip, leftText, rightText, le
 end
 
 local function AddLineDataText(tooltip, lineData, matchLineFunc)
-    local leftText = lineData.leftText;
+	local leftText = lineData.leftText;
 	local leftColor = lineData.leftColor or NORMAL_FONT_COLOR;
 	local wrapText = lineData.wrapText or false;
 	local rightText = lineData.rightText;
@@ -161,346 +161,346 @@ local function AddLineDataText(tooltip, lineData, matchLineFunc)
 		GameTooltip_AddColoredDoubleLine(tooltip, leftText, rightText, leftColor, rightColor, wrapText, leftOffset);
 	elseif leftText then
 		GameTooltip_AddColoredLine(tooltip, leftText, leftColor, wrapText, leftOffset);
-        if matchLineFunc then
-            return matchLineFunc(leftText);
-        end
+		if matchLineFunc then
+			return matchLineFunc(leftText);
+		end
 	end
 end
 -- End of the copy
 
 
 local function ActionButton_Bag_OnEnter(self)
-    if self.bag and self.slot then
-        TooltipFrame:Hide();
+	if self.bag and self.slot then
+		TooltipFrame:Hide();
 
-        --[[
-        --This noticeably affects RAM count, so we use another way to display info
-        local tooltipInfo = {
+		--[[
+		--This noticeably affects RAM count, so we use another way to display info
+		local tooltipInfo = {
 			getterName = "GetBagItem",
 			getterArgs = {self.bag, self.slot, calledByPlumber = true};
 		};
-        TooltipFrame:ProcessInfo(tooltipInfo);
-        --]]
+		TooltipFrame:ProcessInfo(tooltipInfo);
+		--]]
 
-        local tooltipData = C_TooltipInfo.GetBagItem(self.bag, self.slot);
-        if not tooltipData then return end;
+		local tooltipData = C_TooltipInfo.GetBagItem(self.bag, self.slot);
+		if not tooltipData then return end;
 
-        TooltipFrame:SetOwner(self, "ANCHOR_LEFT");
+		TooltipFrame:SetOwner(self, "ANCHOR_LEFT");
 
-        --for i, lineData in ipairs(tooltipData.lines) do
-        --    AddLineDataText(TooltipFrame, lineData);
-        --end
-        TooltipFrame:SetBagItem(self.bag, self.slot);
+		--for i, lineData in ipairs(tooltipData.lines) do
+		--    AddLineDataText(TooltipFrame, lineData);
+		--end
+		TooltipFrame:SetBagItem(self.bag, self.slot);
 
-        TooltipFrame:AddLine(INSTRUCTION_PICK_LOCK, 0.400, 0.733, 1.000, true);    --Use a different color to distinguish it from other <Action> text in Pure Green
-        TooltipFrame:Show();
-    end
+		TooltipFrame:AddLine(INSTRUCTION_PICK_LOCK, 0.400, 0.733, 1.000, true);    --Use a different color to distinguish it from other <Action> text in Pure Green
+		TooltipFrame:Show();
+	end
 end
 
 local PATTERN_ITEM_PROPOSED_ENCHANT;
 do
-    PATTERN_ITEM_PROPOSED_ENCHANT = string.gsub((ITEM_PROPOSED_ENCHANT or "Will receive %s."), "%.", "%%.");
-    PATTERN_ITEM_PROPOSED_ENCHANT = string.gsub(PATTERN_ITEM_PROPOSED_ENCHANT, "%%s", "(%.+)");
-    --print(PATTERN_ITEM_PROPOSED_ENCHANT)
+	PATTERN_ITEM_PROPOSED_ENCHANT = string.gsub((ITEM_PROPOSED_ENCHANT or "Will receive %s."), "%.", "%%.");
+	PATTERN_ITEM_PROPOSED_ENCHANT = string.gsub(PATTERN_ITEM_PROPOSED_ENCHANT, "%%s", "(%.+)");
+	--print(PATTERN_ITEM_PROPOSED_ENCHANT)
 end
 
 local function MatchProposedEnchantText(text)
-    local enchantName = match(text, PATTERN_ITEM_PROPOSED_ENCHANT);
-    if enchantName then
-        return enchantName
-    end
+	local enchantName = match(text, PATTERN_ITEM_PROPOSED_ENCHANT);
+	if enchantName then
+		return enchantName
+	end
 end
 
 local function ActionButton_Trade_OnEnter(self)
-    TooltipFrame:Hide();
+	TooltipFrame:Hide();
 
-    local tooltipData = C_TooltipInfo.GetTradeTargetItem(NOT_TRADED_ITEM_SLOT_INDEX);
-    if not tooltipData then return end;
+	local tooltipData = C_TooltipInfo.GetTradeTargetItem(NOT_TRADED_ITEM_SLOT_INDEX);
+	if not tooltipData then return end;
 
-    TooltipFrame:SetOwner(self, "ANCHOR_RIGHT");
+	TooltipFrame:SetOwner(self, "ANCHOR_RIGHT");
 
-    local matchedText;
-    local enchantTextFound = false;
+	local matchedText;
+	local enchantTextFound = false;
 
-    for i, lineData in ipairs(tooltipData.lines) do
-        matchedText = AddLineDataText(TooltipFrame, lineData, MatchProposedEnchantText);
-        if not enchantTextFound then
-            enchantTextFound = matchedText ~= nil;
-        end
-    end
+	for i, lineData in ipairs(tooltipData.lines) do
+		matchedText = AddLineDataText(TooltipFrame, lineData, MatchProposedEnchantText);
+		if not enchantTextFound then
+			enchantTextFound = matchedText ~= nil;
+		end
+	end
 
-    if not enchantTextFound then
-        TooltipFrame:AddLine(INSTRUCTION_PICK_LOCK, 0.400, 0.733, 1.000, true);
-    end
+	if not enchantTextFound then
+		TooltipFrame:AddLine(INSTRUCTION_PICK_LOCK, 0.400, 0.733, 1.000, true);
+	end
 
-    TooltipFrame:Show();
+	TooltipFrame:Show();
 end
 
 local function ActionButton_OnHideCallback(self)
-    Processor:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-    Processor:UnregisterEvent("PLAYER_REGEN_DISABLED");
-    Processor:UnregisterEvent("TRADE_TARGET_ITEM_CHANGED");
-    Processor:SetScript("OnUpdate", nil);
+	Processor:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
+	Processor:UnregisterEvent("PLAYER_REGEN_DISABLED");
+	Processor:UnregisterEvent("TRADE_TARGET_ITEM_CHANGED");
+	Processor:SetScript("OnUpdate", nil);
 end
 
 local function ActionButton_OnLeave(self)
-    OLD_BAG_ID = nil;
-    OLD_SLOT_ID = nil;
+	OLD_BAG_ID = nil;
+	OLD_SLOT_ID = nil;
 
-    TooltipFrame:Hide();
-    self:Release();
-    HideProgressIndicator();
+	TooltipFrame:Hide();
+	self:Release();
+	HideProgressIndicator();
 end
 
 local function SetupActionButton(bag, slot, tradeItem)
-    if not ShouldShowOverlay() then return end;
+	if not ShouldShowOverlay() then return end;
 
-    if not tradeItem then
-        --When mouseover a lockbox in your bag while trading with another player
-        --We don't create our ActionButton. By default, right-click put items in trade
-        if IsInteractingWithNpcOfType(1) then
-            return
-        end
-    end
+	if not tradeItem then
+		--When mouseover a lockbox in your bag while trading with another player
+		--We don't create our ActionButton. By default, right-click put items in trade
+		if IsInteractingWithNpcOfType(1) then
+			return
+		end
+	end
 
-    local privateKey = "RogueLockpick";
-    local ActionButton = addon.AcquireSecureActionButton(privateKey);
+	local privateKey = "RogueLockpick";
+	local ActionButton = addon.AcquireSecureActionButton(privateKey);
 
-    ActionButton:SetSize(37, 37);
-    ActionButton:SetPassThroughButtons("LeftButton");
-    ActionButton:SetFrameStrata("FULLSCREEN_DIALOG");
-    ActionButton:SetFixedFrameStrata(true);
-    ActionButton:RegisterForClicks("RightButtonDown", "RightButtonUp");
-    ActionButton.bag = bag;
-    ActionButton.slot = slot;
+	ActionButton:SetSize(37, 37);
+	ActionButton:SetPassThroughButtons("LeftButton");
+	ActionButton:SetFrameStrata("FULLSCREEN_DIALOG");
+	ActionButton:SetFixedFrameStrata(true);
+	ActionButton:RegisterForClicks("RightButtonDown", "RightButtonUp");
+	ActionButton.bag = bag;
+	ActionButton.slot = slot;
 
-    ActionButton:SetScript("OnLeave", ActionButton_OnLeave);
-    ActionButton.onHideCallback = ActionButton_OnHideCallback;
+	ActionButton:SetScript("OnLeave", ActionButton_OnLeave);
+	ActionButton.onHideCallback = ActionButton_OnHideCallback;
 
-    ActionButton:ShowDebugHitRect(false);
+	ActionButton:ShowDebugHitRect(false);
 
-    local spellName = GetUnlockSpellName();
-    local macroText;
-    if tradeItem then
-        macroText = string.format("/cast %s\r/click TradeRecipientItem%sItemButton", spellName, NOT_TRADED_ITEM_SLOT_INDEX);
-        ActionButton:SetScript("OnEnter", ActionButton_Trade_OnEnter);
-    else
-        macroText = string.format("/cast %s\r/use %s %s", spellName, bag, slot);
-        ActionButton:SetScript("OnEnter", ActionButton_Bag_OnEnter);
-    end
-    ActionButton:SetAttribute("type2", "macro");
-    ActionButton:SetMacroText(macroText);
+	local spellName = GetUnlockSpellName();
+	local macroText;
+	if tradeItem then
+		macroText = string.format("/cast %s\r/click TradeRecipientItem%sItemButton", spellName, NOT_TRADED_ITEM_SLOT_INDEX);
+		ActionButton:SetScript("OnEnter", ActionButton_Trade_OnEnter);
+	else
+		macroText = string.format("/cast %s\r/use %s %s", spellName, bag, slot);
+		ActionButton:SetScript("OnEnter", ActionButton_Bag_OnEnter);
+	end
+	ActionButton:SetAttribute("type2", "macro");
+	ActionButton:SetMacroText(macroText);
 
-    if not ActionButton.Highlight then
-        local hl = ActionButton:CreateTexture(nil, "HIGHLIGHT");
-        ActionButton.Highlight = hl;
-        hl:SetAllPoints(true);
-        hl:SetTexture("Interface/AddOns/Plumber/Art/Button/Highlight-Square-Inner");
-        hl:SetBlendMode("ADD");
-    end
+	if not ActionButton.Highlight then
+		local hl = ActionButton:CreateTexture(nil, "HIGHLIGHT");
+		ActionButton.Highlight = hl;
+		hl:SetAllPoints(true);
+		hl:SetTexture("Interface/AddOns/Plumber/Art/Button/Highlight-Square-Inner");
+		hl:SetBlendMode("ADD");
+	end
 
-    return ActionButton
+	return ActionButton
 end
 
 local function IsMouseoverItemLocked(lineIndex)
-    local toIndex;
-    if lineIndex then
-        toIndex = GetCVarBool("colorblindMode") and 3 or 2;    --Colorblind Mode: Quality becomes the 2nd line
-    else
-        toIndex = TooltipFrame:NumLines();
-    end
-    local line, lineText;
-    for i = 2, toIndex do
-        line = _G["GameTooltipTextLeft"..i];
-        lineText = line and line:GetText();
-        if lineText and find(lineText, TEXT_LOCKED, 1, true) then      --Colorblind Mode: [++]Locked(Yellow), [-]Locked(Red)
-            local r, g, b = line:GetTextColor();
-            if IsWarningColor(r, g, b) then
-                return false
-            else
-                return true
-            end
-        end
-    end
+	local toIndex;
+	if lineIndex then
+		toIndex = GetCVarBool("colorblindMode") and 3 or 2;    --Colorblind Mode: Quality becomes the 2nd line
+	else
+		toIndex = TooltipFrame:NumLines();
+	end
+	local line, lineText;
+	for i = 2, toIndex do
+		line = _G["GameTooltipTextLeft"..i];
+		lineText = line and line:GetText();
+		if lineText and find(lineText, TEXT_LOCKED, 1, true) then      --Colorblind Mode: [++]Locked(Yellow), [-]Locked(Red)
+			local r, g, b = line:GetTextColor();
+			if IsWarningColor(r, g, b) then
+				return false
+			else
+				return true
+			end
+		end
+	end
 end
 
 local function IsMouseOverObjectItemButton(object)
-    return object.GetBagID ~= nil
+	return object.GetBagID ~= nil
 end
 
 local function SetupButtonAndTooltip(bag, slot, tradeItem)
-    local mouseoverObject = GetMouseFocus();
-    if mouseoverObject and IsMouseOverObjectItemButton(mouseoverObject) then
-        local button = SetupActionButton(bag, slot, tradeItem);
-        ActiveActionButton = button;
+	local mouseoverObject = GetMouseFocus();
+	if mouseoverObject and IsMouseOverObjectItemButton(mouseoverObject) then
+		local button = SetupActionButton(bag, slot, tradeItem);
+		ActiveActionButton = button;
 
-        if not button then return end;
+		if not button then return end;
 
 
-        local x, y = mouseoverObject:GetCenter();
-        local scale = mouseoverObject:GetEffectiveScale();
-        local w, h = mouseoverObject:GetSize();
+		local x, y = mouseoverObject:GetCenter();
+		local scale = mouseoverObject:GetEffectiveScale();
+		local w, h = mouseoverObject:GetSize();
 
-        button:ClearAllPoints();
-        button:SetSize(w, h);
-        button:SetScale(scale);
-        button:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
-        button:SetIgnoreParentScale(true);
-        button:SetParent(UIParent);
-        button:Show();
+		button:ClearAllPoints();
+		button:SetSize(w, h);
+		button:SetScale(scale);
+		button:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
+		button:SetIgnoreParentScale(true);
+		button:SetParent(UIParent);
+		button:Show();
 
-        Processor:StartWatchingOwner(mouseoverObject);
+		Processor:StartWatchingOwner(mouseoverObject);
 
-        if not CursorProgressIndicator then
-            CursorProgressIndicator = addon.AcquireCursorProgressIndicator();
-        end
+		if not CursorProgressIndicator then
+			CursorProgressIndicator = addon.AcquireCursorProgressIndicator();
+		end
 
-        CursorProgressIndicator:ClearAllPoints();
-        CursorProgressIndicator:SetIgnoreParentScale(true);
-        CursorProgressIndicator:SetScale(scale);
-        CursorProgressIndicator:SetParent(UIParent);
-        CursorProgressIndicator:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
-        CursorProgressIndicator:WatchSpell(SPELL_ID_PICK_LOCK);
-        CursorProgressIndicator:SetEdgeScale(1);
-    end
+		CursorProgressIndicator:ClearAllPoints();
+		CursorProgressIndicator:SetIgnoreParentScale(true);
+		CursorProgressIndicator:SetScale(scale);
+		CursorProgressIndicator:SetParent(UIParent);
+		CursorProgressIndicator:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y);
+		CursorProgressIndicator:WatchSpell(SPELL_ID_PICK_LOCK);
+		CursorProgressIndicator:SetEdgeScale(1);
+	end
 end
 
 function Processor:StartWatchingOwner(itemButton)
-    self.owner = itemButton;
-    self.t = 0;
-    self:SetScript("OnUpdate", self.OnUpdate_CheckOwnerVisibility);
-    self:RegisterEvent("PLAYER_REGEN_DISABLED");
-    self:RegisterEvent("TRADE_TARGET_ITEM_CHANGED");
-    self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+	self.owner = itemButton;
+	self.t = 0;
+	self:SetScript("OnUpdate", self.OnUpdate_CheckOwnerVisibility);
+	self:RegisterEvent("PLAYER_REGEN_DISABLED");
+	self:RegisterEvent("TRADE_TARGET_ITEM_CHANGED");
+	self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
 end
 
 function Processor:ProcessItem()
-    if InCombatLockdown() or IsPlayerInteracingBank() then return end;
+	if InCombatLockdown() or IsPlayerInteracingBank() then return end;
 
-    local info = TooltipFrame.processingInfo;
-    if info and TooltipFrame:IsVisible() then
-        if info.getterArgs and not info.getterArgs.calledByPlumber then
-            if info.getterName == "GetBagItem" then
-                local bag, slot = info.getterArgs[1], info.getterArgs[2];
-                if bag and slot then
-                    local tooltipData = TooltipFrame.infoList and TooltipFrame.infoList[1] and TooltipFrame.infoList[1].tooltipData;
-                    if tooltipData and tooltipData.type == TOOLTIP_DATA_TYPE then
-                        local itemID = tooltipData.id;
-                        local lineIndex;
-                        if itemID == 220376 then
-                            --Bismuth Lockbox can have upgrade track on its item tooltip
-                        else
-                            lineIndex = 2;
-                        end
-                        if IsMouseoverItemLocked(lineIndex) then
-                            SetupButtonAndTooltip(bag, slot);
-                            return
-                        end
-                    end
-                end
-            elseif info.getterName == "GetTradeTargetItem" then
-                local tradeSlotIndex = info.getterArgs[1];
-                if tradeSlotIndex and tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
-                    local lineIndex = 2;
-                    if IsMouseoverItemLocked(lineIndex) then
-                        SetupButtonAndTooltip(nil, nil, true);
-                        return
-                    end
-                end
-            end
-        end
-    end
+	local info = TooltipFrame.processingInfo;
+	if info and TooltipFrame:IsVisible() then
+		if info.getterArgs and not info.getterArgs.calledByPlumber then
+			if info.getterName == "GetBagItem" then
+				local bag, slot = info.getterArgs[1], info.getterArgs[2];
+				if bag and slot then
+					local tooltipData = TooltipFrame.infoList and TooltipFrame.infoList[1] and TooltipFrame.infoList[1].tooltipData;
+					if tooltipData and tooltipData.type == TOOLTIP_DATA_TYPE then
+						local itemID = tooltipData.id;
+						local lineIndex;
+						if itemID == 220376 then
+							--Bismuth Lockbox can have upgrade track on its item tooltip
+						else
+							lineIndex = 2;
+						end
+						if IsMouseoverItemLocked(lineIndex) then
+							SetupButtonAndTooltip(bag, slot);
+							return
+						end
+					end
+				end
+			elseif info.getterName == "GetTradeTargetItem" then
+				local tradeSlotIndex = info.getterArgs[1];
+				if tradeSlotIndex and tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
+					local lineIndex = 2;
+					if IsMouseoverItemLocked(lineIndex) then
+						SetupButtonAndTooltip(nil, nil, true);
+						return
+					end
+				end
+			end
+		end
+	end
 end
 
 function Processor:StopAll()
-    HideActionButton();
-    HideProgressIndicator();
-    ActionButton_OnHideCallback();
+	HideActionButton();
+	HideProgressIndicator();
+	ActionButton_OnHideCallback();
 end
 
 
 local function TooltipCall_SetInventoryItem(tooltip, ...)
-    if not MODULE_ENABLED then return end;
+	if not MODULE_ENABLED then return end;
 
-    local info = tooltip.processingInfo;
-    if info then
-        if info.getterName == "GetBagItem" then
-            Processor:Initiate();
-        end
-    end
+	local info = tooltip.processingInfo;
+	if info then
+		if info.getterName == "GetBagItem" then
+			Processor:Initiate();
+		end
+	end
 end
 
 local function TooltipCall_SetTradeTargetItem(tooltip, ...)
-    if not MODULE_ENABLED then return end;
+	if not MODULE_ENABLED then return end;
 
 end
 
 local function Tooltip_OnSetBagItem(tooltip, bag, slot)
-    if not MODULE_ENABLED then return end;
+	if not MODULE_ENABLED then return end;
 
-    if bag == OLD_BAG_ID and slot == OLD_SLOT_ID then
-        return
-    end
+	if bag == OLD_BAG_ID and slot == OLD_SLOT_ID then
+		return
+	end
 
-    OLD_BAG_ID = bag;
-    OLD_SLOT_ID = slot;
+	OLD_BAG_ID = bag;
+	OLD_SLOT_ID = slot;
 
-    local info = tooltip.processingInfo;
-    if info then
-        if info.getterName == "GetBagItem" then
-            Processor:Initiate();
-        end
-    end
+	local info = tooltip.processingInfo;
+	if info then
+		if info.getterName == "GetBagItem" then
+			Processor:Initiate();
+		end
+	end
 end
 
 local function Tooltip_OnSetTradeTargetItem(tooltip, tradeSlotIndex)
-    if not MODULE_ENABLED then return end;
+	if not MODULE_ENABLED then return end;
 
-    if tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
-        Processor:Initiate();
-    end
+	if tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
+		Processor:Initiate();
+	end
 end
 
 
 local function AddTooltipPostCall()
-    if TOOLTIP_CALLBACK_ADDED then return end;
-    TOOLTIP_CALLBACK_ADDED = true;
+	if TOOLTIP_CALLBACK_ADDED then return end;
+	TOOLTIP_CALLBACK_ADDED = true;
 
-    local tooltip = GameTooltip;
+	local tooltip = GameTooltip;
 
-    if tooltip.SetBagItem then
-        hooksecurefunc(tooltip, "SetBagItem", Tooltip_OnSetBagItem);
-    end
+	if tooltip.SetBagItem then
+		hooksecurefunc(tooltip, "SetBagItem", Tooltip_OnSetBagItem);
+	end
 
-    if tooltip.SetTradeTargetItem then
-        hooksecurefunc(tooltip, "SetTradeTargetItem", Tooltip_OnSetTradeTargetItem);
-    end
+	if tooltip.SetTradeTargetItem then
+		hooksecurefunc(tooltip, "SetTradeTargetItem", Tooltip_OnSetTradeTargetItem);
+	end
 end
 
 local function EnableModule(state)
-    if state then
-        MODULE_ENABLED = true;
-        TooltipFrame = GameTooltip;
-        AddTooltipPostCall();
-        GetUnlockSpellName();
-    else
-        MODULE_ENABLED = false;
-        Processor:StopAll();
-    end
+	if state then
+		MODULE_ENABLED = true;
+		TooltipFrame = GameTooltip;
+		AddTooltipPostCall();
+		GetUnlockSpellName();
+	else
+		MODULE_ENABLED = false;
+		Processor:StopAll();
+	end
 end
 
 do
-    local moduleData = {
-        name = addon.L["ModuleName HandyLockpick"],
-        dbKey = "HandyLockpick",
-        description = addon.L["ModuleDescription HandyLockpick"],
-        toggleFunc = EnableModule,
-        categoryID = 1,
-        uiOrder = 100,
+	local moduleData = {
+		name = addon.L["ModuleName HandyLockpick"],
+		dbKey = "HandyLockpick",
+		description = addon.L["ModuleDescription HandyLockpick"],
+		toggleFunc = EnableModule,
+		categoryID = 1,
+		uiOrder = 100,
 		categoryKeys = {
 			"Inventory",
 		},
-    };
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end

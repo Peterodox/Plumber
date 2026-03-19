@@ -70,7 +70,7 @@
 		</Frames>
 	</Frame>
 
-    <Button name="PlumberModelSceneControlButtonTemplate" virtual="true">
+	<Button name="PlumberModelSceneControlButtonTemplate" virtual="true">
 		<Size x="24" y="24"/>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -83,11 +83,11 @@
 			</Layer>
 		</Layers>
 		<NormalTexture parentKey="NormalTexture" atlas="common-button-square-gray-up">
-            <Size x="32" y="32"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </NormalTexture>
+			<Size x="32" y="32"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</NormalTexture>
 		<HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" alpha="0.4">
 			<Anchors>
 				<Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT"/>
@@ -95,16 +95,16 @@
 			</Anchors>
 		</HighlightTexture>
 		<PushedTexture parentKey="PushedTexture" atlas="common-button-square-gray-down">
-            <Size x="32" y="32"/>
-            <Anchors>
-                <Anchor point="CENTER" x="1" y="-1"/>
-            </Anchors>
+			<Size x="32" y="32"/>
+			<Anchors>
+				<Anchor point="CENTER" x="1" y="-1"/>
+			</Anchors>
 		</PushedTexture>
 	</Button>
 
-    <!--Actor name="PlumberHousingDecorActorTemplate" mixin="PlumberHousingDecorActorMixin" virtual="true">
-        <Scripts>
-            <OnModelLoaded method="OnModelLoaded"/>
-        </Scripts>
-    </Actor-->
+	<!--Actor name="PlumberHousingDecorActorTemplate" mixin="PlumberHousingDecorActorMixin" virtual="true">
+		<Scripts>
+			<OnModelLoaded method="OnModelLoaded"/>
+		</Scripts>
+	</Actor-->
 </Ui>

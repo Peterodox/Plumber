@@ -27,835 +27,835 @@ local Display = CreateFrame("Frame");
 local EL = CreateFrame("Frame");
 
 local Colors = {
-    Yellow = {r = 1, g = 0.82, b = 0},
-    UnabledColor = {r = 0.6, g = 0.6, b = 0.6},
-    Red = {r = 1, g = 0.125, b = 0.125},
-    White = {r = 1, g = 1, b = 1},
+	Yellow = {r = 1, g = 0.82, b = 0},
+	UnabledColor = {r = 0.6, g = 0.6, b = 0.6},
+	Red = {r = 1, g = 0.125, b = 0.125},
+	White = {r = 1, g = 1, b = 1},
 };
 
 local Settings = {
-    titleHeight = 15,
-    subtextHeight = 13,
-    iconSize = 16,
-    showCastBar = false,
-    fontObject = "GameFontNormal",
-    textOutline = false,
-    showObjectives = false,
-    hideIconInHouse = false,
-    hideNameInHouse = false,
-    IS_MIDNIGHT = addon.IS_MIDNIGHT,
+	titleHeight = 15,
+	subtextHeight = 13,
+	iconSize = 16,
+	showCastBar = false,
+	fontObject = "GameFontNormal",
+	textOutline = false,
+	showObjectives = false,
+	hideIconInHouse = false,
+	hideNameInHouse = false,
+	IS_MIDNIGHT = addon.IS_MIDNIGHT,
 };
 
 
 local IgnoredGameObjects = {
-    [35591] = true,     --Fish Bobber (Other bobbers may have different ids)
+	[35591] = true,     --Fish Bobber (Other bobbers may have different ids)
 };
 
 local SpecialGameObjects = {};
 
 
 do  --Display
-    Display:Hide();
-    Display:SetSize(16, 16);
-    Display:SetIgnoreParentScale(true);
-    Display.TooltipWatcher = CreateFrame("Frame", nil, Display);
+	Display:Hide();
+	Display:SetSize(16, 16);
+	Display:SetIgnoreParentScale(true);
+	Display.TooltipWatcher = CreateFrame("Frame", nil, Display);
 
 
-    local function CreateTextBackground(parent, fontString, height, extensionX)
-        height = height or 32;
-        extensionX = extensionX or 16;
-        local bg = parent:CreateTexture(nil, "BACKGROUND");
-        bg:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateTextShadow");
-        bg:SetTextureSliceMargins(40, 24, 40, 24);
-        bg:SetTextureSliceMode(0);
-        bg:SetHeight(height);
-        local offsetY = 0;
-        bg:SetPoint("LEFT", fontString, "LEFT", -extensionX, offsetY);
-        bg:SetPoint("RIGHT", fontString, "RIGHT", extensionX, offsetY);
-        bg:SetAlpha(0.4);
-        return bg
-    end
+	local function CreateTextBackground(parent, fontString, height, extensionX)
+		height = height or 32;
+		extensionX = extensionX or 16;
+		local bg = parent:CreateTexture(nil, "BACKGROUND");
+		bg:SetTexture("Interface/AddOns/Plumber/Art/Frame/NameplateTextShadow");
+		bg:SetTextureSliceMargins(40, 24, 40, 24);
+		bg:SetTextureSliceMode(0);
+		bg:SetHeight(height);
+		local offsetY = 0;
+		bg:SetPoint("LEFT", fontString, "LEFT", -extensionX, offsetY);
+		bg:SetPoint("RIGHT", fontString, "RIGHT", extensionX, offsetY);
+		bg:SetAlpha(0.4);
+		return bg
+	end
 
-    function Display:UpdateFonts()
-        local file, height, flags = _G[Settings.fontObject]:GetFont();
-        if Settings.textOutline then
-            flags = "OUTLINE";
-        else
-            flags = "";
-        end
+	function Display:UpdateFonts()
+		local file, height, flags = _G[Settings.fontObject]:GetFont();
+		if Settings.textOutline then
+			flags = "OUTLINE";
+		else
+			flags = "";
+		end
 
-        local uiScale = UIParent:GetEffectiveScale() or 1;
+		local uiScale = UIParent:GetEffectiveScale() or 1;
 
-        if self.Title then
-            height = Round(Settings.titleHeight*uiScale);
-            self.Title:SetFont(file, height, flags);
-            if Settings.textOutline then
-                self.Title:SetShadowOffset(0, 0);
-            else
-                self.Title:SetShadowOffset(1, -1);
-            end
-        end
+		if self.Title then
+			height = Round(Settings.titleHeight*uiScale);
+			self.Title:SetFont(file, height, flags);
+			if Settings.textOutline then
+				self.Title:SetShadowOffset(0, 0);
+			else
+				self.Title:SetShadowOffset(1, -1);
+			end
+		end
 
-        if self.Subtext then
-            height = Round(Settings.subtextHeight*uiScale);
-            self.Subtext:SetFont(file, height, flags);
-            if Settings.textOutline then
-                self.Subtext:SetShadowOffset(0, 0);
-            else
-                self.Subtext:SetShadowOffset(1, -1);
-            end
-        end
-    end
+		if self.Subtext then
+			height = Round(Settings.subtextHeight*uiScale);
+			self.Subtext:SetFont(file, height, flags);
+			if Settings.textOutline then
+				self.Subtext:SetShadowOffset(0, 0);
+			else
+				self.Subtext:SetShadowOffset(1, -1);
+			end
+		end
+	end
 
-    function Display:Init()
-        self.Init = nil;
+	function Display:Init()
+		self.Init = nil;
 
-        if not self.Title then
-            self.Title = Display:CreateFontString(nil, "OVERLAY", Settings.fontObject);
-            self.Title:SetPoint("TOP", self, "TOP", 0, 0);
-            local file, height, flags = _G[Settings.fontObject]:GetFont();
-            self.Title:SetFont(file, height, "OUTLINE");
-            self.Title:SetShadowOffset(0, 0);
-        end
+		if not self.Title then
+			self.Title = Display:CreateFontString(nil, "OVERLAY", Settings.fontObject);
+			self.Title:SetPoint("TOP", self, "TOP", 0, 0);
+			local file, height, flags = _G[Settings.fontObject]:GetFont();
+			self.Title:SetFont(file, height, "OUTLINE");
+			self.Title:SetShadowOffset(0, 0);
+		end
 
-        if not self.Background then
-            self.Background = CreateTextBackground(self, self.Title, 30);
-        end
+		if not self.Background then
+			self.Background = CreateTextBackground(self, self.Title, 30);
+		end
 
-        if not self.SubtextContainer then
-            self.SubtextContainer = CreateFrame("Frame", nil, self);
-            self.SubtextContainer:SetSize(16, 16);
-            self.SubtextContainer:SetPoint("CENTER", self, "CENTER", 0, 0);
-            self.SubtextContainer.alpha = 0;
-        end
+		if not self.SubtextContainer then
+			self.SubtextContainer = CreateFrame("Frame", nil, self);
+			self.SubtextContainer:SetSize(16, 16);
+			self.SubtextContainer:SetPoint("CENTER", self, "CENTER", 0, 0);
+			self.SubtextContainer.alpha = 0;
+		end
 
-        if not self.Subtext then
-            self.Subtext = self.SubtextContainer:CreateFontString(nil, "OVERLAY", Settings.fontObject);
-            self.Subtext:SetPoint("TOP", self.Title, "BOTTOM", 0, -2);
-            self.Subtext.Background = CreateTextBackground(self.SubtextContainer, self.Subtext, 28, 12);
-        end
+		if not self.Subtext then
+			self.Subtext = self.SubtextContainer:CreateFontString(nil, "OVERLAY", Settings.fontObject);
+			self.Subtext:SetPoint("TOP", self.Title, "BOTTOM", 0, -2);
+			self.Subtext.Background = CreateTextBackground(self.SubtextContainer, self.Subtext, 28, 12);
+		end
 
-        local iconOffsetY = 16;
+		local iconOffsetY = 16;
 
-        if not self.InteractIcon then
-            self.InteractIcon = self:CreateTexture(nil, "ARTWORK");
-            self.InteractIcon:SetSize(18, 18);
-            self.InteractIcon:SetPoint("CENTER", self, "TOP", 0, iconOffsetY);
-            self.InteractIcon:Hide();
-        end
+		if not self.InteractIcon then
+			self.InteractIcon = self:CreateTexture(nil, "ARTWORK");
+			self.InteractIcon:SetSize(18, 18);
+			self.InteractIcon:SetPoint("CENTER", self, "TOP", 0, iconOffsetY);
+			self.InteractIcon:Hide();
+		end
 
-        if not self.CastingIndicator then
-            local f = CreateFrame("Cooldown", nil, self, "PlumberGenericCooldownTemplate");
-            self.CastingIndicator = f;
-            f:SetPoint("CENTER", self, "TOP", 0, iconOffsetY);
-            local a = 24;
-            f:SetSize(a, a);
-            f.Background:SetSize(2*a, 2*a);
-            f.Background:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Background");
-            f:SetSwipeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Swipe-Blue");
-            f:SetEdgeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Edge");
-            f.SuccessGlow = f:CreateTexture(nil, "OVERLAY");
-            f.SuccessGlow:SetSize(a, a);
-            f.SuccessGlow:SetPoint("CENTER", f, "CENTER", 0, 0);
-            f.SuccessGlow:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-SuccessGlow");
-            f.SuccessGlow:Hide();
-        end
+		if not self.CastingIndicator then
+			local f = CreateFrame("Cooldown", nil, self, "PlumberGenericCooldownTemplate");
+			self.CastingIndicator = f;
+			f:SetPoint("CENTER", self, "TOP", 0, iconOffsetY);
+			local a = 24;
+			f:SetSize(a, a);
+			f.Background:SetSize(2*a, 2*a);
+			f.Background:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Background");
+			f:SetSwipeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Swipe-Blue");
+			f:SetEdgeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Edge");
+			f.SuccessGlow = f:CreateTexture(nil, "OVERLAY");
+			f.SuccessGlow:SetSize(a, a);
+			f.SuccessGlow:SetPoint("CENTER", f, "CENTER", 0, 0);
+			f.SuccessGlow:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-SuccessGlow");
+			f.SuccessGlow:Hide();
+		end
 
-        self:SetScript("OnShow", self.OnShow);
-        self:SetScript("OnHide", self.OnHide);
-        self:SetScript("OnEvent", self.OnEvent);
+		self:SetScript("OnShow", self.OnShow);
+		self:SetScript("OnHide", self.OnHide);
+		self:SetScript("OnEvent", self.OnEvent);
 
-        self:Remove();
-        self:UpdateFonts();
-    end
+		self:Remove();
+		self:UpdateFonts();
+	end
 
-    function Display:ListenSpellCastEvents(state)
-        if state then
-            self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
-            self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
-            self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
-            self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
-            self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
-        else
-            self:UnregisterEvent("UNIT_SPELLCAST_START");
-            self:UnregisterEvent("UNIT_SPELLCAST_STOP");
-            self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-            self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
-            self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
-        end
-    end
+	function Display:ListenSpellCastEvents(state)
+		if state then
+			self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
+			self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
+			self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+			self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
+			self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
+		else
+			self:UnregisterEvent("UNIT_SPELLCAST_START");
+			self:UnregisterEvent("UNIT_SPELLCAST_STOP");
+			self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
+			self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
+			self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
+		end
+	end
 
-    function Display:UpdateInHouseStatus(state)
-        if state ~= nil then
-            self.inHouseArea = state;
-        else
-            self.inHouseArea = C_Housing.IsInsideHouseOrPlot();
-        end
+	function Display:UpdateInHouseStatus(state)
+		if state ~= nil then
+			self.inHouseArea = state;
+		else
+			self.inHouseArea = C_Housing.IsInsideHouseOrPlot();
+		end
 
-        if self.inHouseArea then
-            self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
-        else
-            self:UnregisterEvent("NAME_PLATE_UNIT_ADDED");
-        end
-    end
+		if self.inHouseArea then
+			self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
+		else
+			self:UnregisterEvent("NAME_PLATE_UNIT_ADDED");
+		end
+	end
 
-    function Display:OnShow()
-        if Settings.showCastBar and not self:ShouldHideIcon() then
-            self:ListenSpellCastEvents(true);
-        end
-    end
+	function Display:OnShow()
+		if Settings.showCastBar and not self:ShouldHideIcon() then
+			self:ListenSpellCastEvents(true);
+		end
+	end
 
-    function Display:OnHide()
-        self:Remove();
-        self:ListenSpellCastEvents(false);
-    end
+	function Display:OnHide()
+		self:Remove();
+		self:ListenSpellCastEvents(false);
+	end
 
-    function Display:OnEvent(event, ...)
-        if event == "UNIT_SPELLCAST_SUCCEEDED" then
-            local unitTarget, castGUID, spellID = ...
-            self.succeededSpellID = spellID;
-        elseif event == "UNIT_SPELLCAST_STOP" then
-            if self.succeededSpellID == self.currentSpellID then
-                self:ShowCastSuccessVisual();
-            else
-                self:UpdateCastingIndicator();
-            end
-            self.succeededSpellID = nil;
-            self.currentSpellID = nil;
-        elseif event == "UNIT_SPELLCAST_START" or  event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
-            self:UpdateCastingIndicator();
-        elseif event == "NAME_PLATE_UNIT_ADDED" then
-            local unit = ...
-            if UnitIsUnit(unit, "softinteract") then
-                if Settings.hideIconInHouse then
-                    local nameplate = GetNamePlateForUnit("softinteract");
-                    if nameplate then
-                        nameplate.UnitFrame.SoftTargetFrame.Icon:SetAlpha(0);
-                    end
-                end
-            end
-        end
-    end
+	function Display:OnEvent(event, ...)
+		if event == "UNIT_SPELLCAST_SUCCEEDED" then
+			local unitTarget, castGUID, spellID = ...
+			self.succeededSpellID = spellID;
+		elseif event == "UNIT_SPELLCAST_STOP" then
+			if self.succeededSpellID == self.currentSpellID then
+				self:ShowCastSuccessVisual();
+			else
+				self:UpdateCastingIndicator();
+			end
+			self.succeededSpellID = nil;
+			self.currentSpellID = nil;
+		elseif event == "UNIT_SPELLCAST_START" or  event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
+			self:UpdateCastingIndicator();
+		elseif event == "NAME_PLATE_UNIT_ADDED" then
+			local unit = ...
+			if UnitIsUnit(unit, "softinteract") then
+				if Settings.hideIconInHouse then
+					local nameplate = GetNamePlateForUnit("softinteract");
+					if nameplate then
+						nameplate.UnitFrame.SoftTargetFrame.Icon:SetAlpha(0);
+					end
+				end
+			end
+		end
+	end
 
-    local function SharedFadeIn_OnUpdate(self, elapsed)
-        self.alpha = self.alpha + 8*elapsed;
-        if self.alpha >= 1 then
-            self.alpha = 1;
-            self:SetScript("OnUpdate", nil);
-        end
-        self:SetAlpha(self.alpha);
-    end
+	local function SharedFadeIn_OnUpdate(self, elapsed)
+		self.alpha = self.alpha + 8*elapsed;
+		if self.alpha >= 1 then
+			self.alpha = 1;
+			self:SetScript("OnUpdate", nil);
+		end
+		self:SetAlpha(self.alpha);
+	end
 
-    function Display:ShouldHideIcon()
-        return self.inHouseArea and Settings.hideIconInHouse
-    end
+	function Display:ShouldHideIcon()
+		return self.inHouseArea and Settings.hideIconInHouse
+	end
 
-    function Display:ShouldHideName()
-        return self.inHouseArea and Settings.hideNameInHouse
-    end
+	function Display:ShouldHideName()
+		return self.inHouseArea and Settings.hideNameInHouse
+	end
 
-    function Display:ShowBlizzardInteractIcon(state)
-        local nameplate = GetNamePlateForUnit("softinteract");
-        if nameplate then
-            if self:ShouldHideIcon() then
-                state = false;
-            end
-            nameplate.UnitFrame.SoftTargetFrame.Icon:SetShown(state);
-        end
-    end
+	function Display:ShowBlizzardInteractIcon(state)
+		local nameplate = GetNamePlateForUnit("softinteract");
+		if nameplate then
+			if self:ShouldHideIcon() then
+				state = false;
+			end
+			nameplate.UnitFrame.SoftTargetFrame.Icon:SetShown(state);
+		end
+	end
 
-    function Display:EditModeShowCastingIndicator(state)
-        local f = self.CastingIndicator;
-        if not f then return end;
+	function Display:EditModeShowCastingIndicator(state)
+		local f = self.CastingIndicator;
+		if not f then return end;
 
-        if state then
-            if self:IsVisible() then
-                local seconds = 1.5;
-                f:SetCooldown(GetTime(), seconds);
-                f:SetEdgeScale(self:GetEffectiveScale());
-                f:SetDrawEdge(true);
-                f:Resume();
-                f.alpha = 0;
-                f:SetAlpha(0);
-                f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
-                f:SetScript("OnCooldownDone", function()
-                    self:ShowBlizzardInteractIcon(true);
-                end);
-                f.SuccessGlow:Hide();
-                self:ShowBlizzardInteractIcon(false);
-            end
-        else
-            f:SetScript("OnUpdate", nil);
-            f:Hide();
-            f.SuccessGlow:Hide();
-            self:ShowBlizzardInteractIcon(true);
-        end
-    end
+		if state then
+			if self:IsVisible() then
+				local seconds = 1.5;
+				f:SetCooldown(GetTime(), seconds);
+				f:SetEdgeScale(self:GetEffectiveScale());
+				f:SetDrawEdge(true);
+				f:Resume();
+				f.alpha = 0;
+				f:SetAlpha(0);
+				f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+				f:SetScript("OnCooldownDone", function()
+					self:ShowBlizzardInteractIcon(true);
+				end);
+				f.SuccessGlow:Hide();
+				self:ShowBlizzardInteractIcon(false);
+			end
+		else
+			f:SetScript("OnUpdate", nil);
+			f:Hide();
+			f.SuccessGlow:Hide();
+			self:ShowBlizzardInteractIcon(true);
+		end
+	end
 
-    function Display:UpdateCastingIndicator()
-        self.currentSpellID = nil;
-        self.succeededSpellID = nil;
-        local _, _, _, startTime, endTime, _, castID, _, spellID = UnitCastingInfo("player");
-        self.currentSpellID = spellID;
-        if not startTime then
-            _, _, _, startTime, endTime = UnitChannelInfo("player");
-        end
-        if startTime and endTime and (endTime - startTime) > 0.1 then
-            self:ShowBlizzardInteractIcon(false);
-            local duration = endTime - startTime;
-            local f = self.CastingIndicator;
-            f:SetCooldown(startTime / 1000.0, duration / 1000.0);
-            f:SetEdgeScale(self:GetEffectiveScale());
-            f:SetDrawEdge(true);
-            f:Resume();
-            f.alpha = 0;
-            f:SetAlpha(0);
-            f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
-            f.SuccessGlow:Hide();
-        else
-            self:ShowBlizzardInteractIcon(true);
-            self.CastingIndicator:Hide();
-        end
-    end
+	function Display:UpdateCastingIndicator()
+		self.currentSpellID = nil;
+		self.succeededSpellID = nil;
+		local _, _, _, startTime, endTime, _, castID, _, spellID = UnitCastingInfo("player");
+		self.currentSpellID = spellID;
+		if not startTime then
+			_, _, _, startTime, endTime = UnitChannelInfo("player");
+		end
+		if startTime and endTime and (endTime - startTime) > 0.1 then
+			self:ShowBlizzardInteractIcon(false);
+			local duration = endTime - startTime;
+			local f = self.CastingIndicator;
+			f:SetCooldown(startTime / 1000.0, duration / 1000.0);
+			f:SetEdgeScale(self:GetEffectiveScale());
+			f:SetDrawEdge(true);
+			f:Resume();
+			f.alpha = 0;
+			f:SetAlpha(0);
+			f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+			f.SuccessGlow:Hide();
+		else
+			self:ShowBlizzardInteractIcon(true);
+			self.CastingIndicator:Hide();
+		end
+	end
 
-    if Settings.IS_MIDNIGHT then
-        function Display:UpdateCastingIndicator()
+	if Settings.IS_MIDNIGHT then
+		function Display:UpdateCastingIndicator()
 
-        end
-    end
+		end
+	end
 
-    local function SuccessVisual_OnUpdate(self, elapsed)
-        self.alpha = self.alpha - 2 * elapsed;
-        if self.alpha <= 0 then
-            self.alpha = 0;
-            self:SetScript("OnUpdate", nil);
-            self:Hide();
-        end
-        self:SetAlpha(self.alpha);
-    end
+	local function SuccessVisual_OnUpdate(self, elapsed)
+		self.alpha = self.alpha - 2 * elapsed;
+		if self.alpha <= 0 then
+			self.alpha = 0;
+			self:SetScript("OnUpdate", nil);
+			self:Hide();
+		end
+		self:SetAlpha(self.alpha);
+	end
 
-    function Display:ShowCastSuccessVisual()
-        local f = self.CastingIndicator;
-        f:Pause();
-        local seconds = 100;
-        local percentage = 1;
-        f:SetCooldown(GetTime() - (seconds * percentage), seconds);
-        f:SetDrawEdge(false);
-        f.SuccessGlow:Show();
-        f.alpha = 1;
-        f:SetScript("OnUpdate", SuccessVisual_OnUpdate);
-        self:ShowBlizzardInteractIcon(true);
-    end
+	function Display:ShowCastSuccessVisual()
+		local f = self.CastingIndicator;
+		f:Pause();
+		local seconds = 100;
+		local percentage = 1;
+		f:SetCooldown(GetTime() - (seconds * percentage), seconds);
+		f:SetDrawEdge(false);
+		f.SuccessGlow:Show();
+		f.alpha = 1;
+		f:SetScript("OnUpdate", SuccessVisual_OnUpdate);
+		self:ShowBlizzardInteractIcon(true);
+	end
 
-    function Display:OnUpdate(elapsed)
-        self.alpha = self.alpha + 8*elapsed;
-        if self.alpha >= 1 then
-            self.alpha = 1;
-            self:SetScript("OnUpdate", nil);
-        end
-        self:SetAlpha(self.alpha);
-    end
+	function Display:OnUpdate(elapsed)
+		self.alpha = self.alpha + 8*elapsed;
+		if self.alpha >= 1 then
+			self.alpha = 1;
+			self:SetScript("OnUpdate", nil);
+		end
+		self:SetAlpha(self.alpha);
+	end
 
-    function Display:SetTitle(text, color, fontHeight)
-        self.objectName = text;
-        self.Title:SetText(text);
-        self.Title:SetTextColor(color.r, color.g, color.b);
-        self.Title:Show();
-        if fontHeight then
-            self.Title:SetFontHeight(fontHeight);
-        end
-    end
+	function Display:SetTitle(text, color, fontHeight)
+		self.objectName = text;
+		self.Title:SetText(text);
+		self.Title:SetTextColor(color.r, color.g, color.b);
+		self.Title:Show();
+		if fontHeight then
+			self.Title:SetFontHeight(fontHeight);
+		end
+	end
 
-    function Display:SetSubtext(text, color, fontHeight)
-        local fs = self.Subtext;
-        fs:SetText(text);
-        fs:SetTextColor(1, 1, 1);
+	function Display:SetSubtext(text, color, fontHeight)
+		local fs = self.Subtext;
+		fs:SetText(text);
+		fs:SetTextColor(1, 1, 1);
 
-        if fontHeight then
-            fs:SetFontHeight(fontHeight);
-        end
+		if fontHeight then
+			fs:SetFontHeight(fontHeight);
+		end
 
-        if color then
-            fs:SetTextColor(color.r, color.g, color.b);
-        else
-            fs:SetTextColor(1, 1, 1);
-        end
+		if color then
+			fs:SetTextColor(color.r, color.g, color.b);
+		else
+			fs:SetTextColor(1, 1, 1);
+		end
 
-        self.SubtextContainer:Show();
-        self.SubtextContainer:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
-    end
+		self.SubtextContainer:Show();
+		self.SubtextContainer:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+	end
 
-    function Display:Remove()
-        self:SetScript("OnUpdate", nil);
-        self:SetParent(nil);
-        self:Hide();
-        self.alpha = 0;
-        self:SetAlpha(0);
-        if self.SubtextContainer then
-            self.SubtextContainer.alpha = 0;
-            self.SubtextContainer:SetAlpha(0);
-            self.SubtextContainer:Hide();
-        end
-    end
+	function Display:Remove()
+		self:SetScript("OnUpdate", nil);
+		self:SetParent(nil);
+		self:Hide();
+		self.alpha = 0;
+		self:SetAlpha(0);
+		if self.SubtextContainer then
+			self.SubtextContainer.alpha = 0;
+			self.SubtextContainer:SetAlpha(0);
+			self.SubtextContainer:Hide();
+		end
+	end
 
-    function Display:ShowFrame()
-        self:SetScript("OnUpdate", self.OnUpdate);
-        self:Show();
-    end
+	function Display:ShowFrame()
+		self:SetScript("OnUpdate", self.OnUpdate);
+		self:Show();
+	end
 
-    local function TooltipWatcher_OnUpdate(self, elapsed)
-        self.t = self.t + elapsed;
-        if self.t >= 0.25 then
-            self.t = 0;
-            Display:UpdateTooltip();
-        end
-    end
+	local function TooltipWatcher_OnUpdate(self, elapsed)
+		self.t = self.t + elapsed;
+		if self.t >= 0.25 then
+			self.t = 0;
+			Display:UpdateTooltip();
+		end
+	end
 
-    function Display:WatchTooltip(state)
-        if state then
-            self.TooltipWatcher.t = 0.25;
-            self.TooltipWatcher:SetScript("OnUpdate", TooltipWatcher_OnUpdate);
-        else
-            self.TooltipWatcher:SetScript("OnUpdate", nil);
-        end
-    end
+	function Display:WatchTooltip(state)
+		if state then
+			self.TooltipWatcher.t = 0.25;
+			self.TooltipWatcher:SetScript("OnUpdate", TooltipWatcher_OnUpdate);
+		else
+			self.TooltipWatcher:SetScript("OnUpdate", nil);
+		end
+	end
 
-    function Display:UpdateTooltip()
-        if not Secret_CanAccess(self.objectName) then return end;
+	function Display:UpdateTooltip()
+		if not Secret_CanAccess(self.objectName) then return end;
 
-        local tooltipInfo = GetWorldCursor();
-        if tooltipInfo and tooltipInfo.lines then
-            local numLines = #tooltipInfo.lines;
-            for index, line in ipairs(tooltipInfo.lines) do
-                if index == 1 then
-                    if not (Secret_CanAccess(line.leftText) and self.objectName == line.leftText) then
-                        break
-                    end
-                else
-                    if index == numLines and line.type == 8 then  --quest criteria
-                        Display:SetSubtext(line.leftText, (self.unabled and Colors.UnabledColor) or line.leftColor, self.subtextFontHeight);
-                    end
-                end
-            end
-        end
-    end
+		local tooltipInfo = GetWorldCursor();
+		if tooltipInfo and tooltipInfo.lines then
+			local numLines = #tooltipInfo.lines;
+			for index, line in ipairs(tooltipInfo.lines) do
+				if index == 1 then
+					if not (Secret_CanAccess(line.leftText) and self.objectName == line.leftText) then
+						break
+					end
+				else
+					if index == numLines and line.type == 8 then  --quest criteria
+						Display:SetSubtext(line.leftText, (self.unabled and Colors.UnabledColor) or line.leftColor, self.subtextFontHeight);
+					end
+				end
+			end
+		end
+	end
 
-    function Display:LoadSettings()
-        local GetDBBool = addon.GetDBBool;
+	function Display:LoadSettings()
+		local GetDBBool = addon.GetDBBool;
 
-        Settings.titleHeight, Settings.subtextHeight = unpack(addon.GetValidOptionChoice(Settings.FontSizes, "SoftTarget_FontSize"));
-        Settings.iconSize = addon.GetValidOptionChoice(Settings.IconSizes, "SoftTarget_IconSize")
-        Settings.showCastBar = GetDBBool("SoftTarget_CastBar") and not Settings.IS_MIDNIGHT;
-        Settings.showObjectives = GetDBBool("SoftTarget_Objectives");
-        Settings.textOutline = GetDBBool("SoftTarget_TextOutline");
-        Settings.includeNPC = GetDBBool("SoftTarget_ShowNPC");
-        Settings.hideIconInHouse = GetDBBool("SoftTarget_House_HideIcon");
-        Settings.hideNameInHouse = GetDBBool("SoftTarget_House_HideName");
+		Settings.titleHeight, Settings.subtextHeight = unpack(addon.GetValidOptionChoice(Settings.FontSizes, "SoftTarget_FontSize"));
+		Settings.iconSize = addon.GetValidOptionChoice(Settings.IconSizes, "SoftTarget_IconSize")
+		Settings.showCastBar = GetDBBool("SoftTarget_CastBar") and not Settings.IS_MIDNIGHT;
+		Settings.showObjectives = GetDBBool("SoftTarget_Objectives");
+		Settings.textOutline = GetDBBool("SoftTarget_TextOutline");
+		Settings.includeNPC = GetDBBool("SoftTarget_ShowNPC");
+		Settings.hideIconInHouse = GetDBBool("SoftTarget_House_HideIcon");
+		Settings.hideNameInHouse = GetDBBool("SoftTarget_House_HideName");
 
-        if self.Init then return end;
+		if self.Init then return end;
 
-        if self:IsVisible() then
-            EL:ProcessSoftInteractNameplate();
+		if self:IsVisible() then
+			EL:ProcessSoftInteractNameplate();
 
-            if Settings.showCastBar then
-                self:ListenSpellCastEvents(true);
-                self:UpdateCastingIndicator();
-            else
-                self:ListenSpellCastEvents(false);
-                self.CastingIndicator:Hide();
-            end
-        end
-    end
+			if Settings.showCastBar then
+				self:ListenSpellCastEvents(true);
+				self:UpdateCastingIndicator();
+			else
+				self:ListenSpellCastEvents(false);
+				self.CastingIndicator:Hide();
+			end
+		end
+	end
 end
 
 
 do  --EL
-    function EL:OnUpdate(elapsed)
-        self.t = self.t + elapsed;
-        if self.t > 0.03 then
-            self.t = 0;
-            self:SetScript("OnUpdate", nil);
-            self:ProcessSoftInteractNameplate();
-        end
-    end
+	function EL:OnUpdate(elapsed)
+		self.t = self.t + elapsed;
+		if self.t > 0.03 then
+			self.t = 0;
+			self:SetScript("OnUpdate", nil);
+			self:ProcessSoftInteractNameplate();
+		end
+	end
 
-    function EL:RequestUpdate()
-        self.t = 0;
-        self:SetScript("OnUpdate", self.OnUpdate);
-    end
+	function EL:RequestUpdate()
+		self.t = 0;
+		self:SetScript("OnUpdate", self.OnUpdate);
+	end
 
-    function EL:ProcessSoftInteractNameplate()
-        if Display.Init then
-            Display:LoadSettings();
-            Display:Init();
-        end
+	function EL:ProcessSoftInteractNameplate()
+		if Display.Init then
+			Display:LoadSettings();
+			Display:Init();
+		end
 
-        local nameplateEnabled = GetCVarBool("SoftTargetIconGameObject");
-        if nameplateEnabled ~= self.nameplateEnabled then
-            self.nameplateEnabled = nameplateEnabled;
-            if not nameplateEnabled then
-                if Display:IsShown() then
-                    Display:Hide();
-                end
-                return
-            end
-        end
+		local nameplateEnabled = GetCVarBool("SoftTargetIconGameObject");
+		if nameplateEnabled ~= self.nameplateEnabled then
+			self.nameplateEnabled = nameplateEnabled;
+			if not nameplateEnabled then
+				if Display:IsShown() then
+					Display:Hide();
+				end
+				return
+			end
+		end
 
-        local unit = "softinteract";
-        local nameplate = GetNamePlateForUnit(unit);
+		local unit = "softinteract";
+		local nameplate = GetNamePlateForUnit(unit);
 
-        if nameplate and (UnitIsGameObject(unit) or (Settings.includeNPC and not UnitIsPlayer(unit))) then
-            local f = nameplate.UnitFrame.SoftTargetFrame;
-            if f:IsShown() then
-                local unitID = GetUnitIDGeneral(unit);
-                --print("GameObject:", unitID);
-                if unitID and IgnoredGameObjects[unitID] then
-                    Display:Hide();
-                    return
-                end
+		if nameplate and (UnitIsGameObject(unit) or (Settings.includeNPC and not UnitIsPlayer(unit))) then
+			local f = nameplate.UnitFrame.SoftTargetFrame;
+			if f:IsShown() then
+				local unitID = GetUnitIDGeneral(unit);
+				--print("GameObject:", unitID);
+				if unitID and IgnoredGameObjects[unitID] then
+					Display:Hide();
+					return
+				end
 
-                local objectName = UnitName(unit);
-                if Secret_CanAccess(objectName) then
-                    objectName = StripHyperlinks(objectName);
-                end
-                Display:ClearAllPoints();
-                Display:SetParent(nameplate);
-                Display:SetPoint("TOP", f.Icon, "BOTTOM", 0, -6);
-                Display.SubtextContainer:Hide();
-                Display:ShowFrame();
+				local objectName = UnitName(unit);
+				if Secret_CanAccess(objectName) then
+					objectName = StripHyperlinks(objectName);
+				end
+				Display:ClearAllPoints();
+				Display:SetParent(nameplate);
+				Display:SetPoint("TOP", f.Icon, "BOTTOM", 0, -6);
+				Display.SubtextContainer:Hide();
+				Display:ShowFrame();
 
-                local uiScale = UIParent:GetEffectiveScale() or 1;
-                local fontHeight = Round(Settings.titleHeight*uiScale);
+				local uiScale = UIParent:GetEffectiveScale() or 1;
+				local fontHeight = Round(Settings.titleHeight*uiScale);
 
-                SetUnitCursorTexture(Display.InteractIcon, unit);
-                local textureFile = Display.InteractIcon:GetAtlas();
+				SetUnitCursorTexture(Display.InteractIcon, unit);
+				local textureFile = Display.InteractIcon:GetAtlas();
 
-                --Icon size is determined by SoftTargetFrame
-                f:SetSize(Settings.iconSize, Settings.iconSize);  --Game default: 24, Ours: 16
-                --local textureFile = f.Icon:GetAtlas();
+				--Icon size is determined by SoftTargetFrame
+				f:SetSize(Settings.iconSize, Settings.iconSize);  --Game default: 24, Ours: 16
+				--local textureFile = f.Icon:GetAtlas();
 
-                if not textureFile then
-                    textureFile = f.Icon:GetTexture();
-                end
+				if not textureFile then
+					textureFile = f.Icon:GetTexture();
+				end
 
-                --To determine if the interaction is in range:
-                local unabled = (not textureFile) or string.find(string.lower(textureFile), "unable");
-                Display.unabled = unabled;
-                if unabled then
-                    Display:SetTitle(objectName, Colors.UnabledColor, fontHeight);
-                else
-                    Display:SetTitle(objectName, Colors.Yellow, fontHeight);
-                end
-                self.softTargetUnit = unit;
+				--To determine if the interaction is in range:
+				local unabled = (not textureFile) or string.find(string.lower(textureFile), "unable");
+				Display.unabled = unabled;
+				if unabled then
+					Display:SetTitle(objectName, Colors.UnabledColor, fontHeight);
+				else
+					Display:SetTitle(objectName, Colors.Yellow, fontHeight);
+				end
+				self.softTargetUnit = unit;
 
-                if nameplate.UnitFrame.name:IsShown() then
-                    Display.Title:Hide();
-                    Display.Background:Hide();
-                else
-                    Display.Background:Show();
-                end
+				if nameplate.UnitFrame.name:IsShown() then
+					Display.Title:Hide();
+					Display.Background:Hide();
+				else
+					Display.Background:Show();
+				end
 
-                local subtextFontHeight = Round(Settings.subtextHeight*uiScale);
-                Display.subtextFontHeight = subtextFontHeight;
+				local subtextFontHeight = Round(Settings.subtextHeight*uiScale);
+				Display.subtextFontHeight = subtextFontHeight;
 
-                if unitID and SpecialGameObjects[unitID] then
-                    local subtext, color = SpecialGameObjects[unitID]();
-                    if subtext then
-                        Display:SetSubtext(subtext, color, subtextFontHeight);
-                    end
-                elseif Settings.showObjectives then
-                    Display:UpdateTooltip();
-                    Display:WatchTooltip(true);
-                else
-                    Display:WatchTooltip(false);
-                end
+				if unitID and SpecialGameObjects[unitID] then
+					local subtext, color = SpecialGameObjects[unitID]();
+					if subtext then
+						Display:SetSubtext(subtext, color, subtextFontHeight);
+					end
+				elseif Settings.showObjectives then
+					Display:UpdateTooltip();
+					Display:WatchTooltip(true);
+				else
+					Display:WatchTooltip(false);
+				end
 
-                if Display:ShouldHideIcon() then
-                    f.Icon:Hide();
-                else
-                    f.Icon:SetAlpha(1);
-                end
+				if Display:ShouldHideIcon() then
+					f.Icon:Hide();
+				else
+					f.Icon:SetAlpha(1);
+				end
 
-                if Display:ShouldHideName() then
-                    Display.Title:Hide();
-                    Display.Subtext:Hide();
-                    Display.Background:Hide();
-                end
+				if Display:ShouldHideName() then
+					Display.Title:Hide();
+					Display.Subtext:Hide();
+					Display.Background:Hide();
+				end
 
-                if Settings.showCastBar and not Display:ShouldHideIcon() then
-                    Display:UpdateCastingIndicator();
-                end
-            else
-                Display:Hide();
-            end
+				if Settings.showCastBar and not Display:ShouldHideIcon() then
+					Display:UpdateCastingIndicator();
+				end
+			else
+				Display:Hide();
+			end
 
-            --Fix the Elite icon on GameObject namepalte
-            --CompactUnitFrame_UpdateClassificationIndicator(nameplate.UnitFrame);
-            if nameplate.UnitFrame.classificationIndicator then
-                nameplate.UnitFrame.classificationIndicator:Hide();
-            end
-        else
-            Display:Hide();
-        end
-    end
+			--Fix the Elite icon on GameObject namepalte
+			--CompactUnitFrame_UpdateClassificationIndicator(nameplate.UnitFrame);
+			if nameplate.UnitFrame.classificationIndicator then
+				nameplate.UnitFrame.classificationIndicator:Hide();
+			end
+		else
+			Display:Hide();
+		end
+	end
 
-    function EL:OnEvent(event, ...)
-        if event == "PLAYER_SOFT_INTERACT_CHANGED" then
-            local oldTarget, newTarget = ...
-            if newTarget then
-                self:RequestUpdate();
-            else
-                Display:Hide();
-                self.softTargetUnit = nil;
-            end
-        elseif event == "HOUSE_PLOT_ENTERED" then
-            Display:UpdateInHouseStatus(true);
-        elseif event == "HOUSE_PLOT_EXITED" then
-            Display:UpdateInHouseStatus(false);
-        elseif event == "HOUSE_EDITOR_AVAILABILITY_CHANGED" then
-            Display:UpdateInHouseStatus();
-        end
-    end
+	function EL:OnEvent(event, ...)
+		if event == "PLAYER_SOFT_INTERACT_CHANGED" then
+			local oldTarget, newTarget = ...
+			if newTarget then
+				self:RequestUpdate();
+			else
+				Display:Hide();
+				self.softTargetUnit = nil;
+			end
+		elseif event == "HOUSE_PLOT_ENTERED" then
+			Display:UpdateInHouseStatus(true);
+		elseif event == "HOUSE_PLOT_EXITED" then
+			Display:UpdateInHouseStatus(false);
+		elseif event == "HOUSE_EDITOR_AVAILABILITY_CHANGED" then
+			Display:UpdateInHouseStatus();
+		end
+	end
 
-    EL.events = {
-        "PLAYER_SOFT_INTERACT_CHANGED",
-        "HOUSE_PLOT_ENTERED",
-        "HOUSE_PLOT_EXITED",
-        "HOUSE_EDITOR_AVAILABILITY_CHANGED",
-    };
+	EL.events = {
+		"PLAYER_SOFT_INTERACT_CHANGED",
+		"HOUSE_PLOT_ENTERED",
+		"HOUSE_PLOT_EXITED",
+		"HOUSE_EDITOR_AVAILABILITY_CHANGED",
+	};
 
-    function EL:ListenEvents(state)
-        if state then
-            self:SetScript("OnEvent", EL.OnEvent);
-            API.RegisterFrameForEvents(self, self.events);
-        else
-            self:SetScript("OnEvent", nil);
-            API.UnregisterFrameForEvents(self, self.events);
-        end
-    end
+	function EL:ListenEvents(state)
+		if state then
+			self:SetScript("OnEvent", EL.OnEvent);
+			API.RegisterFrameForEvents(self, self.events);
+		else
+			self:SetScript("OnEvent", nil);
+			API.UnregisterFrameForEvents(self, self.events);
+		end
+	end
 end
 
 
 local OptionToggle_OnClick;
 do  --Options, Settings
-    Settings.FontSizes = {
-        --{titleHeight, subtextHeight}
-        {14, 12},
-        {15, 13},
-        {16, 14},
-        {18, 16},
-        {20, 18},
-        {22, 20},
-        {24, 22},
-        {26, 24},
-    };
+	Settings.FontSizes = {
+		--{titleHeight, subtextHeight}
+		{14, 12},
+		{15, 13},
+		{16, 14},
+		{18, 16},
+		{20, 18},
+		{22, 20},
+		{24, 22},
+		{26, 24},
+	};
 
-    Settings.IconSizes = {
-        14, 16, 18, 20, 22, 24, 26, 28,
-    };
+	Settings.IconSizes = {
+		14, 16, 18, 20, 22, 24, 26, 28,
+	};
 
-    local function Options_TextOutline_OnClick(self, state)
-        Display:LoadSettings();
-        Display:UpdateFonts();
-    end
+	local function Options_TextOutline_OnClick(self, state)
+		Display:LoadSettings();
+		Display:UpdateFonts();
+	end
 
-    local function Options_IconSizeSlider_OnValueChanged(value)
-        addon.SetDBValue("SoftTarget_IconSize", value);
-        Display:LoadSettings();
-    end
+	local function Options_IconSizeSlider_OnValueChanged(value)
+		addon.SetDBValue("SoftTarget_IconSize", value);
+		Display:LoadSettings();
+	end
 
-    local function Options_FontSizeSlider_OnValueChanged(value)
-        addon.SetDBValue("SoftTarget_FontSize", value);
-        Display:LoadSettings();
-    end
+	local function Options_FontSizeSlider_OnValueChanged(value)
+		addon.SetDBValue("SoftTarget_FontSize", value);
+		Display:LoadSettings();
+	end
 
-    local function Options_GenericSizeSlider_FormatValue(value)
-        value = Round(value);
-        return value
-    end
+	local function Options_GenericSizeSlider_FormatValue(value)
+		value = Round(value);
+		return value
+	end
 
-    local function Options_ShowCastBar_OnClick(self, state)
-        Display:LoadSettings();
-        Display:EditModeShowCastingIndicator(state);
-    end
+	local function Options_ShowCastBar_OnClick(self, state)
+		Display:LoadSettings();
+		Display:EditModeShowCastingIndicator(state);
+	end
 
-    local function Options_ShowObjectives_OnClick(self, state)
-        Display:LoadSettings();
-    end
+	local function Options_ShowObjectives_OnClick(self, state)
+		Display:LoadSettings();
+	end
 
-    local function Options_ShowObjectives_Tooltip()
-        if GetCVarBool("SoftTargetTooltipInteract") then
-            return L["SoftTargetName QuestObjective Tooltip"]
-        else
-            return L["SoftTargetName QuestObjective Tooltip"].."\n\n"..L["SoftTargetName QuestObjective Alert"]
-        end
-    end
+	local function Options_ShowObjectives_Tooltip()
+		if GetCVarBool("SoftTargetTooltipInteract") then
+			return L["SoftTargetName QuestObjective Tooltip"]
+		else
+			return L["SoftTargetName QuestObjective Tooltip"].."\n\n"..L["SoftTargetName QuestObjective Alert"]
+		end
+	end
 
-    local function CheckboxShared_OnClick(self, state)
-        Display:LoadSettings();
-    end
+	local function CheckboxShared_OnClick(self, state)
+		Display:LoadSettings();
+	end
 
-    local OPTIONS_SCHEMATIC = {
-        title = L["ModuleName SoftTargetName"],
-        moduleDBKey = "SoftTargetName",
-        widgets = {
-            {type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Settings.IconSizes, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
-            {type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "SoftTarget_TextOutline"},
-            {type = "Slider", label = L["Font Size"], minValue = 1, maxValue = #Settings.FontSizes, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
+	local OPTIONS_SCHEMATIC = {
+		title = L["ModuleName SoftTargetName"],
+		moduleDBKey = "SoftTargetName",
+		widgets = {
+			{type = "Slider", label = L["Icon Size"], minValue = 1, maxValue = #Settings.IconSizes, valueStep = 1, onValueChangedFunc = Options_IconSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
+			{type = "Checkbox", label = L["TalkingHead Option TextOutline"], onClickFunc = Options_TextOutline_OnClick, dbKey = "SoftTarget_TextOutline"},
+			{type = "Slider", label = L["Font Size"], minValue = 1, maxValue = #Settings.FontSizes, valueStep = 1, onValueChangedFunc = Options_FontSizeSlider_OnValueChanged, formatValueFunc = Options_GenericSizeSlider_FormatValue, dbKey = "SoftTarget_FontSize"},
 
-            {type = "Divider"},
-            --{dbKey = "SoftTarget_CastBar"}
-            {type = "Checkbox", label = L["SoftTargetName QuestObjective"], tooltip = Options_ShowObjectives_Tooltip, onClickFunc = Options_ShowObjectives_OnClick, dbKey = "SoftTarget_Objectives"},
+			{type = "Divider"},
+			--{dbKey = "SoftTarget_CastBar"}
+			{type = "Checkbox", label = L["SoftTargetName QuestObjective"], tooltip = Options_ShowObjectives_Tooltip, onClickFunc = Options_ShowObjectives_OnClick, dbKey = "SoftTarget_Objectives"},
 
-            {type = "Divider"},
-            --{type = "Header", label = L["SoftTargetName Option Condition Header"]};
-            {type = "Checkbox", label = L["SoftTargetName ShowNPC"], tooltip = L["SoftTargetName ShowNPC Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_ShowNPC"},
+			{type = "Divider"},
+			--{type = "Header", label = L["SoftTargetName Option Condition Header"]};
+			{type = "Checkbox", label = L["SoftTargetName ShowNPC"], tooltip = L["SoftTargetName ShowNPC Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_ShowNPC"},
 
 
-            {type = "Divider"},
-            {type = "Header", label = L["SC Housing"]},
-            {type = "Checkbox", label = L["SoftTargetName HideIcon"], tooltip = L["SoftTargetName HideIcon Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideIcon"},
-            {type = "Checkbox", label = L["SoftTargetName HideName"], tooltip = L["SoftTargetName HideName Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideName"},
-        },
-    };
+			{type = "Divider"},
+			{type = "Header", label = L["SC Housing"]},
+			{type = "Checkbox", label = L["SoftTargetName HideIcon"], tooltip = L["SoftTargetName HideIcon Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideIcon"},
+			{type = "Checkbox", label = L["SoftTargetName HideName"], tooltip = L["SoftTargetName HideName Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideName"},
+		},
+	};
 
-    if not Settings.IS_MIDNIGHT then
-        table.insert(OPTIONS_SCHEMATIC.widgets, 5,
-            {type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"}
-        );
-    end
+	if not Settings.IS_MIDNIGHT then
+		table.insert(OPTIONS_SCHEMATIC.widgets, 5,
+			{type = "Checkbox", label = L["SoftTargetName CastBar"], tooltip = L["SoftTargetName CastBar Tooltip"], onClickFunc = Options_ShowCastBar_OnClick, dbKey = "SoftTarget_CastBar"}
+		);
+	end
 
-    function OptionToggle_OnClick(self, button)
-        local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
-        if OptionFrame then
-            OptionFrame:ConvertAnchor();
-        end
-    end
+	function OptionToggle_OnClick(self, button)
+		local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
+		if OptionFrame then
+			OptionFrame:ConvertAnchor();
+		end
+	end
 end
 
 
 do  --Module Registery
-    local function EnableModule(state)
-        if state and not EL.enabled then
-            EL.enabled = true;
-            EL:ListenEvents(true);
-            EL:ProcessSoftInteractNameplate();
-            Display:UpdateInHouseStatus();
-        elseif (not state) and EL.enabled then
-            EL.enabled = nil;
-            EL:ListenEvents(false);
-            EL:SetScript("OnUpdate", nil);
-            Display:Remove();
-        end
-    end
+	local function EnableModule(state)
+		if state and not EL.enabled then
+			EL.enabled = true;
+			EL:ListenEvents(true);
+			EL:ProcessSoftInteractNameplate();
+			Display:UpdateInHouseStatus();
+		elseif (not state) and EL.enabled then
+			EL.enabled = nil;
+			EL:ListenEvents(false);
+			EL:SetScript("OnUpdate", nil);
+			Display:Remove();
+		end
+	end
 
-    local function DescriptionFunc()
-        local value = C_CVar.GetCVar("SoftTargetInteract");
-        value = value and tonumber(value) or 0;
+	local function DescriptionFunc()
+		local value = C_CVar.GetCVar("SoftTargetInteract");
+		value = value and tonumber(value) or 0;
 
-        local desc;
+		local desc;
 
-        local function ConcatenateReq(index)
-            if not desc then
-                desc = L["SoftTargetName Req Title"];
-            end
-            desc = desc.."\n\n- "..L["SoftTargetName Req "..index];
-        end
+		local function ConcatenateReq(index)
+			if not desc then
+				desc = L["SoftTargetName Req Title"];
+			end
+			desc = desc.."\n\n- "..L["SoftTargetName Req "..index];
+		end
 
-        if not (value == 2 or value == 3) then
-            ConcatenateReq(1);
-        end
+		if not (value == 2 or value == 3) then
+			ConcatenateReq(1);
+		end
 
-        value = GetCVarBool("SoftTargetIconGameObject");
-        if not value then
-            ConcatenateReq(2);
-        end
+		value = GetCVarBool("SoftTargetIconGameObject");
+		if not value then
+			ConcatenateReq(2);
+		end
 
-        return desc
-    end
+		return desc
+	end
 
-    local moduleData = {
-        name = L["ModuleName SoftTargetName"],
-        dbKey = "SoftTargetName",
-        description = L["ModuleDescription SoftTargetName"],
-        descriptionFunc = DescriptionFunc,
-        toggleFunc = EnableModule,
-        categoryID = 2,
-        uiOrder = 9,
-        optionToggleFunc = OptionToggle_OnClick,
-        hasMovableWidget = true,
-        moduleAddedTime = 1756400000,
+	local moduleData = {
+		name = L["ModuleName SoftTargetName"],
+		dbKey = "SoftTargetName",
+		description = L["ModuleDescription SoftTargetName"],
+		descriptionFunc = DescriptionFunc,
+		toggleFunc = EnableModule,
+		categoryID = 2,
+		uiOrder = 9,
+		optionToggleFunc = OptionToggle_OnClick,
+		hasMovableWidget = true,
+		moduleAddedTime = 1756400000,
 		categoryKeys = {
 			"UnitFrame",
 		},
-    };
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end
 
 
 do  --SpecialGameObjects
-    local function SubtextFunc_Currency(currencyID, useMaxQuantity, requiredNumber)
-        local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(currencyID);
-        if currencyInfo then
-            --local name = currencyInfo.name;
-            local numOwned = currencyInfo.quantity;
-            local icon = currencyInfo.iconFileID;
-            local maxQuantity = useMaxQuantity and currencyInfo.maxQuantity or requiredNumber;
-            local subtext;
-            if maxQuantity then
-                subtext = string.format("%d / %d |T%s:16:16|t", numOwned, maxQuantity, icon);
-            else
-                subtext = string.format("%d |T%s:16:16|t", numOwned, icon);
-            end
-            local color;
-            if (useMaxQuantity and numOwned >= currencyInfo.maxQuantity) or (requiredNumber and requiredNumber > numOwned) then
-                color = Colors.Red;
-            else
-                color = Colors.White;
-            end
-            return subtext, color
-        end
-    end
+	local function SubtextFunc_Currency(currencyID, useMaxQuantity, requiredNumber)
+		local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+		if currencyInfo then
+			--local name = currencyInfo.name;
+			local numOwned = currencyInfo.quantity;
+			local icon = currencyInfo.iconFileID;
+			local maxQuantity = useMaxQuantity and currencyInfo.maxQuantity or requiredNumber;
+			local subtext;
+			if maxQuantity then
+				subtext = string.format("%d / %d |T%s:16:16|t", numOwned, maxQuantity, icon);
+			else
+				subtext = string.format("%d |T%s:16:16|t", numOwned, icon);
+			end
+			local color;
+			if (useMaxQuantity and numOwned >= currencyInfo.maxQuantity) or (requiredNumber and requiredNumber > numOwned) then
+				color = Colors.Red;
+			else
+				color = Colors.White;
+			end
+			return subtext, color
+		end
+	end
 
-    local function SubtextFunc_Item(itemID, requiredNumber)
-        local numOwned = C_Item.GetItemCount(itemID);
-        local icon = C_Item.GetItemIconByID(itemID);
-        if numOwned and icon then
-            local subtext;
-            local color;
-            if requiredNumber then
-                subtext = string.format("%d / %d |T%s:16:16|t", numOwned, requiredNumber, icon);
-                if numOwned < requiredNumber then
-                    color = Colors.Red;
-                else
-                    color = Colors.White;
-                end
-            else
-                subtext = string.format("%d |T%s:16:16|t", numOwned, icon);
-                color = Colors.White;
-            end
-            return subtext, color
-        end
-    end
-
-
-    local function SubtextFunc_RestoredCofferKey()
-        return SubtextFunc_Currency(3028, false, 1)
-    end
-    SpecialGameObjects[413590] = SubtextFunc_RestoredCofferKey;
+	local function SubtextFunc_Item(itemID, requiredNumber)
+		local numOwned = C_Item.GetItemCount(itemID);
+		local icon = C_Item.GetItemIconByID(itemID);
+		if numOwned and icon then
+			local subtext;
+			local color;
+			if requiredNumber then
+				subtext = string.format("%d / %d |T%s:16:16|t", numOwned, requiredNumber, icon);
+				if numOwned < requiredNumber then
+					color = Colors.Red;
+				else
+					color = Colors.White;
+				end
+			else
+				subtext = string.format("%d |T%s:16:16|t", numOwned, icon);
+				color = Colors.White;
+			end
+			return subtext, color
+		end
+	end
 
 
-    local function SubtextFunc_AncientMana()
-        return SubtextFunc_Currency(1155, true)
-    end
-    SpecialGameObjects[252408] = SubtextFunc_AncientMana;   --Ancient Mana Shard +15
-    SpecialGameObjects[252772] = SubtextFunc_AncientMana;   --Ancient Mana Shard +30
-    SpecialGameObjects[252774] = SubtextFunc_AncientMana;   --Ancient Mana Shard +50 (item)
+	local function SubtextFunc_RestoredCofferKey()
+		return SubtextFunc_Currency(3028, false, 1)
+	end
+	SpecialGameObjects[413590] = SubtextFunc_RestoredCofferKey;
 
 
-    local function SubtextFunc_MisplacedTome()
-        return SubtextFunc_Item(242241)
-    end
-    SpecialGameObjects[531478] = SubtextFunc_MisplacedTome;
+	local function SubtextFunc_AncientMana()
+		return SubtextFunc_Currency(1155, true)
+	end
+	SpecialGameObjects[252408] = SubtextFunc_AncientMana;   --Ancient Mana Shard +15
+	SpecialGameObjects[252772] = SubtextFunc_AncientMana;   --Ancient Mana Shard +30
+	SpecialGameObjects[252774] = SubtextFunc_AncientMana;   --Ancient Mana Shard +50 (item)
+
+
+	local function SubtextFunc_MisplacedTome()
+		return SubtextFunc_Item(242241)
+	end
+	SpecialGameObjects[531478] = SubtextFunc_MisplacedTome;
 end

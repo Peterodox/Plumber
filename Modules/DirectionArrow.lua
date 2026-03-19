@@ -20,32 +20,32 @@ ArrowTexture:SetTexture("Interface/AddOns/Plumber/Art/MapPin/DirectionArrow_Angl
 local Title = MainFrame:CreateFontString(nil, "OVERLAY");
 
 local function SetArrowRadian(radian)
-    local n = floor( (deg(radian) + 2.5) * 0.2 ) + 1;    -- /5
-    if n > 72 then
-        n = 1;
-    end
-    local row = floor(n / 8);
-    local col = floor(n % 8);
-    if col == 0 then
-        col = 8;
-        row = row - 1;
-    end
-    col = col - 1;
-    ArrowTexture:SetTexCoord(0.125*col, 0.125*col + 0.125, 0.0625*row, 0.0625*row + 0.0625);
+	local n = floor( (deg(radian) + 2.5) * 0.2 ) + 1;    -- /5
+	if n > 72 then
+		n = 1;
+	end
+	local row = floor(n / 8);
+	local col = floor(n % 8);
+	if col == 0 then
+		col = 8;
+		row = row - 1;
+	end
+	col = col - 1;
+	ArrowTexture:SetTexCoord(0.125*col, 0.125*col + 0.125, 0.0625*row, 0.0625*row + 0.0625);
 end
 SetArrowRadian(0);
 
 MainFrame:SetScript("OnUpdate", function(self, elapsed)
-    self.t = self.t + elapsed;
-    if self.t > 0.016 then
-        self.t = 0;
-        self.facing = GetPlayerFacing();
-        if self.facing then
-            SetArrowRadian(self.facing);
-        else
+	self.t = self.t + elapsed;
+	if self.t > 0.016 then
+		self.t = 0;
+		self.facing = GetPlayerFacing();
+		if self.facing then
+			SetArrowRadian(self.facing);
+		else
 
-        end
-    end
+		end
+	end
 end);
 
 
@@ -53,6 +53,6 @@ end);
 --MainFrame:RegisterEvent("UI_SCALE_CHANGED");
 
 MainFrame:SetScript("OnEvent", function(self, event, ...)
-    local px = API.GetPixelForWidget(self);
-    self:SetSize(64*px, 64*px);
+	local px = API.GetPixelForWidget(self);
+	self:SetSize(64*px, 64*px);
 end);

@@ -7,7 +7,7 @@
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture parentKey="Icon"> <!-- atlas="Navigation-Tracked-Icon" useAtlasSize="true" -->
-                    <Size x="32" y="32"/>
+					<Size x="32" y="32"/>
 					<Anchors>
 						<Anchor point="CENTER"/>
 					</Anchors>
@@ -20,7 +20,7 @@
 				</Texture>
 				<FontString parentKey="Title" inherits="GameFontNormalSmall" justifyH="CENTER" justifyV="TOP" hidden="true" maxLines="1">
 					<Size x="120" y="0"/>
-                    <Color r="1" g="1" b="1"/>
+					<Color r="1" g="1" b="1"/>
 					<Anchors>
 						<Anchor point="TOP" relativeKey="$parent.Icon" relativePoint="BOTTOM" x="0" y="2"/>
 					</Anchors>

@@ -15,137 +15,137 @@ addon.StaticPopupUtil = StaticPopupUtil;
 
 
 function StaticPopupUtil:FindFrame(which)
-    local f;
-    for i = 1, 3 do
-        f = _G["StaticPopup"..i];
-        if f and f:IsShown() and f.which == which then
-            return f
-        end
-    end
+	local f;
+	for i = 1, 3 do
+		f = _G["StaticPopup"..i];
+		if f and f:IsShown() and f.which == which then
+			return f
+		end
+	end
 end
 
 function StaticPopupUtil:AddTooltipInfoCallback(dataInstanceID, callback)
-    if not self.dataInstanceCallbacks then
-        self.dataInstanceCallbacks = {};
-    end
-    self.dataInstanceCallbacks[dataInstanceID] = callback;
-    self:RegisterEvent("TOOLTIP_DATA_UPDATE");
-    self:RequestUpdate();
+	if not self.dataInstanceCallbacks then
+		self.dataInstanceCallbacks = {};
+	end
+	self.dataInstanceCallbacks[dataInstanceID] = callback;
+	self:RegisterEvent("TOOLTIP_DATA_UPDATE");
+	self:RequestUpdate();
 end
 
 function StaticPopupUtil:OnEvent(event, ...)
-    if event == "TOOLTIP_DATA_UPDATE" then
-        local dataInstanceID = ...
-        if self.dataInstanceCallbacks[dataInstanceID] then
-            self.dataInstanceCallbacks[dataInstanceID]();
-        end
-    end
+	if event == "TOOLTIP_DATA_UPDATE" then
+		local dataInstanceID = ...
+		if self.dataInstanceCallbacks[dataInstanceID] then
+			self.dataInstanceCallbacks[dataInstanceID]();
+		end
+	end
 end
 StaticPopupUtil:SetScript("OnEvent", StaticPopupUtil.OnEvent);
 
 function StaticPopupUtil:AttachWidgetToStaticPopup(which, widget, direction)
-    local f = self:FindFrame(which);
-    if not f then return false end;
+	local f = self:FindFrame(which);
+	if not f then return false end;
 
-    local point, offsetY;
+	local point, offsetY;
 
-    if direction == "TOP" then
-        point = "BOTTOM";
-        offsetY = f:GetTop() + 4;
-    else
-        point = "TOP";
-        offsetY = f:GetBottom() - 12;   --To avoide "YES" "NO" button
-    end
+	if direction == "TOP" then
+		point = "BOTTOM";
+		offsetY = f:GetTop() + 4;
+	else
+		point = "TOP";
+		offsetY = f:GetBottom() - 12;   --To avoide "YES" "NO" button
+	end
 
-    widget:ClearAllPoints();
-    widget:SetPoint(point, UIParent, "BOTTOM", 0, offsetY);
+	widget:ClearAllPoints();
+	widget:SetPoint(point, UIParent, "BOTTOM", 0, offsetY);
 
-    if not self.widgetOwners then
-        self.widgetOwners = {};
-    end
-    self.widgetOwners[f] = which;
+	if not self.widgetOwners then
+		self.widgetOwners = {};
+	end
+	self.widgetOwners[f] = which;
 
-    if not self.popupWidgets then
-        self.popupWidgets = {};
-    end
-    self.popupWidgets[which] = widget;
+	if not self.popupWidgets then
+		self.popupWidgets = {};
+	end
+	self.popupWidgets[which] = widget;
 
-    self:RequestUpdate();
+	self:RequestUpdate();
 
-    return true
+	return true
 end
 
 function StaticPopupUtil:CreateSimpleTooltip()
-    if self.Tooltip then return end;
-    self.Tooltip = addon.CreateSimpleTooltip(UIParent);
+	if self.Tooltip then return end;
+	self.Tooltip = addon.CreateSimpleTooltip(UIParent);
 end
 
 function StaticPopupUtil:HideSimpleTooltip()
-    if self.Tooltip then
-        self.Tooltip:Hide();
-        self.Tooltip:ClearAllPoints();
-    end
+	if self.Tooltip then
+		self.Tooltip:Hide();
+		self.Tooltip:ClearAllPoints();
+	end
 end
 
 function StaticPopupUtil:ShowSimpleTooltip(which, title, description, direction)
-    if title then
-        self:CreateSimpleTooltip();
-        self.Tooltip:SetText(title, description);
-        self.Tooltip:Show();
-        return self:AttachWidgetToStaticPopup(which, self.Tooltip, direction);
-    else
-        self:HideSimpleTooltip();
-        return false
-    end
+	if title then
+		self:CreateSimpleTooltip();
+		self.Tooltip:SetText(title, description);
+		self.Tooltip:Show();
+		return self:AttachWidgetToStaticPopup(which, self.Tooltip, direction);
+	else
+		self:HideSimpleTooltip();
+		return false
+	end
 end
 
 function StaticPopupUtil:GetTooltipFrame()
-    return self.Tooltip
+	return self.Tooltip
 end
 
 function StaticPopupUtil:HidePopupWidget(which)
-    if self.popupWidgets then
-        if self.popupWidgets[which] then
-            self.popupWidgets[which]:Hide();
-            self.popupWidgets[which]:ClearAllPoints();
-            self.popupWidgets[which] = nil;
-        end
-    end
+	if self.popupWidgets then
+		if self.popupWidgets[which] then
+			self.popupWidgets[which]:Hide();
+			self.popupWidgets[which]:ClearAllPoints();
+			self.popupWidgets[which] = nil;
+		end
+	end
 end
 
 function StaticPopupUtil:CheckPopupVisibilities()
-    if self.widgetOwners then
-        for popup, which in pairs(self.widgetOwners) do
-            if (popup:IsVisible() and popup.which == which) then
-                return
-            end
-        end
-    end
+	if self.widgetOwners then
+		for popup, which in pairs(self.widgetOwners) do
+			if (popup:IsVisible() and popup.which == which) then
+				return
+			end
+		end
+	end
 
-    self:SetScript("OnUpdate", nil);
-    self.updateTimer = 0;
-    self.widgetOwners = nil;
-    self:UnregisterEvent("TOOLTIP_DATA_UPDATE");
-    self.dataInstanceCallbacks = nil;
+	self:SetScript("OnUpdate", nil);
+	self.updateTimer = 0;
+	self.widgetOwners = nil;
+	self:UnregisterEvent("TOOLTIP_DATA_UPDATE");
+	self.dataInstanceCallbacks = nil;
 
-    if self.popupWidgets then
-        for which, widget in pairs(self.popupWidgets) do
-            widget:Hide();
-            widget:ClearAllPoints();
-        end
-        self.popupWidgets = nil;
-    end
+	if self.popupWidgets then
+		for which, widget in pairs(self.popupWidgets) do
+			widget:Hide();
+			widget:ClearAllPoints();
+		end
+		self.popupWidgets = nil;
+	end
 end
 
 function StaticPopupUtil:OnUpdate(elapsed)
-   self.updateTimer = self.updateTimer + elapsed;
-    if self.updateTimer > 0.2 then
-        self.updateTimer = 0;
-        self:CheckPopupVisibilities();
-    end
+	self.updateTimer = self.updateTimer + elapsed;
+	if self.updateTimer > 0.2 then
+		self.updateTimer = 0;
+		self:CheckPopupVisibilities();
+	end
 end
 
 function StaticPopupUtil:RequestUpdate()
-    self.updateTimer = 0;
-    self:SetScript("OnUpdate", self.OnUpdate);
+	self.updateTimer = 0;
+	self:SetScript("OnUpdate", self.OnUpdate);
 end

@@ -16,7 +16,7 @@ local Handler = Housing.HouseEditorController.CreateModeHandler("Customize");
 
 
 local function SortFunc_DyeSlots(a, b)
-    return a.orderIndex < b.orderIndex
+	return a.orderIndex < b.orderIndex
 end
 
 
@@ -26,408 +26,408 @@ Instructions.IsModifierPressed = IsControlKeyDown;
 
 local CustomizeModeCallbacks = {};
 do
-    local function IsDyeRecipeTracked(dyeColorID)
-        local recipeID = Housing.GetDyeRecipeID(dyeColorID);
-        if recipeID then
-            local isRecraft = false;
-            local tracked = C_TradeSkillUI.IsRecipeTracked(recipeID, isRecraft);
-            return tracked, recipeID
-        end
-    end
+	local function IsDyeRecipeTracked(dyeColorID)
+		local recipeID = Housing.GetDyeRecipeID(dyeColorID);
+		if recipeID then
+			local isRecraft = false;
+			local tracked = C_TradeSkillUI.IsRecipeTracked(recipeID, isRecraft);
+			return tracked, recipeID
+		end
+	end
 
-    local function ToggleTrackingDyeRecipe(dyeColorID)
-        local tracked, recipeID = IsDyeRecipeTracked(dyeColorID);
-        if recipeID then
-            local newState = not tracked;
-            local isRecraft = false;
-            C_TradeSkillUI.SetRecipeTracked(recipeID, newState, isRecraft);
-            return newState
-        end
-    end
+	local function ToggleTrackingDyeRecipe(dyeColorID)
+		local tracked, recipeID = IsDyeRecipeTracked(dyeColorID);
+		if recipeID then
+			local newState = not tracked;
+			local isRecraft = false;
+			C_TradeSkillUI.SetRecipeTracked(recipeID, newState, isRecraft);
+			return newState
+		end
+	end
 
-    local function CreateTooltipLineWithSwatch(text, dyeSlots, numSlots)
-        tsort(dyeSlots, SortFunc_DyeSlots);
-        local line = text.." ";
-        local colorID;
-        local iconMarkup;
-        numSlots = numSlots or #dyeSlots;
-        for i = 1, numSlots do
-            colorID = dyeSlots[i] and dyeSlots[i].dyeColorID or 0;
-            iconMarkup = GetSwatchMarkup(colorID);
-            line = line .. iconMarkup;
-        end
-        return line
-    end
+	local function CreateTooltipLineWithSwatch(text, dyeSlots, numSlots)
+		tsort(dyeSlots, SortFunc_DyeSlots);
+		local line = text.." ";
+		local colorID;
+		local iconMarkup;
+		numSlots = numSlots or #dyeSlots;
+		for i = 1, numSlots do
+			colorID = dyeSlots[i] and dyeSlots[i].dyeColorID or 0;
+			iconMarkup = GetSwatchMarkup(colorID);
+			line = line .. iconMarkup;
+		end
+		return line
+	end
 
-    function CustomizeModeCallbacks.ShowDecorInstanceTooltip(modeFrame, decorInstanceInfo)
-        Handler.currentDyeInfo = nil;
-        Handler:UnregisterEvent("GLOBAL_MOUSE_UP");
+	function CustomizeModeCallbacks.ShowDecorInstanceTooltip(modeFrame, decorInstanceInfo)
+		Handler.currentDyeInfo = nil;
+		Handler:UnregisterEvent("GLOBAL_MOUSE_UP");
 
-        if not Handler:IsCustomizableDecor(decorInstanceInfo) then
-            return
-        end
+		if not Handler:IsCustomizableDecor(decorInstanceInfo) then
+			return
+		end
 
-        if not Handler:IsEnabled() then return end;
+		if not Handler:IsEnabled() then return end;
 
-        local tooltip = GameTooltip;
-        if tooltip:GetOwner() == modeFrame then
-            local anyNewLine;
-            local numSlots = decorInstanceInfo.dyeSlots and #decorInstanceInfo.dyeSlots or 0;
-            if numSlots > 0 then
-                --HousingDecorDyeSlot
-                if Handler:IsDecorDyeCopied(decorInstanceInfo) then
-                    --tooltip:AddLine(CreateTooltipLineWithSwatch("Dyes Copied", decorInstanceInfo.dyeSlots), 0.5, 0.5, 0.5);
-                    tooltip:AddDoubleLine(L["Dyes Copied"], CreateTooltipLineWithSwatch("", decorInstanceInfo.dyeSlots), 0.5, 0.5, 0.5, 1, 1, 1);
-                else
-                    --tooltip:AddLine(CreateTooltipLineWithSwatch("Right Click to Copy Dyes", decorInstanceInfo.dyeSlots), 1, 0.82, 0);
-                    tooltip:AddDoubleLine(Instructions.CopyDye, CreateTooltipLineWithSwatch("", decorInstanceInfo.dyeSlots), 1, 0.82, 0, 1, 1, 1);
-                    if Handler.lastDyeSlots then
-                        --tooltip:AddLine(CreateTooltipLineWithSwatch("Ctrl Click to Apply Dyes", Handler.lastDyeSlots), 1, 0.82, 0);
-                        tooltip:AddDoubleLine(Instructions.ApplyDye, CreateTooltipLineWithSwatch("", Handler.lastDyeSlots, numSlots), 1, 0.82, 0, 1, 1, 1);
-                    end
-                end
-                anyNewLine = true;
-                Handler:RegisterEvent("GLOBAL_MOUSE_UP");
-            end
+		local tooltip = GameTooltip;
+		if tooltip:GetOwner() == modeFrame then
+			local anyNewLine;
+			local numSlots = decorInstanceInfo.dyeSlots and #decorInstanceInfo.dyeSlots or 0;
+			if numSlots > 0 then
+				--HousingDecorDyeSlot
+				if Handler:IsDecorDyeCopied(decorInstanceInfo) then
+					--tooltip:AddLine(CreateTooltipLineWithSwatch("Dyes Copied", decorInstanceInfo.dyeSlots), 0.5, 0.5, 0.5);
+					tooltip:AddDoubleLine(L["Dyes Copied"], CreateTooltipLineWithSwatch("", decorInstanceInfo.dyeSlots), 0.5, 0.5, 0.5, 1, 1, 1);
+				else
+					--tooltip:AddLine(CreateTooltipLineWithSwatch("Right Click to Copy Dyes", decorInstanceInfo.dyeSlots), 1, 0.82, 0);
+					tooltip:AddDoubleLine(Instructions.CopyDye, CreateTooltipLineWithSwatch("", decorInstanceInfo.dyeSlots), 1, 0.82, 0, 1, 1, 1);
+					if Handler.lastDyeSlots then
+						--tooltip:AddLine(CreateTooltipLineWithSwatch("Ctrl Click to Apply Dyes", Handler.lastDyeSlots), 1, 0.82, 0);
+						tooltip:AddDoubleLine(Instructions.ApplyDye, CreateTooltipLineWithSwatch("", Handler.lastDyeSlots, numSlots), 1, 0.82, 0, 1, 1, 1);
+					end
+				end
+				anyNewLine = true;
+				Handler:RegisterEvent("GLOBAL_MOUSE_UP");
+			end
 
-            if anyNewLine then
-                tooltip:Show();
-            end
-        end
-    end
+			if anyNewLine then
+				tooltip:Show();
+			end
+		end
+	end
 
-    function CustomizeModeCallbacks.ShowSelectedDecorInfo()
-        local info = C_HousingCustomizeMode.GetSelectedDecorInfo();
-        if info and info.canBeCustomized then
-            --print(GetTimePreciseSec())
-        end
-    end
-
-
-    local function DyeSlotFrameSwatch_OnEnter(self)
-        --!! Monitor Interface/AddOns/Blizzard_HouseEditor/Blizzard_HouseEditorCustomizationDyeTemplates.lua
-
-        local tooltip = GameTooltip;
-        local offsetY = 18;     --Try avoiding tooltip/swatch overlap
-
-        if self.dyeColorInfo then
-            tooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 0, offsetY);
-            GameTooltip_AddHighlightLine(tooltip, self.dyeColorInfo.name);
-            GameTooltip_AddNormalLine(tooltip, string.format(HOUSING_DECOR_CUSTOMIZATION_DYE_NUM_OWNED, self.dyeColorInfo.numOwned))
-        else
-            GameTooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 0, offsetY);
-            GameTooltip_AddHighlightLine(tooltip, HOUSING_DECOR_CUSTOMIZATION_DEFAULT_COLOR);
-        end
-
-        if not self.isCurrentSwatch then
-            PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_HOVER);
-        end
-
-        if self.dyeColorInfo then
-            local itemID = self.dyeColorInfo and self.dyeColorInfo.itemID;
-            if itemID then
-                C_Item.GetItemInfo(itemID);
-
-                local dyeColorID = self.dyeColorInfo.ID;
-                if dyeColorID and ContentTrackingUtil.IsContentTrackingEnabled() then
-                    if IsDyeRecipeTracked(dyeColorID) then
-                        local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-untracked", 16, 16, -3, 0);
-                        GameTooltip_AddColoredLine(tooltip, atlasMarkup..CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
-                    else
-                        local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-tracked", 16, 16, -3, 0);
-                        GameTooltip_AddInstructionLine(tooltip, atlasMarkup..CONTENT_TRACKING_TRACKABLE_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
-                    end
-                end
-            end
-        end
-
-        tooltip:Show();
-    end
-
-    local function DyeSlotFrameSwatch_OnClick(self, button) --Override
-        if Handler:IsEnabled() then
-            local itemID = self.dyeColorInfo and self.dyeColorInfo.itemID;
-            if itemID then
-                if IsModifiedClick("CHATLINK") then
-                    if API.ChatLinkItem(self.dyeColorInfo.itemID) then
-                        return
-                    end
-                end
-            end
-
-            if IsModifiedClick("QUESTWATCHTOGGLE") and self.dyeColorInfo and self.dyeColorInfo.ID then
-                local tracked = ToggleTrackingDyeRecipe(self.dyeColorInfo.ID);
-                if tracked ~= nil then
-                    if tracked == true then
-                        PlaySound(SOUNDKIT.CONTENT_TRACKING_START_TRACKING);
-                    else
-                        PlaySound(SOUNDKIT.CONTENT_TRACKING_STOP_TRACKING);
-                    end
-
-                    if self:IsMouseMotionFocus() then
-                        self:OnEnter();
-                        DyeSlotFrameSwatch_OnEnter(self);
-                    end
-                end
-                return
-            end
+	function CustomizeModeCallbacks.ShowSelectedDecorInfo()
+		local info = C_HousingCustomizeMode.GetSelectedDecorInfo();
+		if info and info.canBeCustomized then
+			--print(GetTimePreciseSec())
+		end
+	end
 
 
-            --Click the same button to close popup
-            local pane = Handler.DyePane;
-            if pane and Handler.DyePopout and Handler.DyePopout:IsShown() and pane.dyeSlotFramesByChannel and pane.currentChannel and pane.dyeSlotFramesByChannel[pane.currentChannel] == self:GetParent() then
-                Handler.DyePopout:Hide();
-                self:UpdateSelected(false)
-                return
-            end
-        end
+	local function DyeSlotFrameSwatch_OnEnter(self)
+		--!! Monitor Interface/AddOns/Blizzard_HouseEditor/Blizzard_HouseEditorCustomizationDyeTemplates.lua
 
-        if self.onClickCallback then
-            self.onClickCallback(self);
+		local tooltip = GameTooltip;
+		local offsetY = 18;     --Try avoiding tooltip/swatch overlap
 
-            if not self.isCurrentSwatch then
-                PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_SELECT);
-            end
-        end
-    end
+		if self.dyeColorInfo then
+			tooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 0, offsetY);
+			GameTooltip_AddHighlightLine(tooltip, self.dyeColorInfo.name);
+			GameTooltip_AddNormalLine(tooltip, string.format(HOUSING_DECOR_CUSTOMIZATION_DYE_NUM_OWNED, self.dyeColorInfo.numOwned))
+		else
+			GameTooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 0, offsetY);
+			GameTooltip_AddHighlightLine(tooltip, HOUSING_DECOR_CUSTOMIZATION_DEFAULT_COLOR);
+		end
+
+		if not self.isCurrentSwatch then
+			PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_HOVER);
+		end
+
+		if self.dyeColorInfo then
+			local itemID = self.dyeColorInfo and self.dyeColorInfo.itemID;
+			if itemID then
+				C_Item.GetItemInfo(itemID);
+
+				local dyeColorID = self.dyeColorInfo.ID;
+				if dyeColorID and ContentTrackingUtil.IsContentTrackingEnabled() then
+					if IsDyeRecipeTracked(dyeColorID) then
+						local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-untracked", 16, 16, -3, 0);
+						GameTooltip_AddColoredLine(tooltip, atlasMarkup..CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
+					else
+						local atlasMarkup = CreateAtlasMarkup("waypoint-mappin-minimap-tracked", 16, 16, -3, 0);
+						GameTooltip_AddInstructionLine(tooltip, atlasMarkup..CONTENT_TRACKING_TRACKABLE_TOOLTIP_PROMPT, GREEN_FONT_COLOR);
+					end
+				end
+			end
+		end
+
+		tooltip:Show();
+	end
+
+	local function DyeSlotFrameSwatch_OnClick(self, button) --Override
+		if Handler:IsEnabled() then
+			local itemID = self.dyeColorInfo and self.dyeColorInfo.itemID;
+			if itemID then
+				if IsModifiedClick("CHATLINK") then
+					if API.ChatLinkItem(self.dyeColorInfo.itemID) then
+						return
+					end
+				end
+			end
+
+			if IsModifiedClick("QUESTWATCHTOGGLE") and self.dyeColorInfo and self.dyeColorInfo.ID then
+				local tracked = ToggleTrackingDyeRecipe(self.dyeColorInfo.ID);
+				if tracked ~= nil then
+					if tracked == true then
+						PlaySound(SOUNDKIT.CONTENT_TRACKING_START_TRACKING);
+					else
+						PlaySound(SOUNDKIT.CONTENT_TRACKING_STOP_TRACKING);
+					end
+
+					if self:IsMouseMotionFocus() then
+						self:OnEnter();
+						DyeSlotFrameSwatch_OnEnter(self);
+					end
+				end
+				return
+			end
 
 
-    function CustomizeModeCallbacks.DyePaneSetDecorInfo(self, decorInstanceInfo)
-        if not Handler:IsEnabled() then return end;
+			--Click the same button to close popup
+			local pane = Handler.DyePane;
+			if pane and Handler.DyePopout and Handler.DyePopout:IsShown() and pane.dyeSlotFramesByChannel and pane.currentChannel and pane.dyeSlotFramesByChannel[pane.currentChannel] == self:GetParent() then
+				Handler.DyePopout:Hide();
+				self:UpdateSelected(false)
+				return
+			end
+		end
 
-        for dyeSlotFrame in self.dyeSlotPool:EnumerateActive() do
-            if dyeSlotFrame.dyeSlotInfo and dyeSlotFrame.CurrentSwatch.dyeColorInfo then
-                dyeSlotFrame.Label:SetPoint("LEFT", dyeSlotFrame, "LEFT", 52, 0);
-                dyeSlotFrame.Label:SetSpacing(2);
-                dyeSlotFrame.Label:SetHeight(32);
-                dyeSlotFrame.Label:SetText(dyeSlotFrame.CurrentSwatch.dyeColorInfo.name);
-                local itemID = dyeSlotFrame.dyeSlotInfo.itemID;
-                if itemID then
-                    C_Item.GetItemInfo(itemID);
-                end
-            end
+		if self.onClickCallback then
+			self.onClickCallback(self);
 
-            if not dyeSlotFrame.hookedByPlumber then
-                dyeSlotFrame.hookedByPlumber = true;
-                dyeSlotFrame.CurrentSwatch:SetScript("OnClick", DyeSlotFrameSwatch_OnClick);
-                dyeSlotFrame.CurrentSwatch:SetScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
-            end
-        end
-    end
+			if not self.isCurrentSwatch then
+				PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_SELECT);
+			end
+		end
+	end
 
 
-    local function ModifySwatchPool(pool)
-        if not pool then return end;
-        for swatch in pool:EnumerateActive() do
-            if not swatch.hookedByPlumber then
-                swatch.hookedByPlumber = true;
-                swatch:SetScript("OnClick", DyeSlotFrameSwatch_OnClick);
-                swatch:SetScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
-            end
-        end
-    end
+	function CustomizeModeCallbacks.DyePaneSetDecorInfo(self, decorInstanceInfo)
+		if not Handler:IsEnabled() then return end;
 
-    function CustomizeModeCallbacks.DyePopoutSetDyeSlotInfo(self)
-        ModifySwatchPool(self.recentSwatchPool);
-        ModifySwatchPool(self.dyeSwatchPool);
-    end
+		for dyeSlotFrame in self.dyeSlotPool:EnumerateActive() do
+			if dyeSlotFrame.dyeSlotInfo and dyeSlotFrame.CurrentSwatch.dyeColorInfo then
+				dyeSlotFrame.Label:SetPoint("LEFT", dyeSlotFrame, "LEFT", 52, 0);
+				dyeSlotFrame.Label:SetSpacing(2);
+				dyeSlotFrame.Label:SetHeight(32);
+				dyeSlotFrame.Label:SetText(dyeSlotFrame.CurrentSwatch.dyeColorInfo.name);
+				local itemID = dyeSlotFrame.dyeSlotInfo.itemID;
+				if itemID then
+					C_Item.GetItemInfo(itemID);
+				end
+			end
+
+			if not dyeSlotFrame.hookedByPlumber then
+				dyeSlotFrame.hookedByPlumber = true;
+				dyeSlotFrame.CurrentSwatch:SetScript("OnClick", DyeSlotFrameSwatch_OnClick);
+				dyeSlotFrame.CurrentSwatch:SetScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
+			end
+		end
+	end
+
+
+	local function ModifySwatchPool(pool)
+		if not pool then return end;
+		for swatch in pool:EnumerateActive() do
+			if not swatch.hookedByPlumber then
+				swatch.hookedByPlumber = true;
+				swatch:SetScript("OnClick", DyeSlotFrameSwatch_OnClick);
+				swatch:SetScript("OnEnter", DyeSlotFrameSwatch_OnEnter);
+			end
+		end
+	end
+
+	function CustomizeModeCallbacks.DyePopoutSetDyeSlotInfo(self)
+		ModifySwatchPool(self.recentSwatchPool);
+		ModifySwatchPool(self.dyeSwatchPool);
+	end
 end
 
 
 do
-    function Handler:Init()
-        --CustomizeMode
-        self.Init = nil;
+	function Handler:Init()
+		--CustomizeMode
+		self.Init = nil;
 
-        local CustomizeModeFrame = HouseEditorFrame.CustomizeModeFrame;
-        self.parentFrame = CustomizeModeFrame;
-        self.DyePane = self.parentFrame.DecorCustomizationsPane;
-        self.DyePopout = DyeSelectionPopout;
-
-
-        hooksecurefunc(CustomizeModeFrame, "ShowDecorInstanceTooltip", CustomizeModeCallbacks.ShowDecorInstanceTooltip);
-        --hooksecurefunc(CustomizeModeFrame, "ShowSelectedDecorInfo", CustomizeModeCallbacks.ShowSelectedDecorInfo);
-        hooksecurefunc(self.DyePane, "SetDecorInfo", CustomizeModeCallbacks.DyePaneSetDecorInfo);
-        hooksecurefunc(self.DyePopout, "SetDyeSlotInfo", CustomizeModeCallbacks.DyePopoutSetDyeSlotInfo);
+		local CustomizeModeFrame = HouseEditorFrame.CustomizeModeFrame;
+		self.parentFrame = CustomizeModeFrame;
+		self.DyePane = self.parentFrame.DecorCustomizationsPane;
+		self.DyePopout = DyeSelectionPopout;
 
 
-        --Fixed an issue where tooltip doesn't update when closing DyePane while the cursor hovers on the same decor
-        self.DyePane:HookScript("OnHide", function()
-            Handler:TriggerCursorBlocker();
-        end);
-        self.DyePane:HookScript("OnShow", function()
-            Handler:TriggerCursorBlocker();
-        end);
+		hooksecurefunc(CustomizeModeFrame, "ShowDecorInstanceTooltip", CustomizeModeCallbacks.ShowDecorInstanceTooltip);
+		--hooksecurefunc(CustomizeModeFrame, "ShowSelectedDecorInfo", CustomizeModeCallbacks.ShowSelectedDecorInfo);
+		hooksecurefunc(self.DyePane, "SetDecorInfo", CustomizeModeCallbacks.DyePaneSetDecorInfo);
+		hooksecurefunc(self.DyePopout, "SetDyeSlotInfo", CustomizeModeCallbacks.DyePopoutSetDyeSlotInfo);
 
 
-        self.CursorBlocker = CreateFrame("Button", nil, self.parentFrame);
-        self.CursorBlocker:SetSize(8, 8);
-        self.CursorBlocker:Hide();
+		--Fixed an issue where tooltip doesn't update when closing DyePane while the cursor hovers on the same decor
+		self.DyePane:HookScript("OnHide", function()
+			Handler:TriggerCursorBlocker();
+		end);
+		self.DyePane:HookScript("OnShow", function()
+			Handler:TriggerCursorBlocker();
+		end);
 
 
-        --Save Hide Unavailable State
-        self.DyePopout.ShowOnlyOwned:SetChecked(addon.GetDBBool("Housing_DyePopout_ShowOnlyOwned") or false);
-        self.DyePopout.ShowOnlyOwned:HookScript("OnClick", function(self)
-            addon.SetDBValue("Housing_DyePopout_ShowOnlyOwned", self:GetChecked());
-        end);
-    end
-
-    function Handler:OnActivated()
-        self:LoadSettings();
-        self:SetScript("OnEvent", self.OnEvent);
-    end
-
-    function Handler:OnDeactivated()
-        self:SetScript("OnEvent", nil);
-        self:UnregisterEvent("GLOBAL_MOUSE_UP");
-        self.CursorBlocker:Hide();
-        self.currentDyeInfo = nil;
-        self.lastDyeSlots = nil;
-        self.lastDyeInfo = nil;
-    end
+		self.CursorBlocker = CreateFrame("Button", nil, self.parentFrame);
+		self.CursorBlocker:SetSize(8, 8);
+		self.CursorBlocker:Hide();
 
 
-    function Handler:LoadSettings()
-        Instructions.CopyDye = L["InstructionFormat Right Click"]:format(L["Copy Dyes"]);
-        Instructions.ApplyDye = L["InstructionFormat Ctrl Left Click"]:format(L["Preview Dyes"]);   --L["Apply Dyes"]
-        Instructions.IsModifierPressed = IsControlKeyDown;
-    end
+		--Save Hide Unavailable State
+		self.DyePopout.ShowOnlyOwned:SetChecked(addon.GetDBBool("Housing_DyePopout_ShowOnlyOwned") or false);
+		self.DyePopout.ShowOnlyOwned:HookScript("OnClick", function(_self)
+			addon.SetDBValue("Housing_DyePopout_ShowOnlyOwned", _self:GetChecked());
+		end);
+	end
 
-    function Handler:OnEvent(event, ...)
-        if event == "GLOBAL_MOUSE_UP" then
-            self:OnGlobalMouseUp(...);
-        end
-    end
+	function Handler:OnActivated()
+		self:LoadSettings();
+		self:SetScript("OnEvent", self.OnEvent);
+	end
 
-    function Handler:OnGlobalMouseUp(button)
-        if button == "RightButton" then
-            self:TryCopyDecorDyes();
-        elseif button == "LeftButton" and Instructions.IsModifierPressed() then
-            self:TryPasteCustomization();
-        end
-    end
-
-    function Handler:IsCustomizableDecor(decorInstanceInfo)
-        if decorInstanceInfo and (not decorInstanceInfo.isLocked) and decorInstanceInfo.canBeCustomized then
-            return decorInstanceInfo.dyeSlots and #decorInstanceInfo.dyeSlots
-        end
-    end
-
-    function Handler:TryCopyDecorDyes()
-        if IsHoveringDecor() then
-            local decorInstanceInfo = GetHoveredDecorInfo();
-            if self:IsCustomizableDecor(decorInstanceInfo) then
-                self.lastDyeInfo = {};
-                self.lastDyeSlots = decorInstanceInfo.dyeSlots;
-                tsort(self.lastDyeSlots, SortFunc_DyeSlots);
-
-                for i, v in ipairs(self.lastDyeSlots) do
-                    self.lastDyeInfo[i] = v.dyeColorID or 0;
-                end
-
-                if self.parentFrame then
-                    GameTooltip:Hide();
-                    self.parentFrame:OnDecorHovered();
-                end
-
-                if C_HousingCustomizeMode.IsDecorSelected() then
-                    local openedInfo = C_HousingCustomizeMode.GetSelectedDecorInfo();
-                    if self:IsCustomizableDecor(openedInfo) then
-                        self:TryPasteCustomization();
-                    end
-                end
-            end
-        end
-    end
-
-    function Handler:IsDecorDyeCopied(decorInstanceInfo)
-        if self.lastDyeInfo then
-            local dyeSlots = decorInstanceInfo.dyeSlots;
-            tsort(dyeSlots, SortFunc_DyeSlots);
-            for i, v in ipairs(dyeSlots) do
-                if not (v.dyeColorID and self.lastDyeInfo[i] == v.dyeColorID) then
-                    return false
-                end
-            end
-            return true
-        end
-    end
-
-    function Handler:TriggerCursorBlocker()
-        if not self:IsEnabled() then return end;
-
-        if not self.blockerShown then
-            local x, y = InputUtil.GetCursorPosition(self.parentFrame)
-            self.CursorBlocker:ClearAllPoints();
-            self.CursorBlocker:SetPoint("CENTER", self.parentFrame, "BOTTOMLEFT", x, y);
-            self.CursorBlocker:Show();
-            self.blockerShown = true;
-            C_Timer.After(0.0, function()
-                self.blockerShown = nil;
-                self.CursorBlocker:Hide();
-            end);
-        end
-    end
-
-    function Handler:TryPasteCustomization()
-        --print(GetTimePreciseSec(), "Paste")
+	function Handler:OnDeactivated()
+		self:SetScript("OnEvent", nil);
+		self:UnregisterEvent("GLOBAL_MOUSE_UP");
+		self.CursorBlocker:Hide();
+		self.currentDyeInfo = nil;
+		self.lastDyeSlots = nil;
+		self.lastDyeInfo = nil;
+	end
 
 
-        if not self.lastDyeInfo then return end;
+	function Handler:LoadSettings()
+		Instructions.CopyDye = L["InstructionFormat Right Click"]:format(L["Copy Dyes"]);
+		Instructions.ApplyDye = L["InstructionFormat Ctrl Left Click"]:format(L["Preview Dyes"]);   --L["Apply Dyes"]
+		Instructions.IsModifierPressed = IsControlKeyDown;
+	end
 
-        local info = C_HousingCustomizeMode.GetSelectedDecorInfo();
-        if info and info.canBeCustomized then
-            local dyeSlots = info.dyeSlots;
-            tsort(dyeSlots, SortFunc_DyeSlots);
+	function Handler:OnEvent(event, ...)
+		if event == "GLOBAL_MOUSE_UP" then
+			self:OnGlobalMouseUp(...);
+		end
+	end
 
-            local anyDiff = false;
-            local savedColorID;
-            for i, v in ipairs(dyeSlots) do
-                savedColorID = self.lastDyeInfo[i] or 0;
-                if savedColorID ~= v.dyeColorID then
-                    anyDiff = true;
-                    v.dyeColorID = savedColorID;
-                    if savedColorID == 0 then
-                        savedColorID = nil;
-                    end
-                    C_HousingCustomizeMode.ApplyDyeToSelectedDecor(v.ID, savedColorID);
-                end
-            end
+	function Handler:OnGlobalMouseUp(button)
+		if button == "RightButton" then
+			self:TryCopyDecorDyes();
+		elseif button == "LeftButton" and Instructions.IsModifierPressed() then
+			self:TryPasteCustomization();
+		end
+	end
 
-            local autoApply = false;
-            if anyDiff and autoApply then
-                local anyChanges = C_HousingCustomizeMode.CommitDyesForSelectedDecor();
-                if anyChanges then
-                    PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_APPLY_CHANGED);
-                    C_HousingCustomizeMode.CancelActiveEditing();
-                    self:TriggerCursorBlocker();
-                end
-            end
-        end
-    end
+	function Handler:IsCustomizableDecor(decorInstanceInfo)
+		if decorInstanceInfo and (not decorInstanceInfo.isLocked) and decorInstanceInfo.canBeCustomized then
+			return decorInstanceInfo.dyeSlots and #decorInstanceInfo.dyeSlots
+		end
+	end
+
+	function Handler:TryCopyDecorDyes()
+		if IsHoveringDecor() then
+			local decorInstanceInfo = GetHoveredDecorInfo();
+			if self:IsCustomizableDecor(decorInstanceInfo) then
+				self.lastDyeInfo = {};
+				self.lastDyeSlots = decorInstanceInfo.dyeSlots;
+				tsort(self.lastDyeSlots, SortFunc_DyeSlots);
+
+				for i, v in ipairs(self.lastDyeSlots) do
+					self.lastDyeInfo[i] = v.dyeColorID or 0;
+				end
+
+				if self.parentFrame then
+					GameTooltip:Hide();
+					self.parentFrame:OnDecorHovered();
+				end
+
+				if C_HousingCustomizeMode.IsDecorSelected() then
+					local openedInfo = C_HousingCustomizeMode.GetSelectedDecorInfo();
+					if self:IsCustomizableDecor(openedInfo) then
+						self:TryPasteCustomization();
+					end
+				end
+			end
+		end
+	end
+
+	function Handler:IsDecorDyeCopied(decorInstanceInfo)
+		if self.lastDyeInfo then
+			local dyeSlots = decorInstanceInfo.dyeSlots;
+			tsort(dyeSlots, SortFunc_DyeSlots);
+			for i, v in ipairs(dyeSlots) do
+				if not (v.dyeColorID and self.lastDyeInfo[i] == v.dyeColorID) then
+					return false
+				end
+			end
+			return true
+		end
+	end
+
+	function Handler:TriggerCursorBlocker()
+		if not self:IsEnabled() then return end;
+
+		if not self.blockerShown then
+			local x, y = InputUtil.GetCursorPosition(self.parentFrame)
+			self.CursorBlocker:ClearAllPoints();
+			self.CursorBlocker:SetPoint("CENTER", self.parentFrame, "BOTTOMLEFT", x, y);
+			self.CursorBlocker:Show();
+			self.blockerShown = true;
+			C_Timer.After(0.0, function()
+				self.blockerShown = nil;
+				self.CursorBlocker:Hide();
+			end);
+		end
+	end
+
+	function Handler:TryPasteCustomization()
+		--print(GetTimePreciseSec(), "Paste")
+
+
+		if not self.lastDyeInfo then return end;
+
+		local info = C_HousingCustomizeMode.GetSelectedDecorInfo();
+		if info and info.canBeCustomized then
+			local dyeSlots = info.dyeSlots;
+			tsort(dyeSlots, SortFunc_DyeSlots);
+
+			local anyDiff = false;
+			local savedColorID;
+			for i, v in ipairs(dyeSlots) do
+				savedColorID = self.lastDyeInfo[i] or 0;
+				if savedColorID ~= v.dyeColorID then
+					anyDiff = true;
+					v.dyeColorID = savedColorID;
+					if savedColorID == 0 then
+						savedColorID = nil;
+					end
+					C_HousingCustomizeMode.ApplyDyeToSelectedDecor(v.ID, savedColorID);
+				end
+			end
+
+			local autoApply = false;
+			if anyDiff and autoApply then
+				local anyChanges = C_HousingCustomizeMode.CommitDyesForSelectedDecor();
+				if anyChanges then
+					PlaySound(SOUNDKIT.HOUSING_CUSTOMIZE_DYE_APPLY_CHANGED);
+					C_HousingCustomizeMode.CancelActiveEditing();
+					self:TriggerCursorBlocker();
+				end
+			end
+		end
+	end
 end
 
 
 do
-    local function EnableModule(state)
-        Handler:SetEnabled(state);
-    end
+	local function EnableModule(state)
+		Handler:SetEnabled(state);
+	end
 
-    local moduleData = {
-        name = L["ModuleName Housing_CustomizeMode"],
-        dbKey ="Housing_CustomizeMode",
-        description = L["ModuleDescription Housing_CustomizeMode"],
-        toggleFunc = EnableModule,
-        categoryID = 1,
-        uiOrder = 1,
-        moduleAddedTime = 1765500000,
-        categoryKeys = {
-            "Housing",
-        },
-        searchTags = {
-            "Housing",
-        },
-    };
+	local moduleData = {
+		name = L["ModuleName Housing_CustomizeMode"],
+		dbKey ="Housing_CustomizeMode",
+		description = L["ModuleDescription Housing_CustomizeMode"],
+		toggleFunc = EnableModule,
+		categoryID = 1,
+		uiOrder = 1,
+		moduleAddedTime = 1765500000,
+		categoryKeys = {
+			"Housing",
+		},
+		searchTags = {
+			"Housing",
+		},
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end

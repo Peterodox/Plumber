@@ -8,8 +8,8 @@ local API = addon.API;
 local BlizzardFrame = EventToastManagerFrame;
 
 if not BlizzardFrame then
-    print("Plumber: Cannot find EventToastManagerFrame");
-    return
+	print("Plumber: Cannot find EventToastManagerFrame");
+	return
 end
 
 local GetScaledCursorPosition = addon.API.GetScaledCursorPosition;
@@ -30,280 +30,280 @@ Module:Hide();
 
 
 local function CloseActiveToasts()
-    if BlizzardFrame.CloseActiveToasts then
-        BlizzardFrame:CloseActiveToasts();
-        BlizzardFrame:Hide();
-    end
+	if BlizzardFrame.CloseActiveToasts then
+		BlizzardFrame:CloseActiveToasts();
+		BlizzardFrame:Hide();
+	end
 end
 
 local function IsObjectFocused(obj, cursorX, cursorY)
-    if obj and obj:IsVisible() then
-        local left = obj:GetLeft();
-        if not left then return false end;
+	if obj and obj:IsVisible() then
+		local left = obj:GetLeft();
+		if not left then return false end;
 
-        local right = obj:GetRight();
-        local top = obj:GetTop();
-        local bottom = obj:GetBottom();
-        local shrinkH = (right - left) - HITBOX_MAX_WIDTH;
-        if shrinkH > 0 then
-            --if the Title is too wide, we'll shrink the hitbox
-            left = left + shrinkH*0.5;
-            right = right - shrinkH*0.5;
-        end
-        return cursorX > left and cursorX < right and cursorY > bottom and cursorY < top
-    else
-        return false
-    end
+		local right = obj:GetRight();
+		local top = obj:GetTop();
+		local bottom = obj:GetBottom();
+		local shrinkH = (right - left) - HITBOX_MAX_WIDTH;
+		if shrinkH > 0 then
+			--if the Title is too wide, we'll shrink the hitbox
+			left = left + shrinkH*0.5;
+			right = right - shrinkH*0.5;
+		end
+		return cursorX > left and cursorX < right and cursorY > bottom and cursorY < top
+	else
+		return false
+	end
 end
 
 local function HideGameTooltip()
-    GameTooltip:Hide();
+	GameTooltip:Hide();
 end
 
 local function IsMethodAvailable()
-    local methods = {
-        "PauseAnimations",
-        "ResumeAnimations",
-        "OnUpdate",
-        "eventToastPools",
-        "SetupButton",
-    };
+	local methods = {
+		"PauseAnimations",
+		"ResumeAnimations",
+		"OnUpdate",
+		"eventToastPools",
+		"SetupButton",
+	};
 
-    for _, method in ipairs(methods) do
-        if not BlizzardFrame[method] then
-            return false
-        end
-    end
+	for _, method in ipairs(methods) do
+		if not BlizzardFrame[method] then
+			return false
+		end
+	end
 
-    return true
+	return true
 end
 
 local function SetToastInteractable(toast, interactable)
-    toast:EnableMouse(interactable);
-    if toast.TitleTextMouseOverFrame then
-        toast.TitleTextMouseOverFrame:EnableMouse(interactable);
-    end
-    if toast.SubTitleMouseOverFrame then
-        toast.SubTitleMouseOverFrame:EnableMouse(interactable);
-    end
+	toast:EnableMouse(interactable);
+	if toast.TitleTextMouseOverFrame then
+		toast.TitleTextMouseOverFrame:EnableMouse(interactable);
+	end
+	if toast.SubTitleMouseOverFrame then
+		toast.SubTitleMouseOverFrame:EnableMouse(interactable);
+	end
 end
 
 local function SetAllToastsInteractable(interactable)
-    local pool = BlizzardFrame.eventToastPools;
-    if pool then
-        interactable = (interactable and true) or false;
-        for obj in pool:EnumerateActive() do
-            SetToastInteractable(obj, interactable);
-        end
+	local pool = BlizzardFrame.eventToastPools;
+	if pool then
+		interactable = (interactable and true) or false;
+		for obj in pool:EnumerateActive() do
+			SetToastInteractable(obj, interactable);
+		end
 
-        if pool.EnumerateInactive then
-            for obj in pool:EnumerateInactive() do
-                SetToastInteractable(obj, interactable);
-            end
-        elseif pool.inactiveObjects then
-            for obj in pairs(pool.inactiveObjects) do
-                SetToastInteractable(obj, interactable);
-            end
-        end
-    end
+		if pool.EnumerateInactive then
+			for obj in pool:EnumerateInactive() do
+				SetToastInteractable(obj, interactable);
+			end
+		elseif pool.inactiveObjects then
+			for obj in pairs(pool.inactiveObjects) do
+				SetToastInteractable(obj, interactable);
+			end
+		end
+	end
 end
 
 local function EventToastManager_OnSetupButton(uiTextureKit)
-    if not MODULE_ENABLED then return end;
+	if not MODULE_ENABLED then return end;
 
-    local currentToast = BlizzardFrame.currentDisplayingToast;
-    CURRENT_TOAST = currentToast;
+	local currentToast = BlizzardFrame.currentDisplayingToast;
+	CURRENT_TOAST = currentToast;
 
-    if not currentToast then
-        Module.hasTitleScript = false;
-        Module.hasSubtitleScript = false;
-        return
-    end
+	if not currentToast then
+		Module.hasTitleScript = false;
+		Module.hasSubtitleScript = false;
+		return
+	end
 
-    local toastInfo = CURRENT_TOAST.toastInfo;
-    local hasTitleScript = toastInfo and toastInfo.titleTooltip or toastInfo.titleTooltipUiWidgetSetID;
-    local hasSubtitleScript = toastInfo and toastInfo.subtitleTooltip or toastInfo.subtitleTooltipUiWidgetSetID;
+	local toastInfo = CURRENT_TOAST.toastInfo;
+	local hasTitleScript = toastInfo and toastInfo.titleTooltip or toastInfo.titleTooltipUiWidgetSetID;
+	local hasSubtitleScript = toastInfo and toastInfo.subtitleTooltip or toastInfo.subtitleTooltipUiWidgetSetID;
 
-    currentToast:EnableMouse(false);
-    if currentToast.TitleTextMouseOverFrame then
-        currentToast.TitleTextMouseOverFrame:EnableMouse(hasTitleScript);
-    end
-    if currentToast.SubTitleMouseOverFrame then
-        currentToast.SubTitleMouseOverFrame:EnableMouse(hasSubtitleScript);
-    end
+	currentToast:EnableMouse(false);
+	if currentToast.TitleTextMouseOverFrame then
+		currentToast.TitleTextMouseOverFrame:EnableMouse(hasTitleScript);
+	end
+	if currentToast.SubTitleMouseOverFrame then
+		currentToast.SubTitleMouseOverFrame:EnableMouse(hasSubtitleScript);
+	end
 
-    Module.hasTitleScript = hasTitleScript;
-    Module.hasSubtitleScript = hasSubtitleScript;
+	Module.hasTitleScript = hasTitleScript;
+	Module.hasSubtitleScript = hasSubtitleScript;
 
-    --[[
-    local pool = BlizzardFrame.eventToastPools;
-    if pool then
-        for obj in pool:EnumerateActive() do
-            SetToastInteractable(obj, false);
-        end
-    end
-    --]]
+	--[[
+	local pool = BlizzardFrame.eventToastPools;
+	if pool then
+		for obj in pool:EnumerateActive() do
+			SetToastInteractable(obj, false);
+		end
+	end
+	--]]
 end
 
 local function TopBannerManager_OnShowCallback(banner)
-    if MODULE_ENABLED then
-        Module:StartWatching();
-    end
+	if MODULE_ENABLED then
+		Module:StartWatching();
+	end
 end
 
 function Module:GetActiveToast()
-    return (_G.TopBannerMgr.currentBanner and _G.TopBannerMgr.currentBanner.frame) or (BlizzardFrame.currentDisplayingToast)
+	return (_G.TopBannerMgr.currentBanner and _G.TopBannerMgr.currentBanner.frame) or (BlizzardFrame.currentDisplayingToast)
 end
 
 function Module:StartWatching()
-    self:RegisterEvent("GLOBAL_MOUSE_DOWN");
-    self.interval = 0;
-    self.totalTime = 0;
-    self:SetScript("OnUpdate", self.OnUpdate);
-    self:Show();
+	self:RegisterEvent("GLOBAL_MOUSE_DOWN");
+	self.interval = 0;
+	self.totalTime = 0;
+	self:SetScript("OnUpdate", self.OnUpdate);
+	self:Show();
 end
 
 function Module:OnShow()
-    --print("MANAGER_SHOW");
+	--print("MANAGER_SHOW");
 end
 
 function Module:OnHide()
-    self:SetScript("OnUpdate", nil);
-    self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
-    self.interval = 0;
-    self.totalTime = 0;
-    --print("MANAGER_HIDE");
+	self:SetScript("OnUpdate", nil);
+	self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+	self.interval = 0;
+	self.totalTime = 0;
+	--print("MANAGER_HIDE");
 end
 
 function Module:OnEvent(event, ...)
-    if event == "GLOBAL_MOUSE_DOWN" then
-        local button = ...
-        if button == "RightButton" then
-            local activeBanner = self:GetActiveToast();
-            if activeBanner and activeBanner:IsShown() then
-                if activeBanner:IsMouseOver() then
-                    activeBanner:Hide();
-                    CloseActiveToasts();
-                    HideGameTooltip();
-                    if activeBanner == BossBanner then
-                        API.CloseBossBanner();
-                    end
-                end
-            else
-                self:Hide();
-            end
-        end
-    end
+	if event == "GLOBAL_MOUSE_DOWN" then
+		local button = ...
+		if button == "RightButton" then
+			local activeBanner = self:GetActiveToast();
+			if activeBanner and activeBanner:IsShown() then
+				if activeBanner:IsMouseOver() then
+					activeBanner:Hide();
+					CloseActiveToasts();
+					HideGameTooltip();
+					if activeBanner == BossBanner then
+						API.CloseBossBanner();
+					end
+				end
+			else
+				self:Hide();
+			end
+		end
+	end
 end
 
 function Module:OnUpdate(elapsed)
-    self.interval = self.interval + elapsed;
-    self.totalTime = self.totalTime + elapsed;
+	self.interval = self.interval + elapsed;
+	self.totalTime = self.totalTime + elapsed;
 
-    if self.interval > 0.2 then
-        self.interval = 0;
-        if CURRENT_TOAST and CURRENT_TOAST:IsShown() then
-            local pause = false;
-            local x, y = GetScaledCursorPosition();
-            local mouseFocus = GetMouseFocus();
+	if self.interval > 0.2 then
+		self.interval = 0;
+		if CURRENT_TOAST and CURRENT_TOAST:IsShown() then
+			local pause = false;
+			local x, y = GetScaledCursorPosition();
+			local mouseFocus = GetMouseFocus();
 
-            if mouseFocus == WorldFrame then
-                if CURRENT_TOAST.BGtext then    --WeeklyRewardToast's size is significantly larger than the black bar's
-                    pause = IsObjectFocused(CURRENT_TOAST.BGtext, x, y);
-                else
-                    pause = IsObjectFocused(CURRENT_TOAST, x, y);
-                end
-            elseif self.hasTitleScript then
-                if IsObjectFocused(CURRENT_TOAST.TitleTextMouseOverFrame, x, y) then
-                    pause = true;
-                end
-            elseif self.hasSubtitleScript then
-                if IsObjectFocused(CURRENT_TOAST.SubTitleMouseOverFrame, x, y) then
-                    pause = true;
-                end
-            end
+			if mouseFocus == WorldFrame then
+				if CURRENT_TOAST.BGtext then    --WeeklyRewardToast's size is significantly larger than the black bar's
+					pause = IsObjectFocused(CURRENT_TOAST.BGtext, x, y);
+				else
+					pause = IsObjectFocused(CURRENT_TOAST, x, y);
+				end
+			elseif self.hasTitleScript then
+				if IsObjectFocused(CURRENT_TOAST.TitleTextMouseOverFrame, x, y) then
+					pause = true;
+				end
+			elseif self.hasSubtitleScript then
+				if IsObjectFocused(CURRENT_TOAST.SubTitleMouseOverFrame, x, y) then
+					pause = true;
+				end
+			end
 
-            if pause then
-                BlizzardFrame:PauseAnimations();
-            else
-                BlizzardFrame:ResumeAnimations();
-            end
-        end
-    end
+			if pause then
+				BlizzardFrame:PauseAnimations();
+			else
+				BlizzardFrame:ResumeAnimations();
+			end
+		end
+	end
 
-    if self.totalTime > 10 then
-        self.totalTime = 8;
-        if self:GetActiveToast() == nil then
-            self:Hide();
-        end
-    end
+	if self.totalTime > 10 then
+		self.totalTime = 8;
+		if self:GetActiveToast() == nil then
+			self:Hide();
+		end
+	end
 end
 
 
 function Module:EnableModule()
-    if not IsMethodAvailable() then return end;
+	if not IsMethodAvailable() then return end;
 
-    MODULE_ENABLED = true;
-    BlizzardFrame:EnableMouse(false);
-    BlizzardFrame.OnUpdate = nil;     --Let's pray this doesn't taint
+	MODULE_ENABLED = true;
+	BlizzardFrame:EnableMouse(false);
+	BlizzardFrame.OnUpdate = nil;     --Let's pray this doesn't taint
 
-    if not self.hooked then
-        self.hooked = true;
-        hooksecurefunc(BlizzardFrame, "SetupButton", EventToastManager_OnSetupButton);
-        if TopBannerManager_Show then
-            hooksecurefunc("TopBannerManager_Show", TopBannerManager_OnShowCallback)
-        end
-    end
+	if not self.hooked then
+		self.hooked = true;
+		hooksecurefunc(BlizzardFrame, "SetupButton", EventToastManager_OnSetupButton);
+		if TopBannerManager_Show then
+			hooksecurefunc("TopBannerManager_Show", TopBannerManager_OnShowCallback)
+		end
+	end
 
-    self:SetScript("OnShow", self.OnShow);
-    self:SetScript("OnHide", self.OnHide);
-    self:SetScript("OnEvent", self.OnEvent);
-    self:SetScript("OnUpdate", self.OnUpdate);
+	self:SetScript("OnShow", self.OnShow);
+	self:SetScript("OnHide", self.OnHide);
+	self:SetScript("OnEvent", self.OnEvent);
+	self:SetScript("OnUpdate", self.OnUpdate);
 
-    if BlizzardFrame:IsShown() then
-        SetAllToastsInteractable(false);
-    end
+	if BlizzardFrame:IsShown() then
+		SetAllToastsInteractable(false);
+	end
 end
 
 function Module:DisableModule()
-    if MODULE_ENABLED then
-        MODULE_ENABLED = false;
-        BlizzardFrame:EnableMouse(DEFAULT_STATE);
-        if Original_OnUpdate then
-            BlizzardFrame.OnUpdate = Original_OnUpdate;
-        end
-        SetAllToastsInteractable(true);
-        self:SetParent(UIParent);
-        self:OnHide();
-        self:SetScript("OnUpdate", nil);
-    end
+	if MODULE_ENABLED then
+		MODULE_ENABLED = false;
+		BlizzardFrame:EnableMouse(DEFAULT_STATE);
+		if Original_OnUpdate then
+			BlizzardFrame.OnUpdate = Original_OnUpdate;
+		end
+		SetAllToastsInteractable(true);
+		self:SetParent(UIParent);
+		self:OnHide();
+		self:SetScript("OnUpdate", nil);
+	end
 end
 
 
 
 
 local function EnableModule(state)
-    if state then
-        Module:EnableModule();
-    else
-        Module:DisableModule();
-    end
+	if state then
+		Module:EnableModule();
+	else
+		Module:DisableModule();
+	end
 end
 
 do
-    local L = addon.L;
+	local L = addon.L;
 
-    local moduleData = {
-        dbKey = "BlizzFixEventToast",
-        name = L["ModuleName BlizzFixEventToast"],
-        description = L["ModuleDescription BlizzFixEventToast"],
-        toggleFunc = EnableModule,
-        categoryID = 1,
-        uiOrder = 2,
+	local moduleData = {
+		dbKey = "BlizzFixEventToast",
+		name = L["ModuleName BlizzFixEventToast"],
+		description = L["ModuleDescription BlizzFixEventToast"],
+		toggleFunc = EnableModule,
+		categoryID = 1,
+		uiOrder = 2,
 		categoryKeys = {
 			"Instance",
 		},
-    };
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end

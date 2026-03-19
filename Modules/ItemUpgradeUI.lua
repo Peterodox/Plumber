@@ -253,8 +253,10 @@ do	--Tooltip Event
 
 		if self.queuedDataInstanceIDs then
 			for dataInstanceID, itemLocation in pairs(self.queuedDataInstanceIDs) do
-				anyEntry = true;
-				break
+				if dataInstanceID then
+					anyEntry = true;
+					break
+				end
 			end
 		end
 
@@ -544,22 +546,22 @@ end
 
 
 do	--Module Registry
-    local function EnableModule(state)
-        ItemUpgradeModule.Enable(state);
-    end
+	local function EnableModule(state)
+		ItemUpgradeModule.Enable(state);
+	end
 
-    local moduleData = {
-        name = addon.L["ModuleName ItemUpgradeUI"],
-        dbKey = "ItemUpgradeUI",
-        description = addon.L["ModuleDescription ItemUpgradeUI"],
-        toggleFunc = EnableModule,
-        categoryID = 2,
-        uiOrder = 20,
-        moduleAddedTime = 1728990000,
+	local moduleData = {
+		name = addon.L["ModuleName ItemUpgradeUI"],
+		dbKey = "ItemUpgradeUI",
+		description = addon.L["ModuleDescription ItemUpgradeUI"],
+		toggleFunc = EnableModule,
+		categoryID = 2,
+		uiOrder = 20,
+		moduleAddedTime = 1728990000,
 		categoryKeys = {
 			"Inventory",
 		},
-    };
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end

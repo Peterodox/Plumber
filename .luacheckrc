@@ -1,14 +1,18 @@
 max_line_length = false
 
 exclude_files = {
+	"Modules/AccountStore.lua",
 	"Modules/DevTool.lua",
 	"Modules/DevTool_HyperlinkEditor.lua",
+	"Modules/DruidModelFix.lua",
+	"Modules/MerchantUI",
 };
 
 ignore = {
+	-- Ignore empty if branch
+	"542",
+
 	-- Ignore global writes/accesses/mutations on anything prefixed with
-	-- "Plumber_". This is the standard prefix for all of our global frame names
-	-- and mixins.
 	"11./^Plumber_",
 	"11./^PlumberFont_",
 
@@ -17,16 +21,56 @@ ignore = {
 };
 
 globals = {
-	-- Globals
-	"PlumberGlobals",
+	"Narci_Attribute",
+	"NarciPaperDollWidgetController",
+	"PlumberAPI_AddQuickSlotController",
 	"PlumberDB",
-	"PlumberDevData",
-	"PlumberStorage",
 	"PlumberDB_PC",
+	"PlumberDevData",
+	"PlumberDreamseedMapPinMixin",
+	"PlumberEquipmentFlyoutItemButtonMixin",
+	"PlumberExpansionLandingPage",
+	"PlumberExpansionLandingPageMixin",
+	"PlumberGlobals",
+	"PlumberLandingPageMinimapButtonMixin",
+	"PlumberLootUIFont",
+	"PlumberStorage",
+	"PlumberSuperTrackingMixin",
+	"PlumberWorldMapPinMixin",
 };
 
 read_globals = {
-
+	"AdiBagsContainer1",
+	"AdiBagsBagAnchor1",
+	"ARKINV_Frame1",
+	"Baganator",
+	"BagnonContainerItem1",
+	"BagnonInventory1",
+	"Bagnon",
+	"BetterBagsBagBackpack",
+	"BetterWardrobeCollectionFrame",
+	"CSPilvl",
+	"ConsolePort",
+	"DialogueUIAPI",
+	"EditModeExpandedWarningFrame",
+	"EditModeManagerExpandedFrame",
+	"ElvUI",
+	"ElvUI_ContainerFrame",
+	"GwDressingRoom",
+	"GwDressingRoomGear",
+	"ImmersionFrame",
+	"LeaPlusDB",
+	"LibStub",
+	"LiteBagBackpack",
+	"MacroToolkit",
+	"MacroToolkitFrame",
+	"MacroToolkitSave",
+	"MacroToolkitText",
+	"MerchantFrameCoverTab",
+	"NDui_BackpackBag",
+	"Storyline_DialogChoicesScrollFrame",
+	"TomTom",
+	"TomTomCrazyArrow",
 };
 
 std = "lua51+wow";
@@ -34,25 +78,431 @@ std = "lua51+wow";
 stds.wow = {
 	-- Globals that we mutate.
 	globals = {
+		"BossBanner",
+		"DelvesCompanionConfigurationFrame",
+		"DifficultyUtil",
+		"EventToastManagerFrame",
+		"EventToastManagerFrameMixin",
+		"GossipFrame",
 		"SlashCmdList",
 		"StaticPopupDialogs",
+		"WardrobeItemModelMixin",
+		"WardrobeItemsCollectionSlotButtonMixin",
+
+		GameTooltip = {
+			fields = {
+				"factionID",
+				"suppressAutomaticCompareItem",
+			},
+		},
 	},
 
 	-- Globals that we access.
 	read_globals = {
-		-- Lua function aliases and extensions
-
-		-- string = {
-		-- 	fields = {
-
-		-- 	},
-		-- },
-
+		"AbbreviateNumbers",
+		"AbbreviateLargeNumbers",
+		"AccountStoreFrame",
+		"AchievementFrameAchievements_ForceUpdate",
+		"AddTrackedAchievement",
+		"AddonCompartmentFrame",
+		"AlertFrame",
+		"ArtifactFrame",
+		"AutoScalingFontStringMixin",
+		"BackpackTokenFrame",
+		"BossBanner_OnEvent",
+		"BreakUpLargeNumbers",
+		"CalculateTotalNumberOfFreeBagSlots",
+		"canaccessvalue",
+		"CastSpell",
+		"CharacterFrame",
+		"CharacterStatsPane",
+		"ChatEdit_InsertLink",
+		"ChatEdit_LinkItem",
+		"ChatFrame1",
+		"CinematicFrame",
+		"ClampedPercentageBetween",
+		"ClearAllLFGDungeons",
+		"ClearCursor",
+		"CloseLoot",
+		"ContainerFrame1",
+		"ContainerFrameCombinedBags",
+		"CreateAtlasMarkup",
+		"CreateColor",
+		"CreateDataProvider",
+		"CreateFont",
+		"CreateFrame",
+		"CreateFromMixins",
+		"CreateKeyChordStringUsingMetaKeyState",
+		"CreateMacro",
+		"CreateVector2D",
+		"CursorHasItem",
 		"date",
+		"DeleteMacro",
+		"DelvesDashboardFrame",
+		"DressUpFrame",
+		"DressUpItemLocation",
+		"DressUpItemTransmogInfoList",
+		"DressUpLink",
+		"DressUpVisual",
+		"DyeSelectionPopout",
+		"EditMacro",
+		"EditModeManagerFrame",
+		"EJ_ClearSearch",
+		"EJ_ContentTab_Select",
+		"EJ_GetCreatureInfo",
+		"EJ_GetEncounterInfo",
+		"EJ_GetEncounterInfoByIndex",
+		"EJ_GetInstanceInfo",
+		"EJ_GetNumLoot",
+		"EJ_GetNumSearchResults",
+		"EJ_GetSearchResult",
+		"EJ_IsSearchFinished",
+		"EJ_IsValidInstanceDifficulty",
+		"EJ_SelectEncounter",
+		"EJ_SelectInstance",
+		"EJ_SelectTier",
+		"EJ_SetDifficulty",
+		"EJ_SetLootFilter",
+		"EJ_SetSearch",
+		"EmbeddedItemTooltip",
+		"EncounterJournal",
+		"EncounterJournal_LoadUI",
+		"EncounterJournal_OpenJournal",
+		"EquipmentFlyoutFrame",
+		"EquipmentManager_GetItemInfoByLocation",
+		"EquipmentManager_RunAction",
+		"EquipmentManager_UnequipItemInSlot",
+		"ExpansionLandingPage",
+		"ExpansionLandingPageMinimapButton",
+		"FindSpellOverrideByID",
+		"FlashClientIcon",
+		"FrameDeltaLerp",
+		"FormatShortDate",
+		"GameFontDisable",
+		"GameFontHighlight",
+		"GameFontHighlightLarge",
+		"GameFontHighlightMedium",
+		"GameFontHighlightSmall",
+		"GameFontHighlight_NoShadow",
+		"GameFontNormal",
+		"GameFontNormalLarge",
+		"GameFontNormalLargeOutline",
+		"GameFontNormalSmall",
+		"GameFontRed",
+		"GameTime_GetFormattedTime",
+		"GameTime_GetGameTime",
+		"GameTime_GetLocalTime",
+		"GameTooltip",
+		"GameTooltip_AddBlankLineToTooltip",
+		"GameTooltip_AddColoredLine",
+		"GameTooltip_AddErrorLine",
+		"GameTooltip_AddHighlightLine",
+		"GameTooltip_AddInstructionLine",
+		"GameTooltip_AddNormalLine",
+		"GameTooltip_SetBottomText",
+		"GameTooltip_SetTitle",
+		"GameTooltip_SetTooltipWaitingForData",
+		"GameTooltipText",
+		"GarrisonLandingPage",
+		"GenerateClosure",
+		"GetAchievementCriteriaInfo",
+		"GetAchievementCriteriaInfoByID",
+		"GetAchievementInfo",
+		"GetAchievementLink",
+		"GetAchievementNumCriteria",
+		"GetActionInfo",
+		"GetActiveQuestID",
+		"GetActiveTitle",
+		"GetAvailableQuestInfo",
+		"GetAvailableTitle",
+		"GetBattlefieldEstimatedWaitTime",
+		"GetBattlefieldStatus",
+		"GetBattlefieldTimeWaited",
+		"GetBindingKey",
+		"GetBindingText",
+		"GetBuildInfo",
+		"GetBuybackItemInfo",
+		"GetCameraZoom",
+		"GetCurrentKeyBoardFocus",
+		"GetCursorInfo",
+		"GetCursorPosition",
+		"GetDungeonDifficultyID",
+		"GetFactionInfoByID",
+		"GetFilteredAchievementID",
+		"GetGameTime",
+		"GetInstanceInfo",
+		"GetInventoryItemID",
+		"GetInventoryItemLink",
+		"GetInventoryItemTexture",
+		"GetLFGCategoryForID",
+		"GetLFGDungeonInfo",
+		"GetLFGMode",
+		"GetLFGProposal",
+		"GetLFGQueueStats",
+		"GetLFGQueuedList",
+		"GetLFGRandomDungeonInfo",
+		"GetLFGRoleUpdate",
+		"GetLegacyRaidDifficultyID",
+		"GetLocale",
+		"GetLootSlotInfo",
+		"GetLootSlotLink",
+		"GetLootSlotType",
+		"GetMacroBody",
+		"GetMacroIndexByName",
+		"GetMacroInfo",
+		"GetMaxBattlefieldID",
+		"GetMaxLevelForExpansionLevel",
+		"GetMerchantItemCostInfo",
+		"GetMerchantItemCostItem",
+		"GetMerchantItemInfo",
+		"GetMerchantNumItems",
+		"GetMinimapZoneText",
+		"GetModifiedClick",
+		"GetMoney",
+		"GetMouseFoci",
+		"GetNumActiveQuests",
+		"GetNumAvailableQuests",
+		"GetNumBuybackItems",
+		"GetNumDisplayChannels",
+		"GetNumFilteredAchievements",
+		"GetNumGroupMembers",
+		"GetNumLootItems",
+		"GetNumMacros",
+		"GetNumQuestLeaderBoards",
+		"GetNumQuestLogRewards",
+		"GetNumQuestLogRewardCurrencies",
+		"GetNumRandomDungeons",
+		"GetNumSavedInstances",
+		"GetNumTitles",
+		"GetOverrideBarSkin",
+		"GetPartyLFGID",
+		"GetPhysicalScreenSize",
+		"GetPlayerInfoByGUID",
+		"GetPlayerFacing",
+		"GetPrimaryGarrisonFollowerType",
+		"GetProfessionInfo",
+		"GetProfessions",
+		"GetQuestID",
+		"GetQuestInfo",
+		"GetQuestLogCompletionText",
+		"GetQuestLogIndexByID",
+		"GetQuestLogLeaderBoard",
+		"GetQuestLogRewardCurrencyInfo",
+		"GetQuestLogRewardHonor",
+		"GetQuestLogRewardInfo",
+		"GetQuestLogSpecialItemCooldown",
+		"GetQuestObjectiveInfo",
+		"GetQuestProgressBarPercent",
+		"GetQuestUiMapID",
+		"GetRaidDifficultyID",
+		"GetSavedInstanceChatLink",
+		"GetSavedInstanceInfo",
+		"GetScaledCursorPosition",
+		"GetServerExpansionLevel",
+		"GetSpellBookItemInfo",
+		"GetSpellBookItemType",
+		"GetSpellCharges",
+		"GetSpellCooldown",
+		"GetText",
+		"GetTime",
+		"GetTitleName",
+		"GetTrackedAchievements",
+		"GetCurrentTitle",
+		"HandleModifiedItemClick",
+		"HasOverrideActionBar",
+		"HaveQuestData",
+		"HideUIPanel",
+		"hooksecurefunc",
+		"HouseEditorFrame",
+		"HousingControlsFrame",
+		"HousingDashboardFrame",
+		"HousingItemEarnedAlertFrameSystem",
+		"HousingModelPreviewFrame",
+		"InCombatLockdown",
+		"IsAccountSecured",
+		"IsAltKeyDown",
+		"IsControlKeyDown",
+		"IsCurrentTitle",
+		"IsFishingLoot",
+		"IsFlying",
+		"IsGamePadFreelookEnabled",
+		"IsIndoors",
+		"IsInGroup",
+		"IsInInstance",
+		"IsInRaid",
+		"IsInventoryItemLocked",
+		"IsLegacyDifficulty",
+		"IsLFGDungeonJoinable",
+		"IsMacClient",
+		"IsMouseButtonDown",
+		"IsMouselooking",
+		"IsModifiedClick",
+		"IsMounted",
+		"IsPlayerMoving",
+		"IsPlayerSpell",
+		"IsQuestComplete",
+		"IsQuestLogSpecialItemInRange",
+		"issecretvalue",
+		"IsShiftKeyDown",
+		"IsSpellKnown",
+		"IsSpellKnownOrOverridesKnown",
+		"IsTitleKnown",
+		"ItemUpgradeFrame",
+		"JoinSingleLFG",
+		"LeaveChannelByLocalID",
+		"LeaveChannelByName",
+		"LFDParentFrame",
+		"LFDQueueFrame_SetType",
+		"LFGListPVEStub",
+		"LootFrame",
+		"LootSlot",
+		"LootSlotHasItem",
+		"MacroFrame",
+		"MacroFrame_LoadUI",
+		"MacroSaveButton",
+		"MacroFrameText",
+		"MailFrame",
+		"MapCanvasDataProviderMixin",
+		"MapCanvasPinMixin",
+		"MajorFactionButtonUnlockedStateMixin",
+		"MerchantExtraCurrencyBgLeft",
+		"MerchantExtraCurrencyBgMiddle",
+		"MerchantExtraCurrencyBgRight",
+		"MerchantExtraCurrencyInset",
+		"MerchantFrame",
+		"MerchantFrame_Update",
+		"MerchantMoneyBgLeft",
+		"MerchantMoneyBgMiddle",
+		"MerchantMoneyBgRight",
+		"MerchantMoneyInset",
+		"Minimap",
+		"Mixin",
+		"Model_ApplyUICamera",
+		"MovieSubtitleFont",
+		"MountJournal",
+		"MountJournal_UpdateMountDisplay",
+		"GetNumFilteredAchievements",
+		"GuildInviteFrame",
+		"ObjectiveTrackerFrame",
+		"OpenAchievementFrameToAchievement",
+		"PaperDollFrame",
+		"PaperDollItemsFrame",
+		"PaperDollTitlesPane_InitButton",
+		"PickupContainerItem",
+		"PickupInventoryItem",
+		"PickupMacro",
+		"PickupSpell",
+		"PlaySound",
+		"PlayerChoiceFrame",
+		"PlayerGetTimerunningSeasonID",
+		"PlayerHasToy",
+		"ProfessionsBook_LoadUI",
+		"ProfessionsBookFrame",
+		"ProfessionsFrame",
+		"PVEFrame",
+		"PVEFrame_ShowFrame",
+		"QuestFont",
+		"QuestMapFrame",
+		"QuestMapFrame_ShowQuestDetails",
+		"QueueStatusButton",
+		"RemoveTrackedAchievement",
+		"ReputationEntryMixin",
+		"ReputationParagonFrame_SetupParagonTooltip",
+		"RequestRaidInfo",
+		"ResetCursor",
+		"securecall",
+		"securecallfunction",
+		"SearchBoxTemplate_OnTextChanged",
+		"SetAchievementSearchString",
+		"SetCursor",
+		"SetCVar",
+		"SetCurrentTitle",
+		"SetDungeonDifficultyID",
+		"SetItemRef",
+		"SetLFGDungeon",
+		"SetLegacyRaidDifficultyID",
+		"SetPortraitTextureFromCreatureDisplayID",
+		"SetRaidDifficultyID",
+		"SetUnitCursorTexture",
+		"ShoppingTooltip1",
+		"ShowGarrisonLandingPage",
+		"ShowUIPanel",
+		"SideDressUpFrame",
+		"SocialPostFrame",
+		"Social_InsertLink",
+		"Social_IsShown",
+		"SocketInventoryItem",
+		"SplashFrame",
+		"SpellIsTargeting",
+		"StaticPopup_Show",
+		"StopSound",
+		"Storyline_DialogChoicesScrollFrame",
+		"strcmputf8i",
+		"StripHyperlinks",
 		"strlenutf8",
+		"strsplit",
+		"strtrim",
+		"SubtitlesFrame",
+		"SuperTrackedFrame",
+		"TalkingHeadFrame",
 		"time",
+		"TopBannerManager_BannerFinished",
+		"TopBannerManager_Show",
+		"ToggleCharacter",
+		"TransmogFrame",
+		"TransmogAndMountDressupFrame",
+		"Transmog_LoadUI",
+		"UIErrorsFrame",
+		"UIParent",
+		"UISpecialFrames",
+		"UnitCastingInfo",
+		"UnitChannelInfo",
+		"UnitClass",
+		"UnitExists",
+		"UnitFactionGroup",
+		"UnitGUID",
+		"UnitInParty",
+		"UnitInRaid",
+		"UnitIsAFK",
+		"UnitIsBossMob",
+		"UnitIsGameObject",
+		"UnitIsGroupLeader",
+		"UnitIsPlayer",
+		"UnitIsUnit",
+		"UnitLevel",
+		"UnitName",
+		"UnitPowerBarID",
+		"UnitPVPName",
+		"UnitPosition",
+		"UnitRace",
+		"UnitSex",
+		"UnitWidgetSet",
+		"UpdateContainerFrameAnchors",
+		"Vector2D_CalculateAngleBetween",
+		"Vector2D_Normalize",
+		"WardrobeCollectionFrame",
+		"WardrobeTransmogFrame",
+		"WatchFrame_Update",
+		"WeeklyRewards_ShowUI",
+		"WeeklyRewardsActivityMixin",
+		"WhoFrame",
+		"wipe",
+		"WorldFrame",
+		"WorldMap_GetQuestTimeForTooltip",
+		"WorldMapFrame",
 
-		-- Global Functions
+
+		AuraUtil = {
+			fields = {
+				"ForEachAura",
+			},
+		},
+
+		bit = {
+			fields = {
+				"band",
+			},
+		},
 
 		ChatFrameUtil = {
 			fields = {
@@ -63,11 +513,30 @@ stds.wow = {
 			},
 		},
 
+		CollectionWardrobeUtil = {
+			fields = {
+				"GetPage",
+			},
+		},
+
+		ColorManager = {
+			fields = {
+				"GetColorDataForItemQuality",
+				"GetFormattedStringForItemQuality",
+			},
+		},
+
 		Constants = {
 			fields = {
 				AccountStoreConsts = {
 					fields = {
 						"PlunderstormStoreFrontID",
+					},
+				},
+
+				ContentTrackingConsts = {
+					fields = {
+						"MaxTrackedAchievements",
 					},
 				},
 
@@ -86,13 +555,40 @@ stds.wow = {
 			},
 		},
 
+		ContentTrackingUtil = {
+			fields = {
+				"DisplayTrackingError",
+				"IsContentTrackingEnabled",
+				"IsTrackingModifierDown",
+			},
+		},
+
+		C_AccountStore = {
+			fields = {
+				"GetCategoryInfo",
+				"GetCategoryItems",
+				"GetCategories",
+				"GetCurrencyIDForStore",
+				"GetCurrencyInfo",
+			},
+		},
+
 		C_AddOns = {
 			fields = {
-				"GetNumAddOns",
 				"GetAddOnInfo",
 				"GetAddOnMetadata",
+				"GetNumAddOns",
 				"IsAddOnLoaded",
 				"LoadAddOn",
+			},
+		},
+
+		C_AreaPoiInfo = {
+			fields = {
+				"GetAreaPOIForMap",
+				"GetAreaPOIInfo",
+				"GetDelvesForMap",
+				"GetEventsForMap",
 			},
 		},
 
@@ -116,14 +612,15 @@ stds.wow = {
 			fields = {
 				"GetChannelInfoFromIdentifier",
 				"GetGeneralChannelID",
+				"SendChatMessage",
 			},
 		},
 
 		C_Container = {
 			fields = {
-				"GetContainerItemQuestInfo",
 				"GetContainerItemID",
 				"GetContainerItemInfo",
+				"GetContainerItemQuestInfo",
 				"GetContainerNumSlots",
 				"GetItemCooldown",
 				"PickupContainerItem",
@@ -132,10 +629,28 @@ stds.wow = {
 
 		C_ContentTracking = {
 			fields = {
+				"GetTrackedIDs",
+				"IsTracking",
 				"StartTracking",
 				"StopTracking",
-				"IsTracking",
-				"GetTrackedIDs",
+			},
+		},
+
+		C_CovenantCallings = {
+			fields = {
+				"AreCallingsUnlocked",
+			},
+		},
+
+		C_Covenants = {
+			fields = {
+				"GetActiveCovenantID",
+			},
+		},
+
+		C_CreatureInfo = {
+			fields = {
+				"GetClassInfo",
 			},
 		},
 
@@ -162,8 +677,34 @@ stds.wow = {
 		C_DateAndTime = {
 			fields = {
 				"GetCurrentCalendarTime",
+				"GetSecondsUntilDailyReset",
 				"GetSecondsUntilWeeklyReset",
 				"GetWeeklyResetStartTime",
+			},
+		},
+
+		C_DelvesUI = {
+			fields = {
+				"GetCurrentDelvesSeasonNumber",
+				"GetDelvesFactionForSeason",
+				"HasActiveDelve",
+			},
+		},
+
+		C_DyeColor = {
+			fields = {
+				"GetAllDyeColors",
+				"GetDyeColorInfo",
+			},
+		},
+
+		C_EncounterJournal = {
+			fields = {
+				"GetDungeonEntrancesForMap",
+				"GetInstanceForGameMap",
+				"GetLootInfoByIndex",
+				"InitalizeSelectedTier",
+				"SetSlotFilter",
 			},
 		},
 
@@ -175,10 +716,19 @@ stds.wow = {
 
 		C_FriendList = {
 			fields = {
-				"SetWhoToUi",
-				"SendWho",
-				"GetWhoInfo",
 				"GetNumWhoResults",
+				"GetWhoInfo",
+				"SendWho",
+				"SetWhoToUi",
+			},
+		},
+
+		C_Garrison = {
+			fields = {
+				"GetAvailableMissions",
+				"GetInProgressMissions",
+				"GetLandingPageItems",
+				"IsOnGarrisonMap",
 			},
 		},
 
@@ -193,19 +743,89 @@ stds.wow = {
 			},
 		},
 
+		C_HouseEditor = {
+			fields = {
+				"GetActiveHouseEditorMode",
+				"IsHouseEditorActive",
+			},
+		},
+
+		C_Housing = {
+			fields = {
+				"GetCurrentHouseLevelFavor",
+				"GetHouseLevelFavorForLevel",
+				"GetPlayerOwnedHouses",
+				"GetUIMapIDForNeighborhood",
+				"GetVisitCooldownInfo",
+				"IsInsideHouseOrPlot",
+				"IsOnNeighborhoodMap",
+			},
+		},
+
+		C_HousingBasicMode = {
+			fields = {
+				"IsDecorSelected",
+				"StartPlacingNewDecor",
+			},
+		},
+
+		C_HousingCatalog = {
+			fields = {
+				"CreateCatalogSearcher",
+				"GetCatalogEntryInfo",
+				"GetCatalogEntryInfoByRecordID",
+			},
+		},
+
+		C_HousingCustomizeMode = {
+			fields = {
+				"ApplyDyeToSelectedDecor",
+				"CancelActiveEditing",
+				"CommitDyesForSelectedDecor",
+				"GetHoveredDecorInfo",
+				"GetSelectedDecorInfo",
+				"IsDecorSelected",
+				"IsHoveringDecor",
+			},
+		},
+
+		C_HousingDecor = {
+			fields = {
+				"GetDecorName",
+				"GetHoveredDecorInfo",
+				"GetMaxPlacementBudget",
+				"GetSpentPlacementBudget",
+				"HasMaxPlacementBudget",
+				"IsHoveringDecor",
+			},
+		},
+
+		C_HousingNeighborhood = {
+			fields = {
+				"CanReturnAfterVisitingHouse",
+			},
+		},
+
 		C_Item = {
 			fields = {
+				"DoesItemExist",
 				"DoesItemExistByID",
 				"GetDetailedItemLevelInfo",
+				"GetItemClassInfo",
 				"GetItemCooldown",
 				"GetItemCount",
+				"GetItemCreationContext",
+				"GetItemIcon",
 				"GetItemIconByID",
+				"GetItemIDForItemInfo",
 				"GetItemInfo",
 				"GetItemInfoInstant",
 				"GetItemLearnTransmogSet",
+				"GetItemLink",
 				"GetItemLinkByGUID",
 				"GetItemMaxStackSizeByID",
 				"GetItemNameByID",
+				"GetItemQuality",
 				"GetItemQualityByID",
 				"GetItemQualityColor",
 				"GetItemSpell",
@@ -224,18 +844,54 @@ stds.wow = {
 			},
 		},
 
+		C_LFGList = {
+			fields = {
+				"HasActiveEntryInfo",
+			},
+		},
+
+		C_MajorFactions = {
+			fields = {
+				"GetCurrentRenownLevel",
+				"GetMajorFactionData",
+				"GetMajorFactionIDs",
+				"GetMajorFactionRenownInfo",
+				"GetRenownLevels",
+				"GetRenownRewardsForLevel",
+				"HasMaximumRenown",
+				"IsMajorFactionHiddenFromExpansionPage",
+			},
+		},
+
 		C_Map = {
 			fields = {
 				"ClearUserWaypoint",
 				"GetAreaInfo",
 				"GetBestMapForUnit",
+				"GetMapGroupID",
 				"GetMapGroupMembersInfo",
 				"GetMapInfo",
+				"GetMapInfoAtPosition",
 				"GetMapPosFromWorldPos",
+				"GetMapWorldSize",
 				"GetPlayerMapPosition",
+				"GetUserWaypoint",
 				"GetUserWaypointPositionForMap",
+				"GetWorldPosFromMapPos",
 				"OpenWorldMap",
 				"SetUserWaypoint",
+			},
+		},
+
+		C_MerchantFrame = {
+			fields = {
+				"GetItemInfo",
+			},
+		},
+
+		C_Minimap = {
+			fields = {
+				"IsInsideQuestBlob",
 			},
 		},
 
@@ -249,6 +905,12 @@ stds.wow = {
 			},
 		},
 
+		C_MythicPlus = {
+			fields = {
+				"RequestMapInfo",
+			},
+		},
+
 		C_NamePlate = {
 			fields = {
 				"GetNamePlateForUnit",
@@ -258,17 +920,31 @@ stds.wow = {
 
 		C_Navigation = {
 			fields = {
-				"WasClampedToScreen",
+				"GetDistance",
+				"GetFrame",
 				"GetTargetState",
 				"HasValidScreenPosition",
-				"GetDistance",
-				"GetDistance",
+				"WasClampedToScreen",
 			},
 		},
 
 		C_PaperDollInfo = {
 			fields = {
 				"CanCursorCanGoInSlot",
+			},
+		},
+
+		C_PartyInfo = {
+			fields = {
+				"IsCrossFactionParty",
+				"IsDelveInProgress",
+				"IsPartyWalkIn",
+			},
+		},
+
+		C_PetBattles = {
+			fields = {
+				"IsInBattle",
 			},
 		},
 
@@ -284,11 +960,35 @@ stds.wow = {
 			},
 		},
 
+		C_PlayerChoice = {
+			fields = {
+				"GetCurrentPlayerChoiceInfo",
+				"OnUIClosed",
+				"SendPlayerChoiceResponse",
+			},
+		},
+
 		C_PlayerInfo = {
 			fields = {
 				"GetAlternateFormInfo",
 				"GetGlidingInfo",
 				"IsExpansionLandingPageUnlockedForPlayer",
+			},
+		},
+
+		C_PlayerInteractionManager = {
+			fields = {
+				"IsInteractingWithNpcOfType",
+			},
+		},
+
+		C_ProfSpecs = {
+			fields = {
+				"GetConfigIDForSkillLine",
+				"GetSpendCurrencyForPath",
+				"GetSpecTabIDsForSkillLine",
+				"GetTabInfo",
+				"GetUnlockEntryForPath",
 			},
 		},
 
@@ -298,21 +998,43 @@ stds.wow = {
 			},
 		},
 
+		C_QuestInfoSystem = {
+			fields = {
+				"GetQuestClassification",
+				"GetQuestRewardSpellInfo",
+				"GetQuestRewardSpells",
+				"HasQuestRewardCurrencies",
+				"HasQuestRewardSpells",
+			},
+		},
+
+		C_QuestLine = {
+			fields = {
+				"GetAvailableQuestLines",
+				"GetQuestLineInfo",
+				"GetQuestLineQuests",
+				"RequestQuestLinesForMap",
+			},
+		},
+
 		C_QuestLog = {
 			fields = {
 				"GetActivePreyQuest",
+				"GetLogIndexForQuestID",
 				"GetNumQuestWatches",
-				"GetTitleForQuestID",
+				"GetQuestIDForQuestWatchIndex",
 				"GetQuestInfo",
+				"GetQuestRewardCurrencies",
+				"GetQuestRewardCurrencyInfo",
+				"GetTitleForQuestID",
 				"IsOnQuest",
 				"IsQuestFlaggedCompleted",
 				"IsQuestFlaggedCompletedOnAccount",
+				"IsQuestTask",
 				"IsWorldQuest",
 				"ReadyForTurnIn",
 				"RequestLoadQuestByID",
-				"GetLogIndexForQuestID",
 				"UnitIsRelatedToActiveQuest",
-				"GetQuestRewardCurrencyInfo",
 			},
 		},
 
@@ -322,19 +1044,51 @@ stds.wow = {
 			},
 		},
 
+		C_RaidLocks = {
+			fields = {
+				"IsEncounterComplete",
+			},
+		},
+
+		C_Reputation = {
+			fields = {
+				"GetFactionDataByID",
+				"GetFactionParagonInfo",
+				"GetWatchedFactionData",
+				"IsAccountWideReputation",
+				"IsFactionParagon",
+				"IsFactionParagonForCurrentPlayer",
+				"IsMajorFaction",
+				"RequestFactionParagonPreloadRewardData",
+				"SetWatchedFactionByID",
+			},
+		},
+
 		C_RemixArtifactUI = {
 			fields = {
 				"ClearRemixArtifactItem",
-				"GetCurrTraitTreeID",
 				"GetCurrArtifactItemID",
 				"GetCurrItemSpecIndex",
+				"GetCurrTraitTreeID",
 				"ItemInSlotIsRemixArtifact",
+			},
+		},
+
+		C_Scenario = {
+			fields = {
+				"GetStepInfo",
+			},
+		},
+
+		C_ScenarioInfo = {
+			fields = {
+				"GetScenarioInfo",
 			},
 		},
 
 		C_SpecializationInfo = {
 			fields = {
-				"GetSpecializatio",
+				"GetSpecialization",
 				"GetSpecializationInfo",
 			},
 		},
@@ -358,9 +1112,10 @@ stds.wow = {
 
 		C_SpellBook = {
 			fields = {
+				"FindSpellOverrideByID",
 				"GetSpellBookItemType",
-				"IsSpellKnown",
 				"IsSpellInSpellBook",
+				"IsSpellKnown",
 			},
 		},
 
@@ -376,6 +1131,7 @@ stds.wow = {
 				"GetSuperTrackedMapPin",
 				"GetSuperTrackedQuestID",
 				"IsSuperTrackingAnything",
+				"SetSuperTrackedQuestID",
 				"SetSuperTrackedUserWaypoint",
 			},
 		},
@@ -388,9 +1144,10 @@ stds.wow = {
 
 		C_TaskQuest = {
 			fields = {
-				"GetQuestsForPlayerByMapID",
 				"GetQuestInfoByQuestID",
 				"GetQuestLocation",
+				"GetQuestZoneID",
+				"GetQuestsForPlayerByMapID",
 				"GetQuestsOnMap",
 				"IsActive",
 			},
@@ -402,21 +1159,54 @@ stds.wow = {
 			},
 		},
 
+		C_TradeSkillUI = {
+			fields = {
+				"CloseTradeSkill",
+				"GetAllProfessionTradeSkillLines",
+				"GetBaseProfessionInfo",
+				"GetChildProfessionInfo",
+				"GetFilteredRecipeIDs",
+				"GetItemCraftedQualityByItemInfo",
+				"GetItemReagentQualityByItemInfo",
+				"GetItemReagentQualityInfo",
+				"GetProfessionInfoBySkillLineID",
+				"GetRecipeInfo",
+				"GetRecipeItemNameFilter",
+				"GetRecipeOutputItemData",
+				"GetRecipeSchematic",
+				"IsRecipeTracked",
+				"OpenRecipe",
+				"OpenTradeSkill",
+				"SetRecipeItemNameFilter",
+				"SetRecipeTracked",
+			},
+		},
+
 		C_Traits = {
 			fields = {
-				"GetTreeCurrencyInfo",
-				"GetEntryInfo",
-				"GetNodeInfo",
-				"GetTreeNodes",
 				"CanPurchaseRank",
-				"GetDefinitionInfo",
-				"GetConfigIDByTreeID",
 				"CommitConfig",
+				"ConfigHasStagedChanges",
+				"GetConfigIDByTreeID",
+				"GetConfigInfo",
+				"GetDefinitionInfo",
+				"GetEntryInfo",
+				"GetIncreasedTraitData",
+				"GetNodeCost",
+				"GetNodeInfo",
+				"GetTreeCurrencyInfo",
+				"GetTreeNodes",
+				"PurchaseRank",
+				"ResetTree",
+				"RollbackConfig",
+				"SetSelection",
+				"TryPurchaseToNode",
 			},
 		},
 
 		C_Transmog = {
 			fields = {
+				"GetAllSetAppearancesByID",
 				"IsAtTransmogNPC",
 				"SetPending",
 			},
@@ -434,6 +1224,17 @@ stds.wow = {
 				"GetValidAppearanceSourcesForClass",
 				"IsSearchInProgress",
 				"PlayerHasTransmogItemModifiedAppearance",
+			},
+		},
+
+		C_TransmogSets = {
+			fields = {
+				"GetAllSourceIDs",
+				"GetBaseSetID",
+				"GetSetInfo",
+				"GetSetPrimaryAppearances",
+				"GetVariantSets",
+				"IsBaseSetCollected",
 			},
 		},
 
@@ -468,13 +1269,13 @@ stds.wow = {
 		C_UIWidgetManager = {
 			fields = {
 				"GetAllWidgetsBySetID",
+				"GetHorizontalCurrenciesWidgetVisualizationInfo",
+				"GetItemDisplayVisualizationInfo",
+				"GetScenarioHeaderDelvesWidgetVisualizationInfo",
+				"GetSpacerVisualizationInfo",
+				"GetSpellDisplayVisualizationInfo",
 				"GetStatusBarWidgetVisualizationInfo",
 				"GetTextWithStateWidgetVisualizationInfo",
-				"GetHorizontalCurrenciesWidgetVisualizationInfo",
-				"GetSpacerVisualizationInfo",
-				"GetItemDisplayVisualizationInfo",
-				"GetSpellDisplayVisualizationInfo",
-				"GetScenarioHeaderDelvesWidgetVisualizationInfo",
 			},
 		},
 
@@ -487,18 +1288,51 @@ stds.wow = {
 			},
 		},
 
+		C_VignetteInfo = {
+			fields = {
+				"FindBestUniqueVignette",
+				"GetHealthPercent",
+				"GetVignetteInfo",
+				"GetVignettePosition",
+				"GetVignettes",
+			},
+		},
+
+		C_WeeklyRewards = {
+			fields = {
+				"GetActivities",
+				"GetExampleRewardItemHyperlinks",
+				"GetNextActivitiesIncrease",
+				"GetSortedProgressForActivity",
+				"HasAvailableRewards",
+			},
+		},
+
+		C_ZoneAbility = {
+			fields = {
+				"GetActiveAbilities",
+			},
+		},
+
 		Enum = {
 			fields = {
-				ContentTrackingType = {
+				AccountStoreItemStatus = {
 					fields = {
-						"Achievement",
-						"Decor",
+						"Owned",
+						"Refundable",
 					},
 				},
 
 				ContentTrackingStopType = {
 					fields = {
 						"Manual",
+					},
+				},
+
+				ContentTrackingType = {
+					fields = {
+						"Achievement",
+						"Decor",
 					},
 				},
 
@@ -511,6 +1345,18 @@ stds.wow = {
 					},
 				},
 
+				HouseEditorMode = {
+					fields = {
+						"BasicDecor",
+						"Cleanup",
+						"Customize",
+						"ExpertDecor",
+						"ExteriorCustomization",
+						"Layout",
+						"None",
+					},
+				},
+
 				HousingCatalogEntryType = {
 					fields = {
 						"Decor",
@@ -518,21 +1364,15 @@ stds.wow = {
 					},
 				},
 
-				HouseEditorMode = {
-					fields = {
-						"None",
-						"BasicDecor",
-						"ExpertDecor",
-						"Layout",
-						"Customize",
-						"Cleanup",
-						"ExteriorCustomization",
-					},
-				},
-
 				HousingItemToastType = {
 					fields = {
 						"Decor",
+					},
+				},
+
+				ItemSlotFilterType = {
+					fields = {
+						"NoFilter",
 					},
 				},
 
@@ -564,15 +1404,15 @@ stds.wow = {
 
 				QuestClassification = {
 					fields = {
+						"BonusObjective",
+						"Calling",
+						"Campaign",
 						"Important",
 						"Legendary",
-						"Campaign",
-						"Calling",
 						"Meta",
-						"Recurring",
-						"Questline",
 						"Normal",
-						"BonusObjective",
+						"Questline",
+						"Recurring",
 						"Threat",
 						"WorldQuest",
 					},
@@ -585,57 +1425,52 @@ stds.wow = {
 					},
 				},
 
-				TransmogPendingType = {
-					fields = {
-						"Apply",
-					},
-				},
-
 				TooltipDataLineType = {
 					fields = {
-						"None",
-						"Blank",
-						"UnitName",
-						"GemSocket",
-						"AzeriteEssenceSlot",
 						"AzeriteEssencePower",
-						"LearnableSpell",
-						"UnitThreat",
-						"QuestObjective",
+						"AzeriteEssenceSlot",
 						"AzeriteItemPowerDescription",
+						"Blank",
+						"CurrencyTotal",
+						"DisabledLine",
+						"EquipSlot",
+						"ErrorLine",
+						"FlavorText",
+						"GemSocket",
+						"GemSocketEnchantment",
+						"ItemBinding",
+						"ItemEnchantmentPermanent",
+						"ItemLevel",
+						"ItemName",
+						"ItemQuality",
+						"ItemSpellTriggerLearn",
+						"ItemUpgradeLevel",
+						"LearnTransmogIllusion",
+						"LearnTransmogSet",
+						"LearnableSpell",
+						"NestedBlock",
+						"None",
+						"ProfessionCraftingQuality",
+						"QuestObjective",
+						"QuestPlayer",
+						"QuestTitle",
 						"RuneforgeLegendaryPowerDescription",
 						"SellPrice",
-						"ProfessionCraftingQuality",
-						"SpellName",
-						"CurrencyTotal",
-						"ItemEnchantmentPermanent",
-						"UnitOwner",
-						"QuestTitle",
-						"QuestPlayer",
-						"NestedBlock",
-						"ItemBinding",
-						"EquipSlot",
-						"ItemName",
 						"Separator",
-						"ToyName",
-						"ToyText",
-						"ToyEffect",
-						"ToyDuration",
-						"ToyDescription",
-						"ToySource",
-						"GemSocketEnchantment",
-						"ItemLevel",
-						"ItemUpgradeLevel",
-						"SpellPassive",
 						"SpellDescription",
-						"ItemQuality",
+						"SpellName",
+						"SpellPassive",
+						"TooltipDataLineType",
+						"ToyDescription",
+						"ToyDuration",
+						"ToyEffect",
+						"ToyName",
+						"ToySource",
+						"ToyText",
 						"TradeTimeRemaining",
-						"FlavorText",
-						"ItemSpellTriggerLearn",
-						"LearnTransmogSet",
-						"LearnTransmogIllusion",
-						"ErrorLine",
-						"DisabledLine",
+						"UnitName",
+						"UnitOwner",
+						"UnitThreat",
 						"UsageRequirement",
 					},
 				},
@@ -652,6 +1487,12 @@ stds.wow = {
 					},
 				},
 
+				TransmogPendingType = {
+					fields = {
+						"Apply",
+					},
+				},
+
 				UIMapType = {
 					fields = {
 						"Continent",
@@ -660,13 +1501,14 @@ stds.wow = {
 
 				UIWidgetVisualizationType = {
 					fields = {
-						"Disabled",
-						"Red",
-						"White",
-						"Green",
 						"Artifact",
 						"Black",
 						"BrightBlue",
+						"Disabled",
+						"Green",
+						"Red",
+						"ScenarioHeaderDelves",
+						"White",
 					},
 				},
 
@@ -680,13 +1522,13 @@ stds.wow = {
 
 				WidgetEnabledState = {
 					fields = {
-						"Disabled",
-						"Red",
-						"White",
-						"Green",
 						"Artifact",
 						"Black",
 						"BrightBlue",
+						"Disabled",
+						"Green",
+						"Red",
+						"White",
 					},
 				},
 
@@ -714,9 +1556,37 @@ stds.wow = {
 			},
 		},
 
+		HousingFramesUtil = {
+			fields = {
+				"PreviewHousingDecorID",
+			},
+		},
+
+		InputUtil = {
+			fields = {
+				"GetCursorPosition",
+			},
+		},
+
+		ItemLocation = {
+			fields = {
+				"CreateEmpty",
+				"SetEquipmentSlot",
+			},
+		},
+
 		Menu = {
 			fields = {
 				"ModifyMenu",
+			},
+		},
+
+		MenuResponse = {
+			fields = {
+				"Close",
+				"CloseAll",
+				"Open",
+				"Refresh",
 			},
 		},
 
@@ -727,251 +1597,232 @@ stds.wow = {
 			},
 		},
 
-		"AbbreviateLargeNumbers",
-		"canaccessvalue",
-		"CreateColor",
-		"CreateDataProvider",
-		"CreateFrame",
-		"CreateFromMixins",
-		"FlashClientIcon",
-		"FormatShortDate",
-		"issecretvalue",
-		"Mixin",
-		"ResetCursor",
-		"securecallfunction",
-		"SetCursor",
-		"SetItemRef",
-		"ShowUIPanel",
-		"HideUIPanel",
-		"StripHyperlinks",
-		"UnitClass",
-		"UnitExists",
-		"UnitFactionGroup",
-		"UnitGUID",
-		"UnitInParty",
-		"UnitInRaid",
-		"UnitIsAFK",
-		"UnitIsPlayer",
-		"UnitIsUnit",
-		"UnitRace",
-		"UnitLevel",
-		"UnitName",
-		"UnitPVPName",
-		"UnitRace",
-		"UnitSex",
-		"GameTime_GetFormattedTime",
-		"CreateVector2D",
-		"UnitPosition",
-		"IsInInstance",
-		"GetLocale",
-		"GetInstanceInfo",
-		"GetPhysicalScreenSize",
-		"BreakUpLargeNumbers",
-		"AbbreviateNumbers",
-		"GetCurrentKeyBoardFocus",
-		"ChatEdit_InsertLink",
-		"GetCursorPosition",
-		"GetText",
-		"IsSpellKnownOrOverridesKnown",
-		"IsSpellKnown",
-		"GetMouseFoci",
-		"IsMacClient",
-		"InCombatLockdown",
-		"GetServerExpansionLevel",
-		"GetBuildInfo",
-		"HasOverrideActionBar",
-		"GetOverrideBarSkin",
-		"UnitPowerBarID",
-		"IsFlying",
-		"IsMouselooking",
-		"IsPlayerMoving",
-		"hooksecurefunc",
-		"GetNumGroupMembers",
-		"TopBannerManager_Show",
-		"TopBannerManager_BannerFinished",
-		"BossBanner_OnEvent",
-		"GetCursorInfo",
-		"PlaySound",
-		"StopSound",
-		"IsGamePadFreelookEnabled",
-		"EquipmentManager_GetItemInfoByLocation",
-		"EquipmentManager_RunAction",
-		"EquipmentManager_UnequipItemInSlot",
-		"GetTime",
-		"GetInventoryItemID",
-		"GetInventoryItemTexture",
-		"CursorHasItem",
-		"ClearCursor",
-		"GetMinimapZoneText",
-		"GetNumQuestLeaderBoards",
-		"GetQuestLogLeaderBoard",
-		"GetPlayerInfoByGUID",
-		"UnitIsBossMob",
-		"UnitCastingInfo",
-		"UnitChannelInfo",
-		"IsModifiedClick",
-		"GetAchievementInfo",
-		"GetAchievementLink",
-		"GetNumFilteredAchievements",
-		"GetFilteredAchievementID",
-		"SetAchievementSearchString",
-		"OpenAchievementFrameToAchievement",
-		"HandleModifiedItemClick",
-		"MountJournal_UpdateMountDisplay",
-		"AchievementFrameAchievements_ForceUpdate",
-		"strtrim",
-		"SetUnitCursorTexture",
-		"UnitIsGameObject",
-		"CreateKeyChordStringUsingMetaKeyState",
-		"GetMoney",
-		"IsMouseButtonDown",
-		"IsShiftKeyDown",
-		"IsAltKeyDown",
-		"GetScaledCursorPosition",
-		"PlayerGetTimerunningSeasonID",
-		"DressUpItemLocation",
-		"DressUpLink",
+		QuestCache = {
+			fields = {
+				"Get",
+			},
+		},
+
+		RenownRewardUtil = {
+			fields = {
+				"AddRenownRewardsToTooltip",
+			},
+		},
+
+		ScrollBoxConstants = {
+			fields = {
+				"AlignBegin",
+				"RetainScrollPosition",
+			},
+		},
+
+		Settings = {
+			fields = {
+				"RegisterAddOnCategory",
+				"RegisterCanvasLayoutCategory",
+			},
+		},
+
+		TooltipDataProcessor = {
+			fields = {
+				"AddTooltipPostCall",
+			},
+		},
+
+		UIWidgetManager = {
+			fields = {
+				"GetWidgetTypeInfo",
+				"registeredWidgetContainers",
+			},
+		},
+
+		UnitPopupSharedUtil = {
+			fields = {
+				"HasLFGRestrictions",
+			},
+		},
 
 
-		-- Global Fonts
-		"GameFontNormal",
-		"GameFontNormalLarge",
-		"GameFontNormalLargeOutline",
-		"GameFontNormalSmall",
-		"GameFontHighlight",
-		"GameFontHighlightLarge",
-		"GameFontHighlightMedium",
-		"GameFontHighlightSmall",
-		"GameFontHighlight_NoShadow",
-		"GameFontDisable",
-		"GameFontRed",
-		"QuestFont",
-
-		-- Global Frames
-		"AddonCompartmentFrame",
-		"ArtifactFrame",
-		"BackpackTokenFrame",
-		"BossBanner",
-		"CharacterFrame",
-		"CharacterStatsPane",
-		"ChatFrame1",
-		"ContainerFrame1",
-		"ContainerFrameCombinedBags",
-		"DressUpFrame",
-		"EditModeManagerFrame",
-		"EquipmentFlyoutFrame",
-		"EventToastManagerFrame",
-		"ExpansionLandingPageMinimapButton",
-		"GameTooltip",
-		"GossipFrame",
-		"GuildInviteFrame",
-		"MountJournal",
-		"PaperDollFrame",
-		"PaperDollItemsFrame",
-		"HousingDashboardFrame",
-		"SideDressUpFrame",
-		"SuperTrackedFrame",
-		"TalkingHeadFrame",
-		"TransmogAndMountDressupFrame",
-		"UIErrorsFrame",
-		"UIParent",
-		"UISpecialFrames",
-		"WardrobeTransmogFrame",
-		"WorldFrame",
-		"WorldMapFrame",
-		"WhoFrame",
-
-		-- Global Mixins
-		"EventToastManagerFrameMixin",
-
-		-- Global Constants
-		"ITEM_QUALITY_COLORS",
-		"RAID_CLASS_COLORS",
-		"YELLOW_FONT_COLOR",
-		"HIGHLIGHT_FONT_COLOR",
-		"NORMAL_FONT_COLOR",
-		"RED_FONT_COLOR",
-		"DISABLED_FONT_COLOR",
-		"BRIGHTBLUE_FONT_COLOR",
-		"GREEN_FONT_COLOR",
+		-- Global Colors
+		"ACCOUNT_WIDE_FONT_COLOR",
 		"ARTIFACT_GOLD_COLOR",
 		"BLACK_FONT_COLOR",
+		"BRIGHTBLUE_FONT_COLOR",
+		"DISABLED_FONT_COLOR",
+		"GREEN_FONT_COLOR",
+		"HIGHLIGHT_FONT_COLOR",
+		"INVALID_EQUIPMENT_COLOR",
+		"ITEM_QUALITY_COLORS",
 		"NORMAL_FONT_COLOR",
+		"NORMAL_FONT_COLOR",
+		"RAID_CLASS_COLORS",
+		"RED_FONT_COLOR",
+		"YELLOW_FONT_COLOR",
+
+
+		-- Global Strings
+		"ACCOUNT_BANK_PANEL_TITLE",
+		"ACCOUNT_COMPLETED_QUEST_NOTICE",
+		"ACCOUNT_STORE_NONREFUNDABLE_TOOLTIP",
+		"ACHIEVEMENTFRAME_FILTER_COMPLETED",
+		"ACHIEVEMENTFRAME_FILTER_INCOMPLETE",
+		"ACHIEVEMENTS",
+		"ACHIEVEMENT_WATCH_TOO_MANY",
+		"ALL_CLASSES",
+		"ALT_KEY_TEXT",
+		"AUCTION_HOUSE_FILTER_UNCOLLECTED_ONLY",
+		"BANK",
+		"BATTLENET_BROADCAST",
+		"BONUS_LOOT_TOOLTIP_TITLE",
+		"BONUS_OBJECTIVE_TIME_LEFT",
+		"BOSS_ALIVE",
+		"BOSS_DEAD",
+		"BRAWL_TOOLTIP_ENDS",
+		"CALENDAR_FULLDATE_MONTH_NAMES",
+		"CANCEL",
+		"CANNOT_DO_THIS_WHILE_LFGLIST_LISTED",
+		"CATALOG_SHOP_NO_SEARCH_RESULTS",
+		"CLOSE",
+		"CLUB_FINDER_SORT_BY",
+		"COLLECTIONS",
+		"CONTENT_TRACKING_TRACKABLE_TOOLTIP_PROMPT",
+		"CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT",
+		"COPPER_AMOUNT_SYMBOL",
+		"CRITERIA_COMPLETED",
+		"CRITERIA_NOT_COMPLETED",
+		"CROSS_FACTION_RAID_DUNGEON_FINDER_ERROR",
+		"CTRL_KEY_TEXT",
+		"DAYS_ABBR",
+		"DELVES_GREAT_VAULT_ERR_AVAIL_AT_MAX_LEVEL",
+		"DELVES_GREAT_VAULT_REQUIRES_ACTIVE_SEASON",
+		"DELVES_LABEL",
+		"DUNGEONS_BUTTON",
 		"D_DAYS",
 		"D_HOURS",
 		"D_MINUTES",
 		"D_SECONDS",
-		"DAYS_ABBR",
-		"HOURS_ABBR",
-		"MINUTES_ABBR",
-		"SECONDS_ABBR",
-		"DAYS_ABBR",
-		"CALENDAR_FULLDATE_MONTH_NAMES",
-		"MISCELLANEOUS",
-		"MAP_PIN_HYPERLINK",
-		"ACCOUNT_STORE_NONREFUNDABLE_TOOLTIP",
-		"AUCTION_HOUSE_FILTER_UNCOLLECTED_ONLY",
-		"YES",
-		"NO",
-		"UNIT_YOU",
-		"INVSLOT_MAINHAND",
-		"RETRIEVING_DATA",
-		"TALENT_BUTTON_TOOLTIP_RANK_FORMAT",
-		"TALENT_SPEC_ACTIVATE",
+		"EJ_ITEM_CATEGORY_EXTREMELY_RARE",
+		"EJ_ITEM_CATEGORY_VERY_RARE",
+		"EMOTE",
+		"ENCOUNTER_JOURNAL_DIFF_TEXT",
 		"EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION",
+		"ERR_ACHIEVEMENT_WATCH_COMPLETED",
+		"ERR_COSMETIC_KNOWN",
+		"ERR_ITEM_NOT_FOUND",
 		"ERR_LFG_PROPOSAL_FAILED",
-		"ACCOUNT_COMPLETED_QUEST_NOTICE",
-		"TOOLTIP_UNIT_LEVEL",
+		"EXPANSION_NAME10",
+		"EXPANSION_NAME11",
+		"EXPANSION_NAME4",
 		"FACTION_ALLIANCE",
 		"FACTION_HORDE",
-		"EMOTE",
-		"SUMMON_RANDOM_PET",
-		"OBJECTIVES_STOP_TRACKING",
-		"TRACK_ACHIEVEMENT",
-		"OBJECTIVES_VIEW_ACHIEVEMENT",
-		"COLLECTIONS",
-		"SOUNDKIT",
-		"TRANSMOG_OUTFIT_COPY_TO_CLIPBOARD_NOTICE",
-		"NOT_BOUND",
+		"FILTER",
+		"GAME_VERSION_LABEL",
+		"GARRISON_LANDING_PAGE_TITLE",
+		"GARRISON_TYPE_8_0_LANDING_PAGE_TITLE",
+		"GARRISON_TYPE_9_0_LANDING_PAGE_TITLE",
 		"GOLD_AMOUNT_SYMBOL",
-		"SILVER_AMOUNT_SYMBOL",
-		"COPPER_AMOUNT_SYMBOL",
-		"ERR_ITEM_NOT_FOUND",
-		"SELL_PRICE",
-		"TYPE",
-		"SOURCES",
+		"GREAT_VAULT_REWARDS",
+		"GREAT_VAULT_REWARDS_WORLD_COMPLETED_FIRST",
+		"GREAT_VAULT_REWARDS_WORLD_COMPLETED_SECOND",
+		"GREAT_VAULT_REWARDS_WORLD_INCOMPLETE",
+		"GUILD_NEWS_LINK_ITEM",
+		"HOUSING_CATALOG_CATEGORIES_ALL",
+		"HOUSING_CONTROLS_EDITOR_BUTTON_EXIT",
+		"HOUSING_CONTROLS_EDITOR_BUTTON_EXIT_FMT",
+		"HOUSING_DASHBOARD_FRAMETITLE",
+		"HOUSING_DECOR_CUSTOMIZATION_DEFAULT_COLOR",
+		"HOUSING_DECOR_CUSTOMIZATION_DYE_NUM_OWNED",
+		"HOUSING_DECOR_SELECT_INSTRUCTION",
+		"HOUSING_DECOR_STORAGE_ITEM_DESTROY",
+		"HOURS_ABBR",
+		"INVSLOT_MAINHAND",
+		"IN_GAME_NAVIGATION_RANGE",
+		"ITEM_BNETACCOUNTBOUND",
+		"ITEM_COOLDOWN_TIME",
+		"ITEM_OPENABLE",
+		"ITEM_PROPOSED_ENCHANT",
+		"ITEM_SOULBOUND",
+		"ITEM_SPELL_KNOWN",
+		"ITEM_UNIQUE_MULTIPLE",
+		"JOURNEYS_LABEL",
+		"LANDING_PAGE_RENOWN_LABEL",
+		"LE_LFG_CATEGORY_RF",
+		"LOCKED",
+		"LOOT_NOUN",
+		"MAJOR_FACTION_BUTTON_RENOWN_LEVEL",
+		"MAJOR_FACTION_LIST_TITLE",
+		"MAJOR_FACTION_MAX_RENOWN_REACHED",
+		"MAP_PIN_HYPERLINK",
+		"MAX_ACCOUNT_MACROS",
+		"MAX_CHARACTER_MACROS",
+		"MINUTES_ABBR",
+		"MISCELLANEOUS",
+		"NO",
+		"NONE",
+		"NOT_BOUND",
+		"NO_TRANSMOG_VISUAL_ID",
+		"OBJECTIVES_STOP_TRACKING",
+		"OBJECTIVES_VIEW_ACHIEVEMENT",
+		"ORBIT_CAMERA_MOUSE_MODE_PITCH_ROTATION",
+		"ORDER_HALL_LANDING_PAGE_TITLE",
+		"PARAGON_REPUTATION_TOOLTIP_TEXT",
+		"PARAGON_REPUTATION_TOOLTIP_TEXT_LOW_LEVEL",
 		"PLAYER_DIFFICULTY1",
 		"PLAYER_DIFFICULTY2",
 		"PLAYER_DIFFICULTY3",
 		"PLAYER_DIFFICULTY6",
-		"WEEKLY_REWARDS_MYTHIC_TOP_RUNS",
-		"UNKNOWN",
-		"ENCOUNTER_JOURNAL_DIFF_TEXT",
-		"ALL_CLASSES",
-		"ACHIEVEMENTFRAME_FILTER_COMPLETED",
-		"ACHIEVEMENTFRAME_FILTER_INCOMPLETE",
-		"ACCOUNT_BANK_PANEL_TITLE",
-		"NONE",
-		"BANK",
-		"REAGENT_BANK",
-		"ITEM_SOULBOUND",
-		"ITEM_BNETACCOUNTBOUND",
-		"ITEM_UNIQUE_MULTIPLE",
-		"QUEST_PROGRESS_TOOLTIP_QUEST_READY_FOR_TURN_IN",
-		"QUEST_TOOLTIP_REQUIREMENTS",
+		"PLAYER_TITLE_NONE",
+		"PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS",
+		"PVP_WEEKLY_REWARD",
 		"QUEST_COMPLETE",
-		"ITEM_OPENABLE",
-
-
-		-- Other Addons
-		"Narci_Attribute",
-		"NarciPaperDollWidgetController",
-		"EditModeManagerExpandedFrame",		--EditModeExpanded
-		"EditModeExpandedWarningFrame",
-		"ElvUI",
-		"CSPilvl",				--Chonky Character Sheet
-		"GwDressingRoom",		--GW2 UI
-		"GwDressingRoomGear",
-		"ConsolePort",
+		"QUEST_PROGRESS_TOOLTIP_QUEST_READY_FOR_TURN_IN",
+		"QUEST_REWARDS",
+		"QUEST_TOOLTIP_ACTIVE",
+		"QUEST_TOOLTIP_REQUIREMENTS",
+		"QUEST_WATCH_QUEST_READY",
+		"RAID",
+		"REAGENT_BANK",
+		"RENOWN_REWARD_ACCOUNT_UNLOCK_LABEL",
+		"REPUTATION_TOOLTIP_ACCOUNT_WIDE_LABEL",
+		"RETRIEVING_DATA",
+		"SAVE",
+		"SEARCH",
+		"SECONDS_ABBR",
+		"SELL_PRICE",
+		"SETTINGS",
+		"SHOW_MAP",
+		"SILVER_AMOUNT_SYMBOL",
+		"SOUNDKIT",
+		"SOURCES",
+		"SPEC_ACTIVE",
+		"SUMMON_RANDOM_PET",
+		"SWITCH",
+		"TALENT_BUTTON_TOOLTIP_NEXT_RANK",
+		"TALENT_BUTTON_TOOLTIP_RANK_FORMAT",
+		"TALENT_SPEC_ACTIVATE",
+		"TEMPSCENE",
+		"TIMEMANAGER_TOOLTIP_LOCALTIME",
+		"TIMEMANAGER_TOOLTIP_REALMTIME",
+		"TIMEMANAGER_TOOLTIP_TITLE",
+		"TOKEN_MARKET_PRICE_NOT_AVAILABLE",
+		"TOOLTIP_UNIT_LEVEL",
+		"TRACK_ACHIEVEMENT",
+		"TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN",
+		"TRANSMOG_OUTFIT_COPY_TO_CLIPBOARD_NOTICE",
+		"TYPE",
+		"UNKNOWN",
+		"UNIT_SKINNABLE_HERB",
+		"UNIT_YOU",
+		"WEEKLY_REWARDS_CLICK_TO_PREVIEW_INSTRUCTIONS",
+		"WEEKLY_REWARDS_COMPLETE_WORLD",
+		"WEEKLY_REWARDS_CURRENT_REWARD",
+		"WEEKLY_REWARDS_IMPROVE_ITEM_LEVEL",
+		"WEEKLY_REWARDS_ITEM_LEVEL_WORLD",
+		"WEEKLY_REWARDS_MAXED_REWARD",
+		"WEEKLY_REWARDS_MYTHIC_TOP_RUNS",
+		"WEEKLY_REWARDS_UNCLAIMED_TEXT",
+		"WEEKLY_REWARDS_UNCLAIMED_TITLE",
+		"WEEKLY_REWARDS_UNLOCK_REWARD",
+		"YES",
 	},
 };

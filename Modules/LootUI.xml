@@ -1,63 +1,63 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-    <Font name="PlumberLootUIFont" inherits="GameFontNormal" virtual="true">
-        <Color r="1" g="1" b="1"/>
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0" g="0" b="0"/>
-        </Shadow>
-    </Font>
+	<Font name="PlumberLootUIFont" inherits="GameFontNormal" virtual="true">
+		<Color r="1" g="1" b="1"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="1" y="-1"/>
+			</Offset>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
 
-    <Script file="LootUI_Main.lua"/>
+	<Script file="LootUI_Main.lua"/>
 	<Script file="LootUI_Display.lua"/>
 
-    <Frame name="PlumberLootUISharedIconTemplate" virtual="true">
-        <Size x="32" y="32"/>
-        <Layers>
+	<Frame name="PlumberLootUISharedIconTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
 			<Layer level="OVERLAY" textureSubLevel="0">
 				<Texture parentKey="Icon" setAllPoints="true">
-                    <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+					<TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY" textureSubLevel="1">
 				<Texture parentKey="Border" setAllPoints="true" file="Interface\AddOns\Plumber\Art\LootUI\IconBorder-Square.png">
-                    <TextureSliceMode mode="Stretched"/>
-                    <TextureSliceMargins left="4" right="4" top="4" bottom="4"/>
+					<TextureSliceMode mode="Stretched"/>
+					<TextureSliceMargins left="4" right="4" top="4" bottom="4"/>
 				</Texture>
 			</Layer>
-        </Layers>
-    </Frame>
+		</Layers>
+	</Frame>
 
 	<Frame name="PlumberLootUIIconTemplate" inherits="PlumberLootUISharedIconTemplate" virtual="true">
 		<Size x="32" y="32"/>
 		<Layers>
 			<Layer level="OVERLAY" textureSubLevel="2">
 				<Texture parentKey="IconOverlay" hidden="true">
-                    <Size x="64" y="64"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
+					<Size x="64" y="64"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
 				</Texture>
 			</Layer>
-            <Layer level="OVERLAY" textureSubLevel="3">
+			<Layer level="OVERLAY" textureSubLevel="3">
 				<FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" justifyV="BOTTOM">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
 					</Anchors>
 				</FontString>
-            </Layer>
+			</Layer>
 		</Layers>
 	</Frame>
 
-    <Button name="PlumberLootUIGenericButtonTemplate" propagateKeyboardInput="true" virtual="true">
+	<Button name="PlumberLootUIGenericButtonTemplate" propagateKeyboardInput="true" virtual="true">
 		<Size x="128" y="32"/>
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture parentKey="Background" setAllPoints="true" ignoreParentScale="false" alpha="0.6">
-                    <TexCoords left="0" right="0.125" top="0.140625" bottom="0.203125"/>
-                    <TextureSliceMode mode="Stretched"/>
-                    <TextureSliceMargins left="8" right="8" top="8" bottom="8"/>
+					<TexCoords left="0" right="0.125" top="0.140625" bottom="0.203125"/>
+					<TextureSliceMode mode="Stretched"/>
+					<TextureSliceMargins left="8" right="8" top="8" bottom="8"/>
 				</Texture>
 			</Layer>
 			<Layer level="ARTWORK">
@@ -73,86 +73,86 @@
 				</FontString>
 			</Layer>
 		</Layers>
-        <Frames>
-            <Frame parentKey="HotkeyFrame" useParentLevel="true">
-                <Size x="32" y="32"/>
-                <Anchors>
-                    <Anchor point="LEFT"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="OVERLAY" textureSubLevel="1">
-                        <Texture parentKey="HotkeyBackdrop" setAllPoints="true" ignoreParentScale="true">
-                            <TextureSliceMode mode="Stretched"/>
-                            <TextureSliceMargins left="6" right="6" top="6" bottom="6"/>
-                        </Texture>
-                    </Layer>
-                    <Layer level="OVERLAY" textureSubLevel="2">
-                        <FontString parentKey="Hotkey" inherits="PlumberLootUIFont" justifyH="CENTER" justifyV="MIDDLE">
-                            <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER" x="0"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
-            </Frame>
-        </Frames>
-        <Animations>
-            <AnimationGroup parentKey="AnimClick" setToFinalAlpha="true">
-                <Alpha childKey="Highlight" duration="0.1" fromAlpha="0" toAlpha="1" order="1"/>
-                <Alpha childKey="Highlight" duration="0.8" fromAlpha="1" toAlpha="0" startDelay="0.1" order="2"/>
-            </AnimationGroup>
+		<Frames>
+			<Frame parentKey="HotkeyFrame" useParentLevel="true">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY" textureSubLevel="1">
+						<Texture parentKey="HotkeyBackdrop" setAllPoints="true" ignoreParentScale="true">
+							<TextureSliceMode mode="Stretched"/>
+							<TextureSliceMargins left="6" right="6" top="6" bottom="6"/>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="2">
+						<FontString parentKey="Hotkey" inherits="PlumberLootUIFont" justifyH="CENTER" justifyV="MIDDLE">
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER" x="0"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+		<Animations>
+			<AnimationGroup parentKey="AnimClick" setToFinalAlpha="true">
+				<Alpha childKey="Highlight" duration="0.1" fromAlpha="0" toAlpha="1" order="1"/>
+				<Alpha childKey="Highlight" duration="0.8" fromAlpha="1" toAlpha="0" startDelay="0.1" order="2"/>
+			</AnimationGroup>
 		</Animations>
-    </Button>
+	</Button>
 
-    <Button name="PlumberLootUISquareIconButtonTemplate" virtual="true">
+	<Button name="PlumberLootUISquareIconButtonTemplate" virtual="true">
 		<Size x="32" y="32"/>
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture parentKey="Background" setAllPoints="true" ignoreParentScale="false" alpha="0.6">
-                    <TexCoords left="0" right="0.03125" top="0.203125" bottom="0.265625"/>
-                    <TextureSliceMode mode="Stretched"/>
-                    <TextureSliceMargins left="8" right="8" top="8" bottom="8"/>
+					<TexCoords left="0" right="0.03125" top="0.203125" bottom="0.265625"/>
+					<TextureSliceMode mode="Stretched"/>
+					<TextureSliceMargins left="8" right="8" top="8" bottom="8"/>
 				</Texture>
 			</Layer>
 			<Layer level="ARTWORK">
 				<Texture parentKey="Icon">
-                    <Size x="14" y="14"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
-                    </Anchors>
+					<Size x="14" y="14"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+					</Anchors>
 				</Texture>
 			</Layer>
-        </Layers>
-    </Button>
+		</Layers>
+	</Button>
 
 	<Frame name="PlumberLootUIItemFrameTemplate" alpha="0" virtual="true">
 		<Size x="256" y="32"/>
-        <Frames>
-            <Frame parentKey="Reference" useParentLevel="true">
-                <Size x="8" y="32"/>
-                <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT"/>
-                </Anchors>
-            </Frame>
+		<Frames>
+			<Frame parentKey="Reference" useParentLevel="true">
+				<Size x="8" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT"/>
+				</Anchors>
+			</Frame>
 
-            <Frame parentKey="StackedIconContainer" hidden="true"/>
-        </Frames>
+			<Frame parentKey="StackedIconContainer" hidden="true"/>
+		</Frames>
 		<Layers>
 			<Layer level="OVERLAY">
 				<FontString parentKey="Count" inherits="PlumberLootUIFont" justifyH="LEFT" justifyV="MIDDLE">
-                    <Color r="1" g="1" b="1"/>
+					<Color r="1" g="1" b="1"/>
 					<Anchors>
 						<Anchor point="LEFT" relativeKey="$parent.Reference" relativePoint="LEFT"/>
 					</Anchors>
 				</FontString>
 				<FontString parentKey="DummyCount" inherits="PlumberLootUIFont" justifyH="LEFT" justifyV="MIDDLE" hidden="true">
-                    <Color r="1" g="1" b="1"/>
+					<Color r="1" g="1" b="1"/>
 					<Anchors>
 						<Anchor point="CENTER" relativeKey="$parent.Count" relativePoint="CENTER"/>
 					</Anchors>
 				</FontString>
 				<FontString parentKey="Text" inherits="PlumberLootUIFont" justifyH="LEFT" justifyV="MIDDLE" spacing="2">
-                    <Size x="192"/>
+					<Size x="192"/>
 					<Anchors>
 						<Anchor point="LEFT" relativeKey="$parent.Reference" relativePoint="LEFT"/>
 					</Anchors>
@@ -162,76 +162,76 @@
 		<Animations>
 			<AnimationGroup parentKey="AnimItemCount">
 				<Alpha childKey="Count" fromAlpha="0" toAlpha="0" duration="0" order="1"/>
-                <Translation childKey="Count" offsetY="-6" duration="0" order="1"/>
+				<Translation childKey="Count" offsetY="-6" duration="0" order="1"/>
 				<Alpha childKey="DummyCount" fromAlpha="1" toAlpha="1" duration="0" order="1"/>
 
 				<Alpha childKey="DummyCount" fromAlpha="1" toAlpha="0" duration="0.25" order="2" startDelay="0.25"/>
-                <Translation childKey="DummyCount" offsetY="6" duration="0.25" smoothing="OUT" order="2" startDelay="0.25"/>
-                <Alpha childKey="Count" fromAlpha="0" toAlpha="1" duration="0.25" order="2" startDelay="0.25"/>
-                <Translation childKey="Count" offsetY="6" duration="0.25" smoothing="IN" order="2" startDelay="0.25"/>
+				<Translation childKey="DummyCount" offsetY="6" duration="0.25" smoothing="OUT" order="2" startDelay="0.25"/>
+				<Alpha childKey="Count" fromAlpha="0" toAlpha="1" duration="0.25" order="2" startDelay="0.25"/>
+				<Translation childKey="Count" offsetY="6" duration="0.25" smoothing="IN" order="2" startDelay="0.25"/>
 			</AnimationGroup>
-            <AnimationGroup parentKey="AnimOut" looping="NONE" setToFinalAlpha="true">
-                <Translation duration="0.3" offsetX="100" smoothing="IN"/>
-                <Alpha duration="0.2" fromAlpha="1" toAlpha="0" startDelay="0.1" smoothing="IN"/>
-            </AnimationGroup>
+			<AnimationGroup parentKey="AnimOut" looping="NONE" setToFinalAlpha="true">
+				<Translation duration="0.3" offsetX="100" smoothing="IN"/>
+				<Alpha duration="0.2" fromAlpha="1" toAlpha="0" startDelay="0.1" smoothing="IN"/>
+			</AnimationGroup>
 		</Animations>
 	</Frame>
 
 	<Frame name="PlumberLootUIBackgroundTemplate" ignoreParentScale="true" useParentLevel="true" virtual="true">
-        <Size x="512" y="512"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Background" setAllPoints="true">
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-                <MaskTexture parentKey="MaskRight" file="Interface/AddOns/Plumber/Art/LootUI/BackgroundMask-Right" hWrapMode="CLAMP" vWrapMode="CLAMP">
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Background"/>
-                    </MaskedTextures>
-                    <Size x="512" y="512"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="0"/>
-                    </Anchors>
-                </MaskTexture>
-                <MaskTexture parentKey="MaskBottom" file="Interface/AddOns/Plumber/Art/LootUI/BackgroundMask-Bottom" hWrapMode="CLAMP" vWrapMode="CLAMP">
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Background"/>
-                    </MaskedTextures>
-                    <Size x="512" y="64"/>
-                    <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="-448"/>
-                    </Anchors>
-                </MaskTexture>
-            </Layer>
+		<Size x="512" y="512"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" setAllPoints="true">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture parentKey="MaskRight" file="Interface/AddOns/Plumber/Art/LootUI/BackgroundMask-Right" hWrapMode="CLAMP" vWrapMode="CLAMP">
+					<MaskedTextures>
+						<MaskedTexture childKey="Background"/>
+					</MaskedTextures>
+					<Size x="512" y="512"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="0"/>
+					</Anchors>
+				</MaskTexture>
+				<MaskTexture parentKey="MaskBottom" file="Interface/AddOns/Plumber/Art/LootUI/BackgroundMask-Bottom" hWrapMode="CLAMP" vWrapMode="CLAMP">
+					<MaskedTextures>
+						<MaskedTexture childKey="Background"/>
+					</MaskedTextures>
+					<Size x="512" y="64"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="-448"/>
+					</Anchors>
+				</MaskTexture>
+			</Layer>
 
 			<Layer level="BORDER">
-                <Texture parentKey="TopLine">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
-                    </Anchors>
+				<Texture parentKey="TopLine">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+					</Anchors>
 					<Size x="512" y="8"/>
-                </Texture>
-                <Texture parentKey="TopLineEnd">
-                    <Size x="16" y="8"/>
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent.TopLine" relativePoint="RIGHT" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
+				</Texture>
+				<Texture parentKey="TopLineEnd">
+					<Size x="16" y="8"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.TopLine" relativePoint="RIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
 
-                <Texture parentKey="LeftLine">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
-                    </Anchors>
+				<Texture parentKey="LeftLine">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+					</Anchors>
 					<Size x="512" y="8"/>
-                </Texture>
-                <Texture parentKey="LeftLineEnd">
-                    <Size x="8" y="16"/>
-                    <Anchors>
-                        <Anchor point="TOP" relativeKey="$parent.LeftLine" relativePoint="BOTTOM" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
+				</Texture>
+				<Texture parentKey="LeftLineEnd">
+					<Size x="8" y="16"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.LeftLine" relativePoint="BOTTOM" x="0" y="0"/>
+					</Anchors>
+				</Texture>
 			</Layer>
 		</Layers>
 	</Frame>
@@ -241,87 +241,87 @@
 		<Layers>
 			<Layer level="BORDER" textureSubLevel="0">
 				<Texture parentKey="Texture" setAllPoints="true" file="Interface\AddOns\Plumber\Art\LootUI\LootUI.png">
-                    <TextureSliceMode mode="Stretched"/>
-                    <TextureSliceMargins left="32" right="24" top="4" bottom="4"/>
+					<TextureSliceMode mode="Stretched"/>
+					<TextureSliceMargins left="32" right="24" top="4" bottom="4"/>
 				</Texture>
 			</Layer>
 		</Layers>
-        <Frames>
-            <Frame parentKey="FeedbackFrame" useParentLevel="true" hidden="true">
-                <Size x="64" y="64"/>
-                <Anchors>
-                    <Anchor point="CENTER"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="ARTWORK" textureSubLevel="0">
-                        <Texture parentKey="TopTexture" file="Interface\AddOns\Plumber\Art\LootUI\LootUI.png" alphaMode="ADD">
-                            <Size x="64" y="32"/>
-                            <Anchors>
-                                <Anchor point="BOTTOM" relativeKey="$parent" relativePoint="TOP" y="-2"/>
-                            </Anchors>
-                        </Texture>
-                        <Texture parentKey="BottomTexture" file="Interface\AddOns\Plumber\Art\LootUI\LootUI.png" alphaMode="ADD">
-                            <Size x="64" y="32"/>
-                            <Anchors>
-                                <Anchor point="TOP" relativeKey="$parent" relativePoint="BOTTOM" y="2"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Frame>
-        </Frames>
+		<Frames>
+			<Frame parentKey="FeedbackFrame" useParentLevel="true" hidden="true">
+				<Size x="64" y="64"/>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="0">
+						<Texture parentKey="TopTexture" file="Interface\AddOns\Plumber\Art\LootUI\LootUI.png" alphaMode="ADD">
+							<Size x="64" y="32"/>
+							<Anchors>
+								<Anchor point="BOTTOM" relativeKey="$parent" relativePoint="TOP" y="-2"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="BottomTexture" file="Interface\AddOns\Plumber\Art\LootUI\LootUI.png" alphaMode="ADD">
+							<Size x="64" y="32"/>
+							<Anchors>
+								<Anchor point="TOP" relativeKey="$parent" relativePoint="BOTTOM" y="2"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
 	</Frame>
 
-    <Frame name="PlumberSpikeyGlowTemplate" useParentLevel="true" hidden="true" virtual="true">
-        <Size x="32" y="32"/>
-        <Layers>
-            <Layer level="BORDER" textureSubLevel="2">
-                <Texture parentKey="Glow">
-                    <Color r="0" g="0" b="0"/>
-                    <Size x="64" y="64"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="BORDER" textureSubLevel="1">
-                <Texture parentKey="Spike" alphaMode="ADD">
-                    <Color r="0" g="0" b="0"/>
-                    <Size x="64" y="64"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-                <MaskTexture parentKey="SpikeMask" file="Interface/AddOns/Plumber/Art/LootUI/SpikeyGlowMask" hWrapMode="CLAMPTOBLACK" vWrapMode="CLAMPTOBLACK">
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Spike"/>
-                    </MaskedTextures>
-                    <Size x="64" y="64"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </MaskTexture>
-                <MaskTexture parentKey="Exclusion" file="Interface/AddOns/Plumber/Art/BasicShape/Mask-Exclusion" hWrapMode="CLAMPTOWHITE" vWrapMode="CLAMPTOWHITE">
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Spike"/>
-                        <!--MaskedTexture childKey="Glow"/-->
-                    </MaskedTextures>
-                    <Size x="32" y="32"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </MaskTexture>
-            </Layer>
-        </Layers>
-        <Animations>
-            <AnimationGroup parentKey="AnimGlow" looping="REPEAT">
-                <Rotation childKey="Spike" degrees="-360" duration="8" order="1"/>
-                <Rotation childKey="SpikeMask" degrees="360" duration="8" order="1"/>
-                <Alpha childKey="Glow" fromAlpha="0.5" toAlpha="1" duration="2" startDelay="0" order="1"/>
-                <Alpha childKey="Glow" fromAlpha="1" toAlpha="0.5" duration="2" startDelay="2" order="1"/>
-                <Alpha childKey="Glow" fromAlpha="0.5" toAlpha="1" duration="2" startDelay="4" order="1"/>
-                <Alpha childKey="Glow" fromAlpha="1" toAlpha="0.5" duration="2" startDelay="6" order="1"/>
-            </AnimationGroup>
-        </Animations>
-    </Frame>
+	<Frame name="PlumberSpikeyGlowTemplate" useParentLevel="true" hidden="true" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="BORDER" textureSubLevel="2">
+				<Texture parentKey="Glow">
+					<Color r="0" g="0" b="0"/>
+					<Size x="64" y="64"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER" textureSubLevel="1">
+				<Texture parentKey="Spike" alphaMode="ADD">
+					<Color r="0" g="0" b="0"/>
+					<Size x="64" y="64"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture parentKey="SpikeMask" file="Interface/AddOns/Plumber/Art/LootUI/SpikeyGlowMask" hWrapMode="CLAMPTOBLACK" vWrapMode="CLAMPTOBLACK">
+					<MaskedTextures>
+						<MaskedTexture childKey="Spike"/>
+					</MaskedTextures>
+					<Size x="64" y="64"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</MaskTexture>
+				<MaskTexture parentKey="Exclusion" file="Interface/AddOns/Plumber/Art/BasicShape/Mask-Exclusion" hWrapMode="CLAMPTOWHITE" vWrapMode="CLAMPTOWHITE">
+					<MaskedTextures>
+						<MaskedTexture childKey="Spike"/>
+						<!--MaskedTexture childKey="Glow"/-->
+					</MaskedTextures>
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</MaskTexture>
+			</Layer>
+		</Layers>
+		<Animations>
+			<AnimationGroup parentKey="AnimGlow" looping="REPEAT">
+				<Rotation childKey="Spike" degrees="-360" duration="8" order="1"/>
+				<Rotation childKey="SpikeMask" degrees="360" duration="8" order="1"/>
+				<Alpha childKey="Glow" fromAlpha="0.5" toAlpha="1" duration="2" startDelay="0" order="1"/>
+				<Alpha childKey="Glow" fromAlpha="1" toAlpha="0.5" duration="2" startDelay="2" order="1"/>
+				<Alpha childKey="Glow" fromAlpha="0.5" toAlpha="1" duration="2" startDelay="4" order="1"/>
+				<Alpha childKey="Glow" fromAlpha="1" toAlpha="0.5" duration="2" startDelay="6" order="1"/>
+			</AnimationGroup>
+		</Animations>
+	</Frame>
 </Ui>

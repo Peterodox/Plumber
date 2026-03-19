@@ -3,7 +3,7 @@
 -- DO NOT BOTHER TO TRANSLATE
 
 
-if not (GetLocale() == "koKR") then return end;
+if GetLocale() ~= "koKR" then return end;
 
 local _, addon = ...
 local L = addon.L;

@@ -8,121 +8,117 @@ local TimerFrame;
 
 
 local PlayerChoiceXCurrency = {
-    --[choiceID] = {type, id}     --type: 0(currency) 1(item)
-    [838] = {1, 212493},    --
-    [841] = {0, 3090},      --Flame-Blessed Iron (Siren Isle Command Map)
+	--[choiceID] = {type, id}     --type: 0(currency) 1(item)
+	[838] = {1, 212493},    --
+	[841] = {0, 3090},      --Flame-Blessed Iron (Siren Isle Command Map)
 };
 
 do  --Radian Echo
-    local RadiantEcho = {1, 246771};    --Worldsoul Memory
-    local ChoiceIDs = {827, 829, 830, 831, 832, 833, 854, 855};
-    for _, choiceID in ipairs(ChoiceIDs) do
-        PlayerChoiceXCurrency[choiceID] = RadiantEcho;
-    end
+	local RadiantEcho = {1, 246771};    --Worldsoul Memory
+	local ChoiceIDs = {827, 829, 830, 831, 832, 833, 854, 855};
+	for _, choiceID in ipairs(ChoiceIDs) do
+		PlayerChoiceXCurrency[choiceID] = RadiantEcho;
+	end
 end
 
 do  --Latent Arcana
-    local Runestone = {1, 242241};
-    local ChoiceIDs = {890, 897, 896, 905, 910};
-    for _, choiceID in ipairs(ChoiceIDs) do
-        PlayerChoiceXCurrency[choiceID] = Runestone;
-    end
+	local Runestone = {1, 242241};
+	local ChoiceIDs = {890, 897, 896, 905, 910};
+	for _, choiceID in ipairs(ChoiceIDs) do
+		PlayerChoiceXCurrency[choiceID] = Runestone;
+	end
 end
-
 
 
 local GUIDXCurrency = {};
 
-do
-
-end
 
 local EL = CreateFrame("Frame");
 
 local function HideWigets()
-    if TokenDisplay then
-        TokenDisplay:HideTokenFrame();
-    end
-    if TimerFrame then
-        TimerFrame:Hide();
-        TimerFrame:Clear();
-    end
+	if TokenDisplay then
+		TokenDisplay:HideTokenFrame();
+	end
+	if TimerFrame then
+		TimerFrame:Hide();
+		TimerFrame:Clear();
+	end
 end
 
 local function UpdateChoiceCurrency()
-    local f = PlayerChoiceFrame;
+	local f = PlayerChoiceFrame;
 
-    if not (f and f:IsShown() and f.choiceInfo and f.choiceInfo.choiceID and f.choiceInfo.objectGUID) then
-        HideWigets();
-        return
-    end
+	if not (f and f:IsShown() and f.choiceInfo and f.choiceInfo.choiceID and f.choiceInfo.objectGUID) then
+		HideWigets();
+		return
+	end
 
-    local choiceID = f.choiceInfo.choiceID;
-    local itemType, tokenInfo;
-    --print(choiceID)   --debug
-    if PlayerChoiceXCurrency[choiceID] then
-        itemType = 0;
-        tokenInfo = PlayerChoiceXCurrency[choiceID];
-    else
-        local creatureID = GetCreatureIDFromGUID(f.choiceInfo.objectGUID);
-        if GUIDXCurrency[creatureID] then
-            itemType = 0;
-            tokenInfo = GUIDXCurrency[creatureID];
-        end
-    end
+	local choiceID = f.choiceInfo.choiceID;
+	local itemType, tokenInfo;
+	--print(choiceID)   --debug
+	if PlayerChoiceXCurrency[choiceID] then
+		itemType = 0;
+		tokenInfo = PlayerChoiceXCurrency[choiceID];
+	else
+		local creatureID = GetCreatureIDFromGUID(f.choiceInfo.objectGUID);
+		if GUIDXCurrency[creatureID] then
+			itemType = 0;
+			tokenInfo = GUIDXCurrency[creatureID];
+		end
+	end
 
-    if tokenInfo then
-        if not TokenDisplay then
-            TokenDisplay = addon.CreateTokenDisplay(f);
-        end
-        TokenDisplay:DisplayCurrencyOnFrame(tokenInfo, f, "BOTTOM"); --BOTTOMRIGHT
-    else
-        HideWigets();
-    end
+	if tokenInfo then
+		if not TokenDisplay then
+			TokenDisplay = addon.CreateTokenDisplay(f);
+		end
+		TokenDisplay:DisplayCurrencyOnFrame(tokenInfo, f, "BOTTOM"); --BOTTOMRIGHT
+	else
+		HideWigets();
+	end
 end
 
 local function EL_OnUpdate(self, elapsed)
-    self:SetScript("OnUpdate", nil);
-    UpdateChoiceCurrency();
+	self:SetScript("OnUpdate", nil);
+	UpdateChoiceCurrency();
 end
 
 
 
 EL:SetScript("OnEvent", function(self, event, ...)
-    if event == "PLAYER_CHOICE_UPDATE" then
-        self:RegisterEvent("PLAYER_CHOICE_CLOSE");
-        self:SetScript("OnUpdate", EL_OnUpdate);
-    elseif event == "PLAYER_CHOICE_CLOSE" then
-        self:UnregisterEvent(event);
-        self:SetScript("OnUpdate", nil);
-        HideWigets();
-    end
+	if event == "PLAYER_CHOICE_UPDATE" then
+		self:RegisterEvent("PLAYER_CHOICE_CLOSE");
+		self:SetScript("OnUpdate", EL_OnUpdate);
+	elseif event == "PLAYER_CHOICE_CLOSE" then
+		self:UnregisterEvent(event);
+		self:SetScript("OnUpdate", nil);
+		HideWigets();
+	end
 end);
 
 local function EnableModule(state)
-    if state then
-        EL:RegisterEvent("PLAYER_CHOICE_UPDATE");
-        EL:RegisterEvent("PLAYER_CHOICE_CLOSE");
-    else
-        EL:UnregisterEvent("PLAYER_CHOICE_UPDATE");
-        EL:UnregisterEvent("PLAYER_CHOICE_CLOSE");
-        HideWigets();
-    end
+	if state then
+		EL:RegisterEvent("PLAYER_CHOICE_UPDATE");
+		EL:RegisterEvent("PLAYER_CHOICE_CLOSE");
+	else
+		EL:UnregisterEvent("PLAYER_CHOICE_UPDATE");
+		EL:UnregisterEvent("PLAYER_CHOICE_CLOSE");
+		HideWigets();
+	end
 end
 
 do
-    local moduleData = {
-        name = addon.L["ModuleName PlayerChoiceFrameToken"],
-        dbKey = "PlayerChoiceFrameToken",
-        description = addon.L["ModuleDescription PlayerChoiceFrameToken"],
-        toggleFunc = EnableModule,
-        categoryID = 2,
-        uiOrder = 5,
-        moduleAddedTime = 1718500000,
+	local moduleData = {
+		name = addon.L["ModuleName PlayerChoiceFrameToken"],
+		dbKey = "PlayerChoiceFrameToken",
+		description = addon.L["ModuleDescription PlayerChoiceFrameToken"],
+		toggleFunc = EnableModule,
+		categoryID = 2,
+		uiOrder = 5,
+		moduleAddedTime = 1718500000,
 		categoryKeys = {
 			"Inventory",
 		},
-    };
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end
