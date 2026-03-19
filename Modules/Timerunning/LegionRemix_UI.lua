@@ -382,7 +382,7 @@ do
             for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
                 committedEntryID = id;
 				if committedEntryID then
-                	break
+					break
 				end
             end
         end

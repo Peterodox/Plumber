@@ -331,7 +331,7 @@ function EL:EnableModule()
 
 
     --Find compatible addons
-    local IsAddOnLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or IsAddOnLoaded;
+    local IsAddOnLoaded = C_AddOns.IsAddOnLoaded;
 
     if IsAddOnLoaded("Immersion") then
         UpdateGossipIcons = UpdateGossipIcons_Immersion;

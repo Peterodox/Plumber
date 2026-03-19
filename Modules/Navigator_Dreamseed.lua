@@ -246,7 +246,6 @@ local function UpdateWaypoints()
         if bestCreatureID then
             local data = locations[1];
             flag = data[4];
-            creatureID = data[1];
             local plantName;
             if flag == 2 then
                 plantName = NAME_DREAMSEED_CHEST;
