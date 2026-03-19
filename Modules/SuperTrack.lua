@@ -717,10 +717,10 @@ local PreviousPoint;
 function PlumberSuperTrackingMixin:SetTarget(name, uiMapID, x, y, iconName)
 	if not (self.enabled and self.frameReady) then return end;
 
-    local point = {
-        uiMapID = uiMapID,
-        position = CreateVector2D(x, y);
-    };
+	local point = {
+		uiMapID = uiMapID,
+		position = CreateVector2D(x, y);
+	};
 
 	self.setByPlumber = true
 	--[[
@@ -731,8 +731,8 @@ function PlumberSuperTrackingMixin:SetTarget(name, uiMapID, x, y, iconName)
 	end
 	--]]
 
-    SetUserWaypoint(point);
-    SetSuperTrackedUserWaypoint(true);
+	SetUserWaypoint(point);
+	SetSuperTrackedUserWaypoint(true);
 
 	if name ~= self.waypointName then
 		self.waypointName = name;

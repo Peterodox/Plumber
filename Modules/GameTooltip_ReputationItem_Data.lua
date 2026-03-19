@@ -7,39 +7,39 @@ local _, addon = ...
 
 local SpellFaction = {};
 local FactionChildren = {
-    --[parentFactionID] = {factionID1, factionID2, ...},
+	--[parentFactionID] = {factionID1, factionID2, ...},
 };
 
 local GetItemSpell = C_Item.GetItemSpell;
 local ItemFaction = {};
 
 local function GetFactionGrantedByItem(itemID)
-    if ItemFaction[itemID] then
-        return ItemFaction[itemID]
-    end
+	if ItemFaction[itemID] then
+		return ItemFaction[itemID]
+	end
 
-    local _, spellID = GetItemSpell(itemID);
-    if spellID and SpellFaction[spellID] then
-        local factionID = SpellFaction[spellID];
-        if FactionChildren[factionID] then
-            factionID = FactionChildren[factionID]; --table
-        end
-        ItemFaction[itemID] = factionID;
-        return factionID
-    end
+	local _, spellID = GetItemSpell(itemID);
+	if spellID and SpellFaction[spellID] then
+		local factionID = SpellFaction[spellID];
+		if FactionChildren[factionID] then
+			factionID = FactionChildren[factionID]; --table
+		end
+		ItemFaction[itemID] = factionID;
+		return factionID
+	end
 end
 addon.GetFactionGrantedByItem = GetFactionGrantedByItem;
 
 
 FactionChildren[1834] = {   --Legion (Insignia of Broken Shores)
-    2170,
-    2045,
-    1900,
-    1883,
-    1828,
-    1859,
-    1894,
-    1948,
+	2170,
+	2045,
+	1900,
+	1883,
+	1828,
+	1859,
+	1894,
+	1948,
 };
 
 

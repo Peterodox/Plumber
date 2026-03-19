@@ -1,300 +1,300 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-    <Script file="Preload.lua"/>
-    <Script file="Redactor.lua"/>
-    <Include file="Changelog\Localization.xml"/>
-    <Script file="ScrollBar.lua"/>
+	<Script file="Preload.lua"/>
+	<Script file="Redactor.lua"/>
+	<Include file="Changelog\Localization.xml"/>
+	<Script file="ScrollBar.lua"/>
 
 
-    <Frame name="PlumberSettingsPanelLayoutTemplate" hidden="true" virtual="true">
-        <Size x="128" y="128"/>
-        <Frames>
-            <Frame parentKey="FrameContainer" setAllPoints="true" useParentLevel="true">
-                <Frames>
-                    <Frame parentKey="LeftSection">
-                        <Size x="8"/>
-                        <Anchors>
-                            <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
-                            <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT"/>
-                        </Anchors>
-                    </Frame>
-                    <Frame parentKey="RightSection">
-                        <Size x="8"/>
-                        <Anchors>
-                            <Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT"/>
-                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
-                        </Anchors>
-                    </Frame>
-                    <Frame parentKey="CentralSection">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" relativeKey="$parent.LeftSection" relativePoint="TOPRIGHT"/>
-                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightSection" relativePoint="BOTTOMLEFT"/>
-                        </Anchors>
-                    </Frame>
+	<Frame name="PlumberSettingsPanelLayoutTemplate" hidden="true" virtual="true">
+		<Size x="128" y="128"/>
+		<Frames>
+			<Frame parentKey="FrameContainer" setAllPoints="true" useParentLevel="true">
+				<Frames>
+					<Frame parentKey="LeftSection">
+						<Size x="8"/>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+							<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame parentKey="RightSection">
+						<Size x="8"/>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Frame>
+					<Frame parentKey="CentralSection">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.LeftSection" relativePoint="TOPRIGHT"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightSection" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
 
-                    <Frame parentKey="SideTab"/>
-                    <Frame parentKey="TabButtonContainer" enableMouse="true" enableMouseMotion="true"/>
+					<Frame parentKey="SideTab"/>
+					<Frame parentKey="TabButtonContainer" enableMouse="true" enableMouseMotion="true"/>
 
-                    <Frame parentKey="ModuleTab"/>
-                    <Frame parentKey="ChangelogTab" hidden="true"/>
-                </Frames>
-            </Frame>
-        </Frames>
-    </Frame>
-
-
-    <Script file="SettingsPanel.lua"/>
-    <Script file="SettingsPanelNew.lua"/>
-    <Script file="SettingsPanelRegistry.lua"/>
+					<Frame parentKey="ModuleTab"/>
+					<Frame parentKey="ChangelogTab" hidden="true"/>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
 
 
-    <EditBox name="PlumberEditBoxArtTemplate" autoFocus="false" virtual="true">
-        <Size x="80" y="28"/>
-        <FontString inherits="GameFontNormal" justifyH="LEFT"/>
-        <TextInsets left="26" right="28"/>
-        <Color r="1" g="1" b="1"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="40" y="40"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="OVERLAY">
-                <Texture parentKey="Magnifier" parentArray="SkinnableObjects">
-                    <Size x="20" y="20"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="14"/>
-                    </Anchors>
-                </Texture>
-                <FontString parentKey="Instruction" justifyH="LEFT" inherits="GameFontNormal">
-                    <Color r="0.5" g="0.5" b="0.5"/>
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="26"/>
-                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-8"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-        <Frames>
-            <Button parentKey="ResetButton" hidden="true" parentArray="SkinnableObjects">
-                <Size x="28" y="28"/>
+	<Script file="SettingsPanel.lua"/>
+	<Script file="SettingsPanelNew.lua"/>
+	<Script file="SettingsPanelRegistry.lua"/>
+
+
+	<EditBox name="PlumberEditBoxArtTemplate" autoFocus="false" virtual="true">
+		<Size x="80" y="28"/>
+		<FontString inherits="GameFontNormal" justifyH="LEFT"/>
+		<TextInsets left="26" right="28"/>
+		<Color r="1" g="1" b="1"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="Magnifier" parentArray="SkinnableObjects">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="14"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="Instruction" justifyH="LEFT" inherits="GameFontNormal">
+					<Color r="0.5" g="0.5" b="0.5"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="26"/>
+						<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-8"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button parentKey="ResetButton" hidden="true" parentArray="SkinnableObjects">
+				<Size x="28" y="28"/>
 				<HitRectInsets>
 					<AbsInset left="-2" right="-2" top="-2" bottom="-2"/>
 				</HitRectInsets>
-                <Anchors>
-                    <Anchor point="RIGHT"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <Texture parentKey="Texture" parentArray="SkinnableObjects">
-                            <Size x="20" y="20"/>
-                            <Anchors>
-                                <Anchor point="CENTER"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Button>
-        </Frames>
-    </EditBox>
+				<Anchors>
+					<Anchor point="RIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture parentKey="Texture" parentArray="SkinnableObjects">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+		</Frames>
+	</EditBox>
 
-    <Button name="PlumberTabButtonTemplate" virtual="true">
-        <Size x="72" y="40"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="24" y="48"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" y="-1"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="24" y="48"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" y="-1"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="48" y="48"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="OVERLAY">
-                <FontString parentKey="Name" justifyH="CENTER" inherits="GameFontNormal">
-                    <Color r="0.5" g="0.5" b="0.5"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Button>
+	<Button name="PlumberTabButtonTemplate" virtual="true">
+		<Size x="72" y="40"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="24" y="48"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" y="-1"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="24" y="48"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" y="-1"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="48" y="48"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Name" justifyH="CENTER" inherits="GameFontNormal">
+					<Color r="0.5" g="0.5" b="0.5"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Button>
 
-    <Button name="PlumberSquareButtonArtTemplate" virtual="true">
-        <Size x="28" y="28"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Background" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="40" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="ARTWORK">
-                <Texture parentKey="Texture" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="24" y="24"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="HIGHLIGHT">
-                <Texture parentKey="Highlight" parentArray="SkinnableObjects" alphaMode="ADD">
-                    <Color r="0.4" g="0.2" b="0.1"/>
-                    <Size x="32" y="32"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers>
-    </Button>
+	<Button name="PlumberSquareButtonArtTemplate" virtual="true">
+		<Size x="28" y="28"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Texture" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="24" y="24"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="Highlight" parentArray="SkinnableObjects" alphaMode="ADD">
+					<Color r="0.4" g="0.2" b="0.1"/>
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
 
-    <Button name="PlumberSettingsPanelEntryTemplate" virtual="true">
-        <Size x="128" y="28"/>
-        <Layers>
-            <Layer level="ARTWORK">
-                <Texture parentKey="Box" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="24" y="24"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="14"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="OVERLAY">
-                <FontString parentKey="Label" justifyH="LEFT" inherits="GameFontNormal">
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="28"/>
-                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-28"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-        <Frames>
-            <Button parentKey="OptionToggle" propagateMouseInput="Motion" parentArray="SkinnableObjects" hidden="true">
-                <Size x="28" y="28"/>
+	<Button name="PlumberSettingsPanelEntryTemplate" virtual="true">
+		<Size x="128" y="28"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Box" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="24" y="24"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="14"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Label" justifyH="LEFT" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="28"/>
+						<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-28"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button parentKey="OptionToggle" propagateMouseInput="Motion" parentArray="SkinnableObjects" hidden="true">
+				<Size x="28" y="28"/>
 				<HitRectInsets>
 					<AbsInset left="-14" right="0" top="0" bottom="0"/>
 				</HitRectInsets>
-                <Anchors>
-                    <Anchor point="RIGHT"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <Texture parentKey="Texture" parentArray="SkinnableObjects">
-                            <Size x="20" y="20"/>
-                            <Anchors>
-                                <Anchor point="CENTER"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Button>
-        </Frames>
-    </Button>
+				<Anchors>
+					<Anchor point="RIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture parentKey="Texture" parentArray="SkinnableObjects">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+		</Frames>
+	</Button>
 
-    <Button name="PlumberSettingsPanelHeaderTemplate" virtual="true">
-        <Size x="128" y="28"/>
-        <Layers>
-            <Layer level="ARTWORK">
-                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="20" y="20"/>
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="-8" y="-2"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="20" y="20"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT" x="0"/>
-                        <Anchor point="BOTTOMLEFT" relativeKey="$parent.Left" relativePoint="BOTTOMRIGHT" x="0"/>
-                        <Anchor point="RIGHT"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="OVERLAY">
-                <FontString parentKey="Label" justifyH="LEFT" inherits="GameFontNormal">
-                    <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="LEFT" x="8" y="5"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Button>
+	<Button name="PlumberSettingsPanelHeaderTemplate" virtual="true">
+		<Size x="128" y="28"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="-8" y="-2"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT" x="0"/>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent.Left" relativePoint="BOTTOMRIGHT" x="0"/>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Label" justifyH="LEFT" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="LEFT" x="8" y="5"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Button>
 
-    <Frame name="PlumberSettingsAnimSelectionTemplate" virtual="true" useParentLevel="true">
-        <Size x="128" y="28"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="40" y="40"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <!--Layer level="BACKGROUND" textureSubLevel="1">
-                <Texture parentKey="Border1Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Border1Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Border1Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="40" y="40"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Border1Left" relativePoint="TOPRIGHT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border1Right" relativePoint="BOTTOMLEFT"/>
-                    </Anchors>
-                </Texture>
+	<Frame name="PlumberSettingsAnimSelectionTemplate" virtual="true" useParentLevel="true">
+		<Size x="128" y="28"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<!--Layer level="BACKGROUND" textureSubLevel="1">
+				<Texture parentKey="Border1Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Border1Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Border1Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Border1Left" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border1Right" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
 				<MaskTexture parentKey="Mask1" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle-Blurry">
 					<Size x="240" y="80"/>
 					<Anchors>
@@ -302,30 +302,30 @@
 					</Anchors>
 					<MaskedTextures>
 						<MaskedTexture childKey="Border1Left"/>
-                        <MaskedTexture childKey="Border1Center"/>
-                        <MaskedTexture childKey="Border1Right"/>
+						<MaskedTexture childKey="Border1Center"/>
+						<MaskedTexture childKey="Border1Right"/>
 					</MaskedTextures>
 				</MaskTexture>
 
-                <Texture parentKey="Border2Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Border2Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="16" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Border2Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
-                    <Size x="40" y="40"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Border2Left" relativePoint="TOPRIGHT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border2Right" relativePoint="BOTTOMLEFT"/>
-                    </Anchors>
-                </Texture>
+				<Texture parentKey="Border2Left" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Border2Right" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="16" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Border2Center" parentArray="SkinnableObjects" snapToPixelGrid="false" texelSnappingBias="0">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Border2Left" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border2Right" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
 				<MaskTexture parentKey="Mask2" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle-Blurry">
 					<Size x="240" y="80"/>
 					<Anchors>
@@ -333,136 +333,136 @@
 					</Anchors>
 					<MaskedTextures>
 						<MaskedTexture childKey="Border2Left"/>
-                        <MaskedTexture childKey="Border2Center"/>
-                        <MaskedTexture childKey="Border2Right"/>
+						<MaskedTexture childKey="Border2Center"/>
+						<MaskedTexture childKey="Border2Right"/>
 					</MaskedTextures>
 				</MaskTexture>
-            </Layer-->
-        </Layers>
-    </Frame>
+			</Layer-->
+		</Layers>
+	</Frame>
 
-    <Button name="PlumberTextureHighlightButtonTemplate" virtual="true">
-        <Size x="16" y="16"/>
-        <Layers>
-            <Layer level="ARTWORK">
-                <Texture parentKey="Texture">
-                    <Size x="16" y="16"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="HIGHLIGHT">
-                <Texture parentKey="Highlight" alphaMode="ADD" alpha="0.5">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Texture" relativePoint="TOPLEFT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Texture" relativePoint="BOTTOMRIGHT"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers>
-    </Button>
+	<Button name="PlumberTextureHighlightButtonTemplate" virtual="true">
+		<Size x="16" y="16"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Texture">
+					<Size x="16" y="16"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="Highlight" alphaMode="ADD" alpha="0.5">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Texture" relativePoint="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Texture" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
 
-    <Frame name="PlumberScrollBarWithDynamicSizeTemplate" virtual="true">
-        <Size x="20" y="80"/>
-        <Frames>
-            <Frame parentKey="Rail" useParentLevel="true">
-                <Size x="20" y="80"/>
-                <Anchors>
-                    <Anchor point="TOP" y="0"/>
-                    <Anchor point="BOTTOM" y="0"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <Texture parentKey="Top">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
-                            </Anchors>
-                        </Texture>
-                        <Texture parentKey="Bottom">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
-                            </Anchors>
-                        </Texture>
-                        <Texture parentKey="Middle">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="BOTTOMLEFT"/>
-                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="TOPRIGHT"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Frame>
+	<Frame name="PlumberScrollBarWithDynamicSizeTemplate" virtual="true">
+		<Size x="20" y="80"/>
+		<Frames>
+			<Frame parentKey="Rail" useParentLevel="true">
+				<Size x="20" y="80"/>
+				<Anchors>
+					<Anchor point="TOP" y="0"/>
+					<Anchor point="BOTTOM" y="0"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Top">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="Bottom">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="Middle">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="BOTTOMLEFT"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
 
-            <Button parentKey="UpArrow" inherits="PlumberTextureHighlightButtonTemplate">
-                <Size x="20" y="16"/>
-                <Anchors>
-                    <Anchor point="TOP"/>
-                </Anchors>
-            </Button>
+			<Button parentKey="UpArrow" inherits="PlumberTextureHighlightButtonTemplate">
+				<Size x="20" y="16"/>
+				<Anchors>
+					<Anchor point="TOP"/>
+				</Anchors>
+			</Button>
 
-            <Button parentKey="DownArrow" inherits="PlumberTextureHighlightButtonTemplate">
-                <Size x="20" y="16"/>
-                <Anchors>
-                    <Anchor point="BOTTOM"/>
-                </Anchors>
-            </Button>
+			<Button parentKey="DownArrow" inherits="PlumberTextureHighlightButtonTemplate">
+				<Size x="20" y="16"/>
+				<Anchors>
+					<Anchor point="BOTTOM"/>
+				</Anchors>
+			</Button>
 
-            <Button parentKey="Thumb">
-                <Size x="20" y="48"/>
-                <Anchors>
-                    <Anchor point="TOP" relativeKey="$parent.Rail" relativePoint="TOP"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="ARTWORK">
-                        <Texture parentKey="Top">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
-                            </Anchors>
-                        </Texture>
-                        <Texture parentKey="Bottom">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
-                            </Anchors>
-                        </Texture>
-                        <Texture parentKey="Middle">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="BOTTOMLEFT"/>
-                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="TOPRIGHT"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                    <Layer level="HIGHLIGHT">
-                        <Texture parentKey="HighlightTop" alphaMode="ADD">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="TOPLEFT"/>
-                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Top" relativePoint="BOTTOMRIGHT"/>
-                            </Anchors>
-                        </Texture>
-                        <Texture parentKey="HighlightBottom" alphaMode="ADD">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativeKey="$parent.Bottom" relativePoint="TOPLEFT"/>
-                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="BOTTOMRIGHT"/>
-                            </Anchors>
-                        </Texture>
-                        <Texture parentKey="HighlightMiddle" alphaMode="ADD">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativeKey="$parent.HighlightTop" relativePoint="BOTTOMLEFT"/>
-                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.HighlightBottom" relativePoint="TOPRIGHT"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Button>
-        </Frames>
-    </Frame>
+			<Button parentKey="Thumb">
+				<Size x="20" y="48"/>
+				<Anchors>
+					<Anchor point="TOP" relativeKey="$parent.Rail" relativePoint="TOP"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Top">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent" relativePoint="TOP"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="Bottom">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent" relativePoint="BOTTOM"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="Middle">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="BOTTOMLEFT"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="HIGHLIGHT">
+						<Texture parentKey="HighlightTop" alphaMode="ADD">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.Top" relativePoint="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Top" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="HighlightBottom" alphaMode="ADD">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.Bottom" relativePoint="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bottom" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="HighlightMiddle" alphaMode="ADD">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.HighlightTop" relativePoint="BOTTOMLEFT"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.HighlightBottom" relativePoint="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+		</Frames>
+	</Frame>
 </Ui>

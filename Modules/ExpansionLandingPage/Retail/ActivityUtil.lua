@@ -28,19 +28,19 @@ local ReadyForTurnIn = API.IsQuestReadyForTurnIn;
 
 
 local function ShownIfOnQuest(questID)
-    return questID and IsOnQuest(questID)
+	return questID and IsOnQuest(questID)
 end
 
 local function ShownIfActive(questID)
-    return questID and (IsOnQuest(questID) or IsWorldQuestActive(questID))
+	return questID and (IsOnQuest(questID) or IsWorldQuestActive(questID))
 end
 
 local function IsCategoryCollapsed(categoryID)
-    return GetDBBool("LandingPage_Activity_Collapsed_"..categoryID)
+	return GetDBBool("LandingPage_Activity_Collapsed_"..categoryID)
 end
 
 local function SetCategoryCollapsed(categoryID, isCollapsed)
-    return addon.SetDBValue("LandingPage_Activity_Collapsed_"..categoryID, isCollapsed, true)
+	return addon.SetDBValue("LandingPage_Activity_Collapsed_"..categoryID, isCollapsed, true)
 end
 
 
@@ -56,27 +56,27 @@ local DynamicQuestDataProvider = {};
 
 local ConditionFuncs = {};
 do
-    function ConditionFuncs.OwnItem(itemInfo)
-        --itemInfo can be item name
-        if itemInfo then
-            return GetItemCount(itemInfo) > 0
-        end
-        return false
-    end
+	function ConditionFuncs.OwnItem(itemInfo)
+		--itemInfo can be item name
+		if itemInfo then
+			return GetItemCount(itemInfo) > 0
+		end
+		return false
+	end
 end
 
 
 local ShownQuestClassification = {
-    --Show these types of quests
-    [Enum.QuestClassification.Recurring] = true,
-    [Enum.QuestClassification.Meta] = true,
-    [Enum.QuestClassification.Calling] = true,
+	--Show these types of quests
+	[Enum.QuestClassification.Recurring] = true,
+	[Enum.QuestClassification.Meta] = true,
+	[Enum.QuestClassification.Calling] = true,
 };
 
 
 local QuestIcon = {
-    WEEKLY_QUEST = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/WeeklyQuestAvailable.png",
-    PREY_ACTIVE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png",
+	WEEKLY_QUEST = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/WeeklyQuestAvailable.png",
+	PREY_ACTIVE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png",
 };
 
 
@@ -90,447 +90,447 @@ local QuestIconAtlas = {
 	[Enum.QuestClassification.Legendary] =	"UI-QuestPoiLegendary-QuestBang",
 	[Enum.QuestClassification.Important] =	"importantavailablequesticon",
 
-    DELVES_BOUNTIFUL = "delves-bountiful",
-    DAILY_QUEST = "quest-recurring-available",
+	DELVES_BOUNTIFUL = "delves-bountiful",
+	DAILY_QUEST = "quest-recurring-available",
 };
 ActivityUtil.QuestIconAtlas = QuestIconAtlas;
 
 
 local InProgressQuestIconFile = {
-    [Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
-    [Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-    [Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-    [Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
-    [Enum.QuestClassification.WorldQuest] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Normal] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png",
+	[Enum.QuestClassification.Questline] = 	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Recurring] =	"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.Meta] = 		"Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
+	[Enum.QuestClassification.WorldQuest] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressBlue.png",
 
-    [128] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png",
+	[128] = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png",
 };
 
 
 local Conditions = {};
 do
-    ActivityUtil.Conditions = Conditions;
+	ActivityUtil.Conditions = Conditions;
 
-    Conditions.ItemReadyToTurnInWhenLooted_ItemID = {
-        ShouldShowActivity = ConditionFuncs.OwnItem,
-        IsReadyForTurnIn = ConditionFuncs.OwnItem,
-    };
+	Conditions.ItemReadyToTurnInWhenLooted_ItemID = {
+		ShouldShowActivity = ConditionFuncs.OwnItem,
+		IsReadyForTurnIn = ConditionFuncs.OwnItem,
+	};
 
-    Conditions.ItemReadyToTurnInWhenLooted_ItemName = {
-        ShouldShowActivity = ConditionFuncs.OwnItem,
-        IsReadyForTurnIn = ConditionFuncs.OwnItem,
-        useItemName = true,
-    };
+	Conditions.ItemReadyToTurnInWhenLooted_ItemName = {
+		ShouldShowActivity = ConditionFuncs.OwnItem,
+		IsReadyForTurnIn = ConditionFuncs.OwnItem,
+		useItemName = true,
+	};
 
-    Conditions.KareshWarrant = {
-        ShouldShowActivity = function()
-            return GetCurrentRenownLevel(2658) >= 3
-        end,
-    };
+	Conditions.KareshWarrant = {
+		ShouldShowActivity = function()
+			return GetCurrentRenownLevel(2658) >= 3
+		end,
+	};
 
-    Conditions.DelversBounty = {
-        ShouldShowActivity = function()
-            return GetCurrentRenownLevel(2722) >= 2
-        end,
-    };
+	Conditions.DelversBounty = {
+		ShouldShowActivity = function()
+			return GetCurrentRenownLevel(2722) >= 2
+		end,
+	};
 end
 
 
 local TooltipFuncs = {};
 do
-    ActivityUtil.TooltipFuncs = TooltipFuncs;
+	ActivityUtil.TooltipFuncs = TooltipFuncs;
 
-    local function ShouldShowAdvancedTooltip()
-        return GetDBBool("LandingPage_AdvancedTooltip");
-    end
+	local function ShouldShowAdvancedTooltip()
+		return GetDBBool("LandingPage_AdvancedTooltip");
+	end
 
-    --Similar to Bullet list
-    local function Tooltip_AddListNewLine(tooltip, text, r, g, b)
-        tooltip:AddLine("|TInterface/AddOns/Plumber/Art/Tooltip/TabChar_Dash:0:0|t"..text, r, g, b);
-    end
-    local function Tooltip_AddListInLine(tooltip, text, r, g, b)
-        tooltip:AddLine("|TInterface/AddOns/Plumber/Art/Tooltip/TabChar_Space:0:0|t"..text, r, g, b);
-    end
+	--Similar to Bullet list
+	local function Tooltip_AddListNewLine(tooltip, text, r, g, b)
+		tooltip:AddLine("|TInterface/AddOns/Plumber/Art/Tooltip/TabChar_Dash:0:0|t"..text, r, g, b);
+	end
+	local function Tooltip_AddListInLine(tooltip, text, r, g, b)
+		tooltip:AddLine("|TInterface/AddOns/Plumber/Art/Tooltip/TabChar_Space:0:0|t"..text, r, g, b);
+	end
 
-    local function Tooltip_AddListQuest(tooltip, questID, questName)
-        if IsQuestFlaggedCompleted(questID) then
-            Tooltip_AddListInLine(tooltip, questName, 0.251, 0.753, 0.251)
-        else
-            Tooltip_AddListInLine(tooltip, questName, 0.5, 0.5, 0.5);
-        end
-    end
+	local function Tooltip_AddListQuest(tooltip, questID, questName)
+		if IsQuestFlaggedCompleted(questID) then
+			Tooltip_AddListInLine(tooltip, questName, 0.251, 0.753, 0.251)
+		else
+			Tooltip_AddListInLine(tooltip, questName, 0.5, 0.5, 0.5);
+		end
+	end
 
 
-    function TooltipFuncs.DevouredEnergyPod(tooltip)
-        --Devoured Energy-Pod (20)  Translocated Gorger
-        --Add item count if mount not learnt
-        if API.IsMountCollected(2602) then return true end;
-        local quantityRequired = 20;
-        tooltip:AddLine(" ");
-        API.AddCraftingReagentToTooltip(tooltip, 246240, quantityRequired);
-        return true
-    end
+	function TooltipFuncs.DevouredEnergyPod(tooltip)
+		--Devoured Energy-Pod (20)  Translocated Gorger
+		--Add item count if mount not learnt
+		if API.IsMountCollected(2602) then return true end;
+		local quantityRequired = 20;
+		tooltip:AddLine(" ");
+		API.AddCraftingReagentToTooltip(tooltip, 246240, quantityRequired);
+		return true
+	end
 
-    function TooltipFuncs.WeeklyCofferKey_Shared(tooltip, title, dataKey)
-        local loaded = true;
-        local keepUpdating = false;
+	function TooltipFuncs.WeeklyCofferKey_Shared(tooltip, title, dataKey)
+		local loaded = true;
+		local keepUpdating = false;
 
-        tooltip:AddLine(title, 1, 1, 1, true);
+		tooltip:AddLine(title, 1, 1, 1, true);
 
-        local tbl = addon.WeeklyRewardsConstant;
+		local tbl = addon.WeeklyRewardsConstant;
 
-        if ShouldShowAdvancedTooltip() then
-            for _, itemID in ipairs(tbl[dataKey]) do
-                local itemName = C_Item.GetItemNameByID(itemID);
-                local sources = tbl.ChestSources[itemID];
+		if ShouldShowAdvancedTooltip() then
+			for _, itemID in ipairs(tbl[dataKey]) do
+				local itemName = C_Item.GetItemNameByID(itemID);
+				local sources = tbl.ChestSources[itemID];
 
-                if itemName then
-                    tooltip:AddLine(" ");
-                    Tooltip_AddListNewLine(tooltip, itemName, 1, 0.82, 0);
-                else
-                    loaded = false;
-                end
+				if itemName then
+					tooltip:AddLine(" ");
+					Tooltip_AddListNewLine(tooltip, itemName, 1, 0.82, 0);
+				else
+					loaded = false;
+				end
 
-                if sources then
-                    local quests = sources.quests or (sources.questMap and DynamicQuestDataProvider:GetQuestsByMap(sources.questMap));
-                    if quests then
-                        if sources.questMap then
-                            keepUpdating = true;
-                            for _, questInfo in ipairs(quests) do
-                                local questID = questInfo.questID;
-                                local rewards, missingData = API.GetQuestRewards(questID);
-                                if missingData then
-                                    loaded = false;
-                                end
-                                if rewards then
-                                    if rewards.items then
-                                        for _, v in ipairs(rewards.items) do
-                                            if v.id == itemID then
-                                                local questName = API.GetQuestName(questID);
-                                                if questName then
-                                                    Tooltip_AddListQuest(tooltip, questID, questName);
-                                                else
-                                                    loaded = false;
-                                                end
-                                                break
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        else
-                            for _, questID in ipairs(quests) do
-                                local questName = API.GetQuestName(questID);
-                                if questName then
-                                    Tooltip_AddListQuest(tooltip, questID, questName);
-                                else
-                                    loaded = false;
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        else
-            tooltip:AddLine(" ");
-            for _, itemID in ipairs(tbl.MajorChests) do
-                local name = C_Item.GetItemNameByID(itemID);
-                if name then
-                    tooltip:AddLine("- "..name, 1, 1, 1, false);
-                else
-                    loaded = false;
-                end
-            end
-        end
+				if sources then
+					local quests = sources.quests or (sources.questMap and DynamicQuestDataProvider:GetQuestsByMap(sources.questMap));
+					if quests then
+						if sources.questMap then
+							keepUpdating = true;
+							for _, questInfo in ipairs(quests) do
+								local questID = questInfo.questID;
+								local rewards, missingData = API.GetQuestRewards(questID);
+								if missingData then
+									loaded = false;
+								end
+								if rewards then
+									if rewards.items then
+										for _, v in ipairs(rewards.items) do
+											if v.id == itemID then
+												local questName = API.GetQuestName(questID);
+												if questName then
+													Tooltip_AddListQuest(tooltip, questID, questName);
+												else
+													loaded = false;
+												end
+												break
+											end
+										end
+									end
+								end
+							end
+						else
+							for _, questID in ipairs(quests) do
+								local questName = API.GetQuestName(questID);
+								if questName then
+									Tooltip_AddListQuest(tooltip, questID, questName);
+								else
+									loaded = false;
+								end
+							end
+						end
+					end
+				end
+			end
+		else
+			tooltip:AddLine(" ");
+			for _, itemID in ipairs(tbl.MajorChests) do
+				local name = C_Item.GetItemNameByID(itemID);
+				if name then
+					tooltip:AddLine("- "..name, 1, 1, 1, false);
+				else
+					loaded = false;
+				end
+			end
+		end
 
-        return loaded, keepUpdating
-    end
+		return loaded, keepUpdating
+	end
 
-    function TooltipFuncs.WeeklyRestoredCofferKey(tooltip)
-        return TooltipFuncs.WeeklyCofferKey_Shared(tooltip, L["Weekly Coffer Key Tooltip"], "MajorChests");
-    end
+	function TooltipFuncs.WeeklyRestoredCofferKey(tooltip)
+		return TooltipFuncs.WeeklyCofferKey_Shared(tooltip, L["Weekly Coffer Key Tooltip"], "MajorChests");
+	end
 
-    function TooltipFuncs.WeeklyCofferKeyShard(tooltip)
-        return TooltipFuncs.WeeklyCofferKey_Shared(tooltip, L["Weekly Coffer Key Shards Tooltip"], "MinorChests");
-    end
+	function TooltipFuncs.WeeklyCofferKeyShard(tooltip)
+		return TooltipFuncs.WeeklyCofferKey_Shared(tooltip, L["Weekly Coffer Key Shards Tooltip"], "MinorChests");
+	end
 end
 
 
 local function CreateChildrenFromQuestList(list)
-    local tbl = {};
-    for i, questID in ipairs(list) do
-        tbl[i] = {questID = questID};
-    end
-    return tbl
+	local tbl = {};
+	for i, questID in ipairs(list) do
+		tbl[i] = {questID = questID};
+	end
+	return tbl
 end
 ActivityUtil.CreateChildrenFromQuestList = CreateChildrenFromQuestList;
 
 
 local SortFuncs = {};
 do
-    function SortFuncs.DataIndex(a, b)
-        return a.dataIndex < b.dataIndex
-    end
+	function SortFuncs.DataIndex(a, b)
+		return a.dataIndex < b.dataIndex
+	end
 
-    function SortFuncs.IncompleteFirst(a, b)
-        if a.completed ~= b.completed then
-            return b.completed
-        end
+	function SortFuncs.IncompleteFirst(a, b)
+		if a.completed ~= b.completed then
+			return b.completed
+		end
 
-        if (a.isOnQuest ~= nil) and (b.isOnQuest ~= nil) and a.isOnQuest ~= b.isOnQuest then
-            return b.isOnQuest
-        end
+		if (a.isOnQuest ~= nil) and (b.isOnQuest ~= nil) and a.isOnQuest ~= b.isOnQuest then
+			return b.isOnQuest
+		end
 
-        if (a.readyForTurnIn ~= nil) and (b.readyForTurnIn ~= nil) and a.readyForTurnIn ~= b.readyForTurnIn then
-            return b.readyForTurnIn
-        end
+		if (a.readyForTurnIn ~= nil) and (b.readyForTurnIn ~= nil) and a.readyForTurnIn ~= b.readyForTurnIn then
+			return b.readyForTurnIn
+		end
 
-        if a.sortToTop ~= b.sortToTop then
-            return a.sortToTop
-        end
+		if a.sortToTop ~= b.sortToTop then
+			return a.sortToTop
+		end
 
-        return a.dataIndex < b.dataIndex
-    end
+		return a.dataIndex < b.dataIndex
+	end
 
-    function SortFuncs.ClassificationThenQuestID(a, b)
-        if a.questClassification and b.questClassification then
-            if a.questClassification ~= b.questClassification then
-                return a.questClassification < b.questClassification
-            end
-        else
-            return a.questClassification ~= nil
-        end
+	function SortFuncs.ClassificationThenQuestID(a, b)
+		if a.questClassification and b.questClassification then
+			if a.questClassification ~= b.questClassification then
+				return a.questClassification < b.questClassification
+			end
+		else
+			return a.questClassification ~= nil
+		end
 
-        if a.questID and b.questID then
-            return a.questID > b.questID
-        end
+		if a.questID and b.questID then
+			return a.questID > b.questID
+		end
 
-        return a.name < b.name
-    end
+		return a.name < b.name
+	end
 end
 
 
 local function InitQuestData(info)
-    local questClassification = info.questClassification or GetQuestClassification(info.questID);
+	local questClassification = info.questClassification or GetQuestClassification(info.questID);
 
-    if HaveQuestData(info.questID) then
-        info.questClassification = questClassification;
-    end
+	if HaveQuestData(info.questID) then
+		info.questClassification = questClassification;
+	end
 
-    info.isOnQuest = IsOnQuest(info.questID);
+	info.isOnQuest = IsOnQuest(info.questID);
 
-    if info.isOnQuest then
-        info.icon = questClassification and InProgressQuestIconFile[questClassification];
-        info.readyForTurnIn = ReadyForTurnIn(info.questID);
-    else
-        info.readyForTurnIn = false;
-    end
+	if info.isOnQuest then
+		info.icon = questClassification and InProgressQuestIconFile[questClassification];
+		info.readyForTurnIn = ReadyForTurnIn(info.questID);
+	else
+		info.readyForTurnIn = false;
+	end
 
-    if not info.atlas then
-        info.atlas = questClassification and QuestIconAtlas[questClassification] or "QuestNormal";
-    end
+	if not info.atlas then
+		info.atlas = questClassification and QuestIconAtlas[questClassification] or "QuestNormal";
+	end
 end
 
 
 do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, instead of using a pre-determined table
-    local MapMetaQuestLines = {
-        [2339] = {  --Dornogal
-            5572,   --Worldsoul: Weekly Meata
-        },
-    };
+	local MapMetaQuestLines = {
+		[2339] = {  --Dornogal
+			5572,   --Worldsoul: Weekly Meata
+		},
+	};
 
-    local MapQuests = {
-        [2339] = {  --Dornogal
-            {name = "Sparks of War: Azj-Khahet", questID = 81796, shownIfOnQuest = true},
-            {name = "Sparks of War: Isle of Dorn", questID = 81793, shownIfOnQuest = true},
-            {name = "Sparks of War: The Ringing Deeps", questID = 81794, shownIfOnQuest = true},
-            {name = "Sparks of War: Hallowfall", questID = 81795, shownIfOnQuest = true},
-            {name = "Sparks of War: Undermine", questID = 86853, shownIfOnQuest = true},
-        },
+	local MapQuests = {
+		[2339] = {  --Dornogal
+			{name = "Sparks of War: Azj-Khahet", questID = 81796, shownIfOnQuest = true},
+			{name = "Sparks of War: Isle of Dorn", questID = 81793, shownIfOnQuest = true},
+			{name = "Sparks of War: The Ringing Deeps", questID = 81794, shownIfOnQuest = true},
+			{name = "Sparks of War: Hallowfall", questID = 81795, shownIfOnQuest = true},
+			{name = "Sparks of War: Undermine", questID = 86853, shownIfOnQuest = true},
+		},
 
-        [2393] = {  --Silvermoon
-            --Weekly Meta
-            {name = "Midnight: Abundance", questID = 93890, shownIfOnQuest = true},
-            {name = "Midnight: Arcantina", questID = 93767, shownIfOnQuest = true},
-            {name = "Midnight: Saltheril's Soiree", questID = 93889, shownIfOnQuest = true},
-            {name = "Midnight: Legends of the Haranir", questID = 93891, shownIfOnQuest = true},
-            {name = "Midnight: Stormarion Assault", questID = 93892, shownIfOnQuest = true},
-            {name = "Midnight: Delves", questID = 93909, shownIfOnQuest = true},
-            {name = "Midnight: Dungeons", questID = 93911, shownIfOnQuest = true},
-            {name = "Midnight: World Quests", questID = 93766, shownIfOnQuest = true},
-            {name = "Midnight: Prey", questID = 93910, shownIfOnQuest = true},
-            {name = "Midnight: World Boss", questID = 93913, shownIfOnQuest = true},
-            {name = "Midnight: Housing", questID = 93769, shownIfOnQuest = true},
-            {name = "Midnight: Raid", questID = 93912, shownIfOnQuest = true},
-            {name = "Midnight: Battlegrounds", questID = 94457, shownIfOnQuest = true},
+		[2393] = {  --Silvermoon
+			--Weekly Meta
+			{name = "Midnight: Abundance", questID = 93890, shownIfOnQuest = true},
+			{name = "Midnight: Arcantina", questID = 93767, shownIfOnQuest = true},
+			{name = "Midnight: Saltheril's Soiree", questID = 93889, shownIfOnQuest = true},
+			{name = "Midnight: Legends of the Haranir", questID = 93891, shownIfOnQuest = true},
+			{name = "Midnight: Stormarion Assault", questID = 93892, shownIfOnQuest = true},
+			{name = "Midnight: Delves", questID = 93909, shownIfOnQuest = true},
+			{name = "Midnight: Dungeons", questID = 93911, shownIfOnQuest = true},
+			{name = "Midnight: World Quests", questID = 93766, shownIfOnQuest = true},
+			{name = "Midnight: Prey", questID = 93910, shownIfOnQuest = true},
+			{name = "Midnight: World Boss", questID = 93913, shownIfOnQuest = true},
+			{name = "Midnight: Housing", questID = 93769, shownIfOnQuest = true},
+			{name = "Midnight: Raid", questID = 93912, shownIfOnQuest = true},
+			{name = "Midnight: Battlegrounds", questID = 94457, shownIfOnQuest = true},
 
-            --Dungeon Quest
-            {name = "Windrunner Spire", questID = 93751, shownIfOnQuest = true},
-            {name = "Murder Row", questID = 93752, shownIfOnQuest = true},
-            {name = "Magister's Terrace", questID = 93753, shownIfOnQuest = true},
-            {name = "Maisara Caverns", questID = 93754, shownIfOnQuest = true},
-            {name = "Den of Nalorakk", questID = 93755, shownIfOnQuest = true},
-            {name = "The Blinding Vale", questID = 93756, shownIfOnQuest = true},
-            {name = "Voidscar Arena", questID = 93757, shownIfOnQuest = true},
-            {name = "Nexus-Point Xenas", questID = 93758, shownIfOnQuest = true},
+			--Dungeon Quest
+			{name = "Windrunner Spire", questID = 93751, shownIfOnQuest = true},
+			{name = "Murder Row", questID = 93752, shownIfOnQuest = true},
+			{name = "Magister's Terrace", questID = 93753, shownIfOnQuest = true},
+			{name = "Maisara Caverns", questID = 93754, shownIfOnQuest = true},
+			{name = "Den of Nalorakk", questID = 93755, shownIfOnQuest = true},
+			{name = "The Blinding Vale", questID = 93756, shownIfOnQuest = true},
+			{name = "Voidscar Arena", questID = 93757, shownIfOnQuest = true},
+			{name = "Nexus-Point Xenas", questID = 93758, shownIfOnQuest = true},
 
-            --PVP
-            {name = "Sparks of War: Eversong Woods", questID = 93423, shownIfOnQuest = true},
-            {name = "Sparks of War: Zul'Aman", questID = 93424, shownIfOnQuest = true},
-            {name = "Sparks of War: Harandar", questID = 93425, shownIfOnQuest = true},
-            {name = "Sparks of War: Voidstorm", questID = 93426, shownIfOnQuest = true},
-        },
-    };
+			--PVP
+			{name = "Sparks of War: Eversong Woods", questID = 93423, shownIfOnQuest = true},
+			{name = "Sparks of War: Zul'Aman", questID = 93424, shownIfOnQuest = true},
+			{name = "Sparks of War: Harandar", questID = 93425, shownIfOnQuest = true},
+			{name = "Sparks of War: Voidstorm", questID = 93426, shownIfOnQuest = true},
+		},
+	};
 
-    local DynamicQuestMaps = {
-        --Automatically find repeatable quests from these maps
-        --[uiMapID] = categoryID,
-    };
+	local DynamicQuestMaps = {
+		--Automatically find repeatable quests from these maps
+		--[uiMapID] = categoryID,
+	};
 
-    function DynamicQuestDataProvider:Reset()
-        self.addedQuests = {};
-        self.questsByMap = {};
-    end
+	function DynamicQuestDataProvider:Reset()
+		self.addedQuests = {};
+		self.questsByMap = {};
+	end
 
-    function DynamicQuestDataProvider:AddQuestsFromTable(uiMapID, tbl)
-        if not tbl then return end;
+	function DynamicQuestDataProvider:AddQuestsFromTable(uiMapID, tbl)
+		if not tbl then return end;
 
-        local n = self.questsByMap[uiMapID] and #self.questsByMap[uiMapID] or 0;
-        local mapID, questID;
+		local n = self.questsByMap[uiMapID] and #self.questsByMap[uiMapID] or 0;
+		local mapID, questID;
 
-        for _, v in ipairs(tbl) do
-            questID = v.questID;
-            if questID and not self.addedQuests[questID] then
-                mapID = v.startMapID or v.mapID;
-                if (not v.isHidden) and mapID and mapID == uiMapID then
-                    InitQuestData(v);
-                    if ShownQuestClassification[v.questClassification] then
-                        self.addedQuests[questID] = true;
-                        n = n + 1;
-                        if not self.questsByMap[uiMapID] then
-                            self.questsByMap[uiMapID] = {};
-                        end
-                        v.isDynamicQuest = true;
-                        self.questsByMap[uiMapID][n] = v;
-                    end
-                end
-            end
-        end
-    end
+		for _, v in ipairs(tbl) do
+			questID = v.questID;
+			if questID and not self.addedQuests[questID] then
+				mapID = v.startMapID or v.mapID;
+				if (not v.isHidden) and mapID and mapID == uiMapID then
+					InitQuestData(v);
+					if ShownQuestClassification[v.questClassification] then
+						self.addedQuests[questID] = true;
+						n = n + 1;
+						if not self.questsByMap[uiMapID] then
+							self.questsByMap[uiMapID] = {};
+						end
+						v.isDynamicQuest = true;
+						self.questsByMap[uiMapID][n] = v;
+					end
+				end
+			end
+		end
+	end
 
-    function DynamicQuestDataProvider:IsQuestActive(questID)
-        return self.addedQuests[questID]
-    end
+	function DynamicQuestDataProvider:IsQuestActive(questID)
+		return self.addedQuests[questID]
+	end
 
-    function DynamicQuestDataProvider:AddQuestsFromMap(uiMapID, categoryID)
-        C_QuestLine.RequestQuestLinesForMap(uiMapID);
+	function DynamicQuestDataProvider:AddQuestsFromMap(uiMapID, categoryID)
+		C_QuestLine.RequestQuestLinesForMap(uiMapID);
 
-        self.questsByMap[uiMapID] = nil;
+		self.questsByMap[uiMapID] = nil;
 
-        self:AddQuestsFromTable(uiMapID, C_QuestLine.GetAvailableQuestLines(uiMapID));
-        self:AddQuestsFromTable(uiMapID, C_TaskQuest.GetQuestsOnMap(uiMapID));
+		self:AddQuestsFromTable(uiMapID, C_QuestLine.GetAvailableQuestLines(uiMapID));
+		self:AddQuestsFromTable(uiMapID, C_TaskQuest.GetQuestsOnMap(uiMapID));
 
-        if MapMetaQuestLines[uiMapID] then
-            for _, questLineID in ipairs(MapMetaQuestLines[uiMapID]) do
-                self:AddQuestsFromQuestLine(questLineID, uiMapID);
-            end
-        end
+		if MapMetaQuestLines[uiMapID] then
+			for _, questLineID in ipairs(MapMetaQuestLines[uiMapID]) do
+				self:AddQuestsFromQuestLine(questLineID, uiMapID);
+			end
+		end
 
-        if MapQuests[uiMapID] then
-            local n;
-            local valid;
+		if MapQuests[uiMapID] then
+			local n;
+			local valid;
 
-            if self.questsByMap[uiMapID] then
-                n = #self.questsByMap[uiMapID];
-            else
-                self.questsByMap[uiMapID] = {};
-                n = 0;
-            end
+			if self.questsByMap[uiMapID] then
+				n = #self.questsByMap[uiMapID];
+			else
+				self.questsByMap[uiMapID] = {};
+				n = 0;
+			end
 
-            for _, entry in ipairs(MapQuests[uiMapID]) do
-                valid = false;
-                if entry.shownIfOnQuest then
-                    if ShownIfOnQuest(entry.questID) then
-                        valid = true;
-                    end
-                else
-                    valid = true;
-                end
+			for _, entry in ipairs(MapQuests[uiMapID]) do
+				valid = false;
+				if entry.shownIfOnQuest then
+					if ShownIfOnQuest(entry.questID) then
+						valid = true;
+					end
+				else
+					valid = true;
+				end
 
-                if valid then
-                    n = n + 1;
-                    InitQuestData(entry);
-                    self.questsByMap[uiMapID][n] = entry;
-                end
-            end
-        end
+				if valid then
+					n = n + 1;
+					InitQuestData(entry);
+					self.questsByMap[uiMapID][n] = entry;
+				end
+			end
+		end
 
-        if self.questsByMap[uiMapID] then
-            table.sort(self.questsByMap[uiMapID], SortFuncs.ClassificationThenQuestID);
-            local mapName = C_Map.GetMapInfo(uiMapID).name;
-            local category = {
-                isHeader = true,
-                name = mapName,
-                entries = self.questsByMap[uiMapID],
-                isDynamicQuest = true,
-                questMapID = uiMapID,
-                categoryID = categoryID,
-                isCollapsed = IsCategoryCollapsed(categoryID),
-            };
-            if not MapQuestData then
-                MapQuestData = {};
-            end
-            table.insert(MapQuestData, category);
-        end
-    end
+		if self.questsByMap[uiMapID] then
+			table.sort(self.questsByMap[uiMapID], SortFuncs.ClassificationThenQuestID);
+			local mapName = C_Map.GetMapInfo(uiMapID).name;
+			local category = {
+				isHeader = true,
+				name = mapName,
+				entries = self.questsByMap[uiMapID],
+				isDynamicQuest = true,
+				questMapID = uiMapID,
+				categoryID = categoryID,
+				isCollapsed = IsCategoryCollapsed(categoryID),
+			};
+			if not MapQuestData then
+				MapQuestData = {};
+			end
+			table.insert(MapQuestData, category);
+		end
+	end
 
-    function DynamicQuestDataProvider:AddQuestsFromQuestLine(questLineID, uiMapID)
-        local questIDs = C_QuestLine.GetQuestLineQuests(questLineID);   --Dornogal meta
-        if questIDs then
-            local n = self.questsByMap[uiMapID] and #self.questsByMap[uiMapID] or 0;
-            for _, questID in ipairs(questIDs) do
-                if not self.addedQuests[questID] then
-                    local questLineInfo = GetQuestLineInfo(questID);
-                    if questLineInfo and ShownIfOnQuest(questID) then
-                        --print(questLineInfo.questID, questLineInfo.questName, questLineInfo.isHidden)
-                        InitQuestData(questLineInfo);
-                        if ShownQuestClassification[questLineInfo.questClassification] then
-                            self.addedQuests[questID] = true;
-                            n = n + 1;
-                            if not self.questsByMap[uiMapID] then
-                                self.questsByMap[uiMapID] = {};
-                            end
-                            questLineInfo.isDynamicQuest = true;
-                            self.questsByMap[uiMapID][n] = questLineInfo;
-                        end
-                    end
-                end
-            end
-        end
-    end
+	function DynamicQuestDataProvider:AddQuestsFromQuestLine(questLineID, uiMapID)
+		local questIDs = C_QuestLine.GetQuestLineQuests(questLineID);   --Dornogal meta
+		if questIDs then
+			local n = self.questsByMap[uiMapID] and #self.questsByMap[uiMapID] or 0;
+			for _, questID in ipairs(questIDs) do
+				if not self.addedQuests[questID] then
+					local questLineInfo = GetQuestLineInfo(questID);
+					if questLineInfo and ShownIfOnQuest(questID) then
+						--print(questLineInfo.questID, questLineInfo.questName, questLineInfo.isHidden)
+						InitQuestData(questLineInfo);
+						if ShownQuestClassification[questLineInfo.questClassification] then
+							self.addedQuests[questID] = true;
+							n = n + 1;
+							if not self.questsByMap[uiMapID] then
+								self.questsByMap[uiMapID] = {};
+							end
+							questLineInfo.isDynamicQuest = true;
+							self.questsByMap[uiMapID][n] = questLineInfo;
+						end
+					end
+				end
+			end
+		end
+	end
 
-    function DynamicQuestDataProvider:QueryQuests()
-        for uiMapID, categoryID in pairs(DynamicQuestMaps) do
-            self:AddQuestsFromMap(uiMapID, categoryID);
-        end
-    end
+	function DynamicQuestDataProvider:QueryQuests()
+		for uiMapID, categoryID in pairs(DynamicQuestMaps) do
+			self:AddQuestsFromMap(uiMapID, categoryID);
+		end
+	end
 
-    function DynamicQuestDataProvider:GetQuestsByMap(uiMapID)
-        return self.questsByMap[uiMapID]
-    end
+	function DynamicQuestDataProvider:GetQuestsByMap(uiMapID)
+		return self.questsByMap[uiMapID]
+	end
 
 
-    addon.CallbackRegistry:Register("LandingPage.SetActivityQuestMaps", function(activityQuestMap)
-        DynamicQuestMaps = activityQuestMap or {};
-        DynamicQuestDataProvider:Reset();
-    end);
+	addon.CallbackRegistry:Register("LandingPage.SetActivityQuestMaps", function(activityQuestMap)
+		DynamicQuestMaps = activityQuestMap or {};
+		DynamicQuestDataProvider:Reset();
+	end);
 end
 
 
 function ActivityUtil.GetActivityData(dataIndex)
-    if SortedActivity then
-        return SortedActivity[dataIndex]
-    end
+	if SortedActivity then
+		return SortedActivity[dataIndex]
+	end
 end
 
 
@@ -544,428 +544,428 @@ local ItemNames = {};
 --- @return string name
 --- @return boolean isLocalized
 function ActivityUtil.GetActivityName(dataIndex, questID)
-    local v = SortedActivity[dataIndex];
-    if v then
-        if v.nameGetter then
-            return v.nameGetter(), true
-        end
+	local v = SortedActivity[dataIndex];
+	if v then
+		if v.nameGetter then
+			return v.nameGetter(), true
+		end
 
-        if v.localizedName and ((not questID) or (questID and v.questID and questID == v.questID)) then
-            --Entry's questID may change, in this case don't use cache
-            return v.localizedName, true
-        end
+		if v.localizedName and ((not questID) or (questID and v.questID and questID == v.questID)) then
+			--Entry's questID may change, in this case don't use cache
+			return v.localizedName, true
+		end
 
-        if v.questID or questID then
-            questID = v.questID or questID;
-            local name = QuestNames[questID] or API.GetQuestName(questID);
-            if name and name ~= "" then
-                if v.removeSharedPrefix then
-                    name = API.RemoveTextBeforeColon(name);
-                end
-                v.localizedName = name;
-                return name, true
-            end
-        end
+		if v.questID or questID then
+			questID = v.questID or questID;
+			local name = QuestNames[questID] or API.GetQuestName(questID);
+			if name and name ~= "" then
+				if v.removeSharedPrefix then
+					name = API.RemoveTextBeforeColon(name);
+				end
+				v.localizedName = name;
+				return name, true
+			end
+		end
 
-        if v.isHeader and (v.areaID or v.factionID) then
-            if v.areaID then
-                local zoneName = API.GetZoneName(v.areaID);
-                return zoneName, true
-            end
-            local data = C_Reputation.GetFactionDataByID(v.factionID);
-            if data and data.name then
-                v.localizedName = data.name;
-                return data.name, true
-            end
-        end
+		if v.isHeader and (v.areaID or v.factionID) then
+			if v.areaID then
+				local zoneName = API.GetZoneName(v.areaID);
+				return zoneName, true
+			end
+			local data = C_Reputation.GetFactionDataByID(v.factionID);
+			if data and data.name then
+				v.localizedName = data.name;
+				return data.name, true
+			end
+		end
 
-        if v.itemID then
-            local name = ItemNames[v.itemID] or C_Item.GetItemNameByID(v.itemID);
-            if name then
-                v.localizedName = name;
-                return name, true
-            end
-        end
+		if v.itemID then
+			local name = ItemNames[v.itemID] or C_Item.GetItemNameByID(v.itemID);
+			if name then
+				v.localizedName = name;
+				return name, true
+			end
+		end
 
-        return v.name, false
-    end
+		return v.name, false
+	end
 
-    return "", true
+	return "", true
 end
 
 
 function ActivityUtil.StoreQuestActivityName(questID, localizedName)
-    if questID and localizedName and localizedName ~= "" then
-        QuestNames[questID] = localizedName;
-    end
+	if questID and localizedName and localizedName ~= "" then
+		QuestNames[questID] = localizedName;
+	end
 end
 
 function ActivityUtil.StoreItemActivityName(itemID, localizedName)
-    if itemID and localizedName and localizedName ~= "" then
-        ItemNames[itemID] = localizedName;
-    end
+	if itemID and localizedName and localizedName ~= "" then
+		ItemNames[itemID] = localizedName;
+	end
 end
 
 function ActivityUtil.ShouldShowActivity(data)
-    if data.shownIfOnQuest then
-        return ShownIfOnQuest(data.questID)
-    end
+	if data.shownIfOnQuest then
+		return ShownIfOnQuest(data.questID)
+	end
 
-    if data.shownIfActive then
-        return ShownIfActive(data.questID)
-    end
+	if data.shownIfActive then
+		return ShownIfActive(data.questID)
+	end
 
-    return true
+	return true
 end
 
 
 local function IndexData(activityData)
-    local n = 0;
-    for _, category in ipairs(activityData) do
-        n = n + 1;
-        category.dataIndex = n;
-        for _, entry in ipairs(category.entries) do
-            n = n + 1;
-            entry.dataIndex = n;
-        end
-    end
-    return n
+	local n = 0;
+	for _, category in ipairs(activityData) do
+		n = n + 1;
+		category.dataIndex = n;
+		for _, entry in ipairs(category.entries) do
+			n = n + 1;
+			entry.dataIndex = n;
+		end
+	end
+	return n
 end
 
 local function FlattenData(activityData, n, outputTbl, numCompleted)
-    if not activityData then return n, 0 end;
+	if not activityData then return n, 0 end;
 
-    local dataIndex = IndexData(activityData);
+	local dataIndex = IndexData(activityData);
 
-    local hideCompleted = ActivityUtil.hideCompleted;
-    numCompleted = numCompleted or 0;
+	local hideCompleted = ActivityUtil.hideCompleted;
+	numCompleted = numCompleted or 0;
 
-    local uniqueQuests = {};
+	local uniqueQuests = {};
 
-    for _, category in ipairs(activityData) do
-        local anyIncomplted;
-        local numEntries = 0;
-        local entries = {};
-        local showActivity;
-        local uiMapID;
+	for _, category in ipairs(activityData) do
+		local anyIncomplted;
+		local numEntries = 0;
+		local entries = {};
+		local showActivity;
+		local uiMapID;
 
-        for _, entry in ipairs(category.entries) do
-            showActivity = true;
-            uiMapID = category.uiMapID;
+		for _, entry in ipairs(category.entries) do
+			showActivity = true;
+			uiMapID = category.uiMapID;
 
-            if entry.children then
-                if not entry.icon then
-                    entry.icon = InProgressQuestIconFile[128];
-                end
-                local completed = true;
-                local totalChildren = #entry.children;
-                local numCompletedChildren = 0;
-                for k, v in ipairs(entry.children) do
-                    local flagQuest = v.questID;
-                    if flagQuest then
-                        if (v.accountwide and IsQuestFlaggedCompletedOnAccount(flagQuest)) or (not v.accountwide and IsQuestFlaggedCompleted(flagQuest)) then
-                            numCompletedChildren = numCompletedChildren + 1;
-                        else
-                            completed = false;
-                        end
-                        uniqueQuests[flagQuest] = true;
-                    end
-                end
-                entry.completed = completed;
-                if entry.label then
-                    entry.localizedName = format("%s/%s %s", numCompletedChildren, totalChildren, entry.label);
-                end
-            elseif entry.questPool then
-                --Mutually Exclusive quests: Fortify Runestones
-                if not entry.icon then
-                    entry.icon = QuestIcon.WEEKLY_QUEST;
-                end
-                local flagQuest;
-                local completed = false;
-                for k, v in ipairs(entry.questPool) do
-                    if not flagQuest then
-                        flagQuest = v.questID;
-                    end
-                    if IsQuestFlaggedCompleted(v.questID) then
-                        flagQuest = v.questID;
-                        completed = true;
-                        break
-                    end
-                end
-                entry.questID = flagQuest;
-                InitQuestData(entry);
-                entry.completed = completed;
-            else
-                local flagQuest = entry.flagQuest or entry.questID;
-                if entry.questID then
-                    InitQuestData(entry);
-                    uniqueQuests[entry.questID] = true;
-                else
-                    entry.isOnQuest = false;
-                end
+			if entry.children then
+				if not entry.icon then
+					entry.icon = InProgressQuestIconFile[128];
+				end
+				local completed = true;
+				local totalChildren = #entry.children;
+				local numCompletedChildren = 0;
+				for k, v in ipairs(entry.children) do
+					local flagQuest = v.questID;
+					if flagQuest then
+						if (v.accountwide and IsQuestFlaggedCompletedOnAccount(flagQuest)) or (not v.accountwide and IsQuestFlaggedCompleted(flagQuest)) then
+							numCompletedChildren = numCompletedChildren + 1;
+						else
+							completed = false;
+						end
+						uniqueQuests[flagQuest] = true;
+					end
+				end
+				entry.completed = completed;
+				if entry.label then
+					entry.localizedName = format("%s/%s %s", numCompletedChildren, totalChildren, entry.label);
+				end
+			elseif entry.questPool then
+				--Mutually Exclusive quests: Fortify Runestones
+				if not entry.icon then
+					entry.icon = QuestIcon.WEEKLY_QUEST;
+				end
+				local flagQuest;
+				local completed = false;
+				for k, v in ipairs(entry.questPool) do
+					if not flagQuest then
+						flagQuest = v.questID;
+					end
+					if IsQuestFlaggedCompleted(v.questID) then
+						flagQuest = v.questID;
+						completed = true;
+						break
+					end
+				end
+				entry.questID = flagQuest;
+				InitQuestData(entry);
+				entry.completed = completed;
+			else
+				local flagQuest = entry.flagQuest or entry.questID;
+				if entry.questID then
+					InitQuestData(entry);
+					uniqueQuests[entry.questID] = true;
+				else
+					entry.isOnQuest = false;
+				end
 
-                if flagQuest then
-                    if entry.accountwide then
-                        entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
-                    else
-                        entry.completed = IsQuestFlaggedCompleted(flagQuest);
-                    end
-                else
-                    entry.completed = false;
-                end
-            end
+				if flagQuest then
+					if entry.accountwide then
+						entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
+					else
+						entry.completed = IsQuestFlaggedCompleted(flagQuest);
+					end
+				else
+					entry.completed = false;
+				end
+			end
 
-            if entry.conditions then
-                local arg = entry.conditions.useItemName and entry.localizedName or entry.itemID;
-                if entry.conditions.ShouldShowActivity then
-                    showActivity = entry.conditions.ShouldShowActivity(arg);
-                end
-                if entry.conditions.IsActivityCompleted then
-                    entry.completed = entry.conditions.IsActivityCompleted(arg);
-                end
-            end
+			if entry.conditions then
+				local arg = entry.conditions.useItemName and entry.localizedName or entry.itemID;
+				if entry.conditions.ShouldShowActivity then
+					showActivity = entry.conditions.ShouldShowActivity(arg);
+				end
+				if entry.conditions.IsActivityCompleted then
+					entry.completed = entry.conditions.IsActivityCompleted(arg);
+				end
+			end
 
-            if entry.shownIfOnQuest then
-                if hideCompleted then
-                    if not entry.isOnQuest then
-                        showActivity = false;
-                    end
-                else
-                    if not (entry.completed or entry.isOnQuest) then
-                        showActivity = false;
-                    end
-                end
-            end
+			if entry.shownIfOnQuest then
+				if hideCompleted then
+					if not entry.isOnQuest then
+						showActivity = false;
+					end
+				else
+					if not (entry.completed or entry.isOnQuest) then
+						showActivity = false;
+					end
+				end
+			end
 
-            if entry.shownIfActive then
-                if ShownIfActive(entry.questID) then
-                    showActivity = true;
-                    entry.uiMapID = C_TaskQuest.GetQuestZoneID(entry.questID);
-                else
-                    if entry.showIfCompleted and entry.completed and (not hideCompleted) then
-                        showActivity = true;
-                    else
-                        showActivity = false;
-                    end
-                end
-            end
+			if entry.shownIfActive then
+				if ShownIfActive(entry.questID) then
+					showActivity = true;
+					entry.uiMapID = C_TaskQuest.GetQuestZoneID(entry.questID);
+				else
+					if entry.showIfCompleted and entry.completed and (not hideCompleted) then
+						showActivity = true;
+					else
+						showActivity = false;
+					end
+				end
+			end
 
-            if entry.completed then
-                numCompleted = numCompleted + 1;
-            elseif showActivity then
-                anyIncomplted = true;
-            end
+			if entry.completed then
+				numCompleted = numCompleted + 1;
+			elseif showActivity then
+				anyIncomplted = true;
+			end
 
-            if entry.shouldShow then
-                showActivity = entry.shouldShow();
-            end
+			if entry.shouldShow then
+				showActivity = entry.shouldShow();
+			end
 
-            if showActivity then
-                if entry.isDelveReputation then
-                    if not entry.atlas then
-                        entry.atlas = QuestIconAtlas.DELVES_BOUNTIFUL;
-                    end
+			if showActivity then
+				if entry.isDelveReputation then
+					if not entry.atlas then
+						entry.atlas = QuestIconAtlas.DELVES_BOUNTIFUL;
+					end
 
-                    if not entry.tooltip then
-                        entry.tooltip = DELVES_REP_TOOLTIP;
-                    end
-                end
+					if not entry.tooltip then
+						entry.tooltip = DELVES_REP_TOOLTIP;
+					end
+				end
 
-                if entry.isWeeklyQuest then
-                    --if not entry.atlas then
-                    --    entry.atlas = QuestIconAtlas.WEEKLY_QUEST;
-                    --end
-                    if not entry.icon then
-                        entry.icon = QuestIcon.WEEKLY_QUEST;
-                    end
-                elseif entry.isDailyQuest then
-                    if not entry.atlas then
-                        entry.atlas = QuestIconAtlas.DAILY_QUEST;
-                    end
-                end
+				if entry.isWeeklyQuest then
+					--if not entry.atlas then
+					--    entry.atlas = QuestIconAtlas.WEEKLY_QUEST;
+					--end
+					if not entry.icon then
+						entry.icon = QuestIcon.WEEKLY_QUEST;
+					end
+				elseif entry.isDailyQuest then
+					if not entry.atlas then
+						entry.atlas = QuestIconAtlas.DAILY_QUEST;
+					end
+				end
 
-                if hideCompleted then
-                    if entry.isHeader or (not entry.completed) then
-                        numEntries = numEntries + 1;
-                        entries[numEntries] = entry;
-                    end
-                else
-                    numEntries = numEntries + 1;
-                    entries[numEntries] = entry;
-                end
-            end
-        end
+				if hideCompleted then
+					if entry.isHeader or (not entry.completed) then
+						numEntries = numEntries + 1;
+						entries[numEntries] = entry;
+					end
+				else
+					numEntries = numEntries + 1;
+					entries[numEntries] = entry;
+				end
+			end
+		end
 
-        if category.questLines then
-            for _, questLineID in ipairs(category.questLines) do
-                local questIDs = C_QuestLine.GetQuestLineQuests(questLineID);
-                if questIDs then
-                    for _, questID in ipairs(questIDs) do
-                        if not uniqueQuests[questID] then
-                            uniqueQuests[questID] = true;
-                            if IsOnQuest(questID) then
-                                dataIndex = dataIndex + 1;
-                                local _entry = {questID = questID, name = "", uiMapID = uiMapID, dataIndex = dataIndex, completed = false};
-                                InitQuestData(_entry);
-                                numEntries = numEntries + 1;
-                                entries[numEntries] = _entry;
-                                anyIncomplted = true;
-                            end
-                        end
-                    end
-                end
-            end
-        end
+		if category.questLines then
+			for _, questLineID in ipairs(category.questLines) do
+				local questIDs = C_QuestLine.GetQuestLineQuests(questLineID);
+				if questIDs then
+					for _, questID in ipairs(questIDs) do
+						if not uniqueQuests[questID] then
+							uniqueQuests[questID] = true;
+							if IsOnQuest(questID) then
+								dataIndex = dataIndex + 1;
+								local _entry = {questID = questID, name = "", uiMapID = uiMapID, dataIndex = dataIndex, completed = false};
+								InitQuestData(_entry);
+								numEntries = numEntries + 1;
+								entries[numEntries] = _entry;
+								anyIncomplted = true;
+							end
+						end
+					end
+				end
+			end
+		end
 
-        if hideCompleted then
-            if anyIncomplted then
-                n = n + 1;
-                outputTbl[n] = category;
-                if numEntries > 0 then
-                    tsort(entries, SortFuncs.IncompleteFirst);
-                    for _, entry in ipairs(entries) do
-                        n = n + 1;
-                        outputTbl[n] = entry;
-                    end
-                end
-            end
-        else
-            if true then
-                if numEntries > 0 then
-                    n = n + 1;
-                    outputTbl[n] = category;
-                    tsort(entries, SortFuncs.IncompleteFirst);
-                    for _, entry in ipairs(entries) do
-                        n = n + 1;
-                        outputTbl[n] = entry;
-                    end
-                end
-            end
-        end
-    end
+		if hideCompleted then
+			if anyIncomplted then
+				n = n + 1;
+				outputTbl[n] = category;
+				if numEntries > 0 then
+					tsort(entries, SortFuncs.IncompleteFirst);
+					for _, entry in ipairs(entries) do
+						n = n + 1;
+						outputTbl[n] = entry;
+					end
+				end
+			end
+		else
+			if true then
+				if numEntries > 0 then
+					n = n + 1;
+					outputTbl[n] = category;
+					tsort(entries, SortFuncs.IncompleteFirst);
+					for _, entry in ipairs(entries) do
+						n = n + 1;
+						outputTbl[n] = entry;
+					end
+				end
+			end
+		end
+	end
 
-    return n, numCompleted
+	return n, numCompleted
 end
 
 function ActivityUtil.GetSortedActivity()
-    --Wipe old data
-    MapQuestData = nil;
-    DynamicQuestDataProvider:Reset();
-    DynamicQuestDataProvider:QueryQuests();
+	--Wipe old data
+	MapQuestData = nil;
+	DynamicQuestDataProvider:Reset();
+	DynamicQuestDataProvider:QueryQuests();
 
 
-    local tbl = {};
-    local n = 0;
-    local numCompleted = 0;
+	local tbl = {};
+	local n = 0;
+	local numCompleted = 0;
 
-    for _, category in ipairs(ActivityData) do
-        category.isCollapsed = IsCategoryCollapsed(category.categoryID);
-    end
+	for _, category in ipairs(ActivityData) do
+		category.isCollapsed = IsCategoryCollapsed(category.categoryID);
+	end
 
-    n, numCompleted = FlattenData(MapQuestData, n, tbl, numCompleted);
-    n, numCompleted = FlattenData(ActivityData, n, tbl, numCompleted);
+	n, numCompleted = FlattenData(MapQuestData, n, tbl, numCompleted);
+	n, numCompleted = FlattenData(ActivityData, n, tbl, numCompleted);
 
-    for k, v in ipairs(tbl) do
-        v.dataIndex = k;
-    end
+	for k, v in ipairs(tbl) do
+		v.dataIndex = k;
+	end
 
-    SortedActivity = tbl;
+	SortedActivity = tbl;
 
-    return tbl, numCompleted
+	return tbl, numCompleted
 end
 
 function ActivityUtil.UpdateAndGetProgress(dataIndex)
-    local entry = SortedActivity and SortedActivity[dataIndex];
-    if entry then
-        local flagQuest = entry.flagQuest or entry.questID;
-        if flagQuest then
-            if entry.accountwide then
-                entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
-            else
-                entry.completed = IsQuestFlaggedCompleted(flagQuest);
-            end
-        else
-            entry.completed = false;
-        end
-        return entry.completed
-    end
+	local entry = SortedActivity and SortedActivity[dataIndex];
+	if entry then
+		local flagQuest = entry.flagQuest or entry.questID;
+		if flagQuest then
+			if entry.accountwide then
+				entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
+			else
+				entry.completed = IsQuestFlaggedCompleted(flagQuest);
+			end
+		else
+			entry.completed = false;
+		end
+		return entry.completed
+	end
 end
 
 function ActivityUtil.ToggleCollapsed(dataIndex)
-    local v = SortedActivity and SortedActivity[dataIndex];
-    if v and v.isHeader then
-        v.isCollapsed = not v.isCollapsed;
+	local v = SortedActivity and SortedActivity[dataIndex];
+	if v and v.isHeader then
+		v.isCollapsed = not v.isCollapsed;
 
-        if v.categoryID then
-            SetCategoryCollapsed(v.categoryID, v.isCollapsed);
-        end
+		if v.categoryID then
+			SetCategoryCollapsed(v.categoryID, v.isCollapsed);
+		end
 
-        --print(dataIndex, v.localizedName or v.name, v.isDynamicQuest, v.questMapID, v.isCollapsed);
+		--print(dataIndex, v.localizedName or v.name, v.isDynamicQuest, v.questMapID, v.isCollapsed);
 
-        return v.isCollapsed
-    end
+		return v.isCollapsed
+	end
 end
 
 function ActivityUtil.SetHideCompleted(state)
-    ActivityUtil.hideCompleted = state;
+	ActivityUtil.hideCompleted = state;
 end
 addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", ActivityUtil.SetHideCompleted);
 
 
 addon.CallbackRegistry:Register("LandingPage.SetActivityData", function(data)
-    if data then
-        ActivityData = data;
-    end
+	if data then
+		ActivityData = data;
+	end
 end);
 
 
 --[[
 function Debug_YeetQuests(uiMapID)
-    uiMapID = uiMapID or C_Map.GetBestMapForUnit("player");
+	uiMapID = uiMapID or C_Map.GetBestMapForUnit("player");
 
-    local function PrintMetaQuests(quests)
-        for index, questLineInfo in ipairs(quests) do
-            if questLineInfo.isMeta or true then
-                if not questLineInfo.questName then
-                    questLineInfo.questName = API.GetQuestName(questLineInfo.questID);
-                end
-                print(index, questLineInfo.questName, questLineInfo.questLineID)
-            end
-        end
-    end
+	local function PrintMetaQuests(quests)
+		for index, questLineInfo in ipairs(quests) do
+			if questLineInfo.isMeta or true then
+				if not questLineInfo.questName then
+					questLineInfo.questName = API.GetQuestName(questLineInfo.questID);
+				end
+				print(index, questLineInfo.questName, questLineInfo.questLineID)
+			end
+		end
+	end
 
-    PrintMetaQuests(C_QuestLine.GetAvailableQuestLines(uiMapID));
-    PrintMetaQuests(C_TaskQuest.GetQuestsOnMap(uiMapID));
+	PrintMetaQuests(C_QuestLine.GetAvailableQuestLines(uiMapID));
+	PrintMetaQuests(C_TaskQuest.GetQuestsOnMap(uiMapID));
 end
 
 function Debug_YeetActiveQuestLineQuests()
-    local questIDs = C_QuestLine.GetQuestLineQuests(5572);   --Dornogal meta
-    for _, questID in ipairs(questIDs) do
-        local questLineInfo = C_QuestLine.GetQuestLineInfo(questID);
-        if questLineInfo then
-            print(questLineInfo.questID, questLineInfo.questName, questLineInfo.isHidden)
-        end
-    end
+	local questIDs = C_QuestLine.GetQuestLineQuests(5572);   --Dornogal meta
+	for _, questID in ipairs(questIDs) do
+		local questLineInfo = C_QuestLine.GetQuestLineInfo(questID);
+		if questLineInfo then
+			print(questLineInfo.questID, questLineInfo.questName, questLineInfo.isHidden)
+		end
+	end
 end
 --]]
 
 --Debug Event Listener
 --[[
 do
-    local EL = CreateFrame("Frame");
+	local EL = CreateFrame("Frame");
 
-    local DynamicEvents = {
-        "QUEST_LOG_UPDATE",
-        "QUEST_REMOVED",
-        "QUEST_ACCEPTED",
-        "QUEST_TURNED_IN",
-        "QUESTLINE_UPDATE",
-        "TASK_PROGRESS_UPDATE",
-    };
-    API.RegisterFrameForEvents(EL, DynamicEvents);
+	local DynamicEvents = {
+		"QUEST_LOG_UPDATE",
+		"QUEST_REMOVED",
+		"QUEST_ACCEPTED",
+		"QUEST_TURNED_IN",
+		"QUESTLINE_UPDATE",
+		"TASK_PROGRESS_UPDATE",
+	};
+	API.RegisterFrameForEvents(EL, DynamicEvents);
 
-    EL:SetScript("OnEvent", function(self, event, ...)
-        print(event, ...)
-    end)
+	EL:SetScript("OnEvent", function(self, event, ...)
+		print(event, ...)
+	end)
 end
 --]]

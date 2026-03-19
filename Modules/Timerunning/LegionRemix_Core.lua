@@ -1479,14 +1479,14 @@ do	--CommitUtil
 			end
 			if not isNewEntryIDValid then return end;
 			local canChangeEntry;
-            if nodeInfo.entryIDsWithCommittedRanks then
-                for _, committedEntryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
-                    if committedEntryID ~= entryID then
+			if nodeInfo.entryIDsWithCommittedRanks then
+				for _, committedEntryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+					if committedEntryID ~= entryID then
 						canChangeEntry = true;
 						break
 					end
-                end
-            end
+				end
+			end
 			if canChangeEntry then
 				self:ClearPendingChanges();
 				--local success = configID and C_Traits.RefundAllRanks(configID, nodeID);
@@ -1771,30 +1771,30 @@ do	--Module Registry
 
 	CallbackRegistry:RegisterSettingCallback("LegionRemix_AutoUpgrade", LoadSettings);
 
-    local moduleData = {
-        name = L["ModuleName LegionRemix"],
-        dbKey = "LegionRemix",
-        description = L["ModuleDescription LegionRemix"],
-        toggleFunc = EnableModule,
-        categoryID = -1,
-        uiOrder = 0,
-        moduleAddedTime = 1759900000,
+	local moduleData = {
+		name = L["ModuleName LegionRemix"],
+		dbKey = "LegionRemix",
+		description = L["ModuleDescription LegionRemix"],
+		toggleFunc = EnableModule,
+		categoryID = -1,
+		uiOrder = 0,
+		moduleAddedTime = 1759900000,
 		timerunningSeason = 2,
 		categoryKeys = {
 			"Current",
 		},
 
-        subOptions = {
-            {
-                dbKey = "LegionRemix_AutoUpgrade",
-                name = L["Auto Learn Traits"],
-                description = L["Auto Learn Traits Tooltip"],
-                toggleFunc = LoadSettings,
-            },
-        };
-    };
+		subOptions = {
+			{
+				dbKey = "LegionRemix_AutoUpgrade",
+				name = L["Auto Learn Traits"],
+				description = L["Auto Learn Traits Tooltip"],
+				toggleFunc = LoadSettings,
+			},
+		};
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end
 
 

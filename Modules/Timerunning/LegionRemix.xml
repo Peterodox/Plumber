@@ -310,13 +310,13 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-            <Layer level="OVERLAY">
-                <Texture parentKey="Sheen" alphaMode="ADD" hidden="true">
-                    <Size x="60" y="48"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
+			<Layer level="OVERLAY">
+				<Texture parentKey="Sheen" alphaMode="ADD" hidden="true">
+					<Size x="60" y="48"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
 				<MaskTexture parentKey="SheenMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
 					<Size x="16" y="16"/>
 					<Anchors>
@@ -326,7 +326,7 @@
 						<MaskedTexture childKey="Sheen"/>
 					</MaskedTextures>
 				</MaskTexture>
-            </Layer>
+			</Layer>
 		</Layers>
 		<Frames>
 			<Frame parentKey="Tooltip" frameStrata="TOOLTIP" hidden="true">
