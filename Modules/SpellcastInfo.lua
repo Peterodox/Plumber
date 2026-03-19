@@ -376,7 +376,7 @@ do  --UnitPopup / Menu
                                 local width = fontString:GetUnboundedStringWidth() + leftTexture:GetWidth() + ICON_TEXT_GAP;
                                 local height = 20;
 
-                                button:SetScript("OnClick", function(button, buttonName)
+                                button:SetScript("OnClick", function(_button, buttonName)
                                     if buttonName == "LeftButton" and IsModifiedClick("CHATLINK") and (not InCombatLockdown()) then
                                         local link = C_Spell.GetSpellLink(spellID);
                                         ChatEdit_InsertLink(link);

@@ -49,8 +49,8 @@ do
             if timeDiff < 60 and timeDiff > -60 then
                 --Assume you can only complete 1 delve every minute
                 shouldSave = false;
+				break
             end
-            break
         end
 
         if shouldSave then

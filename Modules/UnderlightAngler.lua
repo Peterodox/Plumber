@@ -1,5 +1,6 @@
 -- Fix Underlight Angler traits not showing bug
 -- The Cause: Artifact power and link's visiblity is determined by C_ArtifactUI.GetArtifactTier(), it wrongfully returns 0 for Underlight Angler
+-- Our fix overrides this API
 
 local _, addon = ...
 local GetArtifactItemID = C_ArtifactUI.GetArtifactItemID;
@@ -30,7 +31,7 @@ function EL:OnEvent(event, ...)
                     return tier
                 end
             end
-            C_ArtifactUI.GetArtifactTier = New_GetArtifactTier;
+            C_ArtifactUI.GetArtifactTier = New_GetArtifactTier;		-- luacheck: ignore 122 -- Setting a read-only field of a global variable
 
 
             ArtifactFrame.PerksTab:Refresh();

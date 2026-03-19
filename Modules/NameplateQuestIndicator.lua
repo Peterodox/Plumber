@@ -1250,7 +1250,7 @@ do  --Options
     };
 
     function OptionToggle_OnClick(self, button)
-        OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
+        local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
         if OptionFrame then
             OptionFrame:ConvertAnchor();
         end

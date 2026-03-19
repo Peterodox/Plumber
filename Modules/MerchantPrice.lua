@@ -185,12 +185,6 @@ function Controller:UpdateMoneyChange() --Unused
         local newCopper = GetMoney();
         local diff = newCopper - self.playerCopper;
         self.playerCopper = newCopper;
-
-        if diff > 0 then
-            
-        elseif diff < 0 then
-
-        end
     end
 end
 
@@ -396,8 +390,8 @@ function Controller:UpdateMerchantInfo()
     local playerMoney = GetMoney();
     local itemIndex;
 
-    for _, priceFrame in pairs(VendorItemPriceFrame) do
-        priceFrame:Hide();
+    for _, _priceFrame in pairs(VendorItemPriceFrame) do
+        _priceFrame:Hide();
     end
 
     for buttonIndex = 1, itemsPerPage do
@@ -488,9 +482,9 @@ function Controller:UpdateMerchantInfo()
 
         local n = 0;
 
-        for id, currencyType in pairs(altCurreny) do
+        for _id, _currencyType in pairs(altCurreny) do
             n = n + 1;
-            tokens[n] = {currencyType, id};
+            tokens[n] = {_currencyType, _id};
         end
 
         tsort(tokens, SortFunc_CurrencyType);

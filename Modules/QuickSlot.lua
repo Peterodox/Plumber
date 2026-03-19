@@ -1216,7 +1216,7 @@ do  --Spell Cooldown
 
     function QuickSlot:RequestUpdateSpellCooldowns()
         if Throttler.pauseUpdate then
-            
+			return
         else
             Throttler.pauseUpdate = true;
             Throttler.t = 0;

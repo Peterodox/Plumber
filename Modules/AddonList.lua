@@ -26,7 +26,7 @@ function AddonDataProvider:LoadNames()
         name = StripHyperlinks(name);
 
         firstLetter = sub(lower(name), 1, 1);
-        
+
         if lastLetter and firstLetter ~= lastLetter then
             self.dict[lastLetter][2] = letterRange;
             letterRange = 0;
@@ -65,7 +65,7 @@ end
 function ScrollToAddOnName(name)
     local index = AddonDataProvider:FindIndexByName(name);
     if index then
-        local alignment = 0;    --ScrollBoxConstants.AlignBegin
+        local alignment = ScrollBoxConstants.AlignBegin;
         local noInterpolation = true;
         AddonList.ScrollBox:ScrollToElementDataIndex(index, alignment, noInterpolation);
         return true

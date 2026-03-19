@@ -35,7 +35,7 @@ local DelvePOI = {
     {2215, 7870, 7783},   --The Sinkhole
 
     --Azj-Kahet
-    {2255, 7873, 7784},   --Tak-Rethan Abyss        
+    {2255, 7873, 7784},   --Tak-Rethan Abyss
     {2255, 7874, 7790},   --The Spiral Weave
     {2255, 7872, 7786},   --The Underkeep
 
@@ -140,11 +140,11 @@ local DelvesPinDataProvider = {};
 do
     local POIxDelveIndex;
 
-    function DelvesPinDataProvider:GetPinDataForMap(uiMapID)
+    function DelvesPinDataProvider:GetPinDataForMap(_uiMapID)
         --Bountiful Delves won't appear in GetDelvesForMap() table, that's how we identify them
         --The method above no longer works
 
-        if uiMapID ~= MAPID_KHAZALGAR then return end;
+        if _uiMapID ~= MAPID_KHAZALGAR then return end;
 
         local data = {};
         local poiID;

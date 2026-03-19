@@ -1227,10 +1227,7 @@ do	--CommitUtil
 					local entryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
 					local committedEntryID;
 					if nodeInfo.entryIDsWithCommittedRanks then
-						for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
-							committedEntryID = id;
-							break
-						end
+						committedEntryID = nodeInfo.entryIDsWithCommittedRanks[1];
 					end
 					if (committedEntryID ~= entryID) then
 						if C_Traits.SetSelection(configID, _nodeID, entryID) then
@@ -1424,8 +1421,8 @@ do	--CommitUtil
 				for _, _nodeID in ipairs(nodeIDs) do
 					if DataProvider:IsSelectionNode(_nodeID) then
 						local nodeInfo = DataProvider:GetNodeInfo(_nodeID);
-						local entryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
-						if C_Traits.SetSelection(configID, _nodeID, entryID) then
+						local lastSelectedEntryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
+						if C_Traits.SetSelection(configID, _nodeID, lastSelectedEntryID) then
 							self.anySuccessPurchase = true;
 						end
 					end
@@ -1486,7 +1483,7 @@ do	--CommitUtil
                 for _, committedEntryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
                     if committedEntryID ~= entryID then
 						canChangeEntry = true;
-                    	break
+						break
 					end
                 end
             end
@@ -1558,7 +1555,7 @@ do	--CommitUtil
 end
 
 
-do	--Debug
+--do	--Debug
 	--[[
 	EventRegistry:RegisterCallback("TalentDisplay.TooltipCreated", function(_, node, tooltip)
 		local nodeInfo = node.nodeInfo;
@@ -1601,7 +1598,7 @@ do	--Debug
 		tooltip:Show();
 	end);
 	--]]
-end
+--end
 
 
 local ExtraTooltipModule = {};

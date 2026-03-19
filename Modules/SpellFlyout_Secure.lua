@@ -319,7 +319,7 @@ do  --VisualButtonMixin
             self:SetPrimaryProfession(action.id);
         elseif self.actionType == "mount" then
             --Only RandomFavoriteMount use this method
-            --Regular mounts have been converted to spells 
+            --Regular mounts have been converted to spells
             self:SetMount(self.id);
         elseif self.actionType == "teleportHome" then
             self:SetTeleportHome();

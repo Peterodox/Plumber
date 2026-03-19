@@ -381,7 +381,9 @@ do
         if nodeInfo.entryIDsWithCommittedRanks then
             for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
                 committedEntryID = id;
-                break
+				if committedEntryID then
+                	break
+				end
             end
         end
 
@@ -1448,7 +1450,7 @@ do
             end
 
             if nodeButton then
-                if not (self.NodeFlyoutFrame.owner == nodeButton) then
+                if self.NodeFlyoutFrame.owner ~= nodeButton then
                     return false
                 end
             end

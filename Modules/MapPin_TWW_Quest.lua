@@ -124,8 +124,8 @@ do
         return "WorldMapPin_TWW_Quest"
     end
 
-    function SpecialQuestPinDataProvider:GetPinDataForMap(uiMapID)
-        if uiMapID ~= MAPID_KHAZALGAR then return end;
+    function SpecialQuestPinDataProvider:GetPinDataForMap(_uiMapID)
+        if _uiMapID ~= MAPID_KHAZALGAR then return end;
 
         local data;
         local positionToCache, p;
@@ -283,14 +283,6 @@ do  --Dev Tool
 
             API.ConvertMapPositionToContinentPosition(data.uiMapID, data.x, data.y, data.poiID);
         end);
-    end
-
-    local function PrintTaskNames(uiMapID)
-        uiMapID = uiMapID or C_Map.GetBestMapForUnit("player");
-        print("MAP", uiMapID)
-        for _, data in ipairs(C_TaskQuest.GetQuestsForPlayerByMapID(uiMapID)) do
-            print(data.questId, QuestUtils_GetQuestName(data.questId), API.RoundCoord(data.x), API.RoundCoord(data.y))
-        end
     end
 end
 

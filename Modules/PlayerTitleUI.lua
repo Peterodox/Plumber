@@ -329,15 +329,15 @@ function Module:Init()
     Searchbox:SetSize(160, 20); --160 184
     Searchbox:SetPoint("TOPLEFT", Header, "TOPLEFT", 0, 0);
 
-    Searchbox:SetScript("OnTextChanged", function(self, userInput)
-        SearchBoxTemplate_OnTextChanged(self);
+    Searchbox:SetScript("OnTextChanged", function(_self, userInput)
+        SearchBoxTemplate_OnTextChanged(_self);
         if Header:IsVisible() then
-            Module:SearchByKeyword(self:GetText())
+            Module:SearchByKeyword(_self:GetText());
         end
     end);
 
-    Searchbox:SetScript("OnEnterPressed", function(self)
-        self:ClearFocus();
+    Searchbox:SetScript("OnEnterPressed", function(_self)
+        _self:ClearFocus();
         local matchedTitleID = TitleDataProvider:GetOnlyMatch();
         if matchedTitleID then
             SetCurrentTitle(matchedTitleID);

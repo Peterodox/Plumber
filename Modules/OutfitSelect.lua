@@ -240,7 +240,7 @@ do  -- Outfit Macro    #plumber:outfit
         local header = "#plumber:"..Def.PlumberMacroCommand;
         local icon = Def.MacroIcon;
         local macro = "/click "..Def.ClickHandlerName;
-        local body = header.."\n"..macro;
+        body = header.."\n"..macro;
         return body, icon
     end
 

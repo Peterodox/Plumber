@@ -354,7 +354,7 @@ do  --WorldMapDataProvider
 
     function WorldMapDataProvider:OnEvent(event, ...)
         --This significantly increase RAM usage count
-        --So we monitor Events using another frame (PinController) 
+        --So we monitor Events using another frame (PinController)
     end
 
     function WorldMapDataProvider:RemoveAllIfNeeded()

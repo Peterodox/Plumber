@@ -1752,8 +1752,8 @@ do  -- PeudoActionButton (a real ActionButtonTemplate will be attached to the bu
             self.stackable = false;
             addon.CallbackRegistry:LoadItem(item, function(_itemID)
                 if _itemID == self.id and self.actionType == "item" then
-                    local stackSize = GetItemMaxStackSizeByID(item);
-                    self.stackable = stackSize and stackSize > 1;
+                    local _stackSize = GetItemMaxStackSizeByID(item);
+                    self.stackable = _stackSize and _stackSize > 1;
                     self:UpdateCount();
                 end
             end);
@@ -2539,7 +2539,7 @@ do
         mask2:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
         mask2:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Exclusion", "CLAMPTOWHITE", "CLAMPTOWHITE");
         f.OutStroke:AddMaskTexture(mask2);
-    
+
         f.BarFill = f:CreateTexture(nil, "OVERLAY");
         f.BarFill:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
         f.BarFill:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0);
@@ -3104,12 +3104,10 @@ do  --Metal Progress Bar
         --f:SetNumThreshold(0);
         f:SetValue(0, 100);
 
-        
         local BarPulse = CreateFrame("Frame", nil, f, "PlumberBarPulseTemplate");
         BarPulse:SetPoint("RIGHT", f.BarFill, "RIGHT", 0, 0);
         f.BarPulse = BarPulse;
 
-        
         local BarShake = Container:CreateAnimationGroup();
         f.BarShake = BarShake;
         local a1 = BarShake:CreateAnimation("Translation");
@@ -3566,7 +3564,6 @@ do  --Shared Context Menu
     local MENU_SUBBUTTON_TEXT_OFFSET = 30;
     local MENU_TOOLTIP_DELAY = 0.5;
 
-    local UIParent = UIParent;
     local GetScaledCursorPosition = API.GetScaledCursorPosition;
 
     local SharedContextMenu;
@@ -5772,13 +5769,13 @@ do  --Blizzard Check Button
                 end
 
                 if tooltip1 then
-                    local GameTooltip = GameTooltip;
-                    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-                    GameTooltip:SetText(tooltip1, 1, 1, 1);
+                    local tooltip = GameTooltip;
+                    tooltip:SetOwner(self, "ANCHOR_RIGHT");
+                    tooltip:SetText(tooltip1, 1, 1, 1);
                     if tooltip2 then
-                        GameTooltip:AddLine(tooltip2, 1, 0.82, 0, true);
+                        tooltip:AddLine(tooltip2, 1, 0.82, 0, true);
                     end
-                    GameTooltip:Show();
+                    tooltip:Show();
                 end
             end
         end

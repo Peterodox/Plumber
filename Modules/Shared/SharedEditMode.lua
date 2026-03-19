@@ -512,10 +512,6 @@ do  --EditModeSettingsDialog
         end
     end
 
-    function EditModeSettingsDialogMixin:UpdateWidgetBy()
-        
-    end
-
     function EditModeSettingsDialogMixin:OnDragStart()
         self:StartMoving();
     end

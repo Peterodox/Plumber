@@ -87,7 +87,7 @@ function EL:ShowBlackBar(state)
         local height = CinematicFrame:GetHeight();
         local viewableHeight = width * DefaultAspectRatio.y / DefaultAspectRatio.x;
         local blackBarHeight = math.floor((height - viewableHeight) / 2.0);
-        
+
         if blackBarHeight < 40 then
             blackBarHeight = 40;
         end
@@ -114,14 +114,8 @@ function EL:ShowBlackBar(state)
 end
 
 
-function EL:OnEvent(event, ...)
-    if event == "SHOW_SUBTITLE" then
-        
-    end
-end
-
---[[
-C_Timer.After(0, function()
-    EL:EnableModule(true);
-end)
---]]
+--function EL:OnEvent(event, ...)
+--    if event == "SHOW_SUBTITLE" then
+--
+--    end
+--end

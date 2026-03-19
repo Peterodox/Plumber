@@ -3,12 +3,11 @@ max_line_length = false
 exclude_files = {
 	"Modules/DevTool.lua",
 	"Modules/DevTool_HyperlinkEditor.lua",
+	"Modules/MerchantUI",
 };
 
 ignore = {
 	-- Ignore global writes/accesses/mutations on anything prefixed with
-	-- "Plumber_". This is the standard prefix for all of our global frame names
-	-- and mixins.
 	"11./^Plumber_",
 	"11./^PlumberFont_",
 
@@ -17,6 +16,9 @@ ignore = {
 
 	-- Ignore empty if branch
 	"542",
+
+	"PlumberSuperTrackingMixin",
+
 };
 
 globals = {
@@ -27,11 +29,25 @@ globals = {
 	"PlumberStorage",
 	"PlumberDB_PC",
 
+	"PlumberAPI_AddQuickSlotController",
+	"PlumberDreamseedMapPinMixin",
+	"PlumberWorldMapPinMixin",
+
+	"NarciPaperDollWidgetController",
+	"Narci_Attribute",
 	"NarciPaperDollWidgetController",
 };
 
 read_globals = {
-
+	"BetterWardrobeCollectionFrame",
+	"EditModeManagerExpandedFrame",		--EditModeExpanded
+	"EditModeExpandedWarningFrame",
+	"ElvUI",
+	"CSPilvl",				--Chonky Character Sheet
+	"GwDressingRoom",		--GW2 UI
+	"GwDressingRoomGear",
+	"ConsolePort",
+	"MerchantFrameCoverTab",
 };
 
 std = "lua51+wow";
@@ -98,6 +114,15 @@ stds.wow = {
 				"GetAddOnMetadata",
 				"IsAddOnLoaded",
 				"LoadAddOn",
+			},
+		},
+
+		C_AreaPoiInfo = {
+			fields = {
+				"GetAreaPOIForMap",
+				"GetAreaPOIInfo",
+				"GetDelvesForMap",
+				"GetEventsForMap",
 			},
 		},
 
@@ -172,6 +197,23 @@ stds.wow = {
 			},
 		},
 
+		C_DyeColor = {
+			fields = {
+				"GetDyeColorInfo",
+				"GetAllDyeColors",
+			},
+		},
+
+		C_EncounterJournal = {
+			fields = {
+				"GetDungeonEntrancesForMap",
+				"GetInstanceForGameMap",
+				"GetLootInfoByIndex",
+				"SetSlotFilter",
+				"InitalizeSelectedTier",
+			},
+		},
+
 		C_EventUtils = {
 			fields = {
 				"IsEventValid",
@@ -198,10 +240,62 @@ stds.wow = {
 			},
 		},
 
+		C_Housing = {
+			fields = {
+				"IsInsideHouseOrPlot",
+				"IsOnNeighborhoodMap",
+				"GetCurrentHouseLevelFavor",
+				"GetHouseLevelFavorForLevel",
+				"GetPlayerOwnedHouses",
+				"GetVisitCooldownInfo",
+				"GetUIMapIDForNeighborhood",
+			},
+		},
+
+		C_HousingBasicMode = {
+			fields = {
+				"IsDecorSelected",
+				"StartPlacingNewDecor",
+			},
+		},
+
+		C_HousingCatalog = {
+			fields = {
+				"GetCatalogEntryInfoByRecordID",
+				"CreateCatalogSearcher",
+				"GetCatalogEntryInfo",
+			},
+		},
+
+		C_HousingCustomizeMode = {
+			fields = {
+				"ApplyDyeToSelectedDecor",
+				"CancelActiveEditing",
+				"CommitDyesForSelectedDecor",
+				"IsDecorSelected",
+				"IsHoveringDecor",
+				"GetHoveredDecorInfo",
+				"GetSelectedDecorInfo",
+			},
+		},
+
+		C_HousingDecor = {
+			fields = {
+				"GetDecorName",
+				"GetHoveredDecorInfo",
+				"IsHoveringDecor",
+				"GetSpentPlacementBudget",
+				"GetMaxPlacementBudget",
+				"HasMaxPlacementBudget",
+			},
+		},
+
 		C_Item = {
 			fields = {
 				"DoesItemExistByID",
 				"GetDetailedItemLevelInfo",
+				"GetItemClassInfo",
+				"GetItemCreationContext",
 				"GetItemCooldown",
 				"GetItemCount",
 				"GetItemIconByID",
@@ -229,6 +323,19 @@ stds.wow = {
 			},
 		},
 
+		C_MajorFactions = {
+			fields = {
+				"HasMaximumRenown",
+				"IsMajorFactionHiddenFromExpansionPage",
+				"GetMajorFactionIDs",
+				"GetMajorFactionRenownInfo",
+				"GetMajorFactionData",
+				"GetRenownLevels",
+				"GetCurrentRenownLevel",
+				"GetRenownRewardsForLevel",
+			},
+		},
+
 		C_Map = {
 			fields = {
 				"ClearUserWaypoint",
@@ -237,10 +344,25 @@ stds.wow = {
 				"GetMapGroupMembersInfo",
 				"GetMapInfo",
 				"GetMapPosFromWorldPos",
+				"GetMapGroupID",
+				"GetMapInfoAtPosition",
+				"GetMapWorldSize",
 				"GetPlayerMapPosition",
 				"GetUserWaypointPositionForMap",
 				"OpenWorldMap",
 				"SetUserWaypoint",
+			},
+		},
+
+		C_MerchantFrame = {
+			fields = {
+				"GetItemInfo",
+			},
+		},
+
+		C_Minimap = {
+			fields = {
+				"IsInsideQuestBlob",
 			},
 		},
 
@@ -267,7 +389,7 @@ stds.wow = {
 				"GetTargetState",
 				"HasValidScreenPosition",
 				"GetDistance",
-				"GetDistance",
+				"GetFrame",
 			},
 		},
 
@@ -297,6 +419,16 @@ stds.wow = {
 			},
 		},
 
+		C_ProfSpecs = {
+			fields = {
+				"GetSpecTabIDsForSkillLine",
+				"GetConfigIDForSkillLine",
+				"GetTabInfo",
+				"GetSpendCurrencyForPath",
+				"GetUnlockEntryForPath",
+			},
+		},
+
 		C_PvP = {
 			fields = {
 				"IsActiveBattlefield",
@@ -319,12 +451,32 @@ stds.wow = {
 				"GetLogIndexForQuestID",
 				"UnitIsRelatedToActiveQuest",
 				"GetQuestRewardCurrencyInfo",
+				"GetQuestIDForQuestWatchIndex",
 			},
 		},
 
 		C_QuestOffer = {
 			fields = {
 				"GetQuestRewardCurrencyInfo",
+			},
+		},
+
+		C_RaidLocks = {
+			fields = {
+				"IsEncounterComplete",
+			},
+		},
+
+		C_Reputation = {
+			fields = {
+				"GetFactionDataByID",
+				"IsMajorFaction",
+				"IsAccountWideReputation",
+				"IsFactionParagon",
+				"SetWatchedFactionByID",
+				"RequestFactionParagonPreloadRewardData",
+				"GetFactionParagonInfo",
+				"IsFactionParagonForCurrentPlayer",
 			},
 		},
 
@@ -335,6 +487,18 @@ stds.wow = {
 				"GetCurrArtifactItemID",
 				"GetCurrItemSpecIndex",
 				"ItemInSlotIsRemixArtifact",
+			},
+		},
+
+		C_Scenario = {
+			fields = {
+				"GetStepInfo",
+			},
+		},
+
+		C_Scenario = {
+			fields = {
+				"GetScenarioInfo",
 			},
 		},
 
@@ -382,6 +546,7 @@ stds.wow = {
 				"GetSuperTrackedMapPin",
 				"GetSuperTrackedQuestID",
 				"IsSuperTrackingAnything",
+				"SetSuperTrackedQuestID",
 				"SetSuperTrackedUserWaypoint",
 			},
 		},
@@ -405,6 +570,28 @@ stds.wow = {
 		C_Timer = {
 			fields = {
 				"After",
+			},
+		},
+
+		C_TradeSkillUI = {
+			fields = {
+				"CloseTradeSkill",
+				"GetAllProfessionTradeSkillLines",
+				"GetBaseProfessionInfo",
+				"GetChildProfessionInfo",
+				"GetFilteredRecipeIDs",
+				"GetProfessionInfoBySkillLineID",
+				"GetRecipeItemNameFilter",
+				"GetRecipeOutputItemData",
+				"GetRecipeSchematic",
+				"GetRecipeInfo",
+				"GetItemCraftedQualityByItemInfo",
+				"GetItemReagentQualityByItemInfo",
+				"IsRecipeTracked",
+				"OpenRecipe",
+				"OpenTradeSkill",
+				"SetRecipeItemNameFilter",
+				"SetRecipeTracked",
 			},
 		},
 
@@ -499,6 +686,26 @@ stds.wow = {
 				"GetAuraDataByIndex",
 				"GetBuffDataByIndex",
 				"GetUnitAuraBySpellID",
+			},
+		},
+
+		C_VignetteInfo = {
+			fields = {
+				"GetHealthPercent",
+				"GetVignetteInfo",
+				"GetVignettes",
+				"GetVignettePosition",
+				"FindBestUniqueVignette",
+				"",
+				"",
+				"",
+			},
+		},
+
+		ColorManager = {
+			fields = {
+				"GetFormattedStringForItemQuality",
+				"GetColorDataForItemQuality",
 			},
 		},
 
@@ -682,6 +889,7 @@ stds.wow = {
 						"Artifact",
 						"Black",
 						"BrightBlue",
+						"ScenarioHeaderDelves",
 					},
 				},
 
@@ -735,10 +943,44 @@ stds.wow = {
 			},
 		},
 
+		MenuResponse = {
+			fields = {
+				"Open",
+				"Refresh",
+				"Close",
+				"CloseAll",
+			},
+		},
+
 		MenuUtil = {
 			fields = {
 				"CreateContextMenu",
 				"GetElementText",
+			},
+		},
+
+		QuestCache = {
+			fields = {
+				"Get",
+			},
+		},
+
+		ScrollBoxConstants = {
+			fields = {
+				"AlignBegin",
+				"RetainScrollPosition",
+			},
+		},
+
+		TooltipDataProcessor = {
+			fields = {
+				"AddTooltipPostCall",
+			},
+		},
+
+		UnitPopupSharedUtil = {
+			fields = {
+				"HasLFGRestrictions",
 			},
 		},
 
@@ -842,6 +1084,7 @@ stds.wow = {
 		"IsMouseButtonDown",
 		"IsShiftKeyDown",
 		"IsAltKeyDown",
+		"IsControlKeyDown",
 		"GetScaledCursorPosition",
 		"PlayerGetTimerunningSeasonID",
 		"DressUpItemLocation",
@@ -852,7 +1095,51 @@ stds.wow = {
 		"PickupInventoryItem",
 		"CalculateTotalNumberOfFreeBagSlots",
 		"GetInventoryItemLink",
-
+		"Vector2D_CalculateAngleBetween",
+		"Vector2D_Normalize",
+		"FrameDeltaLerp",
+		"ClampedPercentageBetween",
+		"PlayerHasToy",
+		"IsIndoors",
+		"RequestRaidInfo",
+		"IsInGroup",
+		"IsInRaid",
+		"UnitIsGroupLeader",
+		"IsLegacyDifficulty",
+		"GetLegacyRaidDifficultyID",
+		"GetDungeonDifficultyID",
+		"GetRaidDifficultyID",
+		"GetSavedInstanceInfo",
+		"GetNumSavedInstances",
+		"StaticPopup_Show",
+		"GetSavedInstanceChatLink",
+		"GetBattlefieldEstimatedWaitTime",
+		"GetBattlefieldTimeWaited",
+		"GetBattlefieldStatus",
+		"GetMaxBattlefieldID",
+		"GetLFGQueueStats",
+		"IsQuestLogSpecialItemInRange",
+		"GetQuestLogSpecialItemCooldown",
+		"GetBindingKey",
+		"ProfessionsBook_LoadUI",
+		"Transmog_LoadUI",
+		"GetCurrentTitle",
+		"GetNumTitles",
+		"IsTitleKnown",
+		"GetTitleName",
+		"SearchBoxTemplate_OnTextChanged",
+		"GetCameraZoom",
+		"UnitWidgetSet",
+		"GetMerchantNumItems",
+		"GetMerchantItemCostInfo",
+		"GetMerchantItemCostItem",
+		"GetNumBuybackItems",
+		"GetBuybackItemInfo",
+		"WorldMap_GetQuestTimeForTooltip",
+		"GameTooltip_SetTitle",
+		"GameTooltip_SetTooltipWaitingForData",
+		"GameTooltip_AddColoredLine",
+		"HaveQuestData",
 
 
 		-- Global Fonts
@@ -867,6 +1154,8 @@ stds.wow = {
 		"GameFontHighlight_NoShadow",
 		"GameFontDisable",
 		"GameFontRed",
+		"GameTooltipText",
+		"MovieSubtitleFont",
 		"QuestFont",
 
 		-- Global Frames
@@ -887,22 +1176,38 @@ stds.wow = {
 		"GameTooltip",
 		"GossipFrame",
 		"GuildInviteFrame",
+		"HousingDashboardFrame",
+		"MerchantFrame",
+		"MerchantMoneyInset",
+		"MerchantMoneyBgLeft",
+		"MerchantMoneyBgMiddle",
+		"MerchantMoneyBgRight",
+		"MerchantExtraCurrencyInset",
+		"MerchantExtraCurrencyBgLeft",
+		"MerchantExtraCurrencyBgMiddle",
+		"MerchantExtraCurrencyBgRight",
+		"Minimap",
 		"MountJournal",
 		"PaperDollFrame",
 		"PaperDollItemsFrame",
-		"HousingDashboardFrame",
+		"PlayerChoiceFrame",
+		"ProfessionsBookFrame",
+		"QuestMapFrame",
+		"QueueStatusButton",
 		"SideDressUpFrame",
+		"SubtitlesFrame",
 		"SuperTrackedFrame",
 		"TalkingHeadFrame",
+		"TransmogFrame",
 		"TransmogAndMountDressupFrame",
 		"UIErrorsFrame",
 		"UIParent",
 		"UISpecialFrames",
 		"WardrobeTransmogFrame",
+		"WardrobeCollectionFrame",
+		"WhoFrame",
 		"WorldFrame",
 		"WorldMapFrame",
-		"WhoFrame",
-		"WardrobeCollectionFrame",
 
 
 		-- Global Mixins
@@ -987,18 +1292,18 @@ stds.wow = {
 		"ITEM_OPENABLE",
 		"TALENT_BUTTON_TOOLTIP_NEXT_RANK",
 		"SPEC_ACTIVE",
+		"IN_GAME_NAVIGATION_RANGE",
+		"HOUSING_DASHBOARD_FRAMETITLE",
+		"BATTLENET_BROADCAST",
+		"TOKEN_MARKET_PRICE_NOT_AVAILABLE",
+		"BOSS_DEAD",
+		"BOSS_ALIVE",
+		"PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS",
+		"PLAYER_TITLE_NONE",
+		"FILTER",
+		"CLOSE",
+		"WEEKLY_REWARDS_UNCLAIMED_TITLE",
+		"BONUS_OBJECTIVE_TIME_LEFT",
 
-
-		-- Other Addons
-		"Narci_Attribute",
-		"NarciPaperDollWidgetController",
-		"BetterWardrobeCollectionFrame",
-		"EditModeManagerExpandedFrame",		--EditModeExpanded
-		"EditModeExpandedWarningFrame",
-		"ElvUI",
-		"CSPilvl",				--Chonky Character Sheet
-		"GwDressingRoom",		--GW2 UI
-		"GwDressingRoomGear",
-		"ConsolePort",
 	},
 };

@@ -30,12 +30,8 @@ do  --Latent Arcana
 end
 
 
-
 local GUIDXCurrency = {};
 
-do
-
-end
 
 local EL = CreateFrame("Frame");
 

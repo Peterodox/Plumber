@@ -214,7 +214,7 @@ function HornButton:OnClick()
         --print(msg);
         local channelID = C_ChatInfo.GetGeneralChannelID();
         if channelID then
-            SendChatMessage(msg, "CHANNEL", nil, channelID);
+            C_ChatInfo.SendChatMessage(msg, "CHANNEL", nil, channelID);
         else
             UIErrorsFrame:AddExternalErrorMessage("Could not find General Chat channel.");
         end

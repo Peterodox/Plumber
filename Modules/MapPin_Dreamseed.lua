@@ -1152,12 +1152,12 @@ function FilterFrame:SetupDropDown(dropdown)
     local width = dropdown:GetWidth();
     local height, diffHeight = self:GetBestDropDownHeight(dropdown);
     local firstButton, numButtons = self:CreateOptionList(width);
-    local extraHeight = (UIDROPDOWNMENU_BUTTON_HEIGHT or 16) * numButtons - diffHeight;
+    local extraHeight = 16 * numButtons - diffHeight;	--UIDROPDOWNMENU_BUTTON_HEIGHT
     local xPos = 11;
 
     self:SetScale(scale);
     firstButton:ClearAllPoints();
-    firstButton:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left + xPos, top - height + (UIDROPDOWNMENU_BORDER_HEIGHT or 15));
+    firstButton:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left + xPos, top - height + 15);	--UIDROPDOWNMENU_BORDER_HEIGHT
     dropdown:SetHeight(height + extraHeight);
 
     self:ShowUI();

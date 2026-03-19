@@ -135,7 +135,6 @@ local function UpdateWaypoints()
     local vignetteGUIDs = C_VignetteInfo.GetVignettes();
     local info;
     local uiMapID = MAPID_EMRALD_DREAM;
-    local creatureID;
     local x, y;
     local remainingTime, fullTime;
     local isActive;
@@ -149,7 +148,7 @@ local function UpdateWaypoints()
         if info then
             if info.vignetteID == VIGID_BOUNTY then
                 --Soil
-                creatureID = GetCreatureIDFromGUID(info.objectGUID);
+                local creatureID = GetCreatureIDFromGUID(info.objectGUID);
             elseif CHEST_VIGNETTE_X_CREATURE[info.vignetteID] then
                 --Dreamseed Chest
                 if not NAME_DREAMSEED_CHEST then
@@ -158,7 +157,7 @@ local function UpdateWaypoints()
                 end
 
                 flag = 2;
-                creatureID = CHEST_VIGNETTE_X_CREATURE[info.vignetteID];
+                local creatureID = CHEST_VIGNETTE_X_CREATURE[info.vignetteID];
                 if not processedCreatures[creatureID] then
                     processedCreatures[creatureID] = true;
                     SetDreamseedFlag(creatureID, flag);

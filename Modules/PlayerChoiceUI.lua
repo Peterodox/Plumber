@@ -372,7 +372,7 @@ end
 
 local function OptionButton_OnClick(self)
     --We need to consume this click if long-click just ended
-    --Sometimes the intial second click doesn't work due to Event not firing that fast? 
+    --Sometimes the intial second click doesn't work due to Event not firing that fast?
 
     if self.id and not PlayerChoiceUI.consumeNextClick then
         C_PlayerChoice.SendPlayerChoiceResponse(self.id);
@@ -844,7 +844,7 @@ function PlayerChoiceUI:Setup(option)
         for i = numOptions + 1, #self.optionFrames do
             self.optionFrames[i]:Hide();
         end
-        
+
         if numOptions > 0 then
             self:SetWidth(numOptions*(OPTION_FRAME_WIDTH + OPTION_FRAME_GAP) - OPTION_FRAME_GAP);
             local headerHeight = 84;
@@ -1023,7 +1023,6 @@ Rework PlayerChoiceFrame
     Title.Left/Middle/Right/Text
     NineSlice
 
-    
 
     PlayerChoiceTimeRemaining
     PlayerChoiceNormalOptionTemplate

@@ -231,7 +231,7 @@ do
     function ItemListButton:UpdateTooltipInfo()
         self.dataInstanceID = nil;
         self.dataInstanceID, self.hasRestrictions = DataProvider:GetMerchantItemRestrictions(self.itemIndex);
-        if self.hasRestrictions then    --self.isPurchasable 
+        if self.hasRestrictions then    --self.isPurchasable
             self.RightIcon:SetTexture("Interface/AddOns/Plumber/Art/MerchantUI/RedAlert.png");
             self.RightIcon:Show();
         else
@@ -278,7 +278,6 @@ do
                 end
 
                 if info.hasExtendedCost then
-                    
                 end
 
                 self.itemType = self.itemInfo and self.itemInfo.itemType;

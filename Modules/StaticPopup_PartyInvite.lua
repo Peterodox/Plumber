@@ -272,7 +272,7 @@ do  --Options
     end
 
     local function DemoFrame_Update()
-        local primaryTalentTree = GetSpecialization();
+        local primaryTalentTree = C_SpecializationInfo.GetSpecialization();
         local unit = "player";
         local level = UnitLevel(unit);
         local classDisplayName, class = UnitClass(unit);
@@ -280,7 +280,7 @@ do  --Options
 
         local spec, _;
         if primaryTalentTree then
-            _, spec = GetSpecializationInfo(primaryTalentTree, nil, nil, nil, UnitSex(unit));
+            _, spec = C_SpecializationInfo.GetSpecializationInfo(primaryTalentTree, nil, nil, nil, UnitSex(unit));
         end
         if spec and spec ~= "" then
             spec = spec.." "..classDisplayName;
