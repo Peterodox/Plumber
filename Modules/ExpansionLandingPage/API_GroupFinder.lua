@@ -89,8 +89,8 @@ function EL:FullUpdate()
     self:ListenEvents(true);
 end
 
+--[[
 do  --Dungeon Finder
-    --[[
     function YeetJoinableDungeons()
         for i = 1, GetNumRandomDungeons() do
             local id, name = GetLFGRandomDungeonInfo(i);
@@ -100,8 +100,8 @@ do  --Dungeon Finder
             end
         end
     end
-    --]]
 end
+--]]
 
 do  --"Public" Method
     function LandingPageUtil.IsQueuingDungeon(lfgDungeonID)

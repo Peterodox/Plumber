@@ -272,14 +272,14 @@ do  --Seasonal Journey Progress
         ProgressBar:SetValue(earned);
 
         function ProgressBar:Test()
-            local level, earned, threshold = 2, 3300, 4200;
+            local _level, _earned, _threshold = 2, 3300, 4200;
             local deltaEarned, levelUp, reachMaxLevel =  290, true, false;
 
             self:FadeIn();
-            self:SetMaxValue(threshold);
-            self:SetValue(earned, levelUp);
+            self:SetMaxValue(_threshold);
+            self:SetValue(_earned, levelUp);
             self:AnimateDeltaValue(deltaEarned);
-            self:SetLevel(level, reachMaxLevel);
+            self:SetLevel(_level, reachMaxLevel);
         end
     end
 

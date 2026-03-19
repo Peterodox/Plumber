@@ -1786,8 +1786,6 @@ function TrackerFrame:UpdateTray(manual)
     local list = self:GetTrackList();
     local numItems = #list;
 
-    local fullWidth = 0;
-    local button, width;
     local itemID, wasTracked;
 
     if manual then
@@ -1800,6 +1798,9 @@ function TrackerFrame:UpdateTray(manual)
             end
         end
     end
+
+    local fullWidth = 0;
+    local button, width;
 
     --Layout
     if self:IsPlacedInsideBag() then

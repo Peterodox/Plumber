@@ -92,6 +92,7 @@ stds.wow = {
 		"GossipFrame",	--gossipOptions
 		"SlashCmdList",
 		"StaticPopupDialogs",
+		"WardrobeItemsCollectionSlotButtonMixin",
 
 		GameTooltip = {
 			fields = {
@@ -1266,6 +1267,7 @@ stds.wow = {
 		UIWidgetManager = {
 			fields = {
 				"GetWidgetTypeInfo",
+				"registeredWidgetContainers",
 			},
 		},
 

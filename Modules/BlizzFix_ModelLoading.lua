@@ -277,15 +277,15 @@ do
 
         --When you are already viewing the corresponding category, click the slot button again to go to page 1
         do
-            local function ItemsCollectionSlotButtonMixin_OnClick(self, button)
-                if self.SelectedTexture:IsShown() then
+            local function ItemsCollectionSlotButtonMixin_OnClick(f, button)
+                if f.SelectedTexture:IsShown() then
                     if appearanceTab.PagingFrame:GetCurrentPage() >= 1 then
                         SaveCurrentPage(1);
                         appearanceTab:ResetPage();
                     end
                     return
                 else
-                    WardrobeItemsCollectionSlotButtonMixin.OnClick(self, button);
+                    WardrobeItemsCollectionSlotButtonMixin.OnClick(f, button);
                 end
             end
 
