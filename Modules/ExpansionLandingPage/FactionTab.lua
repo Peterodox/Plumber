@@ -978,10 +978,10 @@ do
 
 
 			local function LevelText_Create()
-			   local fs = RenownItemScrollView:CreateFontString(nil, "OVERLAY", "PlumberFont_16");
-			   fs:SetTextColor(1, 1, 1, 0.2);
-			   fs:SetJustifyH("RIGHT");
-			   return fs
+				local fs = RenownItemScrollView:CreateFontString(nil, "OVERLAY", "PlumberFont_16");
+				fs:SetTextColor(1, 1, 1, 0.2);
+				fs:SetJustifyH("RIGHT");
+				return fs
 			end
 
 			RenownItemScrollView:AddTemplate("LevelText", LevelText_Create);

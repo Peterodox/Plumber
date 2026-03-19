@@ -138,7 +138,7 @@ function StaticPopupUtil:CheckPopupVisibilities()
 end
 
 function StaticPopupUtil:OnUpdate(elapsed)
-   self.updateTimer = self.updateTimer + elapsed;
+	self.updateTimer = self.updateTimer + elapsed;
 	if self.updateTimer > 0.2 then
 		self.updateTimer = 0;
 		self:CheckPopupVisibilities();

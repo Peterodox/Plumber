@@ -140,7 +140,7 @@ do --SpellFlyout Main
 		bg.pieces[8]:SetTexCoord(48/128, 80/128, 80/128, 128/128);
 		bg.pieces[9]:SetTexCoord(80/128, 128/128, 80/128, 128/128);
 		if IS_CLASSIC then
-		   bg:SetCornerSize(48 * buttonScale);
+			bg:SetCornerSize(48 * buttonScale);
 		else
 			bg:SetCornerSize(48);
 		end

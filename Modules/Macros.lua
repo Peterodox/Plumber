@@ -1354,7 +1354,7 @@ do  --Editor Setup
 			end
 
 			function IconButtonMixin:OnRemoved()
-			   self:ClearAction();
+				self:ClearAction();
 			end
 
 			SecureSpellFlyout:PopulateButtonMixin(IconButtonMixin);

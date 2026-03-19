@@ -57,14 +57,14 @@ local function GetPlayerClassName(playerClassID, markYourClass)
 		return ALL_CLASSES
 	end
 
-   local info = C_CreatureInfo.GetClassInfo(playerClassID);
-   local name = info and info.className or "";
+	local info = C_CreatureInfo.GetClassInfo(playerClassID);
+	local name = info and info.className or "";
 
 	if markYourClass and playerClassID == LandingPageUtil.GetDefaultPlayerClassID() then
 		name = name .."  "..L["Your Class"];
 	end
 
-   return name
+	return name
 end
 
 

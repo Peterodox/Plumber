@@ -245,9 +245,9 @@ do  --Filter
 
 	function Module:ResetFilter()
 		if self.getTitleFunc ~= GetTitles.Earned then
-		   self.showEarned = true;
-		   self.showUnearned = false;
-		   self:UpdateAfterFilterChange();
+			self.showEarned = true;
+			self.showUnearned = false;
+			self:UpdateAfterFilterChange();
 		end
 	end
 

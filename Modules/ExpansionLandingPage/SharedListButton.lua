@@ -232,7 +232,7 @@ do  --Generic Checklist Button
 			self.Name:SetText(data.localizedName);
 		else
 			self.loaded = false;
-		   self.Name:SetText(data.name);
+			self.Name:SetText(data.name);
 		end
 
 		self.type = data.type;

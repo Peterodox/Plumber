@@ -638,7 +638,7 @@ do  -- Item
 
 
 	function API.IsToyItem(item)
-	   return C_ToyBox.GetToyInfo(item) ~= nil
+		return C_ToyBox.GetToyInfo(item) ~= nil
 	end
 
 

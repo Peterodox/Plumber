@@ -72,7 +72,7 @@ if IsEnabled("AuraWather") then  --Aura Watcher
 
 	EL:SetScript("OnEvent", function(self, event, ...)
 		if event == "UNIT_AURA" then
-		   local unitTarget, updateInfo = ...
+			local unitTarget, updateInfo = ...
 			if not updateInfo then return end;
 
 			if updateInfo.addedAuras then
@@ -248,7 +248,7 @@ if IsEnabled("POI") then  --AreaPOI
 		local count = #effectDescriptions;
 		for i = 1, count do
 			if effectID == effectDescriptions[i].id then
-			   return effectDescriptions[i]
+				return effectDescriptions[i]
 			end
 		end
 	end

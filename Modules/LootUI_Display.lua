@@ -573,8 +573,8 @@ do  --Event Handler
 		local numItems = GetNumLootItems();
 
 		if numItems == 0 then
-		   CloseLoot();
-		   return
+			CloseLoot();
+			return
 		end
 
 		if USE_STOCK_UI then

@@ -268,8 +268,8 @@ do  --CastingBar / SpellBar
 end
 
 local function AttachFrameToCastingBar(bar, overlay)
-	if not bar then return
-	   false
+	if not bar then
+		return false
 	end
 
 	local f;

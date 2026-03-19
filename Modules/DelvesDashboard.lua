@@ -282,7 +282,7 @@ do  --Gilded Stash: 3 per week, 7 Gilded Crests each
 			self.Texture:SetDesaturated(true);
 			self.Texture:SetVertexColor(0.8, 0.8, 0.8);
 			if self.initialzed then
-			   return
+				return
 			end
 		end
 

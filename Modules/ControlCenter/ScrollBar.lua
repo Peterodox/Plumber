@@ -263,7 +263,7 @@ do
 		self:UpdateVisibleExtentPercentage();
 	end
 
-   function ScrollBarMixin:SetValueByRatio(ratio)
+	function ScrollBarMixin:SetValueByRatio(ratio)
 		if ratio < 0.001 then
 			ratio = 0;
 			self.isTop = true;

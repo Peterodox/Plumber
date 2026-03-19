@@ -60,7 +60,7 @@ function EL:OnSuperTrackingChanged()
 	end
 
 	if timeLeft then
-	   self:ShowTimer(timerWidgetID, timeLeft);
+		self:ShowTimer(timerWidgetID, timeLeft);
 	else
 		self:HideTimer();
 	end
