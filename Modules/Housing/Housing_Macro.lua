@@ -38,7 +38,7 @@ do  --Teleport Home Macro    #plumber:home
     local function WriteFunc_home(body)
         local header = "#plumber:"..COMMAND_HOME;
         local icon, macro = GetDynamicTeleportAction();
-        local body = header.."\n"..macro;
+        body = header.."\n"..macro;
         return body, icon
     end
 
@@ -120,7 +120,7 @@ do  --Toggle Torch Macro    #plumber:torch
     local function WriteFunc_torch(body)
         local header = "#plumber:"..COMMAND_TORCH;
         local icon;
-        local body = header;
+        body = header;
         if ConditionFunc_torch() then
             body = string.format("%s\n#showtooltip %s\n/use \"item:%s\"", body, ItemInfo:GetItemName(), ItemInfo.itemID);
             icon = ItemInfo.litIcon;

@@ -103,6 +103,12 @@ stds.wow = {
 				"suppressAutomaticCompareItem",
 			},
 		},
+
+		GossipFrame = {
+			fields = {
+				"gossipOptions",
+			},
+		},
 	},
 
 	-- Globals that we access.
@@ -120,6 +126,12 @@ stds.wow = {
 		"time",
 
 		-- Global Functions
+		AuraUtil = {
+			fields = {
+				"ForEachAura",
+			},
+		},
+
 		bit = {
 			fields = {
 				"band",
@@ -410,6 +422,12 @@ stds.wow = {
 				"GetSpentPlacementBudget",
 				"GetMaxPlacementBudget",
 				"HasMaxPlacementBudget",
+			},
+		},
+
+		C_HousingNeighborhood = {
+			fields = {
+				"CanReturnAfterVisitingHouse",
 			},
 		},
 
@@ -1504,6 +1522,11 @@ stds.wow = {
 		"wipe",
 		"GetNumQuestLogRewardCurrencies",
 		"strsplit",
+		"GetLFGRandomDungeonInfo",
+		"IsLFGDungeonJoinable",
+		"GetNumRandomDungeons",
+		"LFDQueueFrame_SetType",
+		"QuestMapFrame_ShowQuestDetails",
 
 		-- Global Fonts
 		"GameFontNormal",
@@ -1544,13 +1567,13 @@ stds.wow = {
 		"ExpansionLandingPageMinimapButton",
 		"GarrisonLandingPage",
 		"GameTooltip",
-		"GossipFrame",
 		"GuildInviteFrame",
 		"HousingControlsFrame",
 		"HousingDashboardFrame",
 		"HousingModelPreviewFrame",
 		"HouseEditorFrame",
 		"ItemUpgradeFrame",
+		"LFDParentFrame",
 		"LootFrame",
 		"MailFrame",
 		"MacroFrame",

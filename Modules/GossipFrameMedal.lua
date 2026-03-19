@@ -198,7 +198,7 @@ local function ProcessAuraByAuraInstanceID(auraInstanceID)
     local info = C_TooltipInfo.GetUnitBuffByAuraInstanceID("player", auraInstanceID);
     if info and info.lines and info.lines[2] then
         EL:WatchDataInstanceID(info.dataInstanceID);
-        ProcessLines( string.split("\r", info.lines[2].leftText) );
+        ProcessLines(strsplit("\r", info.lines[2].leftText));
     else
         --Tooltip data not ready
         EL:QueryAuraTooltipInto(auraInstanceID)
