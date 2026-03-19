@@ -62,7 +62,7 @@ function AddonDataProvider:FindIndexByName(name)
 
 end
 
-function ScrollToAddOnName(name)
+local function ScrollToAddOnName(name)
     local index = AddonDataProvider:FindIndexByName(name);
     if index then
         local alignment = ScrollBoxConstants.AlignBegin;

@@ -883,7 +883,7 @@ function SettingsFrame:Init()
             else
                 self.DragLine:SetPoint("CENTER", button, "TOP", 0, 0);
             end
-            
+
             self.DragLine:Show();
         else
             self:StopArranging();
@@ -2415,7 +2415,7 @@ local function DoesNothing()
 end
 
 local function AnchorToCompatibleAddOn()
-    local IsAddOnLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or IsAddOnLoaded;
+    local IsAddOnLoaded = C_AddOns.IsAddOnLoaded;
     if IsAddOnLoaded("Bagnon") then
         if Bagnon and Bagnon.Frames and Bagnon.Frames.Toggle then
             local bagHook = false;

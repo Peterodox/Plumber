@@ -48,6 +48,20 @@ read_globals = {
 	"GwDressingRoomGear",
 	"ConsolePort",
 	"MerchantFrameCoverTab",
+	"TomTom",
+	"TomTomCrazyArrow",
+
+	"Bagnon",
+	"BagnonInventory1",
+	"BagnonContainerItem1",
+	"AdiBagsContainer1",
+	"AdiBagsBagAnchor1",
+	"ARKINV_Frame1",
+	"ElvUI_ContainerFrame",
+	"NDui_BackpackBag",
+	"LiteBagBackpack",
+	"Baganator",
+	"BetterBagsBagBackpack",
 };
 
 std = "lua51+wow";
@@ -55,6 +69,7 @@ std = "lua51+wow";
 stds.wow = {
 	-- Globals that we mutate.
 	globals = {
+		"BossBanner",
 		"SlashCmdList",
 		"StaticPopupDialogs",
 	},
@@ -104,6 +119,15 @@ stds.wow = {
 						"HOUSING_CATALOG_DECOR_MODELSCENEID_DEFAULT",
 					},
 				},
+			},
+		},
+
+		C_AccountStore = {
+			fields = {
+				"GetCategoryItems",
+				"GetCategories",
+				"GetCategoryInfo",
+				"GetCurrencyIDForStore",
 			},
 		},
 
@@ -194,6 +218,14 @@ stds.wow = {
 				"GetCurrentCalendarTime",
 				"GetSecondsUntilWeeklyReset",
 				"GetWeeklyResetStartTime",
+			},
+		},
+
+		C_DelvesUI = {
+			fields = {
+				"GetCurrentDelvesSeasonNumber",
+				"GetDelvesFactionForSeason",
+				"HasActiveDelve",
 			},
 		},
 
@@ -348,6 +380,7 @@ stds.wow = {
 				"GetMapInfoAtPosition",
 				"GetMapWorldSize",
 				"GetPlayerMapPosition",
+				"GetUserWaypoint",
 				"GetUserWaypointPositionForMap",
 				"OpenWorldMap",
 				"SetUserWaypoint",
@@ -399,6 +432,14 @@ stds.wow = {
 			},
 		},
 
+		C_PartyInfo = {
+			fields = {
+				"IsPartyWalkIn",
+				"IsCrossFactionParty",
+				"IsDelveInProgress",
+			},
+		},
+
 		C_PetJournal = {
 			fields = {
 				"FindPetIDByName",
@@ -435,6 +476,16 @@ stds.wow = {
 			},
 		},
 
+		C_QuestInfoSystem = {
+			fields = {
+				"GetQuestClassification",
+				"GetQuestRewardSpellInfo",
+				"GetQuestRewardSpells",
+				"HasQuestRewardCurrencies",
+				"HasQuestRewardSpells",
+			},
+		},
+
 		C_QuestLog = {
 			fields = {
 				"GetActivePreyQuest",
@@ -452,6 +503,7 @@ stds.wow = {
 				"UnitIsRelatedToActiveQuest",
 				"GetQuestRewardCurrencyInfo",
 				"GetQuestIDForQuestWatchIndex",
+				"GetQuestRewardCurrencies",
 			},
 		},
 
@@ -496,7 +548,7 @@ stds.wow = {
 			},
 		},
 
-		C_Scenario = {
+		C_ScenarioInfo = {
 			fields = {
 				"GetScenarioInfo",
 			},
@@ -639,6 +691,17 @@ stds.wow = {
 			},
 		},
 
+		C_TransmogSets = {
+			fields = {
+				"GetAllSourceIDs",
+				"GetBaseSetID",
+				"GetVariantSets",
+				"GetSetInfo",
+				"GetSetPrimaryAppearances",
+				"IsBaseSetCollected",
+			},
+		},
+
 		C_TooltipInfo = {
 			fields = {
 				"GetBagItem",
@@ -702,6 +765,15 @@ stds.wow = {
 			},
 		},
 
+		C_WeeklyRewards = {
+			fields = {
+				"GetExampleRewardItemHyperlinks",
+				"GetNextActivitiesIncrease",
+				"GetActivities",
+				"HasAvailableRewards",
+			},
+		},
+
 		ColorManager = {
 			fields = {
 				"GetFormattedStringForItemQuality",
@@ -711,6 +783,13 @@ stds.wow = {
 
 		Enum = {
 			fields = {
+				AccountStoreItemStatus = {
+					fields = {
+						"Owned",
+						"Refundable",
+					},
+				},
+
 				ContentTrackingType = {
 					fields = {
 						"Achievement",
@@ -965,6 +1044,13 @@ stds.wow = {
 			},
 		},
 
+		Settings = {
+			fields = {
+				"RegisterAddOnCategory",
+				"RegisterCanvasLayoutCategory",
+			},
+		},
+
 		ScrollBoxConstants = {
 			fields = {
 				"AlignBegin",
@@ -1027,6 +1113,7 @@ stds.wow = {
 		"AbbreviateNumbers",
 		"GetCurrentKeyBoardFocus",
 		"ChatEdit_InsertLink",
+		"ChatEdit_LinkItem",
 		"GetCursorPosition",
 		"GetText",
 		"IsSpellKnownOrOverridesKnown",
@@ -1139,7 +1226,34 @@ stds.wow = {
 		"GameTooltip_SetTitle",
 		"GameTooltip_SetTooltipWaitingForData",
 		"GameTooltip_AddColoredLine",
+		"GameTooltip_AddBlankLineToTooltip",
+		"GameTooltip_AddErrorLine",
+		"GameTooltip_AddHighlightLine",
+		"GameTooltip_AddNormalLine",
 		"HaveQuestData",
+		"GetFactionInfoByID",
+		"GetSpellCooldown",
+		"GetSpellCharges",
+		"ToggleCharacter",
+		"GetMaxLevelForExpansionLevel",
+		"GetQuestLogIndexByID",
+		"IsQuestComplete",
+		"GetNumQuestLogRewards",
+		"GetQuestLogRewardInfo",
+		"GetQuestObjectiveInfo",
+		"GetQuestProgressBarPercent",
+		"GetQuestLogRewardCurrencyInfo",
+		"GetQuestLogRewardHonor",
+		"IsPlayerSpell",
+		"GetProfessions",
+		"GetProfessionInfo",
+		"GetSpellBookItemInfo",
+		"CastSpell",
+		"UpdateContainerFrameAnchors",
+		"Model_ApplyUICamera",
+		"LeaveChannelByLocalID",
+		"LeaveChannelByName",
+		"GetNumDisplayChannels",
 
 
 		-- Global Fonts
@@ -1159,13 +1273,14 @@ stds.wow = {
 		"QuestFont",
 
 		-- Global Frames
+		"AccountStoreFrame",
 		"AddonCompartmentFrame",
 		"ArtifactFrame",
 		"BackpackTokenFrame",
-		"BossBanner",
 		"CharacterFrame",
 		"CharacterStatsPane",
 		"ChatFrame1",
+		"CinematicFrame",
 		"ContainerFrame1",
 		"ContainerFrameCombinedBags",
 		"DressUpFrame",
@@ -1192,9 +1307,12 @@ stds.wow = {
 		"PaperDollItemsFrame",
 		"PlayerChoiceFrame",
 		"ProfessionsBookFrame",
+		"ProfessionsFrame",
+		"PVEFrame",
 		"QuestMapFrame",
 		"QueueStatusButton",
 		"SideDressUpFrame",
+		"SplashFrame",
 		"SubtitlesFrame",
 		"SuperTrackedFrame",
 		"TalkingHeadFrame",
@@ -1212,6 +1330,7 @@ stds.wow = {
 
 		-- Global Mixins
 		"EventToastManagerFrameMixin",
+		"WardrobeItemModelMixin",
 
 		-- Global Constants
 		"ITEM_QUALITY_COLORS",
@@ -1304,6 +1423,22 @@ stds.wow = {
 		"CLOSE",
 		"WEEKLY_REWARDS_UNCLAIMED_TITLE",
 		"BONUS_OBJECTIVE_TIME_LEFT",
-
+		"WEEKLY_REWARDS_UNLOCK_REWARD",
+		"GREAT_VAULT_REWARDS_WORLD_COMPLETED_FIRST",
+		"GREAT_VAULT_REWARDS_WORLD_COMPLETED_SECOND",
+		"GREAT_VAULT_REWARDS_WORLD_INCOMPLETE",
+		"WEEKLY_REWARDS_CURRENT_REWARD",
+		"WEEKLY_REWARDS_IMPROVE_ITEM_LEVEL",
+		"WEEKLY_REWARDS_ITEM_LEVEL_WORLD",
+		"WEEKLY_REWARDS_COMPLETE_WORLD",
+		"WEEKLY_REWARDS_MAXED_REWARD",
+		"WEEKLY_REWARDS_CLICK_TO_PREVIEW_INSTRUCTIONS",
+		"ERR_COSMETIC_KNOWN",
+		"TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN",
+		"BRAWL_TOOLTIP_ENDS",
+		"NO_TRANSMOG_VISUAL_ID",
+		"GAME_VERSION_LABEL",
+		"DELVES_GREAT_VAULT_ERR_AVAIL_AT_MAX_LEVEL",
+		"DELVES_GREAT_VAULT_REQUIRES_ACTIVE_SEASON",
 	},
 };
