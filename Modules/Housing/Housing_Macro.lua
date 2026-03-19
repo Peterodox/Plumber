@@ -8,7 +8,7 @@ local IsInsideHouseOrPlot = C_Housing.IsInsideHouseOrPlot;
 local IsOnNeighborhoodMap = C_Housing.IsOnNeighborhoodMap;
 
 
-function IsInHousingZone()
+local function IsInHousingZone()
     return IsInsideHouseOrPlot() or IsOnNeighborhoodMap()
 end
 

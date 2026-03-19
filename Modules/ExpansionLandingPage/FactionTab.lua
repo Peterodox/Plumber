@@ -98,7 +98,7 @@ do
         tooltip:Show();
     end
 
-    function ReputationTooltipScripts.ShowParagonRewardsTooltip(self) -- luacheck: ignore --122
+    function ReputationTooltipScripts.ShowParagonRewardsTooltip(self)
         local tooltip = GameTooltip;
 
         --AddParagonRewardsToTooltip

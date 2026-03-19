@@ -178,10 +178,10 @@ do
         end
 
         local processed = false;
-        parentFrame:HookScript("OnKeyDown", function(self, key)
+        parentFrame:HookScript("OnKeyDown", function(_self, key)
             if (not processed) and (key == "ESCAPE" and not InCombatLockdown()) then
                 processed = true;
-                self:SetPropagateKeyboardInput(true);
+                _self:SetPropagateKeyboardInput(true);
             end
         end)
 
@@ -230,32 +230,32 @@ do
 
         --Override WardrobeItemsCollectionMixin.ResetPage
         do
-            local function ItemsCollectionFrame_ResetPage(self)
+            local function ItemsCollectionFrame_ResetPage(f)
                 local category = appearanceTab.activeCategory or -1;
                 local page = Loader.enabled and Loader.lastPages[category] or 1;
                 local selectedVisualID = NO_TRANSMOG_VISUAL_ID;
-                if ( C_TransmogCollection.IsSearchInProgress(self:GetParent():GetSearchType()) ) then
-                    self.resetPageOnSearchUpdated = true;
+                if ( C_TransmogCollection.IsSearchInProgress(f:GetParent():GetSearchType()) ) then
+                    f.resetPageOnSearchUpdated = true;
                 else
-                    if ( self.jumpToVisualID ) then
-                        selectedVisualID = self.jumpToVisualID;
-                        self.jumpToVisualID = nil;
-                    elseif ( self.jumpToLatestAppearanceID and not C_Transmog.IsAtTransmogNPC() ) then
-                        selectedVisualID = self.jumpToLatestAppearanceID;
-                        self.jumpToLatestAppearanceID = nil;
+                    if ( f.jumpToVisualID ) then
+                        selectedVisualID = f.jumpToVisualID;
+                        f.jumpToVisualID = nil;
+                    elseif ( f.jumpToLatestAppearanceID and not C_Transmog.IsAtTransmogNPC() ) then
+                        selectedVisualID = f.jumpToLatestAppearanceID;
+                        f.jumpToLatestAppearanceID = nil;
                     end
                 end
                 if ( selectedVisualID and selectedVisualID ~= NO_TRANSMOG_VISUAL_ID ) then
-                    local visualsList = self:GetFilteredVisualsList();
+                    local visualsList = f:GetFilteredVisualsList();
                     for i = 1, #visualsList do
                         if ( visualsList[i].visualID == selectedVisualID ) then
-                            page = CollectionWardrobeUtil.GetPage(i, self.PAGE_SIZE);
+                            page = CollectionWardrobeUtil.GetPage(i, f.PAGE_SIZE);
                             break;
                         end
                     end
                 end
-                self.PagingFrame:SetCurrentPage(page);
-                self:UpdateItems();
+                f.PagingFrame:SetCurrentPage(page);
+                f:UpdateItems();
             end
 
             function appearanceTab:ResetPage()
@@ -311,7 +311,7 @@ do
         self:SetRowAndCol(values[optionIndex][1], values[optionIndex][2], userInput);
     end
 
-    function Loader:SetRowAndCol(numRow, numCol, userInput)
+    function Loader:SetRowAndCol(numRow, numCol, userInput) -- luacheck: ignore 122
         local gapH, gapV = 16, 24;
         local modelWidth, modelHeight = 78, 104;
         local pageSize = numRow * numCol;

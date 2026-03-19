@@ -1384,7 +1384,7 @@ do  --ChangelogTab
 
     Formatter.TagFonts = {
         ["h1"] = "ObjectiveTrackerFont16",  --PlumberFont_16
-        ["p"] = "GameFontNormal",   --GameFontNormal 
+        ["p"] = "GameFontNormal",   --GameFontNormal
     };
 
     function Formatter:GetTextHeight(fontTag, text, textWidthShrink)
@@ -1677,10 +1677,10 @@ do  --ChangelogTab
 
                     --Add Keywords
                     if info.dbKey then
-                        local text = ControlCenter:GetModuleCategoryName(info.dbKey);
-                        if text then
-                            text = L["Category Colon"]..text;
-                            objectHeight = Formatter:GetTextHeight(info.type, text);
+                        local _text = ControlCenter:GetModuleCategoryName(info.dbKey);
+                        if _text then
+                            _text = L["Category Colon"].._text;
+                            objectHeight = Formatter:GetTextHeight(info.type, _text);
                             top = bottom + Def.ChangelogLineSpacing;
                             bottom = top + objectHeight;
                             n = n + 1;
@@ -1689,14 +1689,14 @@ do  --ChangelogTab
                                 templateKey = "FontString",
                                 setupFunc = function(obj)
                                     obj:SetFontObject(Formatter.TagFonts["p"]);
-                                    obj:SetText(text);
+                                    obj:SetText(_text);
                                     SetTextColor(obj, Def.TextColorNonInteractable);
 
                                     if redacted then
                                         local redactor = self.redactorPool:Acquire();
                                         local fontObject = Formatter.TagFonts["p"];
                                         local _, fontHeight = _G[fontObject]:GetFont();
-                                        redactor:RedactFontString(obj, fontHeight, text);
+                                        redactor:RedactFontString(obj, fontHeight, _text);
                                     end
                                 end,
                                 top = top,

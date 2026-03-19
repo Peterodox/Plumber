@@ -147,21 +147,21 @@ function ChatOptions:SetupStaticPopup()
             text = "",		-- supplied dynamically.
             button1 = YES or "Yes",
             button2 = NO or "No",
-            OnShow = function(self, data)
-                self.Text:SetText(data.text);
+            OnShow = function(_self, data)
+                _self.Text:SetText(data.text);
                 if data.showAlert then
-                    self.AlertIcon:Show();
+                    _self.AlertIcon:Show();
                 end
             end,
-            OnAccept = function(self, data)
+            OnAccept = function(_self, data)
                 data.callback();
             end,
-            OnCancel = function(self, data)
+            OnCancel = function(_self, data)
                 local cancelCallback = data and data.cancelCallback or nil;
                 if cancelCallback ~= nil then
                     cancelCallback();
                 end
-                self:Hide();
+                _self:Hide();
             end,
             hideOnEscape = 1,
             timeout = 0,

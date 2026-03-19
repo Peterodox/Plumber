@@ -1,5 +1,5 @@
 -- Create Action Buttons to Teleport to Alliance, Horde Homes, and Leave home.
--- Thanks to Console Port dev Munk, a mysterious helper that works in extreme weather, and of course myelf for reviving Teleport Home macro in Midnight. 
+-- Thanks to Console Port dev Munk, a mysterious helper that works in extreme weather, and of course myelf for reviving Teleport Home macro in Midnight.
 
 
 local _, addon = ...

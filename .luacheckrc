@@ -17,8 +17,8 @@ ignore = {
 	-- Ignore empty if branch
 	"542",
 
-	"PlumberSuperTrackingMixin",
-
+	-- Ignore retired modules
+	"Modules/AccountStore.lua",
 };
 
 globals = {
@@ -38,6 +38,7 @@ globals = {
 	"PlumberExpansionLandingPage",
 	"PlumberExpansionLandingPageMixin",
 	"PlumberLandingPageMinimapButtonMixin",
+	"PlumberSuperTrackingMixin",
 
 	"NarciPaperDollWidgetController",
 	"Narci_Attribute",
@@ -90,8 +91,15 @@ stds.wow = {
 		"SlashCmdList",
 		"StaticPopupDialogs",
 
+		EventToastManagerFrame = {
+			fields = {
+				"OnUpdate",
+			},
+		},
+
 		GameTooltip = {
 			fields = {
+				"factionID",
 				"suppressAutomaticCompareItem",
 			},
 		},
@@ -159,6 +167,7 @@ stds.wow = {
 		ContentTrackingUtil = {
 			fields = {
 				"DisplayTrackingError",
+				"IsContentTrackingEnabled",
 				"IsTrackingModifierDown",
 			},
 		},
@@ -169,6 +178,7 @@ stds.wow = {
 				"GetCategories",
 				"GetCategoryInfo",
 				"GetCurrencyIDForStore",
+				"GetCurrencyInfo",
 			},
 		},
 
@@ -545,6 +555,14 @@ stds.wow = {
 			},
 		},
 
+		C_PlayerChoice = {
+			fields = {
+				"GetCurrentPlayerChoiceInfo",
+				"SendPlayerChoiceResponse",
+				"OnUIClosed",
+			},
+		},
+
 		C_PlayerInfo = {
 			fields = {
 				"GetAlternateFormInfo",
@@ -882,6 +900,7 @@ stds.wow = {
 				"GetExampleRewardItemHyperlinks",
 				"GetNextActivitiesIncrease",
 				"GetActivities",
+				"GetSortedProgressForActivity",
 				"HasAvailableRewards",
 			},
 		},
@@ -889,6 +908,12 @@ stds.wow = {
 		C_ZoneAbility = {
 			fields = {
 				"GetActiveAbilities",
+			},
+		},
+
+		CollectionWardrobeUtil = {
+			fields = {
+				"GetPage",
 			},
 		},
 
@@ -1143,6 +1168,7 @@ stds.wow = {
 		ItemLocation = {
 			fields = {
 				"CreateEmpty",
+				"SetEquipmentSlot",
 			},
 		},
 
@@ -1203,6 +1229,12 @@ stds.wow = {
 		UnitPopupSharedUtil = {
 			fields = {
 				"HasLFGRestrictions",
+			},
+		},
+
+		UIWidgetManager = {
+			fields = {
+				"GetWidgetTypeInfo",
 			},
 		},
 
@@ -1470,6 +1502,8 @@ stds.wow = {
 		"IsMounted",
 		"GetAchievementCriteriaInfoByID",
 		"wipe",
+		"GetNumQuestLogRewardCurrencies",
+		"strsplit",
 
 		-- Global Fonts
 		"GameFontNormal",
@@ -1500,13 +1534,13 @@ stds.wow = {
 		"ContainerFrame1",
 		"ContainerFrameCombinedBags",
 		"DelvesCompanionConfigurationFrame",
+		"DelvesDashboardFrame",
 		"DressUpFrame",
 		"DyeSelectionPopout",
 		"EditModeManagerFrame",
 		"EmbeddedItemTooltip",
 		"EncounterJournal",
 		"EquipmentFlyoutFrame",
-		"EventToastManagerFrame",
 		"ExpansionLandingPageMinimapButton",
 		"GarrisonLandingPage",
 		"GameTooltip",

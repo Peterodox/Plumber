@@ -583,7 +583,7 @@ do  -- Time
 
     function API.SecondsToDate(seconds)
         local timeString = date("%d %m %y", seconds);
-        local day, month, year = string.split(" ", timeString);
+        local day, month, year = strsplit(" ", timeString);
         month = tonumber(month);
         local monthName = CALENDAR_FULLDATE_MONTH_NAMES[month];
         return string.format(L["Format Month Day"], monthName, day);
@@ -3928,7 +3928,7 @@ do  -- 11.0 Menu Formatter
     function API.ShowBlizzardMenu(ownerRegion, schematic, contextData)
         contextData = contextData or {};
 
-        local menu = MenuUtil.CreateContextMenu(ownerRegion, function(ownerRegion, rootDescription)
+        local menu = MenuUtil.CreateContextMenu(ownerRegion, function(_ownerRegion, rootDescription)
             rootDescription:SetTag(schematic.tag, contextData);
 
             for _, info in ipairs(schematic.objects) do
@@ -3988,17 +3988,17 @@ do  -- 11.0 Menu Formatter
                 end
 
                 if info.tooltip then
-                    elementDescription:SetTooltip(function(tooltip, elementDescription)
+                    elementDescription:SetTooltip(function(tooltip, _elementDescription)
                         --GameTooltip_AddInstructionLine(tooltip, "Test Tooltip Instruction");
                         --GameTooltip_AddErrorLine(tooltip, "Test Tooltip Colored Line");
                         if info.DynamicTooltipFunc then
                             local text, r, g, b = info.DynamicTooltipFunc();
                             if text then
-                                GameTooltip_SetTitle(tooltip, MenuUtil.GetElementText(elementDescription));
+                                GameTooltip_SetTitle(tooltip, MenuUtil.GetElementText(_elementDescription));
                                 tooltip:AddLine(text, r, g, b, true);
                             end
                         else
-                            GameTooltip_SetTitle(tooltip, MenuUtil.GetElementText(elementDescription));
+                            GameTooltip_SetTitle(tooltip, MenuUtil.GetElementText(_elementDescription));
                             GameTooltip_AddNormalLine(tooltip, info.tooltip);
                         end
                     end);

@@ -3,8 +3,6 @@
 -- DO NOT BOTHER TO TRANSLATE
 
 
-if false then return end;
-
 local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;

@@ -223,8 +223,9 @@ end
 
 
 --Test SourceInfo
+--[[
 do
-    --[[    --StoragePanel watcher
+	--StoragePanel watcher
     local function Load()
         local f = HouseEditorFrame.StoragePanel;
 
@@ -263,8 +264,8 @@ do
             end
         end
     end);
-    --]]
 end
+--]]
 
 
 local function ModelScene_OnUpdate(self, elapsed)
