@@ -17,255 +17,255 @@ local IsLegacyDifficulty = IsLegacyDifficulty;
 local EL = CreateFrame("Frame");
 
 function EL:OnUpdate(elapsed)
-    self.t = self.t + elapsed;
-    if self.t > 0 then
-        self.t = nil;
-        self:SetScript("OnUpdate", nil);
-        if self.callback then
-            self.callback();
-            self.callback = nil;
-        end
-    end
+	self.t = self.t + elapsed;
+	if self.t > 0 then
+		self.t = nil;
+		self:SetScript("OnUpdate", nil);
+		if self.callback then
+			self.callback();
+			self.callback = nil;
+		end
+	end
 end
 
 
 local function NullifyEJEvents()
-    --Pause default EncounterJournal updating
-    local f = EncounterJournal;
-    if f then
-        f:UnregisterEvent("EJ_LOOT_DATA_RECIEVED");
-        f:UnregisterEvent("EJ_DIFFICULTY_UPDATE");
+	--Pause default EncounterJournal updating
+	local f = EncounterJournal;
+	if f then
+		f:UnregisterEvent("EJ_LOOT_DATA_RECIEVED");
+		f:UnregisterEvent("EJ_DIFFICULTY_UPDATE");
 
-        EL.callback = function()
-            f:RegisterEvent("EJ_LOOT_DATA_RECIEVED");
-            f:RegisterEvent("EJ_DIFFICULTY_UPDATE");
-        end;
+		EL.callback = function()
+			f:RegisterEvent("EJ_LOOT_DATA_RECIEVED");
+			f:RegisterEvent("EJ_DIFFICULTY_UPDATE");
+		end;
 
-        EL.t = 0;
-        EL:SetScript("OnUpdate", EL.OnUpdate);
-    end
+		EL.t = 0;
+		EL:SetScript("OnUpdate", EL.OnUpdate);
+	end
 end
 
 local function SelectInstanceAndEncounter(journalInstanceID, journalEncounterID)
-    NullifyEJEvents();
-    EJ_SelectInstance(journalInstanceID);
-    if journalEncounterID then
-        EJ_SelectEncounter(journalEncounterID);
-    end
+	NullifyEJEvents();
+	EJ_SelectInstance(journalInstanceID);
+	if journalEncounterID then
+		EJ_SelectEncounter(journalEncounterID);
+	end
 end
 API.SelectInstanceAndEncounter = SelectInstanceAndEncounter;
 
 
 do  --Derivative of Blizzard_EncounterJournal.lua
-    local DifficultyUtil = DifficultyUtil;
+	local DifficultyUtil = DifficultyUtil;
 
-    local EJ_DIFFICULTIES = {
-        DifficultyUtil.ID.DungeonNormal,
-        DifficultyUtil.ID.DungeonHeroic,
-        DifficultyUtil.ID.DungeonMythic,
-        DifficultyUtil.ID.DungeonChallenge,
-        DifficultyUtil.ID.DungeonTimewalker,
-        DifficultyUtil.ID.RaidLFR,
-        DifficultyUtil.ID.Raid10Normal,
-        DifficultyUtil.ID.Raid10Heroic,
-        DifficultyUtil.ID.Raid25Normal,
-        DifficultyUtil.ID.Raid25Heroic,
-        DifficultyUtil.ID.PrimaryRaidLFR,
-        DifficultyUtil.ID.PrimaryRaidNormal,
-        DifficultyUtil.ID.PrimaryRaidHeroic,
-        DifficultyUtil.ID.PrimaryRaidMythic,
-        DifficultyUtil.ID.RaidTimewalker,
-        DifficultyUtil.ID.Raid40,
-    };
+	local EJ_DIFFICULTIES = {
+		DifficultyUtil.ID.DungeonNormal,
+		DifficultyUtil.ID.DungeonHeroic,
+		DifficultyUtil.ID.DungeonMythic,
+		DifficultyUtil.ID.DungeonChallenge,
+		DifficultyUtil.ID.DungeonTimewalker,
+		DifficultyUtil.ID.RaidLFR,
+		DifficultyUtil.ID.Raid10Normal,
+		DifficultyUtil.ID.Raid10Heroic,
+		DifficultyUtil.ID.Raid25Normal,
+		DifficultyUtil.ID.Raid25Heroic,
+		DifficultyUtil.ID.PrimaryRaidLFR,
+		DifficultyUtil.ID.PrimaryRaidNormal,
+		DifficultyUtil.ID.PrimaryRaidHeroic,
+		DifficultyUtil.ID.PrimaryRaidMythic,
+		DifficultyUtil.ID.RaidTimewalker,
+		DifficultyUtil.ID.Raid40,
+	};
 
-    local VALID_DIFFUICULTY_OPEN_WORLD = {
-        DifficultyUtil.ID.DungeonNormal,
-        DifficultyUtil.ID.DungeonHeroic,
-        DifficultyUtil.ID.DungeonMythic,
-        DifficultyUtil.ID.Raid10Normal,
-        DifficultyUtil.ID.Raid10Heroic,
-        DifficultyUtil.ID.Raid25Normal,
-        DifficultyUtil.ID.Raid25Heroic,
-        DifficultyUtil.ID.PrimaryRaidNormal,
-        DifficultyUtil.ID.PrimaryRaidHeroic,
-        DifficultyUtil.ID.PrimaryRaidMythic,
-        DifficultyUtil.ID.Raid40,
-    };
+	local VALID_DIFFUICULTY_OPEN_WORLD = {
+		DifficultyUtil.ID.DungeonNormal,
+		DifficultyUtil.ID.DungeonHeroic,
+		DifficultyUtil.ID.DungeonMythic,
+		DifficultyUtil.ID.Raid10Normal,
+		DifficultyUtil.ID.Raid10Heroic,
+		DifficultyUtil.ID.Raid25Normal,
+		DifficultyUtil.ID.Raid25Heroic,
+		DifficultyUtil.ID.PrimaryRaidNormal,
+		DifficultyUtil.ID.PrimaryRaidHeroic,
+		DifficultyUtil.ID.PrimaryRaidMythic,
+		DifficultyUtil.ID.Raid40,
+	};
 
-    local ALL_DIFFICULTY_ID = -1;   --If so, track all available difficulties
-
-
-    local function GetEJDifficultySize(difficultyID)
-        if difficultyID ~= DifficultyUtil.ID.RaidTimewalker and not DifficultyUtil.IsPrimaryRaid(difficultyID) then
-            return DifficultyUtil.GetMaxPlayers(difficultyID);
-        end
-        return nil;
-    end
-
-    local function GetEJDifficultyString(difficultyID)
-        if difficultyID == ALL_DIFFICULTY_ID then
-            return L["All Difficulties"];
-        end
-
-        local name = DifficultyUtil.GetDifficultyName(difficultyID);
-        local size = GetEJDifficultySize(difficultyID);
-        if size then
-            return string.format(ENCOUNTER_JOURNAL_DIFF_TEXT, size, name);
-        else
-            return name;
-        end
-    end
-    API.GetRaidDifficultyString = GetEJDifficultyString;
+	local ALL_DIFFICULTY_ID = -1;   --If so, track all available difficulties
 
 
-    local function GetValidDifficulties(journalInstanceID, encounterID, showAllDifficulties)
-        local n = 0;
-        local tbl = {};
-        SelectInstanceAndEncounter(journalInstanceID, encounterID);
+	local function GetEJDifficultySize(difficultyID)
+		if difficultyID ~= DifficultyUtil.ID.RaidTimewalker and not DifficultyUtil.IsPrimaryRaid(difficultyID) then
+			return DifficultyUtil.GetMaxPlayers(difficultyID);
+		end
+		return nil;
+	end
 
-        for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
-            if EJ_IsValidInstanceDifficulty(difficultyID) then
-                local text = GetEJDifficultyString(difficultyID);
-                n = n + 1;
-                tbl[n] = {
-                    difficultyID = difficultyID,
-                    text = text,
-                };
-            end
-        end
+	local function GetEJDifficultyString(difficultyID)
+		if difficultyID == ALL_DIFFICULTY_ID then
+			return L["All Difficulties"];
+		end
 
-        if n > 0 then
-            if showAllDifficulties then
-                n = n + 1;
-                tbl[n] = {
-                    difficultyID = ALL_DIFFICULTY_ID;
-                    text = GetEJDifficultyString(ALL_DIFFICULTY_ID);
-                }
-            end
-            return tbl
-        end
-    end
+		local name = DifficultyUtil.GetDifficultyName(difficultyID);
+		local size = GetEJDifficultySize(difficultyID);
+		if size then
+			return string.format(ENCOUNTER_JOURNAL_DIFF_TEXT, size, name);
+		else
+			return name;
+		end
+	end
+	API.GetRaidDifficultyString = GetEJDifficultyString;
 
-    local function GetValidDifficultiesForEncounter(instanceID, encounterID, showAllDifficulties)
-        return GetValidDifficulties(instanceID, encounterID, showAllDifficulties)
-    end
-    API.GetValidDifficultiesForEncounter = GetValidDifficultiesForEncounter;
 
-    local function GetValidDifficultiesForInstance(instanceID, showAllDifficulties)
-        return GetValidDifficulties(instanceID, nil, showAllDifficulties)
-    end
-    API.GetValidDifficultiesForInstance = GetValidDifficultiesForInstance;
+	local function GetValidDifficulties(journalInstanceID, encounterID, showAllDifficulties)
+		local n = 0;
+		local tbl = {};
+		SelectInstanceAndEncounter(journalInstanceID, encounterID);
 
-    function API.GetInstanceInfoForSelector(journalInstanceID)
-        --Selectable at the raid entrance
-        local n = 0;
-        local tbl = {};
+		for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
+			if EJ_IsValidInstanceDifficulty(difficultyID) then
+				local text = GetEJDifficultyString(difficultyID);
+				n = n + 1;
+				tbl[n] = {
+					difficultyID = difficultyID,
+					text = text,
+				};
+			end
+		end
 
-        SelectInstanceAndEncounter(journalInstanceID, nil);
+		if n > 0 then
+			if showAllDifficulties then
+				n = n + 1;
+				tbl[n] = {
+					difficultyID = ALL_DIFFICULTY_ID;
+					text = GetEJDifficultyString(ALL_DIFFICULTY_ID);
+				}
+			end
+			return tbl
+		end
+	end
 
-        local instanceName, description, bgImage, buttonImage1, loreImage, buttonImage2, dungeonAreaMapID, link, shouldDisplayDifficulty, mapID, covenantID, isRaid = EJ_GetInstanceInfo(journalInstanceID);
-        tbl.name = instanceName;
-        tbl.isRaid = isRaid;
-        tbl.instanceID = mapID;
+	local function GetValidDifficultiesForEncounter(instanceID, encounterID, showAllDifficulties)
+		return GetValidDifficulties(instanceID, encounterID, showAllDifficulties)
+	end
+	API.GetValidDifficultiesForEncounter = GetValidDifficultiesForEncounter;
 
-        local isLegacyRaid;
-        local difficulties = {};
+	local function GetValidDifficultiesForInstance(instanceID, showAllDifficulties)
+		return GetValidDifficulties(instanceID, nil, showAllDifficulties)
+	end
+	API.GetValidDifficultiesForInstance = GetValidDifficultiesForInstance;
 
-        for index, difficultyID in ipairs(VALID_DIFFUICULTY_OPEN_WORLD) do
-            if EJ_IsValidInstanceDifficulty(difficultyID) then
-                local text = GetEJDifficultyString(difficultyID);
-                n = n + 1;
-                difficulties[n] = {
-                    difficultyID = difficultyID,
-                    text = text,
-                };
+	function API.GetInstanceInfoForSelector(journalInstanceID)
+		--Selectable at the raid entrance
+		local n = 0;
+		local tbl = {};
 
-                if IsLegacyDifficulty(difficultyID) then
-                    isLegacyRaid = true;
-                end
-            end
-        end
+		SelectInstanceAndEncounter(journalInstanceID, nil);
 
-        tbl.difficulties = difficulties;
-        tbl.isLegacyRaid = isLegacyRaid;
+		local instanceName, description, bgImage, buttonImage1, loreImage, buttonImage2, dungeonAreaMapID, link, shouldDisplayDifficulty, mapID, covenantID, isRaid = EJ_GetInstanceInfo(journalInstanceID);
+		tbl.name = instanceName;
+		tbl.isRaid = isRaid;
+		tbl.instanceID = mapID;
 
-        return tbl
-    end
+		local isLegacyRaid;
+		local difficulties = {};
 
-    function API.GetInstanceEncounters(journalInstanceID, difficultyID)
-        EJ_SetDifficulty(difficultyID);
+		for index, difficultyID in ipairs(VALID_DIFFUICULTY_OPEN_WORLD) do
+			if EJ_IsValidInstanceDifficulty(difficultyID) then
+				local text = GetEJDifficultyString(difficultyID);
+				n = n + 1;
+				difficulties[n] = {
+					difficultyID = difficultyID,
+					text = text,
+				};
 
-        local encounters = {};
-        local i = 1;
-        local bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);    --No dungeonEncounterID in Classic
+				if IsLegacyDifficulty(difficultyID) then
+					isLegacyRaid = true;
+				end
+			end
+		end
 
-        while journalEncounterID do
-            if not dungeonEncounterID then
-                dungeonEncounterID = LandingPageUtil.GetDungeonEncounteID(journalEncounterID);
-            end
+		tbl.difficulties = difficulties;
+		tbl.isLegacyRaid = isLegacyRaid;
 
-            encounters[i] = {
-                name = bossName,
-                id = journalEncounterID,
-                dungeonEncounterID = dungeonEncounterID,
-                difficultyID = difficultyID,
-            };
-            i = i + 1;
-            bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);
-        end
+		return tbl
+	end
 
-        return encounters
-    end
+	function API.GetInstanceEncounters(journalInstanceID, difficultyID)
+		EJ_SetDifficulty(difficultyID);
 
-    local function IsDifficultyValidForEncounter(instanceID, encounterID, difficultyID)
-        local difficulties = instanceID and GetValidDifficultiesForEncounter(instanceID, encounterID);
-        local valid, bestDifficultyID;
-        if difficulties then
-            if difficultyID == ALL_DIFFICULTY_ID then
-                valid = true;
-                bestDifficultyID = ALL_DIFFICULTY_ID;
-            else
-                if difficultyID then
-                    for k, v in ipairs(difficulties) do
-                        if v.difficultyID == difficultyID then
-                            valid = true;
-                            bestDifficultyID = difficultyID;
-                            break;
-                        end
-                    end
-                end
-                if not bestDifficultyID then
-                    bestDifficultyID = difficulties[#difficulties].difficultyID;
-                end
-            end
-        end
-        return valid, bestDifficultyID
-    end
-    API.IsDifficultyValidForEncounter = IsDifficultyValidForEncounter;
+		local encounters = {};
+		local i = 1;
+		local bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);    --No dungeonEncounterID in Classic
 
-    local function IsDifficultyValidForInstance(instanceID, difficultyID)
-        local difficulties = instanceID and GetValidDifficultiesForInstance(instanceID);
-        local valid, bestDifficultyID;
-        if difficulties then
-            if difficultyID == ALL_DIFFICULTY_ID then
-                valid = true;
-                bestDifficultyID = ALL_DIFFICULTY_ID;
-            else
-                if difficultyID then
-                    for k, v in ipairs(difficulties) do
-                        if v.difficultyID == difficultyID then
-                            valid = true;
-                            bestDifficultyID = difficultyID;
-                            break;
-                        end
-                    end
-                end
-                if not bestDifficultyID then
-                    bestDifficultyID = difficulties[#difficulties].difficultyID;
-                end
-            end
-        end
-        return valid, bestDifficultyID
-    end
-    API.IsDifficultyValidForInstance = IsDifficultyValidForInstance;
+		while journalEncounterID do
+			if not dungeonEncounterID then
+				dungeonEncounterID = LandingPageUtil.GetDungeonEncounteID(journalEncounterID);
+			end
+
+			encounters[i] = {
+				name = bossName,
+				id = journalEncounterID,
+				dungeonEncounterID = dungeonEncounterID,
+				difficultyID = difficultyID,
+			};
+			i = i + 1;
+			bossName, description, journalEncounterID, _, _, _, dungeonEncounterID = EJ_GetEncounterInfoByIndex(i, journalInstanceID);
+		end
+
+		return encounters
+	end
+
+	local function IsDifficultyValidForEncounter(instanceID, encounterID, difficultyID)
+		local difficulties = instanceID and GetValidDifficultiesForEncounter(instanceID, encounterID);
+		local valid, bestDifficultyID;
+		if difficulties then
+			if difficultyID == ALL_DIFFICULTY_ID then
+				valid = true;
+				bestDifficultyID = ALL_DIFFICULTY_ID;
+			else
+				if difficultyID then
+					for k, v in ipairs(difficulties) do
+						if v.difficultyID == difficultyID then
+							valid = true;
+							bestDifficultyID = difficultyID;
+							break;
+						end
+					end
+				end
+				if not bestDifficultyID then
+					bestDifficultyID = difficulties[#difficulties].difficultyID;
+				end
+			end
+		end
+		return valid, bestDifficultyID
+	end
+	API.IsDifficultyValidForEncounter = IsDifficultyValidForEncounter;
+
+	local function IsDifficultyValidForInstance(instanceID, difficultyID)
+		local difficulties = instanceID and GetValidDifficultiesForInstance(instanceID);
+		local valid, bestDifficultyID;
+		if difficulties then
+			if difficultyID == ALL_DIFFICULTY_ID then
+				valid = true;
+				bestDifficultyID = ALL_DIFFICULTY_ID;
+			else
+				if difficultyID then
+					for k, v in ipairs(difficulties) do
+						if v.difficultyID == difficultyID then
+							valid = true;
+							bestDifficultyID = difficultyID;
+							break;
+						end
+					end
+				end
+				if not bestDifficultyID then
+					bestDifficultyID = difficulties[#difficulties].difficultyID;
+				end
+			end
+		end
+		return valid, bestDifficultyID
+	end
+	API.IsDifficultyValidForInstance = IsDifficultyValidForInstance;
 end

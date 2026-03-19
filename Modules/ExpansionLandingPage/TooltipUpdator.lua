@@ -13,246 +13,246 @@ LandingPageUtil.TooltipUpdator = TooltipUpdator;
 
 
 local function Tooltip_AddRewardLine(tooltip, texture, text, quality, quantity)
-    local r, g, b = ColorManager.GetColorDataForItemQuality(quality).color:GetRGB();
-    tooltip:AddDoubleLine(string.format("|T%s:%d:%d:%d:%d|t %s", texture, 16, 16, 0, 0, text), quantity, r, g, b, 1, 1, 1);
+	local r, g, b = ColorManager.GetColorDataForItemQuality(quality).color:GetRGB();
+	tooltip:AddDoubleLine(string.format("|T%s:%d:%d:%d:%d|t %s", texture, 16, 16, 0, 0, text), quantity, r, g, b, 1, 1, 1);
 end
 
 
 function TooltipUpdator:StopUpdating()
-    if self.t then
-        self.t = nil;
-        self:SetScript("OnUpdate", nil);
-    end
+	if self.t then
+		self.t = nil;
+		self:SetScript("OnUpdate", nil);
+	end
 
-    self.keepUpdating = nil;
-    self.questID = nil;
-    self.headerText = nil;
-    self.showProgress = nil;
-    self.showRewards = nil;
-    self.showQuestDescription = nil;
-    self.poiID = nil;
-    self.achievementID = nil;
-    self.tooltipLines = nil;
-    self.tooltipSetter = nil;
-    self.entryChildren = nil;
-    self.itemID = nil;
+	self.keepUpdating = nil;
+	self.questID = nil;
+	self.headerText = nil;
+	self.showProgress = nil;
+	self.showRewards = nil;
+	self.showQuestDescription = nil;
+	self.poiID = nil;
+	self.achievementID = nil;
+	self.tooltipLines = nil;
+	self.tooltipSetter = nil;
+	self.entryChildren = nil;
+	self.itemID = nil;
 end
 
 function TooltipUpdator:SetFocusedObject(obj)
-    self:StopUpdating();
-    if obj then
-        self.obj = obj;
-        self.t = 0.3;
-        self:SetParent(obj);
-        self:Show();
-        self:SetScript("OnUpdate", self.OnUpdate);
-    end
+	self:StopUpdating();
+	if obj then
+		self.obj = obj;
+		self.t = 0.3;
+		self:SetParent(obj);
+		self:Show();
+		self:SetScript("OnUpdate", self.OnUpdate);
+	end
 end
 
 function TooltipUpdator:SetHeaderText(headerText)
-    self.headerText = headerText;
+	self.headerText = headerText;
 end
 
 function TooltipUpdator:SetQuestID(questID)
-    self.questID = questID;
+	self.questID = questID;
 end
 
 function TooltipUpdator:RequestQuestProgress()
-    self.showProgress = true;
+	self.showProgress = true;
 end
 
 function TooltipUpdator:RequestQuestReward()
-    self.showRewards = true;
+	self.showRewards = true;
 end
 
 function TooltipUpdator:RequestQuestDescription()
-    self.showQuestDescription = true;
+	self.showQuestDescription = true;
 end
 
 function TooltipUpdator:RequestEventTimer(poiID)
-    self.poiID = poiID;
+	self.poiID = poiID;
 end
 
 function TooltipUpdator:RequestAchievementID(achievementID)
-    self.achievementID = achievementID;
+	self.achievementID = achievementID;
 end
 
 function TooltipUpdator:RequestTooltipLines(tooltipLines)
-    self.tooltipLines = tooltipLines;
+	self.tooltipLines = tooltipLines;
 end
 
 function TooltipUpdator:RequestTooltipSetter(tooltipSetter)
-    self.tooltipSetter = tooltipSetter;
+	self.tooltipSetter = tooltipSetter;
 end
 
 function TooltipUpdator:RequestEntryChildren(entryChildren)
-    self.entryChildren = entryChildren;
+	self.entryChildren = entryChildren;
 end
 
 function TooltipUpdator:RequestItemID(itemID)
-    self.itemID = itemID;
+	self.itemID = itemID;
 end
 
 function TooltipUpdator:OnUpdate(elapsed)
-    self.t = self.t + elapsed;
-    if self.t >= 0.5 then
-        self.t = 0;
-        self:SetScript("OnUpdate", nil);
-        self.keepUpdating = nil;
+	self.t = self.t + elapsed;
+	if self.t >= 0.5 then
+		self.t = 0;
+		self:SetScript("OnUpdate", nil);
+		self.keepUpdating = nil;
 
-        if self.obj and self.obj:IsMouseMotionFocus() and (self.questID or self.tooltipLines or self.entryChildren) then
-            local anyContent;
-            local questRewards = {};
-            local isRetrievingData;
-            local tooltipLines = {};
-            local hasLineAbove = false;
+		if self.obj and self.obj:IsMouseMotionFocus() and (self.questID or self.tooltipLines or self.entryChildren) then
+			local anyContent;
+			local questRewards = {};
+			local isRetrievingData;
+			local tooltipLines = {};
+			local hasLineAbove = false;
 
-            if self.questID then
-                self.keepUpdating = true;
-            end
+			if self.questID then
+				self.keepUpdating = true;
+			end
 
-            if self.showQuestDescription then
-                local description = API.GetDescriptionFromTooltip(self.questID);
-                if description and description ~= QUEST_TOOLTIP_REQUIREMENTS then
-                    tinsert(tooltipLines, description);
-                    tinsert(tooltipLines, " ");
-                end
-            end
+			if self.showQuestDescription then
+				local description = API.GetDescriptionFromTooltip(self.questID);
+				if description and description ~= QUEST_TOOLTIP_REQUIREMENTS then
+					tinsert(tooltipLines, description);
+					tinsert(tooltipLines, " ");
+				end
+			end
 
-            if self.showProgress then
-                local texts = API.GetQuestProgressTexts(self.questID);
-                if texts then
-                    anyContent = true;
-                    if #tooltipLines == 0 then
-                        tooltipLines = texts;
-                    else
-                        for _, text in iparis(texts) do
-                            tinsert(tooltipLines, text);
-                        end
-                    end
-                end
-                self.keepUpdating = true;
-            end
+			if self.showProgress then
+				local texts = API.GetQuestProgressTexts(self.questID);
+				if texts then
+					anyContent = true;
+					if #tooltipLines == 0 then
+						tooltipLines = texts;
+					else
+						for _, text in iparis(texts) do
+							tinsert(tooltipLines, text);
+						end
+					end
+				end
+				self.keepUpdating = true;
+			end
 
-            if self.showRewards then
-                local rewards, missingData = API.GetQuestRewards(self.questID);
-                if rewards then
-                    anyContent = true;
-                    if rewards.items then
-                        tinsert(questRewards, rewards.items);
-                    end
-                    if rewards.currencies then
-                        tinsert(questRewards, rewards.currencies);
-                    end
-                end
+			if self.showRewards then
+				local rewards, missingData = API.GetQuestRewards(self.questID);
+				if rewards then
+					anyContent = true;
+					if rewards.items then
+						tinsert(questRewards, rewards.items);
+					end
+					if rewards.currencies then
+						tinsert(questRewards, rewards.currencies);
+					end
+				end
 
-                if missingData then
-                    isRetrievingData = true;
-                end
+				if missingData then
+					isRetrievingData = true;
+				end
 
-                self.keepUpdating = true;
-            end
+				self.keepUpdating = true;
+			end
 
-            if self.tooltipLines then
-                anyContent = true;
-                local n = #tooltipLines;
-                for i, text in ipairs(self.tooltipLines) do
-                    tooltipLines[n + i] = text;
-                end
-            end
+			if self.tooltipLines then
+				anyContent = true;
+				local n = #tooltipLines;
+				for i, text in ipairs(self.tooltipLines) do
+					tooltipLines[n + i] = text;
+				end
+			end
 
-            if self.itemID then
-                anyContent = true;
-            end
+			if self.itemID then
+				anyContent = true;
+			end
 
-            if anyContent and self.headerText then
-                local tooltip = GameTooltip;
-                --tooltip:SetOwner(self.obj, "ANCHOR_CURSOR_RIGHT", 8, 8);
-                tooltip:SetOwner(self.obj, "ANCHOR_NONE");
-                tooltip:SetPoint("TOPLEFT", self.obj, "TOPRIGHT", 4, 12);
+			if anyContent and self.headerText then
+				local tooltip = GameTooltip;
+				--tooltip:SetOwner(self.obj, "ANCHOR_CURSOR_RIGHT", 8, 8);
+				tooltip:SetOwner(self.obj, "ANCHOR_NONE");
+				tooltip:SetPoint("TOPLEFT", self.obj, "TOPRIGHT", 4, 12);
 
-                tooltip:SetText(self.headerText, 1, 0.82, 0, 1, true);
+				tooltip:SetText(self.headerText, 1, 0.82, 0, 1, true);
 
-                if self.entryChildren then
-                    for k, v in iparis(self.entryChildren) do
-                        local name;
-                        if v.questID then
-                            name = API.GetQuestName(v.questID) or "";
-                            if (v.accountWide and C_QuestLog.IsQuestFlaggedCompletedOnAccount(v.questID)) or (not v.accountWide and C_QuestLog.IsQuestFlaggedCompleted(v.questID)) then
-                                tooltip:AddLine("- "..name, 0.251, 0.753, 0.251, false);
-                            else
-                                tooltip:AddLine("- "..name, 0.5, 0.5, 0.5, false);
-                            end
-                        end
-                    end
-                    self.keepUpdating = true;
-                    hasLineAbove = true;
-                end
+				if self.entryChildren then
+					for k, v in iparis(self.entryChildren) do
+						local name;
+						if v.questID then
+							name = API.GetQuestName(v.questID) or "";
+							if (v.accountWide and C_QuestLog.IsQuestFlaggedCompletedOnAccount(v.questID)) or (not v.accountWide and C_QuestLog.IsQuestFlaggedCompleted(v.questID)) then
+								tooltip:AddLine("- "..name, 0.251, 0.753, 0.251, false);
+							else
+								tooltip:AddLine("- "..name, 0.5, 0.5, 0.5, false);
+							end
+						end
+					end
+					self.keepUpdating = true;
+					hasLineAbove = true;
+				end
 
-                if tooltipLines[1] then
-                    hasLineAbove = true;
-                    for _, text in ipairs(tooltipLines) do
-                        tooltip:AddLine(text, 1, 1, 1, true);
-                    end
-                end
+				if tooltipLines[1] then
+					hasLineAbove = true;
+					for _, text in ipairs(tooltipLines) do
+						tooltip:AddLine(text, 1, 1, 1, true);
+					end
+				end
 
-                if questRewards[1] then
-                    if hasLineAbove then
-                        tooltip:AddLine(" ");
-                    end
-                    tooltip:AddLine(QUEST_REWARDS, 1, 0.82, 0);
+				if questRewards[1] then
+					if hasLineAbove then
+						tooltip:AddLine(" ");
+					end
+					tooltip:AddLine(QUEST_REWARDS, 1, 0.82, 0);
 
-                    for _, rewards in ipairs(questRewards) do
-                        for index, info in ipairs(rewards) do
-                            Tooltip_AddRewardLine(tooltip, info.texture, info.name, info.quality, info.quantity);
-                        end
-                    end
-                end
+					for _, rewards in ipairs(questRewards) do
+						for index, info in ipairs(rewards) do
+							Tooltip_AddRewardLine(tooltip, info.texture, info.name, info.quality, info.quantity);
+						end
+					end
+				end
 
-                if self.achievementID then
-                    local _, name, _, completed, _, _, _, description = GetAchievementInfo(self.achievementID);
-                    if name then
-                        tooltip:AddLine(" ");
-                        if completed then
-                            tooltip:AddDoubleLine("["..name.."]", CRITERIA_COMPLETED, 1, 0.82, 0, 0.098, 1.000, 0.098);
-                        else
-                            tooltip:AddDoubleLine("["..name.."]", CRITERIA_NOT_COMPLETED, 1, 0.82, 0, 1.000, 0.125, 0.125);
-                            tooltip:AddLine(description, 1, 1, 1, true);
-                        end
-                    end
-                end
+				if self.achievementID then
+					local _, name, _, completed, _, _, _, description = GetAchievementInfo(self.achievementID);
+					if name then
+						tooltip:AddLine(" ");
+						if completed then
+							tooltip:AddDoubleLine("["..name.."]", CRITERIA_COMPLETED, 1, 0.82, 0, 0.098, 1.000, 0.098);
+						else
+							tooltip:AddDoubleLine("["..name.."]", CRITERIA_NOT_COMPLETED, 1, 0.82, 0, 1.000, 0.125, 0.125);
+							tooltip:AddLine(description, 1, 1, 1, true);
+						end
+					end
+				end
 
-                if self.tooltipSetter then
-                    local loaded, keepUpdating = self.tooltipSetter(tooltip);
-                    if not loaded then
-                        isRetrievingData = true;
-                    end
-                    if keepUpdating then
-                        self.keepUpdating = true;
-                    end
-                end
+				if self.tooltipSetter then
+					local loaded, keepUpdating = self.tooltipSetter(tooltip);
+					if not loaded then
+						isRetrievingData = true;
+					end
+					if keepUpdating then
+						self.keepUpdating = true;
+					end
+				end
 
-                if self.itemID then
-                    local text = API.ConvertTooltipInfoToOneString(" ", "GetItemByID", self.itemID);
-                    tooltip:AddLine(text, 1, 1, 1, true);
-                    self.keepUpdating = true;
-                end
+				if self.itemID then
+					local text = API.ConvertTooltipInfoToOneString(" ", "GetItemByID", self.itemID);
+					tooltip:AddLine(text, 1, 1, 1, true);
+					self.keepUpdating = true;
+				end
 
-                if isRetrievingData then
-                    tooltip:AddLine(RETRIEVING_DATA, 0.5, 0.5, 0.5, true);
-                    self.keepUpdating = true;
-                end
+				if isRetrievingData then
+					tooltip:AddLine(RETRIEVING_DATA, 0.5, 0.5, 0.5, true);
+					self.keepUpdating = true;
+				end
 
-                tooltip:Show();
-            end
+				tooltip:Show();
+			end
 
-            if self.keepUpdating then
-                self:SetScript("OnUpdate", self.OnUpdate);
-            end
-        end
-    end
+			if self.keepUpdating then
+				self:SetScript("OnUpdate", self.OnUpdate);
+			end
+		end
+	end
 end
 
 function TooltipUpdator:OnHide()
-    self:StopUpdating();
+	self:StopUpdating();
 end

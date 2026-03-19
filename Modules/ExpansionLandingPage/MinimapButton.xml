@@ -1,5 +1,5 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-    <Script file="MinimapButton.lua"/>
+	<Script file="MinimapButton.lua"/>
 
 	<Button name="PlumberLandingPageMinimapButton" mixin="PlumberLandingPageMinimapButtonMixin" registerForClicks="LeftButtonUp, RightButtonUp" clampedToScreen="true" movable="true" dontSavePosition="true" parent="UIParent" frameStrata="MEDIUM" hidden="true">
 		<!--Parent will be changed to Minimap unless user opt not no-->
@@ -56,7 +56,7 @@
 								<Anchor point="CENTER"/>
 							</Anchors>
 							<Color r="0.72" g="0.72" b="0.72"/>
-						</FontString> 
+						</FontString>
 					</Layer>
 					<Layer level="BACKGROUND">
 						<Texture parentKey="BackgroundCenter">
