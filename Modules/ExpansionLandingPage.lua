@@ -343,12 +343,12 @@ do
                     container:SetScale(1);
                 end
 
-                for i, widget in ipairs(container.widgets) do
+                for i, _widget in ipairs(container.widgets) do
                     if i > n then
-                        widget:Hide();
+                        _widget:Hide();
                     end
-                    if widget:IsMouseMotionFocus() then
-                        widget:OnEnter();
+                    if _widget:IsMouseMotionFocus() then
+                        _widget:OnEnter();
                     end
                 end
             else
@@ -434,12 +434,12 @@ do
             container:SetScale(1);
         end
 
-        for i, widget in ipairs(container.widgets) do
+        for i, _widget in ipairs(container.widgets) do
             if i > n then
-                widget:Hide();
+                _widget:Hide();
             end
-            if widget:IsMouseMotionFocus() then
-                widget:OnEnter();
+            if _widget:IsMouseMotionFocus() then
+                _widget:OnEnter();
             end
         end
     end
