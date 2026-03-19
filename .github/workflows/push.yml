@@ -1,6 +1,6 @@
 ---
-name: Any Commit
-on: push
+name: Push and Pull Request
+on: [push, pull_request]
 
 jobs:
   build:
