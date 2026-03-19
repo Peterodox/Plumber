@@ -389,7 +389,7 @@ do
             end
 
             if #trackedIDs >= Constants.ContentTrackingConsts.MaxTrackedAchievements then
-                UIErrorsFrame:AddMessage(format(ACHIEVEMENT_WATCH_TOO_MANY, Constants.ContentTrackingConsts.MaxTrackedAchievements), 1.0, 0.1, 0.1, 1.0);
+                UIErrorsFrame:AddMessage(string.format(ACHIEVEMENT_WATCH_TOO_MANY, Constants.ContentTrackingConsts.MaxTrackedAchievements), 1.0, 0.1, 0.1, 1.0);
                 return
             end
 
@@ -435,7 +435,7 @@ do
 
             if result == nil then
                 if #trackedIDs >= Constants.ContentTrackingConsts.MaxTrackedAchievements then
-                    UIErrorsFrame:AddMessage(format(ACHIEVEMENT_WATCH_TOO_MANY, Constants.ContentTrackingConsts.MaxTrackedAchievements), 1.0, 0.1, 0.1, 1.0);
+                    UIErrorsFrame:AddMessage(string.format(ACHIEVEMENT_WATCH_TOO_MANY, Constants.ContentTrackingConsts.MaxTrackedAchievements), 1.0, 0.1, 0.1, 1.0);
                     return
                 end
 

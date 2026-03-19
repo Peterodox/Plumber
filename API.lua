@@ -592,7 +592,7 @@ end
 
 do  -- Item
     local C_Item = C_Item;
-    local GetItemSpell = GetItemSpell;
+    local GetItemSpell = C_Item.GetItemSpell;
 
 
     local function ColorizeTextByQuality(text, quality, allowColorBlind)

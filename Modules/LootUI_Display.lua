@@ -71,6 +71,7 @@ local MERGE_SIMILAR_ITEMS = true;
 local LOW_FRAME_STRATA = false;
 local SHOW_ALL_MONEY_CHANGE = false;
 local SHOW_ALL_CURRENCY_CHANGE = false;
+local HIDE_PLUMBER_LOOT_UI = false;
 ------------------
 
 local CLASS_SORT_ORDER = {
@@ -367,7 +368,7 @@ do  --Process Loot Message
             --Debug_LogLootMessage(text)
             if currencyID then
                 if self.alwaysListenLootMsg then
-                    local link, name = match(text, "(|Hcurrency:.+|h)%[(.+)%]|h");
+                    local link, _name = match(text, "(|Hcurrency:.+|h)%[(.+)%]|h");
                     local currencyInfo = link and GetCurrencyInfoFromLink(link);
                     if currencyInfo then
                         local slotIndex = 0;
@@ -993,7 +994,7 @@ do  --UI Notification Mode
     end
 
     function MainFrame:QueueDisplayLoot(lootData)
-        if LootUI_WindowHide == true then return end;
+        if HIDE_PLUMBER_LOOT_UI == true then return end;
 		if not (lootData and lootData.quantity) then return end;
         if self.manualMode then return end;
 
@@ -1197,19 +1198,19 @@ do  --UI Notification Mode
                 self.anyAlphaChange = true;
                 self:SetScript("OnUpdate", OnUpdate_FadeIn_Individual);
 
-                for _, itemFrame in ipairs(self.activeFrames) do
-                    itemFrame.toAlpha = 1;
-                    itemFrame.alpha = itemFrame:GetAlpha();
+                for _, _itemFrame in ipairs(self.activeFrames) do
+                    _itemFrame.toAlpha = 1;
+                    _itemFrame.alpha = _itemFrame:GetAlpha();
                 end
             else
                 self:SetScript("OnUpdate", OnUpdate_FadeIn_All_ThenHide);
                 self:Show();
                 self.anyAlphaChange = nil;
 
-                for _, itemFrame in ipairs(self.activeFrames) do
-                    itemFrame.toAlpha = nil;
-                    itemFrame.alpha = 1;
-                    itemFrame:SetAlpha(1);
+                for _, _itemFrame in ipairs(self.activeFrames) do
+                    _itemFrame.toAlpha = nil;
+                    _itemFrame.alpha = 1;
+                    _itemFrame:SetAlpha(1);
                 end
             end
         else
@@ -1858,7 +1859,7 @@ do  --Edit Mode
                 onMouseDownFunc = Options_OpacitySlider_OnMouseDown, onMouseUpFunc = Options_OpacitySlider_OnMouseUp, onEnterFunc = Options_OpacitySlider_OnMouseDown, onLeaveFunc = Options_OpacitySlider_OnMouseUp},
             {type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
             {type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},
-            {type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return C_ColorOverrides and ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
+            {type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
             {type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
             {type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItems"},
             {type = "Checkbox", label = L["LootUI Option Low Frame Strata"], tooltip = L["LootUI Option Low Frame Strata Tooltip"], onClickFunc = nil, dbKey = "LootUI_LowFrameStrata"},
@@ -1999,7 +2000,7 @@ do  --Edit Mode
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_LowFrameStrata", SettingChanged_LowFrameStrata);
 
 	local function SettingChanged_WindowDisabled(state, userInput)
-        LootUI_WindowHide = state;
+        HIDE_PLUMBER_LOOT_UI = state;
     end
     addon.CallbackRegistry:RegisterSettingCallback("LootUI_WindowHide", SettingChanged_WindowDisabled);
 

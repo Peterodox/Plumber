@@ -267,8 +267,8 @@ do
 
         --Save Hide Unavailable State
         self.DyePopout.ShowOnlyOwned:SetChecked(addon.GetDBBool("Housing_DyePopout_ShowOnlyOwned") or false);
-        self.DyePopout.ShowOnlyOwned:HookScript("OnClick", function(self)
-            addon.SetDBValue("Housing_DyePopout_ShowOnlyOwned", self:GetChecked());
+        self.DyePopout.ShowOnlyOwned:HookScript("OnClick", function(_self)
+            addon.SetDBValue("Housing_DyePopout_ShowOnlyOwned", _self:GetChecked());
         end);
     end
 

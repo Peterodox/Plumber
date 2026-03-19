@@ -62,6 +62,7 @@ function AddonDataProvider:FindIndexByName(name)
 
 end
 
+--[[
 local function ScrollToAddOnName(name)
     local index = AddonDataProvider:FindIndexByName(name);
     if index then
@@ -71,3 +72,4 @@ local function ScrollToAddOnName(name)
         return true
     end
 end
+--]]

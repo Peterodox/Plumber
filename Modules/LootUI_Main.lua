@@ -409,7 +409,7 @@ do  --UI ItemButton
                         else
                             f.IconOverlay:SetTexCoord((data.craftQuality - 1) * 0.125, data.craftQuality * 0.125, 0, 0.125);
                         end
-                        
+
                         f.IconOverlay:Show();
                     elseif data.id then
                         if IsCosmeticItem(data.id) then

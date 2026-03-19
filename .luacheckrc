@@ -36,6 +36,8 @@ globals = {
 	"PlumberDreamseedMapPinMixin",
 	"PlumberWorldMapPinMixin",
 	"PlumberExpansionLandingPage",
+	"PlumberExpansionLandingPageMixin",
+	"PlumberLandingPageMinimapButtonMixin",
 
 	"NarciPaperDollWidgetController",
 	"Narci_Attribute",
@@ -72,6 +74,11 @@ read_globals = {
 	"LiteBagBackpack",
 	"Baganator",
 	"BetterBagsBagBackpack",
+
+	"MacroToolkit",
+	"MacroToolkitFrame",
+	"MacroToolkitSave",
+	"MacroToolkitText",
 };
 
 std = "lua51+wow";
@@ -82,6 +89,12 @@ stds.wow = {
 		"BossBanner",
 		"SlashCmdList",
 		"StaticPopupDialogs",
+
+		GameTooltip = {
+			fields = {
+				"suppressAutomaticCompareItem",
+			},
+		},
 	},
 
 	-- Globals that we access.
@@ -99,6 +112,11 @@ stds.wow = {
 		"time",
 
 		-- Global Functions
+		bit = {
+			fields = {
+				"band",
+			},
+		},
 
 		ChatFrameUtil = {
 			fields = {
@@ -117,6 +135,12 @@ stds.wow = {
 					},
 				},
 
+				ContentTrackingConsts = {
+					fields = {
+						"MaxTrackedAchievements",
+					},
+				},
+
 				CurrencyConsts = {
 					fields = {
 						"CLASSIC_HONOR_CURRENCY_ID",
@@ -129,6 +153,13 @@ stds.wow = {
 						"HOUSING_CATALOG_DECOR_MODELSCENEID_DEFAULT",
 					},
 				},
+			},
+		},
+
+		ContentTrackingUtil = {
+			fields = {
+				"DisplayTrackingError",
+				"IsTrackingModifierDown",
 			},
 		},
 
@@ -164,6 +195,12 @@ stds.wow = {
 			fields = {
 				"GetArtifactItemID",
 				"GetArtifactTier",
+			},
+		},
+
+		C_PetBattles = {
+			fields = {
+				"IsInBattle",
 			},
 		},
 
@@ -204,6 +241,22 @@ stds.wow = {
 			},
 		},
 
+		C_CovenantCallings = {
+			"AreCallingsUnlocked",
+		},
+
+		C_Covenants = {
+			fields = {
+				"GetActiveCovenantID",
+			},
+		},
+
+		C_CreatureInfo = {
+			fields = {
+				"GetClassInfo"
+			},
+		},
+
 		C_CurrencyInfo = {
 			fields = {
 				"GetCurrencyContainerInfo",
@@ -228,6 +281,7 @@ stds.wow = {
 			fields = {
 				"GetCurrentCalendarTime",
 				"GetSecondsUntilWeeklyReset",
+				"GetSecondsUntilDailyReset",
 				"GetWeeklyResetStartTime",
 			},
 		},
@@ -272,6 +326,15 @@ stds.wow = {
 			},
 		},
 
+		C_Garrison = {
+			fields = {
+				"IsOnGarrisonMap",
+				"GetAvailableMissions",
+				"GetInProgressMissions",
+				"GetLandingPageItems",
+			},
+		},
+
 		C_GossipInfo = {
 			fields = {
 				"GetActiveQuests",
@@ -280,6 +343,13 @@ stds.wow = {
 				"GetFriendshipReputationRanks",
 				"GetOptions",
 				"SelectOption",
+			},
+		},
+
+		C_HouseEditor = {
+			fields = {
+				"GetActiveHouseEditorMode",
+				"IsHouseEditorActive",
 			},
 		},
 
@@ -344,6 +414,7 @@ stds.wow = {
 				"GetItemCount",
 				"GetItemIcon",
 				"GetItemIconByID",
+				"GetItemIDForItemInfo",
 				"GetItemInfo",
 				"GetItemInfoInstant",
 				"GetItemLearnTransmogSet",
@@ -397,6 +468,7 @@ stds.wow = {
 				"GetPlayerMapPosition",
 				"GetUserWaypoint",
 				"GetUserWaypointPositionForMap",
+				"GetWorldPosFromMapPos",
 				"OpenWorldMap",
 				"SetUserWaypoint",
 			},
@@ -421,6 +493,12 @@ stds.wow = {
 				"GetMountInfoByID",
 				"GetMountInfoExtraByID",
 				"SummonByID",
+			},
+		},
+
+		C_MythicPlus = {
+			fields = {
+				"RequestMapInfo",
 			},
 		},
 
@@ -475,6 +553,12 @@ stds.wow = {
 			},
 		},
 
+		C_PlayerInteractionManager = {
+			fields = {
+				"IsInteractingWithNpcOfType",
+			},
+		},
+
 		C_ProfSpecs = {
 			fields = {
 				"GetSpecTabIDsForSkillLine",
@@ -498,6 +582,14 @@ stds.wow = {
 				"GetQuestRewardSpells",
 				"HasQuestRewardCurrencies",
 				"HasQuestRewardSpells",
+			},
+		},
+
+		C_QuestLine = {
+			fields = {
+				"GetAvailableQuestLines",
+				"GetQuestLineInfo",
+				"GetQuestLineQuests",
 			},
 		},
 
@@ -596,6 +688,7 @@ stds.wow = {
 
 		C_SpellBook = {
 			fields = {
+				"FindSpellOverrideByID",
 				"GetSpellBookItemType",
 				"IsSpellKnown",
 				"IsSpellInSpellBook",
@@ -793,6 +886,12 @@ stds.wow = {
 			},
 		},
 
+		C_ZoneAbility = {
+			fields = {
+				"GetActiveAbilities",
+			},
+		},
+
 		ColorManager = {
 			fields = {
 				"GetFormattedStringForItemQuality",
@@ -853,6 +952,12 @@ stds.wow = {
 				HousingItemToastType = {
 					fields = {
 						"Decor",
+					},
+				},
+
+				ItemSlotFilterType = {
+					fields = {
+						"NoFilter",
 					},
 				},
 
@@ -1032,6 +1137,18 @@ stds.wow = {
 			fields = {
 				"ContinueOnAddOnLoaded",
 				"ContinueOnPlayerLogin",
+			},
+		},
+
+		ItemLocation = {
+			fields = {
+				"CreateEmpty",
+			},
+		},
+
+		InputUtil = {
+			fields = {
+				"GetCursorPosition",
 			},
 		},
 
@@ -1238,21 +1355,26 @@ stds.wow = {
 		"GetNumTitles",
 		"IsTitleKnown",
 		"GetTitleName",
+		"SetCurrentTitle",
 		"SearchBoxTemplate_OnTextChanged",
 		"GetCameraZoom",
 		"UnitWidgetSet",
 		"GetMerchantNumItems",
 		"GetMerchantItemCostInfo",
 		"GetMerchantItemCostItem",
+		"GetMerchantItemInfo",
 		"GetNumBuybackItems",
 		"GetBuybackItemInfo",
+		"MerchantFrame_Update",
 		"WorldMap_GetQuestTimeForTooltip",
 		"GameTooltip_SetTitle",
 		"GameTooltip_SetTooltipWaitingForData",
+		"GameTooltip_SetBottomText",
 		"GameTooltip_AddColoredLine",
 		"GameTooltip_AddBlankLineToTooltip",
 		"GameTooltip_AddErrorLine",
 		"GameTooltip_AddHighlightLine",
+		"GameTooltip_AddInstructionLine",
 		"GameTooltip_AddNormalLine",
 		"HaveQuestData",
 		"GetFactionInfoByID",
@@ -1287,14 +1409,67 @@ stds.wow = {
 		"EJ_GetInstanceInfo",
 		"EJ_GetNumSearchResults",
 		"EJ_GetSearchResult",
+		"EJ_GetEncounterInfoByIndex",
 		"EJ_IsSearchFinished",
 		"EJ_IsValidInstanceDifficulty",
 		"EJ_SetSearch",
+		"EJ_SetDifficulty",
+		"EJ_SetLootFilter",
+		"EJ_SelectInstance",
+		"EJ_SelectEncounter",
+		"strcmputf8i",
 		"ShowGarrisonLandingPage",
 		"GetPrimaryGarrisonFollowerType",
 		"securecall",
 		"MacroFrame_LoadUI",
-
+		"SetLegacyRaidDifficultyID",
+		"SetRaidDifficultyID",
+		"SetDungeonDifficultyID",
+		"PaperDollTitlesPane_InitButton",
+		"MapCanvasPinMixin",
+		"MapCanvasDataProviderMixin",
+		"CreateMacro",
+		"GetMacroBody",
+		"GetMacroInfo",
+		"GetMacroIndexByName",
+		"CreateMacro",
+		"DeleteMacro",
+		"EditMacro",
+		"GetNumMacros",
+		"FindSpellOverrideByID",
+		"GetActionInfo",
+		"CloseLoot",
+		"LootSlot",
+		"LootSlotHasItem",
+		"GetLootSlotLink",
+		"GetLootSlotType",
+		"GetLootSlotInfo",
+		"GetNumLootItems",
+		"IsFishingLoot",
+		"SpellIsTargeting",
+		"Social_IsShown",
+		"Social_InsertLink",
+		"IsAccountSecured",
+		"GameTime_GetLocalTime",
+		"GameTime_GetGameTime",
+		"GetQuestID",
+		"GetNumAvailableQuests",
+		"GetAvailableTitle",
+		"GetAvailableQuestInfo",
+		"GetNumActiveQuests",
+		"GetActiveTitle",
+		"GetActiveQuestID",
+		"AutoScalingFontStringMixin",
+		"WeeklyRewardsActivityMixin",
+		"WeeklyRewards_ShowUI",
+		"SetPortraitTextureFromCreatureDisplayID",
+		"WatchFrame_Update",
+		"ReputationEntryMixin",
+		"CreateFont",
+		"GetPlayerFacing",
+		"IsMounted",
+		"GetAchievementCriteriaInfoByID",
+		"wipe",
 
 		-- Global Fonts
 		"GameFontNormal",
@@ -1324,9 +1499,11 @@ stds.wow = {
 		"CinematicFrame",
 		"ContainerFrame1",
 		"ContainerFrameCombinedBags",
+		"DelvesCompanionConfigurationFrame",
 		"DressUpFrame",
 		"DyeSelectionPopout",
 		"EditModeManagerFrame",
+		"EmbeddedItemTooltip",
 		"EncounterJournal",
 		"EquipmentFlyoutFrame",
 		"EventToastManagerFrame",
@@ -1337,10 +1514,14 @@ stds.wow = {
 		"GuildInviteFrame",
 		"HousingControlsFrame",
 		"HousingDashboardFrame",
+		"HousingModelPreviewFrame",
 		"HouseEditorFrame",
 		"ItemUpgradeFrame",
+		"LootFrame",
 		"MailFrame",
 		"MacroFrame",
+		"MacroFrameText",
+		"MacroSaveButton",
 		"MerchantFrame",
 		"MerchantMoneyInset",
 		"MerchantMoneyBgLeft",
@@ -1363,6 +1544,7 @@ stds.wow = {
 		"QueueStatusButton",
 		"ShoppingTooltip1",
 		"SideDressUpFrame",
+		"SocialPostFrame",
 		"SplashFrame",
 		"SubtitlesFrame",
 		"SuperTrackedFrame",
@@ -1396,6 +1578,7 @@ stds.wow = {
 		"ARTIFACT_GOLD_COLOR",
 		"BLACK_FONT_COLOR",
 		"NORMAL_FONT_COLOR",
+		"INVALID_EQUIPMENT_COLOR",
 		"D_DAYS",
 		"D_HOURS",
 		"D_MINUTES",
@@ -1475,6 +1658,7 @@ stds.wow = {
 		"WEEKLY_REWARDS_UNCLAIMED_TITLE",
 		"BONUS_OBJECTIVE_TIME_LEFT",
 		"WEEKLY_REWARDS_UNLOCK_REWARD",
+		"GREAT_VAULT_REWARDS",
 		"GREAT_VAULT_REWARDS_WORLD_COMPLETED_FIRST",
 		"GREAT_VAULT_REWARDS_WORLD_COMPLETED_SECOND",
 		"GREAT_VAULT_REWARDS_WORLD_INCOMPLETE",
@@ -1483,6 +1667,7 @@ stds.wow = {
 		"WEEKLY_REWARDS_ITEM_LEVEL_WORLD",
 		"WEEKLY_REWARDS_COMPLETE_WORLD",
 		"WEEKLY_REWARDS_MAXED_REWARD",
+		"WEEKLY_REWARDS_UNCLAIMED_TEXT",
 		"WEEKLY_REWARDS_CLICK_TO_PREVIEW_INSTRUCTIONS",
 		"ERR_COSMETIC_KNOWN",
 		"TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN",
@@ -1523,6 +1708,34 @@ stds.wow = {
 		"ITEM_COOLDOWN_TIME",
 		"LOCKED",
 		"ITEM_PROPOSED_ENCHANT",
-
+		"MAX_ACCOUNT_MACROS",
+		"MAX_CHARACTER_MACROS",
+		"ORBIT_CAMERA_MOUSE_MODE_PITCH_ROTATION",
+		"HOUSING_CATALOG_CATEGORIES_ALL",
+		"SWITCH",
+		"RAID",
+		"SHOW_MAP",
+		"DUNGEONS_BUTTON",
+		"LANDING_PAGE_RENOWN_LABEL",
+		"MAJOR_FACTION_LIST_TITLE",
+		"RENOWN_REWARD_ACCOUNT_UNLOCK_LABEL",
+		"REPUTATION_TOOLTIP_ACCOUNT_WIDE_LABEL",
+		"LOOT_NOUN",
+		"ACHIEVEMENTS",
+		"ERR_ACHIEVEMENT_WATCH_COMPLETED",
+		"ACHIEVEMENT_WATCH_TOO_MANY",
+		"EXPANSION_NAME4",
+		"EXPANSION_NAME10",
+		"EXPANSION_NAME11",
+		"TEMPSCENE",
+		"CROSS_FACTION_RAID_DUNGEON_FINDER_ERROR",
+		"CANNOT_DO_THIS_WHILE_LFGLIST_LISTED",
+		"LE_LFG_CATEGORY_RF",
+		"MAJOR_FACTION_BUTTON_RENOWN_LEVEL",
+		"PVP_WEEKLY_REWARD",
+		"CATALOG_SHOP_NO_SEARCH_RESULTS",
+		"SETTINGS",
+		"CLUB_FINDER_SORT_BY",
+		"SEARCH",
 	},
 };

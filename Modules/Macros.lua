@@ -38,7 +38,7 @@ local EditMacro = EditMacro;
 local GetNumMacros = GetNumMacros;
 local GetActiveAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or API.Nop;
 local GetMountInfoByID = C_MountJournal and C_MountJournal.GetMountInfoByID or API.Nop;
-local FindSpellOverrideByID = FindSpellOverrideByID;
+local FindSpellOverrideByID = C_SpellBook and C_SpellBook.FindSpellOverrideByID or FindSpellOverrideByID or API.Nop;
 local GetActionInfo = GetActionInfo;
 local GetCursorInfo = GetCursorInfo;
 local GetCurrentKeyBoardFocus = GetCurrentKeyBoardFocus;
@@ -1134,7 +1134,7 @@ do  --MacroInterpreter
                         id = _spellID;
                     end
                 elseif actionType == "profession" then
-                    
+					--Action will be set in SpellFlyout_Secure.lua
                 else
                     name = name or line;
                     macroText = macroText or line;
@@ -1250,9 +1250,7 @@ do  --Editor Setup
                 Placeholder:Hide();
                 local body = "#plumber:drawer";
                 for _, object in ipairs(ReorderController.objects) do
-                    if delete and object == draggedObject then
-                        
-                    else
+                    if not(delete and object == draggedObject) then
                         body = body.."\n#"..object.rawMacroText;
                     end
                 end
@@ -1486,7 +1484,7 @@ do  --Editor Setup
                     end
                     name = name or "Unknown";
 
-                    local function Receptor_OnEnter(self)
+                    local function Receptor_OnEnter(_self)
                         receptor.PlusSign:Hide();
                         receptor.Instruction:Show();
                         receptor.Instruction:SetText(format(L["Drawer Add Action Format"], "["..name.."]"));
@@ -1494,13 +1492,13 @@ do  --Editor Setup
                         receptor.newCommand = newCommand;
                     end
 
-                    local function Receptor_OnLeave(self)
+                    local function Receptor_OnLeave(_self)
                         receptor.PlusSign:Show();
                         receptor.Instruction:Hide();
                         receptor.newCommand = nil;
                     end
 
-                    local function Receptor_OnClick(self, button)
+                    local function Receptor_OnClick(_self, button)
                         if button == "RightButton" then
                             if not InCombatLockdown() then
                                 ClearCursor();
@@ -1519,8 +1517,8 @@ do  --Editor Setup
                         end
                     end
 
-                    local function Receptor_OnReceiveDrag(self)
-                        Receptor_OnClick(self, "LeftButton");
+                    local function Receptor_OnReceiveDrag(_self)
+                        Receptor_OnClick(_self, "LeftButton");
                     end
 
                     receptor:SetScript("OnEnter", Receptor_OnEnter);
@@ -1973,8 +1971,8 @@ do  --For other modules like Legion Remix
         end
 
         if (not macroID) and generatorFunc then
-            local name, icon, body = generatorFunc();
-            local success, arg = CreateCharacterMacro(name, icon, body);
+            local name, icon, _body = generatorFunc();
+            local success, arg = CreateCharacterMacro(name, icon, _body);
             if success then
                 macroID = arg;
             end

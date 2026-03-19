@@ -888,7 +888,6 @@ do  --Dropdown Menu
                 if v.type == "Checkbox" or v.type == "Radio" or v.type == "Button" or v.type == "Header" then
                     widget = self.buttonPool:Acquire();
                     widget:SetRightTexture(v.rightTexture);
-                    
                     if numWidgets == 1 then
                         widget:SetPoint("CENTER", f, "CENTER", 0, 0);
                     else
@@ -944,8 +943,8 @@ do  --Dropdown Menu
             contentWidth = API.Round(contentWidth);
             contentHeight = API.Round(contentHeight);
 
-            for _, widget in ipairs(widgets) do
-                widget:SetWidth(contentWidth);
+            for _, _widget in ipairs(widgets) do
+                _widget:SetWidth(contentWidth);
             end
 
             self:SetContentSize(contentWidth, contentHeight);

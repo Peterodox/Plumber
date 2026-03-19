@@ -103,7 +103,7 @@ end
 
 
 do
-    function Handler:Init()
+    function Handler:Init() --luacheck: ignore --122
         self.Init = nil;
 
         local container = HouseEditorFrame.BasicDecorModeFrame.Instructions;
@@ -320,7 +320,7 @@ do
         local dupeKeyIndex = addon.GetDBValue("Housing_DecorHover_DuplicateKey");
         self.dupeEnabled = dupeEnabled;
 
-        if (not type(dupeKeyIndex) == "number") and (self.DuplicateKeyOptions[dupeKeyIndex]) then
+        if not(type(dupeKeyIndex) == "number" and self.DuplicateKeyOptions[dupeKeyIndex]) then
             dupeKeyIndex = 2;
         end
 

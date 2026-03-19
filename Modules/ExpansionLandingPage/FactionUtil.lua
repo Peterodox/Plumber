@@ -92,7 +92,7 @@ local OverrideFactionInfo = {
         rewardQuestID = 79196,
     },
 
-        [2601] = {  --The Weaver 
+        [2601] = {  --The Weaver
             rewardQuestID = 83738,
         },
 
@@ -100,7 +100,7 @@ local OverrideFactionInfo = {
             rewardQuestID = 83739,
         },
 
-        [2607] = {  --The Vizier 
+        [2607] = {  --The Vizier
             rewardQuestID = 83740,
         },
 
@@ -121,7 +121,7 @@ local OverrideFactionInfo = {
             rewardQuestID = 85809,
         },
 
-        [2675] = {  --Blackwater Cartel 
+        [2675] = {  --Blackwater Cartel
             rewardQuestID = 85807,
         },
 

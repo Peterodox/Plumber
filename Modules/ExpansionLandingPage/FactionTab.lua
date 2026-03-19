@@ -98,7 +98,7 @@ do
         tooltip:Show();
     end
 
-    function ReputationTooltipScripts.ShowParagonRewardsTooltip(self)
+    function ReputationTooltipScripts.ShowParagonRewardsTooltip(self) -- luacheck: ignore --122
         local tooltip = GameTooltip;
 
         --AddParagonRewardsToTooltip
@@ -414,7 +414,7 @@ do
             end
 
             if progress.isUnlocked then
-                
+
             else
 
             end

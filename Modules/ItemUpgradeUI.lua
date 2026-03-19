@@ -253,8 +253,10 @@ do	--Tooltip Event
 
 		if self.queuedDataInstanceIDs then
 			for dataInstanceID, itemLocation in pairs(self.queuedDataInstanceIDs) do
-				anyEntry = true;
-				break
+				if dataInstanceID then
+					anyEntry = true;
+					break
+				end
 			end
 		end
 

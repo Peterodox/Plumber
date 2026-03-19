@@ -334,15 +334,17 @@ local function MapPin_UpdateTooltip(self)
             if remainingTime ~= self.remainingTime then
                 self.remainingTime = remainingTime;
                 local timeText = format(FORMAT_TIME_LEFT, SecondsToTime(remainingTime, true));
-                if TooltipFrame.TextLeft2 and TooltipFrame.TextLeft2:GetText() then
-                    TooltipFrame.TextLeft2:SetText(timeText);
+				local line2 = TooltipFrame:GetLeftLine(2);
+                if line2 and line2:GetText() then
+                    line2:SetText(timeText);
                 else
                     TooltipFrame:AddLine(timeText, 1, 0.82, 0, false);
                 end
 
                 local progressText = DreamseedUtil:GetNurtureProgress(self.objectGUID, true);
-                if GameTooltipTextLeft3 and GameTooltipTextLeft3:GetText() then
-                    GameTooltipTextLeft3:SetText(progressText);
+				local line3 = TooltipFrame:GetLeftLine(3);
+                if line3 and line3:GetText() then
+                    line3:SetText(progressText);
                 else
                     TooltipFrame:AddLine(progressText, 1, 1, 1, false);
                 end
@@ -592,7 +594,6 @@ function WorldMapDataProvider:ShowAllPins()
     end
 
     local vignetteGUIDs = C_VignetteInfo.GetVignettes();
-    local pin;
     local info, vignettePosition, vignetteFacing;
     local mapFrame = MapFrame;
     local relavantVignetteGUIDs = {};
@@ -606,7 +607,7 @@ function WorldMapDataProvider:ShowAllPins()
         if info and info.vignetteID == VIGID_BOUNTY then
             vignettePosition, vignetteFacing = GetVignettePosition(info.vignetteGUID, uiMapID);
             if vignettePosition then
-                pin = mapFrame:AcquirePin(PIN_TEMPLATE_NAME, vignetteGUID, info.objectGUID);
+                local pin = mapFrame:AcquirePin(PIN_TEMPLATE_NAME, vignetteGUID, info.objectGUID);
                 pin:SetPosition(vignettePosition:GetXY());
                 pin:UpdateState();
                 total = total + 1;

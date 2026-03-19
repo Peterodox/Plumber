@@ -26,6 +26,7 @@ local IsOnQuest = C_QuestLog.IsOnQuest;
 local GetFactionInfoByID = GetFactionInfoByID;
 
 
+local SortedActivity = {};
 local DAILY_QUEST = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/DailyQuestAvailable.png";  --"QuestNormal"
 
 
@@ -423,27 +424,25 @@ local function BuildEntriesForCategory(category)
             for _, questID in ipairs(quests) do
                 if IsQuestActiveFromCache(questID) then
                     questSetIndex = i;
-                    for _, questID in ipairs(quests) do
-                        unlockCondition = QuestXCondition[questID];
-                        if (not unlockCondition) or (unlockCondition()) then
-                            n = n + 1;
-                            numAvailable = numAvailable + 1;
-                            completed = IsQuestFlaggedCompleted(questID);
-                            entries[n] = {
-                                questID = questID,
-                                icon = DAILY_QUEST,
-                                shownIfOnQuest = true,
-                                uiMapID = uiMapID,
-                                isActive = true,
-                                completed = completed,
-                            };
+					unlockCondition = QuestXCondition[questID];
+					if (not unlockCondition) or (unlockCondition()) then
+						n = n + 1;
+						numAvailable = numAvailable + 1;
+						completed = IsQuestFlaggedCompleted(questID);
+						entries[n] = {
+							questID = questID,
+							icon = DAILY_QUEST,
+							shownIfOnQuest = true,
+							uiMapID = uiMapID,
+							isActive = true,
+							completed = completed,
+						};
 
-                            if completed then
-                                DailyUtil.TryFlagQuestCompleted(questID);
-                                numCompleted = numCompleted + 1;
-                            end
-                        end
-                    end
+						if completed then
+							DailyUtil.TryFlagQuestCompleted(questID);
+							numCompleted = numCompleted + 1;
+						end
+					end
                     questsPerDay = questsPerDay + numAvailable;
                     break
                 end
@@ -767,7 +766,7 @@ do
             v.dataIndex = k;
         end
 
-        SortedActivity = tbl
+        SortedActivity = tbl;
 
         return tbl, numCompleted
     end
