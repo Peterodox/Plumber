@@ -2496,8 +2496,8 @@ do  -- Player
     end
 end
 
+--[[
 do  -- Scenario
-    --[[
     local SCENARIO_DELVES = addon.L["Scenario Delves"] or "Delves";
 
     local GetScenarioInfo = C_ScenarioInfo.GetScenarioInfo;
@@ -2507,8 +2507,8 @@ do  -- Scenario
         return scenarioInfo and scenarioInfo.name == SCENARIO_DELVES
     end
     API.IsInDelves = IsInDelves;
-    --]]
 end
+--]]
 
 do  -- ObjectPool
     local ObjectPoolMixin = {};

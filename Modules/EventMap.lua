@@ -154,7 +154,7 @@ end
 
 local function PinUpdateFunc_SeedPlanting(self)
     if not self.objectGUID then return end;
-    
+
     local currentTime, fullTime = API.DreamseedUtil:GetGrowthTimes(self.objectGUID);
     if currentTime and currentTime > 0 then
         self.Icon:SetTexture("Interface/AddOns/Plumber/Art/MapPin/SeedPlanting-Green");
@@ -287,7 +287,7 @@ function PinUtil:Acquire(templateName)
             pin:SetSize(16, 16);
             pin.Icon:SetTexCoord(0, 1, 0, 1);
         end
-        
+
         pin.updateFunc = templateData.updateFunc;
     end
 
@@ -685,6 +685,7 @@ local function YeetWidgetInfo(widgetID, widgetType)
     if widgetInfo.tooltip then print(widgetInfo.tooltip) end;
     if widgetInfo.timerTooltip then print(widgetInfo.timerTooltip) end;
 
+	--[[
     if false then
         local widgetFrame = CreateFrame(widgetTypeInfo.templateInfo.frameType, nil, MainFrame, widgetTypeInfo.templateInfo.frameTemplate);
         numWidgets = numWidgets + 1;
@@ -698,7 +699,7 @@ local function YeetWidgetInfo(widgetID, widgetType)
         widgetFrame.widgetTag = widgetInfo.widgetTag;
         widgetFrame.inAnimType = widgetInfo.inAnimType;
         widgetFrame.outAnimType = widgetInfo.outAnimType;
-        widgetFrame.layoutDirection = widgetInfo.layoutDirection; 
+        widgetFrame.layoutDirection = widgetInfo.layoutDirection;
         widgetFrame.modelSceneLayer = widgetInfo.modelSceneLayer;
         widgetFrame.scriptedAnimationEffectID = widgetInfo.scriptedAnimationEffectID;
         widgetFrame.markedForRemove = nil;
@@ -714,6 +715,7 @@ local function YeetWidgetInfo(widgetID, widgetType)
             widgetFrame:OnAcquired(widgetInfo);
         end
     end
+	--]]
 end
 
 MainFrame:RegisterEvent("VIGNETTES_UPDATED");

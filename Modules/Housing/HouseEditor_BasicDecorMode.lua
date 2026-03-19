@@ -103,14 +103,14 @@ end
 
 
 do
-    function Handler:Init() --luacheck: ignore --122
+    function Handler:Init()
         self.Init = nil;
 
         local container = HouseEditorFrame.BasicDecorModeFrame.Instructions;
         for _, v in ipairs(container.UnselectedInstructions) do
             v:Hide();
         end
-        container.UnselectedInstructions = {};
+        container.UnselectedInstructions = {}; --luacheck: ignore --122
 
         if not DisplayFrame then
             DisplayFrame = CreateFrame("Frame", nil, container, "PlumberHouseEditorInstructionTemplate");
@@ -140,7 +140,7 @@ do
             SubFrame:SetHotkey(L["Duplicate"], Handler:CurrentGetDupeKeyName());
         end
 
-        container.UnselectedInstructions = {DisplayFrame};
+        container.UnselectedInstructions = {DisplayFrame}; --luacheck: ignore --122
 
         if IsDecorSelected() then
             DisplayFrame:Hide();

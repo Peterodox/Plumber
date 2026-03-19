@@ -311,16 +311,18 @@ do
         self:SetRowAndCol(values[optionIndex][1], values[optionIndex][2], userInput);
     end
 
-    function Loader:SetRowAndCol(numRow, numCol, userInput) -- luacheck: ignore 122
+    function Loader:SetRowAndCol(numRow, numCol, userInput)
         local gapH, gapV = 16, 24;
         local modelWidth, modelHeight = 78, 104;
         local pageSize = numRow * numCol;
 
         local appearanceTab = WardrobeCollectionFrame.ItemsCollectionFrame;
 
+		-- luacheck: push ignore 122
         appearanceTab.NUM_ROWS = numRow;
         appearanceTab.NUM_COLS = numCol;
         appearanceTab.PAGE_SIZE = pageSize;
+		-- luacheck: pop
 
         local fromOffsetY = -92;
         local fromOffsetX = -math.floor(0.5 * (numCol * (modelWidth + gapH) - gapH));

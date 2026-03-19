@@ -4,6 +4,8 @@ exclude_files = {
 	"Modules/DevTool.lua",
 	"Modules/DevTool_HyperlinkEditor.lua",
 	"Modules/MerchantUI",
+	"Modules/AccountStore.lua",
+	"Modules/DruidModelFix",
 };
 
 ignore = {
@@ -16,9 +18,6 @@ ignore = {
 
 	-- Ignore empty if branch
 	"542",
-
-	-- Ignore retired modules
-	"Modules/AccountStore.lua",
 };
 
 globals = {
@@ -88,14 +87,11 @@ stds.wow = {
 	-- Globals that we mutate.
 	globals = {
 		"BossBanner",
+		"DifficultyUtil",
+		"EventToastManagerFrame",
+		"GossipFrame",	--gossipOptions
 		"SlashCmdList",
 		"StaticPopupDialogs",
-
-		EventToastManagerFrame = {
-			fields = {
-				"OnUpdate",
-			},
-		},
 
 		GameTooltip = {
 			fields = {
@@ -104,11 +100,7 @@ stds.wow = {
 			},
 		},
 
-		GossipFrame = {
-			fields = {
-				"gossipOptions",
-			},
-		},
+		"DelvesCompanionConfigurationFrame",
 	},
 
 	-- Globals that we access.
@@ -264,7 +256,9 @@ stds.wow = {
 		},
 
 		C_CovenantCallings = {
-			"AreCallingsUnlocked",
+			fiels = {
+				"AreCallingsUnlocked",
+			},
 		},
 
 		C_Covenants = {
@@ -469,6 +463,12 @@ stds.wow = {
 			},
 		},
 
+		C_LFGList = {
+			fields = {
+				"HasActiveEntryInfo",
+			},
+		},
+
 		C_MajorFactions = {
 			fields = {
 				"HasMaximumRenown",
@@ -626,6 +626,7 @@ stds.wow = {
 				"GetAvailableQuestLines",
 				"GetQuestLineInfo",
 				"GetQuestLineQuests",
+				"RequestQuestLinesForMap",
 			},
 		},
 
@@ -1224,6 +1225,12 @@ stds.wow = {
 			},
 		},
 
+		RenownRewardUtil = {
+			fields = {
+				"AddRenownRewardsToTooltip",
+			},
+		},
+
 		Settings = {
 			fields = {
 				"RegisterAddOnCategory",
@@ -1347,6 +1354,9 @@ stds.wow = {
 		"GetAchievementLink",
 		"GetNumFilteredAchievements",
 		"GetFilteredAchievementID",
+		"GetTrackedAchievements",
+		"RemoveTrackedAchievement",
+		"AddTrackedAchievement",
 		"SetAchievementSearchString",
 		"OpenAchievementFrameToAchievement",
 		"HandleModifiedItemClick",
@@ -1467,6 +1477,7 @@ stds.wow = {
 		"EJ_SetLootFilter",
 		"EJ_SelectInstance",
 		"EJ_SelectEncounter",
+		"EJ_SelectTier",
 		"strcmputf8i",
 		"ShowGarrisonLandingPage",
 		"GetPrimaryGarrisonFollowerType",
@@ -1503,6 +1514,8 @@ stds.wow = {
 		"GameTime_GetLocalTime",
 		"GameTime_GetGameTime",
 		"GetQuestID",
+		"GetQuestLogCompletionText",
+		"GetQuestUiMapID",
 		"GetNumAvailableQuests",
 		"GetAvailableTitle",
 		"GetAvailableQuestInfo",
@@ -1512,12 +1525,14 @@ stds.wow = {
 		"AutoScalingFontStringMixin",
 		"WeeklyRewardsActivityMixin",
 		"WeeklyRewards_ShowUI",
+		"MajorFactionButtonUnlockedStateMixin",
 		"SetPortraitTextureFromCreatureDisplayID",
 		"WatchFrame_Update",
 		"ReputationEntryMixin",
 		"CreateFont",
 		"GetPlayerFacing",
 		"IsMounted",
+		"GetAchievementCriteriaInfo",
 		"GetAchievementCriteriaInfoByID",
 		"wipe",
 		"GetNumQuestLogRewardCurrencies",
@@ -1527,6 +1542,9 @@ stds.wow = {
 		"GetNumRandomDungeons",
 		"LFDQueueFrame_SetType",
 		"QuestMapFrame_ShowQuestDetails",
+		"SocketInventoryItem",
+		"GenerateClosure",
+
 
 		-- Global Fonts
 		"GameFontNormal",
@@ -1556,7 +1574,6 @@ stds.wow = {
 		"CinematicFrame",
 		"ContainerFrame1",
 		"ContainerFrameCombinedBags",
-		"DelvesCompanionConfigurationFrame",
 		"DelvesDashboardFrame",
 		"DressUpFrame",
 		"DyeSelectionPopout",
@@ -1564,6 +1581,7 @@ stds.wow = {
 		"EmbeddedItemTooltip",
 		"EncounterJournal",
 		"EquipmentFlyoutFrame",
+		"ExpansionLandingPage",
 		"ExpansionLandingPageMinimapButton",
 		"GarrisonLandingPage",
 		"GameTooltip",
@@ -1636,6 +1654,7 @@ stds.wow = {
 		"BLACK_FONT_COLOR",
 		"NORMAL_FONT_COLOR",
 		"INVALID_EQUIPMENT_COLOR",
+		"ACCOUNT_WIDE_FONT_COLOR",
 		"D_DAYS",
 		"D_HOURS",
 		"D_MINUTES",
@@ -1794,5 +1813,10 @@ stds.wow = {
 		"SETTINGS",
 		"CLUB_FINDER_SORT_BY",
 		"SEARCH",
+		"BONUS_LOOT_TOOLTIP_TITLE",
+		"MAJOR_FACTION_MAX_RENOWN_REACHED",
+		"PARAGON_REPUTATION_TOOLTIP_TEXT_LOW_LEVEL",
+		"PARAGON_REPUTATION_TOOLTIP_TEXT",
+
 	},
 };

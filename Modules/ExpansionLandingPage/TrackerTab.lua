@@ -1081,7 +1081,6 @@ do
 
         if button == "RightButton" then
             if self.isHeader then
-                
             else
                 local function getter()
                     return DropdownInfoGetters.GenericEntryContextMenu(self)
