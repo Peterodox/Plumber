@@ -926,14 +926,14 @@ do
                 if objectives and #objectives > 0 then
                     for i = 1, #objectives do
                         n = n + 1;
-                        local isOdd = n % 2 == 0;
+                        local _isOdd = n % 2 == 0;
                         top = offsetY;
                         bottom = offsetY + buttonHeight + gap;
                         offsetY = bottom;
                         content[n] = {
                             templateKey = "ListButton",
                             setupFunc = function(obj)
-                                obj.isOdd = isOdd;
+                                obj.isOdd = _isOdd;
                                 obj:SetObjective(objectives[i].text);
                             end,
                             top = top,

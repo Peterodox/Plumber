@@ -156,8 +156,8 @@ do  --Checklist Button
             if not name then
                 CallbackRegistry:LoadQuest(questID, function(_questID)
                     if questID == self.id then
-                        local name = DailyUtil.GetQuestTitle(_questID);
-                        self.Name:SetText(name);
+                        local _name = DailyUtil.GetQuestTitle(_questID);
+                        self.Name:SetText(_name);
                         self:UpdateProgress();
                         if self:IsMouseMotionFocus() then
                             self:OnEnter();
@@ -179,9 +179,9 @@ do  --Checklist Button
             if not isLocalized then
                 CallbackRegistry:LoadQuest(questID, function(_questID)
                     if questID == self.id then
-                        local name = API.GetQuestName(_questID);
-                        ActivityUtil.StoreQuestActivityName(_questID, name);
-                        self.Name:SetText(name);
+                        local _name = API.GetQuestName(_questID);
+                        ActivityUtil.StoreQuestActivityName(_questID, _name);
+                        self.Name:SetText(_name);
                         self:UpdateProgress();
                         if self:IsMouseMotionFocus() then
                             self:OnEnter();
@@ -204,9 +204,9 @@ do  --Checklist Button
         if not isLocalized then
             CallbackRegistry:LoadItem(itemID, function(_itemID)
                 if _itemID == self.itemID then
-                    local name = C_Item.GetItemNameByID(_itemID);
-                    ActivityUtil.StoreItemActivityName(_itemID, name);
-                    self.Name:SetText(name);
+                    local _name = C_Item.GetItemNameByID(_itemID);
+                    ActivityUtil.StoreItemActivityName(_itemID, _name);
+                    self.Name:SetText(_name);
                     self:UpdateProgress();
                 end
             end);

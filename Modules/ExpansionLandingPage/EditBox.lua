@@ -56,7 +56,6 @@ do
 
         local tooltipText;
         if self:IsEnabled() then
-            
         else
             tooltipText = self.disabledTooltipText;
         end

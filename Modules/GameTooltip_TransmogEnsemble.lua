@@ -160,8 +160,8 @@ local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
 
             local allCollected = true;
 
-            for i, setID in ipairs(ItemXSets[itemID]) do
-                local appearances = GetSetPrimaryAppearances(setID);
+            for i, _setID in ipairs(ItemXSets[itemID]) do
+                local appearances = GetSetPrimaryAppearances(_setID);
                 local numCollected = 0;
                 local numTotal = 0;
                 for _, v in ipairs(appearances) do

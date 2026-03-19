@@ -5,7 +5,7 @@ exclude_files = {
 	"Modules/DevTool_HyperlinkEditor.lua",
 	"Modules/MerchantUI",
 	"Modules/AccountStore.lua",
-	"Modules/DruidModelFix",
+	"Modules/DruidModelFix.lua",
 };
 
 ignore = {
@@ -256,7 +256,7 @@ stds.wow = {
 		},
 
 		C_CovenantCallings = {
-			fiels = {
+			fields = {
 				"AreCallingsUnlocked",
 			},
 		},
@@ -1219,6 +1219,12 @@ stds.wow = {
 			},
 		},
 
+		HousingFramesUtil = {
+			fields = {
+				"PreviewHousingDecorID",
+			},
+		},
+
 		QuestCache = {
 			fields = {
 				"Get",
@@ -1468,6 +1474,7 @@ stds.wow = {
 		"EJ_GetEncounterInfo",
 		"EJ_GetInstanceInfo",
 		"EJ_GetNumSearchResults",
+		"EJ_GetNumLoot",
 		"EJ_GetSearchResult",
 		"EJ_GetEncounterInfoByIndex",
 		"EJ_IsSearchFinished",
@@ -1534,17 +1541,29 @@ stds.wow = {
 		"IsMounted",
 		"GetAchievementCriteriaInfo",
 		"GetAchievementCriteriaInfoByID",
+		"GetAchievementNumCriteria",
 		"wipe",
 		"GetNumQuestLogRewardCurrencies",
 		"strsplit",
 		"GetLFGRandomDungeonInfo",
+		"GetLFGDungeonInfo",
+		"GetLFGCategoryForID",
+		"GetPartyLFGID",
+		"GetLFGRoleUpdate",
+		"GetLFGProposal",
+		"GetLFGQueuedList",
 		"IsLFGDungeonJoinable",
+		"ClearAllLFGDungeons",
+		"SetLFGDungeon",
+		"JoinSingleLFG",
+		"GetLFGMode",
 		"GetNumRandomDungeons",
 		"LFDQueueFrame_SetType",
 		"QuestMapFrame_ShowQuestDetails",
 		"SocketInventoryItem",
 		"GenerateClosure",
-
+		"PVEFrame_ShowFrame",
+		"ReputationParagonFrame_SetupParagonTooltip",
 
 		-- Global Fonts
 		"GameFontNormal",
@@ -1588,10 +1607,12 @@ stds.wow = {
 		"GuildInviteFrame",
 		"HousingControlsFrame",
 		"HousingDashboardFrame",
+		"HousingItemEarnedAlertFrameSystem",
 		"HousingModelPreviewFrame",
 		"HouseEditorFrame",
 		"ItemUpgradeFrame",
 		"LFDParentFrame",
+		"LFGListPVEStub",
 		"LootFrame",
 		"MailFrame",
 		"MacroFrame",
@@ -1817,6 +1838,8 @@ stds.wow = {
 		"MAJOR_FACTION_MAX_RENOWN_REACHED",
 		"PARAGON_REPUTATION_TOOLTIP_TEXT_LOW_LEVEL",
 		"PARAGON_REPUTATION_TOOLTIP_TEXT",
+		"EJ_ITEM_CATEGORY_EXTREMELY_RARE",
+		"EJ_ITEM_CATEGORY_VERY_RARE",
 
 	},
 };

@@ -326,8 +326,9 @@ do
             if numCriteria > 0 then
                 tooltip:AddLine(" ");
                 local lineText;
+				local criteriaString, criteriaType, quantity, reqQuantity, charName, assetID, quantityString;
                 for i = 1, numCriteria do
-                    local criteriaString, criteriaType, completed, quantity, reqQuantity, charName, flags, assetID, quantityString = GetAchievementCriteriaInfo(id, i);
+                    criteriaString, criteriaType, completed, quantity, reqQuantity, charName, flags, assetID, quantityString = GetAchievementCriteriaInfo(id, i);
 
                     if criteriaType == 8 and assetID then     --Meta, CRITERIA_TYPE_ACHIEVEMENT
                         _, lineText = GetAchievementInfo(assetID);

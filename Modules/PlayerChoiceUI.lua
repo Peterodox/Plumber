@@ -55,7 +55,7 @@ local function HideBlizzardFrame_Default()
     end
 end
 
-local function HideBlizzardFrame_MoveAny() -- luacheck: ignore 122
+local function HideBlizzardFrame_MoveAny() -- luacheck: push ignore 122
     --Fixed an compatibility issue where after "MoveAny" users adjust the PlayerChoiceFrame
     --the frame will be clamped to screen and constantly restore its previous position
     --Mechanism: MoveAny hooks frame's SetPoint method
@@ -69,9 +69,9 @@ local function HideBlizzardFrame_MoveAny() -- luacheck: ignore 122
         f:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
         f.maframesetpoint = false;
     end
-end
+end -- luacheck: pop
 
-local function HideBlizzardFrame_Drift() -- luacheck: ignore 122
+local function HideBlizzardFrame_Drift() -- luacheck: push ignore 122
     --Similar to MoveAny, they hook the SetPoint method
     --see Drift\DriftHelpers.lua
 
@@ -83,7 +83,7 @@ local function HideBlizzardFrame_Drift() -- luacheck: ignore 122
         f:SetPoint("TOP", UIParent, "BOTTOM", 0, -64);
         f.DriftAboutToSetPoint = false;
     end
-end
+end -- luacheck: pop
 
 local HideBlizzardFrame = HideBlizzardFrame_Default;
 
