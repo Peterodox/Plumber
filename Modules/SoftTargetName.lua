@@ -844,6 +844,7 @@ do  --SpecialGameObjects
 		return SubtextFunc_Currency(3028, false, 1)
 	end
 	SpecialGameObjects[413590] = SubtextFunc_RestoredCofferKey;
+	SpecialGameObjects[584514] = SubtextFunc_RestoredCofferKey;
 
 
 	local function SubtextFunc_AncientMana()

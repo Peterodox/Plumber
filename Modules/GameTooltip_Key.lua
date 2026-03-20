@@ -23,6 +23,7 @@ for _, data in pairs(NAME_KEYS) do
 	end
 end
 
+--[[
 local SUPPORTED_MAPS = {};
 
 do
@@ -44,12 +45,15 @@ do
 		2815,
 		2826,
 		2803,
+
+		2962,
 	};
 
 	for _, mapID in ipairs(DELVE_INSTANCE) do
 		SUPPORTED_MAPS[mapID] = true;
 	end
 end
+-]]
 
 
 local SubModule = GameTooltipWorldObjectManager:CreateSubModule("TooltipChestKeys");
@@ -99,19 +103,27 @@ local EL = CreateFrame("Frame");
 EL:SetScript("OnEvent", function(self, event, ...)
 	if event == "PLAYER_MAP_CHANGED" then
 		local oldMapID, newMapID = ...
-		self:UpdateZone(newMapID);
+		self:RequestUpdateZone();
 	end
 end);
 
-function EL:UpdateZone(newMapID)
-	local mapID = newMapID or GetMapID();
-	if mapID and SUPPORTED_MAPS[mapID] then
-		SubModule.inValidZone = true;
-	else
-		SubModule.inValidZone = false;
-	end
+function EL:RequestUpdateZone(newMapID)
+	self.t = 0;
+	self:SetScript("OnUpdate", self.OnUpdate);
 end
 
+function EL:UpdateZone()
+	SubModule.inValidZone = API.IsInDelves();
+end
+
+function EL:OnUpdate(elapsed)
+	self.t = self.t + elapsed;
+	if self.t > 2 then
+		self.t = 0;
+		self:SetScript("OnUpdate", nil);
+		self:UpdateZone();
+	end
+end
 
 local function EnableModule(state)
 	SubModule:SetEnabled(state);
@@ -124,7 +136,7 @@ local function EnableModule(state)
 			end
 		end
 		EL:RegisterEvent("PLAYER_MAP_CHANGED");
-		EL:UpdateZone();
+		EL:RequestUpdateZone();
 	else
 		EL:UnregisterEvent("PLAYER_MAP_CHANGED");
 	end
