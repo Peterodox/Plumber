@@ -34,7 +34,7 @@ L["Modules"] = "Modules";
 L["Release Notes"] = "Notes de mise à jour";
 L["Option AutoShowChangelog"] = "Afficher automatiquement les notes de mise à jour";
 L["Option AutoShowChangelog Tooltip"] = "Afficher automatiquement les notes de version après une mise à jour.";
-L["Category Colon"] = (CATEGORY or "Catégorie")..": ";
+L["Category Colon"] = (CATEGORY or "Catégorie").." : ";
 L["Module Wrong Game Version"] = "Ce module est incompatible avec votre version actuelle du jeu.";
 L["Changelog Wrong Game Version"] = "Les changements suivants ne s'appliquent pas à votre version actuelle du jeu.";
 L["Settings Panel"] = "Panneau de configuration";
@@ -66,7 +66,7 @@ L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "Logis";
 L["SC Uncategorized"] = "Non classé";
 
 --Settings Search Keywords, Search Tags
-L["KW Tooltip"] = "infobulle";
+L["KW Tooltip"] = "Infobulle";
 L["KW Transmog"] = "Transmogrification";
 L["KW Vendor"] = "Vendeur";
 L["KW LegionRemix"] = "Remix de Legion";
@@ -109,12 +109,12 @@ L["Module Category AzerothianArchives"] = "Archives d'Azeroth";     --Added in p
 
 --AutoJoinEvents
 L["ModuleName AutoJoinEvents"] = "Rejoindre automatiquement les événements";
-L["ModuleDescription AutoJoinEvents"] = "Rejoint automatiquement l'événement lorsque vous interagissez avec le PNJ :\n\n- Faille temporelle\n\n- Groupe de théâtre";
+L["ModuleDescription AutoJoinEvents"] = "Rejoindre automatiquement ces événements lorsque vous interagissez avec le PNJ :\n\n- Faille temporelle\n\n- Troupe de théâtre";
 
 
 --BackpackItemTracker
-L["ModuleName BackpackItemTracker"] = "Suivi des objets dans le sac";
-L["ModuleDescription BackpackItemTracker"] = "Suivez les objets empilables dans l'interface utilisateur du sac comme s'il s'agissait de monnaies. \n\nLes jetons des événements saisonniers sont automatiquement suivis et épinglés à gauche.";
+L["ModuleName BackpackItemTracker"] = "Suivre les objets dans le sac";
+L["ModuleDescription BackpackItemTracker"] = "Suivre objets empilables dans l'interface utilisateur du sac comme s'il s'agissait de monnaies.\n\nLes jetons de vacances sont automatiquement suivis et épinglés à gauche.";
 L["Instruction Track Item"] = "Suivre l'objet";
 L["Hide Not Owned Items"] = "Masquer les objets non possédés";
 L["Hide Not Owned Items Tooltip"] = "Si vous ne possédez plus un objet que vous suiviez, il sera déplacé vers un menu caché.";
@@ -132,7 +132,7 @@ L["Track Upgrade Currency Tooltip"] = "Épingle sur la barre le type d'Écu de n
 L["Track Holiday Item"] = "Suivre la monnaie des événements saisonniers";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Actuellement épinglé :";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Barre à l'intérieur du sac";     --Put the bar inside the bag UI (below money/currency)
-L["Bar Inside The Bag Tooltip"] = "Place la barre à l'intérieur de l'interface du sac.\n\nCela ne fonctionne que dans le mode Sacs séparés de Blizzard.";
+L["Bar Inside The Bag Tooltip"] = "Placer la barre à l'intérieur de l'interface du sac.\n\nCela ne fonctionne que dans le mode Sacs séparés de Blizzard.";
 L["Catalyst Charges"] = "Charges du Catalyseur";
 
 
@@ -143,7 +143,7 @@ L["ModuleDescription GossipFrameMedal Format"] = "Remplacer l'icône par défaut
 
 --DruidModelFix (Disabled after 10.2.0)
 L["ModuleName DruidModelFix"] = "Correction du modèle de druide";
-L["ModuleDescription DruidModelFix"] = "Corrige le problème d'affichage du modèle de l'interface utilisateur du personnage causé par l'utilisation du Glyphe des étoiles\n\nCe bug sera corrigé par Blizzard à la 10.2.0 et ce module sera supprimé.";
+L["ModuleDescription DruidModelFix"] = "Corriger le problème d'affichage du modèle de l'interface utilisateur du personnage causé par l'utilisation du Glyphe des étoiles\n\nCe bug sera corrigé par Blizzard à la 10.2.0 et ce module sera supprimé.";
 L["Model Layout"] = "Disposition du modèle";
 
 
@@ -277,8 +277,8 @@ L["Collected Items"] = "Objets collectés";
 L["ModuleName TooltipHousing"] = "Logis";
 L["ModuleDescription TooltipHousing"] = "Logis";
 L["Instruction View In Dressing Room"] = "<Ctrl + clic pour afficher dans la cabine d'essayage>";  --VIEW_IN_DRESSUP_FRAME
-L["Data Loading In Progress"] = "Plumber is loading data";
 L["Data Loading In Progress"] = "Plumber charge les données";
+
 
 --Tooltip RichSoil
 L["ModuleName TooltipRichSoil"] = "Emplacement rapide : Graines rustiques";
@@ -290,7 +290,7 @@ L["No Resilient Seed"] = "Aucune Graine rustique";
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
 L["ModuleDescription Plunderstore"] = "Modification de la boutique accessible via la Recherche de groupe :\n\n– Ajout d'une case à cocher pour masquer les objets déjà collectés.\n\n– Affichage du nombre d'objets non collectés sur les boutons de catégorie.\n\n– Ajout de l'emplacement d'équipement (arme ou armure) dans les infobulles.\n\n– Possibilité de visualiser les objets équipables dans la salle d'essayage.";
-L["Store Full Purchase Price Format"] = "Gagnez |cffffffff%s|r de butin pour acheter tout ce que contient la boutique.";
+L["Store Full Purchase Price Format"] = "Gagner |cffffffff%s|r butin pour acheter tout ce que contient la boutique.";
 L["Store Item Fully Collected"] = "Vous avez tout récupéré dans la boutique !";
 
 
@@ -314,8 +314,8 @@ L["QueueStatus Show Time Tooltip"] = "Afficher la différence entre le temps d'a
 --Landing Page (Expansion Summary Minimap)
 L["ModuleName ExpansionLandingPage"] = "Résumé de Khaz Algar";
 L["ModuleDescription ExpansionLandingPage"] = "Afficher des informations supplémentaires sur la page de destination :\n\n- Niveau du Pacte des Fils tranchés\n\n- Classement des Cartels de Terremine";
-L["Instruction Track Reputation"] = "<Maj + clic pour suivre cette réputation>";
-L["Instruction Untrack Reputation"] = "<Maj + clic pour arrêter le suivi>";
+L["Instruction Track Reputation"] = "<Maj + Clic pour suivre cette réputation>";
+L["Instruction Untrack Reputation"] = "<Maj + CqQlic pour arrêter le suivi>";
 L["Error Show UI In Combat"] = "Vous ne pouvez pas afficher / masquer ceci en combat.";
 L["Error Show UI In Combat 1"] = "Il est impossible de modifier cette interface utilisateur pendant un combat.";
 L["Error Show UI In Combat 2"] = "ARRÊTEZ S'IL VOUS PLAÎT";
@@ -372,7 +372,7 @@ L["ModuleDescription QuestItemDestroyAlert"] = "Afficher les informations de qu�
 
 --SpellcastingInfo
 L["ModuleName SpellcastingInfo"] = "Informations sur les sorts de la cible";
-L["ModuleDescription SpellcastingInfo"] = "– Affiche l'infobulle du sort lorsque vous survolez la barre d'incantation sur le cadre de la cible.\n\n– Enregistre les capacités des monstres, consultables ultérieurement par un clic droit sur le cadre de la cible.";
+L["ModuleDescription SpellcastingInfo"] = "– Afficher l'infobulle du sort lorsque vous survolez la barre d'incantation sur le cadre de la cible.\n\n– Enregistrer les capacités des monstres, consultables ultérieurement par un clic droit sur le cadre de la cible.";
 L["Abilities"] = "Capacités";
 L["Spell Colon"] = "Sort : ";   --Display SpellID
 L["Icon Colon"] = "Icône : ";     --Display IconFileID
@@ -387,7 +387,7 @@ L["Chat Leave All Characters Tooltip"] = "Vous quitterez automatiquement ce cana
 L["Chat Auto Leave Alert Format"] = "Souhaitez-vous quitter automatiquement |cffffc0c0[%s]|r sur tous vos personnages ?";
 L["Chat Auto Leave Cancel Format"] = "Quitter Auto. a été désactivé pour %s. Veuillez utiliser la commande « /join » pour rejoindre le canal.";
 L["Auto Leave Channel Format"] = "Quitter Auto. \"%s\"";
-L["Click To Disable"] = "Cliquez pour désactiver";
+L["Click To Disable"] = "Cliquer pour désactiver";
 
 
 --NameplateWidget
@@ -410,7 +410,7 @@ L["NameplateQuest ShowProgressOnKeyPress Tooltip Format"] = "Afficher la progres
 L["NameplateQuest Instruction Find Nameplate"] = "Pour ajuster la position de l'icône, rendez-vous dans un endroit où les plaques de nom des PNJ sont visibles.";
 L["NameplateQuest Progress Format"] = "Format de progression";
 L["Progress Show Icon"] = "Afficher l'icône";
-L["Progress Format Completed"] = "Terminé/Requis";
+L["Progress Format Completed"] = "Terminé / requis";
 L["Progress Format Remaining"] = "Restant";
 
 
@@ -491,7 +491,7 @@ L["SoftTargetName HideName Tooltip"] = "Masquer le nom de l'objet ciblé automat
 
 --LegionRemix
 L["ModuleName LegionRemix"] = "Legion Remix";
-L["ModuleDescription LegionRemix"] = "- Apprend automatiquement les traits.\n\n- Ajoute un widget à la feuille de personnage affichant diverses informations. Vous pouvez cliquer sur ce widget pour ouvrir une nouvelle interface d'artefact.";
+L["ModuleDescription LegionRemix"] = "- Apprendre automatiquement les traits.\n\n- Ajouter un widget à la feuille de personnage affichant diverses informations. Vous pouvez cliquer sur ce widget pour ouvrir une nouvelle interface d'artefact.";
 L["ModuleName LegionRemix_HideWorldTier"] = "Masquer l'icône de palier mondial";
 L["ModuleDescription LegionRemix_HideWorldTier"] = "Masquer l'icône du palier mondial héroïque située sous la mini-carte.";
 L["ModuleName LegionRemix_LFGSpam"] = "Spam de la Recherche de raid";
@@ -532,7 +532,7 @@ L["Infinite Knowledge Bonus Next Format"] = "Prochain rang : %s";
 
 --ItemUpgradeUI
 L["ModuleName ItemUpgradeUI"] = "Améliorations d'objets : afficher la fiche du personnage";
-L["ModuleDescription ItemUpgradeUI"] = "Ouvre automatiquement la fiche de votre personnage lorsque vous interagissez avec un PNJ proposant des améliorations d'objets.";
+L["ModuleDescription ItemUpgradeUI"] = "Ouvrir automatiquement la fiche de votre personnage lorsque vous interagissez avec un PNJ proposant des améliorations d'objets.";
 
 
 --HolidayDungeon
@@ -652,8 +652,8 @@ L["Reward Available"] = "Récompense disponible";  --As brief as possible
 L["Paragon Reward Available"] = "Récompense de Paragon disponible";
 L["Until Next Level Format"] = "%d jusqu'au prochain niveau";   --Earn x reputation to reach the next level
 L["Until Paragon Reward Format"] = "%d jusqu'à la récompense Paragon";
-L["Instruction Click To View Renown"] = "<Cliquez pour afficher le Renom>";
-L["Instruction Click To View Companion"] = "<Cliquez pour afficher le compagnon de Gouffre>";
+L["Instruction Click To View Renown"] = "<Cliquer pour afficher le Renom>";
+L["Instruction Click To View Companion"] = "<Cliquer pour afficher le compagnon de Gouffre>";
 L["Not On Quest"] = "Vous n'êtes pas sur cette quête";
 L["Factions"] = "Factions";
 L["Activities"] = "Activités";
@@ -901,8 +901,8 @@ L["Close Frame Format"]= "|cff808080(Fermer %s)|r";
 L["ModuleName EnableNewByDefault"] = "Toujours activer les nouvelles fonctionnalités";
 L["ModuleDescription EnableNewByDefault"] = "Activez toujours les fonctionnalités nouvellement ajoutées.\n\n*Vous verrez une notification dans la fenêtre de discussion lorsqu'un nouveau module est activé de cette manière.";
 L["New Feature Auto Enabled Format"] = "Nouveau module %s activé.";
-L["Click To See Details"] = "Cliquez pour voir les détails";
-L["Click To Show Settings"] = "Cliquez pour afficher / masquer les paramètres.";
+L["Click To See Details"] = "Cliquer pour afficher les détails";
+L["Click To Show Settings"] = "Cliquer pour afficher / masquer les paramètres.";
 
 
 --WIP Merchant UI
