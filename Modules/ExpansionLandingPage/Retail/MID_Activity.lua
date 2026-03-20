@@ -271,12 +271,13 @@ local ActivityData = {
 		entries = {
 			{name = "A Gnawing Void of Curiosity", questID = 93784, isWeeklyQuest = true, accountwide = true},
 			{name = "Trovehunter\'s Bounty", itemID = 252415, flagQuest = 86371, icon = 1064187, tooltipItem = 252415},
+			{name = "Coffer Key Shard", currencyID = 3310, icon = 133016, removeIconBorder = true},
 
-			--{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, useItemIcon = true,
+			--{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, removeIconBorder = true,
 			--    children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
 			--},
 
-			--{name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, useItemIcon = true,
+			--{name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, removeIconBorder = true,
 			--    children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyShardFlags),
 			--},
 		}

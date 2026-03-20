@@ -68,7 +68,7 @@ do  --Checklist Button
 			if self.completed then
 				self.Icon:SetAtlas("checkmark-minimal-disabled");
 			elseif data.icon then
-				if data.itemID or data.useItemIcon then
+				if data.itemID or data.removeIconBorder then
 					self.Icon:SetTexCoord(6/64, 58/64, 6/64, 58/64);
 				else
 					self.Icon:SetTexCoord(0, 1, 0, 1);
@@ -86,6 +86,8 @@ do  --Checklist Button
 				self:SetQuest(data.questID);
 			elseif data.itemID then
 				self:SetItem(data.itemID);
+			elseif data.currencyID then
+				self:SetCurrency(data.currencyID);
 			else
 				self.type = nil;
 				self.id = nil;
@@ -133,6 +135,16 @@ do  --Checklist Button
 			else
 				local percentText = API.GetQuestProgressPercent(self.id, true);
 				self.Text1:SetText(percentText);
+			end
+		elseif self.type == "Currency" then
+			local earned, max = API.GetCurrencyEarnedAndCap(self.id);
+			if earned and max and earned < max then
+				--self.Text1:SetText(string.format("%s/%s", earned, max));
+				self.Text1:SetText(math.floor(100 * earned / max).."%");
+				self.completed = false;
+			else
+				self.Text1:SetText(nil);
+				self.completed = true;
 			end
 		else
 			self.Text1:SetText(nil);
@@ -213,6 +225,13 @@ do  --Checklist Button
 		end
 	end
 
+	function ChecklistButtonMixin:SetCurrency(currencyID)
+		self.type = "Currency";
+		self.id = currencyID;
+		local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex);
+		self.Name:SetText(name);
+	end
+
 	function ChecklistButtonMixin:ToggleCollapsed()
 		local v = self.dataIndex;
 		if v then
@@ -236,6 +255,10 @@ do  --Checklist Button
 			if not self.completed then
 				TooltipUpdator:RequestQuestReward();
 			end
+		elseif self.type == "Currency" and self.id then
+			TooltipUpdator:SetFocusedObject(self);
+			TooltipUpdator:SetHeaderText(API.GetCurrencyName(self.id));
+			TooltipUpdator:SetCurrencyID(self.id);
 		else
 			local data = ActivityUtil.GetActivityData(self.dataIndex);
 			if data then

@@ -695,6 +695,19 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 				entry.questID = flagQuest;
 				InitQuestData(entry);
 				entry.completed = completed;
+			elseif entry.currencyID then
+				if not entry.localizedName then
+					local info = C_CurrencyInfo.GetCurrencyInfo(entry.currencyID);
+					if info then
+						entry.localizedName = info.name;
+						entry.icon = info.iconFileID;
+					else
+						entry.localizedName = "Currency:"..entry.currencyID;
+						entry.icon = 134400;
+					end
+				end
+				entry.completed = API.IsCurrencyFullyEarned(entry.currencyID);
+				showActivity = true;
 			else
 				local flagQuest = entry.flagQuest or entry.questID;
 				if entry.questID then
