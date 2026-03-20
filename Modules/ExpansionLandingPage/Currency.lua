@@ -32,11 +32,12 @@ end
 
 local CurrencyButtonMixin = {};
 do
-	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc)
+	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc, hasWeeklyCap)
 		self.currencyID = currencyID;
 		self.itemID = nil;
 		self.buttonDitry = true;
 		self.appendTooltipFunc = appendTooltipFunc;
+		self.hasWeeklyCap = hasWeeklyCap;
 		self.useActionButton = nil;
 		self:Refresh();
 		self:SetShownAsMinor(isMinor);
@@ -47,6 +48,7 @@ do
 		self.itemID = itemID;
 		self.buttonDitry = true;
 		self.appendTooltipFunc = appendTooltipFunc;
+		self.hasWeeklyCap = nil;
 		self.useActionButton = useActionButton;
 		self:Refresh();
 		self:SetShownAsMinor(isMinor);
@@ -97,7 +99,13 @@ do
 		end
 
 		if quantity then
-			if quantity > 0 then
+			if self.hasWeeklyCap and self.currencyID then
+				if API.IsCurrencyFullyEarned(self.currencyID) then
+					isOverflow = true;
+				end
+			end
+
+			if quantity > 0 or isOverflow then
 				self.anyOwned = true;
 				self.Name:SetTextColor(0.922, 0.871, 0.761);
 				self.Count:SetText(BreakUpLargeNumbers(quantity));
@@ -112,6 +120,7 @@ do
 				self.Count:SetTextColor(0.5, 0.5, 0.5);
 				self.Count:SetText(0);
 			end
+
 			return true
 		else
 			self.anyOwned = false;
@@ -387,7 +396,7 @@ do
 					if v.currencyID then
 						self.anyCurrency = true;
 						content[n].setupFunc = function(obj)
-							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc);
+							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
 						end;
 					elseif v.itemID then
 						self.anyItem = true;

@@ -1661,6 +1661,24 @@ do  -- Currency
 		end
 	end
 
+	function API.GetCurrencyEarnedAndCap(currencyID)
+		local info = GetCurrencyInfo(currencyID);
+		if info then
+			if info.useTotalEarnedForMaxQty then
+				return info.totalEarned, info.maxQuantity
+			elseif info.maxWeeklyQuantity and info.maxWeeklyQuantity > 0 and info.quantityEarnedThisWeek then
+				return info.quantityEarnedThisWeek, info.maxWeeklyQuantity
+			end
+		end
+	end
+
+	function API.IsCurrencyFullyEarned(currencyID)
+		local earned, max = API.GetCurrencyEarnedAndCap(currencyID);
+		if earned and max then
+			return earned >= max
+		end
+	end
+
 
 	local IGNORED_OVERFLOW_ID = {
 		[3068] = true,      --Delver's Journey

@@ -26,6 +26,7 @@ function TooltipUpdator:StopUpdating()
 
 	self.keepUpdating = nil;
 	self.questID = nil;
+	self.currencyID = nil;
 	self.headerText = nil;
 	self.showProgress = nil;
 	self.showRewards = nil;
@@ -55,6 +56,10 @@ end
 
 function TooltipUpdator:SetQuestID(questID)
 	self.questID = questID;
+end
+
+function TooltipUpdator:SetCurrencyID(currencyID)
+	self.currencyID = currencyID;
 end
 
 function TooltipUpdator:RequestQuestProgress()
@@ -100,7 +105,7 @@ function TooltipUpdator:OnUpdate(elapsed)
 		self:SetScript("OnUpdate", nil);
 		self.keepUpdating = nil;
 
-		if self.obj and self.obj:IsMouseMotionFocus() and (self.questID or self.tooltipLines or self.entryChildren) then
+		if self.obj and self.obj:IsMouseMotionFocus() and (self.questID or self.currencyID or self.tooltipLines or self.entryChildren) then
 			local anyContent;
 			local questRewards = {};
 			local isRetrievingData;
@@ -162,6 +167,10 @@ function TooltipUpdator:OnUpdate(elapsed)
 			end
 
 			if self.itemID then
+				anyContent = true;
+			end
+
+			if self.currencyID then
 				anyContent = true;
 			end
 
@@ -236,6 +245,11 @@ function TooltipUpdator:OnUpdate(elapsed)
 					local text = API.ConvertTooltipInfoToOneString(" ", "GetItemByID", self.itemID);
 					tooltip:AddLine(text, 1, 1, 1, true);
 					self.keepUpdating = true;
+				end
+
+				if self.currencyID then
+					local text = API.ConvertTooltipInfoToOneString(" ", "GetCurrencyByID", self.currencyID);
+					tooltip:AddLine(text, 1, 1, 1, true);
 				end
 
 				if isRetrievingData then

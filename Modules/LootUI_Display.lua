@@ -216,6 +216,7 @@ local function CreateItemDataFromLink(link, slotIndex, icon, name, quantity, qua
 	return data
 end
 
+
 local function CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, icon, name, quantity, quality, locked, questType)
 	local itemOverflow;
 	local overflow, numOwned, useTotalEarnedForMaxQty, maxQuantity = API.WillCurrencyRewardOverflow(currencyID, quantity);
@@ -1335,11 +1336,22 @@ end
 
 
 do  --Currency Change Handler
+	local ModifiedCurrencyQuantity = {
+		--TEMP FIX: The two currencies return 100x the actual value when looted from chests or bodies for some reasons
+		[1602] = 0.01,	--Conquest
+		[2123] = 0.01,	--Bloody Tokens
+	};
+
 	function EL:OnCurrencyDisplayUpdate(currencyID, quantity, quantityChange, quantityGainSource, destroyReason)
 		if quantityChange and quantityChange > 0 then
 			local name, icon, quality = GetCurrencyDisplayInfo(currencyID);
 			if name then
 				--print(name, currencyID, quantity, quantityChange, quantityGainSource);    --debug
+
+				if quantityChange > 2000 and ModifiedCurrencyQuantity[currencyID] then
+					quantityChange = math.floor(quantityChange * 0.01);
+				end
+
 				local link = string.format("|Hcurrency:%d|h", currencyID);
 				local slotIndex = 0;
 				local data = CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, icon, name, quantityChange, quality);
