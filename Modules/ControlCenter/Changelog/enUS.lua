@@ -11,6 +11,76 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10809] = {
 	{
 		type = "date",
+		versionText = "1.8.9 f",
+		timestamp = 1774000000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName NewExpansionLandingPage"],
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Activities Tab: Added Bountiful Delves to each Renown. Note: opening a Bountiful Coffer increase your reputation with a random Renown. One time per Renown per week.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Activities Tab: Added Coffer Key Shards to the Delves category. You can obtain 600 shards per week.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Resources: The quantity text of Coffer Key Shards will turn green once you reach the weekly cap.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Fixed an issue where \"Fortify the Runestones\" shows twice on the activity list when you are on this quest.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Fixed an issue where the number shown next to the \"Hide Completed\" button doesn't match what you see on the list.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Modules that display the number of owned Restored Coffer Keys should be working again. The involved modules are \"Chest Keys\" and \"Nameplate: Soft Target\".",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot UI: When \"Show Any Currency Changes\" is enabled, Conquest and Bloody Tokens earned from War Supply Drops should no longer show 100 times the actual quantity.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+
+	{
+		type = "date",
 		versionText = "1.8.9 d-e",
 		timestamp = 1773700000,
 	},
