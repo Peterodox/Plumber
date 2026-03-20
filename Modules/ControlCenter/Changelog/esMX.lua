@@ -3,7 +3,7 @@
 -- DO NOT BOTHER TO TRANSLATE
 
 
-if not (GetLocale() == "esMX") then return end;
+if GetLocale() ~= "esMX" then return end;
 
 local _, addon = ...
 local L = addon.L;

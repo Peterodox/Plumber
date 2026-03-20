@@ -12,8 +12,8 @@
 			</Layer>
 		</Layers>
 		<SwipeTexture file="Interface\PVPFrame\pvpqueue-sidebar-honorbar-fill"/>
-        <KeyValues>
-            <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
-        </KeyValues>
+		<KeyValues>
+			<KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+		</KeyValues>
 	</Cooldown>
 </Ui>

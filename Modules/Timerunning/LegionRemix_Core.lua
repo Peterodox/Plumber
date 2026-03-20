@@ -340,32 +340,6 @@ do	--DataProvider
 		return 0
 	end
 
-	function DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, newTrackIndex)
-		if true then return false end;	--Debug Maybe no longer an issue in live?
-
-		local tbl;
-		if (not activeTrackIndex) or (activeTrackIndex == newTrackIndex) then
-			tbl = {newTrackIndex};
-		else
-			tbl = {activeTrackIndex, newTrackIndex};
-		end
-
-		for _, artifactTrackIndex in ipairs(tbl) do
-			if self.ForbiddenNodes[artifactTrackIndex] then
-				for _, v in ipairs(self.ForbiddenNodes[artifactTrackIndex]) do
-					local nodeID, entryID = v[1], v[2];
-					local nodeInfo = self:GetNodeInfo(nodeID);
-					local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[entryID] or 0;
-					if increasedRanks > 0 and nodeInfo.entryIDsWithCommittedRanks and #nodeInfo.entryIDsWithCommittedRanks > 0 then	--In question
-						return true
-					end
-				end
-			end
-		end
-
-		return false
-	end
-
 	function DataProvider:GetItemNameByID(itemID)
 		--Cache jewelry name
 		if not self.itemNameCache then
@@ -1253,10 +1227,7 @@ do	--CommitUtil
 					local entryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
 					local committedEntryID;
 					if nodeInfo.entryIDsWithCommittedRanks then
-						for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
-							committedEntryID = id;
-							break
-						end
+						committedEntryID = nodeInfo.entryIDsWithCommittedRanks[1];
 					end
 					if (committedEntryID ~= entryID) then
 						if C_Traits.SetSelection(configID, _nodeID, entryID) then
@@ -1394,37 +1365,35 @@ do	--CommitUtil
 
 		local activeTrackIndex = DataProvider:GetActiveArtifactTrackIndex();
 
-		if DataProvider:IsForbiddenSelectionNodeOnTracks(activeTrackIndex, index) then
-			local items = DataProvider:GetForbiddenSelectionNodeItems();
-			if items then
-				--print("Unequip these items before changing traits:")
-				--for _, v in ipairs(items) do
-				--	print(v.slotID, v.coloredItemName);
-				--end
+		local items = DataProvider:GetForbiddenSelectionNodeItems();
+		if items then
+			--print("Unequip these items before changing traits:")
+			--for _, v in ipairs(items) do
+			--	print(v.slotID, v.coloredItemName);
+			--end
 
-				--Auto unequip/re-equip
-				local total = #items;
-				local numFound = 0;
-				if CalculateTotalNumberOfFreeBagSlots() > total then
-					local itemIDxData = {};
-					for _, v in ipairs(items) do
-						local hyperlink = GetInventoryItemLink("player", v.slotID);
-						if hyperlink then
-							numFound = numFound + 1;
-							itemIDxData[v.itemID] = {
-								hyperlink = hyperlink,
-								slotID = v.slotID
-							};
-						end
+			--Auto unequip/re-equip
+			local total = #items;
+			local numFound = 0;
+			if CalculateTotalNumberOfFreeBagSlots() > total then
+				local itemIDxData = {};
+				for _, v in ipairs(items) do
+					local hyperlink = GetInventoryItemLink("player", v.slotID);
+					if hyperlink then
+						numFound = numFound + 1;
+						itemIDxData[v.itemID] = {
+							hyperlink = hyperlink,
+							slotID = v.slotID
+						};
 					end
-
-					if numFound == total then
-						self:SetReplacedEquipment(itemIDxData);
-					end
-				else
-					API.DisplayErrorMessage(L["Require More Bag Slot Alert"]);
-					return
 				end
+
+				if numFound == total then
+					self:SetReplacedEquipment(itemIDxData);
+				end
+			else
+				API.DisplayErrorMessage(L["Require More Bag Slot Alert"]);
+				return
 			end
 		end
 
@@ -1452,8 +1421,8 @@ do	--CommitUtil
 				for _, _nodeID in ipairs(nodeIDs) do
 					if DataProvider:IsSelectionNode(_nodeID) then
 						local nodeInfo = DataProvider:GetNodeInfo(_nodeID);
-						local entryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
-						if C_Traits.SetSelection(configID, _nodeID, entryID) then
+						local lastSelectedEntryID = DataProvider:GetLastSelectedEntryID(_nodeID, nodeInfo.entryIDs);
+						if C_Traits.SetSelection(configID, _nodeID, lastSelectedEntryID) then
 							self.anySuccessPurchase = true;
 						end
 					end
@@ -1510,14 +1479,14 @@ do	--CommitUtil
 			end
 			if not isNewEntryIDValid then return end;
 			local canChangeEntry;
-            if nodeInfo.entryIDsWithCommittedRanks then
-                for _, committedEntryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
-                    if committedEntryID ~= entryID then
+			if nodeInfo.entryIDsWithCommittedRanks then
+				for _, committedEntryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+					if committedEntryID ~= entryID then
 						canChangeEntry = true;
-                    	break
+						break
 					end
-                end
-            end
+				end
+			end
 			if canChangeEntry then
 				self:ClearPendingChanges();
 				--local success = configID and C_Traits.RefundAllRanks(configID, nodeID);
@@ -1586,7 +1555,7 @@ do	--CommitUtil
 end
 
 
-do	--Debug
+--do	--Debug
 	--[[
 	EventRegistry:RegisterCallback("TalentDisplay.TooltipCreated", function(_, node, tooltip)
 		local nodeInfo = node.nodeInfo;
@@ -1629,7 +1598,7 @@ do	--Debug
 		tooltip:Show();
 	end);
 	--]]
-end
+--end
 
 
 local ExtraTooltipModule = {};
@@ -1802,30 +1771,30 @@ do	--Module Registry
 
 	CallbackRegistry:RegisterSettingCallback("LegionRemix_AutoUpgrade", LoadSettings);
 
-    local moduleData = {
-        name = L["ModuleName LegionRemix"],
-        dbKey = "LegionRemix",
-        description = L["ModuleDescription LegionRemix"],
-        toggleFunc = EnableModule,
-        categoryID = -1,
-        uiOrder = 0,
-        moduleAddedTime = 1759900000,
+	local moduleData = {
+		name = L["ModuleName LegionRemix"],
+		dbKey = "LegionRemix",
+		description = L["ModuleDescription LegionRemix"],
+		toggleFunc = EnableModule,
+		categoryID = -1,
+		uiOrder = 0,
+		moduleAddedTime = 1759900000,
 		timerunningSeason = 2,
 		categoryKeys = {
 			"Current",
 		},
 
-        subOptions = {
-            {
-                dbKey = "LegionRemix_AutoUpgrade",
-                name = L["Auto Learn Traits"],
-                description = L["Auto Learn Traits Tooltip"],
-                toggleFunc = LoadSettings,
-            },
-        };
-    };
+		subOptions = {
+			{
+				dbKey = "LegionRemix_AutoUpgrade",
+				name = L["Auto Learn Traits"],
+				description = L["Auto Learn Traits Tooltip"],
+				toggleFunc = LoadSettings,
+			},
+		};
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end
 
 
@@ -1843,7 +1812,7 @@ end
 			local coloredItemName = qualityColor:WrapTextInColorCode(increasedTraitData.itemNameIncreasing);
 			local wrapText = true;
 			GameTooltip_AddColoredLine(tooltip, TALENT_FRAME_INCREASED_RANKS_TEXT:format(increasedTraitData.numPointsIncreased, coloredItemName), GREEN_FONT_COLOR, wrapText);
-		end	
+		end
 	end
 
 	C_Traits.GetTreeCurrencyInfo(configID, treeID, excludeStagedChanges)

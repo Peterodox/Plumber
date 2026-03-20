@@ -16,9 +16,9 @@ local GetLegacyRaidDifficultyID = GetLegacyRaidDifficultyID;
 
 
 function DataProvider:GetDungeonDifficultyID()
-    return GetDungeonDifficultyID()
+	return GetDungeonDifficultyID()
 end
 
 function DataProvider:GetRaidDifficultyID()
-    return GetRaidDifficultyID(), GetLegacyRaidDifficultyID()
+	return GetRaidDifficultyID(), GetLegacyRaidDifficultyID()
 end

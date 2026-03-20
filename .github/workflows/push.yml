@@ -1,6 +1,6 @@
 ---
-name: Workflow Test
-on: push
+name: Push and Pull Request
+on: [push, pull_request]
 
 jobs:
   build:

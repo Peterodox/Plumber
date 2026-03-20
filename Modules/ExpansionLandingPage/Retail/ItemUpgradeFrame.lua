@@ -10,60 +10,60 @@ local ItemUpgradeFrame;
 
 local ItemUpgradeFrameMixin = {};
 do
-    function ItemUpgradeFrameMixin:Refresh()
-        for _, button in ipairs(self.buttons) do
-            button:Refresh();
-        end
-    end
+	function ItemUpgradeFrameMixin:Refresh()
+		for _, button in ipairs(self.buttons) do
+			button:Refresh();
+		end
+	end
 
-    function ItemUpgradeFrameMixin:GetActiveWidgets()
-        return self.buttons
-    end
+	function ItemUpgradeFrameMixin:GetActiveWidgets()
+		return self.buttons
+	end
 
-    function LandingPageUtil.GetItemUpgradeButtons()
-        if ItemUpgradeFrame then
-            return ItemUpgradeFrame:GetActiveWidgets()
-        end
-    end
+	function LandingPageUtil.GetItemUpgradeButtons()
+		if ItemUpgradeFrame then
+			return ItemUpgradeFrame:GetActiveWidgets()
+		end
+	end
 end
 
 
 function LandingPageUtil.CreateItemUpgradeFrame(parent)
-    if ItemUpgradeFrame then return ItemUpgradeFrame end;
+	if ItemUpgradeFrame then return ItemUpgradeFrame end;
 
-    local f = CreateFrame("Frame", nil, parent);
-    ItemUpgradeFrame = f;
+	local f = CreateFrame("Frame", nil, parent);
+	ItemUpgradeFrame = f;
 
-    local buttonGap = 2;
+	local buttonGap = 2;
 
-    local n = 0;
-    local buttons = {};
+	local n = 0;
+	local buttons = {};
 
-    local ItemUpgradeConstant = addon.ItemUpgradeConstant;
+	local ItemUpgradeConstant = addon.ItemUpgradeConstant;
 
-    for i, currencyID in ipairs(ItemUpgradeConstant.Crests) do
-        n = n + 1;
-        local button = CreateButton(parent);
-        buttons[n] = button;
-        button:SetPoint("TOPRIGHT", f, "TOPRIGHT", (1 - i) * (BUTTON_WIDTH + buttonGap), 0);
-        button.currencyID = currencyID;
-        button.displayedMax = 999;
-    end
+	for i, currencyID in ipairs(ItemUpgradeConstant.Crests) do
+		n = n + 1;
+		local button = CreateButton(parent);
+		buttons[n] = button;
+		button:SetPoint("TOPRIGHT", f, "TOPRIGHT", (1 - i) * (BUTTON_WIDTH + buttonGap), 0);
+		button.currencyID = currencyID;
+		button.displayedMax = 999;
+	end
 
-    --[[    --Valorstones Removed. Replaced by 5 tiers of crests in Midnight
-    local button = CreateButton(parent);
-    table.insert(buttons, button);
-    button:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
-    button.currencyID = ItemUpgradeConstant.BaseCurrencyID;
-    --]]
+	--[[    --Valorstones Removed. Replaced by 5 tiers of crests in Midnight
+	local button = CreateButton(parent);
+	table.insert(buttons, button);
+	button:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0);
+	button.currencyID = ItemUpgradeConstant.BaseCurrencyID;
+	--]]
 
-    local width = #buttons * (BUTTON_WIDTH + buttonGap) - buttonGap;
-    local height = BUTTON_HEIGHT;
+	local width = #buttons * (BUTTON_WIDTH + buttonGap) - buttonGap;
+	local height = BUTTON_HEIGHT;
 
-    f:SetSize(width, height);
+	f:SetSize(width, height);
 
-    API.Mixin(f, ItemUpgradeFrameMixin);
-    f.buttons = buttons;
+	API.Mixin(f, ItemUpgradeFrameMixin);
+	f.buttons = buttons;
 
-    return f, height
+	return f, height
 end

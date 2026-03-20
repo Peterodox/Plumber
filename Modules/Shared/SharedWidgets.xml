@@ -1,210 +1,210 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="SharedWidgets.lua"/>
-    <Script file="SharedWidgets_ReorderController.lua"/>
-    <Script file="SharedWidgets_StaticPopup.lua"/>
+	<Script file="SharedWidgets_ReorderController.lua"/>
+	<Script file="SharedWidgets_StaticPopup.lua"/>
 
-    <Frame name="PlumberBarPulseTemplate" virtual="true">
-        <!--Derivative of Blizzard FullResourcePulseFrame-->
-        <Size x="16" y="32"/>
-        <Layers>
-            <Layer level="OVERLAY">
-                <Texture parentKey="Spike" alpha="0" alphaMode="ADD" file="Interface\AddOns\Plumber\Art\Frame\ProgressBar-Pulse" hidden="false">
-                    <TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
-                    <Size x="16" y="32"/>
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Glow" alpha="0" alphaMode="ADD" file="Interface\AddOns\Plumber\Art\Frame\ProgressBar-Pulse">
-                    <TexCoords left="0" right="0.25" top="0" bottom="1"/>
-                    <Size x="16" y="32"/>
-                    <Anchors>
-                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="1" y="0"/>
-                    </Anchors>
-                </Texture>
-                <MaskTexture file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Full" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
-                    <Size x="32" y="32"/>
-                    <Anchors>
-                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
-                    </Anchors>
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Glow"/>
-                    </MaskedTextures>
-                </MaskTexture>
-            </Layer>
-        </Layers>
-        <Animations>
-            <AnimationGroup parentKey="AnimPulse" setToFinalAlpha="true">
-                <Alpha childKey="Spike" order="1" fromAlpha="0" toAlpha="0" duration="0.15"/>
-                <Alpha childKey="Spike" startDelay="0.15" smoothing="IN" duration="0.1" order="1" fromAlpha="0" toAlpha="0.5"/>
-                <Scale childKey="Spike" startDelay="0.15" smoothing="NONE" duration="0.1" order="1" fromScaleX="0.25" fromScaleY="1" toScaleX="1.4" toScaleY="1">
-                    <Origin point="LEFT"/>
-                </Scale>
-                <Scale childKey="Spike" startDelay="0.25" smoothing="IN" duration="0.2" order="1" fromScaleX="1" fromScaleY="1" toScaleX="0.5" toScaleY="1">
-                    <Origin point="LEFT"/>
-                </Scale>
-                <Alpha childKey="Spike" startDelay="0.25" duration="0.25" order="1" fromAlpha="0.5" toAlpha="0"/>
+	<Frame name="PlumberBarPulseTemplate" virtual="true">
+		<!--Derivative of Blizzard FullResourcePulseFrame-->
+		<Size x="16" y="32"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="Spike" alpha="0" alphaMode="ADD" file="Interface\AddOns\Plumber\Art\Frame\ProgressBar-Pulse" hidden="false">
+					<TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
+					<Size x="16" y="32"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Glow" alpha="0" alphaMode="ADD" file="Interface\AddOns\Plumber\Art\Frame\ProgressBar-Pulse">
+					<TexCoords left="0" right="0.25" top="0" bottom="1"/>
+					<Size x="16" y="32"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="1" y="0"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Full" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Glow"/>
+					</MaskedTextures>
+				</MaskTexture>
+			</Layer>
+		</Layers>
+		<Animations>
+			<AnimationGroup parentKey="AnimPulse" setToFinalAlpha="true">
+				<Alpha childKey="Spike" order="1" fromAlpha="0" toAlpha="0" duration="0.15"/>
+				<Alpha childKey="Spike" startDelay="0.15" smoothing="IN" duration="0.1" order="1" fromAlpha="0" toAlpha="0.5"/>
+				<Scale childKey="Spike" startDelay="0.15" smoothing="NONE" duration="0.1" order="1" fromScaleX="0.25" fromScaleY="1" toScaleX="1.4" toScaleY="1">
+					<Origin point="LEFT"/>
+				</Scale>
+				<Scale childKey="Spike" startDelay="0.25" smoothing="IN" duration="0.2" order="1" fromScaleX="1" fromScaleY="1" toScaleX="0.5" toScaleY="1">
+					<Origin point="LEFT"/>
+				</Scale>
+				<Alpha childKey="Spike" startDelay="0.25" duration="0.25" order="1" fromAlpha="0.5" toAlpha="0"/>
 
-                <Alpha childKey="Glow" duration="0.1" order="1" fromAlpha="0" toAlpha="0.8"/>
-                <Translation childKey="Glow" duration="0.25" order="1" offsetX="8" offsetY="0" smoothing="OUT"/>
-                <Alpha childKey="Glow" startDelay="0.35" duration="0.15" order="1" fromAlpha="1" toAlpha="0"/>
-            </AnimationGroup>
-        </Animations>
-    </Frame>
+				<Alpha childKey="Glow" duration="0.1" order="1" fromAlpha="0" toAlpha="0.8"/>
+				<Translation childKey="Glow" duration="0.25" order="1" offsetX="8" offsetY="0" smoothing="OUT"/>
+				<Alpha childKey="Glow" startDelay="0.35" duration="0.15" order="1" fromAlpha="1" toAlpha="0"/>
+			</AnimationGroup>
+		</Animations>
+	</Frame>
 
-    <Cooldown name="PlumberGenericCooldownTemplate" hideCountdownNumbers="true" reverse="true" hidden="true" virtual="true">
-        <Size x="32" y="32"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Background" file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Background">
-                    <Size x="32" y="32"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>	
-                </Texture>
-            </Layer>
-        </Layers>
-        <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Swipe-Blue"/>
-        <EdgeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Edge"/>
-        <KeyValues>
-            <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
-        </KeyValues>
-    </Cooldown>
+	<Cooldown name="PlumberGenericCooldownTemplate" hideCountdownNumbers="true" reverse="true" hidden="true" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Background">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<SwipeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Swipe-Blue"/>
+		<EdgeTexture file="Interface\AddOns\Plumber\Art\Button\GenericCooldown-Edge"/>
+		<KeyValues>
+			<KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+		</KeyValues>
+	</Cooldown>
 
-    <Cooldown name="PlumberCursorCooldownTemplate" hideCountdownNumbers="true" reverse="false" useCircularEdge="true" hidden="true" virtual="true">
-        <Size x="64" y="64"/>
-        <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Swipe"/>
-        <EdgeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Edge"/>
-        <KeyValues>
-            <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
-        </KeyValues>
-        <Animations>
-            <AnimationGroup parentKey="AnimFadeIn">
-                <Alpha order="1" fromAlpha="0" toAlpha="0" duration="0"/>
-                <Alpha order="1" fromAlpha="0" toAlpha="1" duration="0.12" startDelay="0.08"/>
-            </AnimationGroup>
-        </Animations>
-    </Cooldown>
+	<Cooldown name="PlumberCursorCooldownTemplate" hideCountdownNumbers="true" reverse="false" useCircularEdge="true" hidden="true" virtual="true">
+		<Size x="64" y="64"/>
+		<SwipeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Swipe"/>
+		<EdgeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Edge"/>
+		<KeyValues>
+			<KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+		</KeyValues>
+		<Animations>
+			<AnimationGroup parentKey="AnimFadeIn">
+				<Alpha order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+				<Alpha order="1" fromAlpha="0" toAlpha="1" duration="0.12" startDelay="0.08"/>
+			</AnimationGroup>
+		</Animations>
+	</Cooldown>
 
-    <Slider name="PlumberMinimalSliderTemplate" orientation="HORIZONTAL" enableMouse="true" virtual="true">
-        <Size x="200" y="24"/>
-        <ThumbTexture parentKey="Thumb">
-            <Size x="12" y="12"/>
-        </ThumbTexture>
-        <Layers>
-            <Layer level="BORDER">
-                <Texture parentKey="Left">
-                    <Size x="8" y="16"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Right">
-                    <Size x="8" y="16"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
-                <Texture parentKey="Middle">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="OVERLAY">
-                <Texture parentKey="ThumbTexture">
-                    <Size x="32" y="32"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent.Thumb" relativePoint="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="HIGHLIGHT">
-                <Texture parentKey="ThumbHighlight">
-                    <Size x="32" y="32"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent.ThumbTexture" relativePoint="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers>
-    </Slider>
+	<Slider name="PlumberMinimalSliderTemplate" orientation="HORIZONTAL" enableMouse="true" virtual="true">
+		<Size x="200" y="24"/>
+		<ThumbTexture parentKey="Thumb">
+			<Size x="12" y="12"/>
+		</ThumbTexture>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture parentKey="Left">
+					<Size x="8" y="16"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Right">
+					<Size x="8" y="16"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Middle">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Left" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Right" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="ThumbTexture">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Thumb" relativePoint="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="ThumbHighlight">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.ThumbTexture" relativePoint="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Slider>
 
-    <Frame name="PlumberMinimalSliderWithControllerTemplate" enableMouse="true" virtual="true">
-        <Size x="342" y="24"/>
-        <Frames>
-            <Slider parentKey="Slider" inherits="PlumberMinimalSliderTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="128"/>
-                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-60"/>
-                </Anchors>
-            </Slider>
-            <Button parentKey="Back">
-                <Size x="16" y="24"/>
-                <Anchors>
-                    <Anchor point="RIGHT" relativeKey="$parent.Slider" relativePoint="LEFT" x="-4"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="ARTWORK">
-                        <Texture parentKey="Texture">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                    <Layer level="HIGHLIGHT">
-                        <Texture parentKey="Highlight">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Button>
-            <Button parentKey="Forward">
-                <Size x="16" y="24"/>
-                <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.Slider" relativePoint="RIGHT" x="4"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="ARTWORK">
-                        <Texture parentKey="Texture">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                    <Layer level="HIGHLIGHT">
-                        <Texture parentKey="Highlight">
-                            <Size x="16" y="16"/>
-                            <Anchors>
-                                <Anchor point="CENTER"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Button>
-        </Frames>
-        <Layers>
-            <Layer level="ARTOWKR">
-                <FontString parentKey="Label" inherits="GameFontHighlightMedium" justifyH="LEFT" justifyV="MIDDLE">
-                    <Size x="100" y="32"/>
-                    <Anchors>
-                        <Anchor point="LEFT"/>
-                    </Anchors>
-                </FontString>
-                <FontString parentKey="RightText" inherits="GameFontNormal" hidden="false">
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent.Forward" relativePoint="RIGHT" x="6"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Frame>
+	<Frame name="PlumberMinimalSliderWithControllerTemplate" enableMouse="true" virtual="true">
+		<Size x="342" y="24"/>
+		<Frames>
+			<Slider parentKey="Slider" inherits="PlumberMinimalSliderTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="128"/>
+					<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-60"/>
+				</Anchors>
+			</Slider>
+			<Button parentKey="Back">
+				<Size x="16" y="24"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.Slider" relativePoint="LEFT" x="-4"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="HIGHLIGHT">
+						<Texture parentKey="Highlight">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+			<Button parentKey="Forward">
+				<Size x="16" y="24"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.Slider" relativePoint="RIGHT" x="4"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="HIGHLIGHT">
+						<Texture parentKey="Highlight">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="ARTOWKR">
+				<FontString parentKey="Label" inherits="GameFontHighlightMedium" justifyH="LEFT" justifyV="MIDDLE">
+					<Size x="100" y="32"/>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="RightText" inherits="GameFontNormal" hidden="false">
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.Forward" relativePoint="RIGHT" x="6"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
 
 	<Cooldown name="PlumberRadialProgressBarTemplate" reverse="true" hideCountdownNumbers="true" rotation="180" virtual="true">
 		<Size x="68" y="68"/>
@@ -223,509 +223,509 @@
 			</Layer>
 		</Layers>
 		<SwipeTexture file="Interface\PVPFrame\pvpqueue-sidebar-honorbar-fill"/>
-        <EdgeTexture file="Interface\AddOns\Plumber\Art\Cooldown\QueueStatusProgress-Edge"/>
-        <KeyValues>
-            <KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
-        </KeyValues>
-        <Animations>
-            <AnimationGroup parentKey="AnimSpin" looping="REPEAT">
-                <Rotation degrees="-360" duration="4" order="1" childKey="Spinner"/>
-            </AnimationGroup>
-        </Animations>
+		<EdgeTexture file="Interface\AddOns\Plumber\Art\Cooldown\QueueStatusProgress-Edge"/>
+		<KeyValues>
+			<KeyValue key="noCooldownCount" value="true" type="boolean"/> <!--OmniCC-->
+		</KeyValues>
+		<Animations>
+			<AnimationGroup parentKey="AnimSpin" looping="REPEAT">
+				<Rotation degrees="-360" duration="4" order="1" childKey="Spinner"/>
+			</AnimationGroup>
+		</Animations>
 	</Cooldown>
 
-    <Frame name="PlumberWoWProgressBarTemplate" virtual="true">
-        <Size x="248" y="64"/>
-        <Layers>
-            <!--Layer level="BACKGROUND" textureSubLevel="-1">
-                <Texture parentKey="DebugArea" setAllPoints="true">
-                    <Color r="1" a="0.5"/>
-                </Texture>
-            </Layer-->
-            <Layer level="BACKGROUND" textureSubLevel="1">
-                <Texture parentKey="BarBackground" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
-                    <Size x="288" y="96"/>
-                    <TexCoords left="0" right="0.5625" top="0" bottom="0.1875"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="BACKGROUND" textureSubLevel="2">
-                <Texture parentKey="BarFill" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
-                    <Size x="288" y="32"/>
-                    <TexCoords left="0" right="0.5625" top="0.1875" bottom="0.25"/>
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent.BarBackground" relativePoint="LEFT" x="0" y="-16"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="BACKGROUND" textureSubLevel="3">
-                <Texture parentKey="BarSurface" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
-                    <Size x="48" y="32"/>
-                    <TexCoords left="0.5625" right="0.65625" top="0.1875" bottom="0.25"/>
-                    <Anchors>
-                        <Anchor point="RIGHT" relativeKey="$parent.BarFill" relativePoint="RIGHT" x="8" y="0"/>
-                    </Anchors>
-                </Texture>
-                <MaskTexture parentKey="BarSurfaceMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
-                    <Size x="248" y="64"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent.BarBackground" relativePoint="CENTER" x="0" y="0"/>
-                    </Anchors>
-                    <MaskedTextures>
-                        <MaskedTexture childKey="BarSurface"/>
-                    </MaskedTextures>
-                </MaskTexture>
-            </Layer>
-            <Layer level="BACKGROUND" textureSubLevel="5">
-                <Texture parentKey="LevelBackground" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" hidden="true">
-                    <Size x="96" y="96"/>
-                    <TexCoords left="0.8125" right="1" top="0" bottom="0.1875"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="OVERLAY">
-                <FontString parentKey="Label" inherits="GameFontNormalMed2" justifyH="LEFT" justifyV="BOTTOM" text="Bar Label">
-                    <Color r="1" g="1" b="1"/>
-                    <Shadow>
-                        <Offset>
-                            <AbsDimension x="1" y="-1"/>
-                        </Offset>
-                        <Color r="0" g="0" b="0"/>
-                    </Shadow>
-                    <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativeKey="$parent.BarBackground" relativePoint="LEFT" x="36" y="8"/>
-                    </Anchors>
-                </FontString>
-                <FontString parentKey="LevelText" inherits="SystemFont_Large2" justifyH="CENTER" hidden="true">
-                    <Color r="1" g="1" b="1"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent.LevelBackground" relativePoint="CENTER" x="0" y="0"/>
-                    </Anchors>
-                </FontString>
-                <Texture parentKey="MaxLevelIcon" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" hidden="true">
-                    <Size x="48" y="48"/>
-                    <TexCoords left="0.6875" right="0.78125" top="0.09375" bottom="0.1875"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent.LevelBackground" relativePoint="CENTER" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers>
-        <Frames>
-            <Frame parentKey="MouseoverFrame" hidden="true">
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <FontString parentKey="ValueText" inherits="SystemFont_Outline_Small" justifyH="CENTER" justifyV="MIDDLE">
-                            <Color r="1" g="1" b="1"/>
-                            <Anchors>
-                                <Anchor point="CENTER" relativeKey="$parent.$parent.BarBackground" relativePoint="CENTER" x="0" y="-8"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
-            </Frame>
+	<Frame name="PlumberWoWProgressBarTemplate" virtual="true">
+		<Size x="248" y="64"/>
+		<Layers>
+			<!--Layer level="BACKGROUND" textureSubLevel="-1">
+				<Texture parentKey="DebugArea" setAllPoints="true">
+					<Color r="1" a="0.5"/>
+				</Texture>
+			</Layer-->
+			<Layer level="BACKGROUND" textureSubLevel="1">
+				<Texture parentKey="BarBackground" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
+					<Size x="288" y="96"/>
+					<TexCoords left="0" right="0.5625" top="0" bottom="0.1875"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BACKGROUND" textureSubLevel="2">
+				<Texture parentKey="BarFill" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
+					<Size x="288" y="32"/>
+					<TexCoords left="0" right="0.5625" top="0.1875" bottom="0.25"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.BarBackground" relativePoint="LEFT" x="0" y="-16"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BACKGROUND" textureSubLevel="3">
+				<Texture parentKey="BarSurface" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason">
+					<Size x="48" y="32"/>
+					<TexCoords left="0.5625" right="0.65625" top="0.1875" bottom="0.25"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent.BarFill" relativePoint="RIGHT" x="8" y="0"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture parentKey="BarSurfaceMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Size x="248" y="64"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.BarBackground" relativePoint="CENTER" x="0" y="0"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="BarSurface"/>
+					</MaskedTextures>
+				</MaskTexture>
+			</Layer>
+			<Layer level="BACKGROUND" textureSubLevel="5">
+				<Texture parentKey="LevelBackground" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" hidden="true">
+					<Size x="96" y="96"/>
+					<TexCoords left="0.8125" right="1" top="0" bottom="0.1875"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent" relativePoint="LEFT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Label" inherits="GameFontNormalMed2" justifyH="LEFT" justifyV="BOTTOM" text="Bar Label">
+					<Color r="1" g="1" b="1"/>
+					<Shadow>
+						<Offset>
+							<AbsDimension x="1" y="-1"/>
+						</Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent.BarBackground" relativePoint="LEFT" x="36" y="8"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="LevelText" inherits="SystemFont_Large2" justifyH="CENTER" hidden="true">
+					<Color r="1" g="1" b="1"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.LevelBackground" relativePoint="CENTER" x="0" y="0"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="MaxLevelIcon" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" hidden="true">
+					<Size x="48" y="48"/>
+					<TexCoords left="0.6875" right="0.78125" top="0.09375" bottom="0.1875"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.LevelBackground" relativePoint="CENTER" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="MouseoverFrame" hidden="true">
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString parentKey="ValueText" inherits="SystemFont_Outline_Small" justifyH="CENTER" justifyV="MIDDLE">
+							<Color r="1" g="1" b="1"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.$parent.BarBackground" relativePoint="CENTER" x="0" y="-8"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
 
-            <Frame parentKey="MouseoverArea">
-                <Size x="248" y="32"/>
-                <Anchors>
-                    <Anchor point="CENTER" relativeKey="$parent.BarBackground" relativePoint="CENTER" x="0" y="0"/>
-                </Anchors>
-            </Frame>
+			<Frame parentKey="MouseoverArea">
+				<Size x="248" y="32"/>
+				<Anchors>
+					<Anchor point="CENTER" relativeKey="$parent.BarBackground" relativePoint="CENTER" x="0" y="0"/>
+				</Anchors>
+			</Frame>
 
-            <Frame parentKey="DeltaValueFrame" hidden="true">
-                <Size x="64" y="20"/>
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <Texture parentKey="UpArrow" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" snapToPixelGrid="false">
-                            <Size x="24" y="24"/>
-                            <TexCoords left="0.6875" right="0.75" top="0" bottom="0.0625"/>
-                            <Anchors>
-                                <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="0" y="-2"/>
-                            </Anchors>
-                        </Texture>
-                        <FontString parentKey="Value" inherits="SystemFont_Shadow_Large_Outline" justifyH="LEFT" text="0">
-                            <Color r="1" g="1" b="1"/>
-                            <Anchors>
-                                <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="20" y="0"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
-                <Animations>
-                    <AnimationGroup parentKey="AnimText" setToFinalAlpha="true">
-                        <Alpha childKey="UpArrow" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
-                        <Translation childKey="UpArrow" order="1" duration="0" offsetX="-2" offsetY="-28"/>
-                        <Alpha childKey="Value" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
-                        <Translation childKey="Value" order="1" duration="0" offsetX="0" offsetY="-14"/>
+			<Frame parentKey="DeltaValueFrame" hidden="true">
+				<Size x="64" y="20"/>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture parentKey="UpArrow" file="Interface\AddOns\Plumber\Art\Delves\ProgressBar-DelveSeason" snapToPixelGrid="false">
+							<Size x="24" y="24"/>
+							<TexCoords left="0.6875" right="0.75" top="0" bottom="0.0625"/>
+							<Anchors>
+								<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="0" y="-2"/>
+							</Anchors>
+						</Texture>
+						<FontString parentKey="Value" inherits="SystemFont_Shadow_Large_Outline" justifyH="LEFT" text="0">
+							<Color r="1" g="1" b="1"/>
+							<Anchors>
+								<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="20" y="0"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Animations>
+					<AnimationGroup parentKey="AnimText" setToFinalAlpha="true">
+						<Alpha childKey="UpArrow" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+						<Translation childKey="UpArrow" order="1" duration="0" offsetX="-2" offsetY="-28"/>
+						<Alpha childKey="Value" order="1" fromAlpha="0" toAlpha="0" duration="0"/>
+						<Translation childKey="Value" order="1" duration="0" offsetX="0" offsetY="-14"/>
 
-                        <Alpha childKey="UpArrow" order="2" fromAlpha="0" toAlpha="1" duration="0.15"/>
-                        <Translation childKey="UpArrow" order="2" duration="0.25" offsetX="2" offsetY="16" smoothing="OUT"/>
-                        <Alpha childKey="Value" order="2" fromAlpha="0" toAlpha="1" duration="0.15"/>
-                        <Translation childKey="Value" order="2" duration="0.25" offsetX="0" offsetY="4"/>
+						<Alpha childKey="UpArrow" order="2" fromAlpha="0" toAlpha="1" duration="0.15"/>
+						<Translation childKey="UpArrow" order="2" duration="0.25" offsetX="2" offsetY="16" smoothing="OUT"/>
+						<Alpha childKey="Value" order="2" fromAlpha="0" toAlpha="1" duration="0.15"/>
+						<Translation childKey="Value" order="2" duration="0.25" offsetX="0" offsetY="4"/>
 
-                        <Alpha childKey="UpArrow" order="3" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.25"/>
-                        <Translation childKey="UpArrow" order="3" duration="2" offsetX="0" offsetY="16"/>
-                        <Alpha childKey="Value" order="3" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.25"/>
-                        <Translation childKey="Value" order="3" duration="2" offsetX="0" offsetY="16"/>
-                        
-                        <Scripts>
-                            <OnFinished>
-                                self:GetParent():Hide();
-                            </OnFinished>
-                            <OnStop>
-                                self:GetParent():Hide();
-                            </OnStop>
-                        </Scripts>
-                    </AnimationGroup>
-                </Animations>
-            </Frame>
-        </Frames>
-    </Frame>
+						<Alpha childKey="UpArrow" order="3" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.25"/>
+						<Translation childKey="UpArrow" order="3" duration="2" offsetX="0" offsetY="16"/>
+						<Alpha childKey="Value" order="3" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="1.25"/>
+						<Translation childKey="Value" order="3" duration="2" offsetX="0" offsetY="16"/>
 
-    <Button name="PlumberPeudoActionButtonTemplate" virtual="true">
-        <Size x="46" y="46"/>
-        <Layers>
-            <Layer level="BORDER">
-                <Texture parentKey="Icon">
-                    <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
-                    <Size x="40" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-                <MaskTexture file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
-                    <Size x="32" y="32"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT" x="0" y="0"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-                    </Anchors>
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Icon"/>
-                    </MaskedTextures>
-                </MaskTexture>
-            </Layer>
-            <Layer level="OVERLAY" textureSubLevel="6">
-                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
-                    <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-        <NormalTexture parentKey="NormalTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Border">
-            <Size x="64" y="64"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </NormalTexture>
-        <PushedTexture parentKey="PushedTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Highlight-Full">
-            <Size x="64" y="64"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </PushedTexture>
-        <HighlightTexture parentKey="HighlightTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Highlight-Inner">
-            <Size x="64" y="64"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </HighlightTexture>
-        <Frames>
-            <Cooldown parentKey="Cooldown" hideCountdownNumbers="false" reverse="false" useCircularEdge="true" hidden="true" useParentLevel="true" drawSwipe="true" drawEdge="false">
-                <Size x="40" y="40"/>
-                <Anchors>
-                    <Anchor point="CENTER"/>
-                </Anchors>
-                <SwipeTexture file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-CooldownSwipe"/>
-                <!--EdgeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Edge"/-->
-                <KeyValues>
-                    <KeyValue key="noCooldownCount" value="false" type="boolean"/> <!--OmniCC-->
-                </KeyValues>
-            </Cooldown>
-        </Frames>
-    </Button>
+						<Scripts>
+							<OnFinished>
+								self:GetParent():Hide();
+							</OnFinished>
+							<OnStop>
+								self:GetParent():Hide();
+							</OnStop>
+						</Scripts>
+					</AnimationGroup>
+				</Animations>
+			</Frame>
+		</Frames>
+	</Frame>
 
-    <Button name="PlumberSmallIconButtonTemplate" virtual="true">
-        <Size x="32" y="32"/>
-        <Layers>
-            <Layer level="BORDER">
-                <Texture parentKey="Icon">
-                    <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
-                    <Size x="30" y="30"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-                <MaskTexture parentKey="IconMask" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Chamfer" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT" x="0" y="0"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-                    </Anchors>
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Icon"/>
-                    </MaskedTextures>
-                </MaskTexture>
-            </Layer>
-            <Layer level="ARTWORK">
-                <Texture parentKey="Border">
-                    <Size x="72" y="72"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers>
-    </Button>
+	<Button name="PlumberPeudoActionButtonTemplate" virtual="true">
+		<Size x="46" y="46"/>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture parentKey="Icon">
+					<TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Circle" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Icon"/>
+					</MaskedTextures>
+				</MaskTexture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="6">
+				<FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<NormalTexture parentKey="NormalTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Border">
+			<Size x="64" y="64"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</NormalTexture>
+		<PushedTexture parentKey="PushedTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Highlight-Full">
+			<Size x="64" y="64"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</PushedTexture>
+		<HighlightTexture parentKey="HighlightTexture" file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-Highlight-Inner">
+			<Size x="64" y="64"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</HighlightTexture>
+		<Frames>
+			<Cooldown parentKey="Cooldown" hideCountdownNumbers="false" reverse="false" useCircularEdge="true" hidden="true" useParentLevel="true" drawSwipe="true" drawEdge="false">
+				<Size x="40" y="40"/>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<SwipeTexture file="Interface\AddOns\Plumber\Art\Button\ActionButtonCircle-CooldownSwipe"/>
+				<!--EdgeTexture file="Interface\AddOns\Plumber\Art\Button\CursorCooldown-Edge"/-->
+				<KeyValues>
+					<KeyValue key="noCooldownCount" value="false" type="boolean"/> <!--OmniCC-->
+				</KeyValues>
+			</Cooldown>
+		</Frames>
+	</Button>
 
-    <Button name="PlumberSmallItemButtonTemplate" inherits="PlumberSmallIconButtonTemplate" hidden="true" virtual="true">
-        <Size x="32" y="32"/>
-        <Layers>
-            <Layer level="OVERLAY" textureSubLevel="6">
-                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
-                    <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="2" y="-2"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Button>
+	<Button name="PlumberSmallIconButtonTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture parentKey="Icon">
+					<TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+					<Size x="30" y="30"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture parentKey="IconMask" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Chamfer" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Icon"/>
+					</MaskedTextures>
+				</MaskTexture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Border">
+					<Size x="72" y="72"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
 
-    <Button name="PlumberActionBarButtonTemplate" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
-        <Size x="45" y="45"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Icon">
-                    <TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
-                    <Size x="40" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
-                <MaskTexture parentKey="IconMask" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Chamfer" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPELFT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT"/>
-                    </Anchors>
-                    <MaskedTextures>
-                        <MaskedTexture childKey="Icon"/>
-                    </MaskedTextures>
-                </MaskTexture>
-            </Layer>
-            <!--Layer level="ARTWORK" textureSubLevel="1">
-                <Texture parentKey="Flash" atlas="UI-HUD-ActionBar-IconFrame-Flash" useAtlasSize="true" hidden="true">
-                    <Anchors>
-                        <Anchor point="TOPLEFT"/>
-                    </Anchors>
-                </Texture>
-            </Layer-->
-            <Layer level="ARTWORK" textureSubLevel="1">
-                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
-                    <Anchors>
-                        <Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-            <Layer level="OVERLAY" textureSubLevel="4">
-                <!--FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
-                    <Size x="36" y="10"/>
-                    <Anchors>
-                        <Anchor point="BOTTOM" x="0" y="2"/>
-                    </Anchors>
-                </FontString-->
-                <Texture parentKey="IconOverlay" hidden="true">
-                    <Size x="24" y="24"/>
-                    <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="CENTER"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers>
-        <NormalTexture parentKey="NormalTexture">
-            <Size x="48" y="48"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </NormalTexture>
-        <PushedTexture parentKey="PushedTexture">
-            <Size x="48" y="48"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </PushedTexture>
-        <HighlightTexture parentKey="HighlightTexture">
-            <Size x="48" y="48"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </HighlightTexture>
-        <!--CheckedTexture parentKey="CheckedTexture" atlas="UI-HUD-ActionBar-IconFrame-Mouseover">
-            <Size x="48" y="48"/>
-            <Anchors>
-                <Anchor point="CENTER"/>
-            </Anchors>
-        </CheckedTexture-->
-        <Frames>
-            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawBling="false" drawEdge="false" useParentLevel="true">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="0" y="0"/>
-                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="0" y="0"/>
-                </Anchors>        
-                <SwipeTexture>
-                    <Color r="0" g="0" b="0" a="0.8"/>
-                </SwipeTexture>
-            </Cooldown>
-        </Frames>
-    </Button>
+	<Button name="PlumberSmallItemButtonTemplate" inherits="PlumberSmallIconButtonTemplate" hidden="true" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="OVERLAY" textureSubLevel="6">
+				<FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="2" y="-2"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Button>
 
-    <Button name="PlumberSecureActionBarButtonTemplate" inherits="SecureActionButtonTemplate" propagateMouseInput="Both" hidden="true" virtual="true">
-        <Size x="45" y="45"/>
-        <!--Layers>
-            <Layer level="BACKGROUND" textureSubLevel="-1">
-                <Texture parentKey="DebugArea" setAllPoints="true">
-                    <Color r="1" a="0.5"/>
-                </Texture>
-            </Layer>
-        </Layers-->
-        <Scripts>
-            <OnShow>
-                if self.VisualButton then
-                    self.VisualButton:Show();
-                end
-            </OnShow>
-            <OnHide>
-                if self.VisualButton then
-                    self.VisualButton:Hide();
-                    self.VisualButton:ClearAction();
-                end
-            </OnHide>
-        </Scripts>
-    </Button>
+	<Button name="PlumberActionBarButtonTemplate" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
+		<Size x="45" y="45"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon">
+					<TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<MaskTexture parentKey="IconMask" file="Interface\AddOns\Plumber\Art\BasicShape\Mask-Chamfer" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPELFT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Icon"/>
+					</MaskedTextures>
+				</MaskTexture>
+			</Layer>
+			<!--Layer level="ARTWORK" textureSubLevel="1">
+				<Texture parentKey="Flash" atlas="UI-HUD-ActionBar-IconFrame-Flash" useAtlasSize="true" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer-->
+			<Layer level="ARTWORK" textureSubLevel="1">
+				<FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="4">
+				<!--FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
+					<Size x="36" y="10"/>
+					<Anchors>
+						<Anchor point="BOTTOM" x="0" y="2"/>
+					</Anchors>
+				</FontString-->
+				<Texture parentKey="IconOverlay" hidden="true">
+					<Size x="24" y="24"/>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture parentKey="NormalTexture">
+			<Size x="48" y="48"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</NormalTexture>
+		<PushedTexture parentKey="PushedTexture">
+			<Size x="48" y="48"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</PushedTexture>
+		<HighlightTexture parentKey="HighlightTexture">
+			<Size x="48" y="48"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</HighlightTexture>
+		<!--CheckedTexture parentKey="CheckedTexture" atlas="UI-HUD-ActionBar-IconFrame-Mouseover">
+			<Size x="48" y="48"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</CheckedTexture-->
+		<Frames>
+			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawBling="false" drawEdge="false" useParentLevel="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="0" y="0"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="0" y="0"/>
+				</Anchors>
+				<SwipeTexture>
+					<Color r="0" g="0" b="0" a="0.8"/>
+				</SwipeTexture>
+			</Cooldown>
+		</Frames>
+	</Button>
 
-    <Button name="PlumberBlizzardCheckButtonTemplate" virtual="true">
-        <Size x="225" y="32"/>
-        <Frames>
-            <CheckButton parentKey="Button" motionScriptsWhileDisabled="true">
-                <Size x="32" y="32"/>
-                <Anchors>
-                    <Anchor point="LEFT"/>
-                </Anchors>
-                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
-                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
-                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
-                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
-                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
-            </CheckButton>
-        </Frames>
-        <Layers>
-            <Layer level="ARTWORK">
-                <FontString parentKey="Label" wordwrap="false" justifyH="LEFT" inherits="GameFontHighlightMedium">
-                    <Size y="32"/>
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent.Button" relativePoint="RIGHT" x="5"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Button>
+	<Button name="PlumberSecureActionBarButtonTemplate" inherits="SecureActionButtonTemplate" propagateMouseInput="Both" hidden="true" virtual="true">
+		<Size x="45" y="45"/>
+		<!--Layers>
+			<Layer level="BACKGROUND" textureSubLevel="-1">
+				<Texture parentKey="DebugArea" setAllPoints="true">
+					<Color r="1" a="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers-->
+		<Scripts>
+			<OnShow>
+				if self.VisualButton then
+					self.VisualButton:Show();
+				end
+			</OnShow>
+			<OnHide>
+				if self.VisualButton then
+					self.VisualButton:Hide();
+					self.VisualButton:ClearAction();
+				end
+			</OnHide>
+		</Scripts>
+	</Button>
 
-    <Frame name="PlumberRepositionFrameTemplate" registerForDrag="LeftButton" virtual="true">
-        <Size x="8" y="8"/>
-        <Scripts>
-            <OnDragStart>
-                self.isMoving = true;
-                self:GetParent():StartMoving(true);
-            </OnDragStart>
-            <OnDragStop>
-                self.isMoving = false;
-                self:GetParent():StopMovingOrSizing();
-            </OnDragStop>
-            <OnHide>
-                if self.isMoving then
-                    self.isMoving = false;
-                    self:GetParent():StopMovingOrSizing();
-                end
-            </OnHide>
-            <OnMouseDown>
-                if button == "RightButton" then
-                    local parent = self:GetParent();
-                    if parent.ResetPosition then
-                        parent:ResetPosition();
-                    end
-                end
-            </OnMouseDown>
-        </Scripts>
-    </Frame>
+	<Button name="PlumberBlizzardCheckButtonTemplate" virtual="true">
+		<Size x="225" y="32"/>
+		<Frames>
+			<CheckButton parentKey="Button" motionScriptsWhileDisabled="true">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT"/>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Label" wordwrap="false" justifyH="LEFT" inherits="GameFontHighlightMedium">
+					<Size y="32"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.Button" relativePoint="RIGHT" x="5"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Button>
 
-    <Frame name="PlumberLoadingIndicatorTemplate" hidden="true" virtual="true">
-        <Size x="16" y="16"/>
-        <Layers>
-            <Layer level="OVERLAY">
+	<Frame name="PlumberRepositionFrameTemplate" registerForDrag="LeftButton" virtual="true">
+		<Size x="8" y="8"/>
+		<Scripts>
+			<OnDragStart>
+				self.isMoving = true;
+				self:GetParent():StartMoving(true);
+			</OnDragStart>
+			<OnDragStop>
+				self.isMoving = false;
+				self:GetParent():StopMovingOrSizing();
+			</OnDragStop>
+			<OnHide>
+				if self.isMoving then
+					self.isMoving = false;
+					self:GetParent():StopMovingOrSizing();
+				end
+			</OnHide>
+			<OnMouseDown>
+				if button == "RightButton" then
+					local parent = self:GetParent();
+					if parent.ResetPosition then
+						parent:ResetPosition();
+					end
+				end
+			</OnMouseDown>
+		</Scripts>
+	</Frame>
+
+	<Frame name="PlumberLoadingIndicatorTemplate" hidden="true" virtual="true">
+		<Size x="16" y="16"/>
+		<Layers>
+			<Layer level="OVERLAY">
 				<Texture parentKey="Spinner" setAllPoints="true" file="Interface\AddOns\Plumber\Art\Button\LoadingIndicator32" texelSnappingBias="0.0" snapToPixelGrid="false"/>
-            </Layer>
-        </Layers>
-        <Animations>
-            <AnimationGroup parentKey="Anim" looping="REPEAT">
-                <Rotation degrees="-360" duration="1" order="1" childKey="Spinner"/>
-            </AnimationGroup>
-            <AnimationGroup parentKey="Anim2">
-                <Rotation degrees="-720" duration="2" order="1" childKey="Spinner"/>
-                <Scripts>
-                    <OnFinished>
-                        self:GetParent():Hide();
-                    </OnFinished>
-                </Scripts>
-            </AnimationGroup>
-        </Animations>
-        <Scripts>
-            <OnShow>
-                if self.autoHide then
-                    self.Anim2:Play();
-                else
-                    self.Anim:Play();
-                end
-            </OnShow>
-            <OnHide>
-                self.Anim:Stop();
-                self.Anim2:Stop();
-            </OnHide>
-        </Scripts>
-    </Frame>
+			</Layer>
+		</Layers>
+		<Animations>
+			<AnimationGroup parentKey="Anim" looping="REPEAT">
+				<Rotation degrees="-360" duration="1" order="1" childKey="Spinner"/>
+			</AnimationGroup>
+			<AnimationGroup parentKey="Anim2">
+				<Rotation degrees="-720" duration="2" order="1" childKey="Spinner"/>
+				<Scripts>
+					<OnFinished>
+						self:GetParent():Hide();
+					</OnFinished>
+				</Scripts>
+			</AnimationGroup>
+		</Animations>
+		<Scripts>
+			<OnShow>
+				if self.autoHide then
+					self.Anim2:Play();
+				else
+					self.Anim:Play();
+				end
+			</OnShow>
+			<OnHide>
+				self.Anim:Stop();
+				self.Anim2:Stop();
+			</OnHide>
+		</Scripts>
+	</Frame>
 
-    <Frame name="PlumberPropagateMouseTemplate" propagateMouseInput="Both" virtual="true"/>
-    <Frame name="PlumberPropagateMouseMotionTemplate" propagateMouseInput="Motion" virtual="true"/>
-    <Frame name="PlumberPropagateMouseClicksTemplate" propagateMouseInput="Clicks" virtual="true"/>
+	<Frame name="PlumberPropagateMouseTemplate" propagateMouseInput="Both" virtual="true"/>
+	<Frame name="PlumberPropagateMouseMotionTemplate" propagateMouseInput="Motion" virtual="true"/>
+	<Frame name="PlumberPropagateMouseClicksTemplate" propagateMouseInput="Clicks" virtual="true"/>
 
-    <Frame name="PlumberSharedPopupFrameTemplate" parent="UIParent" frameStrata="DIALOG" toplevel="true" hidden="true" virtual="true">
-        <Size x="320" y="72"/>
-        <Anchors>
-            <Anchor point="TOP" x="0" y="-135"/>
-        </Anchors>
-        <Layers>
-            <Layer level="OVERLAY">
-                <FontString parentKey="Text" inherits="GameFontHighlight" justifyH="CENTER" justifyV="TOP"/>
-            </Layer>
-        </Layers>
-        <Frames>
-            <Frame parentKey="BackgroundFrame" inherits="DialogBorderDarkTemplate"/> <!--DialogBorderTemplate-->
+	<Frame name="PlumberSharedPopupFrameTemplate" parent="UIParent" frameStrata="DIALOG" toplevel="true" hidden="true" virtual="true">
+		<Size x="320" y="72"/>
+		<Anchors>
+			<Anchor point="TOP" x="0" y="-135"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Text" inherits="GameFontHighlight" justifyH="CENTER" justifyV="TOP"/>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="BackgroundFrame" inherits="DialogBorderDarkTemplate"/> <!--DialogBorderTemplate-->
 
-            <Button parentKey="CloseButton" inherits="UIPanelCloseButton">
-                <Anchors>
-                    <Anchor point="TOPRIGHT" x="-3" y="-3"/>
-                </Anchors>
-            </Button>
+			<Button parentKey="CloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-3" y="-3"/>
+				</Anchors>
+			</Button>
 
-            <EditBox parentKey="EditBox" multiLine="false" autoFocus="false">
-                <Size x="130" y="24"/>
-                <FontString inherits="NumberFont_Shadow_Small" justifyH="LEFT"/>
-                <TextInsets left="8" right="8"/>
-                <HighlightColor r="0.05" g="0.41" b="0.85"/>
-            </EditBox>
+			<EditBox parentKey="EditBox" multiLine="false" autoFocus="false">
+				<Size x="130" y="24"/>
+				<FontString inherits="NumberFont_Shadow_Small" justifyH="LEFT"/>
+				<TextInsets left="8" right="8"/>
+				<HighlightColor r="0.05" g="0.41" b="0.85"/>
+			</EditBox>
 
-            <Frame parentKey="KeyListener" propagateKeyboardInput="true" frameLevel="1208"/>
-        </Frames>
-    </Frame>
+			<Frame parentKey="KeyListener" propagateKeyboardInput="true" frameLevel="1208"/>
+		</Frames>
+	</Frame>
 </Ui>

@@ -14,45 +14,45 @@ Processor.shouldChangeTexture = true;
 
 
 function Processor:OnMapChanged(uiMapID, mapScale)
-    if not self.enabled then return end;
+	if not self.enabled then return end;
 
-    local changeTexture = self.shouldChangeTexture;
-    if changeTexture then
-        self.shouldChangeTexture = nil;
-    end
+	local changeTexture = self.shouldChangeTexture;
+	if changeTexture then
+		self.shouldChangeTexture = nil;
+	end
 
-    for pin in (WorldMapFrame:EnumeratePinsByTemplate("GroupMembersPinTemplate")) do
-        --pin:StartPlayerPing(2, 0.25);
-        pin:StartPlayerPing(2.75, 0.5);
+	for pin in (WorldMapFrame:EnumeratePinsByTemplate("GroupMembersPinTemplate")) do
+		--pin:StartPlayerPing(2, 0.25);
+		pin:StartPlayerPing(2.75, 0.5);
 
-        if changeTexture then
-            pin:SetPlayerPingTexture(Enum.PingTextureType.Center, "Interface/AddOns/Plumber/Art/MapPin/UI-Minimap-Ping-Center", 32, 32);    --"Interface\\minimap\\UI-Minimap-Ping-Center", 32, 32
-            pin:SetPlayerPingTexture(Enum.PingTextureType.Expand, "Interface/AddOns/Plumber/Art/MapPin/UI-Minimap-Ping-Expand", 64, 64);    --"Interface\\minimap\\UI-Minimap-Ping-Expand", 32, 32
-            pin:SetPlayerPingTexture(Enum.PingTextureType.Rotation, "Interface/AddOns/Plumber/Art/MapPin/UI-Minimap-Ping-Rotate", 128, 128);  --"Interface\\minimap\\UI-Minimap-Ping-Rotate", 70, 70
-        end
-    end
+		if changeTexture then
+			pin:SetPlayerPingTexture(Enum.PingTextureType.Center, "Interface/AddOns/Plumber/Art/MapPin/UI-Minimap-Ping-Center", 32, 32);    --"Interface\\minimap\\UI-Minimap-Ping-Center", 32, 32
+			pin:SetPlayerPingTexture(Enum.PingTextureType.Expand, "Interface/AddOns/Plumber/Art/MapPin/UI-Minimap-Ping-Expand", 64, 64);    --"Interface\\minimap\\UI-Minimap-Ping-Expand", 32, 32
+			pin:SetPlayerPingTexture(Enum.PingTextureType.Rotation, "Interface/AddOns/Plumber/Art/MapPin/UI-Minimap-Ping-Rotate", 128, 128);  --"Interface\\minimap\\UI-Minimap-Ping-Rotate", 70, 70
+		end
+	end
 end
 
 function Processor:OnModifiderStateChanged()
-    self:OnMapChanged();
+	self:OnMapChanged();
 end
 
 --[[
 function Processor:OnCanvasScaleChanged(scale)
-    if not scale then scale = WorldMapFrame.ScrollContainer.targetScale end;
-    if (not scale) or scale == 0 then return end;
+	if not scale then scale = WorldMapFrame.ScrollContainer.targetScale end;
+	if (not scale) or scale == 0 then return end;
 
-    local baseScale;
-    if WorldMapFrame.isMaximized then
-        baseScale = 0.8;
-    else
-        baseScale = 0.65;
-    end
-    local pingScale = baseScale / scale;
+	local baseScale;
+	if WorldMapFrame.isMaximized then
+		baseScale = 0.8;
+	else
+		baseScale = 0.65;
+	end
+	local pingScale = baseScale / scale;
 
-    for pin in (WorldMapFrame:EnumeratePinsByTemplate("GroupMembersPinTemplate")) do
-        pin:SetPlayerPingScale(pingScale);
-    end
+	for pin in (WorldMapFrame:EnumeratePinsByTemplate("GroupMembersPinTemplate")) do
+		pin:SetPlayerPingScale(pingScale);
+	end
 end
 --]]
 
@@ -60,20 +60,20 @@ PinController:AddMapProcessor(Processor);
 
 
 do
-    local function EnableModule(state)
-        PinController:RequestLoadSettings();
-    end
+	local function EnableModule(state)
+		PinController:RequestLoadSettings();
+	end
 
-    local moduleData = {
-        name = addon.L["ModuleName PlayerPing"],
-        dbKey = Processor.dbKey,
-        description = addon.L["ModuleDescription PlayerPing"],
-        toggleFunc = EnableModule,
-        categoryID = 1,
-        uiOrder = 1102,
-        moduleAddedTime = 1761240000,
-        categoryKeys = {"Map"},
-    };
+	local moduleData = {
+		name = addon.L["ModuleName PlayerPing"],
+		dbKey = Processor.dbKey,
+		description = addon.L["ModuleDescription PlayerPing"],
+		toggleFunc = EnableModule,
+		categoryID = 1,
+		uiOrder = 1102,
+		moduleAddedTime = 1761240000,
+		categoryKeys = {"Map"},
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end

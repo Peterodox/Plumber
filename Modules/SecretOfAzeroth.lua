@@ -8,15 +8,15 @@ local QuestAreaTrigger = addon.QuestAreaTrigger;
 local QUICKSLOT_NAME = "secret_of_azeroth";
 
 local QuestData = {
-    [84363] = { --Tweasure Hunt
+	[84363] = { --Tweasure Hunt
 
-    };
+	};
 }
 
 local function OnQuestAreaChanged(questID, isInside)
-    print(API.GetQuestName(questID), questID, isInside);
+	print(API.GetQuestName(questID), questID, isInside);
 end
 
 for questID in pairs(QuestData) do
-    QuestAreaTrigger:AddAreaChangedCallback(questID, OnQuestAreaChanged);
+	QuestAreaTrigger:AddAreaChangedCallback(questID, OnQuestAreaChanged);
 end

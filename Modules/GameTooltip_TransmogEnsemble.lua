@@ -28,256 +28,256 @@ local ItemXSets = {};
 
 
 local DifficultyNames = {
-    PLAYER_DIFFICULTY3,
-    PLAYER_DIFFICULTY1,
-    PLAYER_DIFFICULTY2,
-    PLAYER_DIFFICULTY6,
+	PLAYER_DIFFICULTY3,
+	PLAYER_DIFFICULTY1,
+	PLAYER_DIFFICULTY2,
+	PLAYER_DIFFICULTY6,
 };
 
 
 local CollectionCache = CreateFrame("Frame");
 do
-    CollectionCache.cache = {};
+	CollectionCache.cache = {};
 
-    function CollectionCache:ListenEvents(state)
-        if state then
-            if not self.listend then
-                self.listend = true;
-                self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED");
-                self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED");
-                self:RegisterEvent("TRANSMOG_COSMETIC_COLLECTION_SOURCE_ADDED");
-            end
+	function CollectionCache:ListenEvents(state)
+		if state then
+			if not self.listend then
+				self.listend = true;
+				self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED");
+				self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED");
+				self:RegisterEvent("TRANSMOG_COSMETIC_COLLECTION_SOURCE_ADDED");
+			end
 
-        else
-            if self.listend then
-                self.listend = nil;
-                self:UnregisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED");
-                self:UnregisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED");
-                self:UnregisterEvent("TRANSMOG_COSMETIC_COLLECTION_SOURCE_ADDED");
-            end
-        end
-    end
+		else
+			if self.listend then
+				self.listend = nil;
+				self:UnregisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED");
+				self:UnregisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED");
+				self:UnregisterEvent("TRANSMOG_COSMETIC_COLLECTION_SOURCE_ADDED");
+			end
+		end
+	end
 
-    function CollectionCache:GetData(setID)
-        if not self.cache[setID] then
-            local setItems = GetAllSetAppearancesByID(setID);
-            if setItems then
-                local appCol, appTotal = 0, 0;
-                local sourceCol, sourceTotal = 0, 0;
-                local appearanceIDs = {};
-                local sourceInfo;
-                for _, v in ipairs(setItems) do
-                    sourceInfo = GetSourceInfo(v.itemModifiedAppearanceID);
-                    if sourceInfo and sourceInfo.visualID then
-                        appearanceIDs[sourceInfo.visualID] = true;
-                        sourceTotal = sourceTotal + 1;
-                        if sourceInfo.isCollected then
-                            sourceCol = sourceCol + 1;
-                        end
-                    end
-                end
+	function CollectionCache:GetData(setID)
+		if not self.cache[setID] then
+			local setItems = GetAllSetAppearancesByID(setID);
+			if setItems then
+				local appCol, appTotal = 0, 0;
+				local sourceCol, sourceTotal = 0, 0;
+				local appearanceIDs = {};
+				local sourceInfo;
+				for _, v in ipairs(setItems) do
+					sourceInfo = GetSourceInfo(v.itemModifiedAppearanceID);
+					if sourceInfo and sourceInfo.visualID then
+						appearanceIDs[sourceInfo.visualID] = true;
+						sourceTotal = sourceTotal + 1;
+						if sourceInfo.isCollected then
+							sourceCol = sourceCol + 1;
+						end
+					end
+				end
 
-                for appearanceID in pairs(appearanceIDs) do
-                    appTotal = appTotal + 1;
-                    if IsAppearanceCollected(appearanceID) then
-                        appCol = appCol + 1;
-                    end
-                end
+				for appearanceID in pairs(appearanceIDs) do
+					appTotal = appTotal + 1;
+					if IsAppearanceCollected(appearanceID) then
+						appCol = appCol + 1;
+					end
+				end
 
-                self.cache[setID] = {appCol, appTotal, sourceCol, sourceTotal};
-                self:ListenEvents(true);
-            end
-        end
+				self.cache[setID] = {appCol, appTotal, sourceCol, sourceTotal};
+				self:ListenEvents(true);
+			end
+		end
 
-        local v = self.cache[setID];
-        if v then
-            return v[1], v[2], v[3], v[4]
-        end
-    end
+		local v = self.cache[setID];
+		if v then
+			return v[1], v[2], v[3], v[4]
+		end
+	end
 
-    CollectionCache:SetScript("OnEvent", function(self)
-        self:ListenEvents(false);
-        self.cache = {};
-    end);
+	CollectionCache:SetScript("OnEvent", function(self)
+		self:ListenEvents(false);
+		self.cache = {};
+	end);
 end
 
 
 local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
-    --[[ --debug
-    local setID = hyperlink and C_Item.GetItemLearnTransmogSet(hyperlink);
-    if setID then
-        if not ItemXSets[itemID] then
-            if not PlumberDevData then
-                PlumberDevData = {};
-            end
-            if not PlumberDevData.ItemXSets then
-                PlumberDevData.ItemXSets = {};
-            end
-            ItemXSets[itemID] = setID;
-            local name = C_Item.GetItemInfo(hyperlink);
-            print(name, itemID, setID);
-            PlumberDevData.ItemXSets[itemID] = string.format("{%s},     --%s", setID, name);
-        end
-    end
-    --]]
+	--[[ --debug
+	local setID = hyperlink and C_Item.GetItemLearnTransmogSet(hyperlink);
+	if setID then
+		if not ItemXSets[itemID] then
+			if not PlumberDevData then
+				PlumberDevData = {};
+			end
+			if not PlumberDevData.ItemXSets then
+				PlumberDevData.ItemXSets = {};
+			end
+			ItemXSets[itemID] = setID;
+			local name = C_Item.GetItemInfo(hyperlink);
+			print(name, itemID, setID);
+			PlumberDevData.ItemXSets[itemID] = string.format("{%s},     --%s", setID, name);
+		end
+	end
+	--]]
 
-    if not hyperlink then return end;
+	if not hyperlink then return end;
 
-    local setID = GetItemLearnTransmogSet(hyperlink);
-    if setID then
-        if LegionRaidEnsemble[itemID] then
-            if not ItemXSets[itemID] then
-                local baseSetID = GetBaseSetID(setID);
-                local baseSetInfo = GetSetInfo(baseSetID);
-                local allSetInfo = GetVariantSets(baseSetID);
-                local insertBaseSet = true;
-                for _, info in ipairs(allSetInfo) do
-                    if info.setID == baseSetID then
-                        insertBaseSet = false;
-                        break
-                    end
-                end
+	local setID = GetItemLearnTransmogSet(hyperlink);
+	if setID then
+		if LegionRaidEnsemble[itemID] then
+			if not ItemXSets[itemID] then
+				local baseSetID = GetBaseSetID(setID);
+				local baseSetInfo = GetSetInfo(baseSetID);
+				local allSetInfo = GetVariantSets(baseSetID);
+				local insertBaseSet = true;
+				for _, info in ipairs(allSetInfo) do
+					if info.setID == baseSetID then
+						insertBaseSet = false;
+						break
+					end
+				end
 
-                if insertBaseSet then
-                    table.insert(allSetInfo, baseSetInfo);
-                end
+				if insertBaseSet then
+					table.insert(allSetInfo, baseSetInfo);
+				end
 
-                table.sort(allSetInfo, function(a, b)
-                    if a.uiOrder ~= b.uiOrder then
-                        return a.uiOrder < b.uiOrder
-                    end
-                    return a.setID < b.setID
-                end);
+				table.sort(allSetInfo, function(a, b)
+					if a.uiOrder ~= b.uiOrder then
+						return a.uiOrder < b.uiOrder
+					end
+					return a.setID < b.setID
+				end);
 
-                local tbl = {};
-                for i = 1, 4 do
-                    tbl[i] = allSetInfo[i].setID;
-                end
-                ItemXSets[itemID] = tbl;
-            end
+				local tbl = {};
+				for i = 1, 4 do
+					tbl[i] = allSetInfo[i].setID;
+				end
+				ItemXSets[itemID] = tbl;
+			end
 
-            tooltip:AddLine(" ");
+			tooltip:AddLine(" ");
 
-            local allCollected = true;
+			local allCollected = true;
 
-            for i, setID in ipairs(ItemXSets[itemID]) do
-                local appearances = GetSetPrimaryAppearances(setID);
-                local numCollected = 0;
-                local numTotal = 0;
-                for _, v in ipairs(appearances) do
-                    if v.collected then
-                        numCollected = numCollected + 1;
-                    end
-                    numTotal = numTotal + 1;
-                end
-                if numCollected >= numTotal then
-                    tooltip:AddDoubleLine(DifficultyNames[i], GREY_CHECKMARK, 0.5, 0.5, 0.5, 1, 1, 1);
-                else
-                    allCollected = false;
-                    tooltip:AddDoubleLine(DifficultyNames[i], numCollected.."/"..numTotal, 1, 1, 1, 1, 1, 1);
-                end
-            end
+			for i, _setID in ipairs(ItemXSets[itemID]) do
+				local appearances = GetSetPrimaryAppearances(_setID);
+				local numCollected = 0;
+				local numTotal = 0;
+				for _, v in ipairs(appearances) do
+					if v.collected then
+						numCollected = numCollected + 1;
+					end
+					numTotal = numTotal + 1;
+				end
+				if numCollected >= numTotal then
+					tooltip:AddDoubleLine(DifficultyNames[i], GREY_CHECKMARK, 0.5, 0.5, 0.5, 1, 1, 1);
+				else
+					allCollected = false;
+					tooltip:AddDoubleLine(DifficultyNames[i], numCollected.."/"..numTotal, 1, 1, 1, 1, 1, 1);
+				end
+			end
 
-            ReplaceTooltipLine(tooltip, ALREADY_KNOWN, nil);
-            DeleteLineByMatching(tooltip, PATTERN_PARTIALLY_KNOWN);
+			ReplaceTooltipLine(tooltip, ALREADY_KNOWN, nil);
+			DeleteLineByMatching(tooltip, PATTERN_PARTIALLY_KNOWN);
 
-            if allCollected then
-                tooltip:AddLine(" ");
-                tooltip:AddLine(ALREADY_KNOWN, 1, 0.125, 0.125, true);
-            end
+			if allCollected then
+				tooltip:AddLine(" ");
+				tooltip:AddLine(ALREADY_KNOWN, 1, 0.125, 0.125, true);
+			end
 
-            return true
-        else
-            --Generic Ensembles
-            local appCol, appTotal, sourceCol, sourceTotal = CollectionCache:GetData(setID);
-            local showItems = C_CVar.GetCVarBool("missingTransmogSourceInItemTooltips");
-            if appCol and ((appCol < appTotal) or (showItems and sourceCol < sourceTotal)) then
-                local found1, isLastLine1 = ReplaceTooltipLine(tooltip, ALREADY_KNOWN, " ");
-                local found2, isLastLine2 = ReplaceLineByMatching(tooltip, PATTERN_PARTIALLY_KNOWN, " ");
+			return true
+		else
+			--Generic Ensembles
+			local appCol, appTotal, sourceCol, sourceTotal = CollectionCache:GetData(setID);
+			local showItems = C_CVar.GetCVarBool("missingTransmogSourceInItemTooltips");
+			if appCol and ((appCol < appTotal) or (showItems and sourceCol < sourceTotal)) then
+				local found1, isLastLine1 = ReplaceTooltipLine(tooltip, ALREADY_KNOWN, " ");
+				local found2, isLastLine2 = ReplaceLineByMatching(tooltip, PATTERN_PARTIALLY_KNOWN, " ");
 
-                if not (isLastLine1 or isLastLine2) then
-                    tooltip:AddLine(" ");
-                end
+				if not (isLastLine1 or isLastLine2) then
+					tooltip:AddLine(" ");
+				end
 
-                if appCol < appTotal then
-                    tooltip:AddDoubleLine(L["Collected Appearances"], appCol.."/"..appTotal, 1, 1, 1, 1, 1, 1);
-                elseif showItems then
-                    tooltip:AddDoubleLine(L["Collected Appearances"], appCol.."/"..appTotal, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5); --Show numbers instead of checkmark
-                end
+				if appCol < appTotal then
+					tooltip:AddDoubleLine(L["Collected Appearances"], appCol.."/"..appTotal, 1, 1, 1, 1, 1, 1);
+				elseif showItems then
+					tooltip:AddDoubleLine(L["Collected Appearances"], appCol.."/"..appTotal, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5); --Show numbers instead of checkmark
+				end
 
-                if showItems then
-                    if sourceCol < sourceTotal and sourceTotal > appTotal then
-                        tooltip:AddDoubleLine(L["Collected Items"], sourceCol.."/"..sourceTotal, 1, 1, 1, 1, 1, 1);
-                    end
-                end
+				if showItems then
+					if sourceCol < sourceTotal and sourceTotal > appTotal then
+						tooltip:AddDoubleLine(L["Collected Items"], sourceCol.."/"..sourceTotal, 1, 1, 1, 1, 1, 1);
+					end
+				end
 
-                return true
-            end
-        end
-    end
-    return false
+				return true
+			end
+		end
+	end
+	return false
 end
 
 
 local ItemSubModule = {};
 do
-    function ItemSubModule:ProcessData(tooltip, itemID, itemLink)
-        if self.enabled then
-            return ProcessItemTooltip(tooltip, itemID, itemLink)
-        else
-            return false
-        end
-    end
+	function ItemSubModule:ProcessData(tooltip, itemID, itemLink)
+		if self.enabled then
+			return ProcessItemTooltip(tooltip, itemID, itemLink)
+		else
+			return false
+		end
+	end
 
-    function ItemSubModule:GetDBKey()
-        return "TooltipTransmogEnsemble"
-    end
+	function ItemSubModule:GetDBKey()
+		return "TooltipTransmogEnsemble"
+	end
 
-    function ItemSubModule:SetEnabled(enabled)
-        self.enabled = enabled == true;
-        GameTooltipItemManager:RequestUpdate();
-    end
+	function ItemSubModule:SetEnabled(enabled)
+		self.enabled = enabled == true;
+		GameTooltipItemManager:RequestUpdate();
+	end
 
-    function ItemSubModule:IsEnabled()
-        return self.enabled == true
-    end
+	function ItemSubModule:IsEnabled()
+		return self.enabled == true
+	end
 end
 
 
 do
-    --local function ProcessItemTooltip_DialogueUI(tooltip, itemID, itemLink)
-    --    return ProcessItemTooltip(tooltip, itemID, itemLink, true)
-    --end
+	--local function ProcessItemTooltip_DialogueUI(tooltip, itemID, itemLink)
+	--    return ProcessItemTooltip(tooltip, itemID, itemLink, true)
+	--end
 
-    local function EnableModule(state)
-        ItemSubModule:SetEnabled(state);
+	local function EnableModule(state)
+		ItemSubModule:SetEnabled(state);
 
-        if state then
-            GameTooltipItemManager:AddSubModule(ItemSubModule);
-        end
+		if state then
+			GameTooltipItemManager:AddSubModule(ItemSubModule);
+		end
 
-        --if DialogueUIAPI and DialogueUIAPI.AddItemTooltipProcessorExternal then
-        --    DialogueUIAPI.AddItemTooltipProcessorExternal(ProcessItemTooltip_DialogueUI);
-        --end
-    end
+		--if DialogueUIAPI and DialogueUIAPI.AddItemTooltipProcessorExternal then
+		--    DialogueUIAPI.AddItemTooltipProcessorExternal(ProcessItemTooltip_DialogueUI);
+		--end
+	end
 
-    local moduleData = {
-        name = addon.L["ModuleName TooltipTransmogEnsemble"],
-        dbKey = ItemSubModule:GetDBKey(),
-        description = addon.L["ModuleDescription TooltipTransmogEnsemble"],
-        toggleFunc = EnableModule,
-        categoryID = 3,
-        uiOrder = 1205,
-        moduleAddedTime = 1755200000,
+	local moduleData = {
+		name = addon.L["ModuleName TooltipTransmogEnsemble"],
+		dbKey = ItemSubModule:GetDBKey(),
+		description = addon.L["ModuleDescription TooltipTransmogEnsemble"],
+		toggleFunc = EnableModule,
+		categoryID = 3,
+		uiOrder = 1205,
+		moduleAddedTime = 1755200000,
 		categoryKeys = {
 			"Collection",
 		},
-        searchTags = {
-            "Tooltip", "Transmog",
-        },
-    };
+		searchTags = {
+			"Tooltip", "Transmog",
+		},
+	};
 
-    addon.ControlCenter:AddModule(moduleData);
+	addon.ControlCenter:AddModule(moduleData);
 end
 
 
