@@ -643,7 +643,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 	local uniqueQuests = {};
 
 	for _, category in ipairs(activityData) do
-		local anyIncomplted;
+		local anyIncompleted;
 		local numEntries = 0;
 		local entries = {};
 		local showActivity;
@@ -749,10 +749,8 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 				end
 			end
 
-			if entry.completed then
-				numCompleted = numCompleted + 1;
-			elseif showActivity then
-				anyIncomplted = true;
+			if (not entry.completed) and showActivity then
+				anyIncompleted = true;
 			end
 
 			if entry.shouldShow then
@@ -760,6 +758,10 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 			end
 
 			if showActivity then
+				if entry.completed then
+					numCompleted = numCompleted + 1;
+				end
+
 				if entry.isDelveReputation then
 					if not entry.atlas then
 						entry.atlas = QuestIconAtlas.DELVES_BOUNTIFUL;
@@ -808,7 +810,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 								InitQuestData(_entry);
 								numEntries = numEntries + 1;
 								entries[numEntries] = _entry;
-								anyIncomplted = true;
+								anyIncompleted = true;
 							end
 						end
 					end
@@ -817,7 +819,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 		end
 
 		if hideCompleted then
-			if anyIncomplted then
+			if anyIncompleted then
 				n = n + 1;
 				outputTbl[n] = category;
 				if numEntries > 0 then
