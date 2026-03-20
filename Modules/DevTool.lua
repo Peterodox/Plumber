@@ -7,6 +7,7 @@ local M = {
 	ModelStressTest = false;
 	SetAlphaGradient = false,
 	MaxmimumSecret = false,
+	ChatHistory = false,
 };
 
 
@@ -381,6 +382,23 @@ if IsEnabled("SetAlphaGradient") then  --Frame SetAlphaGradient Test. Doesn't do
 	end
 
 	ApplyEdgeFade(f, CalculateEdgeFade());
+end
+
+if IsEnabled("ChatHistory") then
+	local EL = CreateFrame("Frame");
+	--EL:RegisterEvent("CHAT_MSG_CHANNEL");
+	EL:RegisterEvent("CHAT_MSG_SAY");
+	EL:RegisterEvent("CHAT_MSG_EMOTE");
+	EL:RegisterEvent("CHAT_MSG_TEXT_EMOTE");
+	EL:RegisterEvent("CHAT_MSG_MONSTER_EMOTE");
+	EL:RegisterEvent("CHAT_MSG_MONSTER_PARTY");
+	EL:RegisterEvent("CHAT_MSG_MONSTER_SAY");
+	EL:RegisterEvent("CHAT_MSG_MONSTER_WHISPER");
+	EL:RegisterEvent("CHAT_MSG_MONSTER_YELL");
+
+	EL:SetScript("OnEvent", function(self, event, ...)
+		print(event, ...);
+	end);
 end
 
 if true then    --Secret Debug
