@@ -23,7 +23,7 @@ changelogs[10809] = {
 	{
 		type = "p",
 		bullet = true,
-		text = "Activities Tab: Added Bountiful Delves to each Renown. Note: opening a Bountiful Coffer increase your reputation with a random Renown. One time per Renown per week.",
+		text = "Activities Tab: Added Bountiful Delves to each Renown. Note: Opening a Bountiful Coffer increases your reputation with a random Renown. One time per Renown per week.",
 	},
 
 	{
