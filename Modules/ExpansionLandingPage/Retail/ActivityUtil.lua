@@ -699,7 +699,6 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 				local flagQuest = entry.flagQuest or entry.questID;
 				if entry.questID then
 					InitQuestData(entry);
-					uniqueQuests[entry.questID] = true;
 				else
 					entry.isOnQuest = false;
 				end
@@ -784,14 +783,14 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 					end
 				end
 
-				if hideCompleted then
-					if entry.isHeader or (not entry.completed) then
+				if (not hideCompleted) or (entry.isHeader or not entry.completed) then
+					if (not entry.questID) or (entry.questID and not uniqueQuests[entry.questID]) then
+						if entry.questID then
+							uniqueQuests[entry.questID] = true;
+						end
 						numEntries = numEntries + 1;
 						entries[numEntries] = entry;
 					end
-				else
-					numEntries = numEntries + 1;
-					entries[numEntries] = entry;
 				end
 			end
 		end
