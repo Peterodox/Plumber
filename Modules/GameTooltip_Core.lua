@@ -127,8 +127,8 @@ do
 			end
 		end
 
-		if self.anyChange and tooltip == GameTooltip then
-			tooltip:Show();
+		if self.anyChange then
+			pcall(tooltip.Show, tooltip);
 		end
 
 		if self.hasAltMode then
