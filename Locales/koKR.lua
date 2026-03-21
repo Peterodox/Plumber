@@ -718,7 +718,7 @@ L["Click to Open Format"] = "%s 클릭 열기";
 L["List Is Empty"] = "목록이 비어 있습니다.";
 L["Prey No Data"] = "사냥 진행 불가";
 L["Abundance No Data"] = "활성화된 풍요 이벤트 없음";
-L["Defeated Prey"] = "처치된 먹잇감 대상";
+L["Defeated Prey"] = "처치된 사냥감 대상";
 
 
 --ExpansionSummaryMinimapButton
