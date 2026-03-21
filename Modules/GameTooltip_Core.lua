@@ -127,7 +127,7 @@ do
 			end
 		end
 
-		if self.anyChange then
+		if self.anyChange and tooltip == GameTooltip then
 			tooltip:Show();
 		end
 
