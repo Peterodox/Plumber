@@ -762,6 +762,15 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 				end
 			end
 
+			if entry.shownIfOwned and entry.itemID then
+				local count = C_Item.GetItemCount(entry.itemID);
+				if count and count > 0 then
+					showActivity = true;
+				else
+					showActivity = false;
+				end
+			end
+
 			if (not entry.completed) and showActivity then
 				anyIncompleted = true;
 			end

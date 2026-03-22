@@ -301,6 +301,7 @@ local ActivityData = {
 					{name = "Fortify the Runestones: Shades of the Row", questID = 90576, isWeeklyQuest = true, uiMapID = 2395},
 				},
 			},
+			{name = "Saltheril\'s Favor", itemID = 238987, icon = 237281, removeIconBorder = true, tooltipItem = 238987, uiMapID = 2395, shownIfOwned = true, tooltip = L["Item Expire Alert Weekly"]},
 
 			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 93821, accountwide = true},
 		},

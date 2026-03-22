@@ -719,6 +719,7 @@ L["List Is Empty"] = "The list is empty.";
 L["Prey No Data"] = "Prey Progress Unavailable";
 L["Abundance No Data"] = "No Active Abundance Event";
 L["Defeated Prey"] = "Defeated Prey Targets";
+L["Item Expire Alert Weekly"] = "This item will disappear after the weekly reset.";
 
 
 --ExpansionSummaryMinimapButton

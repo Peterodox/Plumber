@@ -685,6 +685,10 @@ L["Click To Switch"] = "点击以切换为|cffffffff%s|r";
 L["Click To Queue"] = "点击以加入|cffffffff%s|r";
 L["Click to Open Format"] = "点击以打开%s";
 L["List Is Empty"] = "暂无可显示内容";
+L["Prey No Data"] = "暂时无法获取狩猎信息";
+L["Abundance No Data"] = "暂无丰饶活动";
+L["Defeated Prey"] = "已击败的狩猎目标";
+L["Item Expire Alert Weekly"] = "这件物品将在每周服务器维护后消失。";
 
 
 --ExpansionSummaryMinimapButton
