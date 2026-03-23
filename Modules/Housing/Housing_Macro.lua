@@ -204,16 +204,11 @@ end
 local function EnableModule(state)
 	state = true;   --Always ON
 	Housing.RequestUpdateHouseInfo();
+	Flags.macroEnabled = state;
 	if state then
-		Flags.macroEnabled = true;
-		local blizzardAddOnName = "Blizzard_HousingDashboard";
-		if C_AddOns.IsAddOnLoaded(blizzardAddOnName) then
-			Blizzard_HousingDashboard_OnLoaded();
-		else
-			EventUtil.ContinueOnAddOnLoaded(blizzardAddOnName, Blizzard_HousingDashboard_OnLoaded);
-		end
+		addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_HousingDashboard", Blizzard_HousingDashboard_OnLoaded);
 	else
-		Flags.macroEnabled = false;
+		addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_HousingDashboard", Blizzard_HousingDashboard_OnLoaded);
 	end
 end
 
