@@ -347,6 +347,7 @@ stds.wow = {
 		"IsSpellKnown",
 		"IsSpellKnownOrOverridesKnown",
 		"IsTitleKnown",
+		"ItemInteractionFrame",
 		"ItemUpgradeFrame",
 		"JoinSingleLFG",
 		"LeaveChannelByLocalID",
