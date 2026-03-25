@@ -24,6 +24,13 @@ local AbundantHarvest = {
 	ticketCurrency = 3376,      --Shard of Dundun
 };
 
+local DelvesBonusRepQuestFlags = {
+	{questID = 93821, factionID = 2710, accountwide = true},	--Silvermoon
+	{questID = 93819, factionID = 2696, accountwide = true},	--Amani
+	{questID = 93822, factionID = 2704, accountwide = true},	--Harandar
+	{questID = 93820, factionID = 2699, accountwide = true},	--Singularity
+};
+
 
 local SetupFuncs = {};
 do
@@ -262,6 +269,12 @@ do
 
 		return loaded, keepUpdating
 	end
+
+
+	function SetupFuncs.WeeklyBonusRenown(tooltip)
+		ActivityUtil.TooltipFuncs.WeeklyBonusRenown(tooltip, DelvesBonusRepQuestFlags);
+		return true
+	end
 end
 
 
@@ -272,6 +285,7 @@ local ActivityData = {
 			{name = "A Gnawing Void of Curiosity", questID = 93784, isWeeklyQuest = true, accountwide = true},
 			{name = "Trovehunter\'s Bounty", itemID = 252415, flagQuest = 86371, icon = 1064187, tooltipItem = 252415},
 			{name = "Coffer Key Shard", currencyID = 3310, icon = 133016, removeIconBorder = true},
+			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFuncs.WeeklyBonusRenown, children = DelvesBonusRepQuestFlags},
 
 			--{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, removeIconBorder = true,
 			--    children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
@@ -280,7 +294,7 @@ local ActivityData = {
 			--{name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, removeIconBorder = true,
 			--    children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyShardFlags),
 			--},
-		}
+		},
 	},
 
 	{isHeader = true, name = "Prey", localizedName = L["Prey System"], categoryID = 120000, nameGetter = SetupFuncs.GetPreyHeader,
@@ -302,8 +316,6 @@ local ActivityData = {
 				},
 			},
 			{name = "Saltheril\'s Favor", itemID = 238987, icon = 237281, removeIconBorder = true, tooltipItem = 238987, uiMapID = 2395, shownIfOwned = true, tooltip = L["Item Expire Alert Weekly"]},
-
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 93821, accountwide = true},
 		},
 		questLines = {5841},
 	},
@@ -312,8 +324,6 @@ local ActivityData = {
 		entries = {
 			{name = "Abundant Offerings", questID = 89507, isWeeklyQuest = true, sortToTop = true},
 			{name = "Abundance", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Abundance.png", shouldShow = SetupFuncs.ShouldShowAbundance, setupFunc = SetupFuncs.AbundanceEvent, tooltipSetter = SetupFuncs.AbundanceTooltip},
-
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 93819, accountwide = true},
 		},
 	},
 
@@ -338,8 +348,6 @@ local ActivityData = {
 			{name = "WANTED: Muckmire's Choking Vines", questID = 91998, uiMapID = 2413, shownIfActive = true},
 			{name = "WANTED: Slewstalk's Stalks", questID = 92010, uiMapID = 2413, shownIfActive = true},
 			{name = "WANTED: Toadshade's Petals", questID = 91982, uiMapID = 2413, shownIfActive = true},
-
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 93822, accountwide = true},
 		},
 	},
 
@@ -352,8 +360,6 @@ local ActivityData = {
 			{name = "Darkness Unmade", questID = 91700, uiMapID = 2405, shownIfOnQuest = true},  --Kill 2 Rare creatures
 			{name = "Harvesting the Void", questID = 86810, uiMapID = 2405, shownIfOnQuest = true},
 			{name = "Hidey-Hole", questID = 92407, uiMapID = 2405, shownIfOnQuest = true},
-
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 93820, accountwide = true},
 		},
 	},
 

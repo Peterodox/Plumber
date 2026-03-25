@@ -4,6 +4,22 @@ local LandingPageUtil = addon.LandingPageUtil;
 local ActivityUtil = addon.ActivityUtil;
 
 
+local DelvesBonusRepQuestFlags = {
+	{questID = 91453, factionID = 2658, accountwide = true},	--Karesh
+	{questID = 87407, factionID = 2653, accountwide = true},	--Cartels
+	{questID = 83317, factionID = 2590, accountwide = true},	--Council
+	{questID = 83318, factionID = 2594, accountwide = true},	--Deeps
+	{questID = 83320, factionID = 2570, accountwide = true},	--Arathi
+	{questID = 83319, factionID = 2600, accountwide = true},	--Severed
+};
+
+
+local function SetupFunc_WeeklyBonusRenown(tooltip)
+	ActivityUtil.TooltipFuncs.WeeklyBonusRenown(tooltip, DelvesBonusRepQuestFlags);
+	return true
+end
+
+
 local ActivityData = {  --Constant
 	--questClassification: 5 is recurring
 
@@ -19,6 +35,8 @@ local ActivityData = {  --Constant
 			{name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, removeIconBorder = true,
 				children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyShardFlags),
 			},
+
+			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFunc_WeeklyBonusRenown, children = DelvesBonusRepQuestFlags},
 		}
 	},
 
@@ -29,7 +47,6 @@ local ActivityData = {  --Constant
 			{name = "Anima Reclamation Program", questID = 85459, isWeeklyQuest = true, uiMapID = 2371},
 			{name = "Food Run", questID = 85461, isWeeklyQuest = true, uiMapID = 2371},
 			{name = "A Reel Problem", questID = 90545, isWeeklyQuest = true, uiMapID = 2371},
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 91453, accountwide = true},
 
 			--{name = "Eliminate Grubber", questID = 90126, isWeeklyQuest = true, uiMapID = 2371, conditions = ActivityUtil.Conditions.KareshWarrant},   --one-time?
 
@@ -77,7 +94,6 @@ local ActivityData = {  --Constant
 	{isHeader = true, name = "Council of Dornogal", factionID = 2590, categoryID = 2590, uiMapID = 2248,
 		entries = {
 			{name = "The Theater Troupe", questID = 83240, isWeeklyQuest = true, uiMapID = 2248},
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83317, accountwide = true},
 		}
 	},
 
@@ -85,14 +101,12 @@ local ActivityData = {  --Constant
 		entries = {
 			{name = "Rollin\' Down in the Deeps", questID = 82946, isWeeklyQuest = true, uiMapID = 2214},
 			{name = "Gearing Up for Trouble", questID = 83333, isWeeklyQuest = true, uiMapID = 2214}, --Awakening the Machine
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83318, accountwide = true},
 		}
 	},
 
 	{isHeader = true, name = "Hallowfall Arathi", factionID = 2570, categoryID = 2570, uiMapID = 2215,
 		entries = {
 			{name = "Speading the Light", questID = 76586, isWeeklyQuest = true, uiMapID = 2215},
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83320, accountwide = true},
 		}
 	},
 
@@ -102,7 +116,6 @@ local ActivityData = {  --Constant
 			{name = "Blade of the General", questID = 80671, isWeeklyQuest = true, factionID = 2605, shownIfOnQuest = true, uiMapID = 2255},
 			{name = "Hand of the Vizier", questID = 80672, isWeeklyQuest = true, factionID = 2607, shownIfOnQuest = true, uiMapID = 2255},
 			{name = "Eyes of the Weaver", questID = 80670, isWeeklyQuest = true, factionID = 2601, shownIfOnQuest = true, uiMapID = 2255},
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 83319, accountwide = true},
 		}
 	},
 
@@ -113,7 +126,6 @@ local ActivityData = {  --Constant
 			{name = "Reduce, Reuse, Resell", questID = 85879, isWeeklyQuest = true, uiMapID = 2346},
 			{name = "Completed C.H.E.T.T. List", itemID = 235053, localizedName = L["Completed CHETT List"], conditions = ActivityUtil.Conditions.ItemReadyToTurnInWhenLooted_ItemName,   --The incompleted and completed items have the same itemID, needs checking count by name
 				icon = 134391, tooltip = L["Ready To Turn In Tooltip"], uiMapID = 2346},
-			{name = "Weekly Delve", localizedName = L["Bountiful Delve"], isDelveReputation = true, flagQuest = 87407, accountwide = true},
 		}
 	},
 
