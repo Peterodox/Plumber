@@ -194,8 +194,8 @@ do
 	addon.ControlCenter:AddModule(moduleData);
 end
 
-
-do	--Test
+--[[
+do
 	local function YeetConveribleItems()
 		local filterFunction = C_Item.IsItemConvertibleAndValidForPlayer;
 		local tbl = {};
@@ -271,3 +271,4 @@ do	--Test
 		C_ItemInteraction.SetPendingItem(list[1]);
 	end
 end
+--]]
