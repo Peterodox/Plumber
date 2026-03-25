@@ -182,7 +182,7 @@ do
 		description = addon.L["ModuleDescription CatalystUI"],
 		toggleFunc = EnableModule,
 		categoryID = 3,
-		moduleAddedTime = 1755200000,
+		moduleAddedTime = 1774400000,
 		categoryKeys = {
 			"Collection",
 		},
