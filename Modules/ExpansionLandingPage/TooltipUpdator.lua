@@ -248,8 +248,26 @@ function TooltipUpdator:OnUpdate(elapsed)
 				end
 
 				if self.currencyID then
-					local text = API.ConvertTooltipInfoToOneString(" ", "GetCurrencyByID", self.currencyID);
-					tooltip:AddLine(text, 1, 1, 1, true);
+					local info = C_CurrencyInfo.GetCurrencyInfo(self.currencyID);
+					if info then
+						local progressLabel, earned, cap;
+						if info.useTotalEarnedForMaxQty then
+							progressLabel = CURRENCY_TOTAL_CAP;
+							earned, cap = info.totalEarned, info.maxQuantity;
+						elseif info.maxWeeklyQuantity and info.maxWeeklyQuantity > 0 and info.quantityEarnedThisWeek then
+							progressLabel = CURRENCY_WEEKLY_CAP;
+							earned, cap = info.quantityEarnedThisWeek, info.maxWeeklyQuantity
+						end
+
+						if progressLabel then
+							tooltip:AddLine(progressLabel:format("|cffffffff", earned, cap), 1, 0.82, 0, false);
+							tooltip:AddLine(" ");
+						end
+
+						tooltip:AddLine(info.description, 1, 1, 1, true);
+					end
+					--local text = API.ConvertTooltipInfoToOneString(" ", "GetCurrencyByID", self.currencyID);
+					--tooltip:AddLine(text, 1, 1, 1, true);
 				end
 
 				if isRetrievingData then
