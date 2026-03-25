@@ -8,6 +8,85 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10900] = {
+	{
+		type = "date",
+		versionText = "1.9.0",
+		timestamp = 1774400000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName CatalystUI"],
+		dbKey = "CatalystUI",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "CatalystUI",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Allows you to Ctrl-Click the output item to view it in the Dressing Room, or Shift-Click to link it to chat.",
+	},
+
+	{
+		type = "img",
+		dbKey = "CatalystUI",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName NewExpansionLandingPage"],
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Activities Tab: Added item \"Saltheril's Favor\" to Silvermoon Court. Note: These items can be used to unlock more tasks and expire after the weekly reset.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Activities Tab: Added quest \"Lost Legends\" to Hara'ti.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Activities Tab: Merged \"Bountiful Delves\" under each Renown activity into a single entry named \"Bonus Renown\" under the Delves category.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Great Vault: Fixed an issue where the third row incorrectly showed \"Reward at Highest Level.\"",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Fixed an issue where hovering your cursor over certain items caused errors after entering and leaving an instance.",
+	},
+};
+
+
 changelogs[10809] = {
 	{
 		type = "date",

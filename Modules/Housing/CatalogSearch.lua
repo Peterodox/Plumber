@@ -436,19 +436,15 @@ do
 	local function EnableModule(state)
 		if state then
 			for _, v in ipairs(BlizzardAddOns) do
-				if not v.registered then
-					v.registered = true;
-					if C_AddOns.IsAddOnLoaded(v.name) then
-						v.callback();
-					else
-						EventUtil.ContinueOnAddOnLoaded(v.name, v.callback);
-					end
-				end
+				addon.CallbackRegistry:RegisterAddOnLoadedCallback(v.name, v.callback);
 			end
 			ModifyContextMenu();
 			MODULE_ENABLED = true;
 		else
 			MODULE_ENABLED = false;
+			for _, v in ipairs(BlizzardAddOns) do
+				addon.CallbackRegistry:UnregisterAddOnLoadedCallback(v.name, v.callback);
+			end
 		end
 
 		EnableLinkDecorToChat(state);

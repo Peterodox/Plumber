@@ -1,7 +1,7 @@
 ## X-Flavor: retail
 ## X-Expansion: TWW
 ## Interface: 120001, 120005
-## Version: 1.8.9
+## Version: 1.9.0
 
 ## Title: Plumber
 
@@ -86,6 +86,7 @@ Modules\CraftSearchExtended.lua
 Modules\SourceAchievementLink.lua
 Modules\OutfitSelect.lua
 Modules\BreakTime.xml
+Modules\CatalystUI.lua
 
 #Modules\MerchantUI\MerchantUI.xml
 

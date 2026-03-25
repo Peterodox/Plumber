@@ -11,7 +11,7 @@ if classID ~= 4 and raceID ~= 37 then return end;
 local API = addon.API;
 local IsWarningColor = API.IsWarningColor;
 
-local _G = _G;
+
 local InCombatLockdown = InCombatLockdown;
 local IsSpellKnown = C_SpellBook.IsSpellKnown or IsSpellKnown;
 local SpellIsTargeting = SpellIsTargeting;
@@ -22,6 +22,7 @@ local GetCVarBool = C_CVar.GetCVarBool;
 local match = string.match;
 local find = string.find;
 local IsInteractingWithNpcOfType = (C_PlayerInteractionManager and C_PlayerInteractionManager.IsInteractingWithNpcOfType) or function(type) return false end
+local Secret_CanAccess = API.Secret_CanAccess;
 
 
 local TEXT_LOCKED = LOCKED or "Locked";
@@ -302,19 +303,29 @@ local function SetupActionButton(bag, slot, tradeItem)
 	return ActionButton
 end
 
-local function IsMouseoverItemLocked(lineIndex)
+local function IsMouseoverItemLocked(lines, lineIndex)
+	if not lines then return end;
+
 	local toIndex;
+
 	if lineIndex then
 		toIndex = GetCVarBool("colorblindMode") and 3 or 2;    --Colorblind Mode: Quality becomes the 2nd line
 	else
-		toIndex = TooltipFrame:NumLines();
+		toIndex = #lines;
 	end
+
 	local line, lineText;
+
 	for i = 2, toIndex do
-		line = _G["GameTooltipTextLeft"..i];
-		lineText = line and line:GetText();
-		if lineText and find(lineText, TEXT_LOCKED, 1, true) then      --Colorblind Mode: [++]Locked(Yellow), [-]Locked(Red)
-			local r, g, b = line:GetTextColor();
+		line = lines[i];
+		lineText = line and line.leftText;
+
+		if not Secret_CanAccess(lineText) then
+			return
+		end
+
+		if find(lineText, TEXT_LOCKED, 1, true) then      --Colorblind Mode: [++]Locked(Yellow), [-]Locked(Red)
+			local r, g, b = line.leftColor:GetRGB();
 			if IsWarningColor(r, g, b) then
 				return false
 			else
@@ -374,6 +385,10 @@ function Processor:StartWatchingOwner(itemButton)
 	self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
 end
 
+local function GetTooltipDataFromTooltip(tooltip)
+	return tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData and tooltip.infoList[1].tooltipData
+end
+
 function Processor:ProcessItem()
 	if InCombatLockdown() or IsPlayerInteracingBank() then return end;
 
@@ -383,7 +398,7 @@ function Processor:ProcessItem()
 			if info.getterName == "GetBagItem" then
 				local bag, slot = info.getterArgs[1], info.getterArgs[2];
 				if bag and slot then
-					local tooltipData = TooltipFrame.infoList and TooltipFrame.infoList[1] and TooltipFrame.infoList[1].tooltipData;
+					local tooltipData = GetTooltipDataFromTooltip(TooltipFrame);
 					if tooltipData and tooltipData.type == TOOLTIP_DATA_TYPE then
 						local itemID = tooltipData.id;
 						local lineIndex;
@@ -392,7 +407,7 @@ function Processor:ProcessItem()
 						else
 							lineIndex = 2;
 						end
-						if IsMouseoverItemLocked(lineIndex) then
+						if IsMouseoverItemLocked(tooltipData.lines, lineIndex) then
 							SetupButtonAndTooltip(bag, slot);
 							return
 						end
@@ -402,7 +417,8 @@ function Processor:ProcessItem()
 				local tradeSlotIndex = info.getterArgs[1];
 				if tradeSlotIndex and tradeSlotIndex == NOT_TRADED_ITEM_SLOT_INDEX then
 					local lineIndex = 2;
-					if IsMouseoverItemLocked(lineIndex) then
+					local tooltipData = GetTooltipDataFromTooltip(TooltipFrame);
+					if IsMouseoverItemLocked(tooltipData.lines, lineIndex) then
 						SetupButtonAndTooltip(nil, nil, true);
 						return
 					end

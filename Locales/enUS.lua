@@ -667,7 +667,8 @@ L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Great Vault";
 L["Item Upgrade"] = ITEM_UPGRADE or "Item Upgrade";
 L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Resources";
 L["Plumber Experimental Feature Tooltip"] = "An experimental feature in Plumber addon.";
-L["Bountiful Delves Rep Tooltip"] = "Opening a Bountiful Coffer has a chance to increase your reputation with this faction.";
+L["Bountiful Delves Rep Label"] = "Bonus Renowns";
+L["Bountiful Delves Rep Tooltip"] = "Opening a Bountiful Coffer at the end of a Bountiful Delve increases your reputation with a random Renown, limited to once per Renown.";
 L["Warband Weekly Reward Tooltip"] = "You Warband can only receive this reward once per week.";
 L["Completed"] = CRITERIA_COMPLETED or "Completed";
 L["Filter Hide Completed Format"] = "Hide Completed (%d)";
@@ -719,6 +720,7 @@ L["List Is Empty"] = "The list is empty.";
 L["Prey No Data"] = "Prey Progress Unavailable";
 L["Abundance No Data"] = "No Active Abundance Event";
 L["Defeated Prey"] = "Defeated Prey Targets";
+L["Item Expire Alert Weekly"] = "This item will disappear after the weekly reset.";
 
 
 --ExpansionSummaryMinimapButton
@@ -871,6 +873,11 @@ L["BreakTime AFK Pause"] = "The countdown is on hold because you are AFK.";
 L["BreakTime Reset Cancellation"] = "Reset Cancelled Break";
 L["BreakTime Annouce Timer Deferred Combat"] = "Remember to take a break after fight!";
 L["BreakTime Shared Countdown Tooltip Format"] = "Scheduled break in |cffffffff%d|r min.";
+
+
+--CatalystUI
+L["ModuleName CatalystUI"] = "Catalyst: View Item In Dressing Room";
+L["ModuleDescription CatalystUI"] = "Allows you to Ctrl-Click the output item to view it in the Dressing Room, or Shift-Click to link it to chat.";
 
 
 --Generic

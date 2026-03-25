@@ -85,7 +85,7 @@ do  --Checklist Button
 			if data.questID then
 				self:SetQuest(data.questID);
 			elseif data.itemID then
-				self:SetItem(data.itemID);
+				self:SetItem(data.itemID, data.shownIfOwned);
 			elseif data.currencyID then
 				self:SetCurrency(data.currencyID);
 			else
@@ -204,20 +204,38 @@ do  --Checklist Button
 		end
 	end
 
+	local function PrependItemCount(itemID, itemName)
+		if itemName then
+			local count = C_Item.GetItemCount(itemID);
+			if count then
+				return count.." "..itemName;
+			end
+		end
+		return itemName
+	end
 
-	function ChecklistButtonMixin:SetItem(itemID)
+	function ChecklistButtonMixin:SetItem(itemID, showItemCount)
 		self.type = "Item";
 		self.id = itemID;
+		self.showItemCount = showItemCount;
 
 		self.Text1:SetText(nil);
 
 		local name, isLocalized = ActivityUtil.GetActivityName(self.dataIndex);
+
+		if name and showItemCount then
+			name = PrependItemCount(itemID, name);
+		end
+
 		self.Name:SetText(name);
 		if not isLocalized then
 			CallbackRegistry:LoadItem(itemID, function(_itemID)
 				if _itemID == self.itemID then
 					local _name = C_Item.GetItemNameByID(_itemID);
 					ActivityUtil.StoreItemActivityName(_itemID, _name);
+					if showItemCount then
+						_name = PrependItemCount(itemID, _name);
+					end
 					self.Name:SetText(_name);
 					self:UpdateProgress();
 				end

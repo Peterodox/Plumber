@@ -467,20 +467,13 @@ do  --Module Registry
 	local function EnableModule(state)
 		if state and not EL.enabled then
 			EL.enabled = true;
-			if C_AddOns.IsAddOnLoaded("Blizzard_Transmog") then
-				Mod.Transmog_OnLoad();
-			else
-				if not EL.hooked then
-					EL.hooked = true;
-					EventUtil.ContinueOnAddOnLoaded("Blizzard_Transmog", Mod.Transmog_OnLoad);
-				end
-			end
-
+			addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_Transmog", Mod.Transmog_OnLoad);
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
 			if TransmogFrame then
 				Mod.MaximizeTransmogUI();
 			end
+			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", Mod.Transmog_OnLoad);
 		end
 	end
 

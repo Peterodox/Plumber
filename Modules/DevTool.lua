@@ -417,3 +417,15 @@ if true then    --Secret Debug
 		C_CVar.SetCVar("secret"..v.."RestrictionsForced", value);
 	end
 end
+
+do
+	local function ModifyChat(newText)
+		for f in ChatFrame1.fontStringPool:EnumerateActive() do
+			if f:IsMouseOver() then
+				local oldText = f:GetText();
+				local speaker = string.match(oldText, "[^:]+", 1);
+				f:SetText(string.format("%s: %s", speaker, newText));
+			end
+		end
+	end
+end

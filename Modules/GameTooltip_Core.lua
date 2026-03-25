@@ -350,13 +350,14 @@ do  --APIs
 	function GameTooltipManager.ReplaceTooltipLine(tooltip, searchText, newText, r, g, b)
 		local found;
 		local fs;
-		local name = tooltip:GetName();
+		local text;
 		local isLastLine = true;
 
 		for i = tooltip:NumLines(), 2, -1 do
-			fs = _G[name.."TextLeft"..i];
+			fs = tooltip:GetLeftLine(i);
 			if fs then
-				if fs:GetText() == searchText then
+				text = fs:GetText();
+				if Secret_CanAccess(text) and text == searchText then
 					found = true;
 					if newText then
 						fs:SetText(newText);
@@ -382,13 +383,12 @@ do  --APIs
 	function GameTooltipManager.ReplaceLineByMatching(tooltip, pattern, newText, r, g, b)
 		local found;
 		local fs, text;
-		local name = tooltip:GetName();
 		local isLastLine = true;
 		for i = tooltip:NumLines(), 2, -1 do
-			fs = _G[name.."TextLeft"..i];
+			fs = tooltip:GetLeftLine(i);
 			if fs then
 				text = fs:GetText();
-				if text and match(text, pattern) then
+				if Secret_CanAccess(text) and match(text, pattern) then
 					found = true;
 					fs:SetText(newText);
 					if r then

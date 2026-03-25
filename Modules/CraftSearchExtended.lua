@@ -445,18 +445,10 @@ do  --Module Registry
 	local function EnabledModule(state)
 		MODULE_ENABLED = state;
 		if state then
-			local blizzardAddonName = "Blizzard_Professions";
-			if C_AddOns.IsAddOnLoaded(blizzardAddonName) then
-				Blizzard_Professions_OnLoaded();
-			else
-				if not DummyOwner.callbackAdded then
-					DummyOwner.callbackAdded = true;
-					EventUtil.ContinueOnAddOnLoaded("Blizzard_Professions", Blizzard_Professions_OnLoaded);
-				end
-			end
-
+			addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_Professions", Blizzard_Professions_OnLoaded);
 			EventRegistry:RegisterCallback("ProfessionsFrame.Minimized", SearchBox_OnTextChanged, DummyOwner);
 		else
+			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Professions", Blizzard_Professions_OnLoaded);
 			EventRegistry:UnregisterCallback("ProfessionsFrame.Minimized", DummyOwner);
 			HideUI();
 		end

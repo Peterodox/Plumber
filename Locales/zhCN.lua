@@ -667,7 +667,8 @@ L["Great Vault"] = "宏伟宝库";
 L["Item Upgrade"] = "物品升级";
 L["Resources"] = "资源";
 L["Plumber Experimental Feature Tooltip"] = "Plumber插件中的实验性功能。";
-L["Bountiful Delves Rep Tooltip"] = "打开丰裕宝匣有几率奖励此阵营的声望。";
+L["Bountiful Delves Rep Label"] = "额外名望奖励";
+L["Bountiful Delves Rep Tooltip"] = "打开丰裕宝匣会奖励随机名望的声望，每个名望每周只能获得一次奖励。";
 L["Warband Weekly Reward Tooltip"] = "你的战团每周只能获取一次此奖励。";
 L["Completed"] = "已完成";
 L["Filter Hide Completed Format"] = "隐藏已完成的条目 (%d)";
@@ -685,6 +686,10 @@ L["Click To Switch"] = "点击以切换为|cffffffff%s|r";
 L["Click To Queue"] = "点击以加入|cffffffff%s|r";
 L["Click to Open Format"] = "点击以打开%s";
 L["List Is Empty"] = "暂无可显示内容";
+L["Prey No Data"] = "暂时无法获取狩猎信息";
+L["Abundance No Data"] = "暂无丰饶活动";
+L["Defeated Prey"] = "已击败的狩猎目标";
+L["Item Expire Alert Weekly"] = "这件物品将在每周服务器维护后消失。";
 
 
 --ExpansionSummaryMinimapButton
@@ -836,6 +841,11 @@ L["BreakTime AFK Pause"] = "由于你处于暂离状态，倒计时已暂停。"
 L["BreakTime Reset Cancellation"] = "重置已取消的休息时间";
 L["BreakTime Annouce Timer Deferred Combat"] = "战斗过后请记得休息！";
 L["BreakTime Shared Countdown Tooltip Format"] = "计划休息将于|cffffffff%d|r分钟后开始。";
+
+
+--CatalystUI
+L["ModuleName CatalystUI"] = "化生充能：试衣间预览";
+L["ModuleDescription CatalystUI"] = "允许你按住Ctrl点击转化后的装备来在试衣间中预览它，或是按住Shift点击来插入到聊天窗口。";
 
 
 --Generic

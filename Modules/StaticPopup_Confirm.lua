@@ -1,10 +1,8 @@
 local _, addon = ...
 local L = addon.L;
-local API = addon.API;
 
 
 local MODULE_ENABLED = false;
-local CALLBACK_REGISTERED = false;
 
 
 local Backups = {};
@@ -74,15 +72,11 @@ local function EnableModule(state)
 	if state and not MODULE_ENABLED then
 		MODULE_ENABLED = true;
 		ModifyDialogs();
-		if not CALLBACK_REGISTERED then
-			CALLBACK_REGISTERED = true;
-			EventUtil.ContinueOnAddOnLoaded("Blizzard_ItemInteractionUI", function()
-				ModifyDialogs();
-			end);
-		end
+		addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_ItemInteractionUI", ModifyDialogs);
 	elseif (not state) and MODULE_ENABLED then
 		MODULE_ENABLED = false;
 		RestoreDialogs();
+		addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_ItemInteractionUI", ModifyDialogs);
 	end
 end
 

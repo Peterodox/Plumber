@@ -253,6 +253,26 @@ do
 	function TooltipFuncs.WeeklyCofferKeyShard(tooltip)
 		return TooltipFuncs.WeeklyCofferKey_Shared(tooltip, L["Weekly Coffer Key Shards Tooltip"], "MinorChests");
 	end
+
+	function TooltipFuncs.WeeklyBonusRenown(tooltip, flagQuests)
+		for _, v in ipairs(flagQuests) do
+			local factionName = addon.FactionUtil:GetFactionName(v.factionID);
+			if factionName then
+				if C_QuestLog.IsQuestFlaggedCompletedOnAccount(v.questID) then
+					tooltip:AddLine("- "..factionName, 0.251, 0.753, 0.251, false);
+				else
+					tooltip:AddLine("- "..factionName, 0.5, 0.5, 0.5, false);
+				end
+			end
+		end
+
+		tooltip:AddLine(" ");
+		tooltip:AddLine(L["Bountiful Delves Rep Tooltip"], 1, 1, 1, true);
+		tooltip:AddLine(" ");
+		tooltip:AddLine(L["Warband Weekly Reward Tooltip"], 0, 0.8, 1, true);
+
+		return true
+	end
 end
 
 
@@ -738,14 +758,8 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 			end
 
 			if entry.shownIfOnQuest then
-				if hideCompleted then
-					if not entry.isOnQuest then
-						showActivity = false;
-					end
-				else
-					if not (entry.completed or entry.isOnQuest) then
-						showActivity = false;
-					end
+				if not entry.isOnQuest then
+					showActivity = false;
 				end
 			end
 
@@ -759,6 +773,15 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 					else
 						showActivity = false;
 					end
+				end
+			end
+
+			if entry.shownIfOwned and entry.itemID then
+				local count = C_Item.GetItemCount(entry.itemID);
+				if count and count > 0 then
+					showActivity = true;
+				else
+					showActivity = false;
 				end
 			end
 
