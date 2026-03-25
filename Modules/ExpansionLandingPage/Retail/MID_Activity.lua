@@ -329,17 +329,17 @@ local ActivityData = {
 
 	{isHeader = true, name = "Harandar", factionID = 2704, categoryID = 2704, uiMapID = 2413,
 		entries = {
-			--{name = "Lost Legends", questID = 89268, isWeeklyQuest = true, uiMapID = 2413, sortToTop = true},
+			{name = "Lost Legends", questID = 89268, isWeeklyQuest = true, uiMapID = 2413, sortToTop = true},
 
-			{name = L["QuestName HarandarRelic"], localizedName = L["QuestName HarandarRelic"], isWeeklyQuest = true, uiMapID = 2413, sortToTop = true, useActiveQuestTitle = true,
-				questPool = {
-					{name = "Wey'nan's Ward", questID = 88993, isWeeklyQuest = true, uiMapID = 2413},
-					{name = "The Cauldron of Echoes", questID = 88994, isWeeklyQuest = true, uiMapID = 2413},
-					{name = "The Echoless Flame", questID = 88996, isWeeklyQuest = true, uiMapID = 2413},
-					{name = "Russula's Outreach", questID = 88997, isWeeklyQuest = true, uiMapID = 2413},
-					{name = "Aln'hara's Bloom", questID = 88995, isWeeklyQuest = true, uiMapID = 2413},
-				},
-			},
+			--{name = L["QuestName HarandarRelic"], localizedName = L["QuestName HarandarRelic"], isWeeklyQuest = true, uiMapID = 2413, sortToTop = true, useActiveQuestTitle = true,
+			--	questPool = {
+					{name = "Wey'nan's Ward", questID = 88993, isWeeklyQuest = true, uiMapID = 2413, shownIfOnQuest = true},
+					{name = "The Cauldron of Echoes", questID = 88994, isWeeklyQuest = true, uiMapID = 2413, shownIfOnQuest = true},
+					{name = "The Echoless Flame", questID = 88996, isWeeklyQuest = true, uiMapID = 2413, shownIfOnQuest = true},
+					{name = "Russula's Outreach", questID = 88997, isWeeklyQuest = true, uiMapID = 2413, shownIfOnQuest = true},
+					{name = "Aln'hara's Bloom", questID = 88995, isWeeklyQuest = true, uiMapID = 2413, shownIfOnQuest = true},
+			--	},
+			--},
 
 			{name = "WANTED: Dionaea's Thorntusks", questID = 92013, uiMapID = 2413, shownIfActive = true},
 			{name = "WANTED: Gelatonius", questID = 91970, uiMapID = 2413, shownIfActive = true},

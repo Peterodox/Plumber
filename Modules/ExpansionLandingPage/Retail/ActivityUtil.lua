@@ -758,14 +758,8 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 			end
 
 			if entry.shownIfOnQuest then
-				if hideCompleted then
-					if not entry.isOnQuest then
-						showActivity = false;
-					end
-				else
-					if not (entry.completed or entry.isOnQuest) then
-						showActivity = false;
-					end
+				if not entry.isOnQuest then
+					showActivity = false;
 				end
 			end
 
