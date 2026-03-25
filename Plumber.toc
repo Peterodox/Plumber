@@ -86,7 +86,7 @@ Modules\CraftSearchExtended.lua
 Modules\SourceAchievementLink.lua
 Modules\OutfitSelect.lua
 Modules\BreakTime.xml
-Modules\TryOnItem.lua
+Modules\CatalystUI.lua
 
 #Modules\MerchantUI\MerchantUI.xml
 

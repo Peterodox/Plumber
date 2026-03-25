@@ -25,7 +25,7 @@ end
 local CursorWatcher = CreateFrame("Frame");
 do	--Change curosr icon to Inspect
 	CursorWatcher:Hide();
-	CursorWatcher.frames = {};
+	CursorWatcher.checkFuncs = {};
 	CursorWatcher.IsControlKeyDown = IsControlKeyDown;
 
 	function CursorWatcher:OnUpdate(elapsed)
@@ -33,19 +33,22 @@ do	--Change curosr icon to Inspect
 		if self.t >= 0.1 then
 			self.t = 0;
 			self.anyShown = false;
-			self.anyMouseover = false;
+			self.anyItem = false;
+			local isShown, hasItem;
 
-			for _, f in ipairs(self.frames) do
-				if (not self.anyMouseover) and f:IsMouseMotionFocus() then
-					self.anyMouseover = true;
+			for _, func in ipairs(self.checkFuncs) do
+				isShown, hasItem = func();
+				if isShown then
+					self.anyShown = true;
 				end
 
-				if f:IsVisible() then
-					self.anyShown = true;
+				if hasItem then
+					self.anyItem = true;
+					break
 				end
 			end
 
-			if self.anyMouseover and IsControlKeyDown() then
+			if self.anyItem and IsControlKeyDown() then
 				self.cusorChanged = true;
 				SetCursor("INSPECT_CURSOR");
 			elseif self.cusorChanged then
@@ -60,8 +63,8 @@ do	--Change curosr icon to Inspect
 		end
 	end
 
-	function CursorWatcher:AddFrame(f)
-		table.insert(self.frames, f);
+	function CursorWatcher:AddCheckFunc(f)
+		table.insert(self.checkFuncs, f);
 	end
 
 	function CursorWatcher:Start()
@@ -127,7 +130,20 @@ do	--ItemInteractionFrame
 			outputSlot:HookScript("OnClick", OutputSlot_OnClick);
 			outputSlot:HookScript("OnShow", SharedButton_OnShow);
 			hooksecurefunc(outputSlot, "RefreshIcon", OutputSlot_RefreshIcon);
-			CursorWatcher:AddFrame(outputSlot);
+
+			local function IsItemButton()
+				local isShown, hasItem;
+				if outputSlot:IsVisible() then
+					isShown = true;
+					hasItem = outputSlot:IsMouseMotionFocus() and ItemInteractionFrame.itemLocation ~= nil
+				else
+					isShown = false;
+					hasItem = false;
+				end
+				return isShown, hasItem
+			end
+
+			CursorWatcher:AddCheckFunc(IsItemButton);
 
 			local inputSlot = API.GetGlobalObject("ItemInteractionFrame.ItemConversionFrame.ItemConversionInputSlot");
 			if inputSlot then
@@ -161,9 +177,9 @@ do
 	end
 
 	local moduleData = {
-		name = addon.L["ModuleName TryOnItem"],
-		dbKey = "TryOnItem",
-		description = addon.L["ModuleDescription TryOnItem"],
+		name = addon.L["ModuleName CatalystUI"],
+		dbKey = "CatalystUI",
+		description = addon.L["ModuleDescription CatalystUI"],
 		toggleFunc = EnableModule,
 		categoryID = 3,
 		moduleAddedTime = 1755200000,

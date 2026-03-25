@@ -842,9 +842,9 @@ L["BreakTime Annouce Timer Deferred Combat"] = "战斗过后请记得休息！";
 L["BreakTime Shared Countdown Tooltip Format"] = "计划休息将于|cffffffff%d|r分钟后开始。";
 
 
---TryOnItem
-L["ModuleName TryOnItem"] = "化生充能：试衣间预览";
-L["ModuleDescription TryOnItem"] = "允许你按住Ctrl点击转化后的装备来在试衣间中预览它，或是按住Shift点击来插入到聊天窗口。";
+--CatalystUI
+L["ModuleName CatalystUI"] = "化生充能：试衣间预览";
+L["ModuleDescription CatalystUI"] = "允许你按住Ctrl点击转化后的装备来在试衣间中预览它，或是按住Shift点击来插入到聊天窗口。";
 
 
 --Generic

@@ -874,9 +874,9 @@ L["BreakTime Annouce Timer Deferred Combat"] = "Remember to take a break after f
 L["BreakTime Shared Countdown Tooltip Format"] = "Scheduled break in |cffffffff%d|r min.";
 
 
---TryOnItem
-L["ModuleName TryOnItem"] = "Catalyst: View Item In Dressing Room";
-L["ModuleDescription TryOnItem"] = "Allows you to Ctrl-Click the output item to view it in the Dressing Room, or Shift-Click to link it to chat.";
+--CatalystUI
+L["ModuleName CatalystUI"] = "Catalyst: View Item In Dressing Room";
+L["ModuleDescription CatalystUI"] = "Allows you to Ctrl-Click the output item to view it in the Dressing Room, or Shift-Click to link it to chat.";
 
 
 --Generic

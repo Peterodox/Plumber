@@ -243,7 +243,7 @@ local DefaultValues = {
 	CraftSearchExtended = false,        --Show more search result, custom keywords
 	SourceAchievementLink = true,       --Make Achievement name in MountJournal, DecorCatalog interactable
 	TransmogOutfitSelect = true,        --Show Minimized Transmog Outfit Collection
-	TryOnItem = true,					--Allow Ctrl-Click to preview items in Dressing Room for UIs that don't natively support this action
+	CatalystUI = true,					--Allow Ctrl-Click to preview items in Dressing Room for UIs that don't natively support this action
 
 
 	--Tooltip
