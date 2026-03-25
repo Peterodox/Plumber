@@ -120,25 +120,25 @@ do  --CallbackRegistry
 		end
 	end
 
-    function CallbackRegistry:RegisterAddOnLoadedCallback(name, callback)
-        if C_AddOns.IsAddOnLoaded(name) then
-            callback();
-            return
-        end
+	function CallbackRegistry:RegisterAddOnLoadedCallback(name, callback)
+		if C_AddOns.IsAddOnLoaded(name) then
+			callback();
+			return
+		end
 
-        if not self.addonLoadedCallbacks[name] then
-            self.addonLoadedCallbacks[name] = {};
-            EL:RegisterEvent("ADDON_LOADED");
-        end
+		if not self.addonLoadedCallbacks[name] then
+			self.addonLoadedCallbacks[name] = {};
+			EL:RegisterEvent("ADDON_LOADED");
+		end
 
-        self.addonLoadedCallbacks[name][callback] = true;
-    end
+		self.addonLoadedCallbacks[name][callback] = true;
+	end
 
-    function CallbackRegistry:UnregisterAddOnLoadedCallback(name, callback)
-        if self.addonLoadedCallbacks[name] then
-            self.addonLoadedCallbacks[name][callback] = nil;
-        end
-    end
+	function CallbackRegistry:UnregisterAddOnLoadedCallback(name, callback)
+		if self.addonLoadedCallbacks[name] then
+			self.addonLoadedCallbacks[name][callback] = nil;
+		end
+	end
 end
 
 
