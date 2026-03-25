@@ -177,3 +177,81 @@ do
 
 	addon.ControlCenter:AddModule(moduleData);
 end
+
+
+do	--Test
+	local function YeetConveribleItems()
+		local filterFunction = C_Item.IsItemConvertibleAndValidForPlayer;
+		local tbl = {};
+		local n = 0;
+
+		local function ItemLocationCallback(itemLocation)
+			if filterFunction(itemLocation) then
+				n = n + 1;
+				tbl[itemLocation] = C_Item.GetItemLink(itemLocation);
+			end
+		end
+
+		ItemUtil.IteratePlayerInventoryAndEquipment(ItemLocationCallback);
+
+		local list = {};
+
+		for itemLocation in pairs(tbl) do
+			table.insert(list, itemLocation);
+		end
+
+		local fromIndex = 1;
+		local TestFrame = PlumberTestFrame or CreateFrame("Frame", "PlumberTestFrame", UIParent);
+
+		TestFrame:SetScript("OnUpdate", nil);
+
+		local function TestFrame_OnUpdate(self, elapsed)
+			self:SetScript("OnUpdate", nil);
+			if list[fromIndex] then
+				C_ItemInteraction.SetPendingItem(list[fromIndex]);
+			end
+		end
+
+		local links = {};
+
+		local function DisplayResult()
+			local GetItemUpgradeInfo = C_Item.GetItemUpgradeInfo;
+
+			for _, link in ipairs(links) do
+				local info = GetItemUpgradeInfo(link);
+				if info then
+					print(info.trackStringID, info.trackString, info.currentLevel, string.gsub(link, "^|cn|Q%s:|H", ""), C_TransmogCollection.GetItemInfo(link));
+				end
+			end
+		end
+
+		TestFrame:SetScript("OnEvent", function(self, event, ...)
+			if event == "ITEM_CONVERSION_DATA_READY" or event == "ITEM_INTERACTION_ITEM_SELECTION_UPDATED" then
+				local itemGUID = ...
+				local info = C_TooltipInfo.GetItemInteractionItem();
+				--print(event)
+				if info and info.hyperlink then
+					print(info.hyperlink);
+					self:SetScript("OnUpdate", nil);
+					table.insert(links, info.hyperlink);
+
+					fromIndex = fromIndex + 1;
+					if list[fromIndex] then
+						TestFrame_OnUpdate(self);
+						--self:SetScript("OnUpdate", TestFrame_OnUpdate);
+					else
+						self:UnregisterEvent(event);
+						C_ItemInteraction.ClearPendingItem();
+
+						DisplayResult();
+					end
+				end
+			end
+		end)
+
+		TestFrame:RegisterEvent("ITEM_CONVERSION_DATA_READY");
+		TestFrame:RegisterEvent("ITEM_INTERACTION_ITEM_SELECTION_UPDATED");
+
+		C_ItemInteraction.SetPendingItem(list[1]);
+	end
+end

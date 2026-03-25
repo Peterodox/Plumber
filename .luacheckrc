@@ -831,12 +831,18 @@ stds.wow = {
 				"GetItemQualityColor",
 				"GetItemSpell",
 				"GetItemSubClassInfo",
+				"GetItemUpgradeInfo",
 				"IsCosmeticItem",
 				"IsDecorItem",
 				"IsDressableItemByID",
 				"IsItemDataCachedByID",
 				"RequestLoadItemDataByID",
 			},
+		},
+
+		C_ItemInteraction = {
+			"ClearPendingItem",
+			"SetPendingItem",
 		},
 
 		C_ItemUpgrade = {
