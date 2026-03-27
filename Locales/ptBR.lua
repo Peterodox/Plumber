@@ -52,7 +52,7 @@ L["Work In Progress Tag"] = "[WIP]";
 L["SC Signature"] = "Principais recursos";
 L["SC Current"] = "Conteúdo atual";
 L["SC ActionBar"] = "Barras de ação";
-L["SC Chat"] = "Chat";
+L["SC Chat"] = "Bate-papo";
 L["SC Collection"] = "Coleções";
 L["SC Instance"] = "Instâncias";
 L["SC Inventory"] = "Inventário";
@@ -186,7 +186,7 @@ L["TalkingHead Option InstantText"] = "Texto instantâneo";   --Should texts imm
 L["TalkingHead Option TextOutline"] = "Contorno do texto";   --Added a stroke/outline to the letter
 L["TalkingHead Option Condition Header"] = "Ocultar textos de origem:";
 L["TalkingHead Option Hide Everything"] = "Ocultar tudo";
-L["TalkingHead Option Hide Everything Tooltip"] = "|cffff4800A legenda não aparecerá mais.|r\n\nA narração ainda tocará, e a transcrição será exibida na janela de chat.";
+L["TalkingHead Option Hide Everything Tooltip"] = "|cffff4800A legenda não aparecerá mais.|r\n\nA narração ainda tocará, e a transcrição será exibida na janela de bate-papo.";
 L["TalkingHead Option Condition WorldQuest"] = TRACKER_HEADER_WORLD_QUESTS or "Missões Mundiais";
 L["TalkingHead Option Condition WorldQuest Tooltip"] = "Oculta a transcrição se for de uma Missão Mundial.\nÀs vezes, a Cabeça Falante é acionada antes de aceitar a Missão Mundial, e não poderemos ocultá-la.";
 L["TalkingHead Option Condition Instance"] = INSTANCE or "Instância";
@@ -223,7 +223,7 @@ L["ModuleDescription BlizzFixWardrobeTrackingTip"] = "Oculta o tutorial para ata
 
 
 --Rare/Location Announcement
-L["Announce Location Tooltip"] = "Compartilhar este local no chat.";
+L["Announce Location Tooltip"] = "Compartilhar este local no bate-papo.";
 L["Announce Forbidden Reason In Cooldown"] = "Você compartilhou um local recentemente.";
 L["Announce Forbidden Reason Duplicate Message"] = "Este local foi compartilhado por outro jogador recentemente.";
 L["Announce Forbidden Reason Soon Despawn"] = "Você não pode compartilhar este local porque ele desaparecerá em breve.";
@@ -264,7 +264,7 @@ L["You Have Received Weekly Item Format"] = "Você recebeu %s essa semana.";
 --Tooltip ItemQuest
 L["ModuleName TooltipItemQuest"] = "Itens que iniciam missões";
 L["ModuleDescription TooltipItemQuest"] = "Se um item em suas bolsas começar uma missão, exibe os detalhes dessa missão.\n\nVocê pode usar ctrl + clique no item para visualizá-la no registro de missões, caso a missão já esteja em andamento.";
-L["Instruction Show In Quest Log"] = "<Ctrl + clique> para ver no registro de missões>";
+L["Instruction Show In Quest Log"] = "<Ctrl + clique para ver no registro de missões>";
 
 
 L["ModuleName TooltipTransmogEnsemble"] = "Indumentárias";
@@ -349,7 +349,7 @@ L["Delve Crest Stash No Info"] = "Esta informação não está disponível em su
 L["Delve Crest Stash Requirement"] = "Aparece em Imersões abundantes de grau 11.";
 L["Overcharged Delve"] = "Imersão Sobrecarregada";
 L["Delves History Requires AddOn"] = "O histórico de imersões é armazenado localmente pelo Plumber.";
-L["Auto Select"] = "Selecionar automaticamente";
+L["Auto Select"] = "Selecionado automaticamente";
 L["Power Borrowed"] = "Poder emprestado";
 
 
@@ -379,8 +379,8 @@ L["Icon Colon"] = "Ícone: ";     --Display IconFileID
 
 
 --Chat Options
-L["ModuleName ChatOptions"] = "Opções do canal de chat";
-L["ModuleDescription ChatOptions"] = "Adiciona botões de Sair ao menu que aparece quando você clica com o botão direito no nome do canal na janela de chat.";
+L["ModuleName ChatOptions"] = "Opções do bate-papo";
+L["ModuleDescription ChatOptions"] = "Adiciona botões de Sair ao menu que aparece quando você clica com o botão direito no nome do canal na janela de bate-papo.";
 L["Chat Leave"] = CHAT_LEAVE or "Sair";
 L["Chat Leave All Characters"] = "Sair em todos os personagens";
 L["Chat Leave All Characters Tooltip"] = "Você sairá automaticamente deste canal quando fizer login em um personagem.";
@@ -467,7 +467,7 @@ L["BossBanner Valuable Item Only Tooltip"] = "Exibe apenas montarias, tokens de 
 
 --AppearanceTab
 L["ModuleName AppearanceTab"] = "Aba de aparências";
-L["ModuleDescription AppearanceTab"] = "Modifica a aba de aparências nas coleções do Bando de Guerra:\n\n- Reduz a carga da GPU melhorando a sequência de carregamento do modelo e alterando o número de itens exibidos por página. Isso pode reduzir a probabilidade de falhas gráficas ao abrir esta interface.\n\n- Lembre-se da página que você visitou por último ao mudar de aba.";
+L["ModuleDescription AppearanceTab"] = "Modifica a Aba de Aparências nas Coleções do Bando de Guerra:\n\n- Reduz a carga da GPU melhorando a sequência de carregamento de modelos e alterando o número de itens exibidos por página. Isso pode reduzir falhas gráficas ao abrir esta interface.\n\n- Lembra a página que você visitou ao mudar de aba.";
 
 
 --SoftTargetName
@@ -531,7 +531,7 @@ L["Infinite Knowledge Bonus Next Format"] = "Próximo ranque: %s";
 
 
 --ItemUpgradeUI
-L["ModuleName ItemUpgradeUI"] = "Aprimoramento de item: Painel de personagem";
+L["ModuleName ItemUpgradeUI"] = "Aprimorar itens: Painel de personagem";
 L["ModuleDescription ItemUpgradeUI"] = "Abre automaticamente o painel de personagem quando você interage com um NPC que pode aprimorar itens.";
 
 
@@ -597,7 +597,7 @@ L["LootUI Option Show Reputation Tooltip"] = "Exibe qualquer aumento de reputaç
 L["LootUI Option Show All Money"] = "Exibir mudanças de dinheiro";
 L["LootUI Option Show All Money Tooltip"] = "Exibe qualquer dinheiro ganho de todas as fontes, não apenas de saque.";
 L["LootUI Option Show All Currency"] = "Exibir mudanças de moedas";
-L["LootUI Option Show All Currency Tooltip"] = "Exibe quaisquer moedas ganhas de todas as fontes, não apenas de saque.\n\n|cffff4800Você pode às vezes ver moedas que não são exibidas na janela do chat.|r";
+L["LootUI Option Show All Currency Tooltip"] = "Exibe quaisquer moedas ganhas de todas as fontes, não apenas de saque.\n\n|cffff4800Você pode às vezes ver moedas que não são exibidas na janela do bate-papo.|r";
 L["LootUI Option Hide Title"] = "Ocultar o texto \"Você recebeu\"";
 L["LootUI Option Hide Title Tooltip"] = "Esconde o texto \"Você recebeu\" no topo da janela de saque.";
 
@@ -646,7 +646,7 @@ L["No Slot For New Character Macro Alert"] = "Você precisa ter um slot de macro
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Sumário da Expansão";
-L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode acessá-la ao:\n\n- Habilitar o botão do minimapa.\n\n- Usar a tecla de atalho atribuída em Opções do jogo > Atalhos do teclado > Plumber.\n\n- Usar o compartimento de addons abaixo do botão do calendário.";
+L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode vê-la ao:\n\n- Habilitar o botão do minimapa.\n\n- Usar uma tecla de atalho atribuída em > Opções > Atalhos do teclado > Plumber.\n\n- Usar o compartimento de addons abaixo do calendário.";
 L["Abbr NewExpansionLandingPage"] = "Sumário da Expansão";
 L["Reward Available"] = "Recompensa Disponível";
 L["Paragon Reward Available"] = "Recompensa de paragão disponível";
@@ -667,6 +667,7 @@ L["Great Vault"] = DELVES_GREAT_VAULT_LABEL or "Grande Cofre";
 L["Item Upgrade"] = "Itens de aprimoramento";
 L["Resources"] = WORLD_QUEST_REWARD_FILTERS_RESOURCES or "Recursos";
 L["Plumber Experimental Feature Tooltip"] = "Um recurso experimental no addon Plumber.";
+L["Bountiful Delves Rep Label"] = "Renomes bônus";
 L["Bountiful Delves Rep Tooltip"] = "Abrir um Baú Abundante tem uma chance de aumentar sua reputação com esta facção.";
 L["Warband Weekly Reward Tooltip"] = "Seu Bando de Guerra só pode receber esta recompensa uma vez por semana.";
 L["Completed"] = CRITERIA_COMPLETED or "Concluído";
@@ -717,6 +718,9 @@ L["Click To Queue"] = "Clique para entrar na fila para |cffffffff%s|r";
 L["Click to Open Format"] = "Clique para abrir %s";
 L["List Is Empty"] = "Essa lista está vazia.";
 L["Prey No Data"] = "Progresso de Presa Indisponível";
+L["Abundance No Data"] = "Sem eventos de Abundância ativos";
+L["Defeated Prey"] = "Presas derrotadas";
+L["Item Expire Alert Weekly"] = "Este irá desaparecer após o reset semanal.";
 
 
 --ExpansionSummaryMinimapButton
@@ -750,14 +754,14 @@ L["Cannot Reset Instance"] = "Você não pode reiniciar instâncias neste moment
 L["Difficulty Not Accurate"] = "Dificuldade da instância imprecisa pois você não é o líder do grupo.";
 L["Instruction Click To Open Adventure Guide"] = "Clique: |cffffffffAbrir guia da aventura.|r";
 L["Instruction Alt Click To Reset Instance"] = "Alt + clique direito: |cffffffffReiniciar todas as instâncias.|r";
-L["Instruction Link Progress In Chat"] = "<Shift + clique para compartilhar o progresso no chat>";
+L["Instruction Link Progress In Chat"] = "<Shift + clique para compartilhar o progresso no bate-papo>";
 L["Instance Name"] = "Nome da instância";   --Dungeon/Raid Name
 L["EditMode Instruction InstanceDifficulty"] = "A largura do quadro é afetada pelo número de opções disponíveis.";
 
 
 --TransmogChatCommand
-L["ModuleName TransmogChatCommand"] = "Comando de chat de transmog";
-L["ModuleDescription TransmogChatCommand"] = "- Quando usar um comando de chat de transmog, remove as roupas do seu personagem primeiro para que itens antigos não sejam atribuídos ao novo conjunto.\n\n- Quando estiver no transmogrificador, usar um comando de chat carrega automaticamente todos os itens disponíveis para a interface de transmog.";
+L["ModuleName TransmogChatCommand"] = "Comando de bate-papo de transmog";
+L["ModuleDescription TransmogChatCommand"] = "- Quando usar um comando de bate-papo de transmog, remove as roupas do seu personagem primeiro para que itens antigos não sejam atribuídos ao novo conjunto.\n\n- Quando estiver no transmogrificador, usar um comando de bate-papo carrega automaticamente todos os itens disponíveis para a interface de transmog.";
 L["Copy To Clipboard"] = "Copiar para área de transferência";
 L["Copy Current Outfit Tooltip"] = "Copia a roupa atual para compartilhar online.";
 L["Missing Appearances Format"] = "%d |4aparência:aparências; faltando";
@@ -765,7 +769,7 @@ L["Press Key To Copy Format"] = "Aperte |cffffd100%s|r para copiar";
 
 
 --TransmogOutfitSelect
-L["ModuleName TransmogOutfitSelect"] = "Coleção de Roupas: Acesso Rápido";
+L["ModuleName TransmogOutfitSelect"] = "Coleção de Roupas: Acesso rápido";
 L["ModuleDescription1 TransmogOutfitSelect"] = "Permite que você abra a coleção de roupas e habilite aparências salvas em qualquer lugar.";
 L["ModuleDescription2 TransmogOutfitSelect"] = "Para isso: abra a interface de transmog, então arraste o botão de |cffd7c0a3Acesso Rápido|r acima da lista de roupas para as suas barras de ações.";
 L["Outfit Collection"] = "Coleção de Roupas";
@@ -871,6 +875,11 @@ L["BreakTime Annouce Timer Deferred Combat"] = "Lembre-se de dar uma pausinha de
 L["BreakTime Shared Countdown Tooltip Format"] = "Intervalo programado em |cffffffff%d|r min.";
 
 
+--CatalystUI
+L["ModuleName CatalystUI"] = "Catalisador: Exibir aparência do item";
+L["ModuleDescription CatalystUI"] = "Permite que você use Ctrl + clique no item exibido para visualizar a aparência dele, ou Shift + clique para linkar o item no bate-papo.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Mover horizontalmente";
@@ -897,7 +906,7 @@ L["Close Frame Format"]= "|cff808080(Fechar %s)|r";
 
 --Plumber AddOn Settings
 L["ModuleName EnableNewByDefault"] = "Sempre ativar novos recursos";
-L["ModuleDescription EnableNewByDefault"] = "Sempre ativar recursos recém-adicionados.\n\n*Você verá uma notificação na janela de chat quando um novo módulo for ativado desta forma.";
+L["ModuleDescription EnableNewByDefault"] = "Sempre ativar recursos recém-adicionados.\n\n*Você verá uma notificação na janela de bate-papo quando um novo módulo for ativado desta forma.";
 L["New Feature Auto Enabled Format"] = "O novo módulo %s foi ativado.";
 L["Click To See Details"] = "Clique para ver detalhes";
 L["Click To Show Settings"] = "Clique para exibir as configurações.";
@@ -944,7 +953,7 @@ L["QuestName HarandarRelic"] = "Lendas dos Haranir";
 L["Prey System"] = "Presa";
 L["Prey Difficulty Normal"] = "Normal";
 L["Prey Difficulty Hard"] = "Difícil";
-L["Prey Difficulty Nightmare"] = "Nightmare";
+L["Prey Difficulty Nightmare"] = "Pesadelo";
 
 L["CONFIRM_PURCHASE_NONREFUNDABLE_ITEM"] = "Tem certeza de que deseja trocar %s pelo item a seguir?\n\n|cffff2020Esta compra não é reembolsável.|r\n %s";
 
