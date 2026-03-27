@@ -11,6 +11,68 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10900] = {
 	{
 		type = "date",
+		versionText = "1.9.0 b",
+		timestamp = 1774600000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName HuntTable"],
+		dbKey = "HuntTable",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "HuntTable",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Replaces the generic blue quest icons to show difficulties.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Shows an indicator if the Prey target is a requirement for an unearned achievement.",
+	},
+
+	{
+		type = "img",
+		dbKey = "HuntTable",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added \"Gilded Stash\" progress to the Activities tab. Note: This info is only available when you are in Midnight open-world zones.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI, Great Vault: Fixed an issue where the item level on the tooltip is wrong for Delves and World Activities.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.0",
 		timestamp = 1774400000,
 	},
