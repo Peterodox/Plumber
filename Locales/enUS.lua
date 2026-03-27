@@ -46,6 +46,7 @@ L["Always On Module"] = "This module is always enabled.";
 L["Return To Module List"] = "Return to List";
 L["Generic Addon Conflict"] = "This module might be incompatible with addons of similar functionalities:";
 L["Work In Progress Tag"] = "[WIP]";
+L["Colon With Space"] = ": ";
 
 
 --Settings Category
