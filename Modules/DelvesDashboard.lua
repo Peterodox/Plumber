@@ -134,6 +134,7 @@ do  --Gilded Stash: 3 per week, 7 Gilded Crests each
 		6729,
 		6794,
 		7193,
+		7591,
 	};
 
 	local KeyWidgets = {};

@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.9.0";
-local VERSION_DATE = 1774400000;
+local VERSION_TEXT = "1.9.0 b";
+local VERSION_DATE = 1774600000;
 
 
 local addonName, addon = ...
@@ -244,6 +244,7 @@ local DefaultValues = {
 	SourceAchievementLink = true,       --Make Achievement name in MountJournal, DecorCatalog interactable
 	TransmogOutfitSelect = true,        --Show Minimized Transmog Outfit Collection
 	CatalystUI = true,					--Allow Ctrl-Click to preview items in Dressing Room for UIs that don't natively support this action
+	HuntTable = true,					--Replace generic quest icons with difficulties and add achievement indicators.
 
 
 	--Tooltip

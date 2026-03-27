@@ -46,6 +46,7 @@ L["Always On Module"] = "This module is always enabled.";
 L["Return To Module List"] = "Return to List";
 L["Generic Addon Conflict"] = "This module might be incompatible with addons of similar functionalities:";
 L["Work In Progress Tag"] = "[WIP]";
+L["Colon With Space"] = ": ";
 
 
 --Settings Category
@@ -347,6 +348,7 @@ L["ModuleName Delves_Automation"] = "Delves: Auto Choose Power";
 L["ModuleDescription Delves_Automation"] = "Automatically choose the power dropped by treasures and rares.";
 L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
 L["Delve Crest Stash Requirement"] = "Appears in Tier 11 Bountiful Delves.";
+L["Delve Crest Stash Old Data"] = "This info may be inaccurate in your current location. Please refer to the Delves Difficulty Picker.";
 L["Overcharged Delve"] = "Overcharged Delve";
 L["Delves History Requires AddOn"] = "Delves history is stored locally by the Plumber AddOn.";
 L["Auto Select"] = "Auto Select";
@@ -878,6 +880,12 @@ L["BreakTime Shared Countdown Tooltip Format"] = "Scheduled break in |cffffffff%
 --CatalystUI
 L["ModuleName CatalystUI"] = "Catalyst: View Item In Dressing Room";
 L["ModuleDescription CatalystUI"] = "Allows you to Ctrl-Click the output item to view it in the Dressing Room, or Shift-Click to link it to chat.";
+
+
+--HuntTable
+L["ModuleName HuntTable"] = "Prey: Hunt Table";
+L["ModuleDescription HuntTable"] = "- Replaces the generic blue quest icons to show difficulties.\n\n- Shows an indicator if the Prey target is a requirement for an unearned achievement.";
+L["Prey Target Has Achievement"] = "This Prey target is a requirement for an unearned achievement.";
 
 
 --Generic

@@ -32,6 +32,62 @@ local DelvesBonusRepQuestFlags = {
 };
 
 
+local GildedStashTracker = {};
+do
+	GildedStashTracker.spellID = 1216211;
+	GildedStashTracker.widgetID = 7591;
+	GildedStashTracker.getter = C_UIWidgetManager.GetSpellDisplayVisualizationInfo;
+	--/dump C_UIWidgetManager.GetSpellDisplayVisualizationInfo(7591)
+
+	function GildedStashTracker:GetCrestStashTooltip()
+		local info = self.getter(self.widgetID);
+		if info then
+			if info.spellInfo and info.spellInfo.spellID == self.spellID then
+				return info.spellInfo.tooltip, info.spellInfo.shownState == 1;
+			end
+		end
+	end
+
+	function GildedStashTracker:GetCrestStashProgess()
+		local sourceText, isAccurate = self:GetCrestStashTooltip();
+		if sourceText then
+			local current, max = string.match(sourceText, "(%d+)/(%d+)");
+			if current and max then
+				current = tonumber(current);
+				max = tonumber(max);
+				if max > 0 then
+					return current, max, isAccurate;
+				end
+			end
+		end
+	end
+
+	function GildedStashTracker:CacheName()
+		local name = C_Spell.GetSpellName(self.spellID);
+		if name and name ~= "" then
+			self.localizedSpellName = name;
+		else
+			addon.CallbackRegistry:LoadSpell(self.spellID, function()
+				self.localizedSpellName = C_Spell.GetSpellName(self.spellID);
+			end);
+		end
+	end
+	addon.CallbackRegistry:Register("DBLoaded", GildedStashTracker.CacheName, GildedStashTracker);
+
+	function GildedStashTracker:GetName()
+		if not self.localizedSpellName then
+			self:CacheName();
+		end
+		return self.localizedSpellName or "";
+	end
+
+	function GildedStashTracker.IsActivityCompleted()
+		local current, max = GildedStashTracker:GetCrestStashProgess();
+		return current and max and current >= max;
+	end
+end
+
+
 local SetupFuncs = {};
 do
 	local WIDGET_TYPE = 2;
@@ -128,15 +184,6 @@ do
 		end
 	end
 
-	local function AddQuestsByPattern(tbl, fromID, step, times)
-		local n = #tbl;
-		local questID = fromID - step;
-		for i = 1, times do
-			n = n + 1;
-			questID = questID + step;
-			tbl[n] = questID;
-		end
-	end
 
 	local PreyTargetQuests = {
 		Normal = {},
@@ -144,11 +191,21 @@ do
 		Nightmare = {},
 	};
 
-	AddQuestsByPattern(PreyTargetQuests.Normal, 91095, 1, 30);  --Consecutive 91095 - 91124
-	AddQuestsByPattern(PreyTargetQuests.Hard, 91210, 2, 16);    --Even 91210 - 91240
-	AddQuestsByPattern(PreyTargetQuests.Hard, 91242, 1, 14);    --Consecutive 91242 - 91255
-	AddQuestsByPattern(PreyTargetQuests.Nightmare, 91211, 2, 16);    --Odd 91211 - 91241
-	AddQuestsByPattern(PreyTargetQuests.Nightmare, 91256, 1, 14);    --Consecutive 91256 - 91269
+	function SetupFuncs.BuildPreyTargetQuests()
+		local tinsert = table.insert;
+		local tbl;
+		for questID, info in pairs(addon.PreyQuestData) do
+			if info[1] == 1 then
+				tbl = PreyTargetQuests.Normal;
+			elseif info[1] == 2 then
+				tbl = PreyTargetQuests.Hard;
+			elseif info[1] == 3 then
+				tbl = PreyTargetQuests.Nightmare;
+			end
+			tinsert(tbl, questID);
+		end
+	end
+
 
 	local function GetUnlockedPreyDifficulties()
 		local level = C_MajorFactions.GetCurrentRenownLevel(2764);
@@ -275,6 +332,34 @@ do
 		ActivityUtil.TooltipFuncs.WeeklyBonusRenown(tooltip, DelvesBonusRepQuestFlags);
 		return true
 	end
+
+
+	function SetupFuncs.GildedStashEntry(listButton)
+		local name = GildedStashTracker:GetName();
+		local current, max, isAccurate = GildedStashTracker:GetCrestStashProgess();
+		if not (current and max) then
+			current, max = "?", 4;
+		else
+			listButton.completed = current >= max;
+		end
+		listButton.Name:SetText(string.format("%s/%s %s", current, max, name));
+	end
+
+	function SetupFuncs.GildedStashTooltip(tooltip)
+		local description, isAccurate = GildedStashTracker:GetCrestStashTooltip();
+		if description then
+			tooltip:AddLine(L["Delve Crest Stash Requirement"], 1, 1, 1, true);
+			tooltip:AddLine(" ");
+			tooltip:AddLine(description, 1, 0.82, 0, true);
+			if not isAccurate then
+				tooltip:AddLine(" ");
+				tooltip:AddLine(L["Delve Crest Stash Old Data"], 0.5, 0.5, 0.5, true);
+			end
+		else
+			tooltip:AddLine(L["Delve Crest Stash No Info"], 1, 0.1, 0.1, true);
+		end
+		return true;
+	end
 end
 
 
@@ -286,6 +371,7 @@ local ActivityData = {
 			{name = "Trovehunter\'s Bounty", itemID = 252415, flagQuest = 86371, icon = 1064187, tooltipItem = 252415},
 			{name = "Coffer Key Shard", currencyID = 3310, icon = 133016, removeIconBorder = true},
 			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFuncs.WeeklyBonusRenown, children = DelvesBonusRepQuestFlags},
+			{name = "Gilded Stash", icon = 5872049, removeIconBorder = true, setupFunc = SetupFuncs.GildedStashEntry, tooltipSetter = SetupFuncs.GildedStashTooltip, conditions = GildedStashTracker},
 
 			--{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, removeIconBorder = true,
 			--    children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
@@ -408,6 +494,8 @@ do  --Add Prey Quests
 			removeSharedPrefix = true,
 		};
 	end
+
+	SetupFuncs.BuildPreyTargetQuests();
 end
 
 

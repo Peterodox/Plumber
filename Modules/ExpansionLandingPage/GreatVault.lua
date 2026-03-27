@@ -168,7 +168,7 @@ do
 						itemLevel, upgradeItemLevel, itemLink = nil, nil, nil;
 
 						if row == 3 then
-							--itemLevel = API.GetDelvesGreatVaultItemLevel(activityInfo.level); --[TEMP] disabled because we don't have S1 Data yet
+							itemLevel = API.GetDelvesGreatVaultItemLevel(activityInfo.level);
 						end
 
 						if not itemLevel then

@@ -197,6 +197,12 @@ do  -- String
 		end
 	end
 
+	function API.FormatLabelAndText(label, text)
+		if not text then text = ""; end
+		if not label then label = "Unknown Label"; end
+		return label..L["Colon With Space"]..text
+	end
+
 	local UnitName = UnitName;
 
 	function API.Secret_GetUnitName(unit)
