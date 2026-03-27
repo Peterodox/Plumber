@@ -128,15 +128,6 @@ do
 		end
 	end
 
-	local function AddQuestsByPattern(tbl, fromID, step, times)
-		local n = #tbl;
-		local questID = fromID - step;
-		for i = 1, times do
-			n = n + 1;
-			questID = questID + step;
-			tbl[n] = questID;
-		end
-	end
 
 	local PreyTargetQuests = {
 		Normal = {},
@@ -144,11 +135,21 @@ do
 		Nightmare = {},
 	};
 
-	AddQuestsByPattern(PreyTargetQuests.Normal, 91095, 1, 30);  --Consecutive 91095 - 91124
-	AddQuestsByPattern(PreyTargetQuests.Hard, 91210, 2, 16);    --Even 91210 - 91240
-	AddQuestsByPattern(PreyTargetQuests.Hard, 91242, 1, 14);    --Consecutive 91242 - 91255
-	AddQuestsByPattern(PreyTargetQuests.Nightmare, 91211, 2, 16);    --Odd 91211 - 91241
-	AddQuestsByPattern(PreyTargetQuests.Nightmare, 91256, 1, 14);    --Consecutive 91256 - 91269
+	function SetupFuncs.BuildPreyTargetQuests()
+		local tinsert = table.insert;
+		local tbl;
+		for questID, info in pairs(addon.PreyQuestData) do
+			if info[1] == 1 then
+				tbl = PreyTargetQuests.Normal;
+			elseif info[1] == 2 then
+				tbl = PreyTargetQuests.Hard;
+			elseif info[1] == 3 then
+				tbl = PreyTargetQuests.Nightmare;
+			end
+			tinsert(tbl, questID);
+		end
+	end
+
 
 	local function GetUnlockedPreyDifficulties()
 		local level = C_MajorFactions.GetCurrentRenownLevel(2764);
@@ -408,6 +409,8 @@ do  --Add Prey Quests
 			removeSharedPrefix = true,
 		};
 	end
+
+	SetupFuncs.BuildPreyTargetQuests();
 end
 
 
