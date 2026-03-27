@@ -881,6 +881,12 @@ L["ModuleName CatalystUI"] = "Catalyst: View Item In Dressing Room";
 L["ModuleDescription CatalystUI"] = "Allows you to Ctrl-Click the output item to view it in the Dressing Room, or Shift-Click to link it to chat.";
 
 
+--HuntTable
+L["ModuleName HuntTable"] = "Prey: Hunt Table";
+L["ModuleDescription HuntTable"] = "- Replaces the generic blue quest icons to show difficulties.\n\n- Shows an indicator if the Prey target is a requirement for an unearned achievement.";
+L["Prey Target Has Achievement"] = "This Prey target is a requirement for an unearned achievement.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally

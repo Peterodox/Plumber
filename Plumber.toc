@@ -87,6 +87,7 @@ Modules\SourceAchievementLink.lua
 Modules\OutfitSelect.lua
 Modules\BreakTime.xml
 Modules\CatalystUI.lua
+Modules\HuntTable.lua
 
 #Modules\MerchantUI\MerchantUI.xml
 

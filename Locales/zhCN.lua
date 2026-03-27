@@ -849,6 +849,12 @@ L["ModuleName CatalystUI"] = "化生充能：试衣间预览";
 L["ModuleDescription CatalystUI"] = "允许你按住Ctrl点击转化后的装备来在试衣间中预览它，或是按住Shift点击来插入到聊天窗口。";
 
 
+--HuntTable
+L["ModuleName HuntTable"] = "狩猎地图";
+L["ModuleDescription HuntTable"] = "- 将狩猎地图上的蓝色任务图标替换为难度图标。\n\n- 若狩猎目标与某个未完成的成就相关，在其右上方显示特别标记。";
+L["Prey Target Has Achievement"] = "某个未完成的成就要求你击败此目标。";
+
+
 --Generic
 L["Total Colon"] = "总计：";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally
