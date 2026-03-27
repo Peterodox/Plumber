@@ -348,6 +348,7 @@ L["ModuleName Delves_Automation"] = "地下堡: 自动选择特效";
 L["ModuleDescription Delves_Automation"] = "当你在地下堡内时，自动选择宝藏或稀有精英掉落的特效。";
 L["Delve Crest Stash No Info"] = "你所在区域无法获取该信息。";
 L["Delve Crest Stash Requirement"] = "仅在11层丰裕地下堡出现。";
+L["Delve Crest Stash Old Data"] = "此信息在你当前位置可能不准确，请以地下堡难度选择器上的鼠标提示为准。";
 L["Overcharged Delve"] = "超载地下堡";
 L["Delves History Requires AddOn"] = "地下堡记录由Plumber插件在本地保存。";
 L["Auto Select"] = "自动选择";

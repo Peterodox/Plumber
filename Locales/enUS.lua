@@ -348,6 +348,7 @@ L["ModuleName Delves_Automation"] = "Delves: Auto Choose Power";
 L["ModuleDescription Delves_Automation"] = "Automatically choose the power dropped by treasures and rares.";
 L["Delve Crest Stash No Info"] = "This info is unavailable in your current location.";
 L["Delve Crest Stash Requirement"] = "Appears in Tier 11 Bountiful Delves.";
+L["Delve Crest Stash Old Data"] = "This info may be inaccurate in your current location. Please refer to the Delves Difficulty Picker.";
 L["Overcharged Delve"] = "Overcharged Delve";
 L["Delves History Requires AddOn"] = "Delves history is stored locally by the Plumber AddOn.";
 L["Auto Select"] = "Auto Select";
