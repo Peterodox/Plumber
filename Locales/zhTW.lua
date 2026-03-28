@@ -323,10 +323,10 @@ L["Data Loading In Progress"] = "Plumber正在載入資料";
 
 
 --Tooltip RichSoil
-L["ModuleName TooltipRichSoil"] = "快捷按鈕：堅韌之種";
-L["ModuleDescription TooltipRichSoil"] = "對採藥專業生效：滑鼠左鍵雙擊肥沃的土壤可顯示堅韌之種快捷按鈕。"..L["Quick Slot Generic Description"];
-L["Instruction Show Resilient Seeds"] = "<雙擊左鍵來顯示堅韌之種>";
-L["No Resilient Seed"] = "你身上沒有攜帶堅韌之種";
+L["ModuleName TooltipRichSoil"] = "快捷按鈕：頑強種子";
+L["ModuleDescription TooltipRichSoil"] = "對採藥專業生效：滑鼠左鍵雙擊肥沃的土壤可顯示頑強種子快捷按鈕。"..L["Quick Slot Generic Description"];
+L["Instruction Show Resilient Seeds"] = "<雙擊左鍵來顯示頑強種子>";
+L["No Resilient Seed"] = "你身上沒有攜帶頑強種子";
 
 
 --Delves
@@ -975,7 +975,7 @@ L["Upgrade Track 2"] = "探險者";
 L["Upgrade Track 3"] = "精兵";
 L["Upgrade Track 4"] = "勇士";
 L["Upgrade Track 5"] = "英雄";
-L["Upgrade Track 6"] = "神話";
+L["Upgrade Track 6"] = "傳奇";
 
 L["Match Pattern Transmog Set Partially Known"] = "^包含(%d)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
