@@ -46,6 +46,7 @@ L["Always On Module"] = "Este módulo está sempre ativado.";
 L["Return To Module List"] = "Retornar ao addon";
 L["Generic Addon Conflict"] = "Esse módulo pode ser incompatível com addons de funcionalidades semelhantes:";
 L["Work In Progress Tag"] = "[WIP]";
+L["Colon With Space"] = ": ";
 
 
 --Settings Category
@@ -347,6 +348,7 @@ L["ModuleName Delves_Automation"] = "Imersões: Escolher poder automaticamente";
 L["ModuleDescription Delves_Automation"] = "Escolhe automaticamente o poder saqueado de tesouros e raros.";
 L["Delve Crest Stash No Info"] = "Esta informação não está disponível em sua localização atual.";
 L["Delve Crest Stash Requirement"] = "Aparece em Imersões abundantes de grau 11.";
+L["Delve Crest Stash Old Data"] = "Esta informação pode ser imprecisa em sua localização atual. Por favor, consulte o Seletor de Dificuldade das Imersões.";
 L["Overcharged Delve"] = "Imersão Sobrecarregada";
 L["Delves History Requires AddOn"] = "O histórico de imersões é armazenado localmente pelo Plumber.";
 L["Auto Select"] = "Selecionado automaticamente";
@@ -878,6 +880,12 @@ L["BreakTime Shared Countdown Tooltip Format"] = "Intervalo programado em |cffff
 --CatalystUI
 L["ModuleName CatalystUI"] = "Catalisador: Exibir aparência do item";
 L["ModuleDescription CatalystUI"] = "Permite que você use Ctrl + clique no item exibido para visualizar a aparência dele, ou Shift + clique para linkar o item no bate-papo.";
+
+
+--HuntTable
+L["ModuleName HuntTable"] = "Presa: Alvos de Caça";
+L["ModuleDescription HuntTable"] = "- Substitui os ícones genéricos de missão azul para mostrar as dificuldades.\n\n- Exibe um indicador se a Presa-alvo for um requisito para uma conquista não obtida.";
+L["Prey Target Has Achievement"] = "Esta Presa-alvo é um requisito para uma conquista não obtida.";
 
 
 --Generic
