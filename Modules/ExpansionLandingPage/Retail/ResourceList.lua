@@ -58,8 +58,8 @@ do  --MID
 		{itemID = 246951, uiMapID = 2405},   --Stormarion Core
 
 		{currencyID = 3379, shownIfOwned = true},   --Brimming Arcana
-		{currencyID = 3392, shownIfOwned = true},   --Remnant of Anguish
-		{currencyID = 3376, shownIfOwned = true},   --Shard of Dundun
+		{currencyID = 3392},   --Remnant of Anguish
+		{currencyID = 3376, hasWeeklyCap = true},   --Shard of Dundun
 		{currencyID = 3377, shownIfOwned = true},   --Unalloyed Abundance
 
 		{currencyID = 1602, shownIfOwned = true},   --Conquest
