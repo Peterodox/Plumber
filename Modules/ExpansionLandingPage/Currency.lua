@@ -11,7 +11,6 @@ local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 local GetItemIconByID = C_Item.GetItemIconByID;
 local GetItemCount = C_Item.GetItemCount;
 local GetItemNameByID = C_Item.GetItemNameByID;
-local BreakUpLargeNumbers = BreakUpLargeNumbers;
 
 
 local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
@@ -108,17 +107,11 @@ do
 			if quantity > 0 or isOverflow then
 				self.anyOwned = true;
 				self.Name:SetTextColor(0.922, 0.871, 0.761);
-				self.Count:SetText(BreakUpLargeNumbers(quantity));
-				if isOverflow then
-					self.Count:SetTextColor(0.098, 1.000, 0.098);
-				else
-					self.Count:SetTextColor(0.88, 0.88, 0.88);
-				end
+				self:SetCount(quantity, isOverflow);
 			else
 				self.anyOwned = false;
 				self.Name:SetTextColor(0.5, 0.5, 0.5);
-				self.Count:SetTextColor(0.5, 0.5, 0.5);
-				self.Count:SetText(0);
+				self:SetCount(quantity);
 			end
 
 			return true
@@ -225,21 +218,21 @@ do
 end
 
 local function CreateButton(parent)
-	local f = CreateFrame("Button", nil, parent);
+	local f = CreateFrame("Button", nil, parent, "PlumberStrikethroughNumberTemplate");
 	f:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 	API.Mixin(f, CurrencyButtonMixin);
 
-	f.Icon = f:CreateTexture(nil, "OVERLAY");
+	f.Icon = f:CreateTexture(nil, "ARTWORK");
 	f.Icon:SetSize(20, 20);
 	f.Icon:SetPoint("RIGHT", f, "RIGHT", -8, 0);
 
-	f.Count = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+	f.breakupLargeNumbers = true;
 	f.Count:SetPoint("RIGHT", f, "RIGHT", -32, 0);
 	f.Count:SetJustifyH("RIGHT");
 	f.Count:SetTextColor(1, 1, 1);
 	f.Count:SetText("0");
 
-	f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+	f.Name = f:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 	f.Name:SetPoint("LEFT", f, "LEFT", 8, 0);
 	f.Name:SetPoint("RIGHT", f.Count, "LEFT", -20, 0);
 	f.Name:SetJustifyH("LEFT");

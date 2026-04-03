@@ -1790,6 +1790,41 @@ do  --Minimap Button
 end
 
 
+do	--PlumberStrikethroughNumberMixin
+	PlumberStrikethroughNumberMixin = {};
+
+	local BreakUpLargeNumbers = BreakUpLargeNumbers;
+
+	function PlumberStrikethroughNumberMixin:SetCount(quantity, overflow)
+		self.Strikethrough:Hide();
+		self.StrikethroughShadow:Hide();
+		if quantity and quantity > 0 then
+			if self.displayedMax and quantity > self.displayedMax then
+				self.Count:SetText(self.displayedMax.."+");
+			else
+				if self.breakupLargeNumbers then
+					self.Count:SetText(BreakUpLargeNumbers(quantity));
+				else
+					self.Count:SetText(quantity);
+				end
+			end
+
+			if overflow then
+				self.Count:SetTextColor(0.098, 1.000, 0.098);
+			else
+				self.Count:SetTextColor(0.88, 0.88, 0.88);
+			end
+		else
+			self.Count:SetText(0);
+			self.Count:SetTextColor(0.5, 0.5, 0.5);
+			if overflow then
+				self.Strikethrough:Show();
+				self.StrikethroughShadow:Show();
+			end
+		end
+	end
+end
+
 --[[
 do  --SoftTargetName
 	local EL = CreateFrame("Frame");

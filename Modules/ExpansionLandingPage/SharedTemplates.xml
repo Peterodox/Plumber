@@ -125,4 +125,30 @@
 			<OnLoad method="OnLoad"/>
 		</Scripts>
 	</Frame>
+
+	<Frame name="PlumberStrikethroughNumberTemplate" mixin="PlumberStrikethroughNumberMixin" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Count" inherits="GameFontNormal"/>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="2">
+				<Texture parentKey="Strikethrough">
+					<Size x="10" y="1"/>
+					<Color r="0.5" g="0.5" b="0.5"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Count" relativePoint="CENTER" y="0.5"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="1">
+				<Texture parentKey="StrikethroughShadow">
+					<Size x="10" y="1"/>
+					<Color r="0" g="0" b="0"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Strikethrough" relativePoint="CENTER" x="1" y="-1"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
 </Ui>
