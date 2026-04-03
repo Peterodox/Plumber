@@ -934,6 +934,17 @@ do  --Right Section
 		end
 		self.FeatureDescription:SetText(desc);
 		self.FeaturePreview:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..(parentDBKey or moduleData.dbKey));
+
+		if moduleData.consultant then
+			self.FooterTexture:Show();
+			if moduleData.consultant == 2 then
+				self.FooterTexture:SetTexCoord(0, 1, 0.125, 0.25);
+			else
+				self.FooterTexture:SetTexCoord(0, 1, 0, 0.125);
+			end
+		else
+			self.FooterTexture:Hide();
+		end
 	end
 end
 
@@ -1217,6 +1228,16 @@ local function CreateUI()
 		description:SetPoint("BOTTOMRIGHT", RightSection, "BOTTOMRIGHT", -visualOffset -Def.WidgetGap, Def.WidgetGap);
 		description:SetShadowColor(0, 0, 0);
 		description:SetShadowOffset(1, -1);
+
+
+		local rightPadding = 16;
+		local FooterTexture = Tab1:CreateTexture(nil, "OVERLAY");
+		MainFrame.FooterTexture = FooterTexture;
+		FooterTexture:SetSize(previewSize - 2*rightPadding, (previewSize - 2*rightPadding) / 8);
+		FooterTexture:SetPoint("BOTTOM", RightSection, "BOTTOM", 0, 0);
+		FooterTexture:SetTexture("Interface/AddOns/Plumber/Art/ControlCenter/sc.png");
+		FooterTexture:SetTexCoord(0, 1, 0.125, 0.25);
+		FooterTexture:Hide();
 	end
 
 

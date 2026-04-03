@@ -144,6 +144,7 @@ do
 		categoryKeys = {
 			"Quest",
 		},
+		consultant = 2,
 	};
 
 	addon.ControlCenter:AddModule(moduleData);

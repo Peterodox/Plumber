@@ -464,6 +464,7 @@ do
 		searchTags = {
 			"Housing",
 		},
+		consultant = 1,
 	};
 
 	addon.ControlCenter:AddModule(moduleData);
