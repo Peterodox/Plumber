@@ -1509,7 +1509,7 @@ do  -- Instance -- Map
 
 
 	function API.IsInPvP()
-		if C_PvP.IsActiveBattlefield() then
+		if C_PvP.IsActiveBattlefield and C_PvP.IsActiveBattlefield() then
 			return true
 		end
 		local _, instanceType = GetInstanceInfo();
