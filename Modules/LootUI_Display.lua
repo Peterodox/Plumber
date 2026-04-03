@@ -1335,7 +1335,7 @@ do  --Money Change Handler
 end
 
 
-do  --Currency Change Handler
+do  --Currency Change Handler (SHOW_ALL_CURRENCY_CHANGE)
 	local ModifiedCurrencyQuantity = {
 		--TEMP FIX: The two currencies return 100x the actual value when looted from chests or bodies for some reasons
 		[1602] = 0.01,	--Conquest
@@ -1344,6 +1344,16 @@ do  --Currency Change Handler
 
 	function EL:OnCurrencyDisplayUpdate(currencyID, quantity, quantityChange, quantityGainSource, destroyReason)
 		if quantityChange and quantityChange > 0 then
+			if self.deferCurrencyChange then
+				if not self.currencyCache[currencyID] then
+					local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+					if info then
+						self.currencyCache[currencyID] = info.quantity;
+					end
+				end
+				return
+			end
+
 			local name, icon, quality = GetCurrencyDisplayInfo(currencyID);
 			if name then
 				--print(name, currencyID, quantity, quantityChange, quantityGainSource);    --debug
@@ -1359,6 +1369,36 @@ do  --Currency Change Handler
 			end
 		end
 	end
+
+	function EL.LOADING_SCREEN_DISABLED()
+		if API.IsInPvP() then
+			EL.deferCurrencyChange = true;
+			if not EL.currencyCache then
+				EL.currencyCache = {};
+			end
+		else
+			EL.deferCurrencyChange = nil;
+			if EL.currencyCache then
+				local tbl = EL.currencyCache;
+				EL.currencyCache = nil;
+				if not EL.enabled then return; end
+
+				for currencyID, oldQuantity in pairs(tbl) do
+					local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+					if info then
+						local quantityChange = info.quantity - oldQuantity;
+						if quantityChange > 0 then
+							local link = string.format("|Hcurrency:%d|h", currencyID);
+							local slotIndex = 0;
+							local data = CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, info.iconFileID, info.name, quantityChange, info.quality);
+							MainFrame:QueueDisplayLoot(data);
+						end
+					end
+				end
+			end
+		end
+	end
+	addon.CallbackRegistry:Register("LOADING_SCREEN_DISABLED", EL.LOADING_SCREEN_DISABLED);
 end
 
 

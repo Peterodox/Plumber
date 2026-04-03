@@ -468,6 +468,7 @@ do  --Module Registry
 		searchTags = {
 			"Housing",
 		},
+		consultant = 1,
 	};
 
 	addon.ControlCenter:AddModule(moduleData);

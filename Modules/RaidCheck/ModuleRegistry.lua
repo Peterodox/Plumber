@@ -42,6 +42,8 @@ do
 		visibleInEditMode = true,
 		enterEditMode = RaidCheck.EnterEditMode,
 		exitEditMode = RaidCheck.ExitEditMode,
+
+		consultant = 2,
 	};
 
 	addon.ControlCenter:AddModule(moduleData);

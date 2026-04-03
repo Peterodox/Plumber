@@ -402,6 +402,7 @@ local ActivityData = {
 				},
 			},
 			{name = "Saltheril\'s Favor", itemID = 238987, icon = 237281, removeIconBorder = true, tooltipItem = 238987, uiMapID = 2395, shownIfOwned = true, tooltip = L["Item Expire Alert Weekly"]},
+			{name = "Lu'ashal", questID = 92560, uiMapID = 2395, shownIfActive = true, isBoss = true},
 		},
 		questLines = {5841},
 	},
@@ -410,6 +411,7 @@ local ActivityData = {
 		entries = {
 			{name = "Abundant Offerings", questID = 89507, isWeeklyQuest = true, sortToTop = true},
 			{name = "Abundance", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Abundance.png", shouldShow = SetupFuncs.ShouldShowAbundance, setupFunc = SetupFuncs.AbundanceEvent, tooltipSetter = SetupFuncs.AbundanceTooltip},
+			{name = "Cragpine", questID = 92123, uiMapID = 2437, shownIfActive = true, isBoss = true},
 		},
 	},
 
@@ -427,6 +429,8 @@ local ActivityData = {
 			--	},
 			--},
 
+			{name = "Thorm'belan", questID = 92034, uiMapID = 2413, shownIfActive = true, isBoss = true},
+
 			{name = "WANTED: Dionaea's Thorntusks", questID = 92013, uiMapID = 2413, shownIfActive = true},
 			{name = "WANTED: Gelatonius", questID = 91970, uiMapID = 2413, shownIfActive = true},
 			{name = "WANTED: Gorebarb's Pincers", questID = 92012, uiMapID = 2413, shownIfActive = true},
@@ -441,6 +445,7 @@ local ActivityData = {
 		entries = {
 			{name = "Stormarion Assault", isWeeklyQuest = true, questID = 90962, uiMapID = 2405, sortToTop = true}, --This Weekly World Quest seems to only appear on the map when you are in the surrounding area
 			{name = "Stand Your Ground", questID = 94581, uiMapID = 2405, shownIfOnQuest = true},    --Replace the quest above after completion
+			{name = "Predaxas", questID = 92636, uiMapID = 2405, shownIfActive = true, isBoss = true},
 
 			--The following quests reward no rep but Stormarion Core
 			{name = "Darkness Unmade", questID = 91700, uiMapID = 2405, shownIfOnQuest = true},  --Kill 2 Rare creatures

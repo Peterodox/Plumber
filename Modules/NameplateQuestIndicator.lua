@@ -1303,6 +1303,7 @@ do
 		categoryKeys = {
 			"UnitFrame",
 		},
+		consultant = 2,
 	};
 
 	addon.ControlCenter:AddModule(moduleData);

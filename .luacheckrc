@@ -37,6 +37,7 @@ globals = {
 	"PlumberStorage",
 	"PlumberSuperTrackingMixin",
 	"PlumberWorldMapPinMixin",
+	"PlumberStrikethroughNumberMixin",
 };
 
 read_globals = {

@@ -189,6 +189,7 @@ do
 		searchTags = {
 			"Transmog",
 		},
+		consultant = 2,
 	};
 
 	addon.ControlCenter:AddModule(moduleData);

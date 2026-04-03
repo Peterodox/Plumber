@@ -77,6 +77,7 @@ local ShownQuestClassification = {
 local QuestIcon = {
 	WEEKLY_QUEST = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/WeeklyQuestAvailable.png",
 	PREY_ACTIVE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png",
+	Boss = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/TrackerType-Boss.png",
 };
 
 
@@ -338,6 +339,10 @@ local function InitQuestData(info)
 	end
 
 	info.isOnQuest = IsOnQuest(info.questID);
+
+	if info.isBoss then
+		info.icon = QuestIcon.Boss;
+	end
 
 	if info.isOnQuest then
 		info.icon = questClassification and InProgressQuestIconFile[questClassification];

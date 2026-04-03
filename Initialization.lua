@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.9.0 b";
-local VERSION_DATE = 1774600000;
+local VERSION_TEXT = "1.9.0 c";
+local VERSION_DATE = 1775200000;
 
 
 local addonName, addon = ...
@@ -474,6 +474,7 @@ end
 EL:RegisterEvent("ADDON_LOADED");
 EL:RegisterEvent("PLAYER_ENTERING_WORLD");
 EL:RegisterEvent("PLAYER_LOGOUT");
+EL:RegisterEvent("LOADING_SCREEN_DISABLED");
 
 EL:SetScript("OnEvent", function(self, event, ...)
 	if event == "ADDON_LOADED" then
@@ -520,8 +521,35 @@ EL:SetScript("OnEvent", function(self, event, ...)
 
 	elseif event == "PLAYER_LOGOUT" then
 		DB.lastLogoutTime = time();
+
+	elseif event == "LOADING_SCREEN_DISABLED" then
+		self:QueueEvent(event);
 	end
 end);
+
+function EL:OnUpdate(elapsed)
+	self.t = self.t + elapsed;
+	if self.t > 2 then
+		self.t = nil;
+		self:SetScript("OnUpdate", nil);
+		if self.eventQueue then
+			local tbl = self.eventQueue;
+			self.eventQueue = nil;
+			for event in pairs(tbl) do
+				CallbackRegistry:Trigger(event);
+			end
+		end
+	end
+end
+
+function EL:QueueEvent(event)
+	if not self.eventQueue then
+		self.eventQueue = {};
+	end
+	self.eventQueue[event] = true;
+	self.t = 0;
+	self:SetScript("OnUpdate", self.OnUpdate);
+end
 
 
 do
