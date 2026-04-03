@@ -11,6 +11,48 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10900] = {
 	{
 		type = "date",
+		versionText = "1.9.0 c",
+		timestamp = 1775200000,
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot Window: When \"Show Any Currency Changes\" is enabled, any currency earned while in a battleground will be displayed when you leave.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added world bosses to the Activities Tab.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: If a currency has reached its cap and the remaining quantity is zero, it will show 0 with a strikethrough effect instead of in green color.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Shard of Dundun and Remnant of Anguish will no longer be removed from the list when you have none.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.0 b",
 		timestamp = 1774600000,
 	},
