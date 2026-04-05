@@ -692,6 +692,9 @@ L["Prey No Data"] = "暂时无法获取狩猎信息";
 L["Abundance No Data"] = "暂无丰饶活动";
 L["Defeated Prey"] = "已击败的狩猎目标";
 L["Item Expire Alert Weekly"] = "这件物品将在每周服务器维护后消失。";
+L["Delves Completion Reward Cap"] = "通关奖励";
+L["Delves Completion Reward Cap Tooltip"] = "当你达到此战团上限后，完成丰裕地下堡将不再奖励旅程进度和伙伴经验。\n\n丰裕宝匣和宿敌宝箱不受此上限影响。\n\n每周上限为28次，可以累计。";
+L["Near Completion Tooltip"] = "你可以看见此条目是因为你即将达到上限。";
 
 
 --ExpansionSummaryMinimapButton
@@ -851,9 +854,14 @@ L["ModuleDescription CatalystUI"] = "允许你按住Ctrl点击转化后的装备
 
 
 --HuntTable
-L["ModuleName HuntTable"] = "狩猎地图";
+L["ModuleName HuntTable"] = "狩猎：狩猎地图";
 L["ModuleDescription HuntTable"] = "- 将狩猎地图上的蓝色任务图标替换为难度图标。\n\n- 若狩猎目标与某个未完成的成就相关，在其右上方显示特别标记。";
 L["Prey Target Has Achievement"] = "某个未完成的成就要求你击败此目标。";
+
+
+--PreyQuestSuperTrack
+L["ModuleName PreyQuestSuperTrack"] = "狩猎：目标最终位置追踪";
+L["ModuleDescription PreyQuestSuperTrack"] = "当你知晓狩猎目标的最终位置后，点击狩猎进度指示器会将追踪此位置以便于你导航。";
 
 
 --Generic

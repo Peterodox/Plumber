@@ -11,8 +11,73 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10900] = {
 	{
 		type = "date",
-		versionText = "1.9.0 c",
-		timestamp = 1775200000,
+		versionText = "1.9.0 c-d",
+		timestamp = 1775400000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName PreyQuestSuperTrack"],
+		dbKey = "PreyQuestSuperTrack",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "PreyQuestSuperTrack",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = L["ModuleDescription PreyQuestSuperTrack"],
+	},
+
+	{
+		type = "img",
+		dbKey = "PreyQuestSuperTrack",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName NewExpansionLandingPage"],
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Fixed an issue where the Dawncrests showed their total earned quantities this season instead of the currently owned numbers.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Added the 28 Weekly Bountiful Delves Caps to the Activities Tab. Note: This entry only becomes visible when you are about to reach the weekly cap.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Added world bosses to the Activities Tab.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "If a currency has reached its cap and the remaining quantity is zero, it will show 0 with a strikethrough effect instead of in green color.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Shard of Dundun and Remnant of Anguish will no longer be removed from the list when you have none.",
+	},
+
+	{
+		type = "br",
 	},
 
 	{
@@ -24,24 +89,6 @@ changelogs[10900] = {
 		type = "p",
 		bullet = true,
 		text = "Loot Window: When \"Show Any Currency Changes\" is enabled, any currency earned while in a battleground will be displayed when you leave.",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Expansion Summary UI: Added world bosses to the Activities Tab.",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Expansion Summary UI: If a currency has reached its cap and the remaining quantity is zero, it will show 0 with a strikethrough effect instead of in green color.",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Expansion Summary UI: Shard of Dundun and Remnant of Anguish will no longer be removed from the list when you have none.",
 	},
 
 	{
