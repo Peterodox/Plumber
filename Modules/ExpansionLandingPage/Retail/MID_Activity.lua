@@ -347,9 +347,9 @@ do
 
 	function SetupFuncs.GildedStashTooltip(tooltip)
 		local description, isAccurate = GildedStashTracker:GetCrestStashTooltip();
+		tooltip:AddLine(L["Delve Crest Stash Requirement"], 1, 1, 1, true);
+		tooltip:AddLine(" ");
 		if description then
-			tooltip:AddLine(L["Delve Crest Stash Requirement"], 1, 1, 1, true);
-			tooltip:AddLine(" ");
 			tooltip:AddLine(description, 1, 0.82, 0, true);
 			if not isAccurate then
 				tooltip:AddLine(" ");
