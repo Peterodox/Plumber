@@ -119,17 +119,17 @@ L["ModuleDescription BackpackItemTracker"] = "Suivre objets empilables dans l'in
 L["Instruction Track Item"] = "Suivre l'objet";
 L["Hide Not Owned Items"] = "Masquer les objets non possédés";
 L["Hide Not Owned Items Tooltip"] = "Si vous ne possédez plus un objet que vous suiviez, il sera déplacé vers un menu caché.";
-L["Concise Tooltip"] = "infobulle concise";
+L["Concise Tooltip"] = "Infobulle concise";
 L["Concise Tooltip Tooltip"] = "Afficher uniquement le type de liaison de l'objet et sa quantité maximale.";
 L["Item Track Too Many"] = "Vous pouvez suivre seulement %d objets à la fois.";
 L["Tracking List Empty"] = "Votre liste de suivi personnalisée est vide.";
 L["Holiday Ends Format"] = "Se termine : %s";
 L["Not Found"] = "Non trouvé";   --Item not found
 L["Own"] = "Possédé";   --Something that the player has/owns
-L["Numbers To Earn"] = "À recevoir";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
-L["Numbers Of Earned"] = "Reçus";    --The number of stuff the player has earned
+L["Numbers To Earn"] = "# À recevoir";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
+L["Numbers Of Earned"] = "# Reçus";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Suivre les Écus";       --Crest: e.g. Drake's Dreaming Crest
-L["Track Upgrade Currency Tooltip"] = "Épingle sur la barre le type d'Écu de niveau supérieur que vous avez gagné.";
+L["Track Upgrade Currency Tooltip"] = "Épingler sur la barre l'écu de haut niveau que vous avez.;
 L["Track Holiday Item"] = "Suivre la monnaie des événements saisonniers";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Actuellement épinglé :";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Barre à l'intérieur du sac";     --Put the bar inside the bag UI (below money/currency)
@@ -648,7 +648,7 @@ L["No Slot For New Character Macro Alert"] = "Vous devez disposer d'un emplaceme
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Résumé de l'extension";
-L["ModuleDescription NewExpansionLandingPage"] = "Interface affichant les factions, les activités hebdomadaires et les verrouillages de raids. Vous pouvez l'ouvrir de la manière suivante :\n\nCliquez sur le bouton Résumé de Khaz Algar sur la mini-carte.\n\n- Attribuer un raccourci dans Options du jeu > Raccourcis clavier."
+L["ModuleDescription NewExpansionLanding    Page"] = "Une interface affichant les factions, les activités hebdomadaires et les restrictions de raid. Pour l'ouvrir :\n\n- Activer le bouton de la mini-carte.\n\n- Attribuer un raccourci clavier dans Options > Jeu > Raccourcis clavier > Plumber Addon.\n\n- Utiliser le menu des addons  le compartiment des extensions sous le bouton Calendrier."
 L["Abbr NewExpansionLandingPage"] = "Résumé de l'extension";
 L["Reward Available"] = "Récompense dispo.";  --As brief as possible
 L["Paragon Reward Available"] = "Récompense de Paragon disponible";
@@ -723,7 +723,6 @@ L["Prey No Data"] = "Progression de la Traque indisponible";
 L["Abundance No Data"] = "Aucun événement d'abondance actif";
 L["Defeated Prey"] = "Cibles de la Traque vaincues";
 L["Item Expire Alert Weekly"] = "Cet objet disparaîtra après la réinitialisation hebdomadaire.";
-L["Item Expire Alert Weekly"] = "Cet objet disparaîtra après la réinitialisation hebdomadaire.";
 
 
 --ExpansionSummaryMinimapButton
@@ -741,8 +740,8 @@ L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "Supprime la bordure do
 L["LandingButtonOption PrimaryUI"] = "Clic gauche : ouvrir";
 L["LandingButtonOption PrimaryUI Tooltip"] = "Choisir quelle interface ouvrir avec un clic gauche sur le bouton de la mini-carte.";
 L["LandingButtonOption SmartExpansion"] = "Choix automatique de l'extension";
-L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activé : clic gauche sur le bouton de la mini-carte ouvre l'interface adaptée à votre zone actuelle, par exemple le rapport du Sanctum de congrégation lorsque vous êtes en Ombreterre.";
-L["LandingButtonOption SmartExpansion Tooltip 2"] = "Si désactivé : clic gauche sur le bouton de la mini-carte ouvre toujours %s.";
+L["LandingButtonOption SmartExpansion Tooltip 1"] = "Lorsque cette option est activée : clic gauche sur le bouton de la mini-carte ouvre l’interface du jeu adaptée à votre position actuelle, par exemple le rapport du Sanctuaire de Congrégation lorsque vous êtes dans Shadowlands.";
+L["LandingButtonOption SmartExpansion Tooltip 2"] = "Lorsque cette option est désactivée : clic gauche sur le bouton de la mini-carte ouvre toujours %s;
 L["LandingButtonOption ReduceSize"] = "Réduire la taille du bouton";
 L["LandingButtonOption DarkColor"] = "Utiliser le thème sombre";
 L["LandingButtonOption HideWhenIdle"] = "Masquer en cas d'inactivité";
@@ -752,22 +751,22 @@ L["LandingButtonOption HideWhenIdle Tooltip"] = "Le bouton de la mini-carte rest
 --RaidCheck
 L["ModuleName InstanceDifficulty"] = "Difficulté de l'instance";
 L["ModuleDescription InstanceDifficulty"] = "- Afficher un sélecteur de difficulté lorsque vous vous trouvez à l'entrée d'un raid ou d'un donjon.\n\n- Afficher la difficulté actuelle et les informations de verrouillage en haut de l'écran lorsque vous entrez dans une instance.";
-L["Cannot Change Difficulty"] = "La difficulté de l'instance ne peut pas être modifiée pour le moment.";
+L["Cannot Change Difficulty"] = "La difficulté des instances ne peut pas être modifiée pour le moment.";
 L["Cannot Reset Instance"] = "Vous ne pouvez pas réinitialiser les instances pour le moment.";
-L["Difficulty Not Accurate"] = "La difficulté est inexacte car vous n'êtes pas le chef du groupe.";
-L["Instruction Click To Open Adventure Guide"] = "Clic gauche : |cffffffffGuide de l'aventurier|r";
-L["Instruction Alt Click To Reset Instance"] = "Alt + Clic droit : |cffffffffRéinitialiser toutes les instances|r";
+L["Difficulty Not Accurate"] = "La difficulté affichée est incorrecte car vous n'êtes pas le chef du groupe.";
+L["Instruction Click To Open Adventure Gui"] = "Clic gauche : |cffffffffguide de l'aventurier|r";
+L["Instruction Alt Click To Reset Instance"] = "Alt + Clic droit : |cffffffffréinitialiser toutes les instances|r";
 L["Instruction Link Progress In Chat"] = "<Maj + Clic pour poster la progression dans le chat>";
 L["Instance Name"] = "Nom de l'instance";   --Dungeon/Raid Name
 L["EditMode Instruction InstanceDifficulty"] = "La largeur du cadre dépend du nombre d'options disponibles.";
 
 
 --TransmogChatCommand
-L["ModuleName TransmogChatCommand"] = "Commande de transmogrification";
-L["ModuleDescription TransmogChatCommand"] = "- Lorsque vous utilisez une commande de transmogrification, déshabillez d'abord votre personnage afin que les anciens objets ne soient pas conservés dans la nouvelle tenue.\n\n- Auprès du Transmogrificateur, utiliser une commande de discussion charge automatiquement tous les objets disponibles dans l'interface de transmogrification.";
-L["Copy To Clipboard"] = "Copier dans le presse-papiers";
-L["Copy Current Outfit Tooltip"] = "Copie la tenue actuelle pour la partager en ligne.";
-L["Missing Appearances Format"] = "%d |4apparence manquante:apparences manquantes";
+L["ModuleName TransmogChatCommand"] = "Commande de chat de transmogrification";
+L["ModuleDescription TransmogChatCommand"] = "- Lorsque vous utilisez une commande de chat de transmogrification, déshabillez d'abord votre personnage afin que les anciens objets ne soient pas transférés dans la nouvelle tenue.\n\n- Devant le Transmogrificateur, l'utilisation d'une commande de chat, charge automatiquement tous les objets disponibles dans l'interface de transmogrification.";
+L["Copy To Pressboard"] = "Copier dans le presse-papiers";
+L["Copy Current Outfit Tooltip"] = "Copier la tenue actuelle pour la partager en ligne.";
+L["Missing Appearances Format"] = "%d |4apparence:apparences; manquante";
 L["Press Key To Copy Format"] = "Appuyez sur |cffffd100%s|r pour copier";
 
 
