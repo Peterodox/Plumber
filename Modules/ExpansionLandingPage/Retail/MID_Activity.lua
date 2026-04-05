@@ -88,6 +88,66 @@ do
 end
 
 
+local DelvesWarbandCap = {};
+do
+	DelvesWarbandCap.shownThreshold = 4;
+	DelvesWarbandCap.weeklyCap = 28;
+
+	function DelvesWarbandCap:GetNumEarned(normalize)
+		local info = C_CurrencyInfo.GetCurrencyInfo(3142);
+		if info and info.maxQuantity and info.maxQuantity > 0 then
+			--info.quantity, info.maxQuantity = 24 + self.weeklyCap, 2*self.weeklyCap;	--debug
+
+			local delta = info.maxQuantity - info.quantity;
+			if delta <= self.shownThreshold then
+				local current = info.quantity;
+				local max = info.maxQuantity;
+				if normalize then
+					while max > self.weeklyCap and current > self.weeklyCap do
+						max = max - self.weeklyCap;
+						current = current - self.weeklyCap;
+					end
+					delta = max - current;
+				end
+				return current;
+			end
+		end
+	end
+
+	function DelvesWarbandCap.ShouldShowActivity()
+		return DelvesWarbandCap:GetNumEarned() ~= nil
+	end
+
+	function DelvesWarbandCap.SetupButton(listButton)
+		local info = C_CurrencyInfo.GetCurrencyInfo(3142);
+		if info then
+			local delta = info.maxQuantity - info.quantity;
+			listButton.Name:SetText(string.format("%s/%s %s", DelvesWarbandCap:GetNumEarned(true), DelvesWarbandCap.weeklyCap, L["Delves Completion Reward Cap"]));
+			listButton.Icon:SetTexCoord(0, 1, 0, 1);
+			if delta > 0 then
+				listButton.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/WarbandBonfire.png");
+				listButton.completed = nil;
+			else
+				listButton.Icon:SetAtlas("checkmark-minimal-disabled");
+				listButton.completed = true;
+			end
+		end
+	end
+
+	function DelvesWarbandCap.SetupTooltip(tooltip)
+		tooltip:AddLine(L["Delves Completion Reward Cap Tooltip"], 1, 1, 1, true);
+
+		local current = DelvesWarbandCap:GetNumEarned(true);
+		if current and current < DelvesWarbandCap.weeklyCap then
+			tooltip:AddLine(" ");
+			tooltip:AddLine(L["Near Completion Tooltip"], 0.5, 0.5, 0.5, true);
+		end
+
+		return true;
+	end
+end
+
+
 local SetupFuncs = {};
 do
 	local WIDGET_TYPE = 2;
@@ -372,6 +432,7 @@ local ActivityData = {
 			{name = "Coffer Key Shard", currencyID = 3310, icon = 133016, removeIconBorder = true},
 			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFuncs.WeeklyBonusRenown, children = DelvesBonusRepQuestFlags},
 			{name = "Gilded Stash", icon = 5872049, removeIconBorder = true, setupFunc = SetupFuncs.GildedStashEntry, tooltipSetter = SetupFuncs.GildedStashTooltip, conditions = GildedStashTracker},
+			{name = "Completion Rewards Cap", icon = 5872049, removeIconBorder = true, setupFunc = DelvesWarbandCap.SetupButton, tooltipSetter = DelvesWarbandCap.SetupTooltip, conditions = DelvesWarbandCap},
 
 			--{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, removeIconBorder = true,
 			--    children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
