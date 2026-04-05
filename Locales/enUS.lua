@@ -891,6 +891,11 @@ L["ModuleDescription HuntTable"] = "- Replaces the generic blue quest icons to s
 L["Prey Target Has Achievement"] = "This Prey target is a requirement for an unearned achievement.";
 
 
+--PreyQuestSuperTrack
+L["ModuleName PreyQuestSuperTrack"] = "Prey: Target Waypoint";
+L["ModuleDescription PreyQuestSuperTrack"] = "Once your Prey target's location is revealed, clicking the Hunt Progress widget will also set a waypoint to that location.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally

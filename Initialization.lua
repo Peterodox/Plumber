@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.9.0 c";
-local VERSION_DATE = 1775200000;
+local VERSION_TEXT = "1.9.0 d";
+local VERSION_DATE = 1775400000;
 
 
 local addonName, addon = ...
@@ -245,6 +245,7 @@ local DefaultValues = {
 	TransmogOutfitSelect = true,        --Show Minimized Transmog Outfit Collection
 	CatalystUI = true,					--Allow Ctrl-Click to preview items in Dressing Room for UIs that don't natively support this action
 	HuntTable = true,					--Replace generic quest icons with difficulties and add achievement indicators.
+	PreyQuestSuperTrack = true,			--During the final stage, clicking the Prey widget also super track the target location.
 
 
 	--Tooltip
