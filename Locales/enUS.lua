@@ -723,6 +723,9 @@ L["Prey No Data"] = "Prey Progress Unavailable";
 L["Abundance No Data"] = "No Active Abundance Event";
 L["Defeated Prey"] = "Defeated Prey Targets";
 L["Item Expire Alert Weekly"] = "This item will disappear after the weekly reset.";
+L["Delves Completion Reward Cap"] = "Completion Rewards";
+L["Delves Completion Reward Cap Tooltip"] = "Once you reach this account-wide cap, completing a Bountiful Delve will no longer grant Delver's Journey or Companion EXP.\n\nRewards from Bountiful Coffers and Nemesis Caches will not be affected by this cap.\n\nThe cap will be raised by 28 per week.";
+L["Near Completion Tooltip"] = "This entry is visible to you because you are about to reach the weekly cap.";
 
 
 --ExpansionSummaryMinimapButton
@@ -886,6 +889,11 @@ L["ModuleDescription CatalystUI"] = "Allows you to Ctrl-Click the output item to
 L["ModuleName HuntTable"] = "Prey: Hunt Table";
 L["ModuleDescription HuntTable"] = "- Replaces the generic blue quest icons to show difficulties.\n\n- Shows an indicator if the Prey target is a requirement for an unearned achievement.";
 L["Prey Target Has Achievement"] = "This Prey target is a requirement for an unearned achievement.";
+
+
+--PreyQuestSuperTrack
+L["ModuleName PreyQuestSuperTrack"] = "Prey: Target Waypoint";
+L["ModuleDescription PreyQuestSuperTrack"] = "Once your Prey target's location is revealed, clicking the Hunt Progress widget will also set a waypoint to that location.";
 
 
 --Generic

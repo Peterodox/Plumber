@@ -664,6 +664,8 @@ stds.wow = {
 				"GetCurrencyInfoFromLink",
 				"GetCurrencyLink",
 				"GetFactionGrantedByCurrency",
+				"PlayerHasMaxQuantity",
+				"PlayerHasMaxWeeklyQuantity",
 			},
 		},
 

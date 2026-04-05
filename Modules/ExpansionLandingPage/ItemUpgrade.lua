@@ -16,9 +16,10 @@ do
 		if info then
 			self:Show();
 			self.Icon:SetTexture(info.iconFileID);
-			local quantity = info.useTotalEarnedForMaxQty and info.totalEarned or info.quantity;
+			local quantity = info.quantity;
+			local totalEarned = info.useTotalEarnedForMaxQty and info.totalEarned or info.quantity;
 			local maxQuantity = info.maxQuantity or 0;
-			local isCapped = maxQuantity > 0 and quantity >= maxQuantity;
+			local isCapped = maxQuantity > 0 and totalEarned >= maxQuantity;
 			self:SetCount(quantity, isCapped);
 		else
 			self:Hide();

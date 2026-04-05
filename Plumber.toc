@@ -88,6 +88,8 @@ Modules\OutfitSelect.lua
 Modules\BreakTime.xml
 Modules\CatalystUI.lua
 Modules\HuntTable.lua
+Modules\PreyQuestSuperTrack.lua
+
 
 #Modules\MerchantUI\MerchantUI.xml
 
