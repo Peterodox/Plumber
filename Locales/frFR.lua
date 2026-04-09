@@ -119,17 +119,17 @@ L["ModuleDescription BackpackItemTracker"] = "Suivre objets empilables dans l'in
 L["Instruction Track Item"] = "Suivre l'objet";
 L["Hide Not Owned Items"] = "Masquer les objets non possédés";
 L["Hide Not Owned Items Tooltip"] = "Si vous ne possédez plus un objet que vous suiviez, il sera déplacé vers un menu caché.";
-L["Concise Tooltip"] = "infobulle concise";
+L["Concise Tooltip"] = "Infobulle concise";
 L["Concise Tooltip Tooltip"] = "Afficher uniquement le type de liaison de l'objet et sa quantité maximale.";
 L["Item Track Too Many"] = "Vous pouvez suivre seulement %d objets à la fois.";
 L["Tracking List Empty"] = "Votre liste de suivi personnalisée est vide.";
 L["Holiday Ends Format"] = "Se termine : %s";
 L["Not Found"] = "Non trouvé";   --Item not found
 L["Own"] = "Possédé";   --Something that the player has/owns
-L["Numbers To Earn"] = "À recevoir";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
-L["Numbers Of Earned"] = "Reçus";    --The number of stuff the player has earned
+L["Numbers To Earn"] = "# À recevoir";     --The number of items/currencies player can earn. The wording should be as abbreviated as possible.
+L["Numbers Of Earned"] = "# Reçus";    --The number of stuff the player has earned
 L["Track Upgrade Currency"] = "Suivre les Écus";       --Crest: e.g. Drake's Dreaming Crest
-L["Track Upgrade Currency Tooltip"] = "Épingle sur la barre le type d'Écu de niveau supérieur que vous avez gagné.";
+L["Track Upgrade Currency Tooltip"] = "Épingler l'écu de haut niveau que vous avez.";
 L["Track Holiday Item"] = "Suivre la monnaie des événements saisonniers";       --e.g. Tricky Treats (Hallow's End)
 L["Currently Pinned Colon"] = "Actuellement épinglé :";  --Tells the currently pinned item
 L["Bar Inside The Bag"] = "Barre à l'intérieur du sac";     --Put the bar inside the bag UI (below money/currency)
@@ -539,7 +539,7 @@ L["ModuleDescription ItemUpgradeUI"] = "Ouvrir automatiquement la fiche de votre
 
 --HolidayDungeon
 L["ModuleName HolidayDungeon"] = "Sélection auto. du donjon des Événements saisonniers";
-L["ModuleDescription HolidayDungeon"] = "Sélectionne automatiquement les donjons des Événements saisonniers et des Marcheurs du temps lorsque vous ouvrez la Recherche de groupe pour la première fois.";
+L["ModuleDescription HolidayDungeon"] = "Sélectionner automatiquement les donjons des Événements saisonniers et des Marcheurs du temps lorsqu'on ouvre la Recherche de groupe pour la première fois.";
 
 
 --PlayerPing
@@ -648,7 +648,7 @@ L["No Slot For New Character Macro Alert"] = "Vous devez disposer d'un emplaceme
 
 --New Expansion Landing Page
 L["ModuleName NewExpansionLandingPage"] = "Résumé de l'extension";
-L["ModuleDescription NewExpansionLandingPage"] = "Interface affichant les factions, les activités hebdomadaires et les verrouillages de raids. Vous pouvez l'ouvrir de la manière suivante :\n\nCliquez sur le bouton Résumé de Khaz Algar sur la mini-carte.\n\n- Attribuer un raccourci dans Options du jeu > Raccourcis clavier."
+L["ModuleDescription NewExpansionLandingPage"] = "Une interface affichant les factions, les activités hebdomadaires et les restrictions de raid. Pour l'ouvrir :\n\n- Activer le bouton de la mini-carte.\n\n- Attribuer un raccourci clavier dans Options > Jeu > Raccourcis clavier > Plumber Addon.\n\n- Utiliser le menu des addons  le compartiment des extensions sous le bouton Calendrier."
 L["Abbr NewExpansionLandingPage"] = "Résumé de l'extension";
 L["Reward Available"] = "Récompense dispo.";  --As brief as possible
 L["Paragon Reward Available"] = "Récompense de Paragon disponible";
@@ -723,7 +723,9 @@ L["Prey No Data"] = "Progression de la Traque indisponible";
 L["Abundance No Data"] = "Aucun événement d'abondance actif";
 L["Defeated Prey"] = "Cibles de la Traque vaincues";
 L["Item Expire Alert Weekly"] = "Cet objet disparaîtra après la réinitialisation hebdomadaire.";
-L["Item Expire Alert Weekly"] = "Cet objet disparaîtra après la réinitialisation hebdomadaire.";
+L["Delves Completion Reward Cap"] = "Récompenses de complétion";
+L["Delves Completion Reward Cap Tooltip"] = "Une fois cette limite de compte atteinte, terminer un gouffre abondant ne vous accordera plus de progression pour le Périple du Gouffre ni d'expérience de compagnon.\n\nLes récompenses des coffres abondants et des Caches de Némésis ne sont pas affectées par cette limite.\n\nLa limite augmente de 28 chaque semaine.";
+L["Near Completion Tooltip"] = "Cette entrée est visible car vous êtes sur le point d'atteindre la limite hebdomadaire.";
 
 
 --ExpansionSummaryMinimapButton
@@ -741,8 +743,8 @@ L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "Supprime la bordure do
 L["LandingButtonOption PrimaryUI"] = "Clic gauche : ouvrir";
 L["LandingButtonOption PrimaryUI Tooltip"] = "Choisir quelle interface ouvrir avec un clic gauche sur le bouton de la mini-carte.";
 L["LandingButtonOption SmartExpansion"] = "Choix automatique de l'extension";
-L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activé : clic gauche sur le bouton de la mini-carte ouvre l'interface adaptée à votre zone actuelle, par exemple le rapport du Sanctum de congrégation lorsque vous êtes en Ombreterre.";
-L["LandingButtonOption SmartExpansion Tooltip 2"] = "Si désactivé : clic gauche sur le bouton de la mini-carte ouvre toujours %s.";
+L["LandingButtonOption SmartExpansion Tooltip 1"] = "Option activée : clic gauche sur le bouton de la mini-carte ouvre l’interface du jeu adaptée à votre position actuelle, par exemple le rapport du Sanctuaire de Congrégation lorsque vous êtes dans Shadowlands.";
+L["LandingButtonOption SmartExpansion Tooltip 2"] = "Option désactivée : clic gauche sur le bouton de la mini-carte ouvre toujours %s";
 L["LandingButtonOption ReduceSize"] = "Réduire la taille du bouton";
 L["LandingButtonOption DarkColor"] = "Utiliser le thème sombre";
 L["LandingButtonOption HideWhenIdle"] = "Masquer en cas d'inactivité";
@@ -767,7 +769,7 @@ L["ModuleName TransmogChatCommand"] = "Commande de transmogrification";
 L["ModuleDescription TransmogChatCommand"] = "- Lorsque vous utilisez une commande de transmogrification, déshabillez d'abord votre personnage afin que les anciens objets ne soient pas conservés dans la nouvelle tenue.\n\n- Auprès du Transmogrificateur, utiliser une commande de discussion charge automatiquement tous les objets disponibles dans l'interface de transmogrification.";
 L["Copy To Clipboard"] = "Copier dans le presse-papiers";
 L["Copy Current Outfit Tooltip"] = "Copie la tenue actuelle pour la partager en ligne.";
-L["Missing Appearances Format"] = "%d |4apparence manquante:apparences manquantes";
+L["Missing Appearances Format"] = "%d |4apparence:apparences; manquante";
 L["Press Key To Copy Format"] = "Appuyez sur |cffffd100%s|r pour copier";
 
 
@@ -845,6 +847,7 @@ L["Match Sources"] = "Correspondance des sources";
 --SourceAchievementLink
 L["ModuleName SourceAchievementLink"] = "Information interactive sur la source";
 L["ModuleDescription SourceAchievementLink"] = "Dans certaines interfaces, rend la plupart des hauts faits cliquables pour afficher les détails ou de le suivre.\n\n- Catalogue d'éléments de décoration\n\n- Journal des montures";
+L["ModuleDescription SourceAchievementLink"] = "Makes most achievement names on the following UI become clickable, allowing you to see their details or track them.\n\n- Decor Catalog\n\n- Mount Journal";
 
 
 --BreakTime
@@ -880,13 +883,18 @@ L["BreakTime Shared Countdown Tooltip Format"] = "Pause prévue dans |cffffffff%
 
 --CatalystUI
 L["ModuleName CatalystUI"] = "Catalyseur : essayer l'objet";
-L["ModuleDescription CatalystUI"] = "Ctrl + Clic sur l'objet obtenu pour l'afficher dans la cabine d'essayage, ou Maj + clic pour le poster dans le chat.";
+L["ModuleDescription CatalystUI"] = "Ctrl + Clic sur l'objet obtenu pour l'afficher dans la cabine d'essayage, ou Maj + Clic pour le poster dans le chat.";
 
 
 --HuntTable
-L["ModuleName HuntTable"] = "Traque : table de chasse";
+L["ModuleName HuntTable"] = "Traque : table de traque";
 L["ModuleDescription HuntTable"] = "- Remplacer les icônes de quête bleues pour indiquer les difficultés.\n\n- Afficher un indicateur si la cible de la Traque est une condition requise pour un haut fait non réalisé.";
-L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition nécessaire pour obtenir un haut fait non réalisé .";
+L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition requise pour obtenir un haut fait non réalisé .";
+
+
+--PreyQuestSuperTrack
+L["ModuleName PreyQuestSuperTrack"] = "Traque : point de passage des cibles";
+L["ModuleDescription PreyQuestSuperTrack"] = "Une fois la position de votre proie révélée, un clic sur le widget de progression de la traque définira également un point de repère vers cette position.";
 
 
 --Generic
