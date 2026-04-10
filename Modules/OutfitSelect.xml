@@ -1,0 +1,152 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="OutfitSelect.lua"/>
+
+	<Frame name="Plumber_OutfitSelectOutfitEntryTemplate" mixin="PlumberOutfitSelectOutfitEntryMixin" virtual="true">
+		<Size x="236" y="36"/>
+		<Frames>
+			<Button parentKey="IconButton" registerForDrag="LeftButton">
+				<Size x="36" y="36"/>
+				<Anchors>
+					<Anchor point="LEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="HIGHLIGHT">
+						<Texture parentKey="BorderHighlight" alphaMode="ADD">
+							<Size x="48" y="48"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture parentKey="Border">
+							<Size x="48" y="48"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon">
+							<Size x="33" y="33"/>
+							<TexCoords left="0.0625" right="0.9375" top="0.0625" bottom="0.9375"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+        		<Frames>
+					<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawEdge="false" drawBling="false"/>
+					<Frame parentKey="OverlayLocked" inherits="AutoCastOverlayTemplate" hidden="true">
+						<Size x="34" y="34"/>
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Button>
+			<Button parentKey="TextButton">
+				<Size x="192" y="36"/>
+				<Anchors>
+					<Anchor point="RIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString parentKey="Name" inherits="GameFontNormal" justifyH="LEFT" maxLines="1">
+							<Anchors>
+								<Anchor point="LEFT" x="10"/>
+								<Anchor point="RIGHT" x="-11"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Background">
+							<Size x="208" y="48"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+			<OnEvent method="OnEvent"/>
+		</Scripts>
+	</Frame>
+
+	<Frame name="Plumber_OutfitSelectFrameTemplate" inherits="PortraitFrameFlatTemplate" clampedToScreen="true" enableMouse="true" movable="true" virtual="true">
+		<KeyValues>
+			<KeyValue key="layoutType" value="HeldBagLayout" type="string"/>
+		</KeyValues>
+		<Size x="304" y="800"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level ="BACKGROUND">
+				<Texture parentKey="GradientTop" atlas="transmog-outfit-toptexture">
+					<Size x="300" y="76"/>
+					<Anchors>
+						<Anchor point="TOP" y="-20"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="ClearTransmogFrame" inherits="Plumber_OutfitSelectOutfitEntryTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="20" y="-48"/>
+				</Anchors>
+			</Frame>
+
+			<Frame parentKey="OutfitList">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="-96"/>
+					<Anchor point="BOTTOMRIGHT" x="0" y="24"/>
+				</Anchors>
+				<Layers>
+					<Layer level ="OVERLAY">
+						<Texture parentKey="DividerTop">
+							<Size x="300" y="4"/>
+							<Anchors>
+								<Anchor point="TOP" y="1"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="DividerBottom">
+							<Size x="300" y="4"/>
+							<Anchors>
+								<Anchor point="BOTTOM" y="-1"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
+						<KeyValues>
+							<KeyValue key="canInterpolateScroll" value="false" type="boolean"/>
+						</KeyValues>
+						<Anchors>
+							<Anchor point="TOPLEFT" x="0" y="-2"/>
+							<Anchor point="BOTTOMRIGHT" x="-25" y="2"/>
+						</Anchors>
+					</Frame>
+					<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+						<KeyValues>
+							<KeyValue key="canInterpolateScroll" value="false" type="boolean"/>
+						</KeyValues>
+						<Anchors>
+							<Anchor point="TOP" relativeKey="$parent.ScrollBox" relativePoint="TOP" x="0" y="-12"/>
+							<Anchor point="BOTTOM" relativeKey="$parent.ScrollBox" relativePoint="BOTTOM" x="0" y="12"/>
+							<Anchor point="RIGHT" x="-18" y="0"/>
+						</Anchors>
+					</EventFrame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

@@ -1,6 +1,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local SetSpellCooldown = addon.CooldownUtil.SetSpellCooldown;
 
 
 local Def = {
@@ -32,6 +33,19 @@ local Def = {
 
 	DefaultOffsetX = -480,
 	DefaultOffsetY = 0,
+
+	FrameName = "PlumberOutfitSelectFrame",
+
+	OutfitEntry = {
+		IconButtonWidth = 36,
+		TextButtonWidth = 192,
+		IconTextGap = 8,
+		FrameGap = 12,
+	},
+
+	TextureFile = "Interface/AddOns/Plumber/Art/Frame/TransmogUI.png",
+
+	equipOutfitSpellID = Constants.TransmogOutfitDataConsts.EQUIP_TRANSMOG_OUTFIT_MANUAL_SPELL_ID,
 };
 
 
@@ -43,6 +57,9 @@ local ExtraFrame;
 local CreateExtraFrame;
 local RepositionFrame;
 local CreateRepositionFrame;
+
+
+local OutfitSelectFrame_Show, OutfitSelectFrame_Hide;	--For 12.0.5+
 
 
 do  -- DragButton On TransmogFrame
@@ -105,24 +122,23 @@ do  -- DragButton On TransmogFrame
 		f:SetSize(308, 34);
 		f:SetFrameLevel(128);
 
-		local file = "Interface/AddOns/Plumber/Art/Frame/TransmogUI.png";
 		local alpha = 0.5;
 
 		local Left = f:CreateTexture(nil, "OVERLAY");
 		Left:SetSize(40, 12);
-		Left:SetTexture(file);
+		Left:SetTexture(Def.TextureFile);
 		Left:SetTexCoord(0, 80/512, 0, 24/512);
 		Left:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0);
 
 		local Right = f:CreateTexture(nil, "OVERLAY");
 		Right:SetSize(40, 12);
-		Right:SetTexture(file);
+		Right:SetTexture(Def.TextureFile);
 		Right:SetTexCoord(160/512, 240/512, 0, 24/512);
 		Right:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0);
 
 		local Center = f:CreateTexture(nil, "OVERLAY");
 		Center:SetSize(40, 12);
-		Center:SetTexture(file);
+		Center:SetTexture(Def.TextureFile);
 		Center:SetTexCoord(80/512, 160/512, 0, 24/512);
 		Center:SetPoint("TOPLEFT", Left, "TOPRIGHT", 0, 0);
 		Center:SetPoint("BOTTOMRIGHT", Right, "BOTTOMLEFT", 0, 0);
@@ -460,6 +476,300 @@ do  --EL Event Listener
 			self:SetScript("OnKeyDown", nil);
 		end
 	end
+end
+
+
+do	--OutfitEntryMixin
+	PlumberOutfitSelectOutfitEntryMixin = {};
+
+	function PlumberOutfitSelectOutfitEntryMixin:OnLoad()
+		self.Icon = self.IconButton.Icon;
+		self.Border = self.IconButton.Border;
+		self.BorderHighlight = self.IconButton.BorderHighlight;
+		self.Background = self.TextButton.Background;
+		self.Name = self.TextButton.Name;
+
+		if not Def.OutfitEntryWidth then
+			Def.OutfitEntryWidth = 	Def.OutfitEntry.IconButtonWidth + Def.OutfitEntry.IconTextGap + Def.OutfitEntry.TextButtonWidth;
+		end
+		self:SetWidth(Def.OutfitEntryWidth);
+
+		self.Border:SetTexture(Def.TextureFile);
+		self.Border:SetTexCoord(0, 96/512, 32/512, 128/512);
+		self.BorderHighlight:SetTexture(Def.TextureFile);
+		self.BorderHighlight:SetTexCoord(0, 96/512, 32/512, 128/512);
+
+		self.Background:SetTexture(Def.TextureFile);
+		self.Background:SetTexCoord(96/512, 1, 32/512, 128/512);
+
+		self.IconButton:SetScript("OnDragStart", function()
+			self:PickupOutfit();
+		end);
+
+		self.IconButton:SetScript("OnEnter", function()
+			self:ShowTooltip();
+		end);
+
+		self.IconButton:SetScript("OnLeave", function()
+			GameTooltip:Hide();
+		end);
+
+		self.IconButton.Cooldown:SetHideCountdownNumbers(true);
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:OnShow()
+		self:RegisterEvent("SPELL_UPDATE_COOLDOWN");
+		self:UpdateCooldown();
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:OnHide()
+		self:UnregisterEvent("SPELL_UPDATE_COOLDOWN");
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:OnEvent()
+		self:UpdateCooldown();
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:SetActive(selected)
+		self.selected = selected;
+		if selected then
+			self.Border:SetTexCoord(0, 96/512, 128/512, 224/512);
+			self.Background:SetTexCoord(96/512, 1, 128/512, 224/512);
+			--self.BorderHighlight:SetAlpha(0);
+			self.Name:SetTextColor(1, 1, 1);
+		else
+			self.Border:SetTexCoord(0, 96/512, 32/512, 128/512);
+			self.Background:SetTexCoord(96/512, 1, 32/512, 128/512);
+			--self.BorderHighlight:SetAlpha(1);
+			self.Name:SetTextColor(1, 0.82, 0);
+		end
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:PickupOutfit()
+		local outfitID = self.outfitID;
+		if (not outfitID) and self.GetElementData then
+			local elementData = self:GetElementData();
+			outfitID = elementData and elementData.outfitID;
+		end
+		if outfitID then
+			C_TransmogOutfitInfo.PickupOutfit(outfitID);
+		end
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:ShowTooltip()
+		if self.spellID then
+			GameTooltip:SetOwner(self.IconButton, "ANCHOR_RIGHT");
+			GameTooltip:SetSpellByID(self.spellID);
+			return
+		end
+
+		local elementData = self:GetElementData();
+		if not (elementData and elementData.outfitID) then
+			return;
+		end
+
+		GameTooltip:SetOwner(self.IconButton, "ANCHOR_RIGHT");
+		GameTooltip:SetOutfit(elementData.outfitID);
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:UpdateCooldown()
+		SetSpellCooldown(self.IconButton.Cooldown, self.spellID or Def.equipOutfitSpellID, true);
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:Init(elementData)
+		self.IconButton:SetScript("OnClick", function(_button, buttonName)
+			local toggleLock = false;
+
+			if buttonName == "RightButton" then
+				toggleLock = true;
+			end
+		end);
+
+		self.Icon:SetTexture(elementData.icon);
+		self.Name:SetText(elementData.name);
+		self:SetActive(elementData.isActive);
+
+		local isLockedOutfit = elementData.isActive and C_TransmogOutfitInfo.IsLockedOutfit(elementData.outfitID);
+		self.IconButton.OverlayLocked:SetShown(isLockedOutfit);
+		self.IconButton.OverlayLocked:ShowAutoCastEnabled(isLockedOutfit);
+
+		--[[
+		local situationText = "";
+		if elementData.situationCategories then
+			for index, situationCategory in ipairs(elementData.situationCategories) do
+				situationText = situationText..situationCategory;
+
+				if index ~= #elementData.situationCategories then
+					situationText = situationText..TRANSMOG_SITUATION_CATEGORY_LIST_SEPARATOR;
+				end
+			end
+		end
+		--]]
+	end
+end
+
+
+do	--12.0.5 Change
+	local MainFrame;
+
+	local OutfitSelectFrameMixin = {};
+
+	function OutfitSelectFrameMixin:OnShow()
+		self:RegisterEvent("TRANSMOG_OUTFITS_CHANGED");
+		self:RegisterEvent("TRANSMOG_DISPLAYED_OUTFIT_CHANGED");
+		self:RegisterEvent("PLAYER_REGEN_DISABLED");
+		self:SetScript("OnKeyDown", self.OnKeyDown);
+		self:RefreshList();
+	end
+
+	function OutfitSelectFrameMixin:OnHide()
+		self:UnregisterEvent("TRANSMOG_OUTFITS_CHANGED");
+		self:UnregisterEvent("TRANSMOG_DISPLAYED_OUTFIT_CHANGED");
+		self:UnregisterEvent("PLAYER_REGEN_DISABLED");
+		self:SetScript("OnKeyDown", nil);
+	end
+
+	function OutfitSelectFrameMixin:OnEvent(event, ...)
+		if event == "TRANSMOG_OUTFITS_CHANGED" or event == "TRANSMOG_DISPLAYED_OUTFIT_CHANGED" then
+			self:RefreshList();
+		elseif event == "PLAYER_REGEN_DISABLED" then
+			self:Hide();
+		end
+	end
+
+	function OutfitSelectFrameMixin:RefreshList()
+		local dataProvider = CreateDataProvider();
+		local outfitsInfo = C_TransmogOutfitInfo.GetOutfitsInfo();
+
+		if outfitsInfo then
+			local activeOutfitID = C_TransmogOutfitInfo.GetActiveOutfitID();
+			for _index, outfitInfo in ipairs(outfitsInfo) do
+				local outfitData = {
+					outfitID = outfitInfo.outfitID,
+					name = outfitInfo.name,
+					situationCategories = outfitInfo.situationCategories,
+					icon = outfitInfo.icon,
+					isActive = outfitInfo.outfitID == activeOutfitID,
+				};
+
+				dataProvider:Insert(outfitData);
+			end
+		end
+
+		self.OutfitList.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
+		self.ClearTransmogFrame:SetActive(C_TransmogOutfitInfo.IsEquippedGearOutfitDisplayed());
+	end
+
+	function OutfitSelectFrameMixin:OnKeyDown(key)
+		if InCombatLockdown() then
+			self:Hide();
+			self:SetScript("OnKeyDown", nil);
+			return;
+		end
+
+		local valid;
+
+		if key == "ESCAPE" then
+			valid = true;
+			self:Hide();
+		end
+
+		self:SetPropagateKeyboardInput(not valid);
+	end
+
+	function OutfitSelectFrame_Show()
+		if not MainFrame then
+			local f = CreateFrame("Frame", Def.FrameName, UIParent, "Plumber_OutfitSelectFrameTemplate");
+			MainFrame = f;
+			Mixin(f, OutfitSelectFrameMixin);
+			f:Hide();
+
+			f:SetPortraitTextureSizeAndOffset(38, -5, -1);
+			f:SetTitleOffsets(35);
+			f:SetPortraitTextureRaw(Def.TextureFile);
+			f:SetPortraitTexCoord(8/512, 88/512, 232/512, 312/512);
+			f:SetTitle(TRANSMOGRIFY);
+			f:SetBackgroundColor(CreateColor(0, 0, 0, 0.6));
+			f:SetToplevel(true);
+
+			f.TitleContainer:EnableMouse(true);
+			f.TitleContainer:RegisterForDrag("LeftButton");
+			f.TitleContainer:SetHitRectInsets(0, 32, 0, 0);
+
+			f.TitleContainer:SetScript("OnDragStart", function()
+				f:StartMoving();
+			end);
+
+			f.TitleContainer:SetScript("OnDragStop", function()
+				f:StopMovingOrSizing();
+			end);
+
+			f.TitleContainer:SetScript("OnEnter", function()
+				SetCursor("Interface/CURSOR/UI-Cursor-Move.blp");
+			end);
+
+			f.TitleContainer:SetScript("OnLeave", function()
+				ResetCursor();
+			end);
+
+
+			local frameGap = Def.OutfitEntry.FrameGap;
+			local layoutSize = Def.OutfitEntry.IconButtonWidth + frameGap;
+			local listHeight = 10 * layoutSize - frameGap;
+			f.OutfitList:SetHeight(listHeight);
+			f:SetHeight(96 + listHeight + 24);
+
+			f.OutfitList.DividerTop:SetTexture(Def.TextureFile);
+			f.OutfitList.DividerTop:SetTexCoord(128/512, 1, 224/512, 232/512);
+			f.OutfitList.DividerBottom:SetTexture(Def.TextureFile);
+			f.OutfitList.DividerBottom:SetTexCoord(128/512, 1, 224/512, 232/512);
+
+			local spellID = 1247917;
+			local spellIcon = C_Spell.GetSpellTexture(spellID);
+			local ctf = f.ClearTransmogFrame;
+			ctf.spellID = spellID;
+			ctf.outfitID = 0;
+			ctf.Icon:SetTexture(spellIcon);
+			ctf.Name:SetText(TRANSMOG_SHOW_EQUIPPED_GEAR);
+			ctf.Name:ClearAllPoints();
+			ctf.Name:SetPoint("LEFT", ctf.IconButton, "RIGHT", Def.OutfitEntry.IconTextGap + 2, 0);
+			ctf.Name:SetPoint("RIGHT", f, "RIGHT", -Def.OutfitEntry.IconTextGap, 0);
+			ctf.Name:SetMaxLines(2);
+			ctf.Background:SetTexture(nil);
+
+			local view = CreateScrollBoxListLinearView();
+
+			view:SetElementInitializer("Plumber_OutfitSelectOutfitEntryTemplate", function(frame, elementData)
+				frame:Init(elementData);
+			end);
+
+			local padV = frameGap;
+			local padLeft = 20;
+			local padRight = 0;
+			local spacing = frameGap;
+			view:SetPadding(padV, padV, padLeft, padRight, spacing);	--top, bottom, left, right, spacing
+			view:SetElementStretchDisabled(true);
+
+			ScrollUtil.InitScrollBoxListWithScrollBar(f.OutfitList.ScrollBox, f.OutfitList.ScrollBar, view);
+			ScrollUtil.AddResizableChildrenBehavior(f.OutfitList.ScrollBox);
+
+			f:SetScript("OnShow", f.OnShow);
+			f:SetScript("OnHide", f.OnHide);
+			f:SetScript("OnEvent", f.OnEvent);
+		end
+
+		MainFrame:Show();
+		MainFrame:Raise();
+	end
+
+	function OutfitSelectFrame_Hide()
+		if MainFrame then
+			MainFrame:Hide();
+		end
+	end
+
+
+	--C_Timer.After(2, OutfitSelectFrame_Show);
 end
 
 
