@@ -273,10 +273,17 @@ do  --Checklist Button
 			if not self.completed then
 				TooltipUpdator:RequestQuestReward();
 			end
+			if data then
+				TooltipUpdator:RequestTooltipSetter(data.tooltipSetter);
+			end
 		elseif self.type == "Currency" and self.id then
 			TooltipUpdator:SetFocusedObject(self);
 			TooltipUpdator:SetHeaderText(API.GetCurrencyName(self.id));
 			TooltipUpdator:SetCurrencyID(self.id);
+			local data = ActivityUtil.GetActivityData(self.dataIndex);
+			if data then
+				TooltipUpdator:RequestTooltipSetter(data.tooltipSetter);
+			end
 		else
 			local data = ActivityUtil.GetActivityData(self.dataIndex);
 			if data then
