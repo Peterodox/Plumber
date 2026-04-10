@@ -2097,6 +2097,22 @@ do  --(In)Secure Button Pool
 		end
 	end
 
+	function SecureButtonMixin:SetEquipOutfit(playerFacingOutfitIndex)
+		self:SetAttribute("type", "outfit");
+		self:SetAttribute("outfit-index", playerFacingOutfitIndex);
+		self:SetAttribute("action", "change");	--"toggle"
+		self:SetAttribute("useOnKeyDown", false);
+		self:RegisterForClicks("AnyDown", "AnyUp");
+	end
+
+	function SecureButtonMixin:SetClearOutfit()
+		self:SetAttribute("type", "outfit");
+		self:SetAttribute("outfit-index", nil);
+		self:SetAttribute("action", "clear");
+		self:SetAttribute("useOnKeyDown", false);
+		self:RegisterForClicks("AnyDown", "AnyUp");
+	end
+
 	local function CreateSecureActionButton()
 		if InCombatLockdown() then return end;
 		local index = #SecureButtons + 1;

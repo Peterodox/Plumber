@@ -1644,6 +1644,7 @@ stds.wow = {
 		ScrollBoxConstants = {
 			fields = {
 				"AlignBegin",
+				"AlignNearest",
 				"RetainScrollPosition",
 			},
 		},

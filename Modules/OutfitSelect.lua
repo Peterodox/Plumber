@@ -46,6 +46,8 @@ local Def = {
 	TextureFile = "Interface/AddOns/Plumber/Art/Frame/TransmogUI.png",
 
 	equipOutfitSpellID = Constants.TransmogOutfitDataConsts.EQUIP_TRANSMOG_OUTFIT_MANUAL_SPELL_ID,
+
+	SecureButttonPrivateKey = "EquipOutfit",
 };
 
 
@@ -59,7 +61,8 @@ local RepositionFrame;
 local CreateRepositionFrame;
 
 
-local OutfitSelectFrame_Show, OutfitSelectFrame_Hide;	--For 12.0.5+
+local IS_12_0_5 = C_TransmogOutfitInfo.ChangeToOutfit ~= nil;
+local ToggleOutfitSelectFrame;	--For 12.0.5+
 
 
 do  -- DragButton On TransmogFrame
@@ -392,6 +395,11 @@ do  --SecureHandler
 			return
 		end
 
+		if IS_12_0_5 then
+			ToggleOutfitSelectFrame();
+			return;
+		end
+
 		if not TransmogFrame then
 			Transmog_LoadUI();
 		end
@@ -508,6 +516,7 @@ do	--OutfitEntryMixin
 
 		self.IconButton:SetScript("OnEnter", function()
 			self:ShowTooltip();
+			self:SetupActionButton();
 		end);
 
 		self.IconButton:SetScript("OnLeave", function()
@@ -560,7 +569,7 @@ do	--OutfitEntryMixin
 		if self.spellID then
 			GameTooltip:SetOwner(self.IconButton, "ANCHOR_RIGHT");
 			GameTooltip:SetSpellByID(self.spellID);
-			return
+			return;
 		end
 
 		local elementData = self:GetElementData();
@@ -576,7 +585,49 @@ do	--OutfitEntryMixin
 		SetSpellCooldown(self.IconButton.Cooldown, self.spellID or Def.equipOutfitSpellID, true);
 	end
 
+	function PlumberOutfitSelectOutfitEntryMixin:SetupActionButton()
+		local index;
+
+		if self.spellID then
+			index = 0;
+		else
+			local elementData = self:GetElementData();
+			index = elementData and elementData.index;
+			if not index then return; end
+		end
+
+		local propagateMouseMotion = true;
+		local actionButton = addon.AcquireSecureActionButton(Def.SecureButttonPrivateKey, propagateMouseMotion);
+
+		if actionButton then
+			actionButton:SetParent(self.IconButton);
+			actionButton:CoverParent();
+
+			if index == 0 then
+				actionButton:SetClearOutfit();
+			else
+				actionButton:SetEquipOutfit(index);
+			end
+
+			actionButton:RegisterForDrag("LeftButton");
+			actionButton:SetScript("OnDragStart", function()
+				self:PickupOutfit();
+			end);
+
+			actionButton:Show();
+
+			return true;
+		end
+	end
+
+	function PlumberOutfitSelectOutfitEntryMixin:UpdateLocked(outfitID)
+		local isLockedOutfit = C_TransmogOutfitInfo.IsLockedOutfit(outfitID);
+		self.IconButton.OverlayLocked:SetShown(isLockedOutfit);
+		self.IconButton.OverlayLocked:ShowAutoCastEnabled(isLockedOutfit);
+	end
+
 	function PlumberOutfitSelectOutfitEntryMixin:Init(elementData)
+		--[[
 		self.IconButton:SetScript("OnClick", function(_button, buttonName)
 			local toggleLock = false;
 
@@ -584,14 +635,12 @@ do	--OutfitEntryMixin
 				toggleLock = true;
 			end
 		end);
+		--]]
 
 		self.Icon:SetTexture(elementData.icon);
 		self.Name:SetText(elementData.name);
 		self:SetActive(elementData.isActive);
-
-		local isLockedOutfit = elementData.isActive and C_TransmogOutfitInfo.IsLockedOutfit(elementData.outfitID);
-		self.IconButton.OverlayLocked:SetShown(isLockedOutfit);
-		self.IconButton.OverlayLocked:ShowAutoCastEnabled(isLockedOutfit);
+		self:UpdateLocked(elementData.outfitID);
 
 		--[[
 		local situationText = "";
@@ -619,7 +668,7 @@ do	--12.0.5 Change
 		self:RegisterEvent("TRANSMOG_DISPLAYED_OUTFIT_CHANGED");
 		self:RegisterEvent("PLAYER_REGEN_DISABLED");
 		self:SetScript("OnKeyDown", self.OnKeyDown);
-		self:RefreshList();
+		self:RefreshList(true);
 	end
 
 	function OutfitSelectFrameMixin:OnHide()
@@ -627,6 +676,7 @@ do	--12.0.5 Change
 		self:UnregisterEvent("TRANSMOG_DISPLAYED_OUTFIT_CHANGED");
 		self:UnregisterEvent("PLAYER_REGEN_DISABLED");
 		self:SetScript("OnKeyDown", nil);
+		addon.HideSecureActionButton(Def.SecureButttonPrivateKey);
 	end
 
 	function OutfitSelectFrameMixin:OnEvent(event, ...)
@@ -637,20 +687,26 @@ do	--12.0.5 Change
 		end
 	end
 
-	function OutfitSelectFrameMixin:RefreshList()
+	function OutfitSelectFrameMixin:RefreshList(scrollToActive)
 		local dataProvider = CreateDataProvider();
 		local outfitsInfo = C_TransmogOutfitInfo.GetOutfitsInfo();
+		local activeDataIndex;
 
 		if outfitsInfo then
 			local activeOutfitID = C_TransmogOutfitInfo.GetActiveOutfitID();
-			for _index, outfitInfo in ipairs(outfitsInfo) do
+			for index, outfitInfo in ipairs(outfitsInfo) do
 				local outfitData = {
 					outfitID = outfitInfo.outfitID,
 					name = outfitInfo.name,
 					situationCategories = outfitInfo.situationCategories,
 					icon = outfitInfo.icon,
 					isActive = outfitInfo.outfitID == activeOutfitID,
+					index = index,
 				};
+
+				if outfitInfo.outfitID == activeOutfitID then
+					activeDataIndex = index;
+				end
 
 				dataProvider:Insert(outfitData);
 			end
@@ -658,6 +714,14 @@ do	--12.0.5 Change
 
 		self.OutfitList.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
 		self.ClearTransmogFrame:SetActive(C_TransmogOutfitInfo.IsEquippedGearOutfitDisplayed());
+		self.ClearTransmogFrame:UpdateLocked(self.ClearTransmogFrame.outfitID);
+
+		if scrollToActive and activeDataIndex then
+			local alignment = ScrollBoxConstants.AlignNearest;	--AlignBegin
+			local offset = 0;
+			local noInterpolation = true;
+			self.OutfitList.ScrollBox:ScrollToElementDataIndex(activeDataIndex, alignment, offset, noInterpolation);
+		end
 	end
 
 	function OutfitSelectFrameMixin:OnKeyDown(key)
@@ -677,7 +741,7 @@ do	--12.0.5 Change
 		self:SetPropagateKeyboardInput(not valid);
 	end
 
-	function OutfitSelectFrame_Show()
+	local function OutfitSelectFrame_Show()
 		if not MainFrame then
 			local f = CreateFrame("Frame", Def.FrameName, UIParent, "Plumber_OutfitSelectFrameTemplate");
 			MainFrame = f;
@@ -762,14 +826,13 @@ do	--12.0.5 Change
 		MainFrame:Raise();
 	end
 
-	function OutfitSelectFrame_Hide()
-		if MainFrame then
+	function ToggleOutfitSelectFrame()
+		if MainFrame and MainFrame:IsShown() then
 			MainFrame:Hide();
+		else
+			OutfitSelectFrame_Show();
 		end
 	end
-
-
-	--C_Timer.After(2, OutfitSelectFrame_Show);
 end
 
 

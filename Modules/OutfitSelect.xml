@@ -128,7 +128,7 @@
 				<Frames>
 					<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
 						<KeyValues>
-							<KeyValue key="canInterpolateScroll" value="false" type="boolean"/>
+							<KeyValue key="canInterpolateScroll" value="true" type="boolean"/>
 						</KeyValues>
 						<Anchors>
 							<Anchor point="TOPLEFT" x="0" y="-2"/>
@@ -137,7 +137,7 @@
 					</Frame>
 					<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
 						<KeyValues>
-							<KeyValue key="canInterpolateScroll" value="false" type="boolean"/>
+							<KeyValue key="canInterpolateScroll" value="true" type="boolean"/>
 						</KeyValues>
 						<Anchors>
 							<Anchor point="TOP" relativeKey="$parent.ScrollBox" relativePoint="TOP" x="0" y="-12"/>
