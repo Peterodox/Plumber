@@ -447,12 +447,12 @@ do  --Event Listener
 
 		if Def.AnchorToHealthBar then
 			if Def.Side == "LEFT" then
-				local relativeTo = UnitFrame.ClassificationFrame;
-				if relativeTo:IsShown() then    --Could this be protected?
-					widget:SetPoint("RIGHT", relativeTo, "LEFT", -1, 0);
+				if UnitFrame.ClassificationFrame:IsShown() then    --Could this be protected?
+					widget:SetPoint("RIGHT", UnitFrame.ClassificationFrame, "LEFT", -1, 0);
+				elseif GetRaidTargetIndex(unit) then
+					widget:SetPoint("RIGHT", UnitFrame.RaidTargetFrame, "LEFT", -1, 0);
 				else
-					relativeTo = UnitFrame.HealthBarsContainer.healthBar;
-					widget:SetPoint("RIGHT", relativeTo, "LEFT", -2, 0);
+					widget:SetPoint("RIGHT", UnitFrame.HealthBarsContainer.healthBar, "LEFT", -2, 0);
 				end
 			else
 				local relativeTo = UnitFrame.AurasFrame.CrowdControlListFrame;
@@ -582,6 +582,8 @@ do  --Event Listener
 			end
 		elseif event == "PLAYER_ENTERING_WORLD" then
 			self:UpdateZone();
+		elseif event == "RAID_TARGET_UPDATE" then
+			self:UpdateAllNameplates();
 		end
 	end
 
@@ -598,6 +600,12 @@ do  --Event Listener
 		self.inInstance = inInstance;
 		self:UnregisterEvent("UNIT_QUEST_LOG_CHANGED");
 
+		if inInstance or not (Def.AnchorToHealthBar and Def.Side) then
+			self:UnregisterEvent("RAID_TARGET_UPDATE");
+		else
+			self:RegisterEvent("RAID_TARGET_UPDATE");
+		end
+	
 		if (not inInstance) and Def.ShowTargetProgress then
 			self:RegisterEvent("PLAYER_TARGET_CHANGED");
 		else
@@ -1095,7 +1103,7 @@ do  --Options
 		Def.ProgressShowRemaining = addon.GetDBValue("NameplateQuest_ProgressFormat") == 2;
 
 
-		local addonNames = {"Platynator", "Plater"};
+		local addonNames = {"Platynator", "Plater", "EllesmereUINameplates"};
 
 		for _, name in ipairs(addonNames) do
 			if C_AddOns.IsAddOnLoaded(name) then
@@ -1283,6 +1291,7 @@ function EL:EnableModule(state)
 		self:UnregisterEvent("UNIT_QUEST_LOG_CHANGED");
 		self:UnregisterEvent("GROUP_ROSTER_UPDATE");
 		self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+		self:UnregisterEvent("RAID_TARGET_UPDATE");
 		self:SetScript("OnEvent", nil);
 		self:SetScript("OnUpdate", nil);
 	end
