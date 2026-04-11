@@ -36,7 +36,7 @@
 						</Texture>
 					</Layer>
 				</Layers>
-        		<Frames>
+				<Frames>
 					<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawEdge="false" drawBling="false"/>
 					<Frame parentKey="OverlayLocked" inherits="AutoCastOverlayTemplate" hidden="true">
 						<Size x="34" y="34"/>
