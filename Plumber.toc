@@ -84,7 +84,7 @@ Modules\TransmogUtil.lua
 Modules\QuestWatchCycle.lua
 Modules\CraftSearchExtended.lua
 Modules\SourceAchievementLink.lua
-Modules\OutfitSelect.lua
+Modules\OutfitSelect.xml
 Modules\BreakTime.xml
 Modules\CatalystUI.lua
 Modules\HuntTable.lua

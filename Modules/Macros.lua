@@ -1122,15 +1122,15 @@ do  --MacroInterpreter
 						local _spellID = 150544;
 						name = L["Random Favorite Mount"];
 						icon = GetSpellTexture(_spellID);
+						usable = true;
 						macroText = "/run C_MountJournal.SummonByID(0)";
 						id = _spellID;
 					else
 						local  _name, _spellID, _icon, _isActive, _isUsable, _sourceType, _isFavorite, _isFactionSpecific, _faction, _shouldHideOnChar, _isCollected = GetMountInfoByID(id);
+						name = GetSpellName(_spellID) or _name;
 						icon = _icon;
 						usable = _isCollected;
-						name = _name;
-						macroText = _name and gsub(line, "mount:%d+", _name) or line;
-						actionType = "spell";
+						macroText = format("/run C_MountJournal.SummonByID(%d)", id);
 						id = _spellID;
 					end
 				elseif actionType == "profession" then

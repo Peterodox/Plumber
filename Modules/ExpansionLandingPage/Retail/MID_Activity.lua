@@ -1,5 +1,6 @@
 local _, addon = ...
 local L = addon.L;
+local API = addon.API;
 local LandingPageUtil = addon.LandingPageUtil;
 local ActivityUtil = addon.ActivityUtil;
 
@@ -148,6 +149,29 @@ do
 end
 
 
+local ResearchConsole = {};
+do	--Uncontaminated Void Sample
+	--Used to upgrade trinket "Crucible of Erratic Energies" as well as other perks. Console is in Voidstorm next to the Quartermaster
+
+	ResearchConsole.currencyID = 3400;
+
+	function ResearchConsole.ShouldShowActivity()
+		local level = C_MajorFactions.GetCurrentRenownLevel(2699);
+		if level and level >= 3 then
+			local earned = API.GetCurrencyEarnedAndCap(ResearchConsole.currencyID);
+			return earned and earned < 7;
+		end
+	end
+
+	function ResearchConsole.SetupTooltip(tooltip)
+		local text = "";
+		text = API.ConvertTooltipInfoToOneString(text, "GetCurrencyByID", ResearchConsole.currencyID);
+		tooltip:AddLine(text, 1, 1, 1, true);
+		return true;
+	end
+end
+
+
 local SetupFuncs = {};
 do
 	local WIDGET_TYPE = 2;
@@ -233,7 +257,7 @@ do
 		if activeQuestID then
 			local uiMapID = GetQuestUiMapID(activeQuestID);
 			if uiMapID then
-				mapName = addon.API.GetMapName(uiMapID);
+				mapName = API.GetMapName(uiMapID);
 			end
 		end
 
@@ -306,7 +330,7 @@ do
 
 	function SetupFuncs.DefeatedPreyTooltip(tooltip)
 		local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted;
-		local GetQuestName = addon.API.GetQuestName;
+		local GetQuestName = API.GetQuestName;
 		local difficulties = GetUnlockedPreyDifficulties();
 		local loaded = true;
 
@@ -358,7 +382,7 @@ do
 
 		if activePoiID then
 			local info = C_AreaPoiInfo.GetAreaPOIInfo(AbundantHarvest.continentUiMapID, activePoiID);
-			local mapName = addon.API.GetMapName(activeUiMapID);
+			local mapName = API.GetMapName(activeUiMapID);
 			listButton.Name:SetText(mapName.." "..info.name);
 			listButton.tooltipWidgetSet = info.tooltipWidgetSet;
 		else
@@ -374,7 +398,7 @@ do
 		if activePoiID then
 			local info = C_AreaPoiInfo.GetAreaPOIInfo(AbundantHarvest.continentUiMapID, activePoiID);
 			if info.tooltipWidgetSet then
-				local anyChange, isRetrievingData = addon.API.AddWidgetSetToTooltip(tooltip, info.tooltipWidgetSet);
+				local anyChange, isRetrievingData = API.AddWidgetSetToTooltip(tooltip, info.tooltipWidgetSet);
 				if anyChange and isRetrievingData then
 					keepUpdating = true;
 				end
@@ -507,6 +531,7 @@ local ActivityData = {
 			{name = "Stormarion Assault", isWeeklyQuest = true, questID = 90962, uiMapID = 2405, sortToTop = true}, --This Weekly World Quest seems to only appear on the map when you are in the surrounding area
 			{name = "Stand Your Ground", questID = 94581, uiMapID = 2405, shownIfOnQuest = true},    --Replace the quest above after completion
 			{name = "Predaxas", questID = 92636, uiMapID = 2405, shownIfActive = true, isBoss = true},
+			{name = "Research Console: Exploring the Void", isWeeklyQuest = true, questID = 94790, uiMapID = 2405, conditions = ResearchConsole, tooltipSetter = ResearchConsole.SetupTooltip},
 
 			--The following quests reward no rep but Stormarion Core
 			{name = "Darkness Unmade", questID = 91700, uiMapID = 2405, shownIfOnQuest = true},  --Kill 2 Rare creatures

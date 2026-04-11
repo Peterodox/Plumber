@@ -32,8 +32,10 @@ globals = {
 	"PlumberExpansionLandingPage",
 	"PlumberExpansionLandingPageMixin",
 	"PlumberGlobals",
+	"PlumberOutfitSelectFrame",
 	"PlumberLandingPageMinimapButtonMixin",
 	"PlumberLootUIFont",
+	"PlumberOutfitSelectOutfitEntryMixin",
 	"PlumberStorage",
 	"PlumberSuperTrackingMixin",
 	"PlumberWorldMapPinMixin",
@@ -135,6 +137,7 @@ stds.wow = {
 		"CreateFromMixins",
 		"CreateKeyChordStringUsingMetaKeyState",
 		"CreateMacro",
+		"CreateScrollBoxListLinearView",
 		"CreateVector2D",
 		"CursorHasItem",
 		"date",
@@ -296,6 +299,7 @@ stds.wow = {
 		"GetQuestProgressBarPercent",
 		"GetQuestUiMapID",
 		"GetRaidDifficultyID",
+		"GetRaidTargetIndex",
 		"GetSavedInstanceChatLink",
 		"GetSavedInstanceInfo",
 		"GetScaledCursorPosition",
@@ -457,7 +461,9 @@ stds.wow = {
 		"UIErrorsFrame",
 		"UIParent",
 		"UISpecialFrames",
+		"UnitCastingDuration",
 		"UnitCastingInfo",
+		"UnitChannelDuration",
 		"UnitChannelInfo",
 		"UnitClass",
 		"UnitExists",
@@ -552,6 +558,12 @@ stds.wow = {
 				HousingCatalogConsts = {
 					fields = {
 						"HOUSING_CATALOG_DECOR_MODELSCENEID_DEFAULT",
+					},
+				},
+
+				TransmogOutfitDataConsts = {
+					fields = {
+						"EQUIP_TRANSMOG_OUTFIT_MANUAL_SPELL_ID",
 					},
 				},
 			},
@@ -1238,6 +1250,17 @@ stds.wow = {
 			},
 		},
 
+		C_TransmogOutfitInfo = {
+			fields = {
+				"ChangeToOutfit",
+				"GetActiveOutfitID",
+				"GetOutfitsInfo",
+				"IsEquippedGearOutfitDisplayed",
+				"IsLockedOutfit",
+				"PickupOutfit",
+			},
+		},
+
 		C_TransmogSets = {
 			fields = {
 				"GetAllSourceIDs",
@@ -1624,7 +1647,15 @@ stds.wow = {
 		ScrollBoxConstants = {
 			fields = {
 				"AlignBegin",
+				"AlignNearest",
 				"RetainScrollPosition",
+			},
+		},
+
+		ScrollUtil = {
+			fields = {
+				"AddResizableChildrenBehavior",
+				"InitScrollBoxListWithScrollBar",
 			},
 		},
 
@@ -1822,8 +1853,10 @@ stds.wow = {
 		"TOKEN_MARKET_PRICE_NOT_AVAILABLE",
 		"TOOLTIP_UNIT_LEVEL",
 		"TRACK_ACHIEVEMENT",
+		"TRANSMOGRIFY",
 		"TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN",
 		"TRANSMOG_OUTFIT_COPY_TO_CLIPBOARD_NOTICE",
+		"TRANSMOG_SHOW_EQUIPPED_GEAR",
 		"TYPE",
 		"UNKNOWN",
 		"UNIT_SKINNABLE_HERB",
