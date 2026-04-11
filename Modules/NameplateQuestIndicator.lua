@@ -605,7 +605,7 @@ do  --Event Listener
 		else
 			self:RegisterEvent("RAID_TARGET_UPDATE");
 		end
-	
+
 		if (not inInstance) and Def.ShowTargetProgress then
 			self:RegisterEvent("PLAYER_TARGET_CHANGED");
 		else

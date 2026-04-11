@@ -1252,6 +1252,7 @@ stds.wow = {
 
 		C_TransmogOutfitInfo = {
 			fields = {
+				"ChangeToOutfit",
 				"GetActiveOutfitID",
 				"GetOutfitsInfo",
 				"IsEquippedGearOutfitDisplayed",
