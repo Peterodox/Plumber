@@ -11,6 +11,55 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10900] = {
 	{
 		type = "date",
+		versionText = "1.9.0 e",
+		timestamp = 1775800000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Nameplate Soft Target: You can once again enable a radial cast bar on your soft target's nameplate.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Nameplate Quest Indicator: When using Blizzard Nameplate, the Target Marker Icon should no longer overlap with the quest marker.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary, Factions: When a Silvermoon Court subfaction reaches its max reputation, its progress bar will be full instead of empty.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary, Activities: Show \"Research Console: Exploring the Void\" on the list if there are more \"Uncontaminated Void Samples\" to collect.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber Drawer Macro: Fixed an issue where Paladins were unable to summon Charger from a Drawer flyout.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "For 12.0.5: The minimized outfit list will become a standalone UI instead of a modification of the base Transmog Frame.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.0 c-d",
 		timestamp = 1775400000,
 	},
