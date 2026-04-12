@@ -2103,7 +2103,12 @@ do  -- Reputation
 			local currentValue = totalEarned - paragonLevel * threshold;
 			return currentValue, threshold, paragonLevel
 		end
-		return 0, 1, 0
+
+		if C_Reputation.IsFactionParagon and C_Reputation.IsFactionParagon(factionID) then
+			return 0, 1, 0;
+		else
+			return 1, 1, 0;
+		end
 	end
 	API.GetParagonValuesAndLevel = GetParagonValuesAndLevel;
 

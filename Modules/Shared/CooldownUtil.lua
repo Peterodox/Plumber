@@ -13,7 +13,7 @@ local GetItemCooldown = C_Container.GetItemCooldown;
 
 
 if not addon.IS_MIDNIGHT then
-	function CooldownUtil.SetSpellCooldown(cooldownFrame, spellID)
+	function CooldownUtil.SetSpellCooldown(cooldownFrame, spellID, hideCountdownNumbers)
 		local startTime, duration, modRate, fromChargeCooldown;
 
 		local chargeInfo = GetSpellCharges(spellID);
@@ -38,7 +38,7 @@ if not addon.IS_MIDNIGHT then
 		if startTime and duration then
 			cooldownFrame:SetCooldown(startTime, duration, modRate);
 			cooldownFrame:Show();
-			if fromChargeCooldown then
+			if fromChargeCooldown or hideCountdownNumbers then
 				cooldownFrame:SetHideCountdownNumbers(true);
 			else
 				cooldownFrame:SetHideCountdownNumbers(false);
@@ -51,7 +51,7 @@ if not addon.IS_MIDNIGHT then
 else
 	local GetSpellCooldownDuration = C_Spell.GetSpellCooldownDuration;
 
-	function CooldownUtil.SetSpellCooldown(cooldownFrame, spellID)
+	function CooldownUtil.SetSpellCooldown(cooldownFrame, spellID, hideCountdownNumbers)
 		--[[ --Unsuable in combat
 		local duo = C_DurationUtil.CreateDuration();
 		local chargeInfo = GetSpellCharges(spellID);
@@ -75,7 +75,7 @@ else
 		local duo = GetSpellCooldownDuration(spellID);
 		if duo then
 			cooldownFrame:SetCooldownFromDurationObject(duo);
-			cooldownFrame:SetHideCountdownNumbers(false);
+			cooldownFrame:SetHideCountdownNumbers(hideCountdownNumbers or false);
 			cooldownFrame:Show();
 		else
 			cooldownFrame:Hide();
