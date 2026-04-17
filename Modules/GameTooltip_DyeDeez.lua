@@ -33,13 +33,11 @@ local function ProcessItemTooltip(tooltip, itemID, itemLink)
 			end
 
 			if not isItemRefTooltip then
-				tooltip:AddLine(" ");
-				tooltip:AddLine(L["Instruction Show Less Info"], 0.000, 0.800, 1.000, true);
+				ItemSubModule.altModeState = 1;
 			end
 
 		elseif not isItemRefTooltip then
-			tooltip:AddLine(" ");
-			tooltip:AddLine(L["Instruction Show More Info"], 0.000, 0.800, 1.000, true);
+			ItemSubModule.altModeState = 0;
 		end
 
 
