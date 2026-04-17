@@ -272,6 +272,7 @@ L["ModuleName TooltipTransmogEnsemble"] = "Transmog Ensembles";
 L["ModuleDescription TooltipTransmogEnsemble"] = "- Show the number of collectable appearances from an Ensemble.\n\n- Fixed the issue where the tooltip says \"Already known\" but you can still use it to unlock new appearances.";
 L["Collected Appearances"] = "Collected Appearances";
 L["Collected Items"] = "Collected Items";
+L["Other Player Classes"] = "Other Classes";
 
 
 --Tooltip Housing

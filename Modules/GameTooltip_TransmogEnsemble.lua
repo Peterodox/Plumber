@@ -17,6 +17,7 @@ local GetBaseSetID = C_TransmogSets.GetBaseSetID;
 local GetVariantSets = C_TransmogSets.GetVariantSets;
 local GetSetInfo = C_TransmogSets.GetSetInfo;
 local GetSetPrimaryAppearances = C_TransmogSets.GetSetPrimaryAppearances;
+local GetSourcesForSlot = C_TransmogSets.GetSourcesForSlot;
 local GetAllSetAppearancesByID = C_Transmog.GetAllSetAppearancesByID;
 local GetSourceInfo = C_TransmogCollection.GetSourceInfo;
 local IsAppearanceCollected = addon.API.IsAppearanceCollected;
@@ -25,6 +26,7 @@ local IsAppearanceCollected = addon.API.IsAppearanceCollected;
 
 local LegionRaidEnsemble = {};
 local ItemXSets = {};
+local ItemSubModule = {};
 
 
 local DifficultyNames = {
@@ -91,7 +93,7 @@ do
 
 		local v = self.cache[setID];
 		if v then
-			return v[1], v[2], v[3], v[4]
+			return v[1], v[2], v[3], v[4];
 		end
 	end
 
@@ -99,6 +101,232 @@ do
 		self:ListenEvents(false);
 		self.cache = {};
 	end);
+end
+
+
+local function SetTooltipCollected(tooltip, leftText)
+	tooltip:AddDoubleLine(leftText, GREY_CHECKMARK, 0.5, 0.5, 0.5, 1, 1, 1);
+end
+
+local function SetTooltipUncollected(tooltip, leftText, numCollected, numTotal)
+	tooltip:AddDoubleLine(leftText, numCollected.."/"..numTotal, 1, 1, 1, 1, 1, 1);
+end
+
+
+local VoidTouchUtil = {};
+do
+	local ClassXSet = {
+		[1] = 5555,
+		[2] = 3850,
+		[3] = 5553,
+		[4] = 3854,
+		[5] = 5556,
+		[6] = 5551,
+		[7] = 3855,
+		[8] = 3853,
+		[9] = 3848,
+		[10]= 5554,
+		[11]= 5552,
+		[12]= 3858,
+		[13]= 3859,
+	};
+
+	local ItemXSlot = {
+		[264314] = 1,
+		[264315] = 3,
+		[264316] = 15,
+		[264317] = 5,
+		[264318] = 9,
+		[264319] = 10,
+		[264320] = 6,
+		[264321] = 7,
+		[264322] = 8,
+	};
+
+	local Weapons = {
+		--[itemSubclass] = {subclassID, itemID1, itemID2},
+		{10, 263952, 263954},
+		{6, 263950, 273874},
+		{8, 263966},
+		{7, 263960, 263963},
+		{4, 263946, 263956},
+		{15, 263942, 263943},
+		{13, 263970},
+		{14, 263959}, -- Offhand
+	};
+
+	function VoidTouchUtil:TryProcessItem(tooltip, itemID)
+		if not (itemID == 264323 or ItemXSlot[itemID]) then
+			return false;
+		end
+
+		local isItemRefTooltip = tooltip:GetName() == "ItemRefTooltip";
+		local showExtraInfo = ItemSubModule.altModeEnabled or isItemRefTooltip;
+
+		if itemID == 264323 then
+			local typeName, itemAppearanceID;
+			local numCollected, numTotal;
+			local allCollected = true;
+
+			if showExtraInfo then
+				local collectionTexts = {};
+
+				for i, v in pairs(Weapons) do
+					numCollected, numTotal = 0, 0;
+
+					if v[1] == 14 then
+						typeName = INVTYPE_HOLDABLE;
+					else
+						typeName = C_Item.GetItemSubClassInfo(2, v[1]);
+					end
+
+					for j = 2, #v do
+						itemAppearanceID = C_TransmogCollection.GetItemInfo(v[j]);
+						if itemAppearanceID and IsAppearanceCollected(itemAppearanceID) then
+							numCollected = numCollected + 1;
+						else
+							allCollected = false;
+						end
+						numTotal = numTotal + 1;
+					end
+
+					if numCollected >= numTotal then
+						collectionTexts[i] = {true, typeName};
+					else
+						collectionTexts[i] = {false, typeName, numCollected, numTotal};
+					end
+				end
+
+				if not allCollected then
+					tooltip:AddLine(" ");
+					for _, v in ipairs(collectionTexts) do
+						if v[1] then
+							SetTooltipCollected(tooltip, v[2]);
+						else
+							SetTooltipUncollected(tooltip, v[2], v[3], v[4]);
+						end
+					end
+				end
+			else
+				numCollected, numTotal = 0, 0;
+				for i, v in pairs(Weapons) do
+					for j = 2, #v do
+						itemAppearanceID = C_TransmogCollection.GetItemInfo(v[j]);
+						if itemAppearanceID and IsAppearanceCollected(itemAppearanceID) then
+							numCollected = numCollected + 1;
+						else
+							allCollected = false;
+						end
+						numTotal = numTotal + 1;
+					end
+				end
+
+				if not allCollected then
+					typeName = C_Item.GetItemClassInfo(2);
+					tooltip:AddLine(" ");
+					SetTooltipUncollected(tooltip, typeName, numCollected, numTotal);
+				end
+			end
+
+			if not allCollected then
+				ItemSubModule.altModeState = showExtraInfo and 1 or 0;
+			end
+
+			return true;
+		end
+
+		local slotID = ItemXSlot[itemID];
+		if not slotID then return false; end
+
+		if not VoidTouchUtil.classID then
+			local _;
+			VoidTouchUtil.className, _, VoidTouchUtil.classID = UnitClass("player");
+		end
+
+		local sources;
+		local isPlayerClassCollected;
+		local numOtherCollected = 0;
+		local numOtherTotal = 0;
+
+		if showExtraInfo then
+			local allCollected = true;
+			local collectionTexts = {};
+			for _classID, setID in ipairs(ClassXSet) do
+				sources = GetSourcesForSlot(setID, slotID);
+				if sources and sources[1] then
+					local isCollected = false;
+					for _, source in ipairs(sources) do
+						if source.isCollected then
+							isCollected = true;
+							break
+						end
+					end
+
+					collectionTexts[_classID] = isCollected;
+					if not isCollected then
+						allCollected = false;
+					end
+				end
+			end
+
+			if not allCollected then
+				local className;
+				for _classID, isCollected in ipairs(collectionTexts) do
+					className = GetClassInfo(_classID);
+					if isCollected then
+						SetTooltipCollected(tooltip, className);
+					else
+						SetTooltipUncollected(tooltip, className, 0, 1);
+					end
+				end
+				ItemSubModule.altModeState = showExtraInfo and 1 or 0;
+			end
+		else
+			for _classID, setID in ipairs(ClassXSet) do
+				sources = GetSourcesForSlot(setID, slotID);
+				if sources and sources[1] then
+					local isCollected = false;
+					for _, source in ipairs(sources) do
+						if source.isCollected then
+							isCollected = true;
+							break
+						end
+					end
+
+					if _classID == VoidTouchUtil.classID then
+						if isCollected then
+							isPlayerClassCollected = true;
+						end
+					else
+						if isCollected then
+							numOtherCollected = numOtherCollected + 1;
+						end
+						numOtherTotal = numOtherTotal + 1;
+					end
+				end
+			end
+
+			if (not isPlayerClassCollected) or (numOtherCollected < numOtherTotal) then
+				tooltip:AddLine(" ");
+
+				if isPlayerClassCollected then
+					SetTooltipCollected(tooltip, VoidTouchUtil.className);
+				else
+					SetTooltipUncollected(tooltip, VoidTouchUtil.className, 0, 1);
+				end
+
+				if numOtherCollected >= numOtherTotal then
+					SetTooltipCollected(tooltip, L["Other Player Classes"]);
+				else
+					SetTooltipUncollected(tooltip, L["Other Player Classes"], numOtherCollected, numOtherTotal);
+				end
+
+				ItemSubModule.altModeState = showExtraInfo and 1 or 0;
+			end
+		end
+
+		return true;
+	end
 end
 
 
@@ -121,7 +349,11 @@ local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
 	end
 	--]]
 
-	if not hyperlink then return end;
+	if VoidTouchUtil:TryProcessItem(tooltip, itemID) then
+		return true;
+	end
+
+	if not hyperlink then return; end
 
 	local setID = GetItemLearnTransmogSet(hyperlink);
 	if setID then
@@ -144,9 +376,9 @@ local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
 
 				table.sort(allSetInfo, function(a, b)
 					if a.uiOrder ~= b.uiOrder then
-						return a.uiOrder < b.uiOrder
+						return a.uiOrder < b.uiOrder;
 					end
-					return a.setID < b.setID
+					return a.setID < b.setID;
 				end);
 
 				local tbl = {};
@@ -171,10 +403,10 @@ local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
 					numTotal = numTotal + 1;
 				end
 				if numCollected >= numTotal then
-					tooltip:AddDoubleLine(DifficultyNames[i], GREY_CHECKMARK, 0.5, 0.5, 0.5, 1, 1, 1);
+					SetTooltipCollected(tooltip, DifficultyNames[i]);
 				else
 					allCollected = false;
-					tooltip:AddDoubleLine(DifficultyNames[i], numCollected.."/"..numTotal, 1, 1, 1, 1, 1, 1);
+					SetTooltipUncollected(tooltip, DifficultyNames[i], numCollected, numTotal);
 				end
 			end
 
@@ -186,7 +418,7 @@ local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
 				tooltip:AddLine(ALREADY_KNOWN, 1, 0.125, 0.125, true);
 			end
 
-			return true
+			return true;
 		else
 			--Generic Ensembles
 			local appCol, appTotal, sourceCol, sourceTotal = CollectionCache:GetData(setID);
@@ -211,16 +443,17 @@ local function ProcessItemTooltip(tooltip, itemID, hyperlink, isDialogueUI)
 					end
 				end
 
-				return true
+				return true;
 			end
 		end
 	end
-	return false
+	return false;
 end
 
 
-local ItemSubModule = {};
-do
+do	--ItemSubModule
+	ItemSubModule.hasAltMode = true;
+
 	function ItemSubModule:ProcessData(tooltip, itemID, itemLink)
 		if self.enabled then
 			return ProcessItemTooltip(tooltip, itemID, itemLink)

@@ -272,6 +272,7 @@ L["ModuleName TooltipTransmogEnsemble"] = "团本外观套装";
 L["ModuleDescription TooltipTransmogEnsemble"] = "- 显示套装内可收集外观的数量。\n\n- 军团再临团本外观商人出售的大多数物品可以解锁所有难度的配色。在这些物品的鼠标提示上显示你的收藏进度。";
 L["Collected Appearances"] = "已收集外观";
 L["Collected Items"] = "已收集物品";
+L["Other Player Classes"] = "其他职业";
 
 
 --Tooltip Housing
