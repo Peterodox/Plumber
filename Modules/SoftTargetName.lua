@@ -873,4 +873,5 @@ do  --SpecialGameObjects
 		return SubtextFunc_Item(242241)
 	end
 	SpecialGameObjects[531478] = SubtextFunc_MisplacedTome;
+	SpecialGameObjects[531479] = SubtextFunc_MisplacedTome;	--Ranger's Cache
 end
