@@ -551,6 +551,7 @@ do  --Atlas
 
 		[2764] = {640, 768, 256, 384},    --Prey
 		[2742] = {768, 896, 256, 384},    --Delves
+		[2792] = {896, 1024, 256, 384},   --Ritual Sites
 	};
 
 	local function SetTextureDimension(textureObject, file, width, height, l, r, t, b, useTrilinearFilter)
