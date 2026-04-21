@@ -69,9 +69,6 @@ local ModifyType = {
 	Overwrite = 2,
 };
 
-local SlashCmd = {};
---SlashCmd.DrawerMacro = API.GetSlashSubcommand("DrawerMacro");
-
 
 local function AddExtraLineToMacroBody(extraLine, body)
 	extraLine = "\n\n"..extraLine;
@@ -432,6 +429,7 @@ function EL:UpdateDrawers()
 			name, icon, body = GetMacroInfo(macroIndex);
 			drawerInfo = MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable, alwaysShowConsumables);
 			if drawerInfo then
+				--print(name, #drawerInfo)
 				handlerName = SecureSpellFlyout:AddActionsAndGetHandler(drawerInfo);
 				if handlerName then
 					body, anyChange = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
@@ -1058,12 +1056,49 @@ do  --MacroInterpreter
 
 			if not processed then
 				if find(line, "/home") then
-					if addon.Housing then
-						processed = true;
-						icon, macroText, name = addon.Housing.GetDynamicTeleportAction();
-						id = -1;
-						actionType = "teleportHome";
-						usable = true;
+					local h = addon.Housing;
+					if h then
+						if h.DoesPlayerHaveMultipleHomes() then
+							processed = true;
+							actionType = "teleportHome";
+							usable = true;
+
+							if not tbl then
+								tbl = {};
+							end
+
+							icon, macroText, name = h.GetDynamicTeleportAllianceAction();
+							n = n + 1;
+							tbl[n] = {
+								tooltipLineText = name,
+								icon = icon,
+								actionType = actionType,
+								id = 1,
+								usable = usable,
+								macroText = macroText,
+								rawMacroText = line,
+							};
+
+							icon, macroText, name = h.GetDynamicTeleportHordeAction();
+							n = n + 1;
+							tbl[n] = {
+								tooltipLineText = name,
+								icon = icon,
+								actionType = actionType,
+								id = 2,
+								usable = usable,
+								macroText = macroText,
+								rawMacroText = line,
+							};
+
+							actionType = nil; -- so the action won't be duplicated by the end
+						else
+							processed = true;
+							icon, macroText, name = h.GetDynamicTeleportAction();
+							id = -1;
+							actionType = "teleportHome";
+							usable = true;
+						end
 					end
 				end
 			end
@@ -1840,6 +1875,8 @@ do  --DrawerUpdator
 		SecureSpellFlyout:Close();
 		--print("DRAWER UPDATED")
 	end
+
+	CallbackRegistry:Register("Macro.UpdateDrawers", DrawerUpdator.RequestUpdate, DrawerUpdator);
 end
 
 

@@ -197,22 +197,30 @@ do  --House Level / Info / Teleport
 
 	function DataProvider:ProcessHouseInfoList()
 		self.teleportHomeInfo = {};
-		_G.Plumber_TeleportHome = nil;
+		self.playerhasHomeInFaction = {};
+		self.numHomes = 0;
 
 		if (not self.houseInfoList) or #self.houseInfoList == 0 then
 			return
 		end
 
-		local factionMapIndex = addon.API.GetPlayerFactionIndex();
+		local factionIndex = addon.API.GetPlayerFactionIndex();
 		local TeleportHomeButtons = Housing.TeleportHomeButtons;
 
 		for i = 1, self:GetMaxHousePlayerCanOwn() do
 			local info = self.houseInfoList[i];
 			if info then
 				local uiMapID = C_Housing.GetUIMapIDForNeighborhood(info.neighborhoodGUID);
-				local mapIndex = uiMapID and NeighborhoodMapIndex[uiMapID] or 1;
+				local mapIndex = uiMapID and NeighborhoodMapIndex[uiMapID];
 
-				if i == 1 or mapIndex == factionMapIndex then
+				if mapIndex then
+					self.playerhasHomeInFaction[mapIndex] = true;
+					self.numHomes = self.numHomes + 1;
+				else
+					mapIndex = 1;
+				end
+
+				if i == 1 or mapIndex == factionIndex then
 					TeleportHomeButtons.CurrentFaction:SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
 				end
 
@@ -229,6 +237,8 @@ do  --House Level / Info / Teleport
 				};
 			end
 		end
+
+		addon.CallbackRegistry:Trigger("Macro.UpdateDrawers");
 	end
 
 	function DataProvider:OnHouseListUpdated(houseInfoList)
@@ -247,17 +257,46 @@ do  --House Level / Info / Teleport
 		end
 	end
 
-	function Housing.SetupTeleportTooltip(tooltip)
+	function Housing.GetAllianceMapName()
+		if not DataProvider.mapName1 then
+			DataProvider.mapName1 = addon.API.GetZoneName(16105); -- Founder's Point
+		end
+		return DataProvider.mapName1
+	end
+
+	function Housing.GetHordeMapName()
+		if not DataProvider.mapName2 then
+			DataProvider.mapName2 = addon.API.GetZoneName(15524); -- Razorwind Shores
+		end
+		return DataProvider.mapName2
+	end
+
+	function Housing.SetupTeleportTooltip(tooltip, index)
 		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
 			tooltip:SetText(L["Leave Home"]);
 		else
-			tooltip:SetText(L["Teleport Home"]);
+			if index == 1 then
+				tooltip:SetText(Housing.GetAllianceMapName());
+			elseif index == 2 then
+				tooltip:SetText(Housing.GetHordeMapName());
+			else
+				tooltip:SetText(L["Teleport Home"]);
+			end
+
 			local timeString = DataProvider:GetTeleportCooldownText();
 			if timeString then
 				tooltip:AddLine(ITEM_COOLDOWN_TIME:format(timeString), 1, 1, 1, true);
 			end
 			tooltip:Show();
 		end
+	end
+
+	function Housing.DoesPlayerHaveHomeInFaction(factionIndex)
+		return DataProvider.playerhasHomeInFaction and DataProvider.playerhasHomeInFaction[factionIndex]
+	end
+
+	function Housing.DoesPlayerHaveMultipleHomes()
+		return DataProvider.numHomes and DataProvider.numHomes >= 2
 	end
 
 	function Housing.RequestUpdateHouseInfo()
