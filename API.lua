@@ -3568,6 +3568,19 @@ do  -- Tooltip
 		return true
 	end
 
+	function API.AddCurrencyToTooltip(tooltip, currencyID)
+		local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+		if info then
+			local a;
+			if info.quantity > 0 then
+				a = 1;
+			else
+				a = 0.5;
+			end
+			tooltip:AddDoubleLine(info.name, string.format("%s|T%s:0:0|t", BreakUpLargeNumbers(info.quantity), info.iconFileID), a, a, a, a, a, a);
+		end
+	end
+
 
 	local AdditionalTooltip = {};
 
