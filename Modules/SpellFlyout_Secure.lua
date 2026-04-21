@@ -509,7 +509,13 @@ do  --VisualButtonMixin
 	function VisualButtonMixin:SetTeleportHome()
 		self.tooltipMethod = nil;
 		self.tooltipText = nil;
-		self.tooltipFunc = addon.Housing and addon.Housing.SetupTeleportTooltip;
+		local h = addon.Housing;
+		if h then
+			self.tooltipFunc = h.SetupTeleportTooltip;
+			h.SetupActionButtonCooldown(self);
+		else
+			self.tooltipFunc = nil;
+		end
 	end
 
 	function SpellFlyout:PopulateButtonMixin(externalMixin)

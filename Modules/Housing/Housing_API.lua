@@ -299,6 +299,22 @@ do  --House Level / Info / Teleport
 		return DataProvider.numHomes and DataProvider.numHomes >= 2
 	end
 
+	function Housing.SetupActionButtonCooldown(button)
+		if not button.Cooldown then return; end
+
+		if not C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+			local cooldownInfo = C_Housing.GetVisitCooldownInfo();
+			if cooldownInfo and cooldownInfo.isEnabled then
+				button.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration, cooldownInfo.modRate);
+				button.Cooldown:Show();
+				return;
+			end
+		end
+
+		button.Cooldown:Clear();
+		button.Cooldown:Hide();
+	end
+
 	function Housing.RequestUpdateHouseInfo()
 		if not Housing.isUpdatingHouseInfo then
 			Housing.isUpdatingHouseInfo = true;
