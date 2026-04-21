@@ -727,6 +727,7 @@ L["Item Expire Alert Weekly"] = "This item will disappear after the weekly reset
 L["Delves Completion Reward Cap"] = "Completion Rewards";
 L["Delves Completion Reward Cap Tooltip"] = "Once you reach this account-wide cap, completing a Bountiful Delve will no longer grant Delver's Journey or Companion EXP.\n\nRewards from Bountiful Coffers and Nemesis Caches will not be affected by this cap.\n\nThe cap will be raised by 28 per week.";
 L["Near Completion Tooltip"] = "This entry is visible to you because you are about to reach the weekly cap.";
+L["Inactive Currencies Tooltip"] = "These currencies are hidden because you have set them as Unused:";
 
 
 --ExpansionSummaryMinimapButton

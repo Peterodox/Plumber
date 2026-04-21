@@ -22,7 +22,7 @@ do
 	end
 
 	function ItemUpgradeFrameMixin:UpdateCurrencies()
-		local n = 0;
+		self.inactiveCurrencyIDs = nil;
 
 		for _, button in ipairs(self.buttons) do
 			button:Hide();
@@ -32,7 +32,12 @@ do
 		local activeCurrencyIDs = {};
 
 		for _, currencyID in ipairs(self.currencyIDs) do
-			if not API.IsCurrencyUnused(currencyID) then
+			if API.IsCurrencyUnused(currencyID) then
+				if not self.inactiveCurrencyIDs then
+					self.inactiveCurrencyIDs = {};
+				end
+				table.insert(self.inactiveCurrencyIDs, currencyID);
+			else
 				table.insert(activeCurrencyIDs, currencyID);
 			end
 		end
@@ -40,6 +45,8 @@ do
 		if #activeCurrencyIDs == 0 then
 			activeCurrencyIDs[1] = self.currencyIDs[1]; -- Default to track the highest tier
 		end
+
+		local n = 0;
 
 		for i, currencyID in ipairs(activeCurrencyIDs) do
 			n = n + 1;
@@ -61,6 +68,11 @@ do
 	end
 end
 
+local function CategoryButtonOnEnterFunc(listCategoryButton)
+	if ItemUpgradeFrame then
+		LandingPageUtil.DisplayInactiveCurrencies(listCategoryButton, ItemUpgradeFrame.inactiveCurrencyIDs);
+	end
+end
 
 function LandingPageUtil.CreateItemUpgradeFrame(parent)
 	if ItemUpgradeFrame then return ItemUpgradeFrame end;
@@ -100,7 +112,7 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
 
 	f:UpdateCurrencies();
 
-	return f, height
+	return f, height, CategoryButtonOnEnterFunc
 end
 
 addon.CallbackRegistry:Register("UnusedCurrencyChanged", function()

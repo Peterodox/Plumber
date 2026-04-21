@@ -313,6 +313,7 @@ do
 		self.anyCurrency = nil;
 		self.anyItem = nil;
 		self.anyRep = nil;
+		self.inactiveCurrencyIDs = nil;
 
 		local n = 0;
 		local content = {};
@@ -347,7 +348,13 @@ do
 			end
 
 			if valid and v.currencyID then
-				valid = not API.IsCurrencyUnused(v.currencyID);
+				if API.IsCurrencyUnused(v.currencyID) then
+					valid = false;
+					if not self.inactiveCurrencyIDs then
+						self.inactiveCurrencyIDs = {};
+					end
+					table.insert(self.inactiveCurrencyIDs, v.currencyID);
+				end
 			end
 
 			if valid then
@@ -455,6 +462,13 @@ do
 end
 
 
+local function CategoryButtonOnEnterFunc(listCategoryButton)
+	if MainFrame then
+		LandingPageUtil.DisplayInactiveCurrencies(listCategoryButton, MainFrame.inactiveCurrencyIDs);
+	end
+end
+
+
 function LandingPageUtil.CreateCurrencyList(parent)
 	local f = CreateFrame("Frame", nil, parent);
 	MainFrame = f;
@@ -536,7 +550,7 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	f:SetScript("OnHide", f.OnHide);
 	f:SetScript("OnEvent", f.OnEvent);
 
-	return f, height
+	return f, height, CategoryButtonOnEnterFunc
 end
 
 
