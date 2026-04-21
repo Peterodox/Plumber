@@ -1680,6 +1680,58 @@ do  -- Currency
 		end
 	end
 
+	-- This API is false
+	-- function API.IsCurrencyUnused(currencyID)
+	-- 	local info = GetCurrencyInfo(currencyID);
+	-- 	if info and not info.isTypeUnused then
+	-- 		return false;
+	-- 	else
+	-- 		return true;
+	-- 	end
+	-- end
+
+	function API.ClearUnusedCurrencyCache()
+		CurrencyDataProvider.unusedCurrency = nil;
+	end
+
+	function API.IsCurrencyUnused(currencyID)
+		if not CurrencyDataProvider.unusedCurrency then
+			CurrencyDataProvider.unusedCurrency = {};
+			local GetCurrencyListInfo = C_CurrencyInfo.GetCurrencyListInfo;
+
+			if GetCurrencyListInfo and C_CurrencyInfo.GetCurrencyListSize then
+				local size = C_CurrencyInfo.GetCurrencyListSize();
+				if size < 1 then return end;
+
+				local index = size;
+				local info = GetCurrencyListInfo(index);
+				local dirtyHeaderIndex;
+
+				if info.isHeader and info.name == UNUSED and not info.isHeaderExpanded then
+					dirtyHeaderIndex = index;
+					C_CurrencyInfo.ExpandCurrencyList(index, true);
+				end
+
+				size = C_CurrencyInfo.GetCurrencyListSize();
+
+				for i = size, 1, -1 do
+					info = GetCurrencyListInfo(i);
+					if info and info.isTypeUnused then
+						CurrencyDataProvider.unusedCurrency[info.currencyID] = true;
+					else
+						break
+					end
+				end
+
+				if dirtyHeaderIndex then
+					C_CurrencyInfo.ExpandCurrencyList(dirtyHeaderIndex, false);
+				end
+			end
+		end
+
+		return CurrencyDataProvider.unusedCurrency[currencyID]
+	end
+
 	if CurrencyDataProvider.PlayerHasMaxWeeklyQuantity then
 		function API.IsCurrencyFullyEarned(currencyID)
 			return CurrencyDataProvider.PlayerHasMaxWeeklyQuantity(currencyID) or CurrencyDataProvider.PlayerHasMaxQuantity(currencyID);
@@ -3514,6 +3566,19 @@ do  -- Tooltip
 		tooltip:AddTexture(icon, TextureInfoTable);
 
 		return true
+	end
+
+	function API.AddCurrencyToTooltip(tooltip, currencyID)
+		local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+		if info then
+			local a;
+			if info.quantity > 0 then
+				a = 1;
+			else
+				a = 0.5;
+			end
+			tooltip:AddDoubleLine(info.name, string.format("%s|T%s:0:0|t", BreakUpLargeNumbers(info.quantity), info.iconFileID), a, a, a, a, a, a);
+		end
 	end
 
 

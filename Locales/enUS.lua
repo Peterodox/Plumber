@@ -272,6 +272,7 @@ L["ModuleName TooltipTransmogEnsemble"] = "Transmog Ensembles";
 L["ModuleDescription TooltipTransmogEnsemble"] = "- Show the number of collectable appearances from an Ensemble.\n\n- Fixed the issue where the tooltip says \"Already known\" but you can still use it to unlock new appearances.";
 L["Collected Appearances"] = "Collected Appearances";
 L["Collected Items"] = "Collected Items";
+L["Other Player Classes"] = "Other Classes";
 
 
 --Tooltip Housing
@@ -726,6 +727,7 @@ L["Item Expire Alert Weekly"] = "This item will disappear after the weekly reset
 L["Delves Completion Reward Cap"] = "Completion Rewards";
 L["Delves Completion Reward Cap Tooltip"] = "Once you reach this account-wide cap, completing a Bountiful Delve will no longer grant Delver's Journey or Companion EXP.\n\nRewards from Bountiful Coffers and Nemesis Caches will not be affected by this cap.\n\nThe cap will be raised by 28 per week.";
 L["Near Completion Tooltip"] = "This entry is visible to you because you are about to reach the weekly cap.";
+L["Inactive Currencies Tooltip"] = "These currencies are hidden because you have set them as Unused:";
 
 
 --ExpansionSummaryMinimapButton

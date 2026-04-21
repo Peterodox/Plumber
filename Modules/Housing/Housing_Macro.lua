@@ -35,6 +35,36 @@ do  --Teleport Home Macro    #plumber:home
 	end
 	Housing.GetDynamicTeleportAction = GetDynamicTeleportAction;
 
+	local function GetDynamicTeleportAllianceAction()
+		local icon, macro, tooltip;
+		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+			icon = 236350;
+			macro = Housing.GetLeaveHomeMacro();
+			tooltip = L["Leave Home"];
+		else
+			icon = 236761;
+			macro = Housing.GetTeleportAllianceHomeMacro();
+			tooltip = Housing.GetAllianceMapName();
+		end
+		return icon, macro, tooltip
+	end
+	Housing.GetDynamicTeleportAllianceAction = GetDynamicTeleportAllianceAction;
+
+	local function GetDynamicTeleportHordeAction()
+		local icon, macro, tooltip;
+		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+			icon = 236350;
+			macro = Housing.GetLeaveHomeMacro();
+			tooltip = L["Leave Home"];
+		else
+			icon = 236756;
+			macro = Housing.GetTeleportHordeHomeMacro();
+			tooltip = Housing.GetHordeMapName();
+		end
+		return icon, macro, tooltip
+	end
+	Housing.GetDynamicTeleportHordeAction = GetDynamicTeleportHordeAction;
+
 	local function WriteFunc_home(body)
 		local header = "#plumber:"..COMMAND_HOME;
 		local icon, macro = GetDynamicTeleportAction();

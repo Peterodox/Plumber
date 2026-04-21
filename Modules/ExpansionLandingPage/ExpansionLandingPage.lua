@@ -401,7 +401,7 @@ do
 				offsetY = offsetY + categoryButtonHeight;
 				if v.frameGetter then
 					offsetY = offsetY + lineGap;
-					local frame, height = v.frameGetter(container);
+					local frame, height, categoryOnEnterFunc = v.frameGetter(container);
 					frame:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 					offsetY = offsetY + height;
 					if k == numCategories then
@@ -411,6 +411,7 @@ do
 					if frame.OnShow and frame:IsVisible() then
 						frame:OnShow();
 					end
+					categoryButton:SetOnEnterFunc(categoryOnEnterFunc);
 				end
 				offsetY = offsetY + paragraphGap;
 			end

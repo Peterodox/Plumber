@@ -267,6 +267,7 @@ do
 	end
 
 	function CurrencyListMixin:OnShow()
+		API.ClearUnusedCurrencyCache();
 		self:FullUpdate();
 	end
 
@@ -312,6 +313,7 @@ do
 		self.anyCurrency = nil;
 		self.anyItem = nil;
 		self.anyRep = nil;
+		self.inactiveCurrencyIDs = nil;
 
 		local n = 0;
 		local content = {};
@@ -343,6 +345,16 @@ do
 				end
 			elseif v.shownIfOwned then
 				valid = GetResourcesQuantity(v) > 0;
+			end
+
+			if valid and v.currencyID then
+				if API.IsCurrencyUnused(v.currencyID) then
+					valid = false;
+					if not self.inactiveCurrencyIDs then
+						self.inactiveCurrencyIDs = {};
+					end
+					table.insert(self.inactiveCurrencyIDs, v.currencyID);
+				end
 			end
 
 			if valid then
@@ -450,6 +462,13 @@ do
 end
 
 
+local function CategoryButtonOnEnterFunc(listCategoryButton)
+	if MainFrame then
+		LandingPageUtil.DisplayInactiveCurrencies(listCategoryButton, MainFrame.inactiveCurrencyIDs);
+	end
+end
+
+
 function LandingPageUtil.CreateCurrencyList(parent)
 	local f = CreateFrame("Frame", nil, parent);
 	MainFrame = f;
@@ -531,14 +550,29 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	f:SetScript("OnHide", f.OnHide);
 	f:SetScript("OnEvent", f.OnEvent);
 
-	return f, height
+	return f, height, CategoryButtonOnEnterFunc
+end
+
+
+local function UpdateIfVisible()
+	if MainFrame and MainFrame:IsVisible() then
+		MainFrame:FullUpdate();
+	end
 end
 
 CallbackRegistry:Register("LandingPage.SetResourceList", function(list)
 	if list then
 		ResourceList = list;
-		if MainFrame and MainFrame:IsVisible() then
-			MainFrame:FullUpdate();
-		end
+		UpdateIfVisible();
 	end
 end);
+
+CallbackRegistry:Register("UnusedCurrencyChanged", UpdateIfVisible);
+
+
+if TokenFramePopup and TokenFramePopup.InactiveCheckbox then
+	TokenFramePopup.InactiveCheckbox:HookScript("OnClick", function()
+		API.ClearUnusedCurrencyCache();
+		CallbackRegistry:Trigger("UnusedCurrencyChanged");
+	end);
+end

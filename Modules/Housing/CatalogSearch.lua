@@ -17,6 +17,8 @@ local match = string.match;
 
 local MODULE_ENABLED;
 
+--addon.IS_12_0_5: Players can link decor in chat with the native UI now
+
 
 --Storage List Injection
 --  HouseEditorStorageFrameTemplate (HouseEditorFrame.StoragePanel.OptionsContainer)
@@ -272,6 +274,8 @@ local function ModifySearcherBase(f, ownedOnly)
 		end
 	end);
 
+	if addon.IS_12_0_5 then return; end
+
 	f:HookScript("OnShow", function()
 		if not MODULE_ENABLED then return end;
 		EventRegistry:UnregisterCallback("HousingCatalogEntry.OnInteract", f);
@@ -334,44 +338,6 @@ local function ModifyContextMenu()
 			end
 		end
 	end);
-
-	if not addon.IS_MIDNIGHT then
-		--No context menu for uncollcetd decor in 11.1.7
-		local Dummy = {};
-
-		function Dummy.OnInteract(_, self, button, isDrag)
-			if not MODULE_ENABLED then return end
-			if button == "RightButton" and (not isDrag) and self.entryInfo and self.entryInfo.entryID and self.entryInfo.entryID.recordID then
-				local totalInStorage = self.entryInfo.quantity + self.entryInfo.remainingRedeemable;
-				if totalInStorage > 0 then return end;
-
-				local itemID = Housing.GetDecorItemID(self.entryInfo.entryID.recordID);
-				if itemID then
-					C_Item.GetItemInfo(itemID);
-				else
-					return
-				end
-
-				MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
-					rootDescription:SetTag("PLUMBER_MENU_HOUSING_CATALOG_ENTRY");
-
-					local destroySingleButtonDesc = rootDescription:CreateButton(HOUSING_DECOR_STORAGE_ITEM_DESTROY, function() end);
-					destroySingleButtonDesc:SetEnabled(false);
-
-					rootDescription:CreateDivider();
-					rootDescription:CreateSpacer();
-
-					local function OnClick()
-						API.ChatForceLinkItem(itemID);
-					end
-
-					local button1 = rootDescription:CreateButton(GUILD_NEWS_LINK_ITEM, OnClick);
-				end);
-			end
-		end
-
-		EventRegistry:RegisterCallback("HousingCatalogEntry.OnInteract", Dummy.OnInteract, Dummy);
-	end
 end
 
 
@@ -421,6 +387,8 @@ do
 
 
 	function EnableLinkDecorToChat(state)
+		if addon.IS_12_0_5 then return; end
+
 		if state then
 			EventRegistry:RegisterCallback("HousingCatalogEntry.OnInteract", Dummy.OnInteract, Dummy);
 			EventRegistry:RegisterCallback("HousingCatalogEntry.TooltipCreated", Dummy.TooltipCreated, Dummy);

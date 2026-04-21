@@ -286,6 +286,21 @@ do
 		end
 	end
 
+	function ListCategoryButtonMixin:OnEnter()
+		if self.onEnterFunc then
+			self.onEnterFunc(self);
+		end
+	end
+
+	function ListCategoryButtonMixin:OnLeave()
+		GameTooltip:Hide();
+	end
+
+	function ListCategoryButtonMixin:SetOnEnterFunc(onEnterFunc)
+		self.onEnterFunc = onEnterFunc;
+	end
+
+
 	local MinimizeButtonMixin = {};
 
 	function MinimizeButtonMixin:OnMouseDown()
@@ -308,8 +323,8 @@ do
 		self:GetParent():SetCollapsed(not self.isCollapsed, true);
 	end
 
-	function LandingPageUtil.CreateListCategoryButton(parent, name)
-		local f = CreateFrame("Frame", nil, parent);
+	function LandingPageUtil.CreateListCategoryButton(parent, name, onEnterFunc)
+		local f = CreateFrame("Button", nil, parent);
 		Mixin(f, ListCategoryButtonMixin);
 		f:SetSize(240, 32); --debug
 
@@ -329,6 +344,10 @@ do
 		f.Right:SetSize(20, 32);
 		f.Right:SetTexCoord(910/1024, 950/1024, 48/1024, 112/1024);
 		f.Center:SetTexCoord(734/1024, 910/1024, 48/1024, 112/1024);
+
+		f:SetScript("OnEnter", f.OnEnter);
+		f:SetScript("OnLeave", f.OnLeave);
+		f:SetOnEnterFunc(onEnterFunc);
 
 		if name then
 			f:SetName(name);
@@ -551,6 +570,7 @@ do  --Atlas
 
 		[2764] = {640, 768, 256, 384},    --Prey
 		[2742] = {768, 896, 256, 384},    --Delves
+		[2792] = {896, 1024, 256, 384},   --Ritual Sites
 	};
 
 	local function SetTextureDimension(textureObject, file, width, height, l, r, t, b, useTrilinearFilter)
@@ -1824,6 +1844,22 @@ do	--PlumberStrikethroughNumberMixin
 		end
 	end
 end
+
+
+function LandingPageUtil.DisplayInactiveCurrencies(owner, currencyIDs)
+	if owner and currencyIDs then
+		local tooltip = GameTooltip;
+		tooltip:SetOwner(owner, "ANCHOR_RIGHT");
+		tooltip:SetText(UNUSED, 1, 1, 1);
+		tooltip:AddLine(addon.L["Inactive Currencies Tooltip"], 1, 0.82, 0, true);
+		tooltip:AddLine(" ");
+		for _, currencyID in ipairs(currencyIDs) do
+			API.AddCurrencyToTooltip(tooltip, currencyID);
+		end
+		tooltip:Show();
+	end
+end
+
 
 --[[
 do  --SoftTargetName

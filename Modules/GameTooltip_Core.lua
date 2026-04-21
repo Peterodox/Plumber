@@ -116,23 +116,36 @@ do
 
 	function HandlerMixin:CallSubModules(tooltip, id, hyperlink)
 		self.hasAltMode = nil;
+		self.altModeState = nil;
 		self.currentTooltip = tooltip;
 
 		for _, m in ipairs(self.modules) do
+			m.altModeState = nil;
 			if m:ProcessData(tooltip, id, hyperlink) then
 				self.anyChange = true;
 				if m.hasAltMode then
 					self.hasAltMode = true;
+					if not self.altModeState then
+						self.altModeState = m.altModeState;
+					end
+				end
+			end
+		end
+
+		if self.altModeState then
+			AltModeListener:SetHandlerAndStart(self);
+			if self.anyChange and tooltip:GetName() == "GameTooltip" then
+				tooltip:AddLine(" ");
+				if self.altModeState == 1 then
+					tooltip:AddLine(addon.L["Instruction Show Less Info"], 0.000, 0.800, 1.000, true);
+				else
+					tooltip:AddLine(addon.L["Instruction Show More Info"], 0.000, 0.800, 1.000, true);
 				end
 			end
 		end
 
 		if self.anyChange then
 			tooltip:Show();
-		end
-
-		if self.hasAltMode then
-			AltModeListener:SetHandlerAndStart(self);
 		end
 	end
 
