@@ -672,6 +672,7 @@ stds.wow = {
 
 		C_CurrencyInfo = {
 			fields = {
+				"ExpandCurrencyList",
 				"GetCurrencyContainerInfo",
 				"GetCurrencyIDFromLink",
 				"GetCurrencyInfo",
