@@ -5,6 +5,7 @@ local CreateButton = LandingPageUtil.CreateItemUpgradeButton;
 
 
 local BUTTON_WIDTH, BUTTON_HEIGHT = 36, 40;
+local BUTTON_GAP = 2;
 local ItemUpgradeFrame;
 
 
@@ -18,6 +19,39 @@ do
 
 	function ItemUpgradeFrameMixin:GetActiveWidgets()
 		return self.buttons
+	end
+
+	function ItemUpgradeFrameMixin:UpdateCurrencies()
+		local n = 0;
+
+		for _, button in ipairs(self.buttons) do
+			button:Hide();
+			button:ClearAllPoints();
+		end
+
+		local activeCurrencyIDs = {};
+
+		for _, currencyID in ipairs(self.currencyIDs) do
+			if not API.IsCurrencyUnused(currencyID) then
+				table.insert(activeCurrencyIDs, currencyID);
+			end
+		end
+
+		if #activeCurrencyIDs == 0 then
+			activeCurrencyIDs[1] = self.currencyIDs[1]; -- Default to track the highest tier
+		end
+
+		for i, currencyID in ipairs(activeCurrencyIDs) do
+			n = n + 1;
+			local button = self.currencyXButton[currencyID];
+			if button then
+				button:SetPoint("TOPRIGHT", self, "TOPRIGHT", (1 - i) * (BUTTON_WIDTH + BUTTON_GAP), 0);
+				button:Show();
+			end
+		end
+
+		local width = n * (BUTTON_WIDTH + BUTTON_GAP) - BUTTON_GAP;
+		self:SetWidth(width);
 	end
 
 	function LandingPageUtil.GetItemUpgradeButtons()
@@ -34,20 +68,19 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
 	local f = CreateFrame("Frame", nil, parent);
 	ItemUpgradeFrame = f;
 
-	local buttonGap = 2;
-
 	local n = 0;
 	local buttons = {};
 
-	local ItemUpgradeConstant = addon.ItemUpgradeConstant;
+	f.currencyXButton = {};
+	f.currencyIDs = addon.ItemUpgradeConstant.Crests;
 
-	for i, currencyID in ipairs(ItemUpgradeConstant.Crests) do
+	for i, currencyID in ipairs(f.currencyIDs) do
 		n = n + 1;
 		local button = CreateButton(parent);
 		buttons[n] = button;
-		button:SetPoint("TOPRIGHT", f, "TOPRIGHT", (1 - i) * (BUTTON_WIDTH + buttonGap), 0);
 		button.currencyID = currencyID;
 		button.displayedMax = 999;
+		f.currencyXButton[currencyID] = button;
 	end
 
 	--[[    --Valorstones Removed. Replaced by 5 tiers of crests in Midnight
@@ -57,7 +90,7 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
 	button.currencyID = ItemUpgradeConstant.BaseCurrencyID;
 	--]]
 
-	local width = #buttons * (BUTTON_WIDTH + buttonGap) - buttonGap;
+	local width = #buttons * (BUTTON_WIDTH + BUTTON_GAP) - BUTTON_GAP;
 	local height = BUTTON_HEIGHT;
 
 	f:SetSize(width, height);
@@ -65,5 +98,13 @@ function LandingPageUtil.CreateItemUpgradeFrame(parent)
 	API.Mixin(f, ItemUpgradeFrameMixin);
 	f.buttons = buttons;
 
+	f:UpdateCurrencies();
+
 	return f, height
 end
+
+addon.CallbackRegistry:Register("UnusedCurrencyChanged", function()
+	if ItemUpgradeFrame then
+		ItemUpgradeFrame:UpdateCurrencies();
+	end
+end);

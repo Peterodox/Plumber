@@ -267,6 +267,7 @@ do
 	end
 
 	function CurrencyListMixin:OnShow()
+		API.ClearUnusedCurrencyCache();
 		self:FullUpdate();
 	end
 
@@ -343,6 +344,10 @@ do
 				end
 			elseif v.shownIfOwned then
 				valid = GetResourcesQuantity(v) > 0;
+			end
+
+			if valid and v.currencyID then
+				valid = not API.IsCurrencyUnused(v.currencyID);
 			end
 
 			if valid then
@@ -534,11 +539,26 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	return f, height
 end
 
+
+local function UpdateIfVisible()
+	if MainFrame and MainFrame:IsVisible() then
+		MainFrame:FullUpdate();
+	end
+end
+
 CallbackRegistry:Register("LandingPage.SetResourceList", function(list)
 	if list then
 		ResourceList = list;
-		if MainFrame and MainFrame:IsVisible() then
-			MainFrame:FullUpdate();
-		end
+		UpdateIfVisible();
 	end
 end);
+
+CallbackRegistry:Register("UnusedCurrencyChanged", UpdateIfVisible);
+
+
+if TokenFramePopup and TokenFramePopup.InactiveCheckbox then
+	TokenFramePopup.InactiveCheckbox:HookScript("OnClick", function()
+		API.ClearUnusedCurrencyCache();
+		CallbackRegistry:Trigger("UnusedCurrencyChanged");
+	end);
+end
