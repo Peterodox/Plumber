@@ -725,8 +725,8 @@ do  -- Tooltip Parser
 			local name;
 			local n = 0;
 			for _, creatureID in ipairs(creatures) do
-				name = GetCreatureName(creatureID);
-				if name and name ~= "" then
+		name = GetCreatureName(creatureID);
+			if name and #name > 0 then
 					callback(creatureID, name);
 				else
 					if not failedCreatures then
@@ -738,8 +738,8 @@ do  -- Tooltip Parser
 			end
 		else
 			--when creatures is creatureID (number)
-			local name = GetCreatureName(creatures);
-			if name and name ~= "" then
+		local name = GetCreatureName(creatures);
+		if name and #name > 0 then
 				callback(creatures, name);
 			else
 				failedCreatures = creatures;
@@ -3681,14 +3681,14 @@ do  -- AsyncCallback
 
 			if self.creatureCallbacks then
 				for id, callbacks in pairs(self.creatureCallbacks) do
-					local name = API.GetCreatureName(id);
-					if name and name ~= "" then
-						CreatureNameCache[id] = name;
-					else
-						name = nil;
-					end
-					if name then
-						for _, callbackInfo in ipairs(callbacks) do
+local name = API.GetCreatureName(id);
+if name and #name > 0 then
+CreatureNameCache[id] = name;
+else
+name = nil;
+end
+if name then
+for _, callbackInfo in ipairs(callbacks) do
 							if not callbackInfo.processed then
 								callbackInfo.processed = true;
 								callbackInfo.func(id, name);
@@ -3772,9 +3772,9 @@ do  -- AsyncCallback
 		if CreatureNameCache[creatureID] then
 			return CreatureNameCache[creatureID]
 		end
-		local name = API.GetCreatureName(creatureID);
-		if name and name ~= "" then
-			CreatureNameCache[creatureID] = name;
+local name = API.GetCreatureName(creatureID);
+if name and #name > 0 then
+CreatureNameCache[creatureID] = name;
 		else
 			name = nil;
 		end
