@@ -59,6 +59,8 @@ function ControlCenter:InitializeModules()
 		end
 	end
 
+	local loadingErrors = {};
+
 	for _, moduleData in pairs(self.modules) do
 		isForceEnabled = false;
 		if (not moduleData.validityCheck) or (moduleData.validityCheck()) then
@@ -81,7 +83,10 @@ function ControlCenter:InitializeModules()
 
 			if moduleData.toggleFunc then
 				if enabled then
-					moduleData.toggleFunc(enabled);
+					local success, result = pcall(moduleData.toggleFunc, enabled);
+					if not success then
+						table.insert(loadingErrors, result);
+					end
 				end
 			else
 				moduleData.virtual = true;
@@ -118,6 +123,16 @@ function ControlCenter:InitializeModules()
 	self.seenNewFeatureMark = db.seenNewFeatureMark;
 
 	addon.CallbackRegistry:Trigger("ModulesLoaded");
+
+
+	-- Display errors if any
+	if loadingErrors[1] then
+		for i, result in ipairs(loadingErrors) do
+			C_Timer.After(0.1 * i, function()
+				error(result);
+			end);
+		end
+	end
 end
 
 function ControlCenter:AddModule(moduleData)
