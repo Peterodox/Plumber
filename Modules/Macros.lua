@@ -947,7 +947,7 @@ do  --MacroInterpreter
 		end
 	end
 
-	function MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable, alwaysShowConsumables)
+	function MacroInterpreter:GetDrawerInfo(body, checkUsability, hideUnusable, alwaysShowConsumables, forEditor)
 		if not body then return end;
 		if not find(body, "#plumber:drawer") then return end;
 
@@ -1058,7 +1058,8 @@ do  --MacroInterpreter
 				if find(line, "/home") then
 					local h = addon.Housing;
 					if h then
-						if h.DoesPlayerHaveMultipleHomes() then
+						if h.DoesPlayerHaveMultipleHomes() and not forEditor then
+							-- Avoid showing two teleportHome buttons if it's the editor that requires the drawerInfo
 							processed = true;
 							actionType = "teleportHome";
 							usable = true;
@@ -1655,7 +1656,8 @@ do  --Editor Setup
 		EditorSetup.ReceptorFrame:Hide();
 		EditorSetup.IconButtonFrame:Show();
 
-		local drawerInfo = MacroInterpreter:GetDrawerInfo(body);
+		local forEditor = true;
+		local drawerInfo = MacroInterpreter:GetDrawerInfo(body, nil, nil, nil, forEditor);
 		if drawerInfo and #drawerInfo > 0 then
 			local refresh = false;
 
