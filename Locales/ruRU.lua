@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.0 c
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.1
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -272,6 +272,7 @@ L["ModuleName TooltipTransmogEnsemble"] = "Трансмог: комплекты"
 L["ModuleDescription TooltipTransmogEnsemble"] = "- Показывает количество собираемых внешностей в комплекте.\n\n- Исправлена проблема, когда в подсказке написано «Уже известно», но комплект всё равно можно использовать для получения новых внешностей.";
 L["Collected Appearances"] = "Собрано внешностей";
 L["Collected Items"] = "Собрано предметов";
+L["Other Player Classes"] = "Другие классы";
 
 
 --Tooltip Housing
@@ -723,6 +724,10 @@ L["Prey No Data"] = "Прогресс охоты недоступен";
 L["Abundance No Data"] = "Нет активного события Изобилия";
 L["Defeated Prey"] = "Побежденные цели охоты";
 L["Item Expire Alert Weekly"] = "Этот предмет исчезнет после еженедельного сброса кд.";
+L["Delves Completion Reward Cap"] = "Лимит наград за прохождение";
+L["Delves Completion Reward Cap Tooltip"] = "Как только вы достигнете этого общего на аккаунт лимита, прохождение многообещающих вылазок перестанет приносить опыт спутника и прогресс «Пути участника вылазки».\n\nНаграды из многообещающих сундуков и тайников заклятых врагов не зависят от этого лимита.\n\nЛимит увеличивается на 28 в неделю.";
+L["Near Completion Tooltip"] = "Эта запись видна вам, так как вы почти достигли еженедельного лимита.";
+L["Inactive Currencies Tooltip"] = "Эти валюты скрыты, так как вы пометили их как «Неиспользуемые»:";
 
 
 --ExpansionSummaryMinimapButton
@@ -886,6 +891,11 @@ L["ModuleDescription CatalystUI"] = "Позволяет нажать Ctrl+кли
 L["ModuleName HuntTable"] = "Добыча: Таблица охоты";
 L["ModuleDescription HuntTable"] = "- Заменяет стандартные синие значки заданий на значки с указанием сложности.\n\n- Показывает индикатор, если цель охоты необходима для получения еще не выполненного достижения.";
 L["Prey Target Has Achievement"] = "Эта цель охоты необходима для получения еще не выполненного достижения.";
+
+
+--PreyQuestSuperTrack
+L["ModuleName PreyQuestSuperTrack"] = "Добыча: Целевая точка маршрута";
+L["ModuleDescription PreyQuestSuperTrack"] = "Как только местоположение вашей Добычи будет раскрыто, нажатие на виджет прогресса охоты также установит путевую точку в это место.";
 
 
 --Generic
