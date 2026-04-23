@@ -9,9 +9,10 @@ local UnitName = addon.API.Secret_GetUnitName;
 local RACE_TIMES = "^Race Times";
 local Timekeepers = {};
 
-local SpecialNPCs = {
-	234643,     --Omtroid, Ecological Succession
-};
+-- Due to secrets we will hardcode these names
+-- local SpecialNPCs = {
+-- 	234643,     --Omtroid, Ecological Succession
+-- };
 
 local RankIcons = {
 	[1] = "Interface\\AddOns\\Plumber\\Art\\GossipIcons\\Medal_Gold",
@@ -34,6 +35,7 @@ do
 		Timekeepers = {
 			["Grimy Timekeeper"] = true,
 			["Bronze Timekeeper"] = true,
+			["Om'torid"] = true,
 		};
 
 	elseif locale == "esMX" then
@@ -43,6 +45,7 @@ do
 			["Cronometradora mugrienta"] = true,
 			["Cronometrador bronce"] = true,
 			["Cronometrador mugriento"] = true,
+			["Om'torid"] = true,
 		};
 
 	elseif locale == "ptBR" then
@@ -50,6 +53,7 @@ do
 		Timekeepers = {
 			["Guarda-tempo Bronze"] = true,
 			["Guarda-tempo Limosa"] = true,
+			["Om'torid"] = true,
 		};
 
 	elseif locale == "deDE" then
@@ -59,6 +63,7 @@ do
 			["Schmuddeliger Zeithüter"] = true,
 			["Bronzezeithüterin"] = true,
 			["Bronzezeithüter"] = true,
+			["Om'torid"] = true,
 		};
 
 	elseif locale == "esES" then
@@ -67,6 +72,7 @@ do
 			["Vigilante del tiempo pringoso"] = true,
 			["Vigilante del tiempo pringosa"] = true,
 			["Vigilante del tiempo bronce"] = true,
+			["Om'torid"] = true,
 		};
 
 	elseif locale == "frFR" then
@@ -76,6 +82,7 @@ do
 			["Chronométreur de bronze"] = true,
 			["Chronométreur crasseux"] = true,
 			["Chronométreuse de bronze"] = true,
+			["Om'torid"] = true,
 		};
 
 	elseif locale == "itIT" then
@@ -85,6 +92,7 @@ do
 			["Custode del Tempo Bronzea"] = true,
 			["Custode del Tempo Sporca"] = true,
 			["Custode del Tempo Bronzeo"] = true,
+			["Om'torid"] = true,
 		};
 
 	elseif locale == "ruRU" then
@@ -94,6 +102,7 @@ do
 			["Бронзовый хранитель времени"] = true,
 			["Закопченный хранитель времени"] = true,
 			["Закопченная хранительница времени"] = true,
+			["Ом'торид"] = true,
 		};
 
 	elseif locale == "koKR" then
@@ -101,6 +110,7 @@ do
 		Timekeepers = {
 			["꾀죄죄한 시간지기"] = true,
 			["청동 시간지기"] = true,
+			["옴토리드"] = true,
 		};
 
 	elseif locale == "zhTW" then
@@ -108,6 +118,7 @@ do
 		Timekeepers = {
 			["髒兮兮的時空守衛者"] = true,
 			["青銅時空守衛者"] = true,
+			["奧姆托利德"] = true,
 		};
 
 	elseif locale == "zhCN" then
@@ -115,6 +126,7 @@ do
 		Timekeepers = {
 			["青铜时光守护者"] = true,
 			["满身油渍的时光守护者"] = true,
+			["欧·托里德"] = true,
 		};
 	end
 end
@@ -341,7 +353,7 @@ function EL:EnableModule()
 		end
 	end
 
-	addon.API.LoadCreatureNameWithCallback(SpecialNPCs, OnCreatureNameReceived);
+	--addon.API.LoadCreatureNameWithCallback(SpecialNPCs, OnCreatureNameReceived);
 end
 
 function EL:DisableModule()

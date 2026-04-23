@@ -11,6 +11,25 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10901] = {
 	{
 		type = "date",
+		versionText = "1.9.1 b",
+		timestamp = 1776900000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Fixed a critical issue that prevented this addon from loading properly if you logged in during combat or in an instance.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.1",
 		timestamp = 1776700000,
 	},

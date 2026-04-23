@@ -1041,6 +1041,8 @@ do  --UI Notification Mode
 	end
 
 	function MainFrame:DisplayLootResult()
+		if not ENABLE_MODULE then return end;
+
 		local overflowWarning;
 		local anyNotification;  --Other Plumber module may use this as notification (e.g. auto-selected trait)
 
