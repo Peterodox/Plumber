@@ -968,14 +968,14 @@ L["Match Pattern Rep 1"] = "戰隊的(.+)聲望提高([%d%,]+)";   --FACTION_STA
 L["Match Pattern Rep 2"] = "你於(.+)的聲望提高了([%d%,]+)";   --FACTION_STANDING_INCREASED
 
 L["Match Pattern Item Level"] = "^物品等級(%d+)";
-L["Match Pattern Item Upgrade Tooltip"] = "^升級等級： (.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
+L["Match Pattern Item Upgrade Tooltip"] = "^提升等級：(.+) (%d+)/(%d+)";  --See ITEM_UPGRADE_TOOLTIP_FORMAT_STRING
 
 L["Upgrade Track 1"] = "冒險者";
 L["Upgrade Track 2"] = "探險者";
 L["Upgrade Track 3"] = "精兵";
 L["Upgrade Track 4"] = "勇士";
 L["Upgrade Track 5"] = "英雄";
-L["Upgrade Track 6"] = "傳奇";
+L["Upgrade Track 6"] = "神話";
 
 L["Match Pattern Transmog Set Partially Known"] = "^包含(%d)";   --TRANSMOG_SET_PARTIALLY_KNOWN_CLASS
 
