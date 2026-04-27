@@ -587,17 +587,10 @@ do  --Event Listener
 		end
 	end
 
-	local DangerousInstanceType = {
-		party = true,
-		raid = true,
-		arena = true,
-		pvp = true,
-	};
-
 	function EL:UpdateZone()
-		local _, instanceType = GetInstanceInfo();
-		local inInstance = instanceType and DangerousInstanceType[instanceType] or false;
+		local inInstance = API.IsPlayerInInstance();	-- Maybe we'll use C_RestrictedActions.IsAddOnRestrictionActive
 		self.inInstance = inInstance;
+
 		self:UnregisterEvent("UNIT_QUEST_LOG_CHANGED");
 
 		if inInstance or not (Def.AnchorToHealthBar and Def.Side) then
