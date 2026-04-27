@@ -1519,7 +1519,9 @@ do  -- Instance -- Map
 
 	function API.IsPlayerInInstance()
 		local _, instanceType = GetInstanceInfo();
-		if instanceType then
+		if (not instanceType) or instanceType == "none" then
+			return false
+		else
 			return true
 		end
 	end
