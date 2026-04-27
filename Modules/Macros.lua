@@ -1169,11 +1169,10 @@ do  --MacroInterpreter
 						macroText = "/run C_MountJournal.SummonByID(0)";
 						id = _spellID;
 					else
-						local factionIndex = API.GetPlayerFactionIndex();
 						local _name, _spellID, _icon, _isActive, _isUsable, _sourceType, _isFavorite, _isFactionSpecific, _faction, _shouldHideOnChar, _isCollected = GetMountInfoByID(id);
 						name = GetSpellName(_spellID) or _name;
 						icon = _icon;
-						usable = _isCollected and (_faction == nil or _faction == factionIndex);
+						usable = _isCollected and not _shouldHideOnChar;
 						macroText = format("/run C_MountJournal.SummonByID(%d)", id);
 						id = _spellID;
 					end
