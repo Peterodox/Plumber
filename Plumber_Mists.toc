@@ -1,6 +1,6 @@
 ## X-Flavor: classic
 ## X-Expansion: MOP
-## Interface: 50503
+## Interface: 50503, 50504
 ## Version: 1.9.1
 
 ## Title: Plumber
