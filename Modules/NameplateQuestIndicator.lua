@@ -1055,6 +1055,21 @@ do  --Options
 	end
 
 
+	local UnitTokenFromGUID = UnitTokenFromGUID;
+	local TOOLTIP_DATA_TYPE = Enum.TooltipDataType.Unit;
+
+	local function GetDisplayedUnit(tooltip)
+		local tooltipInfo = tooltip.infoList and tooltip.infoList[1];
+		if tooltipInfo and tooltipInfo.tooltipData then
+			local tooltipData = tooltipInfo.tooltipData;
+			if tooltipData.type == TOOLTIP_DATA_TYPE then
+				local guid = tooltipData.guid;
+				local unit = guid and Secret_CanAccess(guid) and UnitTokenFromGUID(guid);
+				return unit
+			end
+		end
+	end
+
 	local function OnTooltipSetUnit(tooltip)
 		if EL.inInstance or not Def.ShowProgressOnHover then return end;
 
@@ -1063,7 +1078,7 @@ do  --Options
 			LastMouseOverWidget:UpdateProgressVisibility(true)
 		end
 
-		local _, unit = tooltip:GetUnit();
+		local unit = GetDisplayedUnit(tooltip);
 
 		if Secret_CanAccess(unit) then
 			for widget, shown in pairs(WidgetPool) do
