@@ -1093,13 +1093,10 @@ do  --MacroInterpreter
 								tbl = {};
 							end
 
-							local info1, info2 = h.GetOverrideDrawerInfo_TeleportHome();
-
-							n = n + 1;
-							tbl[n] = info1;
-
-							n = n + 1;
-							tbl[n] = info2;
+							for _, info in ipairs(h.GetOverrideDrawerInfo_TeleportHome()) do
+								n = n + 1;
+								tbl[n] = info;
+							end
 						else
 							processed = true;
 							icon, macroText, name = h.GetDynamicTeleportAction();
