@@ -17,7 +17,7 @@ local match = string.match;
 
 local MODULE_ENABLED;
 
---addon.IS_12_0_5: Players can link decor in chat with the native UI now
+-- 12.0.5: Players can link decor in chat with the native UI now
 
 
 --Storage List Injection
@@ -131,6 +131,7 @@ do
 
 		local entryTypeDecor = Enum.HousingCatalogEntryType.Decor;
 		local entryTypeRoom = Enum.HousingCatalogEntryType.Room;
+		local entryContextGetter = GenerateClosure(self.optionsContainer.GetEntryDisplayContext, self);
 
 		local lastTemplate = nil;
 		local n = 0;
@@ -155,23 +156,24 @@ do
 				if catalogEntry.isHeader then
 					n = n + 1;
 					catalogElements[n] = { templateKey = "CATALOG_ENTRY_HEADER", text = catalogEntry.text };
+				elseif catalogEntry.productID then
+					elementData.templateKey = "CATALOG_ENTRY_SMALL_PRODUCT";
+				elseif catalogEntry.decorID then
+					elementData = { bundleItemInfo = catalogEntry, };
+					elementData.templateKey = "CATALOG_ENTRY_DECOR";
 				else
-					if catalogEntry.decorID then
-						elementData = { bundleItemInfo = catalogEntry, };
+					elementData = { entryvariantID = catalogEntry, };
+					local entryType = catalogEntry.entryType;
+					if entryType == entryTypeDecor then
 						elementData.templateKey = "CATALOG_ENTRY_DECOR";
-					else
-						elementData = { entryID = catalogEntry, };
-						local entryType = catalogEntry.entryType;
-						if entryType == entryTypeDecor then
-							elementData.templateKey = "CATALOG_ENTRY_DECOR";
-						elseif entryType == entryTypeRoom then
-							elementData.templateKey = "CATALOG_ENTRY_ROOM";
-						end
+					elseif entryType == entryTypeRoom then
+						elementData.templateKey = "CATALOG_ENTRY_ROOM";
 					end
 				end
 			end
 
 			if elementData.templateKey then
+				elementData.displayContextGetter = entryContextGetter;
 				lastTemplate = elementData.templateKey;
 				n = n + 1;
 				catalogElements[n] = elementData;
@@ -273,15 +275,6 @@ local function ModifySearcherBase(f, ownedOnly)
 			end
 		end
 	end);
-
-	if addon.IS_12_0_5 then return; end
-
-	f:HookScript("OnShow", function()
-		if not MODULE_ENABLED then return end;
-		EventRegistry:UnregisterCallback("HousingCatalogEntry.OnInteract", f);
-	end);
-
-	EventRegistry:UnregisterCallback("HousingCatalogEntry.OnInteract", f)
 end
 
 
@@ -341,65 +334,6 @@ local function ModifyContextMenu()
 end
 
 
-local EnableLinkDecorToChat;
-do
-	local Dummy = {};
-
-	function Dummy.OnInteract(_, catalogEntry, button, isDrag)
-		if button == "LeftButton" and not isDrag then
-			if IsInStorageView() then return end;
-
-			local itemID = Housing.GetDecorItemID(catalogEntry.entryInfo.entryID.recordID);
-			if API.ChatLinkItem(itemID) then
-				return
-			end
-
-			if ContentTrackingUtil.IsTrackingModifierDown() then
-				if C_ContentTracking.IsTracking(Enum.ContentTrackingType.Decor, catalogEntry.entryInfo.entryID.recordID) then
-					C_ContentTracking.StopTracking(Enum.ContentTrackingType.Decor, catalogEntry.entryInfo.entryID.recordID, Enum.ContentTrackingStopType.Manual);
-					PlaySound(SOUNDKIT.CONTENT_TRACKING_STOP_TRACKING);
-				else
-					local error = C_ContentTracking.StartTracking(Enum.ContentTrackingType.Decor, catalogEntry.entryInfo.entryID.recordID);
-					if error then
-						ContentTrackingUtil.DisplayTrackingError(error);
-					else
-						PlaySound(SOUNDKIT.CONTENT_TRACKING_START_TRACKING);
-						PlaySound(SOUNDKIT.CONTENT_TRACKING_OBJECTIVE_TRACKING_START);
-					end
-				end
-			else
-				PlaySound(SOUNDKIT.HOUSING_CATALOG_ENTRY_SELECT);
-				local CatalogContent = HousingDashboardFrame and HousingDashboardFrame.CatalogContent;
-				if CatalogContent and CatalogContent:IsVisible() then
-					CatalogContent.PreviewFrame:PreviewCatalogEntryInfo(catalogEntry.entryInfo);
-					CatalogContent.PreviewFrame:Show();
-				end
-			end
-		end
-	end
-
-	function Dummy.TooltipCreated(_, catalogEntry, tooltip)
-		local itemID = Housing.GetDecorItemID(catalogEntry.entryInfo.entryID.recordID);
-		if itemID then
-			C_Item.GetItemInfo(itemID);
-		end
-	end
-
-
-	function EnableLinkDecorToChat(state)
-		if addon.IS_12_0_5 then return; end
-
-		if state then
-			EventRegistry:RegisterCallback("HousingCatalogEntry.OnInteract", Dummy.OnInteract, Dummy);
-			EventRegistry:RegisterCallback("HousingCatalogEntry.TooltipCreated", Dummy.TooltipCreated, Dummy);
-		else
-			EventRegistry:UnregisterCallback("HousingCatalogEntry.OnInteract", Dummy);
-			EventRegistry:UnregisterCallback("HousingCatalogEntry.TooltipCreated", Dummy);
-		end
-	end
-end
-
-
 do
 	local function EnableModule(state)
 		if state then
@@ -414,8 +348,6 @@ do
 				addon.CallbackRegistry:UnregisterAddOnLoadedCallback(v.name, v.callback);
 			end
 		end
-
-		EnableLinkDecorToChat(state);
 	end
 
 	local moduleData = {

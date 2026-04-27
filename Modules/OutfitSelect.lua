@@ -61,8 +61,8 @@ local RepositionFrame;
 local CreateRepositionFrame;
 
 
-local IS_12_0_5 = C_TransmogOutfitInfo.ChangeToOutfit ~= nil;
-local ToggleOutfitSelectFrame;	--For 12.0.5+
+local USE_STANDALONE_UI = false;	-- Users started to notice the missing Lock Appearance function, so we cannot use our own UI until Blizzard add an API to achieve that.
+local ToggleOutfitSelectFrame;	-- For 12.0.5+
 
 
 do  -- DragButton On TransmogFrame
@@ -395,7 +395,7 @@ do  --SecureHandler
 			return
 		end
 
-		if IS_12_0_5 then
+		if USE_STANDALONE_UI then
 			ToggleOutfitSelectFrame();
 			return;
 		end

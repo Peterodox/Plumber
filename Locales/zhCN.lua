@@ -866,6 +866,11 @@ L["ModuleName PreyQuestSuperTrack"] = "狩猎：目标最终位置追踪";
 L["ModuleDescription PreyQuestSuperTrack"] = "当你知晓狩猎目标的最终位置后，点击狩猎进度指示器会将追踪此位置以便于你导航。";
 
 
+--BlizzFixActionBarArt
+L["ModuleName BlizzFixActionBarArt"] = "动作条装饰修复";
+L["ModuleDescription BlizzFixActionBarArt"] = "修复被你隐藏的动作条装饰在隐藏/显示游戏界面或退出住宅编辑器后重现的问题。";
+
+
 --Generic
 L["Total Colon"] = "总计：";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally

@@ -730,8 +730,6 @@ do  --SecureControllerPool
 					handler:SetAttribute("customMacroText"..i, action.macroText);
 				end
 			end
-		else
-
 		end
 
 		handler:SetScript("PreClick", function()

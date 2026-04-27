@@ -1518,13 +1518,10 @@ do  -- Instance -- Map
 
 
 	function API.IsPlayerInInstance()
-		local state = IsInInstance();
-		if state then
-			return true
-		end
-
 		local _, instanceType = GetInstanceInfo();
-		if instanceType == "scenario" then
+		if (not instanceType) or instanceType == "none" then
+			return false
+		else
 			return true
 		end
 	end

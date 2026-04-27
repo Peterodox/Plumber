@@ -898,6 +898,11 @@ L["ModuleName PreyQuestSuperTrack"] = "Prey: Target Waypoint";
 L["ModuleDescription PreyQuestSuperTrack"] = "Once your Prey target's location is revealed, clicking the Hunt Progress widget will also set a waypoint to that location.";
 
 
+--BlizzFixActionBarArt
+L["ModuleName BlizzFixActionBarArt"] = "Blitz Fix: Action Bar Art";
+L["ModuleDescription BlizzFixActionBarArt"] = "Fixed an issue where Action Bar Art (gryphons and wyverns) reappears unexpectedly after Hiding/Showing UI or exiting House Editor.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally

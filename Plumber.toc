@@ -90,6 +90,8 @@ Modules\CatalystUI.lua
 Modules\HuntTable.lua
 Modules\PreyQuestSuperTrack.lua
 
+Modules\BlizzFix_EndCaps.lua
+
 
 #Modules\MerchantUI\MerchantUI.xml
 

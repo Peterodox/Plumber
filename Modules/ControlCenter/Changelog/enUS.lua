@@ -11,8 +11,32 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10901] = {
 	{
 		type = "date",
-		versionText = "1.9.1 b",
-		timestamp = 1776900000,
+		versionText = "1.9.1 b-c",
+		timestamp = 1777200000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Action Bar Art: Added a new module to fix the issue where the Action Bar Art (gryphons and wyverns) reappears unexpectedly after Hiding/Showing UI or exiting House Editor.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Outfit Collection Quick Access: You can once again Lock Appearance using the minimized outfit list.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber Home Macro: If you have two houses, clicking the Teleport Home macro will now open a pop-up to let you choose.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Nameplate Quest Indicator: Fixed an error that occurred whenever you hovered over an NPC in Delves or Ritual Sites.",
 	},
 
 	{

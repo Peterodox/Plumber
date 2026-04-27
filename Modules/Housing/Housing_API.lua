@@ -238,7 +238,7 @@ do  --House Level / Info / Teleport
 			end
 		end
 
-		addon.CallbackRegistry:Trigger("Macro.UpdateDrawers");
+		addon.CallbackRegistry:Trigger("Macro.UpdateMacros");
 	end
 
 	function DataProvider:OnHouseListUpdated(houseInfoList)

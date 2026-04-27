@@ -86,6 +86,34 @@ do  --Teleport Home Macro    #plumber:home
 		return addon.AcquireCharacterMacro(COMMAND_HOME, Generator_home)
 	end
 
+
+	local function GetOverrideDrawerInfo()
+		local actionType = "teleportHome";
+
+		local icon, macroText, name = GetDynamicTeleportAllianceAction();
+		local info1 = {
+			tooltipLineText = name,
+			icon = icon,
+			actionType = actionType,
+			id = 1,
+			usable = true,
+			macroText = macroText,
+		};
+
+		icon, macroText, name = GetDynamicTeleportHordeAction();
+		local info2 = {
+			tooltipLineText = name,
+			icon = icon,
+			actionType = actionType,
+			id = 2,
+			usable = true,
+			macroText = macroText,
+		};
+
+		return {info1, info2};
+	end
+	Housing.GetOverrideDrawerInfo_TeleportHome = GetOverrideDrawerInfo;
+
 	local TeleportHomeCommand = {
 		command = COMMAND_HOME,
 		name = L["PlumberMacro Housing"],
@@ -98,6 +126,9 @@ do  --Teleport Home Macro    #plumber:home
 		},
 
 		writeFunc = WriteFunc_home,
+
+		shouldUseDrawer = Housing.DoesPlayerHaveMultipleHomes,
+		getOverrideDrawerInfo = GetOverrideDrawerInfo,
 	};
 
 	table.insert(Commands, TeleportHomeCommand);
