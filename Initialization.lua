@@ -246,6 +246,7 @@ local DefaultValues = {
 	CatalystUI = true,					--Allow Ctrl-Click to preview items in Dressing Room for UIs that don't natively support this action
 	HuntTable = true,					--Replace generic quest icons with difficulties and add achievement indicators.
 	PreyQuestSuperTrack = true,			--During the final stage, clicking the Prey widget also super track the target location.
+	BlizzFixActionBarArt = true,		--Fix Action Bar Art Reappears After Hide/Show UI
 
 
 	--Tooltip
