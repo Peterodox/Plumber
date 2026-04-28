@@ -272,6 +272,7 @@ L["ModuleName TooltipTransmogEnsemble"] = "Ensembles de transmogrification";
 L["ModuleDescription TooltipTransmogEnsemble"] = "- Affiche le nombre d'apparences d'un ensemble à collectionner.\n\n- Correction du problème où l'infobulle indiquait « Déjà connu » mais vous pouviez quand même l'utiliser pour débloquer de nouvelles apparences.";
 L["Collected Appearances"] = "Apparences collectées";
 L["Collected Items"] = "Objets collectés";
+L["Other Player Classes"] = "Autres classes de joueurs";
 
 
 --Tooltip Housing
@@ -726,6 +727,7 @@ L["Item Expire Alert Weekly"] = "Cet objet disparaîtra après la réinitialisat
 L["Delves Completion Reward Cap"] = "Récompenses de complétion";
 L["Delves Completion Reward Cap Tooltip"] = "Une fois cette limite de compte atteinte, terminer un gouffre abondant ne vous accordera plus de progression pour le Périple du Gouffre ni d'expérience de compagnon.\n\nLes récompenses des coffres abondants et des Caches de Némésis ne sont pas affectées par cette limite.\n\nLa limite augmente de 28 chaque semaine.";
 L["Near Completion Tooltip"] = "Cette entrée est visible car vous êtes sur le point d'atteindre la limite hebdomadaire.";
+L["Inactive Currencies Tooltip"] = "Ces Monnaies sont masquées car vous les avez définies comme inutilisées :";
 
 
 --ExpansionSummaryMinimapButton
@@ -827,8 +829,8 @@ L["ModuleDescription Housing_ItemAcquiredAlert"] = "Clic gauche sur l'alerte « 
 
 --Housing Clock
 L["ModuleName Housing_Clock"] = "Éditeur : horloge";
-L["ModuleDescription Housing_Clock"] = "Lors de l'utilisation de l'éditeur de maison, afficher une horloge en haut de l'écran.";
-L["Time Spent In Editor"] = "Temps passé dans l'éditeur";
+L["ModuleDescription Housing_Clock"] = "Pendant l'utilisation de l'Éditeur de maison, afficher une horloge en haut de l'écran.\n\nEnregistre également le temps d'utilisation.";
+L["Time Spent In Editor"] = "Temps passé dans l'Éditeur";
 L["This Session Colon"] = "Cette session : ";
 L["Time Spent Total Colon"] = "Total : ";
 L["Right Click Show Settings"] = "Clic droit pour afficher les paramètres.";
@@ -893,7 +895,12 @@ L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition req
 
 --PreyQuestSuperTrack
 L["ModuleName PreyQuestSuperTrack"] = "Traque : point de passage des cibles";
-L["ModuleDescription PreyQuestSuperTrack"] = "Une fois la position de votre proie révélée, un clic sur le widget de progression de la traque définira également un point de repère vers cette position.";
+L["ModuleDescription PreyQuestSuperTrack"] = "Une fois la position de votre proie révélée, cliquer sur le widget de progression de la traque définira également un point de repère vers cette position.";
+
+
+--BlizzFixActionBarArt
+L["ModuleName BlizzFixActionBarArt"] = "Blitz Fix : illustration de la barre d'action";
+L["ModuleDescription BlizzFixActionBarArt"] = "Correction d'un problème où les illustrations de la barre d'action (Griffons et Wyvernes) réapparaissaient de manière inattendue après avoir masqué / affiché l'interface utilisateur ou quitté l'Éditeur de maison.";
 
 
 --Generic
