@@ -44,7 +44,7 @@ do
 		dbKey = "BlizzFixActionBarArt",
 		description = addon.L["ModuleDescription BlizzFixActionBarArt"],
 		toggleFunc = EnableModule,
-		moduleAddedTime = 1755200000,
+		moduleAddedTime = 1777500000,
 		categoryKeys = {
 			"Housing",
 		},
