@@ -9,6 +9,11 @@ local function TempFix_RestoreActionBarEndCaps()
 	MainActionBar.EndCaps:SetShown(MainActionBar.BorderArt:IsShown());
 end
 
+local function OnEvent()
+	-- Just one UPDATE_OVERRIDE_ACTIONBAR
+	TempFix_RestoreActionBarEndCaps();
+end
+
 local function EnableModule(state)
 	if state then
 		if not UIParentTracker then
@@ -19,12 +24,16 @@ local function EnableModule(state)
 					TempFix_RestoreActionBarEndCaps();
 				end
 			end);
+
+			UIParentTracker:SetScript("OnEvent", OnEvent);
 		end
 		UIParentTracker.enabled = true;
+		UIParentTracker:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR");
 		TempFix_RestoreActionBarEndCaps();
 	else
 		if UIParentTracker then
 			UIParentTracker.enabled = false;
+			UIParentTracker:UnregisterEvent("UPDATE_OVERRIDE_ACTIONBAR");
 		end
 	end
 end
