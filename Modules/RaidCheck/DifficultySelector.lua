@@ -92,6 +92,8 @@ local function ShowLockoutTooltip(self, instanceName, difficultyName, instanceID
 	tooltip:AddDoubleLine(instanceName, difficultyName);
 	tooltip:SetCustomLineSpacing(4);
 
+	local currentDifficultyID = self.encounters[1].difficultyID;
+
 	for i, v in ipairs(self.encounters) do
 		local hasDefeated = v.dungeonEncounterID and IsEncounterComplete(instanceID, v.dungeonEncounterID, v.difficultyID);
 		if i % 5 == 1 then
@@ -110,9 +112,22 @@ local function ShowLockoutTooltip(self, instanceName, difficultyName, instanceID
 			tooltip:AddLine(L["Cannot Change Difficulty"], 1, 0.125, 0.125, true);
 		end
 
-		if SelectorUI.isRaid and API.HasActiveChatBox() and SelectorUI:CanLinkProgress(self.encounters[1].difficultyID) then
+		if SelectorUI.isRaid and API.HasActiveChatBox() and SelectorUI:CanLinkProgress(currentDifficultyID) then
 			tooltip:AddLine(" ");
 			tooltip:AddLine(L["Instruction Link Progress In Chat"], 0.098, 1.000, 0.098, true);
+		end
+	end
+
+	if SelectorUI.isSharedLockout then
+		tooltip:AddLine(" ");
+		if SelectorUI.lockedDifficultyID then
+			if SelectorUI.lockedDifficultyID == currentDifficultyID then
+				tooltip:AddLine(L["Difficulty Locked To Current Alert"], 1, 0.82, 0, true);
+			else
+				tooltip:AddLine(L["Difficulty Locked To Format"]:format(API.GetRaidDifficultyString(SelectorUI.lockedDifficultyID)), 1, 0.125, 0.125, true);
+			end
+		else
+			tooltip:AddLine(L["Shared Difficulty Alert"], 1, 0.82, 0, true);
 		end
 	end
 
@@ -597,6 +612,7 @@ do  --SelectorUI
 		if event == "PLAYER_DIFFICULTY_CHANGED" then
 			self:UpdateDifficulty(true);
 		elseif event == "UPDATE_INSTANCE_INFO" then
+			self:UpdateLockedDifficultyID();
 			self:UpdateInstanceProgress();
 		elseif event == "GROUP_ROSTER_UPDATE" or event == "PARTY_LEADER_CHANGED" then
 			self:RequestUpdate();
@@ -708,7 +724,9 @@ do  --SelectorUI
 				end
 
 				self.isLegacyRaid = instanceInfo.isLegacyRaid;
+				self.isSharedLockout = self.isLegacyRaid and IsLegacyDifficulty(self.fallbackDifficultyID);
 
+				self:UpdateLockedDifficultyID();
 				self:UpdateDifficulty(false);
 				self.hasInstanceData = true;
 			else
@@ -867,6 +885,31 @@ do  --SelectorUI
 		local index = self:GetSavedInstanceIndex(difficultyID);
 		if index then
 			return API.ChatInsertLink(GetSavedInstanceChatLink(index));  --Dungeon progress sent as plain text for some reason?
+		end
+	end
+
+	function SelectorUI:UpdateLockedDifficultyID()
+		-- For legacy raids pre SoO
+
+		self.difficultyID = nil;
+
+		if self.isSharedLockout and self.isValidDifficulty then
+			for difficultyID in pairs(self.isValidDifficulty) do
+				local encounters = GetInstanceEncounters(self.journalInstanceID, difficultyID);
+				local anyComplete;
+				if encounters then
+					for _, v in ipairs(encounters) do
+						if v.dungeonEncounterID and IsEncounterComplete(self.instanceID, v.dungeonEncounterID, difficultyID) then
+							self.lockedDifficultyID = difficultyID;
+							anyComplete = true;
+							break;
+						end
+					end
+				end
+				if anyComplete then
+					--print("Active Lockout on:", API.GetRaidDifficultyString(difficultyID));
+				end
+			end
 		end
 	end
 end

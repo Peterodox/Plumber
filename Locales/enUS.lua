@@ -764,6 +764,9 @@ L["Instruction Alt Click To Reset Instance"] = "Alt Right-Click: |cffffffffReset
 L["Instruction Link Progress In Chat"] = "<Shift click to post progress in chat>";
 L["Instance Name"] = "Instance Name";   --Dungeon/Raid Name
 L["EditMode Instruction InstanceDifficulty"] = "The frame width is affected by the number of available options.";
+L["Difficulty Locked To Format"] = "The instance is locked to |cffffffff%s|r due to boss kill.";
+L["Difficulty Locked To Current Alert"] = "The instance is locked to this difficulty due to boss kill.";
+L["Shared Difficulty Alert"] = "Defeating a boss will lock the instance to this difficulty.";
 
 
 --TransmogChatCommand
