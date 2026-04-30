@@ -407,6 +407,7 @@ if true then    --Secret Debug
 
 	local CVars = {
 		"ChallengeMode",
+		"Chat",
 		"Combat",
 		"Encounter",
 		"Map",
@@ -414,7 +415,7 @@ if true then    --Secret Debug
 	};
 
 	for _, v in ipairs(CVars) do
-		C_CVar.SetCVar("secret"..v.."RestrictionsForced", value);
+		C_CVar.SetCVar("addon"..v.."RestrictionsForced", value);
 	end
 end
 
