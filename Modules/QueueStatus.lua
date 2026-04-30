@@ -262,7 +262,11 @@ do
 				--print(tankNeeds, healerNeeds, dpsNeeds);
 				--print(totalTanks, totalHealers, totalDPS);
 				--print(averageWait, myWait, queuedTime);
-				if averageWait > 0 then
+				if averageWait then
+					-- Dungeon Queues in Chromie Time show no Estimated Queue Time (averageWait = -1)
+					averageWait = averageWait < 0 and 0 or averageWait;
+					myWait = myWait < 0 and 0 or myWait;
+
 					local total = totalTanks + totalHealers + totalDPS;
 					if total <= 1 then
 						percentage = 1;

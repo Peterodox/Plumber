@@ -11,14 +11,26 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10901] = {
 	{
 		type = "date",
-		versionText = "1.9.1 b-c",
-		timestamp = 1777200000,
+		versionText = "1.9.1 b-d",
+		timestamp = 1777500000,
 	},
 
 	{
 		type = "p",
 		bullet = true,
-		text = "Action Bar Art: Added a new module to fix the issue where the Action Bar Art (gryphons and wyverns) reappears unexpectedly after Hiding/Showing UI or exiting House Editor.",
+		text = "Instance Difficulty Selector: The lockout tooltip will inform you if the difficulty cannot be changed due to a boss being defeated. Note: Applies only to pre-Siege of Orgrimmar raids.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Queue Status: It now works on queues that have no estimated wait time.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Action Bar Art: Added a new module to fix the issue where the Action Bar Art (gryphons and wyverns) reappears unexpectedly after Hiding/Showing UI or exiting House Editor or vehicles.",
 	},
 
 	{

@@ -733,6 +733,9 @@ L["Instruction Alt Click To Reset Instance"] = "按住Alt并右键单击：|cfff
 L["Instruction Link Progress In Chat"] = "<按住Shift点击将副本进度链接到聊天框内>";
 L["Instance Name"] = "副本名称";
 L["EditMode Instruction InstanceDifficulty"] = "此窗口的实际宽度由选项数量决定。";
+L["Difficulty Locked To Format"] = "此副本难度被锁定为|cffffffff%s|r，因为你已击败了一个首领。";
+L["Difficulty Locked To Current Alert"] = "此副本难度被锁定为当前难度，因为你已击败了一个首领。";
+L["Shared Difficulty Alert"] = "击败任何一个首领将会使副本锁定至此难度。";
 
 
 --TransmogChatCommand
