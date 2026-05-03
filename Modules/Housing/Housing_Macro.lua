@@ -22,7 +22,7 @@ do  --Teleport Home Macro    #plumber:home
 
 	local function GetDynamicTeleportAction()
 		local icon, macro, tooltip;
-		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+		if not Housing.ShouldShowTeleportToPlot() then
 			icon = 236350;
 			macro = Housing.GetLeaveHomeMacro();
 			tooltip = L["Leave Home"];
@@ -37,7 +37,7 @@ do  --Teleport Home Macro    #plumber:home
 
 	local function GetDynamicTeleportAllianceAction()
 		local icon, macro, tooltip;
-		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+		if not Housing.ShouldShowTeleportToPlot(1) then
 			icon = 236350;
 			macro = Housing.GetLeaveHomeMacro();
 			tooltip = L["Leave Home"];
@@ -52,7 +52,7 @@ do  --Teleport Home Macro    #plumber:home
 
 	local function GetDynamicTeleportHordeAction()
 		local icon, macro, tooltip;
-		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+		if not Housing.ShouldShowTeleportToPlot(2) then
 			icon = 236350;
 			macro = Housing.GetLeaveHomeMacro();
 			tooltip = L["Leave Home"];

@@ -776,6 +776,7 @@ stds.wow = {
 		C_Housing = {
 			fields = {
 				"GetCurrentHouseLevelFavor",
+				"GetCurrentNeighborhoodGUID",
 				"GetHouseLevelFavorForLevel",
 				"GetPlayerOwnedHouses",
 				"GetUIMapIDForNeighborhood",
