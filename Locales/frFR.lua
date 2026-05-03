@@ -389,7 +389,7 @@ L["Chat Leave All Characters"] = "Quitter sur tous les personnages";
 L["Chat Leave All Characters Tooltip"] = "Vous quitterez automatiquement ce canal lorsque vous vous connecterez sur un personnage.";
 L["Chat Auto Leave Alert Format"] = "Souhaitez-vous quitter automatiquement |cffffc0c0[%s]|r sur tous vos personnages ?";
 L["Chat Auto Leave Cancel Format"] = "Quitter Auto. a été désactivé pour %s. Veuillez utiliser la commande « /join » pour rejoindre le canal.";
-L["Auto Leave Channel Format"] = "Quitter Auto. \"%s\"";
+L["Auto Leave Channel Format"] = "Quitter auto. \"%s\"";
 L["Click To Disable"] = "Cliquer pour désactiver";
 
 
@@ -502,7 +502,7 @@ L["ModuleDescription LegionRemix_LFGSpam"] = "Supprimer le message indésirable 
 L["Artifact Weapon"] = "Arme prodigieuse";
 L["Artifact Ability"] = "Pouvoir prodigieux";
 L["Artifact Traits"] = "Traits prodigieux";
-L["Earn X To Upgrade Y Format"] = "Obtenez encore |cffffffff%s|r %s pour améliorer %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Earn X To Upgrade Y Format"] = "Obtenez à nouveau |cffffffff%s|r %s pour améliorer %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
 L["Until Next Upgrade Format"] = "%s avant la prochaine amélioration";
 L["New Trait Available"] = "Nouveau trait disponible.";
 L["Rank Format"] = "Rang %s";
@@ -764,6 +764,9 @@ L["Instruction Alt Click To Reset Instance"] = "Alt + Clic droit : |cffffffffRé
 L["Instruction Link Progress In Chat"] = "<Maj + Clic pour poster la progression dans le chat>";
 L["Instance Name"] = "Nom de l'instance";   --Dungeon/Raid Name
 L["EditMode Instruction InstanceDifficulty"] = "La largeur du cadre dépend du nombre d'options disponibles.";
+L["Difficulty Locked To Format"] = "L'instance est verrouillée sur |cffffffff%s|r suite à la mort du boss.";
+L["Difficulty Locked To Current Alert"] = "L'instance est verrouillée à ce niveau de difficulté suite à la mort du boss.";
+L["Shared Difficulty Alert"] = "Vaincre un boss bloquera l'instance à ce niveau de difficulté.";
 
 
 --TransmogChatCommand
@@ -890,7 +893,7 @@ L["ModuleDescription CatalystUI"] = "Ctrl + Clic sur l'objet obtenu pour l'affic
 --HuntTable
 L["ModuleName HuntTable"] = "Traque : table de traque";
 L["ModuleDescription HuntTable"] = "- Remplacer les icônes de quête bleues pour indiquer les difficultés.\n\n- Afficher un indicateur si la cible de la Traque est une condition requise pour un haut fait non réalisé.";
-L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition requise pour obtenir un haut fait non réalisé .";
+L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition requise pour obtenir un haut fait non réalisé.";
 
 
 --PreyQuestSuperTrack
@@ -899,7 +902,7 @@ L["ModuleDescription PreyQuestSuperTrack"] = "Une fois la position de votre proi
 
 
 --BlizzFixActionBarArt
-L["ModuleName BlizzFixActionBarArt"] = "Blitz Fix : illustration de la barre d'action";
+L["ModuleName BlizzFixActionBarArt"] = "Correction Blitz : illustration de la barre d'action";
 L["ModuleDescription BlizzFixActionBarArt"] = "Correction d'un problème où les illustrations de la barre d'action (Griffons et Wyvernes) réapparaissaient de manière inattendue après avoir masqué / affiché l'interface utilisateur ou quitté l'Éditeur de maison.";
 
 
