@@ -2358,6 +2358,40 @@ function TrackerFrame:ParentTo_Baganator()
 	end
 end
 
+function TrackerFrame:ParentTo_EnhanceQoL()
+	local api = _G.EnhanceQoL and _G.EnhanceQoL.Bags and _G.EnhanceQoL.Bags.API and _G.EnhanceQoL.Bags.API;
+	if not (api and api.RegisterFooterRegion) then return end;
+
+	self.isBlizzardBag = false;
+	self:SetShowBackground(false);
+	self:SetScript("OnShow", TrackerFrame_Update_OnShow);
+	self:Show();
+	self:SetClampedToScreen(false);
+	self:ClearAllPoints();
+	self.Border:ClearAllPoints();
+	self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
+
+	local RegionDummy = CreateFrame("Frame");
+	RegionDummy:SetSize(16, 12);
+	self:SetParent(RegionDummy);
+	self:SetPoint("LEFT", RegionDummy, "LEFT", 0, -1);
+
+	self:SetTrayButtonFont("GameFontHighlight");
+
+	api.RegisterFooterRegion("plumber", RegionDummy, {
+		side = "left",
+		priority = 50,
+	});
+
+	if api.RequestLayoutRefresh then
+		function TrackerFrame:SetFrameWidth(width)
+			TrackerFrame:SetWidth(width);
+			RegionDummy:SetWidth(width);
+			api.RequestLayoutRefresh();
+		end
+	end
+end
+
 function TrackerFrame:ParentTo_BetterBags()
 	local parent = BetterBagsBagBackpack;
 
@@ -2460,6 +2494,12 @@ local function AnchorToCompatibleAddOn()
 			TrackerFrame.UpdateAnchor = DoesNothing;
 			TrackerFrame:ParentTo_LiteBag();
 			--This addon is using stock searchbox
+		end
+	elseif IsAddOnLoaded("EnhanceQoL") then
+		if _G.EnhanceQoL and _G.EnhanceQoL.Bags and _G.EnhanceQoL.Bags.API and _G.EnhanceQoL.Bags.API.IsAvailable and _G.EnhanceQoL.Bags.API.IsAvailable() then
+			TrackerFrame.UpdateAnchor = DoesNothing;
+			TrackerFrame:ParentTo_EnhanceQoL();
+			GetSearchBox = GetAddOnSearchBox.Nop;
 		end
 	elseif IsAddOnLoaded("Baganator") then
 		TrackerFrame.UpdateAnchor = DoesNothing;
