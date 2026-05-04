@@ -59,6 +59,7 @@ read_globals = {
 	"EditModeManagerExpandedFrame",
 	"ElvUI",
 	"ElvUI_ContainerFrame",
+	"EnhanceQoL",
 	"GwDressingRoom",
 	"GwDressingRoomGear",
 	"ImmersionFrame",
