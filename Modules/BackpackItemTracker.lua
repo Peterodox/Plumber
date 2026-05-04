@@ -11,19 +11,6 @@ local TRACK_UPGRADE_CURRENCY = true;    --DB.TrackItemUpgradeCurrency
 local TRACK_HOLIDAY_ITEM = true;        --DB.TrackHolidayItem
 local INSIDE_SEPARATE_BAG = false;
 
-local MAX_CUSTOM_ITEMS = 6;
-
-local BORDER_SHRINK = 2;
-local TRAY_FRAME_HEIGHT_BASE = 16;  --Single Row
-local TRAY_FRAME_MIN_WIDTH = 32;
-local TRAY_FRAME_MAX_WDITH = 384;
-local TRAY_FRAME_WIDTH_THRESHOLD = 240;
-local RECEPTOR_MIN_WIDTH = 128;
-
-local TRAY_BUTTON_GAP = 8;
-local TRAY_BUTTON_HEIGHT = 20;
-local TRAY_FRAME_SIDE_PADDING = 8;
-
 local BAG_FUNC_HOOKED = false;
 
 local FORMAT_ITEM_UNIQUE_MULTIPLE = ITEM_UNIQUE_MULTIPLE or "Unique (%d)";
@@ -56,6 +43,25 @@ local HolidayItems = {
 	brewfest = 37829,           --Brewfest Prize Token
 	hallowsendend = 33226,      --Tricky Treat
 	--winterveil
+};
+
+local Def = {
+	MaxCustomItems = 6,
+
+	TrayButtonIconSize = 12,
+	TrayButtonGap = 8,
+	TrayButtonHeight = 20,
+	TrayButtonIconTextGap = 2,
+	TrayButtonIconPosition = "RIGHT",
+
+	TrayFrameHeightBase = 16, --Single Row
+	TrayFrameMinWidth = 32,
+	TrayFrameMaxWidth = 384,
+	TrayFrameSidePadding = 8,
+	TrayFrameWidthThreshold = 240,
+
+	BorderShrink = 2,
+	RecpetorMinWidth = 128,
 };
 
 
@@ -675,7 +681,7 @@ function SettingsFrame:Init()
 	local ICON_SIZE = 12;
 	local LIST_BUTTON_HEIGHT = 20;
 
-	local listHeight = LIST_BUTTON_HEIGHT * MAX_CUSTOM_ITEMS;
+	local listHeight = LIST_BUTTON_HEIGHT * Def.MaxCustomItems;
 
 	self.ListButtons = {};
 
@@ -836,7 +842,7 @@ function SettingsFrame:Init()
 		return b
 	end
 
-	for i = 1, MAX_CUSTOM_ITEMS do
+	for i = 1, Def.MaxCustomItems do
 		self.ListButtons[i] = CreateTokenListButton();
 		self.ListButtons[i]:SetPoint("TOPLEFT", f, "TOPLEFT", PADDING, -fullHeight);
 		self.ListButtons[i].index = i;
@@ -963,7 +969,7 @@ function SettingsFrame:UpdateListFrame()
 	local itemID;
 	local numActiveButton = 0;
 
-	for i = 1, MAX_CUSTOM_ITEMS do
+	for i = 1, Def.MaxCustomItems do
 		itemID = self.customList[i];
 		if itemID then
 			numActiveButton = numActiveButton + 1;
@@ -1028,21 +1034,18 @@ end
 do  --Tray Button: [itemCount][itemIcon]
 	TrackerFrame.TrayButtons = {};
 
-	local ICON_SIZE = 12;
-	local TEXT_ICON_GAP = 2;
 	local FONT_OBJECT = "GameFontHighlightSmall";
 
 	local TrayButtonMixin = {};
 
 	function TrayButtonMixin:OnLoad()
 		self.Icon = self:CreateTexture(nil, "ARTWORK");
-		self.Icon:SetSize(ICON_SIZE, ICON_SIZE);
-		self.Icon:SetPoint("RIGHT", self, "RIGHT", 0, 0);
 		self.Icon:SetTexCoord(0.0625, 0.9375, 0.0625, 0.9375);
 
 		self.Count = self:CreateFontString(nil, "ARTWORK", FONT_OBJECT);
-		self.Count:SetJustifyH("RIGHT");
-		self.Count:SetPoint("RIGHT", self.Icon, "LEFT", -TEXT_ICON_GAP, 0);
+
+		self:SetIconSize(Def.TrayButtonIconSize);
+		self:SetIconPosition(Def.TrayButtonIconPosition);
 
 		self:SetScript("OnEnter", self.OnEnter);
 		self:SetScript("OnLeave", self.OnLeave);
@@ -1051,7 +1054,7 @@ do  --Tray Button: [itemCount][itemIcon]
 
 		self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 		self:RegisterForDrag("LeftButton");
-		self:SetSize(TRAY_BUTTON_HEIGHT, TRAY_BUTTON_HEIGHT);
+		self:SetSize(Def.TrayButtonHeight, Def.TrayButtonHeight);
 	end
 
 	function TrayButtonMixin:OnEnter()
@@ -1080,12 +1083,31 @@ do  --Tray Button: [itemCount][itemIcon]
 		end
 	end
 
-	function TrayButtonMixin:OnDragStart(button)
+	function TrayButtonMixin:OnDragStart()
 		SettingsFrame:ShowUI();
 	end
 
-	function TrayButtonMixin:UpdateAndRetureWidth()
-		local width = math.floor(self.Count:GetWrappedWidth() + TEXT_ICON_GAP + ICON_SIZE + 0.5);
+	function TrayButtonMixin:SetIconSize(size)
+		self.iconSize = size;
+		self.Icon:SetSize(size, size);
+	end
+
+	function TrayButtonMixin:SetIconPosition(position)
+		self.Icon:ClearAllPoints();
+		self.Count:ClearAllPoints();
+		if position == "LEFT" then
+			self.Icon:SetPoint("LEFT", self, "LEFT", 0, 0);
+			self.Count:SetJustifyH("LEFT");
+			self.Count:SetPoint("LEFT", self.Icon, "RIGHT", Def.TrayButtonIconTextGap, 0);
+		else
+			self.Icon:SetPoint("RIGHT", self, "RIGHT", 0, 0);
+			self.Count:SetJustifyH("RIGHT");
+			self.Count:SetPoint("RIGHT", self.Icon, "LEFT", -Def.TrayButtonIconTextGap, 0);
+		end
+	end
+
+	function TrayButtonMixin:UpdateAndReturnWidth()
+		local width = math.floor(self.Count:GetWrappedWidth() + Def.TrayButtonIconTextGap + self.iconSize + 0.5);
 		self:SetWidth(width);
 		self.width = width;
 		return width
@@ -1120,11 +1142,7 @@ do  --Tray Button: [itemCount][itemIcon]
 
 		end
 
-		if anyChange then
-			return self:UpdateAndRetureWidth();
-		else
-			return self.width
-		end
+		return self:UpdateAndReturnWidth();
 	end
 
 	function TrayButtonMixin:SetCurrency(currencyID)
@@ -1141,7 +1159,7 @@ do  --Tray Button: [itemCount][itemIcon]
 		if not info then
 			self.Count:SetText("??");
 			self.Icon:SetTexture(134400);
-			return self:UpdateAndRetureWidth();
+			return self:UpdateAndReturnWidth();
 		end
 
 		local count = info.quantity or 0;
@@ -1164,11 +1182,7 @@ do  --Tray Button: [itemCount][itemIcon]
 			end
 		end
 
-		if anyChange then
-			return self:UpdateAndRetureWidth();
-		else
-			return self.width
-		end
+		return self:UpdateAndReturnWidth();
 	end
 
 	function TrayButtonMixin:SetToken(id)
@@ -1189,9 +1203,9 @@ do  --Tray Button: [itemCount][itemIcon]
 			b:OnLoad();
 			b:ClearAllPoints();
 			if i == 1 then
-				b:SetPoint("LEFT", self, "LEFT", TRAY_FRAME_SIDE_PADDING, 0);
+				b:SetPoint("LEFT", self, "LEFT", Def.TrayFrameSidePadding, 0);
 			else
-				b:SetPoint("LEFT", self.TrayButtons[i - 1], "RIGHT", TRAY_BUTTON_GAP, 0);
+				b:SetPoint("LEFT", self.TrayButtons[i - 1], "RIGHT", Def.TrayButtonGap, 0);
 			end
 			self.TrayButtons[i] = b;
 		end
@@ -1301,11 +1315,12 @@ do  --Tray Button: [itemCount][itemIcon]
 		end
 	end
 
-	function TrackerFrame:SetTrayButtonFont(fontObject)
+	function TrackerFrame:SetTrayButtonFontObject(fontObject)
 		FONT_OBJECT = fontObject;
 		for _, button in pairs(self.TrayButtons) do
+			button.itemID = nil;
+			button.currencyID = nil;
 			button.Count:SetFontObject(fontObject);
-			button.Count:SetJustifyH("RIGHT");
 		end
 	end
 end
@@ -1320,7 +1335,7 @@ do
 	f:SetParent(parent);
 
 	f:Hide();
-	f:SetSize(TRAY_FRAME_MIN_WIDTH, TRAY_FRAME_HEIGHT_BASE);
+	f:SetSize(Def.TrayFrameMinWidth, Def.TrayFrameHeightBase);
 	--f:SetPoint("LEFT", parent, "LEFT", 0, 0);
 	f:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, -64);    --child of UIParent
 
@@ -1328,8 +1343,8 @@ do
 	bg:SetCornerSize(8);
 	f.Background = bg;
 	bg:SetFrameLevel(f:GetFrameLevel() - 1);
-	bg:SetPoint("TOPLEFT", f, "TOPLEFT", BORDER_SHRINK, -BORDER_SHRINK);
-	bg:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -BORDER_SHRINK, BORDER_SHRINK);
+	bg:SetPoint("TOPLEFT", f, "TOPLEFT", Def.BorderShrink, -Def.BorderShrink);
+	bg:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -Def.BorderShrink, Def.BorderShrink);
 
 	local border = addon.CreateNineSliceFrame(f, "NineSlice_GenericBox_Border"); --addon.CreateThreeSliceFrame(f, "WhiteBorderBlackBackdrop");
 	border:SetCornerSize(8);
@@ -1338,7 +1353,7 @@ do
 	border:SetColor(r, g, b);
 	border:SetFrameLevel(f:GetFrameLevel() + 10);
 	border:Hide();
-	border:SetSize(16, 16 - 2*BORDER_SHRINK);
+	border:SetSize(16, 16);
 	border:SetPoint("CENTER", f, "CENTER", 0, 0);
 
 	border.Instruction = border:CreateFontString(nil, "OVERLAY", "GameTooltipTextSmall");
@@ -1428,7 +1443,7 @@ function TrackerFrame:UpdateAnchor(forceUpdate)
 	local parent;
 
 	if useCombinedBags then
-		if self:GetWidth() < TRAY_FRAME_WIDTH_THRESHOLD then
+		if self:GetWidth() < Def.TrayFrameWidthThreshold then
 			anchorMode = 1;
 		else
 			anchorMode = 2;
@@ -1456,12 +1471,12 @@ function TrackerFrame:UpdateAnchor(forceUpdate)
 			self.Border:SetPoint("BOTTOMRIGHT", self.Background, "BOTTOMRIGHT", 0, 0);
 		else
 			self:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", -12, -4);
-			self.Border:SetPoint("RIGHT", self, "RIGHT", -BORDER_SHRINK, 0);
+			self.Border:SetPoint("RIGHT", self, "RIGHT", -Def.BorderShrink, 0);
 		end
 	else
 		parent = ContainerFrameCombinedBags;
 		self:SetParent(parent)
-		self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
+		self.Border:SetPoint("LEFT", self, "LEFT", Def.BorderShrink, 0);
 		if anchorMode == 1 then
 			--Anchor to MonenyFrame
 			self:SetShowBackground(false);
@@ -1537,7 +1552,7 @@ function TrackerFrame:UpdateState()
 end
 
 function TrackerFrame:CanTrackMoreItems()
-	return self.numCustomItems < MAX_CUSTOM_ITEMS
+	return self.numCustomItems < Def.MaxCustomItems
 end
 
 function TrackerFrame:IsTrackedItem(itemID)
@@ -1674,7 +1689,7 @@ do
 	local function TokenTray_Receptor_ShowWarning(self)
 		GameTooltip:Hide();
 		GameTooltip:SetOwner(self, "ANCHOR_CURSOR");
-		GameTooltip:AddLine(string.format(L["Item Track Too Many"], MAX_CUSTOM_ITEMS), 1.000, 0.282, 0.000, true);
+		GameTooltip:AddLine(string.format(L["Item Track Too Many"], Def.MaxCustomItems), 1.000, 0.282, 0.000, true);
 		GameTooltip:Show();
 	end
 
@@ -1822,12 +1837,12 @@ function TrackerFrame:UpdateTray(manual)
 			button:SetHeight(buttonHeight);
 			itemID = list[i];
 			width = button:SetToken(itemID);
-			rowWidth = rowWidth + width + TRAY_BUTTON_GAP;
+			rowWidth = rowWidth + width + Def.TrayButtonGap;
 			if rowWidth > maxRowWidth then
 				numRows = numRows + 1;
 				offsetX = paddingX;
 				offsetY = offsetY + buttonGapY + buttonHeight;
-				rowWidth = offsetX + width + TRAY_BUTTON_GAP;
+				rowWidth = offsetX + width + Def.TrayButtonGap;
 			end
 			itemID = tonumber(itemID);
 			if manual and not wasTracked[itemID] then
@@ -1836,7 +1851,7 @@ function TrackerFrame:UpdateTray(manual)
 
 			button:ClearAllPoints();
 			button:SetPoint("TOPLEFT", self, "TOPLEFT", offsetX, -offsetY);
-			offsetX = offsetX + width + TRAY_BUTTON_GAP;
+			offsetX = offsetX + width + Def.TrayButtonGap;
 		end
 
 		--UpdateHeight
@@ -1844,9 +1859,9 @@ function TrackerFrame:UpdateTray(manual)
 		if HIDE_ZERO_COUNT_ITEM and ItemDataProvider:HasZeroCountItem() then
 			self.ThreeDotButton:Show();
 
-			if rowWidth + TRAY_BUTTON_GAP + 20 > maxRowWidth then
+			if rowWidth + Def.TrayButtonGap + 20 > maxRowWidth then
 				numRows = numRows + 1;
-				offsetX = TRAY_FRAME_SIDE_PADDING;
+				offsetX = Def.TrayFrameSidePadding;
 				offsetY = offsetY + buttonGapY + buttonHeight;
 			end
 
@@ -1859,7 +1874,7 @@ function TrackerFrame:UpdateTray(manual)
 
 		local height;
 		if numRows == 1 then
-			height = TRAY_FRAME_HEIGHT_BASE;
+			height = Def.TrayFrameHeightBase;
 		else
 			height = numRows * (buttonGapY + buttonHeight) - buttonGapY + 2*paddingY;
 		end
@@ -1893,12 +1908,12 @@ function TrackerFrame:UpdateTray(manual)
 			end
 
 			if resetPoint then
-				button:SetHeight(TRAY_BUTTON_HEIGHT);
+				button:SetHeight(Def.TrayButtonHeight);
 				button:ClearAllPoints();
 				if i == 1 then
-					button:SetPoint("LEFT", self, "LEFT", TRAY_FRAME_SIDE_PADDING, 0);
+					button:SetPoint("LEFT", self, "LEFT", Def.TrayFrameSidePadding, 0);
 				else
-					button:SetPoint("LEFT", self.TrayButtons[i - 1], "RIGHT", TRAY_BUTTON_GAP, 0);
+					button:SetPoint("LEFT", self.TrayButtons[i - 1], "RIGHT", Def.TrayButtonGap, 0);
 				end
 			end
 		end
@@ -1906,8 +1921,8 @@ function TrackerFrame:UpdateTray(manual)
 		if resetPoint then
 			self.ThreeDotButton:ClearAllPoints();
 			self.ThreeDotButton:SetPoint("RIGHT", self, "RIGHT", 0, 0);
-			self.ThreeDotButton:SetHeight(TRAY_BUTTON_HEIGHT);
-			self:SetHeight(TRAY_FRAME_HEIGHT_BASE);
+			self.ThreeDotButton:SetHeight(Def.TrayButtonHeight);
+			self:SetHeight(Def.TrayFrameHeightBase);
 
 			C_Timer.After(0.01, function()
 				self:UpdateAnchor(true);
@@ -1915,7 +1930,7 @@ function TrackerFrame:UpdateTray(manual)
 		end
 
 		--UpdateWidth
-		fullWidth = fullWidth + 2*TRAY_FRAME_SIDE_PADDING + (numItems - 1)*TRAY_BUTTON_GAP;
+		fullWidth = fullWidth + 2 * Def.TrayFrameSidePadding + (numItems - 1) * Def.TrayButtonGap;
 
 		if HIDE_ZERO_COUNT_ITEM and ItemDataProvider:HasZeroCountItem() then
 			self.ThreeDotButton:Show();
@@ -1924,14 +1939,14 @@ function TrackerFrame:UpdateTray(manual)
 			self.ThreeDotButton:Hide();
 		end
 
-		if fullWidth < TRAY_FRAME_MIN_WIDTH then
-			fullWidth = TRAY_FRAME_MIN_WIDTH;
-		elseif fullWidth > TRAY_FRAME_MAX_WDITH then
-			fullWidth = TRAY_FRAME_MAX_WDITH;
+		if fullWidth < Def.TrayFrameMinWidth then
+			fullWidth = Def.TrayFrameMinWidth;
+		elseif fullWidth > Def.TrayFrameMaxWidth then
+			fullWidth = Def.TrayFrameMaxWidth;
 		end
 
 		self:SetFrameWidth(fullWidth);
-		self.Border:SetWidth(math.max(fullWidth, RECEPTOR_MIN_WIDTH));
+		self.Border:SetWidth(math.max(fullWidth, Def.RecpetorMinWidth));
 	end
 
 	self:UpdateAnchor();
@@ -1953,7 +1968,7 @@ function TrackerFrame:CalculateHeight()
 	if self.effectiveHeight then
 		return self.effectiveHeight + 3;
 	else
-		return TRAY_FRAME_HEIGHT_BASE
+		return Def.TrayFrameHeightBase
 	end
 end
 
@@ -2014,7 +2029,7 @@ end
 
 local RepositionUtil = {};
 
-RepositionUtil.minYSize = TRAY_FRAME_HEIGHT_BASE + 4;
+RepositionUtil.minYSize = Def.TrayFrameHeightBase + 4;
 
 function RepositionUtil:Start()
 	if not self.f then
@@ -2047,7 +2062,7 @@ function RepositionUtil:UpdateAnchor()
 	if (not self.x) or (not self.y) or (self.y > self.minYSize) then
 		anchorMode = 1;
 	else
-		if self.x > TRAY_FRAME_MAX_WDITH then
+		if self.x > Def.TrayFrameMaxWidth then
 			anchorMode = 2;
 		else
 			anchorMode = 3;
@@ -2074,15 +2089,15 @@ function RepositionUtil:SetAnchorMode(id)
 	if id == 1 then
 		--Bellow bag, align to Left
 		f:SetPoint("TOPLEFT", self.parent, "BOTTOMLEFT", 1, -2);
-		f.Border:SetPoint("LEFT", f, "LEFT", BORDER_SHRINK, 0);
+		f.Border:SetPoint("LEFT", f, "LEFT", Def.BorderShrink, 0);
 	elseif id == 2 then
 		--Left of bottom-left, align to Right
 		f:SetPoint("BOTTOMRIGHT", self.parent, "BOTTOMLEFT", -2, 2);
-		f.Border:SetPoint("RIGHT", f, "RIGHT", -BORDER_SHRINK, 0);
+		f.Border:SetPoint("RIGHT", f, "RIGHT", -Def.BorderShrink, 0);
 	elseif id == 3 then
 		--Right of bottom-right, align to Left
 		f:SetPoint("BOTTOMLEFT", self.parent, "BOTTOMRIGHT", 2, 2);
-		f.Border:SetPoint("LEFT", f, "LEFT", BORDER_SHRINK, 0);
+		f.Border:SetPoint("LEFT", f, "LEFT", Def.BorderShrink, 0);
 	end
 end
 
@@ -2311,14 +2326,14 @@ function TrackerFrame:ParentTo_Baganator()
 	self:SetClampedToScreen(false);
 	self:ClearAllPoints();
 	self.Border:ClearAllPoints();
-	self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
+	self.Border:SetPoint("LEFT", self, "LEFT", Def.BorderShrink, 0);
 
 	local RegionDummy = CreateFrame("Frame");
 	RegionDummy:SetSize(16, 12);
 	self:SetParent(RegionDummy);
 	self:SetPoint("LEFT", RegionDummy, "LEFT", 0, -1);
 
-	self:SetTrayButtonFont("GameFontHighlight");
+	self:SetTrayButtonFontObject("GameFontHighlight");
 
 	local label = "Plumber";
 	local id = "plumber";
@@ -2359,24 +2374,23 @@ function TrackerFrame:ParentTo_Baganator()
 end
 
 function TrackerFrame:ParentTo_EnhanceQoL()
-	local api = _G.EnhanceQoL and _G.EnhanceQoL.Bags and _G.EnhanceQoL.Bags.API and _G.EnhanceQoL.Bags.API;
+	---- by R41Z0R ----
+	local api = EnhanceQoL and EnhanceQoL.Bags and EnhanceQoL.Bags.API;
 	if not (api and api.RegisterFooterRegion) then return end;
 
 	self.isBlizzardBag = false;
 	self:SetShowBackground(false);
-	self:SetScript("OnShow", TrackerFrame_Update_OnShow);
-	self:Show();
 	self:SetClampedToScreen(false);
 	self:ClearAllPoints();
 	self.Border:ClearAllPoints();
-	self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
+	self.Border:SetPoint("LEFT", self, "LEFT", Def.BorderShrink, 0);
 
 	local RegionDummy = CreateFrame("Frame");
-	RegionDummy:SetSize(16, 12);
+	RegionDummy:SetSize(16, 18);
 	self:SetParent(RegionDummy);
-	self:SetPoint("LEFT", RegionDummy, "LEFT", 0, -1);
+	self:SetPoint("LEFT", RegionDummy, "LEFT", 0, -2);
 
-	self:SetTrayButtonFont("GameFontHighlight");
+
 
 	api.RegisterFooterRegion("plumber", RegionDummy, {
 		side = "left",
@@ -2390,6 +2404,47 @@ function TrackerFrame:ParentTo_EnhanceQoL()
 			api.RequestLayoutRefresh();
 		end
 	end
+	---- END ----
+
+
+	-- Style Matching
+	Def.TrayButtonIconSize = 16;
+	Def.TrayFrameHeightBase = 18;
+	Def.TrayFrameSidePadding = 0;
+	Def.TrayButtonIconPosition = "LEFT";
+	self.Border:SetHeight(18);
+
+	local fontName = "PlumberBackpackItemTrackerFont";
+	local fontObject = CreateFont(fontName);
+	fontObject:CopyFontObject("GameFontHighlight");
+	self:SetTrayButtonFontObject(fontName);
+
+	local ValidFontFlags = {
+		MONOCHROME = true,
+		OUTLINE = true,
+		THICKOUTLINE = true,
+	};
+
+	local function TrackerFrame_OnShow(f)
+		if EnhanceQoL.GetResolvedTextAppearance then
+			local tbl = EnhanceQoL.GetResolvedTextAppearance("stackCount");
+			if tbl and tbl.appearance and tbl.appearance.size and tbl.font then
+				local flag;
+				if tbl.outlineFlags and ValidFontFlags[tbl.outlineFlags] then
+					flag = tbl.outlineFlags;
+				else
+					flag = "";
+				end
+
+				local fontHeight = math.max(8, tbl.appearance.size - 2); -- See applyConfiguredFrameFonts in BagsCore.lua
+				fontObject:SetFont(tbl.font, fontHeight, flag);
+			end
+		end
+		TrackerFrame_Update_OnShow(f);
+	end
+
+	self:SetScript("OnShow", TrackerFrame_OnShow);
+	self:Show();
 end
 
 function TrackerFrame:ParentTo_BetterBags()
@@ -2407,7 +2462,7 @@ function TrackerFrame:ParentTo_BetterBags()
 	RepositionUtil.parent = parent;
 	self:ClearAllPoints();
 	self.Border:ClearAllPoints();
-	self.Border:SetPoint("LEFT", self, "LEFT", BORDER_SHRINK, 0);
+	self.Border:SetPoint("LEFT", self, "LEFT", Def.BorderShrink, 0);
 
 	local anchorOutside = true;
 	if anchorOutside then
