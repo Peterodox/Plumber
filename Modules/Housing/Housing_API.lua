@@ -196,8 +196,8 @@ do  --House Level / Info / Teleport
 	end
 
 	function DataProvider:ProcessHouseInfoList()
-		self.teleportHomeInfo = {};
 		self.playerhasHomeInFaction = {};
+		self.neighborhoodGUIDs = {};
 		self.numHomes = 0;
 
 		if (not self.houseInfoList) or #self.houseInfoList == 0 then
@@ -226,15 +226,11 @@ do  --House Level / Info / Teleport
 
 				if mapIndex == 1 then
 					TeleportHomeButtons.Alliance:SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
+					self.neighborhoodGUIDs.Alliance = info.neighborhoodGUID;
 				elseif mapIndex == 2 then
 					TeleportHomeButtons.Horde:SetAction_TeleportHome(info.neighborhoodGUID, info.houseGUID, info.plotID);
+					self.neighborhoodGUIDs.Horde = info.neighborhoodGUID;
 				end
-
-				self.teleportHomeInfo[i] = {
-					ownerName = info.ownerName,
-					houseName = info.houseName,
-					mapIndex = mapIndex,
-				};
 			end
 		end
 
@@ -271,8 +267,24 @@ do  --House Level / Info / Teleport
 		return DataProvider.mapName2
 	end
 
-	function Housing.SetupTeleportTooltip(tooltip, index)
+	function Housing.ShouldShowTeleportToPlot(factionIndex)
 		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+			if factionIndex then
+				-- When specifying which house to teleport
+				local currentNeighborhoodGUID = C_Housing.GetCurrentNeighborhoodGUID();
+				if currentNeighborhoodGUID and (
+					(factionIndex == 1 and currentNeighborhoodGUID == DataProvider.neighborhoodGUIDs.Alliance) or
+					(factionIndex == 2 and currentNeighborhoodGUID == DataProvider.neighborhoodGUIDs.Horde)
+					) then
+					return false;
+				end
+			end
+		end
+		return true;
+	end
+
+	function Housing.SetupTeleportTooltip(tooltip, index)
+		if not Housing.ShouldShowTeleportToPlot(index) then
 			tooltip:SetText(L["Leave Home"]);
 		else
 			if index == 1 then
@@ -299,10 +311,10 @@ do  --House Level / Info / Teleport
 		return DataProvider.numHomes and DataProvider.numHomes >= 2
 	end
 
-	function Housing.SetupActionButtonCooldown(button)
+	function Housing.SetupActionButtonCooldown(button, factionIndex)
 		if not button.Cooldown then return; end
 
-		if not C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+		if Housing.ShouldShowTeleportToPlot(factionIndex) then
 			local cooldownInfo = C_Housing.GetVisitCooldownInfo();
 			if cooldownInfo and cooldownInfo.isEnabled then
 				button.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration, cooldownInfo.modRate);

@@ -49,6 +49,7 @@ EL.instancePos = {
 	[255] = {0.35972, 0.83893},         --The Black Morass
 	[279] = {0.57488, 0.82711},         --The Culling of Stratholme
 	[1023]= {0.71979, 0.15423},         --Siege of Boralus (Alliance)
+	[1200]= {0.73039, 0.55700},			--Vault of the Incarnate
 	[1304]= {0.56979, 0.61049, false},  --Murder Row (Outdoor only)
 };
 
@@ -271,6 +272,7 @@ function EL:OnUpdate(elapsed)
 				end
 			end
 
+			--/dump GetMouseFoci()[1].journalInstanceID (use on map pin)
 			--print(self.closestDistance, self.closestIndex and self.entranceInfo[self.closestIndex].journalInstanceID, self.x, self.y)
 
 			if self.closestIndex and self.closestDistance < self.defaultRange then
