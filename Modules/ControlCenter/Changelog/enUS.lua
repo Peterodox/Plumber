@@ -11,6 +11,43 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10901] = {
 	{
 		type = "date",
+		versionText = "1.9.1 e",
+		timestamp = 1777900000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Teleport Home Macro: Now allows you to teleport to your house in the opposing faction when already inside a housing plot.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Instance Difficulty Selector: Fixed an issue where the UI failed to appear at the entrance of Vault of the Incarnates.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Group Inviter Info: Fixed an error that occurred when receiving a group invite while in combat.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "For Enhance QoL Bags users: Plumber\'s Backpack Item Tracker now looks nicer when both addons are enabled. Special thanks to R41Z0R.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.1 b-d",
 		timestamp = 1777500000,
 	},
