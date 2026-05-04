@@ -179,7 +179,7 @@ local function FormatSubtext(spec, race, faction)
 end
 
 function EL:GetPlayerInfoFromTooltip(guid)
-	local data = C_TooltipInfo.GetHyperlink("unit:"..guid);
+	local data = C_TooltipInfo.GetHyperlink("unit:"..guid); -- Require the person in vicinity
 	if data and data.lines then
 		local level, spec, faction, classColorString, subtext;
 		--local playerLocation  = PlayerLocation:CreateFromGUID(guid);
@@ -193,7 +193,7 @@ function EL:GetPlayerInfoFromTooltip(guid)
 			if i == 1 then
 
 			elseif i == 2 then  --Race is on the same line
-				level = match(line.leftText, "%d+");
+				level = addon.API.Secret_CanAccess(line.leftText) and match(line.leftText, "%d+");
 				if level then
 					level = tonumber(level);
 					if level and level > 0 then
@@ -204,18 +204,18 @@ function EL:GetPlayerInfoFromTooltip(guid)
 				end
 			elseif i == 3 then
 				if className and classColorString then
-					if match(line.leftText, className) then
+					if addon.API.Secret_CanAccess(line.leftText) and match(line.leftText, className) then
 						spec = "|c"..classColorString..line.leftText.."|r";
 					end
 				end
 			elseif i == 4 then
-				faction = line.leftText;
-				if faction == FACTION_A then
-					faction = "|cff009cde"..faction.."|r";
-				elseif faction == FACTION_H then
-					faction = "|cffee6159"..faction.."|r";
-				else
-					faction = nil;
+				if addon.API.Secret_CanAccess(line.leftText) then
+					faction = line.leftText;
+					if faction == FACTION_A then
+						faction = "|cff009cde"..faction.."|r";
+					elseif faction == FACTION_H then
+						faction = "|cffee6159"..faction.."|r";
+					end
 				end
 			end
 		end
