@@ -2375,8 +2375,8 @@ end
 
 function TrackerFrame:ParentTo_EnhanceQoL()
 	---- by R41Z0R ----
-	local api = EnhanceQoL and EnhanceQoL.Bags and EnhanceQoL.Bags.API;
-	if not (api and api.RegisterFooterRegion) then return end;
+	local api = EnhanceQoL.Bags.API;
+	if not api.RegisterFooterRegion then return end;
 
 	self.isBlizzardBag = false;
 	self:SetShowBackground(false);
@@ -2550,12 +2550,6 @@ local function AnchorToCompatibleAddOn()
 			TrackerFrame:ParentTo_LiteBag();
 			--This addon is using stock searchbox
 		end
-	elseif IsAddOnLoaded("EnhanceQoL") then
-		if _G.EnhanceQoL and _G.EnhanceQoL.Bags and _G.EnhanceQoL.Bags.API and _G.EnhanceQoL.Bags.API.IsAvailable and _G.EnhanceQoL.Bags.API.IsAvailable() then
-			TrackerFrame.UpdateAnchor = DoesNothing;
-			TrackerFrame:ParentTo_EnhanceQoL();
-			GetSearchBox = GetAddOnSearchBox.Nop;
-		end
 	elseif IsAddOnLoaded("Baganator") then
 		TrackerFrame.UpdateAnchor = DoesNothing;
 		TrackerFrame:ParentTo_Baganator();
@@ -2567,6 +2561,10 @@ local function AnchorToCompatibleAddOn()
 			TrackerFrame:ParentTo_BetterBags();
 			--GetSearchBox = GetAddOnSearchBox.BetterBags;  --No Search Bar yet
 		end
+	elseif IsAddOnLoaded("EnhanceQoL") and (EnhanceQoL and EnhanceQoL.Bags and EnhanceQoL.Bags.API and EnhanceQoL.Bags.API.IsAvailable and EnhanceQoL.Bags.API.IsAvailable()) then
+		TrackerFrame.UpdateAnchor = DoesNothing;
+		TrackerFrame:ParentTo_EnhanceQoL();
+		GetSearchBox = GetAddOnSearchBox.Nop;
 	elseif IsAddOnLoaded("ElvUI") then
 		local bagFrame = ElvUI_ContainerFrame;
 		if bagFrame then
