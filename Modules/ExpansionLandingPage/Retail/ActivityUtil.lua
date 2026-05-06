@@ -374,20 +374,22 @@ do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, inst
 		},
 
 		[2393] = {  --Silvermoon
-			--Weekly Meta
+			--Weekly Meta (https://www.wowhead.com/quests/midnight/meta-quests#0+1+13;name=Midnight%3A)
 			{name = "Midnight: Abundance", questID = 93890, shownIfOnQuest = true},
 			{name = "Midnight: Arcantina", questID = 93767, shownIfOnQuest = true},
-			{name = "Midnight: Saltheril's Soiree", questID = 93889, shownIfOnQuest = true},
-			{name = "Midnight: Legends of the Haranir", questID = 93891, shownIfOnQuest = true},
-			{name = "Midnight: Stormarion Assault", questID = 93892, shownIfOnQuest = true},
+			{name = "Midnight: Battlegrounds", questID = 94457, shownIfOnQuest = true},
 			{name = "Midnight: Delves", questID = 93909, shownIfOnQuest = true},
 			{name = "Midnight: Dungeons", questID = 93911, shownIfOnQuest = true},
-			{name = "Midnight: World Quests", questID = 93766, shownIfOnQuest = true},
-			{name = "Midnight: Prey", questID = 93910, shownIfOnQuest = true},
-			{name = "Midnight: World Boss", questID = 93913, shownIfOnQuest = true},
 			{name = "Midnight: Housing", questID = 93769, shownIfOnQuest = true},
+			{name = "Midnight: Legends of the Haranir", questID = 93891, shownIfOnQuest = true},
+			{name = "Midnight: Prey", questID = 93910, shownIfOnQuest = true},
 			{name = "Midnight: Raid", questID = 93912, shownIfOnQuest = true},
-			{name = "Midnight: Battlegrounds", questID = 94457, shownIfOnQuest = true},
+			{name = "Midnight: Ritual Sites", questID = 95843, shownIfOnQuest = true},
+			{name = "Midnight: Saltheril's Soiree", questID = 93889, shownIfOnQuest = true},
+			{name = "Midnight: Stormarion Assault", questID = 93892, shownIfOnQuest = true},
+			{name = "Midnight: Void Assaults", questID = 95842, shownIfOnQuest = true},
+			{name = "Midnight: World Boss", questID = 93913, shownIfOnQuest = true},
+			{name = "Midnight: World Quests", questID = 93766, shownIfOnQuest = true},
 
 			--Dungeon Quest
 			{name = "Windrunner Spire", questID = 93751, shownIfOnQuest = true},
