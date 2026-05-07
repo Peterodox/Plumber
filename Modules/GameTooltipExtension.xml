@@ -12,6 +12,7 @@
 	<Script file="GameTooltip_TransmogEnsemble.lua"/>
 	<Script file="GameTooltip_DyeDeez.lua"/>
 	<Script file="GameTooltip_RichSoil.lua"/>
+	<Script file="GameTooltip_VendorLocation.lua"/>
 
 
 	<!--No Longer Relevant-->
