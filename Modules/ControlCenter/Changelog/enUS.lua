@@ -1522,31 +1522,31 @@ changelogs[10804] = {
 		type = "br",
 	},
 
-	{
-		type = "h1",
-		text = "Decor Catalog: Extend Search Results",
-		dbKey = "Housing_CatalogSearch",
-	},
+	--{
+	--	type = "h1",
+	--	text = "Decor Catalog: Extend Search Results",
+	--	dbKey = "Housing_CatalogSearch",
+	--},
 
-	{
-		type = "Checkbox",
-		dbKey = "Housing_CatalogSearch",
-	},
+	--{
+	--	type = "Checkbox",
+	--	dbKey = "Housing_CatalogSearch",
+	--},
 
-	{
-		type = "p",
-		bullet = true,
-		text = "Enhances the search box on the decor catalog and storage Tab, allowing you to find items by achievement, vendor, zone, or currency.",
-	},
+	--{
+	--	type = "p",
+	--	bullet = true,
+	--	text = "Enhances the search box on the decor catalog and storage Tab, allowing you to find items by achievement, vendor, zone, or currency.",
+	--},
 
-	{
-		type = "img",
-		dbKey = "Housing_CatalogSearch",
-	},
+	--{
+	--	type = "img",
+	--	dbKey = "Housing_CatalogSearch",
+	--},
 
-	{
-		type = "br",
-	},
+	--{
+	--	type = "br",
+	--},
 
 	{
 		type = "h1",
@@ -2032,53 +2032,53 @@ changelogs[10709] = {
 		type = "br",
 	},
 
-	{
-		type = "h1",
-		text = L["ModuleName PlayerPing"],
-		dbKey = "WorldMapPin_PlayerPing",
-	},
+	--{
+	--	type = "h1",
+	--	text = L["ModuleName PlayerPing"],
+	--	dbKey = "WorldMapPin_PlayerPing",
+	--},
 
-	{
-		type = "Checkbox",
-		dbKey = "WorldMapPin_PlayerPing",
-	},
+	--{
+	--	type = "Checkbox",
+	--	dbKey = "WorldMapPin_PlayerPing",
+	--},
 
-	{
-		type = "p",
-		text = "By default, WoW only shows the player ping when you change maps or the first time you open the World Map. Whereas this module highlights the player's location with a ping effect when you:",
-	},
+	--{
+	--	type = "p",
+	--	text = "By default, WoW only shows the player ping when you change maps or the first time you open the World Map. Whereas this module highlights the player's location with a ping effect when you:",
+	--},
 
-	{
-		type = "p",
-		bullet = true,
-		text = "Open World Map.",
-	},
+	--{
+	--	type = "p",
+	--	bullet = true,
+	--	text = "Open World Map.",
+	--},
 
-	{
-		type = "p",
-		bullet = true,
-		text = "Press the ALT key.",
-	},
+	--{
+	--	type = "p",
+	--	bullet = true,
+	--	text = "Press the ALT key.",
+	--},
 
-	{
-		type = "p",
-		bullet = true,
-		text = "Click the Maximize button.",
-	},
+	--{
+	--	type = "p",
+	--	bullet = true,
+	--	text = "Click the Maximize button.",
+	--},
 
-	{
-		type = "p",
-		text = "Updated the ping texture",
-	},
+	--{
+	--	type = "p",
+	--	text = "Updated the ping texture",
+	--},
 
-	{
-		type = "img",
-		dbKey = "WorldMapPin_PlayerPing",
-	},
+	--{
+	--	type = "img",
+	--	dbKey = "WorldMapPin_PlayerPing",
+	--},
 
-	{
-		type = "br",
-	},
+	--{
+	--	type = "br",
+	--},
 
 	{
 		type = "h1",
