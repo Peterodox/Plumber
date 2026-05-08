@@ -18,26 +18,6 @@ local TextureInfoTable = {
 
 local ItemSubModule = {};
 do
-	local function DressUpItemLocation_Callback(itemLocation)
-		if (not ItemSubModule:IsEnabled()) or InCombatLockdown() then return end;
-
-		if itemLocation and itemLocation.bagID and itemLocation.slotIndex then
-			--Verifiy the IDs and see if they match the current tooltip
-			--In case DressUpItemLocation is called from an unaccounted source
-			local itemQuestInfo = GetContainerItemQuestInfo(itemLocation.bagID, itemLocation.slotIndex);
-			if itemQuestInfo and itemQuestInfo.questID then
-				local tooltip = GameTooltip;
-				local info = tooltip:IsShown() and tooltip.processingInfo;
-				if info and info.getterName == "GetBagItem" and info.getterArgs and (itemLocation.bagID == info.getterArgs[1]) and (itemLocation.slotIndex == info.getterArgs[2]) then
-					if C_QuestLog.GetLogIndexForQuestID(itemQuestInfo.questID) then
-						C_Map.OpenWorldMap();
-						QuestMapFrame_ShowQuestDetails(itemQuestInfo.questID);
-					end
-				end
-			end
-		end
-	end
-
 	function ItemSubModule:ProcessData(tooltip, itemID)
 		--Added Info:
 		-- Quest Title
@@ -115,17 +95,31 @@ do
 	function ItemSubModule:SetEnabled(enabled)
 		self.enabled = enabled == true;
 		GameTooltipItemManager:RequestUpdate();
-		if not self.functionHooked then
-			self.functionHooked = true;
-			hooksecurefunc("DressUpItemLocation", DressUpItemLocation_Callback);
-		end
 	end
 
 	function ItemSubModule:IsEnabled()
-		return self.enabled == true
+		return self.enabled == true;
+	end
+
+	function ItemSubModule:OnDressUpBagItem(itemID, bagID, slotIndex)
+		if InCombatLockdown() then return; end
+
+		--Verifiy the IDs and see if they match the current tooltip
+		--In case DressUpItemLocation is called from an unaccounted source
+
+		local itemQuestInfo = bagID and slotIndex and GetContainerItemQuestInfo(bagID, slotIndex);
+		if itemQuestInfo and itemQuestInfo.questID then
+			local tooltip = GameTooltip;
+			local info = tooltip:IsShown() and tooltip.processingInfo;
+			if info and info.getterName == "GetBagItem" and info.getterArgs and (bagID == info.getterArgs[1]) and (slotIndex == info.getterArgs[2]) then
+				if C_QuestLog.GetLogIndexForQuestID(itemQuestInfo.questID) then
+					C_Map.OpenWorldMap();
+					QuestMapFrame_ShowQuestDetails(itemQuestInfo.questID);
+				end
+			end
+		end
 	end
 end
-
 
 
 do
@@ -133,6 +127,7 @@ do
 		ItemSubModule:SetEnabled(state);
 		if state then
 			GameTooltipItemManager:AddSubModule(ItemSubModule);
+			addon.GameTooltipManager:AddDressUpModule(ItemSubModule);
 		end
 	end
 

@@ -708,11 +708,18 @@ do  -- Tooltip Parser
 		end
 	end
 
-	local function GetCreatureName(creatureID)
+	local function GetCreatureName(creatureID, allowSecret)
 		if not creatureID then return end;
 		local tooltipData = GetInfoByHyperlink("unit:Creature-0-0-0-0-"..creatureID);
 		if tooltipData then
-			return GetLineText(tooltipData.lines, 1);
+			local text = GetLineText(tooltipData.lines, 1);
+			if allowSecret then
+				return text, not canaccessvalue(text);
+			else
+				if canaccessvalue(text) then
+					return text, false;
+				end
+			end
 		end
 	end
 	API.GetCreatureName = GetCreatureName;
@@ -1495,6 +1502,14 @@ do  -- Map
 			end
 			return continentMapID
 		end
+	end
+
+	function API.SetUserWaypoint(uiMapID, x, y)
+		local point = {
+			uiMapID = uiMapID,
+			position = CreateVector2D(x, y);
+		};
+		C_Map.SetUserWaypoint(point);
 	end
 end
 
@@ -3765,12 +3780,12 @@ do  -- AsyncCallback
 	end
 
 
-	function API.GetAndCacheCreatureName(creatureID)
+	function API.GetAndCacheCreatureName(creatureID, allowSecret)
 		if CreatureNameCache[creatureID] then
 			return CreatureNameCache[creatureID]
 		end
-		local name = API.GetCreatureName(creatureID);
-		if name and name ~= "" then
+		local name, isSecret = API.GetCreatureName(creatureID, allowSecret);
+		if (not isSecret) and name and name ~= "" then
 			CreatureNameCache[creatureID] = name;
 		else
 			name = nil;

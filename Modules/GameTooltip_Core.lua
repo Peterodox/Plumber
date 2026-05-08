@@ -115,8 +115,8 @@ do
 	end
 
 	function HandlerMixin:CallSubModules(tooltip, id, hyperlink)
-		self.hasAltMode = nil;
 		self.altModeState = nil;
+		self.hideGenericAltInstruction = nil;
 		self.currentTooltip = tooltip;
 
 		for _, m in ipairs(self.modules) do
@@ -124,9 +124,11 @@ do
 			if m:ProcessData(tooltip, id, hyperlink) then
 				self.anyChange = true;
 				if m.hasAltMode then
-					self.hasAltMode = true;
 					if not self.altModeState then
 						self.altModeState = m.altModeState;
+					end
+					if m.HandleAltPressed then
+						self.hideGenericAltInstruction = true;
 					end
 				end
 			end
@@ -134,7 +136,7 @@ do
 
 		if self.altModeState then
 			AltModeListener:SetHandlerAndStart(self);
-			if self.anyChange and tooltip:GetName() == "GameTooltip" then
+			if (not self.hideGenericAltInstruction) and self.anyChange and tooltip:GetName() == "GameTooltip" then
 				tooltip:AddLine(" ");
 				if self.altModeState == 1 then
 					tooltip:AddLine(addon.L["Instruction Show Less Info"], 0.000, 0.800, 1.000, true);
@@ -179,6 +181,7 @@ do
 			After(0, function()
 				self.pauseUpdate = nil;
 				self:InitSubModules();
+				GameTooltipManager:RequestUpdateDressUpModules();
 			end);
 		end
 	end
@@ -217,7 +220,11 @@ do
 		local anyChange;
 		for _, m in ipairs(self.modules) do
 			if m.hasAltMode and m:IsEnabled() then
-				ToggleModuleAltMode(m);
+				if m.HandleAltPressed then
+					m:HandleAltPressed();
+				else
+					ToggleModuleAltMode(m);
+				end
 				anyChange = true;
 			end
 		end
@@ -357,9 +364,58 @@ do  --GameTooltipManager
 end
 
 
-do  --APIs
-	local _G = _G;
+do	--Ctrl+Click Bag Item Handler
+	local DressUpModules = {};
+	local FUNCTION_HOOKED = false;
 
+	local function DressUpItemLocation_Callback(itemLocation)
+		if itemLocation then
+			local itemID = C_Item.GetItemID(itemLocation);
+			if itemID then
+				for _, m in ipairs(DressUpModules) do
+					if m:IsEnabled() then
+						m:OnDressUpBagItem(itemID, itemLocation.bagID, itemLocation.slotIndex);
+					end
+				end
+			end
+		end
+	end
+
+	function GameTooltipManager:AddDressUpModule(module)
+		-- module is the same as SubModule
+		for _, m in ipairs(DressUpModules) do
+			if m == module then
+				return
+			end
+		end
+
+		if module.OnDressUpBagItem then
+			table.insert(DressUpModules, module);
+		else
+			error("GameTooltip Module Missing OnDressUpBagItem");
+		end
+	end
+
+	function GameTooltipManager:RequestUpdateDressUpModules()
+		if FUNCTION_HOOKED then return; end
+
+		local anyEnabled;
+		for _, m in ipairs(DressUpModules) do
+			if m:IsEnabled() then
+				anyEnabled = true;
+				break
+			end
+		end
+
+		if anyEnabled then
+			FUNCTION_HOOKED = true;
+			hooksecurefunc("DressUpItemLocation", DressUpItemLocation_Callback);
+		end
+	end
+end
+
+
+do  --APIs
 	function GameTooltipManager.ReplaceTooltipLine(tooltip, searchText, newText, r, g, b)
 		local found;
 		local fs;

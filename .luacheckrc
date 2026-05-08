@@ -842,6 +842,7 @@ stds.wow = {
 				"GetItemCreationContext",
 				"GetItemIcon",
 				"GetItemIconByID",
+				"GetItemID",
 				"GetItemIDForItemInfo",
 				"GetItemInfo",
 				"GetItemInfoInstant",

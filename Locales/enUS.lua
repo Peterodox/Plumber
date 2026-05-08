@@ -289,6 +289,16 @@ L["Instruction Show Resilient Seeds"] = "<Double click to show Resilient Seeds>"
 L["No Resilient Seed"] = "No Resilient Seeds";
 
 
+--Tooltip VendorLocation
+L["ModuleName TooltipVendorLocation"] = "Vendor Locations";
+L["ModuleDescription TooltipVendorLocation"] = "Show where to exchange certain tokens on the item tooltip and allow Ctrl-Clicking the item to set a map pin to the vendor.";
+L["Instruction Set Waypoint"] = "<Ctrl click to set a map pin>";
+L["NPC Name Location Format"] = "%s, %s";
+L["Intruction Swtich Destinations"] = "Press Alt to swtich the destination:";
+L["Location Note Inside Cave"] = "Inside a cave";
+L["Location Note Second Floor"] = "On the upper floor";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
 L["ModuleDescription Plunderstore"] = "Modify the store opened via Group Finder:\n\n- Added a checkbox to hide collected items.\n\n- Display the number of uncollected items on the category buttons.\n\n- Added weapon and armor equip location to their tooltips.\n\n- Allow you to view equippable items in the Dressing Room.";
