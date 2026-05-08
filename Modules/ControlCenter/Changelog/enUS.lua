@@ -42,6 +42,23 @@ changelogs[10902] = {
 		type = "img",
 		dbKey = "TooltipVendorLocation",
 	},
+
+	{
+		type = "h1",
+		text = "Bug Fixes",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Teleport Home Macro: Fixed an issue where the macro stopped working if you only owned one house.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Drawer Macro: Fixed an issue that prevented players from casting the Midnight Skinning spell \"Sharpen Your Knife\" due to a name conflict with the The War Within version of the spell.",
+	},
 };
 
 changelogs[10901] = {
