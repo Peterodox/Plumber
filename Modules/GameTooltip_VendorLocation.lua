@@ -19,15 +19,18 @@ do
 	local function AppendName(tooltip, data, isSelected)
 		local text;
 		local mapName = API.GetMapName(data.uiMapID);
-		if data.npc then
+		if data.localizedName then
+			if data.area then
+				mapName = API.GetZoneName(data.area);
+			end
+			text = L["NPC Name Location Format"]:format(data.localizedName, mapName);
+		elseif data.npc then
 			local allowSecret = true;
 			local npcName = API.GetAndCacheCreatureName(data.npc, allowSecret) or data.name or string.format("NPC:%s", data.npc);
 			text = L["NPC Name Location Format"]:format(npcName, mapName);
 		elseif data.area then
 			local areaName = API.GetZoneName(data.area);
 			text = L["NPC Name Location Format"]:format(areaName, mapName);
-		elseif data.localizedName then
-			text = L["NPC Name Location Format"]:format(L["Location Note Inside Cave"], mapName);
 		end
 
 		if text then
@@ -167,8 +170,19 @@ ItemData = {
 		{npc = 236411, name = "Ditty Fuzeboy", pos = {0.354, 0.412}, uiMapID = 2346, label = L["ItemType Pets"]}, -- Ditty Fuzeboy (Pet)
 	}},
 	[245510] = {npc = 245348, name = "Ba\'choso", pos = {0.42, 0.224}, uiMapID = 2371}, -- Loombeast Silk
-	-- Barter Boulder
+
+	-- DF
+	[205188] = {npc = 204693, name = "Ponzo", pos = {0.58, 0.538}, uiMapID = 2133}, -- Barter Boulder
+	[204715] = {npc = 203602, name = "Spinsoa", pos = {0.558, 0.554}, uiMapID = 2133}, -- Unearthed Fragrant Coin
+	[211376] = {npc = 212797, name = "Talisa Whisperbloom", pos = {0.498, 0.62}, uiMapID = 2200}, -- Seedbloom
 
 	-- Class Set Curios
-
+	[249367] = {npc = 254436, name = "Kirana", pos = {0.556, 0.878}, uiMapID = 2424, instructionOnly = true}, -- Chiming Void Curio
+	[237602] = {npc = 248304, name = "Acquirer Ba\'theom", pos = {0.42, 0.224}, uiMapID = 2371, instructionOnly = true}, -- Hungering Void Curio
+	[228819] = {npc = 231824, name = "Kari Bridgeblaster", localizedName = L["Location Note Second Floor"], pos = {0.439, 0.498}, uiMapID = 2346, area = 15388}, -- Excessively Bejeweled Curio
+	[225634] = {npc = 227003, name = "Kir\'xal", pos = {0.566, 0.458}, uiMapID = 2216, instructionOnly = true}, -- Web-Wrapped Curio (City of Threads - Lower)
+	[210947] = {npc = 213278, name = "Kirasztia", pos = {0.366, 0.334}, uiMapID = 2200, instructionOnly = true}, -- Flame-Warped Curio
+	[206046] = {npc = 205675, name = "Kaitalla", pos = {0.52, 0.256}, uiMapID = 2133, instructionOnly = true}, -- Void-Touched Curio
 };
+
+ItemData[204985] = ItemData[205188]; -- Barter Brick
