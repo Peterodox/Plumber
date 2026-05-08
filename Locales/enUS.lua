@@ -290,8 +290,8 @@ L["No Resilient Seed"] = "No Resilient Seeds";
 
 
 --Tooltip VendorLocation
-L["ModuleName VendorLocation"] = "Vendor Locations";
-L["ModuleDescription VendorLocation"] = "Show where to exchange certain tokens on the item tooltip and allow Ctrl+Clicking to set a map pin to the vendor.";
+L["ModuleName TooltipVendorLocation"] = "Vendor Locations";
+L["ModuleDescription TooltipVendorLocation"] = "Show where to exchange certain tokens on the item tooltip and allow Ctrl-Clicking the item to set a map pin to the vendor.";
 L["Instruction Set Waypoint"] = "<Ctrl click to set a map pin>";
 L["NPC Name Location Format"] = "%s, %s";
 L["Intruction Swtich Destinations"] = "Press Alt to swtich the destination:";

@@ -289,6 +289,16 @@ L["Instruction Show Resilient Seeds"] = "<双击左键来显示坚韧之种>";
 L["No Resilient Seed"] = "你身上没有携带坚韧之种";
 
 
+--Tooltip VendorLocation
+L["ModuleName VendorLocation"] = "商人位置";
+L["ModuleDescription VendorLocation"] = "在某些可兑换物品的鼠标提示上显示商人位置，并允许你Ctrl点击此物品来创建地图标记。";
+L["Instruction Set Waypoint"] = "<按住Ctrl点击创建地图标记>";
+L["NPC Name Location Format"] = "%s，%s";
+L["Intruction Swtich Destinations"] = "按Alt键切换终点：";
+L["Location Note Inside Cave"] = "在洞穴内";
+L["Location Note Second Floor"] = "在楼上";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "霸业风暴：珍宝商店";
 L["ModuleDescription Plunderstore"] = "调整从队伍查找器界面打开的珍宝商店：\n\n- 允许仅显示未收集物品。\n\n- 在类别按钮上显示未收集物品的数量。\n\n- 在武器和护甲的鼠标提示上显示其穿戴位置。\n\n- 允许你在试衣间里显示可穿戴的物品。";

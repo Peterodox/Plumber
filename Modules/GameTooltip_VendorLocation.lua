@@ -131,9 +131,9 @@ do
 	end
 
 	local moduleData = {
-		name = addon.L["ModuleName VendorLocation"],
+		name = addon.L["ModuleName TooltipVendorLocation"],
 		dbKey = "TooltipVendorLocation",
-		description = addon.L["ModuleDescription VendorLocation"],
+		description = addon.L["ModuleDescription TooltipVendorLocation"],
 		toggleFunc = EnableModule,
 		moduleAddedTime = 1755200000,
 		categoryKeys = {
