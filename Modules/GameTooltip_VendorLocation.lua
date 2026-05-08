@@ -135,7 +135,7 @@ do
 		dbKey = "TooltipVendorLocation",
 		description = addon.L["ModuleDescription TooltipVendorLocation"],
 		toggleFunc = EnableModule,
-		moduleAddedTime = 1755200000,
+		moduleAddedTime = 1778200000,
 		categoryKeys = {
 			"Inventory",
 		},

@@ -33,6 +33,12 @@ changelogs[10902] = {
 	},
 
 	{
+		type = "p",
+		bullet = true,
+		text = "Special thanks to gjfLeo for the idea and the info."
+	},
+
+	{
 		type = "img",
 		dbKey = "TooltipVendorLocation",
 	},
