@@ -38,6 +38,14 @@ local function SetupClampedFrame(frame)
 	frame:SetClampRectInsets(-offset, offset, offset, -offset);
 end
 
+local UseSpellID = {
+	-- /cast only supports spell name, it breaks if the player knows two spells of the same name
+	-- We use SetAttribute("type", "spell") for these cases, the tradeoff is the flyout can no longer close after click during combat
+
+	[440977]  = true, -- Sharpen Your Knife
+	[1223388] = true,
+};
+
 
 local IS_CLASSIC = addon.IS_CLASSIC;
 local ACTION_BUTTON_SIZE = 45;
@@ -656,9 +664,23 @@ do  --SecureControllerPool
 					button = self:GetFrameRef("SecureButton"..i);
 					if button then
 						numButtons = numButtons + 1;
-						local macroText = self:GetAttribute("customMacroText"..i);
-						button:SetAttribute("type", "macro");
-						button:SetAttribute("macrotext", macroText);
+
+						local processed = false;
+						if self:GetAttribute("shouldUseSpellID"..i) then
+							local spellID = self:GetAttribute("actionID"..i);
+							if spellID and spellID > 0 then
+								processed = true;
+								button:SetAttribute("type", "spell");
+								button:SetAttribute("spell", spellID);
+							end
+						end
+
+						if not processed then
+							local macroText = self:GetAttribute("customMacroText"..i);
+							button:SetAttribute("type", "macro");
+							button:SetAttribute("macrotext", macroText);
+						end
+
 						button:SetFrameLevel(10);
 						button:ClearAllPoints();
 						h = h + 1;
@@ -720,16 +742,25 @@ do  --SecureControllerPool
 		handler:SetAttribute("numActions", numActions);
 
 		if numActions > 0 then
+			local appendedMacro;
 			if CLOSE_AFTER_CLICK then
 				local closeFlyoutMacro = self:GetCloseFlyoutMacro();
-				closeFlyoutMacro = "\n"..closeFlyoutMacro;
-				for i, action in ipairs(actions) do
-					handler:SetAttribute("customMacroText"..i, (action.macroText or "")..closeFlyoutMacro);
-				end
-			else
-				for i, action in ipairs(actions) do
+				appendedMacro = "\n"..closeFlyoutMacro;
+			end
+
+			for i, action in ipairs(actions) do
+				if appendedMacro then
+					handler:SetAttribute("customMacroText"..i, (action.macroText or "")..appendedMacro);
+				else
 					handler:SetAttribute("customMacroText"..i, action.macroText);
 				end
+
+				if action.actionType == "spell" and action.id and UseSpellID[action.id] then
+					handler:SetAttribute("shouldUseSpellID"..i, true);
+				else
+					handler:SetAttribute("shouldUseSpellID"..i, nil);
+				end
+				handler:SetAttribute("actionID"..i, action.id);
 			end
 		end
 
@@ -802,6 +833,12 @@ do  --SecureHandler
 	ActionButtonPool.actionButtons = {};
 	ActionButtonPool.visualButtons = {};
 
+	local function ActionButton_PostClick()
+		if CLOSE_AFTER_CLICK and not InCombatLockdown() then
+			SecureRootContainer:Hide();
+		end
+	end
+
 	function ActionButtonPool:InitButtons(numButtons)
 		local n = #self.actionButtons;
 		if numButtons > n then
@@ -812,6 +849,7 @@ do  --SecureHandler
 				button = CreateFrame("Button", nil, ActionButtonContainer, "PlumberSecureActionBarButtonTemplate");
 				self.actionButtons[index] = button;
 				button:SetSize(ACTION_BUTTON_SIZE, ACTION_BUTTON_SIZE);
+				button:SetScript("PostClick", ActionButton_PostClick);
 
 				local vb = CreateFrame("Button", nil, UIParent, "PlumberActionBarButtonTemplate");
 				vb:Hide();
