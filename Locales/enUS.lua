@@ -294,7 +294,7 @@ L["ModuleName TooltipVendorLocation"] = "Vendor Locations";
 L["ModuleDescription TooltipVendorLocation"] = "Show where to exchange certain tokens on the item tooltip and allow Ctrl-Clicking the item to set a map pin to the vendor.";
 L["Instruction Set Waypoint"] = "<Ctrl click to set a map pin>";
 L["NPC Name Location Format"] = "%s, %s";
-L["Intruction Swtich Destinations"] = "Press Alt to swtich the destination:";
+L["Intruction Swtich Destinations"] = "Press Alt to switch the destination:";
 L["Location Note Inside Cave"] = "Inside a cave";
 L["Location Note Second Floor"] = "On the upper floor";
 
