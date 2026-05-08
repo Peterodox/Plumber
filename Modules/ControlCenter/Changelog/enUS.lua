@@ -8,6 +8,36 @@ local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
 
+changelogs[10902] = {
+	{
+		type = "date",
+		versionText = "1.9.2",
+		timestamp = 1778200000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName TooltipVendorLocation"],
+		dbKey = "TooltipVendorLocation",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "TooltipVendorLocation",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = L["ModuleDescription TooltipVendorLocation"],
+	},
+
+	{
+		type = "img",
+		dbKey = "TooltipVendorLocation",
+	},
+};
+
 changelogs[10901] = {
 	{
 		type = "date",
