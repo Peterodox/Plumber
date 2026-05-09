@@ -430,3 +430,13 @@ do
 		end
 	end
 end
+
+do --Enable ExpansionLandingButton on PTR
+	if IsTestBuild() then
+		function C_PlayerInfo.IsExpansionLandingPageUnlockedForPlayer(index)
+			if index == LE_EXPANSION_MIDNIGHT then
+				return true
+			end
+		end
+	end
+end

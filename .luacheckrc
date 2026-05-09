@@ -59,6 +59,7 @@ read_globals = {
 	"EditModeManagerExpandedFrame",
 	"ElvUI",
 	"ElvUI_ContainerFrame",
+	"EnhanceQoL",
 	"GwDressingRoom",
 	"GwDressingRoomGear",
 	"ImmersionFrame",
@@ -776,6 +777,7 @@ stds.wow = {
 		C_Housing = {
 			fields = {
 				"GetCurrentHouseLevelFavor",
+				"GetCurrentNeighborhoodGUID",
 				"GetHouseLevelFavorForLevel",
 				"GetPlayerOwnedHouses",
 				"GetUIMapIDForNeighborhood",
@@ -840,6 +842,7 @@ stds.wow = {
 				"GetItemCreationContext",
 				"GetItemIcon",
 				"GetItemIconByID",
+				"GetItemID",
 				"GetItemIDForItemInfo",
 				"GetItemInfo",
 				"GetItemInfoInstant",

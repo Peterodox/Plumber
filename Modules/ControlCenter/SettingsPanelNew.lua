@@ -1753,26 +1753,30 @@ do  --ChangelogTab
 				end
 
 			elseif info.type == "Checkbox" then
-				local visualOffset = 12;
-				objectHeight = Def.ButtonSize;
-				top = top + visualOffset - 4;
-				bottom = top + objectHeight + visualOffset;
-				n = n + 1;
-				content[n] = {
-					dataIndex = n,
-					templateKey = "Entry",
-					setupFunc = function(obj)
-						local data = ControlCenter:GetModule(info.dbKey);
-						obj.Label:SetFontObject(Formatter.TagFonts["p"]);
-						obj:SetData(data);
-						obj:SetWidth(objectWidth);
-					end,
-					top = top,
-					bottom = bottom,
-					point = "TOPLEFT",
-					relativePoint = "TOPLEFT",
-					offsetX = leftOffset - 6,
-				};
+				if ControlCenter:GetModule(info.dbKey) then
+					local visualOffset = 12;
+					objectHeight = Def.ButtonSize;
+					top = top + visualOffset - 4;
+					bottom = top + objectHeight + visualOffset;
+					n = n + 1;
+					content[n] = {
+						dataIndex = n,
+						templateKey = "Entry",
+						setupFunc = function(obj)
+							local data = ControlCenter:GetModule(info.dbKey);
+							obj.Label:SetFontObject(Formatter.TagFonts["p"]);
+							obj:SetData(data);
+							obj:SetWidth(objectWidth);
+						end,
+						top = top,
+						bottom = bottom,
+						point = "TOPLEFT",
+						relativePoint = "TOPLEFT",
+						offsetX = leftOffset - 6,
+					};
+				else
+					API.PrintMessage("Deprecated Module: "..(L["ModuleName "..info.dbKey] or info.dbKey));
+				end
 
 			elseif info.type == "br" then
 				bottom = bottom + Def.ChangelogLineBreakHeight;

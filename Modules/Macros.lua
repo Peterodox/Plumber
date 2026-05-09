@@ -369,7 +369,7 @@ function EL:UpdateMacros(commands)
 								anyEdit = true;
 							end
 
-							if (commandInfo.writeFunc) and ((not commandInfo.shouldUseDrawer) or commandInfo.shouldUseDrawer()) then
+							if (commandInfo.writeFunc) and ( (not commandInfo.shouldUseDrawer) or (not commandInfo.shouldUseDrawer()) ) then
 								local _body, _icon = commandInfo.writeFunc(body);
 								--print(math.random(100), _body)    --debug
 								if _body then
