@@ -289,6 +289,16 @@ L["Instruction Show Resilient Seeds"] = "<Double-clic pour afficher les Graines 
 L["No Resilient Seed"] = "Aucune Graine rustique";
 
 
+--Tooltip VendorLocation
+L["ModuleName TooltipVendorLocation"] = "Emplacements des vendeurs";
+L["ModuleDescription TooltipVendorLocation"] = "Affiche où échanger certains jetons dans l'infobulle de l'objet et permet de faire Ctrl + Clic sur l'objet pour placer un repère sur la carte, vers le vendeur.";
+L["Instruction Set Waypoint"] = "<Ctrl+Clic pour placer un repère sur la carte>";
+L["NPC Name Location Format"] = "%s, %s";
+L["Intruction Swtich Destinations"] = "Maintenez Alt pour changer de destination :";
+L["Location Note Inside Cave"] = "À l'intérieur d'une grotte";
+L["Location Note Second Floor"] = "À l'étage supérieur";
+
+
 --Plunderstore
 L["ModuleName Plunderstore"] = "Plunderstore";
 L["ModuleDescription Plunderstore"] = "Modification de la boutique accessible via la Recherche de groupe :\n\n– Ajout d'une case à cocher pour masquer les objets déjà collectés.\n\n– Affichage du nombre d'objets non collectés sur les boutons de catégorie.\n\n– Ajout de l'emplacement d'équipement (arme ou armure) dans les infobulles.\n\n– Possibilité de visualiser les objets équipables dans la salle d'essayage.";
@@ -360,11 +370,11 @@ L["Power Borrowed"] = "Pouvoir emprunté";
 L["ModuleName WoWAnniversary"] = "Anniversaire de WoW";
 L["ModuleDescription WoWAnniversary"] = "– Invoquer facilement la monture correspondante pendant l'événement Maniaque des montures.\n\n– Affichez les résultats des votes pendant l'événement Frénésie de mode.";
 L["Voting Result Header"] = "Résultats";
-L["Mount Not Collected"] = "Vous n'avez pas récupéré cette monture.";
+L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "Vous n'avez pas récupéré cette monture.";
 
 
 --BlizzFixFishingArtifact
-L["ModuleName BlizzFixFishingArtifact"] = "Correction éclair : pêcheur de Terradiance";
+L["ModuleName BlizzFixFishingArtifact"] = "Correction rapide : pêcheur de Terradiance";
 L["ModuleDescription BlizzFixFishingArtifact"] = "Vous permet de visualiser à nouveau les traits de l'artefact de pêche.";
 
 
@@ -389,7 +399,7 @@ L["Chat Leave All Characters"] = "Quitter sur tous les personnages";
 L["Chat Leave All Characters Tooltip"] = "Vous quitterez automatiquement ce canal lorsque vous vous connecterez sur un personnage.";
 L["Chat Auto Leave Alert Format"] = "Souhaitez-vous quitter automatiquement |cffffc0c0[%s]|r sur tous vos personnages ?";
 L["Chat Auto Leave Cancel Format"] = "Quitter Auto. a été désactivé pour %s. Veuillez utiliser la commande « /join » pour rejoindre le canal.";
-L["Auto Leave Channel Format"] = "Quitter auto. \"%s\"";
+L["Auto Leave Channel Format"] = "Quitter Auto. \"%s\"";
 L["Click To Disable"] = "Cliquer pour désactiver";
 
 
@@ -502,7 +512,7 @@ L["ModuleDescription LegionRemix_LFGSpam"] = "Supprimer le message indésirable 
 L["Artifact Weapon"] = "Arme prodigieuse";
 L["Artifact Ability"] = "Pouvoir prodigieux";
 L["Artifact Traits"] = "Traits prodigieux";
-L["Earn X To Upgrade Y Format"] = "Obtenez à nouveau |cffffffff%s|r %s pour améliorer %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
+L["Earn X To Upgrade Y Format"] = "Obtenez encore |cffffffff%s|r %s pour améliorer %s"; --Example: Earn another 100 Infinite Power to upgrade Artifact Weapon
 L["Until Next Upgrade Format"] = "%s avant la prochaine amélioration";
 L["New Trait Available"] = "Nouveau trait disponible.";
 L["Rank Format"] = "Rang %s";
@@ -765,8 +775,8 @@ L["Instruction Link Progress In Chat"] = "<Maj + Clic pour poster la progression
 L["Instance Name"] = "Nom de l'instance";   --Dungeon/Raid Name
 L["EditMode Instruction InstanceDifficulty"] = "La largeur du cadre dépend du nombre d'options disponibles.";
 L["Difficulty Locked To Format"] = "L'instance est verrouillée sur |cffffffff%s|r suite à la mort du boss.";
-L["Difficulty Locked To Current Alert"] = "L'instance est verrouillée à ce niveau de difficulté suite à la mort du boss.";
-L["Shared Difficulty Alert"] = "Vaincre un boss bloquera l'instance à ce niveau de difficulté.";
+L["Difficulty Locked To Current Alert"] = "L'instance est verrouillée sur cette difficulté en raison de la mort du boss.";
+L["Shared Difficulty Alert"] = "Vaincre un boss verrouillera l'instance sur cette difficulté.";
 
 
 --TransmogChatCommand
@@ -893,7 +903,7 @@ L["ModuleDescription CatalystUI"] = "Ctrl + Clic sur l'objet obtenu pour l'affic
 --HuntTable
 L["ModuleName HuntTable"] = "Traque : table de traque";
 L["ModuleDescription HuntTable"] = "- Remplacer les icônes de quête bleues pour indiquer les difficultés.\n\n- Afficher un indicateur si la cible de la Traque est une condition requise pour un haut fait non réalisé.";
-L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition requise pour obtenir un haut fait non réalisé.";
+L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition requise pour obtenir un haut fait non réalisé .";
 
 
 --PreyQuestSuperTrack
@@ -902,7 +912,7 @@ L["ModuleDescription PreyQuestSuperTrack"] = "Une fois la position de votre proi
 
 
 --BlizzFixActionBarArt
-L["ModuleName BlizzFixActionBarArt"] = "Correction Blitz : illustration de la barre d'action";
+L["ModuleName BlizzFixActionBarArt"] = "Correction rapide : illustration de la barre d'action";
 L["ModuleDescription BlizzFixActionBarArt"] = "Correction d'un problème où les illustrations de la barre d'action (Griffons et Wyvernes) réapparaissaient de manière inattendue après avoir masqué / affiché l'interface utilisateur ou quitté l'Éditeur de maison.";
 
 
@@ -913,7 +923,7 @@ L["Reposition Button Vertical"] = "Déplacer verticalement";
 L["Reposition Button Tooltip"] = "Clic gauche et faites glisser pour déplacer la fenêtre";
 L["Font Size"] = FONT_SIZE or "Taille de la police";
 L["Icon Size"] = "Taille de l'icône";
-L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Réinitialiser à la position par défaut";
+L["Reset To Default Position"] = HUD_EDIT_MODE_RESET_POSITION or "Revenir à la position par défaut";
 L["Renown Level Label"] = "Renom ";  --There is a space
 L["Progress Label"] = "Progrès ";  --There is a space
 L["Paragon Reputation"] = "Paragon";
@@ -921,7 +931,7 @@ L["Level Maxed"] = "(Maximum)";   --Reached max level
 L["Current Colon"] = ITEM_UPGRADE_CURRENT or "Actuel :";
 L["Unclaimed Reward Alert"] = "Vous avez des récompenses non réclamées";
 L["Uncollected Set Counter Format"] = "Vous avez |cffffffff%d|r transmogrifications non collectées |4set:sets;.";
-L["InstructionFormat Left Click"] = "Clic gaucge pour %s";
+L["InstructionFormat Left Click"] = "Clic gauche pour %s";
 L["InstructionFormat Right Click"] = "Clic droit pour %s";
 L["InstructionFormat Ctrl Left Click"] = "Ctrl + Clic gauche pour %s";
 L["InstructionFormat Ctrl Right Click"] = "Ctrl + Clic droit pour %s";
@@ -932,7 +942,7 @@ L["Close Frame Format"]= "|cff808080(Fermer %s)|r";
 
 --Plumber AddOn Settings
 L["ModuleName EnableNewByDefault"] = "Toujours activer les nouvelles fonctionnalités";
-L["ModuleDescription EnableNewByDefault"] = "Activez toujours les fonctionnalités nouvellement ajoutées.\n\n*Vous verrez une notification dans la fenêtre de discussion lorsqu'un nouveau module est activé de cette manière.";
+L["ModuleDescription EnableNewByDefault"] = "Toujours activer les fonctionnalités nouvellement ajoutées.\n\nUne notification s'affichera dans la fenêtre de discussion lorsqu'un nouveau module sera activé de cette manière.";
 L["New Feature Auto Enabled Format"] = "Nouveau module %s activé.";
 L["Click To See Details"] = "Cliquer pour afficher les détails";
 L["Click To Show Settings"] = "Cliquer pour afficher / masquer les paramètres.";
