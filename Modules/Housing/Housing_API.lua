@@ -268,7 +268,7 @@ do  --House Level / Info / Teleport
 	end
 
 	function Housing.ShouldShowTeleportToPlot(factionIndex)
-		if C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
+		if DataProvider.neighborhoodGUIDs and C_HousingNeighborhood.CanReturnAfterVisitingHouse() then
 			local currentNeighborhoodGUID = C_Housing.GetCurrentNeighborhoodGUID();
 			if factionIndex then
 				-- When specifying which house to teleport
