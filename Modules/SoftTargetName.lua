@@ -81,7 +81,7 @@ do  --Display
 	function Display:UpdateFonts()
 		local file, height, flags = _G[Settings.fontObject]:GetFont();
 		if Settings.textOutline then
-			flags = "OUTLINE";
+			flags = "SLUGOUTLINE";
 		else
 			flags = "";
 		end
@@ -116,7 +116,7 @@ do  --Display
 			self.Title = Display:CreateFontString(nil, "OVERLAY", Settings.fontObject);
 			self.Title:SetPoint("TOP", self, "TOP", 0, 0);
 			local file, height, flags = _G[Settings.fontObject]:GetFont();
-			self.Title:SetFont(file, height, "OUTLINE");
+			self.Title:SetFont(file, height, "SLUGOUTLINE");
 			self.Title:SetShadowOffset(0, 0);
 		end
 

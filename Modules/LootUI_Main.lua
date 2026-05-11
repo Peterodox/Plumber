@@ -93,7 +93,8 @@ do
 		end
 
 		local fontObject = PlumberLootUIFont;
-		fontObject:SetFont(fontFile, Round(fontSize), "OUTLINE");
+		local fontFlag = "SLUGOUTLINE";
+		fontObject:SetFont(fontFile, Round(fontSize), fontFlag);
 		fontObject:SetShadowOffset(0, 0);
 
 		local locale = GetLocale();

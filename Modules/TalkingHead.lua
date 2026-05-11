@@ -222,7 +222,7 @@ function NewTalkingHead:SetFontHeightByPercentage(percentage)
 
 	local style, gray;
 	if DB.TalkingHead_TextOutline then
-		style = "OUTLINE";
+		style = "SLUGOUTLINE";
 		gray = 0.898;   --VERY_LIGHT_GRAY_COLOR
 	else
 		style = "";
