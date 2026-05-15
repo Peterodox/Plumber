@@ -24,7 +24,8 @@ local Def = {
 	ChangelogLineSpacing = 4,
 	ChangelogParagraphSpacing = 16,
 	ChangelogLineBreakHeight = 32,
-	ChangelogIndent = 16,   --22 to match Checkbox Label
+	ChangelogIndent = 16,   -- 22 to match Checkbox Label. Equal to a "- " in markdown
+	ChangelogIndent2 = 32,	-- Equal to a "  - " in markdown
 	ChangelogImageSize = 240,
 	ChangelogImageSizeLarge = 300,
 
@@ -1652,6 +1653,8 @@ do  --ChangelogTab
 				end
 			end
 
+			local extraLeftOffset = 0;
+
 			if info.type == "h1" or info.type == "p" then
 				local text = info.text;
 				if info.isNewFeature then
@@ -1659,7 +1662,13 @@ do  --ChangelogTab
 				end
 				local textWidthShrink;
 				if info.bullet then
-					textWidthShrink = Def.ChangelogIndent;
+					if info.bullet == 2 then
+						textWidthShrink = Def.ChangelogIndent2;
+						extraLeftOffset = Def.ChangelogIndent2;
+					else
+						textWidthShrink = Def.ChangelogIndent;
+						extraLeftOffset = Def.ChangelogIndent;
+					end
 				else
 					textWidthShrink = 0;
 				end
@@ -1730,7 +1739,7 @@ do  --ChangelogTab
 						end
 					end
 				else
-					content[n].offsetX = leftOffset + (info.bullet and Def.ChangelogIndent or 0);
+					content[n].offsetX = leftOffset + extraLeftOffset;
 					if info.bullet then
 						n = n + 1;
 						content[n] = {
@@ -1740,13 +1749,14 @@ do  --ChangelogTab
 							bottom = bottom,
 							point = "LEFT",
 							relativePoint = "TOPLEFT",
-							offsetX = leftOffset -6,
+							offsetX = leftOffset + extraLeftOffset - 22,
 							setupFunc = function(obj)
 								obj:SetSize(20, 20);
 								obj:SetTexture(Def.TextureFile);
 								SetTexCoord(obj, 904, 944, 80, 120); --864, 904, 80, 120
 								local color = Def.TextColorReadable;
-								obj:SetVertexColor(color[1], color[2], color[3]);
+								local a = info.bullet == 2 and 0.6 or 1;
+								obj:SetVertexColor(a * color[1], a * color[2], a * color[3]);
 							end;
 						};
 					end
