@@ -235,40 +235,40 @@ L["Seed Color Uncommon"] = ICON_TAG_RAID_TARGET_TRIANGLE3 or "Green";
 
 
 --Tooltip Chest Keys
-L["ModuleName TooltipChestKeys"] = "Chest Keys";
+L["ModuleName TooltipChestKeys"] = "Tooltip: Chest Keys";
 L["ModuleDescription TooltipChestKeys"] = "Show info on the key required to open the current chest or door.";
 
 
 --Tooltip Reputation Tokens
-L["ModuleName TooltipRepTokens"] = "Reputation Tokens";
+L["ModuleName TooltipRepTokens"] = "Tooltip: Reputation Tokens";
 L["ModuleDescription TooltipRepTokens"] = "Show the faction info if the item can be used to increase reputation.";
 
 
 --Tooltip Mount Recolor
-L["ModuleName TooltipSnapdragonTreats"] = "Snapdragon Treats";
+L["ModuleName TooltipSnapdragonTreats"] = "Tooltip: Snapdragon Treats";
 L["ModuleDescription TooltipSnapdragonTreats"] = "Show additional info for Snapdragon Treats.";
 L["Color Applied"] = "This is the currently applied color.";
 
 
 --Tooltip Item Reagents
-L["ModuleName TooltipItemReagents"] = "Reagents";
+L["ModuleName TooltipItemReagents"] = "Tooltip: Reagents";
 L["ModuleDescription TooltipItemReagents"] = "If an item can be used to combine into something new, display all \"reagents\" used in the process.\n\nPress and hold Shift to display the crafted item if supported.";
 L["Can Create Multiple Item Format"] = "You have the resources to create |cffffffff%d|r items.";
 
 
 --Tooltip DelvesItem
-L["ModuleName TooltipDelvesItem"] = "Delves Items";
+L["ModuleName TooltipDelvesItem"] = "Tooltip: Delves Items";
 L["ModuleDescription TooltipDelvesItem"] = "Show how many Coffer Keys and Shards you have earned from weekly caches.";
 L["You Have Received Weekly Item Format"] = "You have received %s this week.";
 
 
 --Tooltip ItemQuest
-L["ModuleName TooltipItemQuest"] = "Quest Starting Items";
+L["ModuleName TooltipItemQuest"] = "Tooltip: Quest Starting Items";
 L["ModuleDescription TooltipItemQuest"] = "If an item in your bag starts a quest, show the quest details.\n\nYou can Ctrl Left Click the item to view it in the quest log if you are already on the quest.";
 L["Instruction Show In Quest Log"] = "<Ctrl Click to View in Quest Log>";
 
 
-L["ModuleName TooltipTransmogEnsemble"] = "Transmog Ensembles";
+L["ModuleName TooltipTransmogEnsemble"] = "Tooltip: Transmog Ensembles";
 L["ModuleDescription TooltipTransmogEnsemble"] = "- Show the number of collectable appearances from an Ensemble.\n\n- Fixed the issue where the tooltip says \"Already known\" but you can still use it to unlock new appearances.";
 L["Collected Appearances"] = "Collected Appearances";
 L["Collected Items"] = "Collected Items";
@@ -290,7 +290,7 @@ L["No Resilient Seed"] = "No Resilient Seeds";
 
 
 --Tooltip VendorLocation
-L["ModuleName TooltipVendorLocation"] = "Vendor Locations";
+L["ModuleName TooltipVendorLocation"] = "Tooltip: Vendor Locations";
 L["ModuleDescription TooltipVendorLocation"] = "Show where to exchange certain tokens on the item tooltip and allow Ctrl-Clicking the item to set a map pin to the vendor.";
 L["Instruction Set Waypoint"] = "<Ctrl click to set a map pin>";
 L["NPC Name Location Format"] = "%s, %s";
