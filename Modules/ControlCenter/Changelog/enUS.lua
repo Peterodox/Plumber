@@ -11,6 +11,73 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10902] = {
 	{
 		type = "date",
+		versionText = "1.9.2 b",
+		timestamp = 1778800000,
+	},
+
+	{
+		type = "h1",
+		text = "Bug Fixes",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "House Macros: Fixed an error that occurred during the initial login.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot Window: The \"Take All\" hotkey indicator (Default: E) now automatically hides when entering combat, meaning the hotkey is disabled due to combat restrictions.",
+	},
+	{
+		type = "p",
+		bullet = 2,
+		text = "Note: Hotkeys bound to a single modifier key (SHIFT, CTRL, or ALT) remain functional regardless of combat status.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Tooltip Reagents: Corrected the required quantity display for Ascendant Voidcore (updated from 4 to 5).",
+	},
+	{
+		type = "p",
+		bullet = 2,
+		text = "Note: We are aware that some reagent counts may still be off by 1; these are being patched manually as they are identified.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = "Added",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added Nebulous Voidcore (bonus rolls) to the resource list.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Text Outline: Implemented Slug text rendering for certain Plumber fonts, which improves legibility and sharpness when text is displayed at smaller scales.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.2",
 		timestamp = 1778200000,
 	},

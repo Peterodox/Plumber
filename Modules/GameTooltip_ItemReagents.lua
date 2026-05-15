@@ -16,7 +16,6 @@ local IsShiftKeyDown = IsShiftKeyDown;
 
 
 local ItemReagentCache = {};
-local ItemRecipeIDCache = {};   --Debug
 local QuantityOverride = {};
 
 local IgnoredItems = {
@@ -35,7 +34,6 @@ function ItemSubModule:ProcessData(tooltip, itemID)
 				local schematic = GetRecipeSchematic(spellID, false);
 				if schematic and schematic.reagentSlotSchematics then
 					local recipeID = schematic.recipeID;
-					ItemRecipeIDCache[itemID] = recipeID;
 					local numReagents = 0;
 					local reagents = {};
 					local reagentItemID;
@@ -245,5 +243,9 @@ do  --QuantityOverride
 
 	QuantityOverride[468717] = {
 		[231757] = 2,   --Fractured Spark TWW S3
+	};
+
+	QuantityOverride[1283168] = {
+		[268650] = 5,   --Ascendant Voidcore
 	};
 end

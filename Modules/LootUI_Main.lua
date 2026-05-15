@@ -93,7 +93,8 @@ do
 		end
 
 		local fontObject = PlumberLootUIFont;
-		fontObject:SetFont(fontFile, Round(fontSize), "OUTLINE");
+		local fontFlag = "SLUGOUTLINE";
+		fontObject:SetFont(fontFile, Round(fontSize), fontFlag);
 		fontObject:SetShadowOffset(0, 0);
 
 		local locale = GetLocale();
@@ -1215,7 +1216,7 @@ local CreateUIButton
 do  --UI Generic Button (Hotkey Button)
 	local UIButtonMixin = {};
 
-	function UIButtonMixin:SetHotkey(key)
+	function UIButtonMixin:SetHotkeyVisual(key)
 		if key then
 			self.hotkeyName = key;
 			if API.GetModifierKeyName(key) ~= nil then
@@ -1331,11 +1332,9 @@ do  --TakeAllButton
 	function TakeAllButtonMixin:OnEvent(event, ...)
 		if event == "PLAYER_REGEN_DISABLED" then
 			self:SetPropagateKeyboardInput(true);
+			self:UpdateHotKey();
 		elseif event == "PLAYER_REGEN_ENABLED" then
-			if self.hotkeyName and not self.hasOnKeyDownScript then
-				self:SetScript("OnKeyDown", self.OnKeyDown);
-				self.hasOnKeyDownScript = true;
-			end
+			self:UpdateHotKey();
 		elseif event == "MODIFIER_STATE_CHANGED" then
 			local key, down = ...
 			if down == 1 and key == TAKE_ALL_MODIFIER_KEY then
@@ -1345,22 +1344,20 @@ do  --TakeAllButton
 	end
 
 	function TakeAllButtonMixin:OnShow()
-		if MainFrame.inEditMode then return end;
-
-		if self.hotkeyName and (not InCombatLockdown()) or self:GetPropagateKeyboardInput() then
-			self:SetScript("OnKeyDown", self.OnKeyDown);
-			self.hasOnKeyDownScript = true;
+		if MainFrame.inEditMode then
+			self:SetScript("OnKeyDown", nil);
+			self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+			self:SetHotkeyVisual(TAKE_ALL_KEY);
+			return;
 		end
+
 		self:RegisterEvent("PLAYER_REGEN_DISABLED");
 		self:RegisterEvent("PLAYER_REGEN_ENABLED");
-		if TAKE_ALL_MODIFIER_KEY then
-			self:RegisterEvent("MODIFIER_STATE_CHANGED");
-		end
+		self:UpdateHotKey();
 	end
 
 	function TakeAllButtonMixin:OnHide()
 		self:SetScript("OnKeyDown", nil);
-		self.hasOnKeyDownScript = nil;
 		self:UnregisterEvent("PLAYER_REGEN_DISABLED");
 		self:UnregisterEvent("PLAYER_REGEN_ENABLED");
 		self:UnregisterEvent("MODIFIER_STATE_CHANGED");
@@ -1368,11 +1365,19 @@ do  --TakeAllButton
 		self.Highlight:Hide();
 	end
 
-	function TakeAllButtonMixin:UpdateHotKey()
-		if USE_HOTKEY then
-			self:SetHotkey(TAKE_ALL_KEY);
+	function TakeAllButtonMixin:UpdateHotKey(inCombat)
+		self:SetScript("OnKeyDown", nil);
+		self:UnregisterEvent("MODIFIER_STATE_CHANGED");
+
+		if USE_HOTKEY and TAKE_ALL_KEY and (TAKE_ALL_MODIFIER_KEY or (not (InCombatLockdown() or inCombat))) then
+			self:SetHotkeyVisual(TAKE_ALL_KEY);
+			if TAKE_ALL_MODIFIER_KEY then
+				self:RegisterEvent("MODIFIER_STATE_CHANGED");
+			else
+				self:SetScript("OnKeyDown", self.OnKeyDown);
+			end
 		else
-			self:SetHotkey(nil);
+			self:SetHotkeyVisual(nil);
 		end
 	end
 
