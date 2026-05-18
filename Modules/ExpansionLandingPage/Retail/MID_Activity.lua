@@ -197,8 +197,8 @@ do
 	--]]
 
 	function SetupFuncs.HuntTable(listButton)
-		local activeQuestID = C_QuestLog.GetActivePreyQuest();
-		if activeQuestID then
+		local activeQuestID = C_QuestLog.GetActivePreyQuest() or 91277; -- Prey: Preferential Killing
+		if C_QuestLog.IsOnQuest(activeQuestID) then
 			listButton:SetQuest(activeQuestID);
 			listButton.flagQuest = activeQuestID;
 			listButton.completed = C_QuestLog.IsQuestFlaggedCompleted(activeQuestID);
