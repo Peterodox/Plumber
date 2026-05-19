@@ -1718,7 +1718,7 @@ do  --Expansion Select
 	local CurrentExpansionID;
 	local ExpansionData = {
 		[11] = {name = EXPANSION_NAME10},   --TWW
-		[12] = {name = EXPANSION_NAME11, isWIP = true},   --MID
+		[12] = {name = EXPANSION_NAME11, isWIP = false},   --MID
 		[5] = {name = EXPANSION_NAME4},     --MOP
 	};
 
