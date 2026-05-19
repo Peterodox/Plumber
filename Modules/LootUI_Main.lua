@@ -571,12 +571,20 @@ do  --UI ItemButton
 
 	function ItemFrameMixin:SetItem(data)
 		self.singleItemID = data.id;
-		self:SetNameByQuality(data.name, data.quality);
+
+		local showGlow, subtitle = IsRareItem(data);
+
+		if subtitle then
+			self:SetNameByQuality(string.format("%s\n|cff19ff19%s|r", data.name, subtitle), data.quality);
+		else
+			self:SetNameByQuality(data.name, data.quality);
+		end
+
 		self:SetIcon(data.icon, data);
 		self:SetCount(data);
 		self:Layout();
 
-		if IsRareItem(data) then
+		if showGlow then
 			self:ShowGlow(true);
 		else
 			self:ShowGlow(false);
@@ -1995,12 +2003,34 @@ do  --Rare Items
 		[224025] = true,    --Crackling Shard
 	};
 
+	local TertiaryStats = {
+		"ITEM_MOD_CR_LIFESTEAL_SHORT",
+		"ITEM_MOD_CR_AVOIDANCE_SHORT",
+		"ITEM_MOD_CR_SPEED_SHORT",
+		"ITEM_MOD_CR_STURDINESS_SHORT",
+		--"ITEM_MOD_STAMINA_SHORT", -- debug
+	};
+
 	function IsRareItem(data)
 		if RareItems[data.id] then
-			return true
-		elseif data.classID == 15 and data.subclassID == 5 then
-			--Mount
-			return true
+			return true;
+		elseif data.classID == 15 and (data.subclassID == 2 or data.subclassID == 5) then
+			-- CompanionPet/Mount
+			return true;
+		elseif data.classID == 17 then
+			-- Battlepet
+			return true;
+		elseif data.classID == 2 or data.classID == 4 and data.link and C_Item.GetItemStats then
+			-- Equipment with tertiary stats. Retail only.
+			local stats = C_Item.GetItemStats(data.link);
+			if stats then
+				for _, k in ipairs(TertiaryStats) do
+					if stats[k] then
+						local subtitle = _G[k];
+						return true, subtitle;
+					end
+				end
+			end
 		end
 	end
 end

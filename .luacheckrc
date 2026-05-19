@@ -855,6 +855,7 @@ stds.wow = {
 				"GetItemQualityByID",
 				"GetItemQualityColor",
 				"GetItemSpell",
+				"GetItemStats",
 				"GetItemSubClassInfo",
 				"GetItemUpgradeInfo",
 				"IsCosmeticItem",
