@@ -2011,6 +2011,12 @@ do  --Rare Items
 		--"ITEM_MOD_STAMINA_SHORT", -- debug
 	};
 
+	local ItemStatExclusion = {
+		-- Items that come with tertiaries
+		[251783] = "ITEM_MOD_CR_SPEED_SHORT",	-- Lost Idol of the Hash'ey
+		[262754] = "ITEM_MOD_CR_SPEED_SHORT",	-- Void Pearl of Haste
+	};
+
 	function IsRareItem(data)
 		if RareItems[data.id] then
 			return true;
@@ -2024,8 +2030,9 @@ do  --Rare Items
 			-- Equipment with tertiary stats. Retail only.
 			local stats = C_Item.GetItemStats(data.link);
 			if stats then
+				local excludeStat = ItemStatExclusion[data.id];
 				for _, k in ipairs(TertiaryStats) do
-					if stats[k] then
+					if stats[k] and k ~= excludeStat then
 						local subtitle = _G[k];
 						return true, subtitle;
 					end
