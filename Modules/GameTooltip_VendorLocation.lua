@@ -56,6 +56,11 @@ do
 
 		if self.enabled then
 			if ItemData[itemID] and not InCombatLockdown() then
+				local info = tooltip.processingInfo;
+				if not (info and info.getterName == "GetBagItem") then
+					return false;
+				end
+
 				local data = ItemData[itemID];
 				self.currentData = data;
 

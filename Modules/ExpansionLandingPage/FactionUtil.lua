@@ -157,7 +157,7 @@ local OverrideFactionInfo = {
 do  --Layout MID
 	local MajorFactionLayout = {
 		[1] = {
-			--{factionID = 2792},		--Ritual Sites
+			{factionID = 2792},		--Ritual Sites
 			{factionID = 2764},     --Prey S1
 			{factionID = 2742,      --Delves S1
 				subFactions = {
@@ -184,9 +184,9 @@ do  --Layout MID
 
 	LandingPageUtil.AddExpansionData(12, "factionLayout", MajorFactionLayout);
 
-	if addon.IS_12_0_5 then  --For PTR
-		table.insert(MajorFactionLayout[1], 1, {factionID = 2792});
-	end
+	--if addon.IS_12_0_7 then  --For PTR
+		--table.insert(MajorFactionLayout[1], 1, {factionID = 2792});
+	--end
 end
 
 

@@ -11,6 +11,37 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10902] = {
 	{
 		type = "date",
+		versionText = "1.9.2 c",
+		timestamp = 1779500000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot Window: Added a highlight effect to looted pets and equipment with bonus tertiary stats.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary: Fixed a text display issue for \"Prey\" while on the quest \"Preferential Killing.\"",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Tooltips: Vendor location instructions now only display when hovering over items in your bags, rather than on all tooltip sources.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.2 b",
 		timestamp = 1778800000,
 	},
