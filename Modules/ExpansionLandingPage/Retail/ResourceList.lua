@@ -72,6 +72,17 @@ do  --MID
 		{currencyID = 2797, shownIfOwned = true},   --Trophy of Strife
 	};
 
+	if addon.IS_12_0_7 then
+		local crests = addon.ItemUpgradeConstant.Crests;
+		if crests then
+			for _, currencyID in ipairs(crests) do
+				table.insert(ResourceList, 2, {
+					currencyID = currencyID,
+				});
+			end
+		end
+	end
+
 	if addon.ItemUpgradeConstant.CatalystCurrencyID then
 		table.insert(ResourceList, 2, {
 			currencyID = addon.ItemUpgradeConstant.CatalystCurrencyID,

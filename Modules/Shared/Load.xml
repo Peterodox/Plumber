@@ -7,4 +7,5 @@
 	<Include file="CooldownUtil.lua"/>
 	<Include file="BlizzardEditMode.lua"/>
 	<Include file="WidgetSetUtil.lua"/>
+	<Include file="TraitSystem.lua"/>
 </Ui>

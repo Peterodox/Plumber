@@ -381,9 +381,14 @@ do
 
 		local categories = {
 			{name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
-			{name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
 			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
 		};
+
+		if addon.IS_12_0_7 then
+			table.insert(categories, 2, {name = LandingPageUtil.GetTraitSystemName(), frameGetter = LandingPageUtil.CreateTraitFrame});
+		else
+			table.insert(categories, 2, {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame});
+		end
 
 		local numCategories = #categories;
 
