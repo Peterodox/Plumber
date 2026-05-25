@@ -98,6 +98,7 @@ do
 		self.IconMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Chamfer", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
 		self.Icon:Show();
 		self.IconMask:Show();
+		self.GreenGlow:SetTexCoord(384/1024, 544/1024, 0/1024, 160/1024);
 	end
 
 	function NodeButtonMixin:SetCircle()
@@ -105,6 +106,7 @@ do
 		self.IconMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Circle", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
 		self.Icon:Show();
 		self.IconMask:Show();
+		self.GreenGlow:SetTexCoord(544/1024, 704/1024, 0/1024, 160/1024);
 	end
 
 	function NodeButtonMixin:SetHex()
@@ -112,7 +114,7 @@ do
 		self.IconMask:SetTexture("Interface/AddOns/Plumber/Art/BasicShape/Mask-Hexagon", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
 		self.Icon:Show();
 		self.IconMask:Show();
-		self.GreenGlow:SetTexCoord(768/1024, 928/1024, 416/1024, 576/1024);
+		self.GreenGlow:SetTexCoord(704/1024, 864/1024, 0/1024, 160/1024);
 		self.Sheen:SetTexCoord(768/1024, 928/1024, 576/1024, 736/1024);
 		self.SheenMask:SetTexture("Interface/AddOns/Plumber/Art/Timerunning/Mask-Halo", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
 	end
@@ -151,6 +153,10 @@ do
 		end
 
 		self.Border:SetTexCoord(left/1024, right/1024, top/1024, bottom/1024);
+	end
+
+	function NodeButtonMixin:CanAfford()
+		return self.ownerFrame:CanAffordNode(self.nodeID);
 	end
 
 	function NodeButtonMixin:Refresh(playAnimation)
@@ -212,7 +218,10 @@ do
 		local rankText;
 		local useGreenGlow = false;
 
-		if not (isActive or currentRank > 0) then
+		if nodeInfo.canPurchaseRank and self:CanAfford() then
+			visualState = 2;
+			useGreenGlow = true;
+		elseif not (isActive or currentRank > 0) then
 			visualState = 0;
 		else
 			if self.entryType == 0 then
@@ -289,7 +298,12 @@ do
 		else
 			entryChanged = activeEntryID ~= self.selectedEntryID;
 			self:SetEntry(self.selectedEntryID or activeEntryID or nodeInfo.entryIDs[1]);
-			visualState = 0;
+			if nodeInfo.canPurchaseRank and self:CanAfford() then
+				visualState = 2;
+				useGreenGlow = true;
+			else
+				visualState = 0;
+			end
 		end
 
 		if visualState ~= 0 and entryChanged then
@@ -315,15 +329,7 @@ do
 	end
 
 	function NodeButtonMixin:ShowTooltip()
-		if self.entryIDs then
-			self.UpdateTooltip = nil;
-			--return
-		end
-
-
-		local spellID = self.spellID;
-
-		local name = C_Spell.GetSpellName(spellID);
+		local name = C_Spell.GetSpellName(self.spellID);
 		if not name then
 			name = RETRIEVING_DATA;
 		end
@@ -356,7 +362,6 @@ do
 			description = description.." |cff19ff19+"..increasedRanks.."|r";
 		end
 
-
 		local activeEntryID = self.entryID;
 		description = AddLine(description, " ");
 		description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", activeEntryID, currentRank);
@@ -378,6 +383,8 @@ do
 		tooltip:SetText(name, 1, 1, 1);
 		tooltip:AddLine(description, 1, 1, 1, true);
 		tooltip:Show();
+
+		self.UpdateTooltip = self.ShowTooltip;
 	end
 
 	function NodeButtonMixin:PlaySheen()
@@ -517,6 +524,34 @@ do
 	function TraitContainerMixin:GetEntryInfo(entryID)
 		if self.configID then
 			return C_Traits.GetEntryInfo(self.configID, entryID);
+		end
+	end
+
+	function TraitContainerMixin:CanAffordNode(nodeID)
+		if self.configID and self.treeID and nodeID then
+			local treeCurrencyInfo = C_Traits.GetTreeCurrencyInfo(self.configID, self.treeID, false);
+			local costs = C_Traits.GetNodeCost(self.configID, nodeID);
+			local idToCost = {};
+			if costs and treeCurrencyInfo then
+				for _, cost in ipairs(costs) do
+					idToCost[cost.ID] = cost.amount;
+				end
+			else
+				return true;
+			end
+
+			local idToAmount = {};
+			for _, info in ipairs(treeCurrencyInfo) do
+				idToAmount[info.traitCurrencyID] = info.quantity;
+			end
+
+			for id, required in pairs(idToCost) do
+				if (not idToAmount[id]) or (idToAmount[id] < required) then
+					return false;
+				end
+			end
+
+			return true;
 		end
 	end
 end

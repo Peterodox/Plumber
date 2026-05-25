@@ -1228,6 +1228,7 @@ stds.wow = {
 				"GetIncreasedTraitData",
 				"GetNodeCost",
 				"GetNodeInfo",
+				"GetTraitCurrencyInfo",
 				"GetTreeCurrencyInfo",
 				"GetTreeNodes",
 				"PurchaseRank",

@@ -407,12 +407,15 @@ do
 				if v.frameGetter then
 					offsetY = offsetY + lineGap;
 					local frame, height, categoryOnEnterFunc = v.frameGetter(container);
+					frame.listCategoryButton = categoryButton;
 					frame:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 					offsetY = offsetY + height;
 					if k == numCategories then
 						frame:SetPoint("BOTTOM", relativeTo, "BOTTOM", 0, 16);
 					end
-					frame:Refresh();
+					if frame.OnLoad then
+						frame:OnLoad();
+					end
 					if frame.OnShow and frame:IsVisible() then
 						frame:OnShow();
 					end
