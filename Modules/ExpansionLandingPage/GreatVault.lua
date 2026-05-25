@@ -305,6 +305,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
 		"HandlePreviewRaidRewardTooltip",
 		"HandlePreviewMythicRewardTooltip",
 		"HandlePreviewPvPRewardTooltip",
+		"HasMultipleRaidInstances",
 	};
 
 	local function ShowTooltip(self)
