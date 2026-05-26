@@ -13,7 +13,11 @@ do
 	local DynamicEvents = {
 		"TRAIT_TREE_CURRENCY_INFO_UPDATED",
 		"TRAIT_CONFIG_UPDATED",
+		"QUEST_LOG_UPDATE",
+		"QUESTLINE_UPDATE",
 	};
+
+	local QUEST_PROVIDER_MAP = 2649; -- The Lycaneum
 
 	function TraitFrameMixin:Refresh()
 		if TraitContainer then
@@ -23,8 +27,9 @@ do
 			TraitContainer:SetPoint("CENTER", self, "CENTER", 0, 0);
 			TraitContainer:SetScale(36/40);
 			TraitContainer:SetConfigIDBySystemID(48); -- RUNES_OF_POWER_SYSTEM_ID
+			TraitContainer:SetEnableAutoCommit(true);
 		end
-		self:UpdateInstruction();
+		self:UpdateHeader();
 	end
 
 	function TraitFrameMixin:OnShow()
@@ -46,12 +51,29 @@ do
 			-- Fire twice for auto commiting trait systems
 			local treeID = ...
 			if treeID and treeID == TraitContainer.treeID and TraitContainer.configID then
-				self:UpdateInstruction();
+				self:UpdateHeader();
 			end
+		elseif event == "QUEST_LOG_UPDATE" or event == "QUESTLINE_UPDATE" then
+			C_QuestLine.RequestQuestLinesForMap(QUEST_PROVIDER_MAP);
+			self:RequestUpdate();
 		end
 	end
 
-	function TraitFrameMixin:UpdateInstruction()
+	function TraitFrameMixin:RequestUpdate()
+		self.t = 0;
+		self:SetScript("OnUpdate", self.OnUpdate);
+	end
+
+	function TraitFrameMixin:OnUpdate(elapsed)
+		self.t = self.t + elapsed;
+		if self.t >= 0.5 then
+			self.t = 0;
+			self:SetScript("OnUpdate", nil);
+			self:Refresh();
+		end
+	end
+
+	function TraitFrameMixin:UpdateTraitSpentInstruction()
 		-- If player has any unspent currency, show it on the header
 		local configID = TraitContainer.configID;
 		local treeID = TraitContainer.treeID;
@@ -62,24 +84,137 @@ do
 			local info = treeCurrencyInfo and treeCurrencyInfo[1];
 			if info and info.quantity > 0 then
 				local flags, type, currencyTypesID, icon = C_Traits.GetTraitCurrencyInfo(info.traitCurrencyID);
-				self.CurrencyFrame.Icon:SetTexture(icon);
-				self.CurrencyFrame.Count:SetText(info.quantity);
-				self.CurrencyFrame:SetPoint("CENTER", self.listCategoryButton, "CENTER", 0, 0);
-				self.CurrencyFrame:Show();
-				self.listCategoryButton.Name:Hide();
-				return
+				self.HeaderFrame:DisplayTraitCurrency(icon, info.quantity);
+				return true;
+			end
+		else
+			return false;
+		end
+	end
+
+	function TraitFrameMixin:UpdateQuestNotification()
+		-- When a new quest becomes available
+		local questID, isStartingQuest;
+		local quests = C_QuestLine.GetAvailableQuestLines(QUEST_PROVIDER_MAP);
+
+		if quests then
+			for _, quest in ipairs(quests) do
+				if quest.questLineID == 6307 then
+					-- The Empowered Folio
+					if not quest.isAccountCompleted then
+						isStartingQuest = true;
+						questID = quest.questID;
+					end
+				end
 			end
 		end
 
-		self.CurrencyFrame:Hide();
-		self.listCategoryButton.Name:Show();
+		if not questID then
+			local questIDs = {96410, 96441, 96442, 96443, 96444};
+			for _, _questID in ipairs(questIDs) do
+				if C_QuestLog.IsOnQuest(_questID) then
+					questID = _questID;
+					break
+				end
+			end
+		end
+
+		if questID then
+			self.HeaderFrame:DisplayQuest(questID, isStartingQuest);
+			return true;
+		else
+			return false;
+		end
+	end
+
+	function TraitFrameMixin:ShowHeaderFrame(state)
+		if state then
+			self.HeaderFrame:SetPoint("CENTER", self.listCategoryButton, "CENTER", 0, 0);
+			self.HeaderFrame:Show();
+			self.listCategoryButton.Name:Hide();
+		else
+			self.HeaderFrame:Hide();
+			self.listCategoryButton.Name:Show();
+		end
+	end
+
+	function TraitFrameMixin:UpdateHeader()
+		local anyShown = self:UpdateTraitSpentInstruction();
+		if not anyShown then
+			anyShown = self:UpdateQuestNotification();
+		end
+		self:ShowHeaderFrame(anyShown);
 	end
 end
 
+local HeaderFrameMixin = {};
+do
+	function HeaderFrameMixin:DisplayTraitCurrency(icon, quantity)
+		self.Icon:ClearAllPoints();
+		self.Text:ClearAllPoints();
+		self.Icon:SetSize(16, 16);
+		self.Icon:SetPoint("LEFT", self, "CENTER", 0, 0);
+		self.Icon:SetTexture(icon);
+		self.Text:SetPoint("RIGHT", self.Icon, "LEFT", -4, 0);
+		self.Text:SetText(quantity);
+		self.Text:SetTextColor(0.098, 1.000, 0.098);
+		self:SetScript("OnEnter", self.ShowTooltipSpell);
+	end
 
-local function CategoryButtonOnEnterFunc(listCategoryButton)
+	function HeaderFrameMixin:ShowTooltipSpell()
+		local tooltip = GameTooltip;
+		tooltip:SetOwner(self.Icon, "ANCHOR_RIGHT");
+		tooltip:SetSpellByID(1294322); -- Mote of Omnial Inquiry
+	end
 
+	function HeaderFrameMixin:DisplayQuest(questID, isStartingQuest)
+		self.Icon:ClearAllPoints();
+		self.Text:ClearAllPoints();
+		self.Text:SetPoint("CENTER", self, "CENTER", 8, 0);
+		local iconOffset = 0;
+
+		if isStartingQuest then
+			self.Text:SetText(addon.L["New Quest"]);
+			self.Text:SetTextColor(0.922, 0.871, 0.761);
+			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/TrackerType-Quest.png");
+		elseif API.IsQuestReadyForTurnIn(questID) then
+			self.Text:SetText(QUEST_WATCH_QUEST_READY);
+			self.Text:SetTextColor(0.098, 1.000, 0.098);
+			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/TrackerType-Quest.png");
+		else
+			self.Text:SetText(GARRISON_MISSION_IN_PROGRESS_TOOLTIP);
+			self.Text:SetTextColor(0.922, 0.871, 0.761);
+			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png");
+			iconOffset = -4;
+		end
+
+		self.Icon:SetSize(16, 16);
+		self.Icon:SetPoint("RIGHT", self.Text, "LEFT", iconOffset, 0);
+
+		self.questID = questID;
+		self:SetScript("OnEnter", self.ShowTooltipQuest);
+	end
+
+	function HeaderFrameMixin:ShowTooltipQuest()
+		if not self.questID then return; end
+		local TooltipUpdator = LandingPageUtil.TooltipUpdator;
+		TooltipUpdator:SetFocusedObject(self);
+		TooltipUpdator:SetHeaderText(API.GetQuestName(self.questID))
+		TooltipUpdator:SetQuestID(self.questID);
+		TooltipUpdator:RequestQuestProgress();
+		TooltipUpdator:RequestQuestReward();
+	end
+
+	function HeaderFrameMixin:OnLeave()
+		GameTooltip:Hide();
+		LandingPageUtil.TooltipUpdator:StopUpdating();
+	end
+
+	function HeaderFrameMixin:OnClick()
+
+	end
 end
+
 
 function LandingPageUtil.GetTraitSystemName()
 	return RUNES_OF_POWER;
@@ -99,30 +234,18 @@ function LandingPageUtil.CreateTraitFrame(parent)
 	f:SetScript("OnHide", f.OnHide);
 	f:SetScript("OnEvent", f.OnEvent);
 
-	local CurrencyFrame = CreateFrame("Frame", nil, f);
-	f.CurrencyFrame = CurrencyFrame;
-	CurrencyFrame:Hide();
-	CurrencyFrame:SetSize(240, 24);
+	local HeaderFrame = CreateFrame("Button", nil, f);
+	f.HeaderFrame = HeaderFrame;
+	HeaderFrame:Hide();
+	HeaderFrame:SetSize(240, 24);
+	HeaderFrame.Icon = HeaderFrame:CreateTexture(nil, "OVERLAY");
+	HeaderFrame.Text = HeaderFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+	Mixin(HeaderFrame, HeaderFrameMixin);
+	HeaderFrame:SetScript("OnEnter", HeaderFrame.OnEnter);
+	HeaderFrame:SetScript("OnLeave", HeaderFrame.OnLeave);
+	HeaderFrame:SetScript("OnClick", HeaderFrame.OnClick);
 
-	CurrencyFrame.Icon = CurrencyFrame:CreateTexture(nil, "OVERLAY");
-	CurrencyFrame.Icon:SetSize(16, 16);
-	CurrencyFrame.Icon:SetPoint("LEFT", CurrencyFrame, "CENTER", 0, 0);
-	CurrencyFrame.Count = CurrencyFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-	CurrencyFrame.Count:SetPoint("RIGHT", CurrencyFrame.Icon, "LEFT", -4, 0);
-	CurrencyFrame.Count:SetTextColor(0.098, 1.000, 0.098);
-
-	CurrencyFrame:SetScript("OnEnter", function()
-		local tooltip = GameTooltip;
-		tooltip:SetOwner(CurrencyFrame.Icon, "ANCHOR_RIGHT");
-		tooltip:SetSpellByID(1294322); -- Mote of Omnial Inquiry
-	end);
-
-	CurrencyFrame:SetScript("OnLeave", function()
-		GameTooltip:Hide();
-	end);
-
-
-	return f, height, CategoryButtonOnEnterFunc;
+	return f, height
 end
 
 -- Interface/AddOns/Blizzard_ExpansionLandingPage/Blizzard_MidnightLandingPage.lua
