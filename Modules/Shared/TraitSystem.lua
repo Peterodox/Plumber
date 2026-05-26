@@ -9,6 +9,9 @@ local Def = {
 };
 
 
+local CommitUtil = CreateFrame("Frame");
+
+
 local NodeButtonMixin = {};
 do
 	function NodeButtonMixin:OnLoad()
@@ -20,9 +23,11 @@ do
 		self.Border:SetSize(64, 64);
 		self.Icon:SetSize(36, 36);
 		self.IconMask:SetSize(36, 36);
+		self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 		self:SetScript("OnEnter", self.OnEnter);
 		self:SetScript("OnLeave", self.OnLeave);
 		self:SetScript("OnDragStart", self.OnDragStart);
+		self:SetScript("OnClick", self.OnClick);
 
 
 		local function AnimSheen_OnPlay()
@@ -159,8 +164,27 @@ do
 		return self.ownerFrame:CanAffordNode(self.nodeID);
 	end
 
+	function NodeButtonMixin:CanPurchaseRank()
+		if self.nodeInfo and self.nodeInfo.canPurchaseRank and self:CanAfford() then
+			return true;
+		end
+		return false;
+	end
+
+	function NodeButtonMixin:CanRefundRank()
+		return self.nodeInfo and self.nodeInfo.canRefundRank;
+	end
+
+	function NodeButtonMixin:IsSelectionNode()
+		if not self.nodeInfo then
+			self.nodeInfo = self.ownerFrame:GetNodeInfo(self.nodeID);
+		end
+		return self.nodeInfo and self.nodeInfo.type == 2;
+	end
+
 	function NodeButtonMixin:Refresh(playAnimation)
 		local nodeInfo = self.nodeID and self.ownerFrame:GetNodeInfo(self.nodeID);
+		self.nodeInfo = nodeInfo;
 		if not nodeInfo then return; end
 
 		if self.isNodeDirty then
@@ -218,7 +242,7 @@ do
 		local rankText;
 		local useGreenGlow = false;
 
-		if nodeInfo.canPurchaseRank and self:CanAfford() then
+		if self:CanPurchaseRank() then
 			visualState = 2;
 			useGreenGlow = true;
 		elseif not (isActive or currentRank > 0) then
@@ -298,7 +322,7 @@ do
 		else
 			entryChanged = activeEntryID ~= self.selectedEntryID;
 			self:SetEntry(self.selectedEntryID or activeEntryID or nodeInfo.entryIDs[1]);
-			if nodeInfo.canPurchaseRank and self:CanAfford() then
+			if self:CanPurchaseRank() then
 				visualState = 2;
 				useGreenGlow = true;
 			else
@@ -338,7 +362,6 @@ do
 		local currentRank = nodeInfo.currentRank or 0;
 		local ranksPurchased = nodeInfo.ranksPurchased or 0;
 
-
 		--Bonus Ranks
 		local increasedRanks = nodeInfo.entryIDToRanksIncreased and nodeInfo.entryIDToRanksIncreased[self.entryID] or 0;
 		if self.isFlyoutButton then
@@ -374,14 +397,34 @@ do
 			description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", nextEntryInfo.entryID, nextRank);
 		end
 
-		if self.isFlyoutButton and InCombatLockdown() then
-			description = AddLine(description, "\n|cffff2020"..addon.L["Error Change Trait In Combat"].."|r");
+		if self.isFlyoutButton then
+
 		end
 
 		local tooltip = GameTooltip;
 		tooltip:SetOwner(self, "ANCHOR_RIGHT");
 		tooltip:SetText(name, 1, 1, 1);
 		tooltip:AddLine(description, 1, 1, 1, true);
+
+		local instructionText, r, g, b;
+
+		if self:CanPurchaseRank() then
+			r, g, b = 0.098, 1.000, 0.098;
+			instructionText = TALENT_BUTTON_TOOLTIP_PURCHASE_INSTRUCTIONS;
+		elseif self:CanRefundRank() then
+			r, g, b = 0.502, 0.502, 0.502;
+			instructionText = TALENT_BUTTON_TOOLTIP_REFUND_INSTRUCTIONS;
+		end
+
+		if instructionText then
+			tooltip:AddLine(" ");
+			if InCombatLockdown() then
+				instructionText = addon.L["Error Change Trait In Combat"];
+				r, g, b = 1.000, 0.125, 0.125;
+			end
+			tooltip:AddLine(instructionText, r, g, b, true);
+		end
+
 		tooltip:Show();
 
 		self.UpdateTooltip = self.ShowTooltip;
@@ -391,7 +434,26 @@ do
 		self.AnimSheen:Stop();
 		self.AnimSheen:Play();
 	end
+
+	function NodeButtonMixin:OnClick(button)
+		if InCombatLockdown() then return; end
+
+		if button == "RightButton" then
+			if self:CanRefundRank() then
+				self.ownerFrame:TryRefundRank(self.nodeID);
+			end
+		else
+			if self:CanPurchaseRank() then
+				if self:IsSelectionNode() then
+					self.ownerFrame:TryPurchaseSelectionNode(self.nodeID); -- debug
+				else
+					self.ownerFrame:TryPurchaseRank(self.nodeID);
+				end
+			end
+		end
+	end
 end
+
 
 local TraitContainerMixin = {};
 do
@@ -399,7 +461,7 @@ do
 		if self.nodeButtonPool then return; end
 
 		local function createObjectFunc()
-			local obj = CreateFrame("Frame", nil, self, "PlumberTraitNodeButtonTemplate");
+			local obj = CreateFrame("Button", nil, self, "PlumberTraitNodeButtonTemplate");
 			Mixin(obj, NodeButtonMixin);
 			obj.ownerFrame = self;
 			obj:OnLoad();
@@ -554,7 +616,166 @@ do
 			return true;
 		end
 	end
+
+	function TraitContainerMixin:TryPurchaseRank(nodeID)
+		if self.configID and nodeID then
+			CommitUtil:TryPurchaseRank(self.configID, nodeID, self.shouldAutoCommit);
+		end
+	end
+
+	function TraitContainerMixin:TryPurchaseSelectionNode(nodeID, entryID)
+		if self.configID and nodeID then
+			if not entryID then
+				-- debug: Purchase the first entry
+				local nodeInfo = C_Traits.GetNodeInfo(self.configID, nodeID);
+				if nodeInfo and nodeInfo.entryIDs then
+					entryID = nodeInfo.entryIDs[1];
+				end
+			end
+
+			CommitUtil:TryPurchaseSelectionNode(self.configID, nodeID, entryID, self.shouldAutoCommit);
+		end
+	end
+
+	function TraitContainerMixin:TryRefundRank(nodeID)
+		if self.configID and nodeID then
+			CommitUtil:TryRefundRank(self.configID, nodeID, self.shouldAutoCommit);
+		end
+	end
+
+	function TraitContainerMixin:SetEnableAutoCommit(shouldAutoCommit)
+		self.shouldAutoCommit = shouldAutoCommit;
+	end
 end
+
+
+do
+	function CommitUtil:IsCommittingInProcess()
+		return self.committingConfigID ~= nil;
+	end
+
+	function CommitUtil:StartCommitting(configID)
+		if (not configID) and (InCombatLockdown() or self:IsCommittingInProcess()) then
+			return;
+		end
+
+		self.committingConfigID = configID;
+		self.t = 0;
+		self:SetScript("OnUpdate", self.OnUpdate_Committing);
+		self:SetScript("OnEvent", self.OnEvent);
+		self:RegisterEvent("TRAIT_CONFIG_UPDATED");
+		self:RegisterEvent("CONFIG_COMMIT_FAILED");
+
+		C_Traits.CommitConfig(configID);
+	end
+
+	function CommitUtil:OnCommitFinished()
+		local configID = self.committingConfigID;
+		self.committingConfigID = nil;
+		self:SetScript("OnUpdate", nil);
+		self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
+		self:UnregisterEvent("CONFIG_COMMIT_FAILED");
+		if self.commitResult == 1 then
+			--addon.CallbackRegistry:Trigger("TraitSystem.CommitSucceeded", configID);
+		elseif self.commitResult == 0 then
+			--addon.CallbackRegistry:Trigger("TraitSystem.CommitFailed", configID);
+		end
+		self.commitResult = nil;
+	end
+
+	function CommitUtil:OnUpdate_Committing(elapsed)
+		self.t = self.t + elapsed;
+		if self.t >= 1 then
+			self.t = 0;
+			self:SetScript("OnUpdate", nil);
+			self.committingConfigID = nil;
+		end
+	end
+
+	function CommitUtil:OnEvent(event, ...)
+		if event == "TRAIT_CONFIG_UPDATED" then
+			local configID = ...
+			if configID == self.committingConfigID then
+				self.commitResult = 1;
+			end
+		elseif event == "CONFIG_COMMIT_FAILED" then
+			local configID = ...
+			if configID == self.committingConfigID then
+				self.commitResult = 0;
+			end
+		end
+
+		if self.commitResult then
+			self:OnCommitFinished();
+		end
+	end
+
+	function CommitUtil:TryPurchaseRank(configID, nodeID, autoCommit)
+		if self:IsCommittingInProcess() then
+			return;
+		end
+
+		local success = C_Traits.PurchaseRank(configID, nodeID);
+		if success and autoCommit then
+			self:StartCommitting(configID);
+		end
+		return success;
+	end
+
+	function CommitUtil:TryPurchaseSelectionNode(configID, nodeID, entryID, autoCommit)
+		if self:IsCommittingInProcess() then
+			return;
+		end
+
+		local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID);
+		if nodeInfo then
+			local isNewEntryIDValid;
+
+			if nodeInfo.entryIDs then
+				for _, _entryID in ipairs(nodeInfo.entryIDs) do
+					if _entryID == entryID then
+						isNewEntryIDValid = true;
+						break
+					end
+				end
+			end
+
+			if not isNewEntryIDValid then return end;
+
+			local canChangeEntry = true;
+
+			if nodeInfo.entryIDsWithCommittedRanks then
+				for _, committedEntryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+					if committedEntryID == entryID then
+						canChangeEntry = false;
+						break
+					end
+				end
+			end
+
+			if canChangeEntry then
+				local success = C_Traits.SetSelection(configID, nodeID, entryID);
+				if success and autoCommit then
+					self:StartCommitting(configID);
+				end
+				return success;
+			end
+		end
+	end
+
+	function CommitUtil:TryRefundRank(configID, nodeID, autoCommit)
+		if self:IsCommittingInProcess() then
+			return;
+		end
+
+		local success = C_Traits.RefundRank(configID, nodeID);
+		if success and autoCommit then
+			self:StartCommitting(configID);
+		end
+		return success;
+	end
+end
+
 
 function addon.CreateTraitContainer(parent)
 	local f = CreateFrame("Frame", nil, parent);
