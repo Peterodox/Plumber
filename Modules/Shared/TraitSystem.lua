@@ -51,7 +51,7 @@ do
 
 	function NodeButtonMixin:OnLeave()
 		self.ownerFrame:HoverNode();
-		if self.nodeChoices or self.isFlyoutButton then
+		if self.entryIDs or self.isFlyoutButton then
 			if not self.ownerFrame:IsNodeFlyoutFocused(self) then
 				self.ownerFrame:CloseNodeFlyout();
 			end
@@ -63,9 +63,10 @@ do
 	end
 
 	function NodeButtonMixin:OnFocused()
-		self:ShowTooltip();
-		if self.nodeChoices then
+		if self.entryIDs then
 			self.ownerFrame:ShowNodeFlyout(self);
+		else
+			self:ShowTooltip();
 		end
 	end
 
@@ -165,8 +166,12 @@ do
 	end
 
 	function NodeButtonMixin:CanPurchaseRank()
-		if self.nodeInfo and self.nodeInfo.canPurchaseRank and self:CanAfford() then
-			return true;
+		if self.nodeInfo then
+			if self.nodeInfo.canPurchaseRank and self:CanAfford() then
+				return true;
+			elseif #self.nodeInfo.entryIDs > 1 and self.nodeInfo.entryIDsWithCommittedRanks[1] then
+				return true;
+			end
 		end
 		return false;
 	end
@@ -190,16 +195,22 @@ do
 		if self.isNodeDirty then
 			self.isNodeDirty = nil;
 			local entryID;
-			if nodeInfo.entryIDsWithCommittedRanks then
+
+			if self.isFlyoutButton and self.entryChoiceIndex then
+				entryID = nodeInfo.entryIDs[self.entryChoiceIndex];
+			end
+
+			if (not entryID) and nodeInfo.entryIDsWithCommittedRanks then
 				entryID = nodeInfo.entryIDsWithCommittedRanks[1];
 			end
+
 			if not entryID then
 				entryID = nodeInfo.entryIDs[1];
 			end
 
 			self.entryID = entryID;
 
-			if nodeInfo.type == 2 then  --Enum.TraitNodeType.Selection
+			if nodeInfo.type == 2 and (not self.isFlyoutButton) then  --Enum.TraitNodeType.Selection
 				self:SetHex();
 				self.entryIDs = nodeInfo.entryIDs;
 			else
@@ -228,7 +239,7 @@ do
 		end
 
 		if self.isFlyoutButton then
-			self:Refresh_FlyoutButton();
+			self:Refresh_FlyoutButton(nodeInfo, playAnimation);
 			return
 		end
 
@@ -344,6 +355,65 @@ do
 		self.GreenGlow:SetShown(useGreenGlow);
 	end
 
+	function NodeButtonMixin:Refresh_FlyoutButton(nodeInfo, playAnimation)
+		local currentRank = nodeInfo.currentRank or 0;
+		local ranksPurchased = nodeInfo.ranksPurchased or 0;
+		local increasedRanks = 0;
+
+		if nodeInfo.entryIDToRanksIncreased then
+			for _entryID, totalIncreased in pairs(nodeInfo.entryIDToRanksIncreased) do
+				if _entryID == self.entryID then
+					if currentRank == 0 then
+						currentRank = totalIncreased;
+					end
+					increasedRanks = totalIncreased;
+					break
+				end
+			end
+		end
+
+		local committedEntryID;
+		if nodeInfo.entryIDsWithCommittedRanks then
+			for _, id in ipairs(nodeInfo.entryIDsWithCommittedRanks) do
+				committedEntryID = id;
+				if committedEntryID then
+					break
+				end
+			end
+		end
+
+		local rankText;
+		local visualState;
+		local isSelectable = committedEntryID or self:CanPurchaseRank();
+
+		if isSelectable then
+			if self.entryID == committedEntryID then
+				visualState = 1;
+				rankText = currentRank;
+			else
+				visualState = 2;
+				rankText = increasedRanks;
+			end
+		else
+			if currentRank > 0 then
+				visualState = 1;
+				rankText = currentRank;
+			else
+				visualState = 0;
+				rankText = "";
+			end
+		end
+
+		self:SetVisualState(visualState);
+		self.RankText:SetText(rankText);
+
+		if visualState == 1 then
+			self.RankText:SetTextColor(1, 0.82, 0);
+		elseif visualState == 2 then
+			self.RankText:SetTextColor(0.098, 1.000, 0.098);
+		end
+	end
+
 	local function AddLine(oldText, newText)
 		if oldText then
 			return oldText.."\n"..newText
@@ -444,8 +514,11 @@ do
 			end
 		else
 			if self:CanPurchaseRank() then
-				if self:IsSelectionNode() then
-					self.ownerFrame:TryPurchaseSelectionNode(self.nodeID); -- debug
+				if self.isFlyoutButton then
+					self.ownerFrame:TryPurchaseSelectionNodeByIndex(self.nodeID, self.entryChoiceIndex);
+					self.ownerFrame:CloseNodeFlyout();
+				elseif self:IsSelectionNode() and false then
+					self.ownerFrame:TryPurchaseSelectionNodeByIndex(self.nodeID);
 				else
 					self.ownerFrame:TryPurchaseRank(self.nodeID);
 				end
@@ -550,6 +623,7 @@ do
 			for _, nodeButton in self.nodeButtonPool:EnumerateActive() do
 				nodeButton:Refresh();
 			end
+			self:UpdateNodeFlyoutFrame();
 		end
 	end
 
@@ -623,17 +697,18 @@ do
 		end
 	end
 
-	function TraitContainerMixin:TryPurchaseSelectionNode(nodeID, entryID)
+	function TraitContainerMixin:TryPurchaseSelectionNodeByIndex(nodeID, entryChoiceIndex)
 		if self.configID and nodeID then
-			if not entryID then
-				-- debug: Purchase the first entry
-				local nodeInfo = C_Traits.GetNodeInfo(self.configID, nodeID);
-				if nodeInfo and nodeInfo.entryIDs then
-					entryID = nodeInfo.entryIDs[1];
-				end
+			local entryID;
+
+			local nodeInfo = C_Traits.GetNodeInfo(self.configID, nodeID);
+			if nodeInfo and nodeInfo.entryIDs then
+				entryID = entryChoiceIndex and nodeInfo.entryIDs[entryChoiceIndex] or nodeInfo.entryIDs[1];
 			end
 
-			CommitUtil:TryPurchaseSelectionNode(self.configID, nodeID, entryID, self.shouldAutoCommit);
+			if entryID then
+				CommitUtil:TryPurchaseSelectionNode(self.configID, nodeID, entryID, self.shouldAutoCommit);
+			end
 		end
 	end
 
@@ -645,6 +720,126 @@ do
 
 	function TraitContainerMixin:SetEnableAutoCommit(shouldAutoCommit)
 		self.shouldAutoCommit = shouldAutoCommit;
+	end
+
+	function TraitContainerMixin:CloseNodeFlyout()
+		if self.NodeFlyoutFrame then
+			self.NodeFlyoutFrame:Hide();
+		end
+	end
+
+	function TraitContainerMixin:IsNodeFlyoutFocused(nodeButton)
+		if self.NodeFlyoutFrame then
+			if not self.NodeFlyoutFrame:IsVisible() then return end;
+			if self.NodeFlyoutFrame:IsMouseOver() then
+				return true;
+			end
+
+			if self.NodeFlyoutFrame.owner:IsMouseOver() then
+				return true;
+			end
+
+			if nodeButton then
+				if self.NodeFlyoutFrame.owner ~= nodeButton then
+					return false;
+				end
+			end
+
+			for _, button in ipairs(self.flyoutButtonPool:GetActiveObjects()) do
+				if button:IsMouseMotionFocus() then
+					return true;
+				end
+			end
+		end
+	end
+
+	function TraitContainerMixin:UpdateNodeFlyoutFrame()
+		if self.NodeFlyoutFrame and self.NodeFlyoutFrame:IsVisible() then
+			for _, button in ipairs(self.flyoutButtonPool:GetActiveObjects()) do
+				button:Refresh();
+			end
+		end
+	end
+
+	function TraitContainerMixin:ShowNodeFlyout(nodeButton)
+		if not nodeButton.entryIDs then return; end
+
+		local f = self.NodeFlyoutFrame;
+		if not f then
+			f = CreateFrame("Frame", nil, self);
+			self.NodeFlyoutFrame = f;
+			f:EnableMouse(true);
+			f:EnableMouseMotion(true);
+			f:SetSize(80, 80);
+			f:SetAttribute("nodeignoremime", true);
+			f:SetScript("OnLeave", function()
+				if not(f:IsMouseOver() or (f.owner and f.owner:IsVisible() and f.owner:IsMouseOver())) then
+					self:CloseNodeFlyout();
+				end
+			end);
+
+			local function FlyoutButton_Create()
+				local obj = CreateFrame("Button", nil, f, "PlumberTraitNodeButtonTemplate");
+				Mixin(obj, NodeButtonMixin);
+				obj.ownerFrame = self;
+				obj.isFlyoutButton = true;
+				obj:OnLoad();
+				local shadow = obj:CreateTexture(nil, "BACKGROUND");
+				shadow:SetPoint("CENTER", obj, "CENTER", 0, -8);
+				shadow:SetSize(128, 128);
+				shadow:SetTexture(Def.Art);
+				shadow:SetTexCoord(384/1024, 480/1024, 160/1024, 256/1024);
+				return obj
+			end
+			self.flyoutButtonPool = API.CreateObjectPool(FlyoutButton_Create);
+		end
+
+		if f:IsVisible() and f.owner == nodeButton then
+			return;
+		end
+
+		f:ClearAllPoints();
+		self.flyoutButtonPool:Release();
+
+		local buttonSize = Def.ButtonSize;
+		local gapH = 4;
+		local offsetX = 0;
+		local nodeID = nodeButton.nodeID;
+
+		for i, entryID in ipairs(nodeButton.entryIDs) do
+			local button = self.flyoutButtonPool:Acquire();
+			button.entryChoiceIndex = i;
+			button.parentNodeButton = nodeButton;
+			button:SetPoint("TOPLEFT", f, "TOPLEFT", offsetX, 0);
+			button:SetNode(nodeID);
+			button:Refresh();
+			button:SetFrameStrata("DIALOG");
+			offsetX = offsetX + buttonSize + gapH;
+		end
+
+		local totalWidth = offsetX - gapH;
+		local bottomPadding = 6;
+		f:SetSize(totalWidth, buttonSize + bottomPadding);
+		f:SetPoint("BOTTOM", nodeButton, "TOP", 0, -4 -bottomPadding);
+		f:SetFrameStrata("DIALOG");
+		f.owner = nodeButton;
+
+		local function FlyoutFrame_OnUpdate(_self, elapsed)
+			_self.t = _self.t + elapsed;
+			local alpha = _self.t * 8;
+			if alpha > 1 then
+				alpha = 1;
+				_self:SetScript("OnUpdate", nil);
+			end
+			_self:SetAlpha(alpha);
+		end
+
+		f:Show();
+
+		f:SetScale(1.6);
+		f:SetAlpha(1);
+		f.t = 0;
+		f:SetScript("OnUpdate", FlyoutFrame_OnUpdate);
 	end
 end
 

@@ -429,9 +429,6 @@ do
 	function PlumberExpansionLandingPageMixin:ShowLeftFrame(state)
 		self.LeftSection.DefaultFrame:SetShown(state);
 	end
-	function LandingPageUtil.ShowLeftFrame(state)
-		MainFrame:ShowLeftFrame(state);
-	end
 
 	function PlumberExpansionLandingPageMixin:DimBackground(state)
 		if IS_MOP then
@@ -445,18 +442,9 @@ do
 		--local a = state and 0.5 or 1.0;
 		self.RightSection.NineSlice.Background:SetVertexColor(a, a, a);
 	end
-	function LandingPageUtil.DimBackground(state)
-		MainFrame:DimBackground(state);
-	end
 
 	function PlumberExpansionLandingPageMixin:ToggleUI()
 		self:SetShown(not self:IsShown());
-	end
-
-	function LandingPageUtil.ToggleUI()
-		if MainFrame then
-			MainFrame:ToggleUI();
-		end
 	end
 
 	function PlumberExpansionLandingPageMixin:ResetPosition()
@@ -523,5 +511,26 @@ do
 		end
 
 		self:EnableMouse(false);
+	end
+end
+
+
+do	--Shared
+	function LandingPageUtil.ShowLeftFrame(state)
+		MainFrame:ShowLeftFrame(state);
+	end
+
+	function LandingPageUtil.DimBackground(state)
+		MainFrame:DimBackground(state);
+	end
+
+	function LandingPageUtil.ToggleUI()
+		if MainFrame then
+			MainFrame:ToggleUI();
+		end
+	end
+
+	function LandingPageUtil.GetUIFrameLevel()
+		return MainFrame.LeftSection.DefaultFrame:GetFrameLevel();
 	end
 end

@@ -6,6 +6,10 @@ local LandingPageUtil = addon.LandingPageUtil;
 local MainFrame;
 
 
+local QUEST_PROVIDER_MAP = 2649; -- The Lycaneum
+local QUEST_PIN_MAP = 2424; -- Use Isle map instead of the indoor map
+
+
 local TraitFrameMixin = {};
 do
 	local TraitContainer;
@@ -16,8 +20,6 @@ do
 		"QUEST_LOG_UPDATE",
 		"QUESTLINE_UPDATE",
 	};
-
-	local QUEST_PROVIDER_MAP = 2649; -- The Lycaneum
 
 	function TraitFrameMixin:Refresh()
 		if TraitContainer then
@@ -35,6 +37,7 @@ do
 	function TraitFrameMixin:OnShow()
 		self:Refresh();
 		API.RegisterFrameForEvents(self, DynamicEvents);
+		C_QuestLine.RequestQuestLinesForMap(QUEST_PROVIDER_MAP);
 	end
 
 	function TraitFrameMixin:OnHide()
@@ -85,9 +88,13 @@ do
 			if info and info.quantity > 0 then
 				local flags, type, currencyTypesID, icon = C_Traits.GetTraitCurrencyInfo(info.traitCurrencyID);
 				self.HeaderFrame:DisplayTraitCurrency(icon, info.quantity);
+				MainFrame.BlackOverlay:Show();
 				return true;
+			else
+				MainFrame.BlackOverlay:Hide();
 			end
 		else
+			MainFrame.BlackOverlay:Hide();
 			return false;
 		end
 	end
@@ -132,6 +139,8 @@ do
 			self.HeaderFrame:SetPoint("CENTER", self.listCategoryButton, "CENTER", 0, 0);
 			self.HeaderFrame:Show();
 			self.listCategoryButton.Name:Hide();
+			self.listCategoryButton:EnableMouseMotion(false);
+			self.listCategoryButton:SetFrameLevel(self:GetFrameLevel());
 		else
 			self.HeaderFrame:Hide();
 			self.listCategoryButton.Name:Show();
@@ -150,6 +159,7 @@ end
 local HeaderFrameMixin = {};
 do
 	function HeaderFrameMixin:DisplayTraitCurrency(icon, quantity)
+		self.clickResponse = nil;
 		self.Icon:ClearAllPoints();
 		self.Text:ClearAllPoints();
 		self.Icon:SetSize(16, 16);
@@ -168,6 +178,7 @@ do
 	end
 
 	function HeaderFrameMixin:DisplayQuest(questID, isStartingQuest)
+		self.clickResponse = "quest";
 		self.Icon:ClearAllPoints();
 		self.Text:ClearAllPoints();
 		self.Text:SetPoint("CENTER", self, "CENTER", 8, 0);
@@ -177,14 +188,17 @@ do
 			self.Text:SetText(addon.L["New Quest"]);
 			self.Text:SetTextColor(0.922, 0.871, 0.761);
 			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/TrackerType-Quest.png");
+			self.Icon:SetTexCoord(0, 1, 0, 1);
 		elseif API.IsQuestReadyForTurnIn(questID) then
 			self.Text:SetText(QUEST_WATCH_QUEST_READY);
 			self.Text:SetTextColor(0.098, 1.000, 0.098);
-			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/TrackerType-Quest.png");
+			self.Icon:SetAtlas("QuestTurnin");
+			iconOffset = -2;
 		else
 			self.Text:SetText(GARRISON_MISSION_IN_PROGRESS_TOOLTIP);
 			self.Text:SetTextColor(0.922, 0.871, 0.761);
 			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png");
+			self.Icon:SetTexCoord(0, 1, 0, 1);
 			iconOffset = -4;
 		end
 
@@ -203,6 +217,7 @@ do
 		TooltipUpdator:SetQuestID(self.questID);
 		TooltipUpdator:RequestQuestProgress();
 		TooltipUpdator:RequestQuestReward();
+		TooltipUpdator:SetEnableShowOnMap(QUEST_PIN_MAP);
 	end
 
 	function HeaderFrameMixin:OnLeave()
@@ -210,8 +225,13 @@ do
 		LandingPageUtil.TooltipUpdator:StopUpdating();
 	end
 
-	function HeaderFrameMixin:OnClick()
-
+	function HeaderFrameMixin:OnClick(button)
+		if self.clickResponse == "quest" then
+			if button == "LeftButton" and IsControlKeyDown() and (not InCombatLockdown()) then
+				API.SuperTrackQuestMapPin(self.questID);
+				C_Map.OpenWorldMap(QUEST_PIN_MAP);
+			end
+		end
 	end
 end
 
@@ -228,6 +248,7 @@ function LandingPageUtil.CreateTraitFrame(parent)
 	local width = 240;
 	local height = 40;
 	f:SetSize(width, height);
+	f:SetFrameLevel(LandingPageUtil.GetUIFrameLevel() + 10);
 
 	Mixin(f, TraitFrameMixin);
 	f:SetScript("OnShow", f.OnShow);
@@ -244,6 +265,13 @@ function LandingPageUtil.CreateTraitFrame(parent)
 	HeaderFrame:SetScript("OnEnter", HeaderFrame.OnEnter);
 	HeaderFrame:SetScript("OnLeave", HeaderFrame.OnLeave);
 	HeaderFrame:SetScript("OnClick", HeaderFrame.OnClick);
+
+	local container = PlumberExpansionLandingPage.LeftSection;
+	f.BlackOverlay = f:CreateTexture(nil, "BACKGROUND");
+	f.BlackOverlay:Hide();
+	f.BlackOverlay:SetColorTexture(0, 0, 0, 0.8);
+	f.BlackOverlay:SetPoint("TOPLEFT", container, "TOPLEFT", 8, -8);
+	f.BlackOverlay:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -8, 8);
 
 	return f, height
 end
