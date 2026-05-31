@@ -146,13 +146,16 @@ do
 	local Weapons = {
 		--[itemSubclass] = {subclassID, itemID1, itemID2},
 		{10, 263952, 263954},
+		{2, 263967},
+		{3, 263941},
 		{6, 263950, 273874},
 		{8, 263966},
 		{7, 263960, 263963},
 		{4, 263946, 263956},
 		{15, 263942, 263943},
 		{13, 263970},
-		{14, 263959}, -- Offhand
+		{19, 263968, 263969},
+		{14, 263959, 263949}, -- Offhand
 	};
 
 	function VoidTouchUtil:TryProcessItem(tooltip, itemID)
