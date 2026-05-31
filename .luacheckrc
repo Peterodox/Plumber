@@ -1165,6 +1165,7 @@ stds.wow = {
 				"GetSuperTrackedMapPin",
 				"GetSuperTrackedQuestID",
 				"IsSuperTrackingAnything",
+				"SetSuperTrackedMapPin",
 				"SetSuperTrackedQuestID",
 				"SetSuperTrackedUserWaypoint",
 			},
