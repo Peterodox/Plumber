@@ -9,7 +9,9 @@ local Def = {
 };
 
 
+local SharedNodeFocusSolver;
 local CommitUtil = CreateFrame("Frame");
+local Easing_OutQuart = addon.EasingFunctions.outQuart;
 
 
 local NodeButtonMixin = {};
@@ -170,7 +172,7 @@ do
 			if self.nodeInfo.canPurchaseRank and self:CanAfford() then
 				return true;
 			elseif #self.nodeInfo.entryIDs > 1 and self.nodeInfo.entryIDsWithCommittedRanks[1] then
-				return true;
+				return self.entryID and self.entryID ~= self.nodeInfo.entryIDsWithCommittedRanks[1];
 			end
 		end
 		return false;
@@ -467,10 +469,6 @@ do
 			description = API.ConvertTooltipInfoToOneString(description, "GetTraitEntry", nextEntryInfo.entryID, nextRank);
 		end
 
-		if self.isFlyoutButton then
-
-		end
-
 		local tooltip = GameTooltip;
 		tooltip:SetOwner(self, "ANCHOR_RIGHT");
 		tooltip:SetText(name, 1, 1, 1);
@@ -633,6 +631,9 @@ do
 		f:ClearAllPoints();
 		GameTooltip:Hide();
 
+		SharedNodeFocusSolver:SetParent(self);
+		SharedNodeFocusSolver:SetFocus(nodeButton);
+
 		if nodeButton then
 			f:SetParent(nodeButton);
 			f:SetPoint("TOPLEFT", nodeButton.Border, "TOPLEFT", 0, 0);
@@ -647,7 +648,7 @@ do
 			f:SetAlpha(1);
 			f:Show();
 
-			nodeButton:OnFocused();
+			--nodeButton:OnFocused();
 		end
 	end
 
@@ -772,10 +773,16 @@ do
 			f:EnableMouseMotion(true);
 			f:SetSize(80, 80);
 			f:SetAttribute("nodeignoremime", true);
+			f:SetClampedToScreen(true);
+
 			f:SetScript("OnLeave", function()
 				if not(f:IsMouseOver() or (f.owner and f.owner:IsVisible() and f.owner:IsMouseOver())) then
 					self:CloseNodeFlyout();
 				end
+			end);
+
+			f:SetScript("OnHide", function()
+				self:CloseNodeFlyout();
 			end);
 
 			local function FlyoutButton_Create()
@@ -824,22 +831,32 @@ do
 		f:SetFrameStrata("DIALOG");
 		f.owner = nodeButton;
 
+		local duration = 0.2;
+		local toScale = 1.5;
+
 		local function FlyoutFrame_OnUpdate(_self, elapsed)
 			_self.t = _self.t + elapsed;
+			local scale;
+			if _self.t < duration then
+				scale = Easing_OutQuart(_self.t, 1.0, toScale, duration);
+			else
+				scale = toScale;
+				_self:SetScript("OnUpdate", nil);
+			end
+			_self:SetScale(scale);
+
 			local alpha = _self.t * 8;
 			if alpha > 1 then
 				alpha = 1;
-				_self:SetScript("OnUpdate", nil);
 			end
 			_self:SetAlpha(alpha);
 		end
 
-		f:Show();
-
-		f:SetScale(1.6);
-		f:SetAlpha(1);
+		f:SetScale(1.0);
+		f:SetAlpha(0);
 		f.t = 0;
 		f:SetScript("OnUpdate", FlyoutFrame_OnUpdate);
+		f:Show();
 	end
 end
 
@@ -976,5 +993,11 @@ function addon.CreateTraitContainer(parent)
 	local f = CreateFrame("Frame", nil, parent);
 	f:SetSize(Def.ButtonSize, Def.ButtonSize);
 	Mixin(f, TraitContainerMixin);
-	return f
+
+	if not SharedNodeFocusSolver then
+		SharedNodeFocusSolver = API.CreateFocusSolver(f);
+		SharedNodeFocusSolver:SetDelay(0.15);
+	end
+
+	return f;
 end

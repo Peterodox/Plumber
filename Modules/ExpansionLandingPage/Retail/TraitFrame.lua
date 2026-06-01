@@ -10,6 +10,14 @@ local QUEST_PROVIDER_MAP = 2649; -- The Lycaneum
 local QUEST_PIN_MAP = 2424; -- Use Isle map instead of the indoor map
 
 
+local function GetBestMapForQuest(questID)
+	if API.IsQuestReadyForTurnIn(questID) or (not C_QuestLog.IsOnQuest(questID)) then
+		return QUEST_PIN_MAP;
+	else
+		return GetQuestUiMapID(questID);
+	end
+end
+
 local TraitFrameMixin = {};
 do
 	local TraitContainer;
@@ -17,6 +25,7 @@ do
 	local DynamicEvents = {
 		"TRAIT_TREE_CURRENCY_INFO_UPDATED",
 		"TRAIT_CONFIG_UPDATED",
+		"CONFIG_COMMIT_FAILED",
 		"QUEST_LOG_UPDATE",
 		"QUESTLINE_UPDATE",
 	};
@@ -45,7 +54,7 @@ do
 	end
 
 	function TraitFrameMixin:OnEvent(event, ...)
-		if event == "TRAIT_CONFIG_UPDATED" then
+		if event == "TRAIT_CONFIG_UPDATED" or event == "CONFIG_COMMIT_FAILED" then
 			local configID = ...
 			if configID and configID == TraitContainer.configID then
 				self:Refresh();
@@ -54,7 +63,7 @@ do
 			-- Fire twice for auto commiting trait systems
 			local treeID = ...
 			if treeID and treeID == TraitContainer.treeID and TraitContainer.configID then
-				self:UpdateHeader();
+				self:Refresh();
 			end
 		elseif event == "QUEST_LOG_UPDATE" or event == "QUESTLINE_UPDATE" then
 			C_QuestLine.RequestQuestLinesForMap(QUEST_PROVIDER_MAP);
@@ -92,6 +101,7 @@ do
 				return true;
 			else
 				MainFrame.BlackOverlay:Hide();
+				return false;
 			end
 		else
 			MainFrame.BlackOverlay:Hide();
@@ -140,7 +150,6 @@ do
 			self.HeaderFrame:Show();
 			self.listCategoryButton.Name:Hide();
 			self.listCategoryButton:EnableMouseMotion(false);
-			self.listCategoryButton:SetFrameLevel(self:GetFrameLevel());
 		else
 			self.HeaderFrame:Hide();
 			self.listCategoryButton.Name:Show();
@@ -151,6 +160,10 @@ do
 		local anyShown = self:UpdateTraitSpentInstruction();
 		if not anyShown then
 			anyShown = self:UpdateQuestNotification();
+			if ExpansionLandingPageMinimapButton then
+				HelpTip:Hide(ExpansionLandingPageMinimapButton);
+				ExpansionLandingPageMinimapButton:ClearPulses();
+			end
 		end
 		self:ShowHeaderFrame(anyShown);
 	end
@@ -217,7 +230,8 @@ do
 		TooltipUpdator:SetQuestID(self.questID);
 		TooltipUpdator:RequestQuestProgress();
 		TooltipUpdator:RequestQuestReward();
-		TooltipUpdator:SetEnableShowOnMap(QUEST_PIN_MAP);
+		local questUiMapID = GetBestMapForQuest(self.questID);
+		TooltipUpdator:SetEnableShowOnMap(questUiMapID);
 	end
 
 	function HeaderFrameMixin:OnLeave()
@@ -229,7 +243,8 @@ do
 		if self.clickResponse == "quest" then
 			if button == "LeftButton" and IsControlKeyDown() and (not InCombatLockdown()) then
 				API.SuperTrackQuestMapPin(self.questID);
-				C_Map.OpenWorldMap(QUEST_PIN_MAP);
+				local questUiMapID = GetBestMapForQuest(self.questID);
+				C_Map.OpenWorldMap(questUiMapID);
 			end
 		end
 	end
