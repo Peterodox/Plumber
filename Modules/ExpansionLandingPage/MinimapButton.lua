@@ -744,6 +744,9 @@ do  --Order Hall, RightClickMenu
 			OrderHallUtil.blizzardButtonHidden = true;
 			button:UnregisterAllEvents();
 			button:Hide();
+			C_Timer.After(0, function()
+				button:Hide();
+			end);
 		end
 	end
 

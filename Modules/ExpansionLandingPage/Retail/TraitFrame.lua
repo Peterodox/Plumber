@@ -160,9 +160,10 @@ do
 		local anyShown = self:UpdateTraitSpentInstruction();
 		if not anyShown then
 			anyShown = self:UpdateQuestNotification();
-			if ExpansionLandingPageMinimapButton then
-				HelpTip:Hide(ExpansionLandingPageMinimapButton);
-				ExpansionLandingPageMinimapButton:ClearPulses();
+			local minimapButton = ExpansionLandingPageMinimapButton;
+			if minimapButton and minimapButton:IsShown() then
+				HelpTip:Hide(minimapButton);
+				minimapButton:ClearPulses();
 			end
 		end
 		self:ShowHeaderFrame(anyShown);
