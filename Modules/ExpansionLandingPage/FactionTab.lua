@@ -1058,12 +1058,18 @@ do
 		local buttonHeight = 32;
 		local numLevels = #renownLevelsInfo;
 		local top, bottom;
+		local lastUnlockedIndex;
 		local firstLockedIndex;
 
 		if renownLevelsInfo then
 			for k, v in ipairs(renownLevelsInfo) do
 				rewards = C_MajorFactions.GetRenownRewardsForLevel(factionID, v.level)
 				table.sort(rewards, SortFunc_UIOrder);
+
+				if (not v.locked) and (not firstLockedIndex) then
+					lastUnlockedIndex = n;
+				end
+
 				for index, rewardInfo in ipairs(rewards) do
 					n = n + 1;
 					top = offsetY;
@@ -1125,8 +1131,7 @@ do
 		self.RenownItemScrollView:SetContent(content, retainPosition);
 
 		if scrollToFirstLockedReward then
-			firstLockedIndex = firstLockedIndex or n;
-			self.RenownItemScrollView:SnapToContent(firstLockedIndex);
+			self.RenownItemScrollView:SnapToContent(lastUnlockedIndex or n);
 		end
 	end
 

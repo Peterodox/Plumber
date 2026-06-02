@@ -2026,7 +2026,7 @@ do  --Rare Items
 		elseif data.classID == 17 then
 			-- Battlepet
 			return true;
-		elseif data.classID == 2 or data.classID == 4 and data.link and C_Item.GetItemStats then
+		elseif (data.classID == 2 or data.classID == 4) and data.link and C_Item.GetItemStats then
 			-- Equipment with tertiary stats. Retail only.
 			local stats = C_Item.GetItemStats(data.link);
 			if stats then
@@ -2104,7 +2104,7 @@ do  --Callback Registery
 	local function SettingChanged_CombineItems(state, userInput)
 		MERGE_JUNKS = state;
 	end
-	addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItems", SettingChanged_CombineItems);
+	addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItem", SettingChanged_CombineItems);
 end
 
 

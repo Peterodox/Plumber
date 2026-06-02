@@ -82,6 +82,61 @@
 					</Layer>
 				</Layers>
 			</Frame>
+
+			<Frame parentKey="AlertFrame" useParentLevel="true" hidden="true">
+				<Size x="192" y="32"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent" relativePoint="LEFT" x="20"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString parentKey="Text" inherits="GameFontNormal" justifyH="CENTER" spacing="4">
+							<Size x="192"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Color r="0.922" g="0.871" b="0.761"/>
+						</FontString>
+						<Texture parentKey="BorderTop">
+							<Size x="192" y="24"/>
+							<Anchors>
+								<Anchor point="LEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="-12"/>
+								<Anchor point="RIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x="12"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="BorderBottom">
+							<Size x="192" y="24"/>
+							<Anchors>
+								<Anchor point="LEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="-12"/>
+								<Anchor point="RIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="12"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="GradientLeft">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="4"/>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="4"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="GradientRight">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x="-4"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-4"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="GradientCenter">
+							<Size x="32" y="32"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.GradientLeft" relativePoint="TOPRIGHT"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.GradientRight" relativePoint="BOTTOMLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>

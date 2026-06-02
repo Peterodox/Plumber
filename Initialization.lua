@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.9.2 c";
-local VERSION_DATE = 1779500000;
+local VERSION_TEXT = "1.9.2 d";
+local VERSION_DATE = 1780400000;
 
 
 local addonName, addon = ...
@@ -298,7 +298,7 @@ local DefaultValues = {
 		LootUI_UseCustomColor = false,
 		LootUI_GrowUpwards = false,
 		LootUI_WindowHide = false,
-		LootUI_CombineItems = false,
+		LootUI_CombineItem = true,
 		LootUI_LowFrameStrata = false,
 		LootUI_HideTitle = false,
 		LootUI_ShowReputation = false,

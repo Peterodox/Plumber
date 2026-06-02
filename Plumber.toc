@@ -76,7 +76,6 @@ Modules\Macros.lua
 Modules\ProfessionsBook.lua
 Modules\ExpansionLandingPage\ExpansionLandingPage_Retail.xml
 Modules\BlizzFix_ModelLoading.lua
-Modules\Timerunning\LegionRemix.xml
 Modules\HolidayDungeon.lua
 Modules\QueueStatus.lua
 Modules\RaidCheck\RaidCheck.xml
@@ -104,3 +103,4 @@ Modules\PreyQuestSuperTrack.lua
 #Modules\MinimapMouseover.lua
 #Modules\ObjectiveTrackerModule.xml
 #Modules\BlizzFix_EndCaps.lua
+#Modules\Timerunning\LegionRemix.xml

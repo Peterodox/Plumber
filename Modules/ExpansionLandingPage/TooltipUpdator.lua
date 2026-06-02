@@ -12,7 +12,18 @@ TooltipUpdator:Hide();
 LandingPageUtil.TooltipUpdator = TooltipUpdator;
 
 
+local SkippedQuestRewardSpell = {
+	-- Ignore random/end-of-questline reward
+	-- Enum.QuestCompleteSpellType
+	[8] = true,		--QuestlineUnlock
+	[9] = true,		--QuestlineReward
+	[10] = true,	--QuestlineUnlockPart
+	[11] = true,	--PossibleReward
+};
+
 local function Tooltip_AddRewardLine(tooltip, texture, text, quality, quantity)
+	quality = quality or 1;
+	quantity = quantity or 1;
 	local r, g, b = ColorManager.GetColorDataForItemQuality(quality).color:GetRGB();
 	tooltip:AddDoubleLine(string.format("|T%s:%d:%d:%d:%d|t %s", texture, 16, 16, 0, 0, text), quantity, r, g, b, 1, 1, 1);
 end
@@ -37,6 +48,8 @@ function TooltipUpdator:StopUpdating()
 	self.tooltipSetter = nil;
 	self.entryChildren = nil;
 	self.itemID = nil;
+	self.uiMapID = nil;
+	self.supportShowOnMap = nil;
 end
 
 function TooltipUpdator:SetFocusedObject(obj)
@@ -98,6 +111,11 @@ function TooltipUpdator:RequestItemID(itemID)
 	self.itemID = itemID;
 end
 
+function TooltipUpdator:SetEnableShowOnMap(uiMapID)
+	self.uiMapID = uiMapID;
+	self.supportShowOnMap = uiMapID and C_Map.GetMapInfo(uiMapID) ~= nil;
+end
+
 function TooltipUpdator:OnUpdate(elapsed)
 	self.t = self.t + elapsed;
 	if self.t >= 0.5 then
@@ -148,6 +166,9 @@ function TooltipUpdator:OnUpdate(elapsed)
 					end
 					if rewards.currencies then
 						tinsert(questRewards, rewards.currencies);
+					end
+					if rewards.spells then
+						tinsert(questRewards, rewards.spells);
 					end
 				end
 
@@ -211,9 +232,20 @@ function TooltipUpdator:OnUpdate(elapsed)
 					end
 					tooltip:AddLine(QUEST_REWARDS, 1, 0.82, 0);
 
+					local shouldShowReward;
 					for _, rewards in ipairs(questRewards) do
 						for index, info in ipairs(rewards) do
-							Tooltip_AddRewardLine(tooltip, info.texture, info.name, info.quality, info.quantity);
+							shouldShowReward = nil;
+							if info.isSpellReward then
+								if info.type and not SkippedQuestRewardSpell[info.type] then
+									shouldShowReward = true;
+								end
+							else
+								shouldShowReward = true;
+							end
+							if shouldShowReward then
+								Tooltip_AddRewardLine(tooltip, info.texture, info.name, info.quality, info.quantity);
+							end
 						end
 					end
 				end
@@ -268,6 +300,11 @@ function TooltipUpdator:OnUpdate(elapsed)
 					end
 					--local text = API.ConvertTooltipInfoToOneString(" ", "GetCurrencyByID", self.currencyID);
 					--tooltip:AddLine(text, 1, 1, 1, true);
+				end
+
+				if self.uiMapID and self.supportShowOnMap and not InCombatLockdown() then
+					tooltip:AddLine(" ");
+					tooltip:AddLine(addon.L["Instruction Set Waypoint"], 0.098, 1.000, 0.098);
 				end
 
 				if isRetrievingData then

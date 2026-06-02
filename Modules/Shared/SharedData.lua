@@ -156,7 +156,11 @@ do  --Weekly Caches (Meta quest rewards)
 			259,
 
 			259,
+			263,
+			269,
 		},
+
+		GreatVaultWorldActivityMaxLevel = 13,
 	};
 
 

@@ -19,6 +19,7 @@
 	<Script file="Retail/ResourceList.lua"/>
 	<Script file="Retail/TWW_Activity.lua"/>
 	<Script file="Retail/MID_Activity.lua"/>
+	<Script file="Retail/TraitFrame.lua"/>
 
 	<!--Include file="LegionRemix/LegionRemix.xml"/-->
 

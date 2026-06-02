@@ -707,6 +707,7 @@ L["Delves Completion Reward Cap"] = "通关奖励";
 L["Delves Completion Reward Cap Tooltip"] = "当你达到此战团上限后，完成丰裕地下堡将不再奖励旅程进度和伙伴经验。\n\n丰裕宝匣和宿敌宝箱不受此上限影响。\n\n每周上限为28次，可以累计。";
 L["Near Completion Tooltip"] = "你可以看见此条目是因为你即将达到上限。";
 L["Inactive Currencies Tooltip"] = "以下货币因为被你设为“未使用”而隐藏：";
+L["New Quest"] = "新任务";
 
 
 --ExpansionSummaryMinimapButton

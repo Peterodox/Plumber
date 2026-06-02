@@ -2918,6 +2918,9 @@ do  -- Quest
 				end
 			end
 		end
+
+		function API.SuperTrackQuestMapPin(questID)
+		end
 	else
 		--Retail
 		function API.GetQuestProgressPercent(questID, asText)
@@ -3074,6 +3077,14 @@ do  -- Quest
 
 			return tbl
 		end
+
+		function API.SuperTrackQuestMapPin(questID)
+			if C_QuestLog.IsOnQuest(questID) then
+				C_SuperTrack.SetSuperTrackedQuestID(questID);
+			else
+				C_SuperTrack.SetSuperTrackedMapPin(Enum.SuperTrackingMapPinType.QuestOffer, questID);
+			end
+		end
 	end
 
 
@@ -3169,6 +3180,7 @@ do  -- Quest
 			for index, spellID in ipairs(spellRewards) do
 				info = C_QuestInfoSystem.GetQuestRewardSpellInfo(questID, spellID);
 				info.id = spellID;
+				info.isSpellReward = true;
 				tinsert(spells, info);
 			end
 

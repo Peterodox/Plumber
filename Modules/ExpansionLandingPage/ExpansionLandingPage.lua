@@ -277,11 +277,16 @@ do
 		if not self:IsUserPlaced() then
 			self:ResetPosition();
 		end
+
+		if LandingPageUtil.HasAnyPurchasableTrait() then
+			self:ShowTraitTab();
+		end
 	end
 
 	function PlumberExpansionLandingPageMixin:OnHide()
 		LandingPageUtil.PlayUISound("LandingPageClose");
 		LandingPageUtil.MainContextMenu:HideMenu();
+		LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
 	end
 
 	function PlumberExpansionLandingPageMixin:InitTabButtons()
@@ -381,9 +386,14 @@ do
 
 		local categories = {
 			{name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
-			{name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
 			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
 		};
+
+		if addon.IS_12_0_7 then
+			table.insert(categories, 2, {name = LandingPageUtil.GetTraitSystemName(), frameGetter = LandingPageUtil.CreateTraitFrame});
+		else
+			table.insert(categories, 2, {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame});
+		end
 
 		local numCategories = #categories;
 
@@ -402,12 +412,15 @@ do
 				if v.frameGetter then
 					offsetY = offsetY + lineGap;
 					local frame, height, categoryOnEnterFunc = v.frameGetter(container);
+					frame.listCategoryButton = categoryButton;
 					frame:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 					offsetY = offsetY + height;
 					if k == numCategories then
 						frame:SetPoint("BOTTOM", relativeTo, "BOTTOM", 0, 16);
 					end
-					frame:Refresh();
+					if frame.OnLoad then
+						frame:OnLoad();
+					end
 					if frame.OnShow and frame:IsVisible() then
 						frame:OnShow();
 					end
@@ -420,9 +433,6 @@ do
 
 	function PlumberExpansionLandingPageMixin:ShowLeftFrame(state)
 		self.LeftSection.DefaultFrame:SetShown(state);
-	end
-	function LandingPageUtil.ShowLeftFrame(state)
-		MainFrame:ShowLeftFrame(state);
 	end
 
 	function PlumberExpansionLandingPageMixin:DimBackground(state)
@@ -437,18 +447,9 @@ do
 		--local a = state and 0.5 or 1.0;
 		self.RightSection.NineSlice.Background:SetVertexColor(a, a, a);
 	end
-	function LandingPageUtil.DimBackground(state)
-		MainFrame:DimBackground(state);
-	end
 
 	function PlumberExpansionLandingPageMixin:ToggleUI()
 		self:SetShown(not self:IsShown());
-	end
-
-	function LandingPageUtil.ToggleUI()
-		if MainFrame then
-			MainFrame:ToggleUI();
-		end
 	end
 
 	function PlumberExpansionLandingPageMixin:ResetPosition()
@@ -515,5 +516,41 @@ do
 		end
 
 		self:EnableMouse(false);
+	end
+end
+
+
+do	--12.0.7 Only
+	function PlumberExpansionLandingPageMixin:ShowTraitTab()
+		if not self:IsShown() then
+			self:Show();
+		end
+		local selectedTab = LandingPageUtil.GetSelectedTabKey();
+		if selectedTab ~= "faction" and selectedTab ~= "activity" then
+			LandingPageUtil.SelectTab("faction");
+			MainFrame:UpdateTabs();
+		end
+		LandingPageUtil.SelectExpansion(12);
+	end
+end
+
+
+do	--Shared
+	function LandingPageUtil.ShowLeftFrame(state)
+		MainFrame:ShowLeftFrame(state);
+	end
+
+	function LandingPageUtil.DimBackground(state)
+		MainFrame:DimBackground(state);
+	end
+
+	function LandingPageUtil.ToggleUI()
+		if MainFrame then
+			MainFrame:ToggleUI();
+		end
+	end
+
+	function LandingPageUtil.GetUIFrameLevel()
+		return MainFrame.LeftSection.DefaultFrame:GetFrameLevel();
 	end
 end

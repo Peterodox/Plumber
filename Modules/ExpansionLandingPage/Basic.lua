@@ -1846,6 +1846,17 @@ do	--PlumberStrikethroughNumberMixin
 end
 
 
+do	--ExpansionFeature
+	function LandingPageUtil.HandleTraitTreeCurrencyChanged(treeID)
+		--Override
+	end
+
+	function LandingPageUtil.HasAnyPurchasableTrait()
+		return false;
+	end
+end
+
+
 function LandingPageUtil.DisplayInactiveCurrencies(owner, currencyIDs)
 	if owner and currencyIDs then
 		local tooltip = GameTooltip;

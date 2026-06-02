@@ -45,11 +45,13 @@ do
 		self.Text:SetText("0/0");
 	end
 
+	local WORLD_MAX_LEVEL = addon.WeeklyRewardsConstant.GreatVaultWorldActivityMaxLevel;
+
 	local ActivityMaxLevels = {
 		-- [TEMPFIX] Hardcode Delves level because GetNextActivitiesIncrease return false
-		[196] = 8,
-		[197] = 8,
-		[198] = 8,
+		[196] = WORLD_MAX_LEVEL,
+		[197] = WORLD_MAX_LEVEL,
+		[198] = WORLD_MAX_LEVEL,
 	};
 
 	function GreatVaultButtonMixin:IsRewardAtHighestTier()
@@ -305,6 +307,7 @@ function LandingPageUtil.CreateGreatVaultFrame(parent)
 		"HandlePreviewRaidRewardTooltip",
 		"HandlePreviewMythicRewardTooltip",
 		"HandlePreviewPvPRewardTooltip",
+		"HasMultipleRaidInstances",
 	};
 
 	local function ShowTooltip(self)

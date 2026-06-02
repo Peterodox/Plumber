@@ -260,10 +260,9 @@ end
 
 local CurrencyListMixin = {};
 do
-	function CurrencyListMixin:Refresh()
+	function CurrencyListMixin:OnLoad()
 		--Called once when frame is created
 		self:OnSizeChanged();
-		self:FullUpdate();
 	end
 
 	function CurrencyListMixin:OnShow()
