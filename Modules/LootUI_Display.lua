@@ -1915,7 +1915,7 @@ do  --Edit Mode
 			{type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},
 			{type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
 			{type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
-			{type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItems"},
+			{type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItem"},
 			{type = "Checkbox", label = L["LootUI Option Low Frame Strata"], tooltip = L["LootUI Option Low Frame Strata Tooltip"], onClickFunc = nil, dbKey = "LootUI_LowFrameStrata"},
 			{type = "Checkbox", label = L["LootUI Option Hide Title"], tooltip = L["LootUI Option Hide Title Tooltip"], onClickFunc = nil, dbKey = "LootUI_HideTitle"},
 
@@ -2046,7 +2046,7 @@ do  --Edit Mode
 	local function SettingChanged_CombineItems(state, userInput)
 		MERGE_SIMILAR_ITEMS = state;
 	end
-	addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItems", SettingChanged_CombineItems);
+	addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItem", SettingChanged_CombineItems);
 
 	local function SettingChanged_LowFrameStrata(state, userInput)
 		LOW_FRAME_STRATA = state;

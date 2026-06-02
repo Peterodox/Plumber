@@ -2104,7 +2104,7 @@ do  --Callback Registery
 	local function SettingChanged_CombineItems(state, userInput)
 		MERGE_JUNKS = state;
 	end
-	addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItems", SettingChanged_CombineItems);
+	addon.CallbackRegistry:RegisterSettingCallback("LootUI_CombineItem", SettingChanged_CombineItems);
 end
 
 
