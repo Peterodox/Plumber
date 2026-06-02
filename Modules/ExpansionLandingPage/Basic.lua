@@ -1850,6 +1850,10 @@ do	--ExpansionFeature
 	function LandingPageUtil.HandleTraitTreeCurrencyChanged(treeID)
 		--Override
 	end
+
+	function LandingPageUtil.HasAnyPurchasableTrait()
+		return false;
+	end
 end
 
 
