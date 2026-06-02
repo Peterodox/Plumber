@@ -318,6 +318,7 @@ stds.wow = {
 		"HandleModifiedItemClick",
 		"HasOverrideActionBar",
 		"HaveQuestData",
+		"HelpTip",
 		"HideUIPanel",
 		"hooksecurefunc",
 		"HouseEditorFrame",
@@ -1200,6 +1201,7 @@ stds.wow = {
 				"GetAllProfessionTradeSkillLines",
 				"GetBaseProfessionInfo",
 				"GetChildProfessionInfo",
+				"GetConfigIDBySystemID",
 				"GetFilteredRecipeIDs",
 				"GetItemCraftedQualityByItemInfo",
 				"GetItemReagentQualityByItemInfo",
@@ -1472,6 +1474,12 @@ stds.wow = {
 					fields = {
 						"Pet",
 						"Player",
+					},
+				},
+
+				SuperTrackingMapPinType = {
+					fields = {
+						"QuestOffer",
 					},
 				},
 
