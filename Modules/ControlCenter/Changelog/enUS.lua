@@ -34,7 +34,7 @@ changelogs[10902] = {
 	{
 		type = "p",
 		bullet = 2,
-		text = "Hovering the curor over a Raid progress will no longer cause error.",
+		text = "Hovering the cursor over a Raid progress will no longer cause error.",
 	},
 	{
 		type = "p",
