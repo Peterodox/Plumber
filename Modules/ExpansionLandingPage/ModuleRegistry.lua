@@ -5,6 +5,7 @@ local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
 local FactionUtil = addon.FactionUtil;
+local LandingPageUtil = addon.LandingPageUtil;
 local IsExpansionLandingPageUnlockedForPlayer = C_PlayerInfo.IsExpansionLandingPageUnlockedForPlayer or API.Nop;
 
 
@@ -34,7 +35,7 @@ local function AddonCompartment_OnEnter(menuButton, data)
 	tooltip:SetOwner(menuButton, "ANCHOR_NONE");
 	tooltip:SetPoint("TOPRIGHT", menuButton, "TOPLEFT", -12, 0);
 
-	local title = addon.LandingPageUtil.GetModuleNameWithHotkey();
+	local title = LandingPageUtil.GetModuleNameWithHotkey();
 	tooltip:SetText(title, 1, 1, 1, 1, true);
 	tooltip:AddLine(L["Plumber Experimental Feature Tooltip"], 1, 0.82, 0, true);
 	tooltip:Show();
@@ -48,6 +49,15 @@ end
 local EL = CreateFrame("Frame");
 EL:RegisterEvent("LOADING_SCREEN_DISABLED");
 
+EL.events = {
+	"QUEST_ACCEPTED",
+	"QUEST_TURNED_IN",
+};
+
+if C_EventUtils.IsEventValid("TRAIT_TREE_CURRENCY_INFO_UPDATED") then
+	table.insert(EL.events, "TRAIT_TREE_CURRENCY_INFO_UPDATED");
+end
+
 EL:SetScript("OnEvent", function(self, event, ...)
 	if event == "LOADING_SCREEN_DISABLED" then
 		self:UnregisterEvent(event);
@@ -56,6 +66,7 @@ EL:SetScript("OnEvent", function(self, event, ...)
 				if ShouldShowWarWithinLandingPage() and FactionUtil:IsAnyParagonRewardPending() then
 					API.TriggerExpansionMinimapButtonAlert(L["Paragon Reward Available"]);
 				end
+				LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
 			end);
 		end
 	elseif event == "QUEST_ACCEPTED" then
@@ -72,6 +83,9 @@ EL:SetScript("OnEvent", function(self, event, ...)
 			CallbackRegistry:Trigger("ParagonRewardQuestTurnedIn", questID);
 			CallbackRegistry:Trigger("LandingPage.UpdateNotification");
 		end
+	elseif event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" then
+		local treeID = ...
+		LandingPageUtil.HandleTraitTreeCurrencyChanged(treeID);
 	end
 end);
 
@@ -79,19 +93,17 @@ function EL.EnableModule(state)
 	if state then
 		if not EL.enabled then
 			EL.enabled = true;
-			EL:RegisterEvent("QUEST_ACCEPTED");
-			EL:RegisterEvent("QUEST_TURNED_IN");
+			API.RegisterFrameForEvents(EL, EL.events);
 			API.AddButtonToAddonCompartment(IDENTIFIER, L["Abbr NewExpansionLandingPage"], nil, AddonCompartment_OnClick, AddonCompartment_OnEnter, AddonCompartment_OnLeave);
 		end
 	else
 		if EL.enabled then
 			EL.enabled = false;
-			EL:UnregisterEvent("QUEST_ACCEPTED");
-			EL:UnregisterEvent("QUEST_TURNED_IN");
+			API.UnregisterFrameForEvents(EL, EL.events);
 			API.RemoveButtonFromAddonCompartment(IDENTIFIER);
 		end
 	end
-	addon.LandingPageUtil.UpdateMinimapButtonVisibility();
+	LandingPageUtil.UpdateMinimapButtonVisibility();
 end
 
 
@@ -104,7 +116,7 @@ do
 		categoryID = 1,
 		uiOrder = -10,
 		moduleAddedTime = 1750160000,
-		optionToggleFunc = addon.LandingPageUtil.ToggleMinimapSettings,
+		optionToggleFunc = LandingPageUtil.ToggleMinimapSettings,
 		validityCheck = function()
 			return addon.IsToCVersionEqualOrNewerThan(50000);
 		end,

@@ -2,6 +2,13 @@ local _, addon = ...
 local API = addon.API;
 
 
+if not (C_Traits and C_Traits.GetNodeInfo) then
+	function API.HasAnyPurchasableTraitInSystem()
+		return false;
+	end
+end
+
+
 local Def = {
 	Art = "Interface/AddOns/Plumber/Art/Frame/TraitSystem.png",
 	ButtonSize = 40,
@@ -515,8 +522,9 @@ do
 				if self.isFlyoutButton then
 					self.ownerFrame:TryPurchaseSelectionNodeByIndex(self.nodeID, self.entryChoiceIndex);
 					self.ownerFrame:CloseNodeFlyout();
-				elseif self:IsSelectionNode() and false then
-					self.ownerFrame:TryPurchaseSelectionNodeByIndex(self.nodeID);
+				elseif self:IsSelectionNode() then
+					--self.ownerFrame:TryPurchaseSelectionNodeByIndex(self.nodeID);
+					return;
 				else
 					self.ownerFrame:TryPurchaseRank(self.nodeID);
 				end
@@ -1000,4 +1008,45 @@ function addon.CreateTraitContainer(parent)
 	end
 
 	return f;
+end
+
+function API.HasAnyPurchasableTraitInSystem(systemID)
+	local configID = C_Traits.GetConfigIDBySystemID(systemID);
+	if not configID then
+		return false;
+	end
+
+	local configInfo = C_Traits.GetConfigInfo(configID);
+	local treeID = configInfo and configInfo.treeIDs and configInfo.treeIDs[1];
+	if not treeID then
+		return false;
+	end
+
+	local excludeStagedChanges = false;
+	local treeCurrencies = C_Traits.GetTreeCurrencyInfo(configID, treeID, excludeStagedChanges);
+	if #treeCurrencies <= 0 then
+		return false;
+	end
+
+	local unspentCurrency = treeCurrencies[1] and treeCurrencies[1].quantity or 0;
+	if unspentCurrency <= 0 then
+		return false;
+	end
+
+	local nodeIDs = C_Traits.GetTreeNodes(treeID);
+	for _nodeIndex, nodeID in ipairs(nodeIDs) do
+		local nodeCosts = C_Traits.GetNodeCost(configID, nodeID);
+		-- Assume only 1 type of currency is needed
+		local canAffordNode = (not nodeCosts) or (#nodeCosts == 0) or (unspentCurrency >= nodeCosts[1].amount);
+		if canAffordNode then
+			local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID);
+			for _entryIndex, entryID in ipairs(nodeInfo.entryIDs) do
+				if C_Traits.CanPurchaseRank(configID, nodeID, entryID) then
+					return true;
+				end
+			end
+		end
+	end
+
+	return false;
 end

@@ -8,6 +8,8 @@ local MainFrame;
 
 local QUEST_PROVIDER_MAP = 2649; -- The Lycaneum
 local QUEST_PIN_MAP = 2424; -- Use Isle map instead of the indoor map
+local TRAIT_SYSTEM_ID = 48; -- RUNES_OF_POWER_SYSTEM_ID
+local TRAIT_TREE_ID = 1186; -- RUNES_OF_POWER_TREE_ID;
 
 
 local function GetBestMapForQuest(questID)
@@ -17,6 +19,7 @@ local function GetBestMapForQuest(questID)
 		return GetQuestUiMapID(questID);
 	end
 end
+
 
 local TraitFrameMixin = {};
 do
@@ -37,7 +40,7 @@ do
 			TraitContainer = addon.CreateTraitContainer(self);
 			TraitContainer:SetPoint("CENTER", self, "CENTER", 0, 0);
 			TraitContainer:SetScale(36/40);
-			TraitContainer:SetConfigIDBySystemID(48); -- RUNES_OF_POWER_SYSTEM_ID
+			TraitContainer:SetConfigIDBySystemID(TRAIT_SYSTEM_ID);
 			TraitContainer:SetEnableAutoCommit(true);
 		end
 		self:UpdateHeader();
@@ -90,7 +93,7 @@ do
 		local configID = TraitContainer.configID;
 		local treeID = TraitContainer.treeID;
 
-		if configID and treeID then
+		if configID and treeID and LandingPageUtil.HasAnyPurchasableTrait() then
 			local excludeStagedChanges = false;
 			local treeCurrencyInfo = C_Traits.GetTreeCurrencyInfo(configID, treeID, excludeStagedChanges);
 			local info = treeCurrencyInfo and treeCurrencyInfo[1];
@@ -255,6 +258,33 @@ end
 function LandingPageUtil.GetTraitSystemName()
 	return RUNES_OF_POWER;
 end
+
+function LandingPageUtil.HasAnyPurchasableTrait()
+	return API.HasAnyPurchasableTraitInSystem(TRAIT_SYSTEM_ID);
+end
+
+
+do	--Event Handler
+	local Frame = CreateFrame("Frame");
+
+	function LandingPageUtil.HandleTraitTreeCurrencyChanged(treeID)
+		if treeID == TRAIT_TREE_ID then
+			if not Frame.t then
+				Frame.t = 0;
+				Frame:SetScript("OnUpdate", function(self, elapsed)
+					self.t = self.t + elapsed;
+					if self.t >= 0.1 then
+						self.t = nil;
+						self:SetScript("OnUpdate", nil);
+						addon.CallbackRegistry:Trigger("LandingPage.HasPurchasableTrait", LandingPageUtil.HasAnyPurchasableTrait());
+					end
+				end);
+			end
+			Frame.t = 0;
+		end
+	end
+end
+
 
 function LandingPageUtil.CreateTraitFrame(parent)
 	if MainFrame then return MainFrame; end

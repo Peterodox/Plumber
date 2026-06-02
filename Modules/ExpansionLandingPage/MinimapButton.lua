@@ -779,6 +779,103 @@ do  --Order Hall, RightClickMenu
 end
 
 
+do	--Notification / Alert / Banner
+	function ButtonMixin:AlertFrame_Init()
+		local f = self.AlertFrame;
+
+		--API.DisableSharpening(f.BorderTop);
+		f.BorderTop:SetTexture(Def.TextureFile);
+		f.BorderTop:SetTexCoord(256/512, 512/512, 264/512, 312/512);
+		--API.DisableSharpening(f.BorderBottom);
+		f.BorderBottom:SetTexture(Def.TextureFile);
+		f.BorderBottom:SetTexCoord(256/512, 512/512, 264/512, 312/512);
+
+		local v = 0.02;
+		local a = 0.8;
+		local color1 = CreateColor(1, 1, 1, 0);
+		local color2 = CreateColor(1, 1, 1, 1);
+		f.GradientCenter:SetColorTexture(v, v, v, a);
+		f.GradientLeft:SetColorTexture(v, v, v, a);
+		f.GradientRight:SetColorTexture(v, v, v, a);
+		f.GradientLeft:SetGradient("HORIZONTAL", color1, color2);
+		f.GradientRight:SetGradient("HORIZONTAL", color2, color1);
+
+		local gradientLength = 24;
+		f.GradientLeft:SetWidth(gradientLength);
+		f.GradientRight:SetWidth(gradientLength);
+	end
+
+	function ButtonMixin:AlertFrame_ShowText(text)
+		local f = self.AlertFrame;
+		f.Text:SetText(text);
+		local textWidth = math.ceil(f.Text:GetWrappedWidth());
+		local textHeight = math.ceil(f.Text:GetHeight());
+		f.alertFrameWidth = math.max(192, textWidth + 48);
+		f.alertFrameHeight = textHeight + 24;
+
+		local easingFunc = addon.EasingFunctions.outSine;
+		local duration = 0.5;
+		local alertFrameFromWidth = 32;
+
+		f:SetHeight(f.alertFrameHeight);
+		f:SetAlpha(0);
+		f.Text:SetAlpha(0);
+
+		local function AlertFrame_Text_OnUpdate(_self, elapsed)
+			_self.t = _self.t + elapsed;
+			local alpha = 4 * _self.t - 1;
+			if alpha > 1 then
+				_self:SetScript("OnUpdate", nil);
+				alpha = 1;
+			elseif alpha < 0 then
+				alpha = 0;
+			end
+			f.Text:SetAlpha(alpha);
+		end
+
+		local function AlertFrame_AnimIn_OnUpdate(_self, elapsed)
+			_self.t = _self.t + elapsed;
+			local width = easingFunc(_self.t, alertFrameFromWidth, f.alertFrameWidth, duration);
+			local alpha = 4 * _self.t;
+			if _self.t > duration then
+				_self:SetScript("OnUpdate", AlertFrame_Text_OnUpdate);
+				_self.t = 0;
+				width = f.alertFrameWidth;
+			end
+			f:SetWidth(width);
+			if alpha > 1 then
+				alpha = 1;
+			end
+			f:SetAlpha(alpha);
+		end
+
+		f.t = 0;
+		f:SetScript("OnUpdate", AlertFrame_AnimIn_OnUpdate);
+		f:Show();
+
+		f:SetScript("OnMouseDown", function(_, button)
+			f:Hide();
+			if button == "LeftButton" then
+				PlumberExpansionLandingPage:ShowTraitTab();
+			end
+		end);
+	end
+
+	CallbackRegistry:RegisterCallback("LandingPage.HasPurchasableTrait", function(hasPurchasableTrait)
+		if hasPurchasableTrait and (not InCombatLockdown()) then
+			if MiniButton and MiniButton:IsVisible() and (not MiniButton.AlertFrame:IsShown()) and (not PlumberExpansionLandingPage:IsShown()) then
+				MiniButton:AlertFrame_Init();
+				MiniButton:AlertFrame_ShowText(OMNIUM_FOLIO_UNSPENT_POINTS);
+			end
+		else
+			if MiniButton then
+				MiniButton.AlertFrame:Hide();
+			end
+		end
+	end);
+end
+
+
 do  --Button Settings/Customize
 	Options.ButtonBaseSizes = {24, 36};
 

@@ -277,11 +277,16 @@ do
 		if not self:IsUserPlaced() then
 			self:ResetPosition();
 		end
+
+		if LandingPageUtil.HasAnyPurchasableTrait() then
+			self:ShowTraitTab();
+		end
 	end
 
 	function PlumberExpansionLandingPageMixin:OnHide()
 		LandingPageUtil.PlayUISound("LandingPageClose");
 		LandingPageUtil.MainContextMenu:HideMenu();
+		LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
 	end
 
 	function PlumberExpansionLandingPageMixin:InitTabButtons()
@@ -511,6 +516,21 @@ do
 		end
 
 		self:EnableMouse(false);
+	end
+end
+
+
+do	--12.0.7 Only
+	function PlumberExpansionLandingPageMixin:ShowTraitTab()
+		if not self:IsShown() then
+			self:Show();
+		end
+		local selectedTab = LandingPageUtil.GetSelectedTabKey();
+		if selectedTab ~= "faction" and selectedTab ~= "activity" then
+			LandingPageUtil.SelectTab("faction");
+			MainFrame:UpdateTabs();
+		end
+		LandingPageUtil.SelectExpansion(12);
 	end
 end
 
