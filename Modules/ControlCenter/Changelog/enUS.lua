@@ -11,6 +11,46 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10902] = {
 	{
 		type = "date",
+		versionText = "1.9.2 d",
+		timestamp = 1780400000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot Window: Junk items are now combined and displayed as a single entry.",
+	},
+	{
+		type = "p",
+		bullet = 2,
+		text = "Note: This option is not new, but we changed its default state to Enabled.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary, Great Vault: Fixed several issues.",
+	},
+	{
+		type = "p",
+		bullet = 2,
+		text = "Hovering the curor over a Raid progress will no longer cause error.",
+	},
+	{
+		type = "p",
+		bullet = 2,
+		text = "World Activities should correctly show the increased item level after completing Tier 4 or Tier 5 Ritual Sites.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.2 c",
 		timestamp = 1779500000,
 	},
