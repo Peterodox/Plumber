@@ -859,7 +859,13 @@ do  --Module Registry
 		categoryKeys = {"Collection"},
 	};
 
-	if addon.IS_MIDNIGHT then
+	local IS_MOP_TRANSMOG = addon.IS_MOP and addon.IsToCVersionEqualOrNewerThan(50504); -- Modern Transmog system has been added to 5.5.4
+
+	if addon.IS_MIDNIGHT or IS_MOP_TRANSMOG then
 		addon.ControlCenter:AddModule(moduleData);
+
+		if IS_MOP_TRANSMOG then
+			Def.MacroIcon = 135025;
+		end
 	end
 end
