@@ -175,29 +175,79 @@ end
 
 local HeaderFrameMixin = {};
 do
-	function HeaderFrameMixin:DisplayTraitCurrency(icon, quantity)
+	function HeaderFrameMixin:Reset()
 		self.clickResponse = nil;
+		self.Icon:Hide();
+		self.Text:Hide();
 		self.Icon:ClearAllPoints();
 		self.Text:ClearAllPoints();
+		if self.Points then
+			self.Points:Hide();
+			self.Points:ClearAllPoints();
+		end
+		if self.PointsLabel then
+			self.PointsLabel:Hide();
+			self.PointsLabel:ClearAllPoints();
+		end
+	end
+
+	function HeaderFrameMixin:DisplayTraitCurrency(icon, quantity)
+		self:Reset();
+
+		-- Use a bigger, conspicuous points display instead
+		--[[
 		self.Icon:SetSize(16, 16);
 		self.Icon:SetPoint("LEFT", self, "CENTER", 0, 0);
 		self.Icon:SetTexture(icon);
+		self.Icon:Show();
 		self.Text:SetPoint("RIGHT", self.Icon, "LEFT", -4, 0);
 		self.Text:SetText(quantity);
 		self.Text:SetTextColor(0.098, 1.000, 0.098);
+		self.Text:Show();
+		--]]
+
+		local textGap = 6;
+
+		if not self.Points then
+			self.Points = self:CreateFontString(nil, "OVERLAY", "PlumberFont_16");
+			self.Points:SetTextColor(1, 1, 1);
+		end
+
+		if not self.PointsLabel then
+			self.PointsLabel = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+			self.PointsLabel:SetTextColor(0.88, 0.88, 0.88);
+			self.PointsLabel:SetWidth(128);
+			self.PointsLabel:SetText(addon.L["Trait Points Available"]);
+			self.PointsLabel:SetJustifyH("LEFT");
+		end
+
+		self.Points:SetText(quantity);
+
+		if quantity > 0 then
+			self.Points:SetTextColor(0.098, 1.000, 0.098);
+		else
+			self.Points:SetTextColor(0.5, 0.5, 0.5);
+		end
+
+		local totalWidth = self.Points:GetWrappedWidth() + textGap + self.PointsLabel:GetWrappedWidth();
+
+		self.Points:SetPoint("BOTTOMLEFT", self, "BOTTOM", -0.5 * totalWidth, 4);
+		self.PointsLabel:SetPoint("LEFT", self.Points, "RIGHT", textGap, 0);
+		self.Points:Show();
+		self.PointsLabel:Show();
+
 		self:SetScript("OnEnter", self.ShowTooltipSpell);
 	end
 
 	function HeaderFrameMixin:ShowTooltipSpell()
 		local tooltip = GameTooltip;
-		tooltip:SetOwner(self.Icon, "ANCHOR_RIGHT");
+		tooltip:SetOwner(self, "ANCHOR_RIGHT");
 		tooltip:SetSpellByID(1294322); -- Mote of Omnial Inquiry
 	end
 
 	function HeaderFrameMixin:DisplayQuest(questID, isStartingQuest)
+		self:Reset();
 		self.clickResponse = "quest";
-		self.Icon:ClearAllPoints();
-		self.Text:ClearAllPoints();
 		self.Text:SetPoint("CENTER", self, "CENTER", 8, 0);
 		local iconOffset = 0;
 
@@ -221,6 +271,8 @@ do
 
 		self.Icon:SetSize(16, 16);
 		self.Icon:SetPoint("RIGHT", self.Text, "LEFT", iconOffset, 0);
+		self.Text:Show();
+		self.Icon:Show();
 
 		self.questID = questID;
 		self:SetScript("OnEnter", self.ShowTooltipQuest);
