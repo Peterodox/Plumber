@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.2
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.2 d
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -738,6 +738,7 @@ L["Delves Completion Reward Cap"] = "Лимит наград за прохожд
 L["Delves Completion Reward Cap Tooltip"] = "Как только вы достигнете этого общего на аккаунт лимита, прохождение многообещающих вылазок перестанет приносить опыт спутника и прогресс «Пути участника вылазки».\n\nНаграды из многообещающих сундуков и тайников заклятых врагов не зависят от этого лимита.\n\nЛимит увеличивается на 28 в неделю.";
 L["Near Completion Tooltip"] = "Эта запись видна вам, так как вы почти достигли еженедельного лимита.";
 L["Inactive Currencies Tooltip"] = "Эти валюты скрыты, так как вы пометили их как «Неиспользуемые»:";
+L["New Quest"] = "Новое задание";
 
 
 --ExpansionSummaryMinimapButton
