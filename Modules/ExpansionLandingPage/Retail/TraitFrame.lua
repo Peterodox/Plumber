@@ -177,6 +177,7 @@ local HeaderFrameMixin = {};
 do
 	function HeaderFrameMixin:Reset()
 		self.clickResponse = nil;
+		self.shouldFlashText = nil;
 		self.Icon:Hide();
 		self.Text:Hide();
 		self.Icon:ClearAllPoints();
@@ -253,17 +254,19 @@ do
 
 		if isStartingQuest then
 			self.Text:SetText(addon.L["New Quest"]);
-			self.Text:SetTextColor(0.922, 0.871, 0.761);
+			self.shouldFlashText = true;
 			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/TrackerType-Quest.png");
 			self.Icon:SetTexCoord(0, 1, 0, 1);
 		elseif API.IsQuestReadyForTurnIn(questID) then
 			self.Text:SetText(QUEST_WATCH_QUEST_READY);
 			self.Text:SetTextColor(0.098, 1.000, 0.098);
+			self:FlashText(false);
 			self.Icon:SetAtlas("QuestTurnin");
 			iconOffset = -2;
 		else
 			self.Text:SetText(GARRISON_MISSION_IN_PROGRESS_TOOLTIP);
 			self.Text:SetTextColor(0.922, 0.871, 0.761);
+			self:FlashText(false);
 			self.Icon:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressRed.png");
 			self.Icon:SetTexCoord(0, 1, 0, 1);
 			iconOffset = -4;
@@ -276,6 +279,7 @@ do
 
 		self.questID = questID;
 		self:SetScript("OnEnter", self.ShowTooltipQuest);
+		self:HandleFlashText();
 	end
 
 	function HeaderFrameMixin:ShowTooltipQuest()
@@ -288,11 +292,16 @@ do
 		TooltipUpdator:RequestQuestReward();
 		local questUiMapID = GetBestMapForQuest(self.questID);
 		TooltipUpdator:SetEnableShowOnMap(questUiMapID);
+
+		self:HandleFlashText();
+		self.Text:SetTextColor(1, 1, 1);
+		self.Icon:SetVertexColor(1, 1, 1);
 	end
 
 	function HeaderFrameMixin:OnLeave()
 		GameTooltip:Hide();
 		LandingPageUtil.TooltipUpdator:StopUpdating();
+		self:HandleFlashText();
 	end
 
 	function HeaderFrameMixin:OnClick(button)
@@ -303,6 +312,38 @@ do
 				C_Map.OpenWorldMap(questUiMapID);
 			end
 		end
+	end
+
+	function HeaderFrameMixin:FlashText(state)
+		if state then
+			if not self.AnimFlashText then
+				local ag = self:CreateAnimationGroup();
+				ag:SetLooping("BOUNCE");
+				local anim1 = ag:CreateAnimation("VertexColor");
+				anim1:SetStartColor(CreateColor(1, 1, 1));
+				anim1:SetEndColor(CreateColor(0.804, 0.667, 0.498));
+				anim1:SetDuration(1);
+				anim1:SetChildKey("Text");
+				local anim2 = ag:CreateAnimation("VertexColor");
+				anim2:SetStartColor(CreateColor(1, 1, 1));
+				anim2:SetEndColor(CreateColor(0.6, 0.6, 0.6));
+				anim2:SetDuration(1);
+				anim2:SetChildKey("Icon");
+				self.AnimFlashText = ag;
+			end
+			self.Text:SetTextColor(1, 1, 1);
+			self.AnimFlashText:Play();
+		else
+			if self.AnimFlashText then
+				self.AnimFlashText:Stop();
+			end
+			self.Text:SetTextColor(0.922, 0.871, 0.761);
+			self.Icon:SetVertexColor(1, 1, 1);
+		end
+	end
+
+	function HeaderFrameMixin:HandleFlashText()
+		self:FlashText( self.shouldFlashText and (not self:IsMouseMotionFocus()) );
 	end
 end
 
