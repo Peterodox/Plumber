@@ -1,10 +1,18 @@
 ---
 name: Push and Pull Request
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Skip duplicate runs on pull_request when the push event would also trigger.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     steps:
       - uses: actions/setup-python@v6
         with:
