@@ -26,3 +26,4 @@ Modules\SpellFlyout_Secure.lua
 Modules\Macros.lua
 
 Modules\ExpansionLandingPage\ExpansionLandingPage_MOP.xml
+Modules\OutfitSelect.xml

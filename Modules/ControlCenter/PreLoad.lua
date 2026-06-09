@@ -139,9 +139,10 @@ function ControlCenter:AddModule(moduleData)
 	--moduleData = {name = ModuleName, dbKey = PlumberDB[key], description = string, toggleFunc = function, validityCheck = function, categoryID = number, uiOrder = number}
 
 	if not moduleData.categoryID then
-		moduleData.categoryID = 0;
+		-- Assign a categoryID for modules added post settings revamp
+		-- The old settings UI is only used in Classic
+		moduleData.categoryID = 1;
 		moduleData.uiOrder = 0;
-		--print("Plumber Debug:", moduleData.name, "No Category");
 	end
 
 	table.insert(self.modules, moduleData);

@@ -1807,6 +1807,14 @@ do  --Minimap Button
 	LandingPageUtil.UpdateMinimapButtonVisibility = function()
 		--Override
 	end
+
+	LandingPageUtil.HideMinimapButtonAlert = function()
+		--Override
+	end
+
+	LandingPageUtil.ShowMinimapButtonAlert = function(text)
+		--Override
+	end
 end
 
 
