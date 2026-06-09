@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Skip duplicate runs on pull_request when the push event would also trigger
+    # Skip duplicate runs on pull_request when the push event would also trigger.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     steps:
       - uses: actions/setup-python@v6
