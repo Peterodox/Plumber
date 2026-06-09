@@ -11,7 +11,7 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10902] = {
 	{
 		type = "date",
-		versionText = "1.9.2 d",
+		versionText = "1.9.2 d-e",
 		timestamp = 1780400000,
 	},
 
