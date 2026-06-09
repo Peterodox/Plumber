@@ -281,6 +281,8 @@ do
 		if LandingPageUtil.HasAnyPurchasableTrait() then
 			self:ShowTraitTab();
 		end
+
+		LandingPageUtil.HideMinimapButtonAlert();
 	end
 
 	function PlumberExpansionLandingPageMixin:OnHide()

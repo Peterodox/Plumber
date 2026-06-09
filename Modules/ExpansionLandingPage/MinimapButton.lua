@@ -854,23 +854,38 @@ do	--Notification / Alert / Banner
 		f:Show();
 
 		f:SetScript("OnMouseDown", function(_, button)
-			f:Hide();
 			if button == "LeftButton" then
 				PlumberExpansionLandingPage:ShowTraitTab();
 			end
 		end);
 	end
 
-	CallbackRegistry:RegisterCallback("LandingPage.HasPurchasableTrait", function(hasPurchasableTrait)
-		if hasPurchasableTrait and (not InCombatLockdown()) then
-			if MiniButton and MiniButton:IsVisible() and (not MiniButton.AlertFrame:IsShown()) and (not PlumberExpansionLandingPage:IsShown()) then
+
+	function LandingPageUtil.HideMinimapButtonAlert()
+		if MiniButton then
+			MiniButton.AlertFrame:Hide();
+		end
+	end
+
+	function LandingPageUtil.ShowMinimapButtonAlert(text)
+		if text and text ~= "" then
+			if MiniButton and MiniButton:IsVisible() and (not MiniButton.AlertFrame:IsShown()) then
 				MiniButton:AlertFrame_Init();
-				MiniButton:AlertFrame_ShowText(OMNIUM_FOLIO_UNSPENT_POINTS);
+				MiniButton:AlertFrame_ShowText(text);
 			end
 		else
-			if MiniButton then
-				MiniButton.AlertFrame:Hide();
+			LandingPageUtil.HideMinimapButtonAlert();
+		end
+	end
+
+
+	CallbackRegistry:RegisterCallback("LandingPage.HasPurchasableTrait", function(hasPurchasableTrait)
+		if hasPurchasableTrait and (not InCombatLockdown()) then
+			if not PlumberExpansionLandingPage:IsShown() then
+				LandingPageUtil.ShowMinimapButtonAlert(OMNIUM_FOLIO_UNSPENT_POINTS)
 			end
+		else
+			LandingPageUtil.HideMinimapButtonAlert();
 		end
 	end);
 end
