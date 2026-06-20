@@ -18,13 +18,13 @@ changelogs[10902] = {
 	{
 		type = "p",
 		bullet = true,
-		text = "The Omnium Folio section in Plumber's Expansion Summary UI now stands out more when when you have unselected traits.",
+		text = "The Omnium Folio section in Plumber's Expansion Summary UI now stands out more when you have unselected traits.",
 	},
 
 	{
 		type = "p",
 		bullet = true,
-		text = "Reverted a recent change to text outline rendering method due to compatibility issues.",
+		text = "Reverted a recent change to the text outline rendering method due to compatibility issues.",
 	},
 	{
 		type = "p",
