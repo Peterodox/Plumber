@@ -11,6 +11,36 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10902] = {
 	{
 		type = "date",
+		versionText = "1.9.2 f",
+		timestamp = 1781900000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The Omnium Folio section in Plumber's Expansion Summary UI now stands out more when when you have unselected traits.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Reverted a recent change to text outline rendering method due to compatibility issues.",
+	},
+	{
+		type = "p",
+		bullet = 2,
+		text = "Note: While the switch to Slug rendering provided sharper outlines, it caused rendering problems with certain fonts.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.2 d-e",
 		timestamp = 1780400000,
 	},
