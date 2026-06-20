@@ -135,12 +135,6 @@ changelogs[10902] = {
 	},
 
 	{
-		type = "p",
-		bullet = true,
-		text = "Text Outline: Implemented Slug text rendering for certain Plumber fonts, which improves legibility and sharpness when text is displayed at smaller scales.",
-	},
-
-	{
 		type = "br",
 	},
 	{

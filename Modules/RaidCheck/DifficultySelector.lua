@@ -24,7 +24,7 @@ local DummyFrame;   --Edit Mode: For Reposition
 
 local function SetupFont(fontString, fontHeight)
 	local font = GameFontNormal:GetFont();
-	fontString:SetFont(font, fontHeight or 14, "SLUGOUTLINE");
+	fontString:SetFont(font, fontHeight or 14, "OUTLINE");
 end
 
 
