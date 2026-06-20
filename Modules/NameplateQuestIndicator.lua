@@ -1133,7 +1133,7 @@ do  --Options
 		local fontFile, fontHeight = GameFontNormalSmall:GetFont();
 		local nameplateFont = PlumberFont_Nameplate_Small;
 		if Def.TextOutline then
-			nameplateFont:SetFont(fontFile, fontHeight, "SLUGOUTLINE");
+			nameplateFont:SetFont(fontFile, fontHeight, "OUTLINE");
 		else
 			nameplateFont:SetFont(fontFile, fontHeight, "");
 		end

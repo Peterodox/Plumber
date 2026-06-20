@@ -100,14 +100,14 @@ do
 			if info and info.quantity > 0 then
 				local flags, type, currencyTypesID, icon = C_Traits.GetTraitCurrencyInfo(info.traitCurrencyID);
 				self.HeaderFrame:DisplayTraitCurrency(icon, info.quantity);
-				MainFrame.BlackOverlay:Show();
+				self:ShowBlackScreen(true);
 				return true;
 			else
-				MainFrame.BlackOverlay:Hide();
+				self:ShowBlackScreen(false);
 				return false;
 			end
 		else
-			MainFrame.BlackOverlay:Hide();
+			self:ShowBlackScreen(false);
 			return false;
 		end
 	end
@@ -170,6 +170,44 @@ do
 			end
 		end
 		self:ShowHeaderFrame(anyShown);
+	end
+
+	function TraitFrameMixin:ShowBlackScreen(state)
+		if state then
+			if not self.BlackOverlay then
+				local offset = 8;
+				local alpha = 0.8;
+
+				self.BlackOverlay = CreateFrame("Frame", nil, self);
+				self.BlackOverlay:SetUsingParentLevel(true);
+
+				local function CreateOverlay(container)
+					local overlay = self.BlackOverlay:CreateTexture(nil, "BACKGROUND");
+					overlay:SetColorTexture(0, 0, 0, alpha);
+					overlay:SetPoint("TOPLEFT", container, "TOPLEFT", offset, -offset);
+					overlay:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -offset, offset);
+					return overlay;
+				end
+
+				local overlay1 = CreateOverlay(PlumberExpansionLandingPage.LeftSection);
+				local overlay2 = CreateOverlay(PlumberExpansionLandingPage.RightSection);
+
+				local BackgroundGlow = self.BlackOverlay:CreateTexture(nil, "BACKGROUND", nil, 1);
+				BackgroundGlow:SetSize(256, 256);
+				BackgroundGlow:SetPoint("CENTER", self, "CENTER", 0, 0);
+				BackgroundGlow:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionLandingPage-BackgroundGlow");
+				BackgroundGlow:SetBlendMode("ADD");
+				local shrink = 48;
+				BackgroundGlow:SetTexCoord(shrink/256, 1-shrink/256, shrink/256, 1-shrink/256);
+				BackgroundGlow:SetVertexColor(60/255, 35/255, 20/255);
+			end
+
+			self.BlackOverlay:Show();
+		else
+			if self.BlackOverlay then
+				self.BlackOverlay:Hide();
+			end
+		end
 	end
 end
 
@@ -404,13 +442,6 @@ function LandingPageUtil.CreateTraitFrame(parent)
 	HeaderFrame:SetScript("OnEnter", HeaderFrame.OnEnter);
 	HeaderFrame:SetScript("OnLeave", HeaderFrame.OnLeave);
 	HeaderFrame:SetScript("OnClick", HeaderFrame.OnClick);
-
-	local container = PlumberExpansionLandingPage.LeftSection;
-	f.BlackOverlay = f:CreateTexture(nil, "BACKGROUND");
-	f.BlackOverlay:Hide();
-	f.BlackOverlay:SetColorTexture(0, 0, 0, 0.8);
-	f.BlackOverlay:SetPoint("TOPLEFT", container, "TOPLEFT", 8, -8);
-	f.BlackOverlay:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -8, 8);
 
 	return f, height
 end

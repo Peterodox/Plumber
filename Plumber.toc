@@ -1,6 +1,6 @@
 ## X-Flavor: retail
 ## X-Expansion: TWW
-## Interface: 120005, 120007
+## Interface: 120007, 120100
 ## Version: 1.9.2
 
 ## Title: Plumber
