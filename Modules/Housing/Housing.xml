@@ -7,6 +7,7 @@
 	<Script file="Housing_ActionButton.lua"/>
 	<Script file="Housing_Macro.lua"/>
 	<Script file="ItemAcquiredAlert.lua"/>
+	<Script file="HouseList.lua"/>
 
 	<Script file="HouseEditor_Main.lua"/>
 	<Script file="HouseEditor_Clock.lua"/>
@@ -101,6 +102,118 @@
 			</Anchors>
 		</PushedTexture>
 	</Button>
+
+	<Frame name="PlumberHouseListFrameEntryTemplate" virtual="true">
+		<Size x="480" y="120"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background">
+					<Size x="512" y="152"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString parentKey="HouseNameText" inherits="Game15Font_Shadow" justifyH="LEFT" text="12 Your Mama's Name" maxLines="1">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="22" y="-22"/>
+						<Anchor point="RIGHT" x="-22"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="HouseOwnerLabel" inherits="Game13FontShadow" justifyH="LEFT"  text="HOUSING_DASHBOARD_OWNER_LABEL">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.HouseNameText" relativePoint="BOTTOMLEFT" x="2" y="-5"/>
+					</Anchors>
+					<Color r="1.0" g="0.82" b="0"/>
+				</FontString>
+				<FontString parentKey="HouseOwnerText" inherits="Game13FontShadow" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.HouseOwnerLabel" relativePoint="TOPRIGHT" x="3"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button parentKey="VisitHouseButton" inherits="UIPanelButtonTemplate" text="VIEW_HOUSES_VISIT_BUTTON" hidden="true" motionScriptsWhileDisabled="true">
+				<Size x="160" y="28"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" x="22" y="22"/>
+				</Anchors>
+				<NormalFont style="GameFontNormalMed2"/>
+				<HighlightFont style="GameFontNormalMed2"/>
+				<DisabledFont style="PlumberFont_GameFontNormalMed2Gray"/>
+				<HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="PlumberHouseListFrameTemplate" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hyperlinksEnabled="true" hidden="true" virtual="true">
+		<!-- Copy almost the entire code from Blizzard because ShowUIPanel combat restriction from modifying the original frame -->
+
+        <Size x="400" y="200"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+        <Layers>
+			<Layer level="BACKGROUND" textureSubLevel="-1">
+				<Texture parentKey="Background" atlas="housing-basic-container" setAllPoints="true"/>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="WoodHeader" atlas="housing-basic-container-woodheader">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="6" y="-5"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" x="-6" y="-32"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+            <Layer level="ARTWORK">
+				<Texture parentKey="DecorativeFoliage" atlas="housing-decorative-foliage-left" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="6" y="-2"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="Title" inherits="Game15Font_Shadow" justifyH="CENTER">
+					<Anchors>
+						<Anchor point="TOP" y="-10"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="Reference">
+					<Size x="4"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-32"/>
+						<Anchor point="BOTTOM" x="0" y="6"/>
+                    </Anchors>
+				</Texture>
+                <FontString parentKey="NoHousesText" inherits="Game15Font_Shadow" justifyH="CENTER" hidden="true" text="VIEW_HOUSES_NO_HOUSES">
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.Reference" relativePoint="CENTER" x="0" y="0"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button parentKey="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-5" y="-6"/>
+				</Anchors>
+			</Button>
+
+            <Frame parentKey="LoadingSpinner" hidden="true" inherits="SpinnerTemplate" frameLevel="2000">
+				<Size x="60" y="60"/>
+				<Anchors>
+					<Anchor point="CENTER" relativeKey="$parent.Reference" relativePoint="CENTER" x="0" y="0"/>
+				</Anchors>
+			</Frame>
+
+			<Frame parentKey="ReloadHelper" inherits="PlumberReloadHelperTemplate">
+				<Size x="320"/>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOM" x="0" y="16"/>
+				</Anchors>
+			</Frame>
+        </Frames>
+    </Frame>
 
 	<!--Actor name="PlumberHousingDecorActorTemplate" mixin="PlumberHousingDecorActorMixin" virtual="true">
 		<Scripts>
