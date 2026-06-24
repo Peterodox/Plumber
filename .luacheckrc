@@ -780,6 +780,7 @@ stds.wow = {
 				"GetCurrentHouseLevelFavor",
 				"GetCurrentNeighborhoodGUID",
 				"GetHouseLevelFavorForLevel",
+				"GetOthersOwnedHouses",
 				"GetPlayerOwnedHouses",
 				"GetUIMapIDForNeighborhood",
 				"GetVisitCooldownInfo",
@@ -1320,6 +1321,12 @@ stds.wow = {
 
 		C_UIWidgetManager = {
 			fields = {
+				"Reload",
+			},
+		},
+
+		C_UIWidgetManager = {
+			fields = {
 				"GetAllWidgetsBySetID",
 				"GetHorizontalCurrenciesWidgetVisualizationInfo",
 				"GetItemDisplayVisualizationInfo",
@@ -1776,6 +1783,7 @@ stds.wow = {
 		"EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION",
 		"ERR_ACHIEVEMENT_WATCH_COMPLETED",
 		"ERR_COSMETIC_KNOWN",
+		"ERR_HOUSING_RESULT_LOCKED_BY_COMBAT",
 		"ERR_ITEM_NOT_FOUND",
 		"ERR_LFG_PROPOSAL_FAILED",
 		"EXPANSION_NAME10",
@@ -1891,6 +1899,7 @@ stds.wow = {
 		"UNIT_SKINNABLE_HERB",
 		"UNIT_YOU",
 		"UNUSED",
+		"VIEW_HOUSES_TITLE",
 		"WEEKLY_REWARDS_CLICK_TO_PREVIEW_INSTRUCTIONS",
 		"WEEKLY_REWARDS_COMPLETE_WORLD",
 		"WEEKLY_REWARDS_CURRENT_REWARD",

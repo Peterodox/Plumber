@@ -4039,6 +4039,11 @@ do  -- Custom Hyperlink ItemRef
 			local args = {...};
 			local link = "|Haddon:plumber:"..typeName;
 
+			if #args == 0 then
+				-- There must be at least 1 arg
+				args = {0};
+			end
+
 			for i, v in ipairs(args) do
 				link = link..":"..v;
 			end
@@ -4048,6 +4053,8 @@ do  -- Custom Hyperlink ItemRef
 			return link
 		end
 	end
+
+	API.AddCustomLinkType("ReloadUI", C_UI.Reload);
 end
 
 do  -- 11.0 Menu Formatter

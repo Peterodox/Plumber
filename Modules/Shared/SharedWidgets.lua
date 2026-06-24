@@ -2113,6 +2113,15 @@ do  --(In)Secure Button Pool
 		self:RegisterForClicks("AnyDown", "AnyUp");
 	end
 
+	function SecureButtonMixin:SetVisitHouse(neighborhoodGUID, houseGUID, plotID)
+		self:SetAttribute("type", "visithouse");
+		self:SetAttribute("house-neighborhood-guid", neighborhoodGUID);
+		self:SetAttribute("house-guid", houseGUID);
+		self:SetAttribute("house-plot-id", plotID);
+		self:SetAttribute("useOnKeyDown", false);
+		self:RegisterForClicks("AnyUp");
+	end
+
 	local function CreateSecureActionButton()
 		if InCombatLockdown() then return end;
 		local index = #SecureButtons + 1;
@@ -2132,7 +2141,7 @@ do  --(In)Secure Button Pool
 		return button
 	end
 
-	local function AcquireSecureActionButton(privateKey, propagateMouseMotion)
+	local function AcquireSecureActionButton(privateKey, propagateMouseMotion, propagateMouseClicks)
 		if InCombatLockdown() then return end;
 
 		local button;
@@ -2160,6 +2169,7 @@ do  --(In)Secure Button Pool
 		if button then
 			button.isActive = true;
 			button:SetPropagateMouseMotion(propagateMouseMotion or false);
+			button:SetPropagateMouseClicks(propagateMouseClicks or false);
 			SecureButtonContainer:RegisterEvent("PLAYER_REGEN_DISABLED");
 
 			if GetCVarBool("ActionButtonUseKeyDown") then

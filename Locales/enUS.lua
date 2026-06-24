@@ -47,6 +47,9 @@ L["Return To Module List"] = "Return to List";
 L["Generic Addon Conflict"] = "This module might be incompatible with addons of similar functionalities:";
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = ": ";
+L["Disabled Module Requires Reload Format"] = "You must %s to apply the changes.";	--We'll replace %s with a clickable "reload the UI"
+L["Reload The UI"] = "reload the UI";
+L["Click To Reload UI"] = "Click to reload the UI.";
 
 
 --Settings Category

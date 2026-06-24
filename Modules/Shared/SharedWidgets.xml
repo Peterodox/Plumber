@@ -2,6 +2,7 @@
 	<Script file="SharedWidgets.lua"/>
 	<Script file="SharedWidgets_ReorderController.lua"/>
 	<Script file="SharedWidgets_StaticPopup.lua"/>
+	<Script file="SharedWidgets_Helpers.lua"/>
 
 	<Frame name="PlumberBarPulseTemplate" virtual="true">
 		<!--Derivative of Blizzard FullResourcePulseFrame-->
@@ -812,4 +813,27 @@
 			</AnimationGroup>
 		</Animations>
 	</Button>
+
+	<Frame name="PlumberReloadHelperTemplate" mixin="PlumberReloadHelperMixin" enableMouse="true" enableMouseClicks="true" hyperlinksEnabled="true" hidden="true" virtual="true">
+		<Size x="256" y="16"/>
+		<!--KeyValues>
+			<KeyValue key="textFontObject" value="GameFontNormal" type="string"/>
+		</KeyValues-->
+		<Layers>
+			<Layer level="Overlay">
+				<FontString parentKey="Instruction" inherits="GameFontNormal" spacing="2" justifyH="CENTER">
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="0" y="0"/>
+						<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnHyperlinkClick method="OnHyperlinkClick"/>
+			<OnHyperlinkEnter method="OnHyperlinkEnter"/>
+			<OnHyperlinkLeave method="OnHyperlinkLeave"/>
+		</Scripts>
+	</Frame>
 </Ui>
