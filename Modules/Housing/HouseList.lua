@@ -122,7 +122,7 @@ do	-- HouseListEntry
 		f.Background:SetTexture(Def.TextureFile);
 		f.Background:SetSize(scale * Def.BackgroundWidth, scale * Def.BackgroundHeight);
 		local offset = 12;
-		f.HouseNameText:SetPoint("TOPLEFT", f, "TOPLEFT", offset, -offset);
+		f.HouseNameText:SetPoint("TOPLEFT", f, "TOPLEFT", offset + 1, -offset);
 		f.VisitHouseButton:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", offset, offset);
 
 		Mixin(f.VisitHouseButton, VisitHouseButtonMixin);
@@ -204,12 +204,29 @@ do
 
 		self:SetHeight(headerHeight + numEntries * (Def.CardEffectiveHeight + Def.CardSpacing) + Def.CardSpacing + 7 + extraHeight);
 		self:UpdatePosition();
+		self:Raise();
 	end
 
+
+	local FrameCandidates = {
+		FriendsListFrame = 16,
+		CommunitiesFrame = 36, -- Leave room for tab buttons
+	};
+
 	function MainFrameMixin:UpdatePosition()
-		if FriendsListFrame and FriendsListFrame:IsShown() then
-			self:ClearAllPoints();
-			self:SetPoint("TOPLEFT", FriendsListFrame, "TOPRIGHT", 16, 0);
+		local relativeTo, offset;
+		for frameName, offsetX in pairs(FrameCandidates) do
+			if _G[frameName] and _G[frameName]:IsShown() then
+				relativeTo = _G[frameName];
+				offset = offsetX;
+				break;
+			end
+		end
+		self:ClearAllPoints();
+		if relativeTo then
+			self:SetPoint("TOPLEFT", relativeTo, "TOPRIGHT", offset, 0);
+		else
+			self:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
 		end
 	end
 

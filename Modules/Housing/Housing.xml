@@ -123,7 +123,7 @@
 				</FontString>
 				<FontString parentKey="HouseOwnerLabel" inherits="Game13FontShadow" justifyH="LEFT"  text="HOUSING_DASHBOARD_OWNER_LABEL">
 					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent.HouseNameText" relativePoint="BOTTOMLEFT" x="2" y="-5"/>
+						<Anchor point="TOPLEFT" relativeKey="$parent.HouseNameText" relativePoint="BOTTOMLEFT" x="1" y="-5"/>
 					</Anchors>
 					<Color r="1.0" g="0.82" b="0"/>
 				</FontString>
