@@ -293,6 +293,28 @@ function FactionUtil:GetFactionsWithRewardPending(viewedExpansionOnly)
 	return tbl
 end
 
+function FactionUtil:GetBestExpansionIDWithRewardPending()
+	local IsOnQuest = C_QuestLog.IsOnQuest;
+	local expansionIDs = {12, 11}; -- newer expansion first
+
+	for _, expansionID in ipairs(expansionIDs) do
+		local factionLayout = LandingPageUtil.GetExpansionData(expansionID, "factionLayout");
+		if factionLayout then
+			local questID;
+			for row, rowInfo in ipairs(factionLayout) do
+				for _, factionInfo in ipairs(rowInfo) do
+					if OverrideFactionInfo[factionInfo.factionID] then
+						questID = OverrideFactionInfo[factionInfo.factionID].rewardQuestID;
+						if questID and IsOnQuest(questID) then
+							return expansionID;
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 function FactionUtil:IsAnyParagonRewardPending(viewedExpansionOnly)
 	return self:GetFactionsWithRewardPending(viewedExpansionOnly) ~= nil
 end

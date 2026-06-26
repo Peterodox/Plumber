@@ -780,6 +780,18 @@ end
 
 
 do	--Notification / Alert / Banner
+	local MinimapAlertType = {
+		Generic = {autoHide = true},
+
+		ParagonReward = {autoHide = true, onClickFunc = function()
+			PlumberExpansionLandingPage:ShowFactionTabWithPendingReward();
+		end},
+
+		TraitSystem = {autoHide = false, onClickFunc = function()
+			PlumberExpansionLandingPage:ShowTraitTab();
+		end},
+	};
+
 	function ButtonMixin:AlertFrame_Init()
 		local f = self.AlertFrame;
 
@@ -816,10 +828,24 @@ do	--Notification / Alert / Banner
 		local easingFunc = addon.EasingFunctions.outSine;
 		local duration = 0.5;
 		local alertFrameFromWidth = 32;
+		local shouldAutoHide = self.alertInfo and self.alertInfo.autoHide;
 
 		f:SetHeight(f.alertFrameHeight);
 		f:SetAlpha(0);
 		f.Text:SetAlpha(0);
+
+		local function AlertFrame_AnimOut_OnUpdate(_self, elapsed)
+			_self.t = _self.t + elapsed;
+			if _self.t >= 5 then -- auto hide after 5 second
+				_self.alpha = _self.alpha - 4 * elapsed;
+				if _self.alpha <= 0 then
+					_self.alpha = 0;
+					_self:SetScript("OnUpdate", nil);
+					_self:Hide();
+				end
+				_self:SetAlpha(_self.alpha);
+			end
+		end
 
 		local function AlertFrame_Text_OnUpdate(_self, elapsed)
 			_self.t = _self.t + elapsed;
@@ -827,6 +853,10 @@ do	--Notification / Alert / Banner
 			if alpha > 1 then
 				_self:SetScript("OnUpdate", nil);
 				alpha = 1;
+				if shouldAutoHide then
+					_self.alpha = self:GetAlpha();
+					_self:SetScript("OnUpdate", AlertFrame_AnimOut_OnUpdate);
+				end
 			elseif alpha < 0 then
 				alpha = 0;
 			end
@@ -855,7 +885,9 @@ do	--Notification / Alert / Banner
 
 		f:SetScript("OnMouseDown", function(_, button)
 			if button == "LeftButton" then
-				PlumberExpansionLandingPage:ShowTraitTab();
+				if self.alertInfo and self.alertInfo.onClickFunc then
+					self.alertInfo.onClickFunc(button);
+				end
 			end
 		end);
 	end
@@ -867,9 +899,15 @@ do	--Notification / Alert / Banner
 		end
 	end
 
-	function LandingPageUtil.ShowMinimapButtonAlert(text)
+	function LandingPageUtil.ShowMinimapButtonAlert(text, alertType)
 		if text and text ~= "" then
 			if MiniButton and MiniButton:IsVisible() and (not MiniButton.AlertFrame:IsShown()) then
+				if not (alertType and MinimapAlertType[alertType]) then
+					alertType = "Generic";
+				end
+				MiniButton.alertType = alertType;
+				MiniButton.alertInfo = MinimapAlertType[alertType];
+
 				MiniButton:AlertFrame_Init();
 				MiniButton:AlertFrame_ShowText(text);
 			end
@@ -882,10 +920,12 @@ do	--Notification / Alert / Banner
 	CallbackRegistry:RegisterCallback("LandingPage.HasPurchasableTrait", function(hasPurchasableTrait)
 		if hasPurchasableTrait and (not InCombatLockdown()) then
 			if not PlumberExpansionLandingPage:IsShown() then
-				LandingPageUtil.ShowMinimapButtonAlert(OMNIUM_FOLIO_UNSPENT_POINTS)
+				LandingPageUtil.ShowMinimapButtonAlert(OMNIUM_FOLIO_UNSPENT_POINTS, "TraitSystem");
 			end
 		else
-			LandingPageUtil.HideMinimapButtonAlert();
+			if MiniButton and MiniButton.MiniButton and MiniButton.MiniButton == "TraitSystem" then
+				LandingPageUtil.HideMinimapButtonAlert();
+			end
 		end
 	end);
 end

@@ -522,8 +522,9 @@ do
 end
 
 
-do	--12.0.7 Only
+do	--Open to Tab
 	function PlumberExpansionLandingPageMixin:ShowTraitTab()
+		-- 12.0.7 Only?
 		if not self:IsShown() then
 			self:Show();
 		end
@@ -533,6 +534,21 @@ do	--12.0.7 Only
 			MainFrame:UpdateTabs();
 		end
 		LandingPageUtil.SelectExpansion(12);
+	end
+
+	function PlumberExpansionLandingPageMixin:ShowFactionTabWithPendingReward()
+		if not self:IsShown() then
+			self:Show();
+		end
+		local selectedTab = LandingPageUtil.GetSelectedTabKey();
+		if selectedTab ~= "faction" then
+			LandingPageUtil.SelectTab("faction");
+			MainFrame:UpdateTabs();
+		end
+		local expansionID = addon.FactionUtil:GetBestExpansionIDWithRewardPending();
+		if expansionID then
+			LandingPageUtil.SelectExpansion(expansionID);
+		end
 	end
 end
 

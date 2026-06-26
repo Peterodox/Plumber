@@ -1737,6 +1737,16 @@ do  --Expansion Select
 		ExpansionData[expansionID][field] = data;
 	end
 
+	function LandingPageUtil.GetExpansionData(expansionID, field)
+		if ExpansionData[expansionID] then
+			if field then
+				return ExpansionData[expansionID][field];
+			else
+				return ExpansionData[expansionID];
+			end
+		end
+	end
+
 	function LandingPageUtil.GetCurrentExpansionInfo()
 		if CurrentExpansionID then
 			local name = ExpansionData[CurrentExpansionID].name or "Unknown Expansion";

@@ -2514,7 +2514,7 @@ do  -- System
 	end
 
 
-	function API.TriggerExpansionMinimapButtonAlert(text)
+	function API.TriggerExpansionMinimapButtonAlert(text) -- unused
 		if ExpansionLandingPageMinimapButton then
 			ExpansionLandingPageMinimapButton:TriggerAlert(text);
 		end

@@ -6,12 +6,7 @@ local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
 local FactionUtil = addon.FactionUtil;
 local LandingPageUtil = addon.LandingPageUtil;
-local IsExpansionLandingPageUnlockedForPlayer = C_PlayerInfo.IsExpansionLandingPageUnlockedForPlayer or API.Nop;
 
-
-local function ShouldShowWarWithinLandingPage()
-	return IsExpansionLandingPageUnlockedForPlayer(10)
-end
 
 local function Plumber_ToggleLandingPage()
 	PlumberExpansionLandingPage:ToggleUI();
@@ -63,8 +58,8 @@ EL:SetScript("OnEvent", function(self, event, ...)
 		self:UnregisterEvent(event);
 		if EL.enabled then
 			C_Timer.After(3, function()
-				if ShouldShowWarWithinLandingPage() and FactionUtil:IsAnyParagonRewardPending() then
-					API.TriggerExpansionMinimapButtonAlert(L["Paragon Reward Available"]);
+				if FactionUtil:IsAnyParagonRewardPending() then
+					LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"], "ParagonReward");
 				end
 				LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
 			end);
@@ -73,14 +68,12 @@ EL:SetScript("OnEvent", function(self, event, ...)
 		local questID = ...
 		local factionID = FactionUtil:GetParagonRewardQuestFaction(questID);
 		if factionID then
-			API.TriggerExpansionMinimapButtonAlert(L["Paragon Reward Available"]);
-			CallbackRegistry:Trigger("ParagonRewardReady", factionID);
+			LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"], "ParagonReward");
 			CallbackRegistry:Trigger("LandingPage.UpdateNotification");
 		end
 	elseif event == "QUEST_TURNED_IN" then
 		local questID = ...
 		if FactionUtil:IsParagonRewardQuest(questID) then
-			CallbackRegistry:Trigger("ParagonRewardQuestTurnedIn", questID);
 			CallbackRegistry:Trigger("LandingPage.UpdateNotification");
 		end
 	elseif event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" then
