@@ -47,6 +47,9 @@ L["Return To Module List"] = "Return to List";
 L["Generic Addon Conflict"] = "This module might be incompatible with addons of similar functionalities:";
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = ": ";
+L["Disabled Module Requires Reload Format"] = "You must %s to apply the changes.";	--We'll replace %s with a clickable "reload the UI"
+L["Reload The UI"] = "reload the UI";
+L["Click To Reload UI"] = "Click to reload the UI.";
 
 
 --Settings Category
@@ -916,6 +919,11 @@ L["ModuleDescription PreyQuestSuperTrack"] = "Once your Prey target's location i
 --BlizzFixActionBarArt
 L["ModuleName BlizzFixActionBarArt"] = "Blitz Fix: Action Bar Art";
 L["ModuleDescription BlizzFixActionBarArt"] = "Fixed an issue where Action Bar Art (gryphons and wyverns) reappears unexpectedly after Hiding/Showing UI or exiting House Editor.";
+
+
+--HouseList
+L["ModuleName Housing_HouseList"] = "House List";
+L["ModuleDescription Housing_HouseList"] = "Improve the House List UI:\n\n- Indicate the house's faction with an image on the right.\n\n- Show both Visit House buttons if the player has two houses.";
 
 
 --Generic

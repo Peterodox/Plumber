@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.9.2 f";
-local VERSION_DATE = 1781900000;
+local VERSION_TEXT = "1.9.3";
+local VERSION_DATE = 1782600000;
 
 
 local addonName, addon = ...
@@ -379,6 +379,7 @@ local DefaultValues = {
 	TooltipDyeDeez = true,                  --Show dyes on pigment tooltip
 	Housing_CatalogSearch = false,
 	Housing_ItemAcquiredAlert = true,       --Click AlertFrame to view decor model
+	Housing_HouseList = true,
 
 
 	--Namaplte: Quest Indicator

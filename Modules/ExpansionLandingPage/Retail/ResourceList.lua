@@ -51,6 +51,7 @@ end
 do  --MID
 	local ResourceList = {
 		{currencyID = 3418, hasWeeklyCap = true},	--Nebulous Voidcore (Bonus Rolls)
+		{currencyID = 3405},	--Field Accolade
 		{currencyID = 3028},    --Restored Coffer Key
 		{currencyID = 3310, hasWeeklyCap = true},	--Coffer Key Shard
 		{currencyID = 3316},    --Voidlight Marl

@@ -7,6 +7,71 @@ local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
+changelogs[10903] = {
+	{
+		type = "date",
+		versionText = "1.9.3",
+		timestamp = 1782600000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName Housing_HouseList"],
+		dbKey = "Housing_HouseList",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "Housing_HouseList",
+	},
+
+	{
+		type = "p",
+		text = "Improve the House List UI.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Indicate the house's faction with an image on the right.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Show both Visit House buttons if the player has two houses.",
+	},
+
+	{
+		type = "img",
+		fileName = "Changelog_Housing_HouseList",
+		canvasWidth = 512,
+		canvasHeight = 256,
+		imageRight = 394,
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: If you have enabled the minimap button, it will display a notification when you have unclaimed Paragon reward chests.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added Field Accolade to the Resources List and Sporefall to the Raids Tab.",
+	},
+};
+
 
 changelogs[10902] = {
 	{
