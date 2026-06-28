@@ -36,6 +36,7 @@ globals = {
 	"PlumberLandingPageMinimapButtonMixin",
 	"PlumberLootUIFont",
 	"PlumberOutfitSelectOutfitEntryMixin",
+	"PlumberReloadHelperMixin",
 	"PlumberStorage",
 	"PlumberSuperTrackingMixin",
 	"PlumberWorldMapPinMixin",
@@ -90,6 +91,7 @@ stds.wow = {
 		"GossipFrame",
 		"SlashCmdList",
 		"StaticPopupDialogs",
+		"UnitPopupViewHousesButtonMixin",
 		"WardrobeItemModelMixin",
 		"WardrobeItemsCollectionSlotButtonMixin",
 
@@ -1319,7 +1321,7 @@ stds.wow = {
 			},
 		},
 
-		C_UIWidgetManager = {
+		C_UI = {
 			fields = {
 				"Reload",
 			},
@@ -1711,6 +1713,8 @@ stds.wow = {
 
 		UnitPopupSharedUtil = {
 			fields = {
+				"GetFullPlayerName",
+				"GetGUID",
 				"HasLFGRestrictions",
 			},
 		},
