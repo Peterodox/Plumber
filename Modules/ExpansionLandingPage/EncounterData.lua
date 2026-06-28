@@ -18,6 +18,8 @@ local EncounterData = {
 	--https://wago.tools/db2/JournalEncounter?page=1
 	--/dump GetMouseFoci()[1].icon:GetTexture()
 
+	[2711] = {icon = 7448202, achv = {63237, 63240, 63241}},      --Rotmire
+
 	[2795] = {icon = 7448202, achv = {61487, 61488, 61489, 61454}},      --Chimaerus
 
 	[2733] = {icon = 7448209, achv = {61372, 62106}},      --Imperator Averzian
@@ -271,6 +273,7 @@ do
 
 	local MID_EncounterTabInfo = {
 		JournalInstanceIDs = {
+			1305,	--Sporefall
 			1314,   --The Dreamrift
 			1307,   --The Voidspire
 			1308,   --March on Quel'Danas
