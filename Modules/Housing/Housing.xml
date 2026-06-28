@@ -151,11 +151,11 @@
 	<Frame name="PlumberHouseListFrameTemplate" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hyperlinksEnabled="true" hidden="true" virtual="true">
 		<!-- Copy almost the entire code from Blizzard because ShowUIPanel combat restriction from modifying the original frame -->
 
-        <Size x="400" y="200"/>
+		<Size x="400" y="200"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
-        <Layers>
+		<Layers>
 			<Layer level="BACKGROUND" textureSubLevel="-1">
 				<Texture parentKey="Background" atlas="housing-basic-container" setAllPoints="true"/>
 			</Layer>
@@ -167,7 +167,7 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-            <Layer level="ARTWORK">
+			<Layer level="ARTWORK">
 				<Texture parentKey="DecorativeFoliage" atlas="housing-decorative-foliage-left" useAtlasSize="true">
 					<Anchors>
 						<Anchor point="TOPLEFT" x="6" y="-2"/>
@@ -180,26 +180,26 @@
 				</FontString>
 				<Texture parentKey="Reference">
 					<Size x="4"/>
-                    <Anchors>
-                        <Anchor point="TOP" x="0" y="-32"/>
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-32"/>
 						<Anchor point="BOTTOM" x="0" y="6"/>
-                    </Anchors>
+					</Anchors>
 				</Texture>
-                <FontString parentKey="NoHousesText" inherits="Game15Font_Shadow" justifyH="CENTER" hidden="true" text="VIEW_HOUSES_NO_HOUSES">
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent.Reference" relativePoint="CENTER" x="0" y="0"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-        <Frames>
-            <Button parentKey="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors">
+				<FontString parentKey="NoHousesText" inherits="Game15Font_Shadow" justifyH="CENTER" hidden="true" text="VIEW_HOUSES_NO_HOUSES">
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Reference" relativePoint="CENTER" x="0" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button parentKey="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors">
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="-5" y="-6"/>
 				</Anchors>
 			</Button>
 
-            <Frame parentKey="LoadingSpinner" hidden="true" inherits="SpinnerTemplate" frameLevel="2000">
+			<Frame parentKey="LoadingSpinner" hidden="true" inherits="SpinnerTemplate" frameLevel="2000">
 				<Size x="60" y="60"/>
 				<Anchors>
 					<Anchor point="CENTER" relativeKey="$parent.Reference" relativePoint="CENTER" x="0" y="0"/>
@@ -212,8 +212,8 @@
 					<Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOM" x="0" y="16"/>
 				</Anchors>
 			</Frame>
-        </Frames>
-    </Frame>
+		</Frames>
+	</Frame>
 
 	<!--Actor name="PlumberHousingDecorActorTemplate" mixin="PlumberHousingDecorActorMixin" virtual="true">
 		<Scripts>
