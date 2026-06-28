@@ -319,6 +319,20 @@ function FactionUtil:IsAnyParagonRewardPending(viewedExpansionOnly)
 	return self:GetFactionsWithRewardPending(viewedExpansionOnly) ~= nil
 end
 
+function FactionUtil:GetRewardPendingFactioName()
+	local factions = self:GetFactionsWithRewardPending();
+	if factions then
+		local firstFactionName = self:GetFactionName(factions[1]);
+		if firstFactionName then
+			if #factions == 1 then
+				return firstFactionName;
+			else
+				return firstFactionName.." ...";
+			end
+		end
+	end
+end
+
 function FactionUtil:GetParagonRewardQuestFaction(questID)
 	return questID and RewardQuestXFaction[questID] or nil
 end

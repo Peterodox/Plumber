@@ -58,8 +58,9 @@ EL:SetScript("OnEvent", function(self, event, ...)
 		self:UnregisterEvent(event);
 		if EL.enabled then
 			C_Timer.After(3, function()
-				if FactionUtil:IsAnyParagonRewardPending() then
-					LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"], "ParagonReward");
+				local factionName = FactionUtil:GetRewardPendingFactioName();
+				if factionName then
+					LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"].."\n"..factionName, "ParagonReward");
 				end
 				LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
 			end);
@@ -68,7 +69,10 @@ EL:SetScript("OnEvent", function(self, event, ...)
 		local questID = ...
 		local factionID = FactionUtil:GetParagonRewardQuestFaction(questID);
 		if factionID then
-			LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"], "ParagonReward");
+			local factionName = FactionUtil:GetFactionName(factionID);
+			if factionName then
+				LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"].."\n"..factionName, "ParagonReward");
+			end
 			CallbackRegistry:Trigger("LandingPage.UpdateNotification");
 		end
 	elseif event == "QUEST_TURNED_IN" then
