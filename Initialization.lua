@@ -379,6 +379,7 @@ local DefaultValues = {
 	TooltipDyeDeez = true,                  --Show dyes on pigment tooltip
 	Housing_CatalogSearch = false,
 	Housing_ItemAcquiredAlert = true,       --Click AlertFrame to view decor model
+	Housing_HouseList = true,
 
 
 	--Namaplte: Quest Indicator

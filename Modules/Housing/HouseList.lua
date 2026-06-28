@@ -284,5 +284,19 @@ do	-- Module Control
 		end
 	end
 
-	EnableModule(true);
+	local moduleData = {
+		name = addon.L["ModuleName Housing_HouseList"],
+		dbKey = "Housing_HouseList",
+		description = addon.L["ModuleDescription Housing_HouseList"],
+		toggleFunc = EnableModule,
+		moduleAddedTime = 1782400000,
+		categoryKeys = {
+			"Housing",
+		},
+		searchTags = {
+			"Housing",
+		},
+	};
+
+	addon.ControlCenter:AddModule(moduleData);
 end

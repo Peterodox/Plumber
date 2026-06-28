@@ -889,6 +889,11 @@ L["ModuleName BlizzFixActionBarArt"] = "动作条装饰修复";
 L["ModuleDescription BlizzFixActionBarArt"] = "修复被你隐藏的动作条装饰在隐藏/显示游戏界面或退出住宅编辑器后重现的问题。";
 
 
+--HouseList
+L["ModuleName Housing_HouseList"] = "房屋列表";
+L["ModuleDescription Housing_HouseList"] = "改进房屋列表界面：\n\n- 用图片展示房屋所属的阵营。\n\n- 如果玩家有两栋房子，直接显示两个“访问住宅”按钮。";
+
+
 --Generic
 L["Total Colon"] = "总计：";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally

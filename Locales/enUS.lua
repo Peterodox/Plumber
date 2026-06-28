@@ -921,6 +921,11 @@ L["ModuleName BlizzFixActionBarArt"] = "Blitz Fix: Action Bar Art";
 L["ModuleDescription BlizzFixActionBarArt"] = "Fixed an issue where Action Bar Art (gryphons and wyverns) reappears unexpectedly after Hiding/Showing UI or exiting House Editor.";
 
 
+--HouseList
+L["ModuleName Housing_HouseList"] = "House List";
+L["ModuleDescription Housing_HouseList"] = "Improve the House List UI:\n\n- Indicate the house's faction with an image on the right.\n\n- Show both Visit House buttons if the player has two houses.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally
