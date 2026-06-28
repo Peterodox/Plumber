@@ -319,6 +319,8 @@ function EL:UpdateMacros(commands)
 		local prefix;
 
 		local updateList = false;
+		local macroIndexChanged = false;
+		local newIndex;
 
 		for command, list in pairs(commands) do
 			commandInfo = PlumberMacros[command];
@@ -334,8 +336,8 @@ function EL:UpdateMacros(commands)
 						returns = commandInfo.falseReturn;
 					end
 
-					for _, index in ipairs(list) do
-						name, icon, body = GetMacroInfo(index);
+					for _, macroIndex in ipairs(list) do
+						name, icon, body = GetMacroInfo(macroIndex);
 
 						if command == match(body, "#plumber:(%w+)") then
 							anyEdit = false;
@@ -382,7 +384,11 @@ function EL:UpdateMacros(commands)
 							end
 
 							if anyEdit then
-								EditMacro(index, name, icon, body);
+								newIndex = EditMacro(macroIndex, name, icon, body);
+								if newIndex ~= macroIndex then
+									macroIndexChanged = true;
+									break;
+								end
 							end
 						else
 							--This is when the body doesn't match our last cache
@@ -398,7 +404,9 @@ function EL:UpdateMacros(commands)
 			self:RegisterEvent("PLAYER_REGEN_ENABLED");
 		end
 
-		if updateList then
+		if macroIndexChanged then
+			self:RequestUpdateMacros(0.0);
+		elseif updateList then
 			self:CheckSupportedMacros();
 		end
 	end
@@ -440,6 +448,7 @@ function EL:UpdateDrawers()
 		local hideUnusable = HIDE_UNUSABLE;
 		local alwaysShowConsumables = not UPDATE_FREQUENTLY;
 		local commandInfo;
+		local newIndex;
 
 		for _, macroIndex in ipairs(drawers) do
 			commandInfo = self.macroIndexCommandInfo[macroIndex];
@@ -461,9 +470,13 @@ function EL:UpdateDrawers()
 					body, anyChange = SecureSpellFlyout:RemoveClickHandlerFromMacro(body);
 					local extraLine = "/click "..handlerName;
 					body, overflow = AddExtraLineToMacroBody(extraLine, body);
-					EditMacro(macroIndex, name, icon, body);
+					newIndex = EditMacro(macroIndex, name, icon, body);
 					if overflow then
 						anyOverflow = true;
+					end
+					if newIndex ~= macroIndex then
+						self:RequestUpdateMacros(0.0);
+						return;
 					end
 				end
 			end
@@ -1957,6 +1970,8 @@ do  --For other modules like Legion Remix
 			if numCharacterMacros < EL.maxCharacterMacros then
 				local perCharacter = true;
 				local macroID = CreateMacro(name, icon, body, perCharacter);
+				-- Other macroIndexes may have changed at this point
+				EL:CheckSupportedMacros();
 				success = true;
 				reason = macroID;
 			else
