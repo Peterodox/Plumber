@@ -1794,6 +1794,8 @@ do  --ChangelogTab
 			elseif info.type == "img" then
 				if info.dbKey or info.fileName then
 					local file;
+					local l, r, t, b;
+
 					if info.dbKey then
 						file = "Interface/AddOns/Plumber/Art/ControlCenter/Preview_"..info.dbKey;
 					else
@@ -1809,6 +1811,16 @@ do  --ChangelogTab
 						height = Def.ChangelogImageSize;
 					end
 
+					if info.canvasWidth and info.canvasHeight and info.imageRight then
+						l = 0;
+						r = info.imageRight / info.canvasWidth;
+						t = 0;
+						b = (info.imageBottom and info.imageBottom / info.canvasHeight) or 1;
+						width = height / info.canvasHeight * info.imageRight;
+					else
+						l, r, t, b = 0, 1, 0, 1;
+					end
+
 					n = n + 1;
 					bottom = top + height + Def.ChangelogParagraphSpacing;
 					content[n] = {
@@ -1821,7 +1833,7 @@ do  --ChangelogTab
 						offsetX = leftOffset,
 						setupFunc = function(obj)
 							obj:SetSize(width, height);
-							obj:SetTexCoord(0, 1, 0, 1);
+							obj:SetTexCoord(l, r, t, b);
 							obj:SetVertexColor(1, 1, 1);
 							obj:SetTexture(file);
 						end;
