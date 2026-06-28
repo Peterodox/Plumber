@@ -49,6 +49,27 @@ changelogs[10903] = {
 		canvasHeight = 256,
 		imageRight = 394,
 	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: If you have enabled the minimap button, it will display a notification when you have unclaimed Paragon reward chests.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added Field Accolade to the Resources List and Sporefall to the Raids Tab.",
+	},
 };
 
 
