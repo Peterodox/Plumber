@@ -91,7 +91,7 @@ stds.wow = {
 		"GossipFrame",
 		"SlashCmdList",
 		"StaticPopupDialogs",
-		"UnitPopupViewHousesButtonMixin",
+		"UIPanelWindows",
 		"WardrobeItemModelMixin",
 		"WardrobeItemsCollectionSlotButtonMixin",
 
