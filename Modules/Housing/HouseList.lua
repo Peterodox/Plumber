@@ -21,17 +21,26 @@ local Module = {};
 
 
 do	-- HouseListEntry
+	local NeighborhoodMapXTexCoord = {
+		--[uiMapID] = {top, bottom},
+
+		[0] = {304/512, 456/512},		-- Fallback, No Image
+		[2351] = {0/512, 152/512},		-- Razorwind Shores
+		[2352] = {152/512, 304/512},	-- Founder's Point
+	};
+
 	local HouseListEntryMixin = {};
 
 	function HouseListEntryMixin:SetHouseInfo(houseInfo)
 		if houseInfo then
 			self.HouseNameText:SetText(houseInfo.houseName);
 			self.HouseOwnerText:SetText(houseInfo.ownerName);
-			if addon.Housing.IsAllianceNeighborhood(houseInfo.neighborhoodGUID) then
-				self.Background:SetTexCoord(0, 1, 152/512, 304/512);
-			else
-				self.Background:SetTexCoord(0, 1, 0, 152/512);
+			-- Raeminder: There might be more neighborhood map in the future
+			local uiMapID = C_Housing.GetUIMapIDForNeighborhood(houseInfo.neighborhoodGUID);
+			if not (uiMapID and NeighborhoodMapXTexCoord[uiMapID]) then
+				uiMapID = 0;
 			end
+			self.Background:SetTexCoord(0, 1, NeighborhoodMapXTexCoord[uiMapID][1], NeighborhoodMapXTexCoord[uiMapID][2]);
 			self.VisitHouseButton:Show();
 			self.VisitHouseButton:SetupAction(houseInfo.neighborhoodGUID, houseInfo.houseGUID, houseInfo.plotID);
 		else
