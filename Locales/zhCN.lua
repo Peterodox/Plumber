@@ -892,6 +892,7 @@ L["ModuleDescription BlizzFixActionBarArt"] = "修复被你隐藏的动作条装
 --HouseList
 L["ModuleName Housing_HouseList"] = "房屋列表";
 L["ModuleDescription Housing_HouseList"] = "改进房屋列表界面：\n\n- 用图片展示房屋所属的阵营。\n\n- 如果玩家有两栋房子，直接显示两个“访问住宅”按钮。";
+L["View Houses In Combat Warning"] = "你无法在战斗中查看住宅。";
 
 
 --Generic

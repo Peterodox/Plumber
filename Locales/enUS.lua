@@ -924,6 +924,7 @@ L["ModuleDescription BlizzFixActionBarArt"] = "Fixed an issue where Action Bar A
 --HouseList
 L["ModuleName Housing_HouseList"] = "House List";
 L["ModuleDescription Housing_HouseList"] = "Improve the House List UI:\n\n- Indicate the house's faction with an image on the right.\n\n- Show both Visit House buttons if the player has two houses.";
+L["View Houses In Combat Warning"] = "You cannot view houses while in combat.";
 
 
 --Generic

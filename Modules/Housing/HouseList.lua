@@ -2,6 +2,8 @@ local _, addon = ...
 
 
 local Def = {
+	FrameName = "PlumberHouseListFrame",
+
 	CardWidth = 480,
 	CardHeight = 120,
 	BackgroundWidth = 512,
@@ -144,6 +146,10 @@ do
 	end
 
 	function MainFrameMixin:InitWithContextData(name, guid, bnetID, isGuildMember)
+		if (not self:IsShown()) and InCombatLockdown() then
+			addon.API.DisplayErrorMessage(addon.L["View Houses In Combat Warning"]);
+		end
+
 		self.Title:SetText(string.format(VIEW_HOUSES_TITLE, name));
 		self:OnHouseListUpdated(nil);
 		self.LoadingSpinner:Show();
@@ -203,7 +209,7 @@ do
 		end
 
 		self:SetHeight(headerHeight + numEntries * (Def.CardEffectiveHeight + Def.CardSpacing) + Def.CardSpacing + 7 + extraHeight);
-		self:UpdatePosition();
+		--self:UpdatePosition();
 		self:Raise();
 	end
 
@@ -233,9 +239,8 @@ do
 
 	function Module.InitMainFrame()
 		if not MainFrame then
-			local frameName = "PlumberHouseListFrame";
-			MainFrame = CreateFrame("Frame", frameName, UIParent, "PlumberHouseListFrameTemplate");
-			table.insert(UISpecialFrames, frameName);
+			MainFrame = CreateFrame("Frame", Def.FrameName, UIParent, "PlumberHouseListFrameTemplate");
+			table.insert(UISpecialFrames, Def.FrameName);
 			Mixin(MainFrame, MainFrameMixin);
 			MainFrame.cards = {};
 			MainFrame:SetScript("OnShow", MainFrame.OnShow);
@@ -273,10 +278,29 @@ do	-- Module Control
 		Module.InitWithContextData(name, guid, bnetID, isGuildMember);
 	end
 
+	local function RegisterFrame()
+		-- Since overwriting UnitPopupViewHousesButtonMixin is unsafe
+		-- We use this less unsafe method by replacing HouseListFrame with ours
+
+		C_AddOns.LoadAddOn("Blizzard_HouseList");
+
+		UIPanelWindows[Def.FrameName] = {
+			area = "left",
+			pushable = 1,
+		};
+
+		Module.InitMainFrame();
+		if _G[Def.FrameName] then
+			_G.HouseListFrame = _G[Def.FrameName];
+		end
+	end
+
 	local function EnableModule(state)
 		if state then
 			Module.enabled = true;
-			UnitPopupViewHousesButtonMixin.OnClick = OverrideOnClick;
+			-- This taint the Menu and prohibits Copy Character Name if View Houses is on the same menu.
+			--UnitPopupViewHousesButtonMixin.OnClick = OverrideOnClick;
+			RegisterFrame();
 		elseif Module.enabled then
 			Module.enabled = false;
 			-- Once tainted, it's irreversible and we ask the user to /reload
