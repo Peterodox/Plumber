@@ -165,6 +165,15 @@ do
 	function MainFrameMixin:OnHide()
 		self:UnregisterEvent("VIEW_HOUSES_LIST_RECIEVED");
 		self.LoadingSpinner:Hide();
+		self:StopMovingOrSizing();
+	end
+
+	function MainFrameMixin:OnDragStart()
+		self:StartMoving();
+	end
+
+	function MainFrameMixin:OnDragStop()
+		self:StopMovingOrSizing();
 	end
 
 	function MainFrameMixin:OnEvent(event, ...)
@@ -246,6 +255,8 @@ do
 			MainFrame:SetScript("OnShow", MainFrame.OnShow);
 			MainFrame:SetScript("OnHide", MainFrame.OnHide);
 			MainFrame:SetScript("OnEvent", MainFrame.OnEvent);
+			MainFrame:SetScript("OnDragStart", MainFrame.OnDragStart);
+			MainFrame:SetScript("OnDragStop", MainFrame.OnDragStop);
 
 			if MainFrame:IsShown() then
 				MainFrame:OnShow();

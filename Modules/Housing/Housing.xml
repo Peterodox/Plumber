@@ -148,7 +148,7 @@
 		</Frames>
 	</Frame>
 
-	<Frame name="PlumberHouseListFrameTemplate" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hyperlinksEnabled="true" hidden="true" virtual="true">
+	<Frame name="PlumberHouseListFrameTemplate" toplevel="true" parent="UIParent" movable="true" enableMouse="true" registerForDrag="LeftButton" hyperlinksEnabled="true" hidden="true" virtual="true">
 		<!-- Copy almost the entire code from Blizzard because ShowUIPanel combat restriction from modifying the original frame -->
 
 		<Size x="400" y="200"/>
