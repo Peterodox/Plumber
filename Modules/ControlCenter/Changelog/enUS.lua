@@ -10,8 +10,8 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10903] = {
 	{
 		type = "date",
-		versionText = "1.9.3",
-		timestamp = 1782600000,
+		versionText = "1.9.3 b",
+		timestamp = 1782700000,
 	},
 
 	{
@@ -57,6 +57,18 @@ changelogs[10903] = {
 	{
 		type = "h1",
 		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber House List: Fixed an issue that prohibited you from clicking Copy Character Name if the View Houses button was also shown on the same context menu.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Drawer Macro: Fixed an issue where the Summon Pet buttons didn't work if the text language was set to Spanish.",
 	},
 
 	{

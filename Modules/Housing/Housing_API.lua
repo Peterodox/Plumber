@@ -333,12 +333,6 @@ do  --House Level / Info / Teleport
 		button.Cooldown:Hide();
 	end
 
-	function Housing.IsAllianceNeighborhood(neighborhoodGUID)
-		local uiMapID = C_Housing.GetUIMapIDForNeighborhood(neighborhoodGUID);
-		local mapIndex = uiMapID and NeighborhoodMapIndex[uiMapID];
-		return mapIndex == 1;
-	end
-
 	function Housing.RequestUpdateHouseInfo()
 		if not Housing.isUpdatingHouseInfo then
 			Housing.isUpdatingHouseInfo = true;

@@ -1027,7 +1027,7 @@ do  --MacroInterpreter
 					name, usable = API.GetPetNameAndUsability(id, true);
 					id = name;
 					if name then
-						macroText = "/sp "..name;
+						macroText = "/summonpet "..name;
 					end
 				end
 			end
