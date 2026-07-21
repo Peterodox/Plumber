@@ -8,7 +8,7 @@ local L = addon.L;
 
 --Globals
 BINDING_HEADER_PLUMBER = "Plumber";
-BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Abre o sumário de Expansão do Plumber";   --Show/hide Expansion Summary UI
+BINDING_NAME_TOGGLE_PLUMBER_LANDINGPAGE = "Abre o Resumo de Expansão do Plumber";   --Show/hide Expansion Summary UI
 BINDING_NAME_PLUMBER_QUESTWATCH_NEXT = "Concentrar na próxima missão";
 BINDING_NAME_PLUMBER_QUESTWATCH_PREVIOUS = "Concentrar na missão anterior";
 
@@ -47,6 +47,9 @@ L["Return To Module List"] = "Retornar ao addon";
 L["Generic Addon Conflict"] = "Esse módulo pode ser incompatível com addons de funcionalidades semelhantes:";
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = ": ";
+L["Disabled Module Requires Reload Format"] = "Você precisa %s para aplicar estas mudanças.";	--We'll replace %s with a clickable "reload the UI"
+L["Reload The UI"] = "recarregar a interface";
+L["Click To Reload UI"] = "Clique para recarregar a interface.";
 
 
 --Settings Category
@@ -67,7 +70,7 @@ L["SC Housing"] = AUCTION_CATEGORY_HOUSING or "Moradia";
 L["SC Uncategorized"] = "Sem categoria";
 
 --Settings Search Keywords, Search Tags
-L["KW Tooltip"] = "Dica de ferramenta";
+L["KW Tooltip"] = "Dica de HUD";
 L["KW Transmog"] = "Transmog";
 L["KW Vendor"] = "Comerciante";
 L["KW LegionRemix"] = "Legion Remix";
@@ -89,7 +92,7 @@ L["Module Category General"] = "Geral";
 --- order: 2
 L["Module Category NPC Interaction"] = "Interação com NPC";
 --- order: 3
-L["Module Category Tooltip"] = "Dica de ferramenta";   --Additional Info on Tooltips
+L["Module Category Tooltip"] = "Dica de HUD";   --Additional Info on Tooltips
 --- order: 4
 L["Module Category Class"] = "Classe";   --Player Class (rogue, paladin...)
 --- order: 5
@@ -119,7 +122,7 @@ L["ModuleDescription BackpackItemTracker"] = "Rastreia itens empilháveis na int
 L["Instruction Track Item"] = "Rastrear item";
 L["Hide Not Owned Items"] = "Ocultar itens não possuídos";
 L["Hide Not Owned Items Tooltip"] = "Se você não possuir mais um item rastreado, ele será movido para um menu oculto.";
-L["Concise Tooltip"] = "Dica de ferramenta resumida";
+L["Concise Tooltip"] = "Dica de HUD resumida";
 L["Concise Tooltip Tooltip"] = "Exibe apenas o tipo de vinculação do item e sua quantidade máxima.";
 L["Item Track Too Many"] = "Você só pode rastrear %d itens por vez.";
 L["Tracking List Empty"] = "Sua lista de rastreamento personalizada está vazia.";
@@ -269,9 +272,10 @@ L["Instruction Show In Quest Log"] = "<Ctrl + clique para ver no registro de mis
 
 
 L["ModuleName TooltipTransmogEnsemble"] = "Indumentárias";
-L["ModuleDescription TooltipTransmogEnsemble"] = "- Exibe o número de aparências coletáveis de uma Indumentária.\n\n- Corrige o problema onde a dica de ferramenta diz \"Já aprendido\", mas você ainda pode usá-la para desbloquear novas aparências.";
+L["ModuleDescription TooltipTransmogEnsemble"] = "- Exibe o número de aparências coletáveis de uma Indumentária.\n\n- Corrige o problema onde a dica de HUD diz \"Já aprendido\", mas você ainda pode usá-la para desbloquear novas aparências.";
 L["Collected Appearances"] = "Aparências coletadas";
 L["Collected Items"] = "Itens coletados";
+L["Other Player Classes"] = "Outras classes";
 
 
 --Tooltip Housing
@@ -286,6 +290,16 @@ L["ModuleName TooltipRichSoil"] = "Atalho rápido: Sementes Resilientes";
 L["ModuleDescription TooltipRichSoil"] = "Para herbalistas: Exibe uma lista de Sementes Resilientes ao clicar duas vezes em uma Terra Fértil."..L["Quick Slot Generic Description"];
 L["Instruction Show Resilient Seeds"] = "<Clique duplo para mostrar Sementes Resilientes>";
 L["No Resilient Seed"] = "Sem Sementes Resilientes";
+
+
+--Tooltip VendorLocation
+L["ModuleName TooltipVendorLocation"] = "Dica de HUD: Localização dos vendedores";
+L["ModuleDescription TooltipVendorLocation"] = "Exibe onde trocar certos tokens na dica de HUD e permite usar Ctrl + Clique no item para definir um ponto no mapa para o vendedor.";
+L["Instruction Set Waypoint"] = "<Ctrl + clique para definir um ponto no mapa>";
+L["NPC Name Location Format"] = "%s, %s";
+L["Intruction Swtich Destinations"] = "Aperte Alt para trocar alterar o destino:";
+L["Location Note Inside Cave"] = "Dentro de uma caverna";
+L["Location Note Second Floor"] = "No andar de cima";
 
 
 --Plunderstore
@@ -313,7 +327,7 @@ L["QueueStatus Show Time Tooltip"] = "Mostra a diferença entre o tempo médio d
 
 
 --Landing Page (Expansion Summary Minimap)
-L["ModuleName ExpansionLandingPage"] = "Sumário de Khaz Algar";
+L["ModuleName ExpansionLandingPage"] = "Resumo de Khaz Algar";
 L["ModuleDescription ExpansionLandingPage"] = "Exibe informações extras na página de resumo:\n\n- Progresso de Paragão\n\n- Nível de Pacto de Fios Cortados\n\n- Relações com os Cartéis da Inframina";
 L["Instruction Track Reputation"] = "<Shift + clique para rastrear>";
 L["Instruction Untrack Reputation"] ="<Shift + clique para parar de rastrear>";
@@ -324,7 +338,7 @@ L["Error Show UI In Combat 2"] = "POR FAVOR, PARE.";
 
 --Landing Page Switch
 L["ModuleName LandingPageSwitch"] = "Relatório de missão no minimapa";
-L["ModuleDescription LandingPageSwitch"] = "Acesse relatórios de missão de Guarnição e Salão de Classe clicando com o botão direito no botão de Sumário de Renome no minimapa.";
+L["ModuleDescription LandingPageSwitch"] = "Acesse relatórios de missão de Guarnição e Salão de Classe clicando com o botão direito no botão de Resumo de Renome no minimapa.";
 L["Mission Complete Count Format"] = "%d Prontos para completar";
 L["Open Mission Report Tooltip"] = "Clique com o botão direito para abrir relatórios de missão.";
 
@@ -448,8 +462,8 @@ L["Unspent Knowledge Tooltip Format"] = "Você tem |cffffffff%s|r Conhecimentos 
 
 
 --TooltipProfessionKnowledge
-L["ModuleName TooltipProfessionKnowledge"] = "Dica de ferramenta: conhecimento não gasto";
-L["ModuleDescription TooltipProfessionKnowledge"] = "Exibe o número de seus Conhecimentos de Especialização de Profissão não gastos na dica de ferramenta.";
+L["ModuleName TooltipProfessionKnowledge"] = "Dica de HUD: conhecimento não gasto";
+L["ModuleDescription TooltipProfessionKnowledge"] = "Exibe o número de seus Conhecimentos de Especialização de Profissão não gastos na dica de HUD.";
 L["Available Knowledge Format"] = "Conhecimento Disponível: |cffffffff%s|r";
 
 
@@ -647,9 +661,9 @@ L["No Slot For New Character Macro Alert"] = "Você precisa ter um slot de macro
 
 
 --New Expansion Landing Page
-L["ModuleName NewExpansionLandingPage"] = "Sumário da Expansão";
+L["ModuleName NewExpansionLandingPage"] = "Resumo de Expansão";
 L["ModuleDescription NewExpansionLandingPage"] = "Uma interface que exibe facções, atividades semanais e vínculos de raide. Você pode vê-la ao:\n\n- Habilitar o botão do minimapa.\n\n- Usar uma tecla de atalho atribuída em > Opções > Atalhos do teclado > Plumber.\n\n- Usar o compartimento de addons abaixo do calendário.";
-L["Abbr NewExpansionLandingPage"] = "Sumário da Expansão";
+L["Abbr NewExpansionLandingPage"] = "Resumo de Expansão";
 L["Reward Available"] = "Recompensa Disponível";
 L["Paragon Reward Available"] = "Recompensa de paragão disponível";
 L["Until Next Level Format"] = "%d até o próximo nível";
@@ -723,11 +737,17 @@ L["Prey No Data"] = "Progresso de Presa Indisponível";
 L["Abundance No Data"] = "Sem eventos de Abundância ativos";
 L["Defeated Prey"] = "Presas derrotadas";
 L["Item Expire Alert Weekly"] = "Este irá desaparecer após o reset semanal.";
+L["Delves Completion Reward Cap"] = "Recompensas de Conclusão";
+L["Delves Completion Reward Cap Tooltip"] = "Quando você atingir esse limite para toda a conta, concluir uma Imersão Abundante não concederá mais experiência para a Jornada do Imersor nem para seu Companheiro.\n\nAs recompensas dos Cofres Abundantes e dos Baús do Nêmesis não são afetadas por esse limite.\n\nO limite aumenta em 28 por semana.";
+L["Near Completion Tooltip"] = "Essa informação é exibida porque você está prestes a atingir o limite semanal.";
+L["Inactive Currencies Tooltip"] = "Essas moedas estão ocultas porque você as definiu como Não Utilizadas:";
+L["New Quest"] = "Nova Missão";
+L["Trait Points Available"] = "Pontos Disponíveis";
 
 
 --ExpansionSummaryMinimapButton
-L["LandingButton Settings Title"] = "Sumário da Expansão: Botão do minimapa";
-L["LandingButton Tooltip Format"] = "Clique: Exibir o %s.\nClique direito: Exibir opções.";
+L["LandingButton Settings Title"] = "Resumo de Expansão: Botão do minimapa";
+L["LandingButton Tooltip Format"] = "Clique: Abre o %s\nClique direito: Opções";
 L["LandingButton Customize"] = "Personalizar";
 L["LandingButton Reposition Tooltip"] = "Aperte |cffffffffShift|r para destravar";
 L["LandingButtonOption ShowButton"] = "Habilitar botão do minimapa";
@@ -759,6 +779,9 @@ L["Instruction Alt Click To Reset Instance"] = "Alt + clique direito: |cffffffff
 L["Instruction Link Progress In Chat"] = "<Shift + clique para compartilhar o progresso no bate-papo>";
 L["Instance Name"] = "Nome da instância";   --Dungeon/Raid Name
 L["EditMode Instruction InstanceDifficulty"] = "A largura do quadro é afetada pelo número de opções disponíveis.";
+L["Difficulty Locked To Format"] = "A instância está bloqueada para |cffffffff%s|r devido a um chefe derrotado.";
+L["Difficulty Locked To Current Alert"] = "A instância está bloqueada nesta dificuldade devido a um chefe derrotado.";
+L["Shared Difficulty Alert"] = "Derrotar um chefe bloqueará a instância nesta dificuldade.";
 
 
 --TransmogChatCommand
@@ -814,10 +837,10 @@ L["Copy Dyes"] = "copiar";
 L["Dyes Copied"] = "Pigmentos copiados";
 L["Apply Dyes"] = "Aplicar";
 L["Preview Dyes"] = "Pré-visualização";
-L["ModuleName TooltipDyeDeez"] = "Dica: Pigmentos de tinta";
-L["ModuleDescription TooltipDyeDeez"] = "Exibe o nome da cor dos pigmentos na dica de ferramenta de corantes.";
-L["Instruction Show More Info"] = "<Alt + clique> para exibir mais informações>";
-L["Instruction Show Less Info"] = "<Alt + clique> para exibir menos informações>";
+L["ModuleName TooltipDyeDeez"] = "Dica de HUD: Pigmentos de tinta";
+L["ModuleDescription TooltipDyeDeez"] = "Exibe o nome da cor dos pigmentos na dica de HUD de corantes.";
+L["Instruction Show More Info"] = "<Alt + clique para exibir mais informações>";
+L["Instruction Show Less Info"] = "<Alt + clique para exibir menos informações>";
 L["ModuleName Housing_ItemAcquiredAlert"] = "Alerta de decoração coletada";
 L["ModuleDescription Housing_ItemAcquiredAlert"] = "Permite que você clique com o botão esquerdo no aviso de decoração coletada para visualizar seu modelo.";
 
@@ -884,8 +907,24 @@ L["ModuleDescription CatalystUI"] = "Permite que você use Ctrl + clique no item
 
 --HuntTable
 L["ModuleName HuntTable"] = "Presa: Alvos de Caça";
-L["ModuleDescription HuntTable"] = "- Substitui os ícones genéricos de missão azul para mostrar as dificuldades.\n\n- Exibe um indicador se a Presa-alvo for um requisito para uma conquista não obtida.";
-L["Prey Target Has Achievement"] = "Esta Presa-alvo é um requisito para uma conquista não obtida.";
+L["ModuleDescription HuntTable"] = "- Substitui os ícones genéricos de missão azul para mostrar as dificuldades.\n\n- Exibe um indicador se o alvo de caça for um requisito para uma conquista não obtida.";
+L["Prey Target Has Achievement"] = "Esse alvo de caça é um requisito para uma conquista não obtida.";
+
+
+--PreyQuestSuperTrack
+L["ModuleName PreyQuestSuperTrack"] = "Presa: Marcador de Alvo";
+L["ModuleDescription PreyQuestSuperTrack"] = "Quando a localização da sua Presa for revelada, clicar no widget de Progresso da Caçada também definirá um marcador de mapa para esse local.";
+
+
+--BlizzFixActionBarArt
+L["ModuleName BlizzFixActionBarArt"] = "Correção rápida: Arte da barra de ação";
+L["ModuleDescription BlizzFixActionBarArt"] = "Corrigido um problema em que a arte da Barra de Ações (grifos e serpes) reaparecia inesperadamente após ocultar/exibir a interface ou sair do Editor de Casa.";
+
+
+--HouseList
+L["ModuleName Housing_HouseList"] = "Lista de Moradias";
+L["ModuleDescription Housing_HouseList"] = "Melhoria na interface da Lista de Moradias:\n\n- Exibe a facção da casa com um ícone à direita.\n\n- Exibe ambos os botões Visitar Casa caso o jogador possua duas casas.";
+L["View Houses In Combat Warning"] = "Você não pode visualizar casas em combate.";
 
 
 --Generic
