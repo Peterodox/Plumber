@@ -16,7 +16,7 @@ local function GetBestMapForQuest(questID)
 	if API.IsQuestReadyForTurnIn(questID) or (not C_QuestLog.IsOnQuest(questID)) then
 		return QUEST_PIN_MAP;
 	else
-		return GetQuestUiMapID(questID);
+		return GetQuestUiMapID(questID, true); -- 2nd arg: ignoreWaypoints
 	end
 end
 
@@ -347,7 +347,7 @@ do
 			if button == "LeftButton" and IsControlKeyDown() and (not InCombatLockdown()) then
 				API.SuperTrackQuestMapPin(self.questID);
 				local questUiMapID = GetBestMapForQuest(self.questID);
-				C_Map.OpenWorldMap(questUiMapID);
+				API.OpenWorldMap(questUiMapID);
 			end
 		end
 	end

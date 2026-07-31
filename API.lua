@@ -1511,6 +1511,16 @@ do  -- Map
 		};
 		C_Map.SetUserWaypoint(point);
 	end
+
+	function API.OpenWorldMap(uiMapID)
+		if not InCombatLockdown() then
+			if (not uiMapID) or (uiMapID and GetMapInfo(uiMapID)) then
+				C_Map.OpenWorldMap(uiMapID);
+				return true;
+			end
+		end
+		return false;
+	end
 end
 
 do  -- Instance -- Map
