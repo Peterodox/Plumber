@@ -658,6 +658,7 @@ L["Drawer Option Update Frequently Tooltip"] = "在你背包或法术书发生�
 L["ModuleName DrawerMacro"] = "技能收纳宏";
 L["ModuleDescription DrawerMacro"] = "创建自定义弹出菜单来整理你的物品、法术、宠物、坐骑、玩具。\n\n要创建技能收纳宏, 请先创建一个新宏，然后在宏编辑框中输入 |cffd7c0a3#plumber:drawer|r";
 L["No Slot For New Character Macro Alert"] = "需要一个空的角色专用宏栏位来完成此操作。";
+L["Unknown Pet"] = "未知小宠物";
 
 
 --New Expansion Landing Page

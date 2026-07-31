@@ -658,6 +658,7 @@ L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button sta
 L["ModuleName DrawerMacro"] = "Drawer Macro";
 L["ModuleDescription DrawerMacro"] = "Create a custom flyout menu to manage your items, spells, pets, mounts, toys.\n\nTo make a Drawer Macro, create a new macro first, then enter |cffd7c0a3#plumber:drawer|r in the command editbox.";
 L["No Slot For New Character Macro Alert"] = "You need to have a spare Character Specific Macro slot to complete this action.";
+L["Unknown Pet"] = "Unknown Pet";
 
 
 --New Expansion Landing Page

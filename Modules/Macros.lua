@@ -1028,6 +1028,11 @@ do  --MacroInterpreter
 					id = name;
 					if name then
 						macroText = "/summonpet "..name;
+					else
+						name = L["Unknown Pet"];
+						id = name;
+						usable = false;
+						macroText = "";
 					end
 				end
 			end
