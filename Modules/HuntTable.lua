@@ -7,6 +7,16 @@ local MODULE_ENABLED = false;
 
 local PreyTargetListAchivements = {42701, 42702, 42703};
 
+local PreyQuestXAchievement = {
+	-- New prey target that isn't on the original target list
+	[95021] = 63452, -- Janoa the Fang
+	[95022] = 63452, -- Kursak the Coiled
+	[95023] = 63451, -- Batani the Scaled
+	[95024] = 63451, -- Kadani the Claw
+};
+
+local S2_INTRO_QUEST_ID = 96004;
+
 local PreyQuestData = addon.PreyQuestData;
 
 local Def = {
@@ -35,22 +45,36 @@ local function SetupPin(pin)
 
 	if questID and PreyQuestData[questID] then
 		local difficulty, criteriaID = PreyQuestData[questID][1], PreyQuestData[questID][2];
-		local _, _, completed = GetAchievementCriteriaInfoByID(PreyTargetListAchivements[difficulty], criteriaID);
+		local achievementID = PreyQuestXAchievement[questID] or PreyTargetListAchivements[difficulty];
+		local _, completed;
+		if achievementID then
+			_, _, completed = GetAchievementCriteriaInfoByID(achievementID, criteriaID);
+		end
 
 		local l, r, t, b;
 
-		if completed == nil or completed then
-			t, b = 0, 0.25;
-		else
-			t, b = 0.25, 0.5;
+		if PreyQuestXAchievement[questID] then
+			if C_QuestLog.IsOnQuest(S2_INTRO_QUEST_ID) and not C_QuestLog.ReadyForTurnIn(S2_INTRO_QUEST_ID) then
+				-- Display Important Quest Icon for these targets
+				t, b = 0.25, 0.5;
+				l, r = 0.75, 1;
+			end
 		end
 
-		if difficulty == 1 then
-			l, r = 0, 0.25;
-		elseif difficulty == 2 then
-			l, r = 0.25, 0.5;
-		else
-			l, r = 0.5, 0.75;
+		if not t then
+			if completed == nil or completed then
+				t, b = 0, 0.25;
+			else
+				t, b = 0.25, 0.5;
+			end
+
+			if difficulty == 1 then
+				l, r = 0, 0.25;
+			elseif difficulty == 2 then
+				l, r = 0.25, 0.5;
+			else
+				l, r = 0.5, 0.75;
+			end
 		end
 
 		SetupIcon(pin, "SetTexture", Def.DifficultyIcon);
