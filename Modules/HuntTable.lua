@@ -51,9 +51,12 @@ local function SetupPin(pin)
 			_, _, completed = GetAchievementCriteriaInfoByID(achievementID, criteriaID);
 		end
 
+		local isIncompleteAchievement = completed == false;
+		local rootQuestID;
 		local l, r, t, b;
 
 		if PreyQuestXAchievement[questID] then
+			rootQuestID = S2_INTRO_QUEST_ID;
 			if C_QuestLog.IsOnQuest(S2_INTRO_QUEST_ID) and not C_QuestLog.ReadyForTurnIn(S2_INTRO_QUEST_ID) then
 				-- Display Important Quest Icon for these targets
 				t, b = 0.25, 0.5;
@@ -62,10 +65,10 @@ local function SetupPin(pin)
 		end
 
 		if not t then
-			if completed == nil or completed then
-				t, b = 0, 0.25;
-			else
+			if isIncompleteAchievement then
 				t, b = 0.25, 0.5;
+			else
+				t, b = 0, 0.25;
 			end
 
 			if difficulty == 1 then
@@ -81,9 +84,20 @@ local function SetupPin(pin)
 		SetupIcon(pin, "SetTexCoord", l, r, t, b);
 		SetupIcon(pin, "SetSize", Def.IconSize, Def.IconSize);
 
-		if not completed then
-			pin.description = string.format("%s\n\n%s", FormatLabelAndText(LFG_LIST_DIFFICULTY, Def["Difficulty"..difficulty]), L["Prey Target Has Achievement"]);
+		local description = FormatLabelAndText(LFG_LIST_DIFFICULTY, Def["Difficulty"..difficulty]);
+
+		if isIncompleteAchievement then
+			description = description.."\n\n"..L["Prey Target Has Achievement"];
 		end
+
+		if rootQuestID then
+			local questName = addon.API.GetQuestName(rootQuestID);
+			if questName then
+				description = description.."\n\n"..string.format(L["Quest Objective Entry Format"], "|cffffffff"..questName.."|r");
+			end
+		end
+
+		pin.description = description;
 
 		ModifiedPins[pin] = true;
 	end

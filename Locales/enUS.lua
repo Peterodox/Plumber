@@ -910,6 +910,7 @@ L["ModuleDescription CatalystUI"] = "Allows you to Ctrl-Click the output item to
 L["ModuleName HuntTable"] = "Prey: Hunt Table";
 L["ModuleDescription HuntTable"] = "- Replaces the generic blue quest icons to show difficulties.\n\n- Shows an indicator if the Prey target is a requirement for an unearned achievement.";
 L["Prey Target Has Achievement"] = "This Prey target is a requirement for an unearned achievement.";
+L["Quest Objective Entry Format"] = "Quest objective for: %s";
 
 
 --PreyQuestSuperTrack
