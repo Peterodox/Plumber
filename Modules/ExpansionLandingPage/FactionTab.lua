@@ -1131,7 +1131,7 @@ do
 		self.RenownItemScrollView:SetContent(content, retainPosition);
 
 		if scrollToFirstLockedReward then
-			self.RenownItemScrollView:SnapToContent(lastUnlockedIndex or n);
+			self.RenownItemScrollView:SnapToContent(lastUnlockedIndex or 1);
 		end
 	end
 
