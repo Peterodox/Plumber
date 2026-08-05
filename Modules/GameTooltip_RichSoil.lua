@@ -10,6 +10,7 @@ local GetItemCount = C_Item.GetItemCount;
 local OBJECT_NAME = L["GameObject Rich Soil"];
 
 local SupportedMap = {
+	[2512] = true,	--The Coiled Isle
 	[2395] = true,  --Eversong Woods
 	[2413] = true,  --Harandar
 	[2437] = true,  --Zul'Aman
