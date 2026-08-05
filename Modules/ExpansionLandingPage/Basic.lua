@@ -553,14 +553,14 @@ do  --Atlas
 	local FACTION_ICONS = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/MajorFactionIcons.png";
 	local FACTION_ICONS_COORDS = {
 		--[factionID] = {icon l, r, t, b, highlight l, r, t, b}
-		[2590] = {0  , 128, 0, 128},      --Council of Dornogal
-		[2594] = {128, 256, 0, 128},      --The Assembly of the Deeps
-		[2570] = {256, 384, 0, 128},      --Hallowfall Arathi
-		[2600] = {384, 512, 0, 128},      --Severed Threads
-		[2653] = {512, 640, 0, 128},      --Cartels of Undermine
-		[2685] = {640, 768, 0, 128},      --Gallagio Loyalty Rewards Club
-		[2688] = {768, 896, 0, 128},      --Flame's Radiance
-		[2658] = {896, 1024, 0, 128},     --The K'aresh Trust
+		[2590] = {0  , 128,   0, 128},    --Council of Dornogal
+		[2594] = {128, 256,   0, 128},    --The Assembly of the Deeps
+		[2570] = {256, 384,   0, 128},    --Hallowfall Arathi
+		[2600] = {384, 512,   0, 128},    --Severed Threads
+		[2653] = {512, 640,   0, 128},    --Cartels of Undermine
+		[2685] = {640, 768,   0, 128},    --Gallagio Loyalty Rewards Club
+		[2688] = {768, 896,   0, 128},    --Flame's Radiance
+		[2658] = {896,1024,   0, 128},    --The K'aresh Trust
 		[2736] = {0  , 128, 256, 384},    --Manaforge Vandals
 
 		[2710] = {128, 256, 256, 384},    --Silvermoon Court
@@ -570,8 +570,13 @@ do  --Atlas
 
 		[2764] = {640, 768, 256, 384},    --Prey
 		[2742] = {768, 896, 256, 384},    --Delves
-		[2792] = {896, 1024, 256, 384},   --Ritual Sites
+		[2792] = {896,1024, 256, 384},    --Ritual Sites
+		[2772] = {0  , 128, 512, 640},    --Zul'jarra's Forces
 	};
+
+	FACTION_ICONS_COORDS[2808] = FACTION_ICONS_COORDS[2764];	--Prey S2
+	FACTION_ICONS_COORDS[2796] = FACTION_ICONS_COORDS[2742];	--Delves S2
+
 
 	local function SetTextureDimension(textureObject, file, width, height, l, r, t, b, useTrilinearFilter)
 		if useTrilinearFilter then

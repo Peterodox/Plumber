@@ -50,11 +50,11 @@ local OverrideFactionInfo = {
 		rewardQuestID = 89032,
 	},
 
-	[2764] = {  --Prey S1
+	["Prey"] = {  --Prey S1
 		barColor = {246/255, 138/255, 162/255},
 	},
 
-	[2742] = {  --Delves S1
+	["Delves"] = {  --Delves S1
 		barColor = {215/255, 160/255, 65/255},
 	},
 
@@ -70,6 +70,11 @@ local OverrideFactionInfo = {
 	[2792] = {  --Ritual Sites
 		barColor = {197/255, 142/255, 255/255},
 		rewardQuestID = 95391,
+	},
+
+	[2772] = {  --Zul'jarra's Forces
+		barColor = {108/255, 181/255, 139/255},
+		rewardQuestID = 93798,
 	},
 
 	---- TWW ----
@@ -151,19 +156,38 @@ local OverrideFactionInfo = {
 	},
 };
 
+local Seasonal = {
+	Delves = 2742,
+	Prey = 2764,
+};
+
+if addon.IS_12_1_0 then
+	-- MID Season 2
+	Seasonal.Delves = 2796;
+	Seasonal.Prey = 2808;
+end
+
+for k, factionID in pairs(Seasonal) do
+	if not OverrideFactionInfo[factionID] then
+		OverrideFactionInfo[factionID] = OverrideFactionInfo[k];
+	end
+end
+
 
 do  --Layout MID
-	local MajorFactionLayout = {
-		[1] = {
-			{factionID = 2792},		--Ritual Sites
-			{factionID = 2764},     --Prey S1
-			{factionID = 2742,      --Delves S1
-				subFactions = {
-					{factionID = 2744, creatureDisplayID = 26365, playerCompanionID = 2},     --Valeera Sanguinar. Get playerCompanionID from C_MajorFactions.GetMajorFactionData(C_DelvesUI.GetDelvesFactionForSeason())
-				},
+	local MajorFactionEntry = {
+		Prey = {factionID = Seasonal.Prey},		--Prey
+		Delves = {factionID = Seasonal.Delves,	--Delves
+			subFactions = {
+				{factionID = 2744, creatureDisplayID = 26365, playerCompanionID = 2},     --Valeera Sanguinar. Get playerCompanionID from C_MajorFactions.GetMajorFactionData(C_DelvesUI.GetDelvesFactionForSeason())
 			},
-			{factionID = 2770, shownAsSubfaction = true, iconFileID = 7448209},     --Slayer's Duellum
 		},
+		RitualSites = {factionID = 2792},		--Ritual Sites
+		OpenWorldPVP = {factionID = 2770, shownAsSubfaction = true, iconFileID = 7448209},     --Slayer's Duellum
+		Zuljarra = {factionID = 2772},	--Zul'jarra's Forces
+	}
+	local MajorFactionLayout = {
+		[1] = {},
 
 		[2] = {
 			{factionID = 2696},     --Amani Tribe
@@ -171,7 +195,7 @@ do  --Layout MID
 			{factionID = 2704},     --Hara'ti
 			{factionID = 2710,      --Silvermoon Court
 				subFactions = { --See weekly quest https://www.wowhead.com/beta/quest=91629/high-esteem
-					{factionID = 2711, creatureDisplayID = 69626},     --Magisters Esara Verrinde
+					{factionID = 2711, creatureDisplayID = 69626},      --Magisters Esara Verrinde
 					{factionID = 2712, creatureDisplayID = 113966},     --Blood Knights Knight-Lord Dranarus
 					{factionID = 2713, creatureDisplayID = 140633},     --Farstriders Captain Helios
 					{factionID = 2714, creatureDisplayID = 140691},     --Shades of the Row Darkdealer Thelis
@@ -182,9 +206,22 @@ do  --Layout MID
 
 	LandingPageUtil.AddExpansionData(12, "factionLayout", MajorFactionLayout);
 
-	--if addon.IS_12_0_7 then  --For PTR
-		--table.insert(MajorFactionLayout[1], 1, {factionID = 2792});
-	--end
+	if addon.IS_12_1_0 then  --For PTR
+		MajorFactionLayout[1] = {
+			MajorFactionEntry.Zuljarra,
+			MajorFactionEntry.Prey,
+			MajorFactionEntry.Delves,
+			MajorFactionEntry.RitualSites,
+			MajorFactionEntry.OpenWorldPVP,
+		};
+	else
+		MajorFactionLayout[1] = {
+			MajorFactionEntry.RitualSites,
+			MajorFactionEntry.Prey,
+			MajorFactionEntry.Delves,
+			MajorFactionEntry.OpenWorldPVP,
+		};
+	end
 end
 
 

@@ -572,6 +572,7 @@ do
 	addon.IS_MOP = C_AddOns.GetAddOnMetadata(addonName, "X-Expansion") == "MOP";
 
 	addon.IS_12_0_7 = IsToCVersionEqualOrNewerThan(120007);
+	addon.IS_12_1_0 = IsToCVersionEqualOrNewerThan(120100);
 
 
 	function addon.GetLastLoginTime()
