@@ -675,6 +675,7 @@ L["Not On Quest"] = "你没有接到该任务";
 L["Factions"] = "声望总览";
 L["Activities"] = "每周活动";
 L["Raids"] = "团队副本";
+L["Player Power"] = "战力系统";
 L["Instruction Track Achievement"] = "<按住Shift点击追踪此成就>";
 L["Instruction Untrack Achievement"] = "<按住Shift点击取消追踪>";
 L["No Data"] = "没有数据";

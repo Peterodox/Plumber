@@ -38,8 +38,7 @@ do
 			TraitContainer:Refresh();
 		else
 			TraitContainer = addon.CreateTraitContainer(self);
-			TraitContainer:SetPoint("CENTER", self, "CENTER", 0, 0);
-			TraitContainer:SetScale(36/40);
+			TraitContainer:SetPoint("RIGHT", self, "RIGHT", 0, 0);
 			TraitContainer:SetConfigIDBySystemID(TRAIT_SYSTEM_ID);
 			TraitContainer:SetEnableAutoCommit(true);
 		end
@@ -148,6 +147,8 @@ do
 	end
 
 	function TraitFrameMixin:ShowHeaderFrame(state)
+		if not self.listCategoryButton then return; end
+
 		if state then
 			self.HeaderFrame:SetPoint("CENTER", self.listCategoryButton, "CENTER", 0, 0);
 			self.HeaderFrame:Show();

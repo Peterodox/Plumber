@@ -472,12 +472,18 @@ do  --TabUtil
 		return tabInfo.frame
 	end
 
-	function LandingPageUtil.EnumerateTabInfo()
-		return ipairs(Tabs);
+	local function IsTabValid(tabInfo)
+		return (not tabInfo.validityCheck) or tabInfo.validityCheck();
 	end
 
-	function LandingPageUtil.GetNumTabs()
-		return #Tabs
+	function LandingPageUtil.EnumerateValidTabInfo()
+		local validTabs = {};
+		for _, tabInfo in ipairs(Tabs) do
+			if IsTabValid(tabInfo) then
+				table.insert(validTabs, tabInfo);
+			end
+		end
+		return ipairs(validTabs);
 	end
 
 	function LandingPageUtil.SelectTab(tabKey)
@@ -485,8 +491,8 @@ do  --TabUtil
 		if tabKey then
 			for _, tabInfo in ipairs(Tabs) do
 				if tabInfo.key == tabKey then
-					valid = true;
-					break
+					valid = IsTabValid(tabInfo);
+					break;
 				end
 			end
 		end
@@ -1757,6 +1763,10 @@ do  --Expansion Select
 			local name = ExpansionData[CurrentExpansionID].name or "Unknown Expansion";
 			return name
 		end
+	end
+
+	function LandingPageUtil.GetCurrentExpansionID()
+		return CurrentExpansionID;
 	end
 
 	function LandingPageUtil.GetAvailableExpansions()

@@ -675,6 +675,7 @@ L["Not On Quest"] = "You are not on this quest";
 L["Factions"] = "Factions";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Activities";
 L["Raids"] = RAIDS or "Raids";
+L["Player Power"] = "Powers";
 L["Instruction Track Achievement"] = "<Shift click to track this achievement>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
 L["No Data"] = "No data";

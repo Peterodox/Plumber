@@ -226,13 +226,14 @@ do  -- Slice Frame
 		end
 	end
 
-	function SliceFrameMixin:CoverParent(padding)
-		padding = padding or 0;
+	function SliceFrameMixin:CoverParent(paddingH, paddingV)
+		paddingH = paddingH or 0;
+		paddingV = paddingV or paddingH;
 		local parent = self:GetParent();
 		if parent then
 			self:ClearAllPoints();
-			self:SetPoint("TOPLEFT", parent, "TOPLEFT", -padding, padding);
-			self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", padding, -padding);
+			self:SetPoint("TOPLEFT", parent, "TOPLEFT", -paddingH, paddingV);
+			self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", paddingH, -paddingV);
 		end
 	end
 

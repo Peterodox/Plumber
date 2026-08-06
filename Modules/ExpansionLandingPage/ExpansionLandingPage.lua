@@ -294,36 +294,9 @@ do
 	function PlumberExpansionLandingPageMixin:InitTabButtons()
 		self.InitTabButtons = nil;
 
-		if not self.TabButtons then
-			self.TabButtons = {};
-		end
-
-		for _, button in ipairs(self.TabButtons) do
-			button:Hide();
-		end
-
-		local button;
-		local buttonWidth;
-		local offsetY = -12;
-		local totalWidth = 46;
 		local buttonContainer = self.RightSection.Header;
 
-		for i, tabInfo in LandingPageUtil.EnumerateTabInfo() do
-			button = self.TabButtons[i];
-			if not button then
-				button = CreateTabButton(buttonContainer);
-				self.TabButtons[i] = button;
-			end
-			button.tabKey = tabInfo.key;
-			button.notificationGetter = tabInfo.notificationGetter;
-			buttonWidth = API.Round(button:SetName(tabInfo.name));
-			button:ClearAllPoints();
-			button:SetPoint("LEFT", buttonContainer, "LEFT", totalWidth, offsetY);
-			totalWidth = totalWidth + buttonWidth + 0;
-		end
-
 		self:UpdateTabButtons();
-
 
 		local function Header_OnMouseWheel(_, delta)
 			--Scroll up will go the left tab
@@ -334,20 +307,50 @@ do
 
 
 		local ExpansionSelectButton = CreateExpansionSelectButton(buttonContainer);
-		ExpansionSelectButton:SetPoint("RIGHT", buttonContainer, "RIGHT", -48, offsetY);
+		ExpansionSelectButton:SetPoint("RIGHT", buttonContainer, "RIGHT", -48, -12);
 		ExpansionSelectButton:Refresh();
 	end
 
 	function PlumberExpansionLandingPageMixin:UpdateTabButtons()
+		if not self.TabButtons then
+			self.TabButtons = {};
+		end
+
+		for _, button in ipairs(self.TabButtons) do
+			button:Hide();
+		end
+
+		local buttonWidth;
+		local offsetY = -12;
+		local totalWidth = 46;
+		local buttonContainer = self.RightSection.Header;
+
+		for i, tabInfo in LandingPageUtil.EnumerateValidTabInfo() do
+			local button = self.TabButtons[i];
+			if not button then
+				button = CreateTabButton(buttonContainer);
+				self.TabButtons[i] = button;
+			end
+			button.tabKey = tabInfo.key;
+			button.notificationGetter = tabInfo.notificationGetter;
+			buttonWidth = API.Round(button:SetName(tabInfo.name));
+			button:ClearAllPoints();
+			button:SetPoint("LEFT", buttonContainer, "LEFT", totalWidth, offsetY);
+			button:Show();
+			totalWidth = totalWidth + buttonWidth + 0;
+		end
+
 		local selectedTabKey = LandingPageUtil.GetSelectedTabKey();
 		for _, button in ipairs(self.TabButtons) do
-			button:SetSelected(button.tabKey == selectedTabKey);
-			button:UpdateNotification();
+			if button:IsShown() then
+				button:SetSelected(button.tabKey == selectedTabKey);
+				button:UpdateNotification();
+			end
 		end
 	end
 
 	function PlumberExpansionLandingPageMixin:RequestUpdateTabButtons()
-		if self.TabButtons and self:IsVisible() then
+		if self:IsVisible() then
 			self:UpdateTabButtons();
 		end
 	end
@@ -370,7 +373,7 @@ do
 		local selectedTabKey = LandingPageUtil.GetSelectedTabKey();
 		local tabContainer = self.RightSection.TabContainer;
 
-		for i, tabInfo in LandingPageUtil.EnumerateTabInfo() do
+		for i, tabInfo in LandingPageUtil.EnumerateValidTabInfo() do
 			if tabInfo.key == selectedTabKey then
 				if not tabInfo.frame then
 					local f = LandingPageUtil.AcquireTabFrame(tabContainer, i);
@@ -391,11 +394,9 @@ do
 			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
 		};
 
-		if addon.IS_12_0_7 then
-			table.insert(categories, 2, {name = LandingPageUtil.GetTraitSystemName(), frameGetter = LandingPageUtil.CreateTraitFrame});
-		else
-			table.insert(categories, 2, {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame});
-		end
+		--addon.IS_12_0_7
+		--table.insert(categories, 2, {name = LandingPageUtil.GetTraitSystemName(), frameGetter = LandingPageUtil.CreateTraitFrame});
+		table.insert(categories, 2, {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame});
 
 		local numCategories = #categories;
 

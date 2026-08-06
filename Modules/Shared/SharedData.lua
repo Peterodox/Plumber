@@ -33,6 +33,18 @@ do  --Item Upgrade Track
 		};
 	};
 
+	if addon.IS_12_1_0 then
+		ItemUpgradeConstant.CatalystCurrencyID = 3465; -- Venomblight Manaflux
+
+		ItemUpgradeConstant.Crests = {
+			3446,
+			3445,
+			3444,
+			3443,
+			3442,
+		};
+	end
+
 
 	addon.ItemUpgradeConstant = ItemUpgradeConstant;
 
