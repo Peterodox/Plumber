@@ -714,6 +714,7 @@ L["Near Completion Tooltip"] = "你可以看见此条目是因为你即将达到
 L["Inactive Currencies Tooltip"] = "以下货币因为被你设为“未使用”而隐藏：";
 L["New Quest"] = "新任务";
 L["Trait Points Available"] = "可分配点数";
+L["Unspent Points"] = "你有待分配的点数";
 
 
 --ExpansionSummaryMinimapButton

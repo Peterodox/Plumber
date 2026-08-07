@@ -8,8 +8,6 @@ local MainFrame;
 
 local QUEST_PROVIDER_MAP = 2649; -- The Lycaneum
 local QUEST_PIN_MAP = 2424; -- Use Isle map instead of the indoor map
-local TRAIT_SYSTEM_ID = 48; -- RUNES_OF_POWER_SYSTEM_ID
-local TRAIT_TREE_ID = 1186; -- RUNES_OF_POWER_TREE_ID;
 
 
 local function GetBestMapForQuest(questID)
@@ -33,16 +31,21 @@ do
 		"QUESTLINE_UPDATE",
 	};
 
+	function TraitFrameMixin:SetSystemID(systemID)
+		if not TraitContainer then
+			TraitContainer = addon.CreateTraitContainer(self);
+			TraitContainer:SetPoint("RIGHT", self, "RIGHT", 0, 0);
+		end
+		TraitContainer:SetConfigIDBySystemID(systemID);
+		TraitContainer:SetEnableAutoCommit(true);
+	end
+
 	function TraitFrameMixin:Refresh()
 		if TraitContainer then
 			TraitContainer:Refresh();
-		else
-			TraitContainer = addon.CreateTraitContainer(self);
-			TraitContainer:SetPoint("RIGHT", self, "RIGHT", 0, 0);
-			TraitContainer:SetConfigIDBySystemID(TRAIT_SYSTEM_ID);
-			TraitContainer:SetEnableAutoCommit(true);
 		end
 		self:UpdateHeader();
+		addon.CallbackRegistry:Trigger("LandingPage.UpdateNotification");
 	end
 
 	function TraitFrameMixin:OnShow()
@@ -53,6 +56,7 @@ do
 
 	function TraitFrameMixin:OnHide()
 		API.UnregisterFrameForEvents(self, DynamicEvents);
+		LandingPageUtil.HighlightWidget(self:GetParent(), false);
 	end
 
 	function TraitFrameMixin:OnEvent(event, ...)
@@ -99,14 +103,14 @@ do
 			if info and info.quantity > 0 then
 				local flags, type, currencyTypesID, icon = C_Traits.GetTraitCurrencyInfo(info.traitCurrencyID);
 				self.HeaderFrame:DisplayTraitCurrency(icon, info.quantity);
-				self:ShowBlackScreen(true);
+				LandingPageUtil.HighlightWidget(self:GetParent(), true);
 				return true;
 			else
-				self:ShowBlackScreen(false);
+				LandingPageUtil.HighlightWidget(self:GetParent(), false);
 				return false;
 			end
 		else
-			self:ShowBlackScreen(false);
+			LandingPageUtil.HighlightWidget(self:GetParent(), false);
 			return false;
 		end
 	end
@@ -147,16 +151,11 @@ do
 	end
 
 	function TraitFrameMixin:ShowHeaderFrame(state)
-		if not self.listCategoryButton then return; end
-
 		if state then
-			self.HeaderFrame:SetPoint("CENTER", self.listCategoryButton, "CENTER", 0, 0);
+			self.HeaderFrame:SetPoint("BOTTOMRIGHT", self:GetParent(), "TOPRIGHT", 0, 4);
 			self.HeaderFrame:Show();
-			self.listCategoryButton.Name:Hide();
-			self.listCategoryButton:EnableMouseMotion(false);
 		else
 			self.HeaderFrame:Hide();
-			self.listCategoryButton.Name:Show();
 		end
 	end
 
@@ -171,44 +170,6 @@ do
 			end
 		end
 		self:ShowHeaderFrame(anyShown);
-	end
-
-	function TraitFrameMixin:ShowBlackScreen(state)
-		if state then
-			if not self.BlackOverlay then
-				local offset = 8;
-				local alpha = 0.8;
-
-				self.BlackOverlay = CreateFrame("Frame", nil, self);
-				self.BlackOverlay:SetUsingParentLevel(true);
-
-				local function CreateOverlay(container)
-					local overlay = self.BlackOverlay:CreateTexture(nil, "BACKGROUND");
-					overlay:SetColorTexture(0, 0, 0, alpha);
-					overlay:SetPoint("TOPLEFT", container, "TOPLEFT", offset, -offset);
-					overlay:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -offset, offset);
-					return overlay;
-				end
-
-				local overlay1 = CreateOverlay(PlumberExpansionLandingPage.LeftSection);
-				local overlay2 = CreateOverlay(PlumberExpansionLandingPage.RightSection);
-
-				local BackgroundGlow = self.BlackOverlay:CreateTexture(nil, "BACKGROUND", nil, 1);
-				BackgroundGlow:SetSize(256, 256);
-				BackgroundGlow:SetPoint("CENTER", self, "CENTER", 0, 0);
-				BackgroundGlow:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/ExpansionLandingPage-BackgroundGlow");
-				BackgroundGlow:SetBlendMode("ADD");
-				local shrink = 48;
-				BackgroundGlow:SetTexCoord(shrink/256, 1-shrink/256, shrink/256, 1-shrink/256);
-				BackgroundGlow:SetVertexColor(60/255, 35/255, 20/255);
-			end
-
-			self.BlackOverlay:Show();
-		else
-			if self.BlackOverlay then
-				self.BlackOverlay:Hide();
-			end
-		end
 	end
 end
 
@@ -387,37 +348,6 @@ do
 end
 
 
-function LandingPageUtil.GetTraitSystemName()
-	return RUNES_OF_POWER;
-end
-
-function LandingPageUtil.HasAnyPurchasableTrait()
-	return API.HasAnyPurchasableTraitInSystem(TRAIT_SYSTEM_ID);
-end
-
-
-do	--Event Handler
-	local Frame = CreateFrame("Frame");
-
-	function LandingPageUtil.HandleTraitTreeCurrencyChanged(treeID)
-		if treeID == TRAIT_TREE_ID then
-			if not Frame.t then
-				Frame.t = 0;
-				Frame:SetScript("OnUpdate", function(self, elapsed)
-					self.t = self.t + elapsed;
-					if self.t >= 0.1 then
-						self.t = nil;
-						self:SetScript("OnUpdate", nil);
-						addon.CallbackRegistry:Trigger("LandingPage.HasPurchasableTrait", LandingPageUtil.HasAnyPurchasableTrait());
-					end
-				end);
-			end
-			Frame.t = 0;
-		end
-	end
-end
-
-
 function LandingPageUtil.CreateTraitFrame(parent)
 	if MainFrame then return MainFrame; end
 
@@ -426,7 +356,6 @@ function LandingPageUtil.CreateTraitFrame(parent)
 	local width = 240;
 	local height = 40;
 	f:SetSize(width, height);
-	f:SetFrameLevel(LandingPageUtil.GetUIFrameLevel() + 10);
 
 	Mixin(f, TraitFrameMixin);
 	f:SetScript("OnShow", f.OnShow);
@@ -436,7 +365,7 @@ function LandingPageUtil.CreateTraitFrame(parent)
 	local HeaderFrame = CreateFrame("Button", nil, f);
 	f.HeaderFrame = HeaderFrame;
 	HeaderFrame:Hide();
-	HeaderFrame:SetSize(240, 24);
+	HeaderFrame:SetSize(280, 24);
 	HeaderFrame.Icon = HeaderFrame:CreateTexture(nil, "OVERLAY");
 	HeaderFrame.Text = HeaderFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
 	Mixin(HeaderFrame, HeaderFrameMixin);

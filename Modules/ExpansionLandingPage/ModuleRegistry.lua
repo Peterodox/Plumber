@@ -62,7 +62,7 @@ EL:SetScript("OnEvent", function(self, event, ...)
 				if factionName then
 					LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"].."\n"..factionName, "ParagonReward");
 				end
-				LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
+				LandingPageUtil.HandleTraitTreeCurrencyChanged();
 			end);
 		end
 	elseif event == "QUEST_ACCEPTED" then

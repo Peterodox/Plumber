@@ -745,6 +745,7 @@ L["Near Completion Tooltip"] = "This entry is visible to you because you are abo
 L["Inactive Currencies Tooltip"] = "These currencies are hidden because you have set them as Unused:";
 L["New Quest"] = "New Quest";
 L["Trait Points Available"] = "Points Available";
+L["Unspent Points"] = "Unspent Points";
 
 
 --ExpansionSummaryMinimapButton

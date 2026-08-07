@@ -790,7 +790,7 @@ do	--Notification / Alert / Banner
 		end},
 
 		TraitSystem = {autoHide = false, onClickFunc = function()
-			PlumberExpansionLandingPage:ShowTraitTab();
+			PlumberExpansionLandingPage:ShowPlayerPowerTab();
 		end},
 	};
 
@@ -895,18 +895,27 @@ do	--Notification / Alert / Banner
 	end
 
 
-	function LandingPageUtil.HideMinimapButtonAlert()
+	function LandingPageUtil.HideMinimapButtonAlert(alertType)
 		if MiniButton then
-			MiniButton.AlertFrame:Hide();
+			if (not alertType) or (alertType == MiniButton.alertType) then
+				MiniButton.AlertFrame:Hide();
+			end
 		end
 	end
 
-	function LandingPageUtil.ShowMinimapButtonAlert(text, alertType)
+	function LandingPageUtil.ShowMinimapButtonAlert(text, alertType, prioritized)
 		if text and text ~= "" then
-			if MiniButton and MiniButton:IsVisible() and (not MiniButton.AlertFrame:IsShown()) then
-				if not (alertType and MinimapAlertType[alertType]) then
-					alertType = "Generic";
+			if not (alertType and MinimapAlertType[alertType]) then
+				alertType = "Generic";
+			end
+
+			if prioritized then
+				if alertType == MiniButton.alertType then
+					prioritized = false;
 				end
+			end
+
+			if MiniButton and MiniButton:IsVisible() and (prioritized or (not MiniButton.AlertFrame:IsShown())) then
 				MiniButton.alertType = alertType;
 				MiniButton.alertInfo = MinimapAlertType[alertType];
 
@@ -917,19 +926,6 @@ do	--Notification / Alert / Banner
 			LandingPageUtil.HideMinimapButtonAlert();
 		end
 	end
-
-
-	CallbackRegistry:RegisterCallback("LandingPage.HasPurchasableTrait", function(hasPurchasableTrait)
-		if hasPurchasableTrait and (not InCombatLockdown()) then
-			if not PlumberExpansionLandingPage:IsShown() then
-				LandingPageUtil.ShowMinimapButtonAlert(OMNIUM_FOLIO_UNSPENT_POINTS, "TraitSystem");
-			end
-		else
-			if MiniButton and MiniButton.MiniButton and MiniButton.MiniButton == "TraitSystem" then
-				LandingPageUtil.HideMinimapButtonAlert();
-			end
-		end
-	end);
 end
 
 
@@ -1137,6 +1133,7 @@ do  --Button Settings/Customize
 		end
 	end
 
+	---@diagnostic disable-next-line: duplicate-set-field
 	LandingPageUtil.UpdateMinimapButtonVisibility = function()
 		ButtonManager:UpdateVisibility();
 	end

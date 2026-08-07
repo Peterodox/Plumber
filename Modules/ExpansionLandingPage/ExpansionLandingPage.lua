@@ -279,7 +279,7 @@ do
 		end
 
 		if LandingPageUtil.HasAnyPurchasableTrait() then
-			self:ShowTraitTab();
+			self:ShowPlayerPowerTab();
 		end
 
 		LandingPageUtil.HideMinimapButtonAlert();
@@ -288,7 +288,7 @@ do
 	function PlumberExpansionLandingPageMixin:OnHide()
 		LandingPageUtil.PlayUISound("LandingPageClose");
 		LandingPageUtil.MainContextMenu:HideMenu();
-		LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
+		LandingPageUtil.HandleTraitTreeCurrencyChanged();
 	end
 
 	function PlumberExpansionLandingPageMixin:InitTabButtons()
@@ -391,12 +391,9 @@ do
 
 		local categories = {
 			{name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
+			{name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
 			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
 		};
-
-		--addon.IS_12_0_7
-		--table.insert(categories, 2, {name = LandingPageUtil.GetTraitSystemName(), frameGetter = LandingPageUtil.CreateTraitFrame});
-		table.insert(categories, 2, {name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame});
 
 		local numCategories = #categories;
 
@@ -524,17 +521,14 @@ end
 
 
 do	--Open to Tab
-	function PlumberExpansionLandingPageMixin:ShowTraitTab()
+	function PlumberExpansionLandingPageMixin:ShowPlayerPowerTab()
 		-- 12.0.7 Only?
 		if not self:IsShown() then
 			self:Show();
 		end
-		local selectedTab = LandingPageUtil.GetSelectedTabKey();
-		if selectedTab ~= "faction" and selectedTab ~= "activity" then
-			LandingPageUtil.SelectTab("faction");
-			MainFrame:UpdateTabs();
-		end
 		LandingPageUtil.SelectExpansion(12);
+		LandingPageUtil.SelectTab("playerpower");
+		MainFrame:UpdateTabs();
 	end
 
 	function PlumberExpansionLandingPageMixin:ShowFactionTabWithPendingReward()
@@ -571,5 +565,57 @@ do	--Shared
 
 	function LandingPageUtil.GetUIFrameLevel()
 		return MainFrame.LeftSection.DefaultFrame:GetFrameLevel();
+	end
+
+	local WidgetLevel = {};
+	local BlackOverlay;
+
+	--- Raise the widget frameLevel and darken the rest of the UI
+	--- @param widget any? If nil, hide the blackscreen.
+	--- @param highlighted boolean?
+	function LandingPageUtil.HighlightWidget(widget, highlighted)
+		for w, oldLevel in pairs(WidgetLevel) do
+			w:SetFrameLevel(oldLevel);
+		end
+
+		if not widget then
+			if BlackOverlay then
+				BlackOverlay:Hide();
+			end
+			return;
+		end
+
+		if highlighted then
+			if not BlackOverlay then
+				local offset = 8;
+				local alpha = 0.8;
+
+				BlackOverlay = CreateFrame("Frame", nil, MainFrame);
+
+				local function CreateOverlay(container)
+					local overlay = BlackOverlay:CreateTexture(nil, "BACKGROUND");
+					overlay:SetColorTexture(0, 0, 0, alpha);
+					overlay:SetPoint("TOPLEFT", container, "TOPLEFT", offset, -offset);
+					overlay:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -offset, offset);
+					return overlay;
+				end
+
+				local overlay1 = CreateOverlay(MainFrame.LeftSection);
+				local overlay2 = CreateOverlay(MainFrame.RightSection);
+			end
+
+			WidgetLevel = {
+				[widget] = widget:GetFrameLevel(),
+			};
+
+			local baseFrameLevel = 1208;
+			widget:SetFrameLevel(baseFrameLevel + 10);
+			BlackOverlay:SetFrameLevel(baseFrameLevel);
+			BlackOverlay:Show();
+		else
+			if BlackOverlay and WidgetLevel[widget] then
+				BlackOverlay:Hide();
+			end
+		end
 	end
 end
