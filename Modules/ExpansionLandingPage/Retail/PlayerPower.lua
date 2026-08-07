@@ -1,7 +1,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 local PlayerPowerTab;
 

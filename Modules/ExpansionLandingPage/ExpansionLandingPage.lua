@@ -1,8 +1,8 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local CallbackRegistry = addon.CallbackRegistry;
-local LandingPageUtil = addon.LandingPageUtil;
 local IS_MOP = addon.IS_MOP;
 
 

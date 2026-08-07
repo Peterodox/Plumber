@@ -1,5 +1,5 @@
 local _, addon = ...
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 
 --Greedy Emissary Events

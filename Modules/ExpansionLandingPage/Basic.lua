@@ -4,6 +4,7 @@ local API = addon.API;
 local Mixin = API.Mixin;
 
 
+---@class LandingPageUtil
 local LandingPageUtil = {};
 addon.LandingPageUtil = LandingPageUtil;
 
