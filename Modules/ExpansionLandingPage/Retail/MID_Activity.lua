@@ -565,12 +565,13 @@ if addon.IS_12_1_0 then
 			-- (Underground) Vaults of Atal'Utek
 			{name = "Purging the Vaults", questID = 95520, isWeeklyQuest = true, uiMapID = 2509, sortToTop = true},
 			-- Group Daily
-			{name = "Patrolling the Temple", questID = 96639, uiMapID = 2509, shownIfActive = true},
+			{name = "Patrolling the Temple", questID = 96639, uiMapID = 2509, shownIfActive = true}, -- √
 			{name = "Bounty of the Cursed", questID = 96640, uiMapID = 2509, shownIfActive = true},
 			{name = "Relentless Strikes", questID = 96641, uiMapID = 2509, shownIfActive = true},
-			{name = "Decisive Incursions", questID = 96642, uiMapID = 2509, shownIfActive = true},
+			{name = "Decisive Incursions", questID = 96642, uiMapID = 2509, shownIfActive = true}, -- √
 			{name = "From Whence it Came", questID = 96643, uiMapID = 2509, shownIfActive = true},
-			{name = "Essence of Malice", questID = 96644, uiMapID = 2509, shownIfActive = true},
+			{name = "Essence of Malice", questID = 96644, uiMapID = 2509, shownIfActive = true}, -- √
+			{name = "What's Out There?", questID = 98420, uiMapID = 2509, shownIfActive = true}, -- √
 		},
 	};
 
