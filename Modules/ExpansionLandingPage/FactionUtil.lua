@@ -1,7 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 local FactionUtil = {};
 addon.FactionUtil = FactionUtil;
@@ -185,7 +185,8 @@ do  --Layout MID
 		RitualSites = {factionID = 2792},		--Ritual Sites
 		OpenWorldPVP = {factionID = 2770, shownAsSubfaction = true, iconFileID = 7448209},     --Slayer's Duellum
 		Zuljarra = {factionID = 2772},	--Zul'jarra's Forces
-	}
+	};
+
 	local MajorFactionLayout = {
 		[1] = {},
 
@@ -222,6 +223,8 @@ do  --Layout MID
 			MajorFactionEntry.OpenWorldPVP,
 		};
 	end
+
+	FactionUtil.ActiveFactionLayout = MajorFactionLayout;
 end
 
 
@@ -261,7 +264,6 @@ do  --Layout TWW
 		},
 	};
 
-	FactionUtil.ActiveFactionLayout = MajorFactionLayout;
 	LandingPageUtil.AddExpansionData(11, "factionLayout", MajorFactionLayout);
 end
 
@@ -356,8 +358,8 @@ function FactionUtil:IsAnyParagonRewardPending(viewedExpansionOnly)
 	return self:GetFactionsWithRewardPending(viewedExpansionOnly) ~= nil
 end
 
-function FactionUtil:GetRewardPendingFactioName()
-	local factions = self:GetFactionsWithRewardPending();
+function FactionUtil:GetRewardPendingFactioName(viewedExpansionOnly)
+	local factions = self:GetFactionsWithRewardPending(viewedExpansionOnly);
 	if factions then
 		local firstFactionName = self:GetFactionName(factions[1]);
 		if firstFactionName then
