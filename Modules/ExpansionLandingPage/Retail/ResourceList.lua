@@ -50,11 +50,10 @@ end
 
 do  --MID
 	local ResourceList = {
-		{currencyID = 3418, hasWeeklyCap = true},	--Nebulous Voidcore (Bonus Rolls)
-		{currencyID = 3405},	--Field Accolade
 		{currencyID = 3028},    --Restored Coffer Key
 		{currencyID = 3310, hasWeeklyCap = true},	--Coffer Key Shard
 		{currencyID = 3316},    --Voidlight Marl
+		{currencyID = 3405},	--Field Accolade
 
 		{itemID = 242241, uiMapID = 2395},   --Latent Arcana
 		{itemID = 246951, uiMapID = 2405},   --Stormarion Core
@@ -73,16 +72,24 @@ do  --MID
 		{currencyID = 2797, shownIfOwned = true},   --Trophy of Strife
 	};
 
-	if addon.IS_12_1_0 then
+	local function AddEntry(key, id, shownIfOwned, hasWeeklyCap)
+		table.insert(ResourceList, 1, {
+			[key] = id;
+			shownIfOwned = shownIfOwned,
+			hasWeeklyCap = hasWeeklyCap,
+		});
+	end
 
+	if addon.IS_12_1_0 then
+		AddEntry("currencyID", 3448);	-- Corrosive Coin
+		AddEntry("itemID", 273000);		-- Corrosive Soul
 	end
 
 	if addon.ItemUpgradeConstant.CatalystCurrencyID then
-		table.insert(ResourceList, 2, {
-			currencyID = addon.ItemUpgradeConstant.CatalystCurrencyID,
-			shownIfOwned = true,
-		});
+		AddEntry("currencyID", addon.ItemUpgradeConstant.CatalystCurrencyID, true);
 	end
+
+	AddEntry("currencyID", 3418, nil, true);	--Nebulous Voidcore (Bonus Rolls) Changed to a new token in Season 2?
 
 	LandingPageUtil.AddExpansionData(12, "resource", ResourceList);
 end
