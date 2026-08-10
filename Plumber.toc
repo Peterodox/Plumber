@@ -64,7 +64,6 @@ Modules\ExpansionLandingPage.xml
 Modules\GameTooltipExtension.xml
 Modules\LootUI.xml
 Modules\UnderlightAngler.lua
-Modules\SpellcastInfo.lua
 Modules\ChatOptions.lua
 Modules\NameplateResources.lua
 Modules\NameplateQuestIndicator.lua
@@ -104,3 +103,4 @@ Modules\PreyQuestSuperTrack.lua
 #Modules\ObjectiveTrackerModule.xml
 #Modules\BlizzFix_EndCaps.lua
 #Modules\Timerunning\LegionRemix.xml
+#Modules\SpellcastInfo.lua
