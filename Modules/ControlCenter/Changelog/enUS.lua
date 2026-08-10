@@ -7,6 +7,58 @@ local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
+changelogs[10904] = {
+	{
+		type = "date",
+		versionText = "1.9.4",
+		timestamp = 1786300000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName NewExpansionLandingPage"],
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The Omnium Folio has been moved to a separate tab named Powers.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "New content will appear once patch 12.1 goes live.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber Macros: Fixed an error that occurred if the macro contained an invalid pet.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Hunt Table: Show a quest mark next to the pin if the Prey target is a quest objective.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The module that alleviated the graphics crash by reducing the number of models shown on the Appearance tab has been removed, since a recent NVIDIA driver seems to have fixed it.",
+	},
+};
+
 changelogs[10903] = {
 	{
 		type = "date",
