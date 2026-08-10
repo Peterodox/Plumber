@@ -1,7 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local CallbackRegistry = addon.CallbackRegistry;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local SetupThreeSliceBackground = API.SetupThreeSliceBackground;
 local CreateFrame = CreateFrame;
 

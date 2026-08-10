@@ -7,6 +7,58 @@ local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
+changelogs[10904] = {
+	{
+		type = "date",
+		versionText = "1.9.4",
+		timestamp = 1786300000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName NewExpansionLandingPage"],
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The Omnium Folio has been moved to a separate tab named Powers.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "New content will appear once patch 12.1 goes live.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber Macros: Fixed an error that occurred if the macro contained an invalid pet.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Hunt Table: Show a quest mark next to the pin if the Prey target is a quest objective.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The module that alleviated the graphics crash by reducing the number of models shown on the Appearance tab has been removed, since a recent NVIDIA driver seems to have fixed it.",
+	},
+};
+
 changelogs[10903] = {
 	{
 		type = "date",
@@ -2276,144 +2328,5 @@ changelogs[10800] = {
 		type = "p",
 		bullet = true,
 		text = "Loot Window, Link Item: You can link an item in chat by Shift + clicking an item in Manual Loot mode.",
-	},
-};
-
-
-changelogs[10709] = {
-	{
-		type = "date",
-		versionText = "1.7.9",
-		timestamp = 1761400000,
-	},
-
-	{
-		type = "h1",
-		text = L["ModuleName QueueStatus"],
-		dbKey = "QueueStatus",
-	},
-
-	{
-		type = "Checkbox",
-		dbKey = "QueueStatus",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Add a progress bar to the Group Finder Eye that shows the percentage of teammates found. Tanks and Healers weigh more.",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "(Optional) Show the delta between Average Wait Time and your Time In Queue.",
-	},
-
-	{
-		type = "img",
-		dbKey = "QueueStatus",
-	},
-
-	{
-		type = "br",
-	},
-
-	--{
-	--	type = "h1",
-	--	text = L["ModuleName PlayerPing"],
-	--	dbKey = "WorldMapPin_PlayerPing",
-	--},
-
-	--{
-	--	type = "Checkbox",
-	--	dbKey = "WorldMapPin_PlayerPing",
-	--},
-
-	--{
-	--	type = "p",
-	--	text = "By default, WoW only shows the player ping when you change maps or the first time you open the World Map. Whereas this module highlights the player's location with a ping effect when you:",
-	--},
-
-	--{
-	--	type = "p",
-	--	bullet = true,
-	--	text = "Open World Map.",
-	--},
-
-	--{
-	--	type = "p",
-	--	bullet = true,
-	--	text = "Press the ALT key.",
-	--},
-
-	--{
-	--	type = "p",
-	--	bullet = true,
-	--	text = "Click the Maximize button.",
-	--},
-
-	--{
-	--	type = "p",
-	--	text = "Updated the ping texture",
-	--},
-
-	--{
-	--	type = "img",
-	--	dbKey = "WorldMapPin_PlayerPing",
-	--},
-
-	--{
-	--	type = "br",
-	--},
-
-	{
-		type = "h1",
-		text = L["ModuleName HolidayDungeon"],
-		dbKey = "HolidayDungeon",
-	},
-
-	{
-		type = "Checkbox",
-		dbKey = "HolidayDungeon",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Automatically select holiday and timewalking dungeons when you open Dungeon Finder for the first time.",
-	},
-
-	{
-		type = "br",
-	},
-
-	{
-		type = "h1",
-		text = L["New Features"],
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Tooltip: Quest Starting Items: If an item in your bag starts a quest, show the quest details. You can Ctrl Left Click the item to view it in the quest log if you are already on the quest.",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Non-refundable Purchase Alert: Adjust the confirmation dialog that appears when buying a non-refundable item, adding a brief lockdown to the 'Yes' button and highlighting the keywords in red. This module also reduces the class set conversion delay by half.",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Legion Remix: Auto-set Adventure Guide expansion to Legion.",
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "This module should now support addons that modify the max number of items per page. It also shows thousands separator on alt currencies like Bronze.",
 	},
 };

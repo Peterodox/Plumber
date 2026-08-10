@@ -1511,6 +1511,16 @@ do  -- Map
 		};
 		C_Map.SetUserWaypoint(point);
 	end
+
+	function API.OpenWorldMap(uiMapID)
+		if not InCombatLockdown() then
+			if (not uiMapID) or (uiMapID and GetMapInfo(uiMapID)) then
+				C_Map.OpenWorldMap(uiMapID);
+				return true;
+			end
+		end
+		return false;
+	end
 end
 
 do  -- Instance -- Map
@@ -4291,12 +4301,16 @@ do  -- Macro Util
 	end
 
 	function API.GetPetNameAndUsability(speciesID, checkUsability)
-		local name = WoWAPI.GetPetInfoBySpeciesID(speciesID);
-		if checkUsability then
-			local _, petGUID = WoWAPI.FindPetIDByName(name);
-			return name, petGUID ~= nil
-		else
-			return name
+		local name = speciesID and WoWAPI.GetPetInfoBySpeciesID(speciesID);
+		if type(name) == "string" then
+			-- C_PetJournal.GetPetInfoBySpeciesID returns the function itself and the argument when no pet was found. WTF?
+			-- /dump C_PetJournal.GetPetInfoBySpeciesID(1) == C_PetJournal.GetPetInfoBySpeciesID
+			if checkUsability then
+				local _, petGUID = WoWAPI.FindPetIDByName(name);
+				return name, petGUID ~= nil
+			else
+				return name
+			end
 		end
 	end
 end

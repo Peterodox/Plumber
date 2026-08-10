@@ -1,7 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local AtlasUtil = addon.AtlasUtil;
 local FactionUtil = addon.FactionUtil;
 
@@ -66,30 +66,37 @@ do
 		end
 
 		local tooltip = GameTooltip;
-		local callback = GenerateClosure(ReputationTooltipScripts.ShowMajorFactionRenownTooltip, self);
 
 		tooltip:SetOwner(self, "ANCHOR_RIGHT");
 		tooltip:SetText(data.name, 1, 1, 1);
-
 		ReputationTooltipScripts.TryAppendAccountReputationLineToTooltip(tooltip, factionID);
 
-		--GameTooltip_AddHighlightLine(tooltip, RENOWN_LEVEL_LABEL:format(data.renownLevel));
-		local maxLevel = API.GetMaxRenownLevel(factionID);
+		if data.isUnlocked then
+			--GameTooltip_AddHighlightLine(tooltip, RENOWN_LEVEL_LABEL:format(data.renownLevel));
+			local maxLevel = API.GetMaxRenownLevel(factionID);
 
-		tooltip:AddLine(string.format("|cffffd100%s|r %d/%d", LANDING_PAGE_RENOWN_LABEL, data.renownLevel, maxLevel), 1, 1, 1);
-		local value = data.renownReputationEarned;
-		local threshold = data.renownLevelThreshold;
-		ReputationTooltipScripts.AppendProgressBar(tooltip, 0, threshold, value);
+			tooltip:AddLine(string.format("|cffffd100%s|r %d/%d", LANDING_PAGE_RENOWN_LABEL, data.renownLevel, maxLevel), 1, 1, 1);
+			local value = data.renownReputationEarned;
+			local threshold = data.renownLevelThreshold;
+			ReputationTooltipScripts.AppendProgressBar(tooltip, 0, threshold, value);
 
-		tooltip:AddLine(" ");
-		--[[
-		tooltip:AddLine(MAJOR_FACTION_RENOWN_TOOLTIP_PROGRESS:format(data.name), 1, 0.82, 0, true);
-		tooltip:AddLine(" ");
-		--]]
+			tooltip:AddLine(" ");
+			--[[
+			tooltip:AddLine(MAJOR_FACTION_RENOWN_TOOLTIP_PROGRESS:format(data.name), 1, 0.82, 0, true);
+			tooltip:AddLine(" ");
+			--]]
 
-		local nextRenownRewards = C_MajorFactions.GetRenownRewardsForLevel(factionID, C_MajorFactions.GetCurrentRenownLevel(factionID) + 1);
-		if #nextRenownRewards > 0 then
-			RenownRewardUtil.AddRenownRewardsToTooltip(tooltip, nextRenownRewards, callback);
+			local nextRenownRewards = C_MajorFactions.GetRenownRewardsForLevel(factionID, C_MajorFactions.GetCurrentRenownLevel(factionID) + 1);
+			if #nextRenownRewards > 0 then
+				local callback = GenerateClosure(ReputationTooltipScripts.ShowMajorFactionRenownTooltip, self);
+				RenownRewardUtil.AddRenownRewardsToTooltip(tooltip, nextRenownRewards, callback);
+			end
+		else
+			tooltip:AddLine(" ");
+			tooltip:AddLine(MAJOR_FACTION_BUTTON_FACTION_LOCKED, 1, 0.82, 0);
+			if data.unlockDescription then
+				tooltip:AddLine(data.unlockDescription, 1, 0.125, 0.125, true);
+			end
 		end
 
 		tooltip:AddLine(" ");
@@ -1131,7 +1138,7 @@ do
 		self.RenownItemScrollView:SetContent(content, retainPosition);
 
 		if scrollToFirstLockedReward then
-			self.RenownItemScrollView:SnapToContent(lastUnlockedIndex or n);
+			self.RenownItemScrollView:SnapToContent(lastUnlockedIndex or 1);
 		end
 	end
 

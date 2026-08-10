@@ -516,6 +516,7 @@ do
 		if button == "RightButton" then
 			if self:CanRefundRank() then
 				self.ownerFrame:TryRefundRank(self.nodeID);
+				PlaySound(SOUNDKIT.UI_CLASS_TALENT_NODE_REFUND);
 			end
 		else
 			if self:CanPurchaseRank() then
@@ -528,6 +529,7 @@ do
 				else
 					self.ownerFrame:TryPurchaseRank(self.nodeID);
 				end
+				PlaySound(SOUNDKIT.UI_CLASS_TALENT_LEARN_TALENT);
 			end
 		end
 	end

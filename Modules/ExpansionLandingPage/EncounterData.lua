@@ -1,7 +1,7 @@
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 
 local ipairs = ipairs;
@@ -13,12 +13,23 @@ local PLAYER_CLASS_ID;
 
 
 local EncounterData = {
-	--[journalEncounterID] = { achv = {Mythic, Special} }
+	--[journalEncounterID] = { achv = {achievementID1, achievementID2, ...} }
+	-- achv order: Any Kill, Heroic, Mythic, Special Condition
 
 	--https://wago.tools/db2/JournalEncounter?page=1
 	--/dump GetMouseFoci()[1].icon:GetTexture()
+	[2849] = {icon = 3012069, achv = {63683, 63681, 63682}},	--Nymrissa Wavecaller
 
-	[2711] = {icon = 7448202, achv = {63237, 63240, 63241}},      --Rotmire
+	[2888] = {icon = 7966621, achv = {61372, 63418}},      --Nek'zali the Soulcoiler
+	[2874] = {icon = 7966620, achv = {63524, 63250}},      --Entombed Sentinels
+	[2882] = {icon = 7966618, achv = {63526, 63397}},      --Vashnik the Malignant
+	[2894] = {icon = 7966622, achv = {63525, 63645}},      --The Lost Explorers
+	[2871] = {icon = 7966619, achv = {63527, 63391}},      --Sszorak
+	[2887] = {icon = 7966623, achv = {63528, 63656}},      --The Twin Fangs
+	[2883] = {icon = 7966625, achv = {63529, 63669}},      --The Coiled Altar
+	[2895] = {icon = 7966624, achv = {63476, 63609}},      --Ula'tek
+
+	[2711] = {icon = 7852823, achv = {63237, 63240, 63241}},      --Rotmire
 
 	[2795] = {icon = 7448202, achv = {61487, 61488, 61489, 61454}},      --Chimaerus
 
@@ -261,6 +272,18 @@ LandingPageUtil.GetDifficultyName = GetEJDifficultyString;
 
 
 do
+	local MID_EncounterTabInfo = {
+		JournalInstanceIDs = {
+			1317,	--The Tidebound Grotto
+			1320,	--The Venomous Abyss
+			1305,	--Sporefall
+			1314,   --The Dreamrift
+			1307,   --The Voidspire
+			1308,   --March on Quel'Danas
+		},
+	};
+	LandingPageUtil.AddExpansionData(12, "encounter", MID_EncounterTabInfo);
+
 	local TWW_EncounterTabInfo = {
 		JournalInstanceIDs = {
 			1302,   --Manaforge Omega
@@ -270,14 +293,4 @@ do
 		},
 	};
 	LandingPageUtil.AddExpansionData(11, "encounter", TWW_EncounterTabInfo);
-
-	local MID_EncounterTabInfo = {
-		JournalInstanceIDs = {
-			1305,	--Sporefall
-			1314,   --The Dreamrift
-			1307,   --The Voidspire
-			1308,   --March on Quel'Danas
-		},
-	};
-	LandingPageUtil.AddExpansionData(12, "encounter", MID_EncounterTabInfo);
 end

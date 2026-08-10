@@ -658,6 +658,7 @@ L["Drawer Option Update Frequently Tooltip"] = "在你背包或法术书发生�
 L["ModuleName DrawerMacro"] = "技能收纳宏";
 L["ModuleDescription DrawerMacro"] = "创建自定义弹出菜单来整理你的物品、法术、宠物、坐骑、玩具。\n\n要创建技能收纳宏, 请先创建一个新宏，然后在宏编辑框中输入 |cffd7c0a3#plumber:drawer|r";
 L["No Slot For New Character Macro Alert"] = "需要一个空的角色专用宏栏位来完成此操作。";
+L["Unknown Pet"] = "未知小宠物";
 
 
 --New Expansion Landing Page
@@ -674,6 +675,7 @@ L["Not On Quest"] = "你没有接到该任务";
 L["Factions"] = "声望总览";
 L["Activities"] = "每周活动";
 L["Raids"] = "团队副本";
+L["Player Power"] = "战力系统";
 L["Instruction Track Achievement"] = "<按住Shift点击追踪此成就>";
 L["Instruction Untrack Achievement"] = "<按住Shift点击取消追踪>";
 L["No Data"] = "没有数据";
@@ -712,6 +714,7 @@ L["Near Completion Tooltip"] = "你可以看见此条目是因为你即将达到
 L["Inactive Currencies Tooltip"] = "以下货币因为被你设为“未使用”而隐藏：";
 L["New Quest"] = "新任务";
 L["Trait Points Available"] = "可分配点数";
+L["Unspent Points"] = "你有待分配的点数";
 
 
 --ExpansionSummaryMinimapButton
@@ -877,6 +880,7 @@ L["ModuleDescription CatalystUI"] = "允许你按住Ctrl点击转化后的装备
 L["ModuleName HuntTable"] = "狩猎：狩猎地图";
 L["ModuleDescription HuntTable"] = "- 将狩猎地图上的蓝色任务图标替换为难度图标。\n\n- 若狩猎目标与某个未完成的成就相关，在其右上方显示特别标记。";
 L["Prey Target Has Achievement"] = "某个未完成的成就要求你击败此目标。";
+L["Quest Objective Entry Format"] = "属于此任务的目标：%s";
 
 
 --PreyQuestSuperTrack

@@ -1,6 +1,6 @@
 local _, addon = ...
 local L = addon.L;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local ActivityUtil = addon.ActivityUtil;
 
 

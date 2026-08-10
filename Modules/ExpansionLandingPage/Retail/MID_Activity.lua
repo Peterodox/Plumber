@@ -1,7 +1,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local ActivityUtil = addon.ActivityUtil;
 
 --C_QuestLog.GetActivePreyQuest()
@@ -30,7 +30,18 @@ local DelvesBonusRepQuestFlags = {
 	{questID = 93819, factionID = 2696, accountwide = true},	--Amani
 	{questID = 93822, factionID = 2704, accountwide = true},	--Harandar
 	{questID = 93820, factionID = 2699, accountwide = true},	--Singularity
+	-- No Zuljarra as of Aug 5
 };
+
+local Seasonal = {
+	DelveWeeklyQuestID = 93784,
+	DelveBountyItemID = 252415,
+};
+
+if addon.IS_12_1_0 then
+	--Seasonal.DelveWeeklyQuestID = 0; -- Unchanged
+	Seasonal.DelveBountyItemID = 274374;
+end
 
 
 local GildedStashTracker = {};
@@ -448,11 +459,10 @@ end
 
 
 local ActivityData = {
-		--Enable After S1
 	{isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
 		entries = {
-			{name = "A Gnawing Void of Curiosity", questID = 93784, isWeeklyQuest = true, accountwide = true},
-			{name = "Trovehunter\'s Bounty", itemID = 252415, flagQuest = 86371, icon = 1064187, tooltipItem = 252415},
+			{name = "A Gnawing Void of Curiosity", questID = Seasonal.DelveWeeklyQuestID, isWeeklyQuest = true, accountwide = true},
+			{name = "Trovehunter\'s Bounty", itemID = Seasonal.DelveBountyItemID, flagQuest = 86371, icon = 1064187, tooltipItem = Seasonal.DelveBountyItemID},
 			{name = "Coffer Key Shard", currencyID = 3310, icon = 133016, removeIconBorder = true},
 			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFuncs.WeeklyBonusRenown, children = DelvesBonusRepQuestFlags},
 			{name = "Gilded Stash", icon = 5872049, removeIconBorder = true, setupFunc = SetupFuncs.GildedStashEntry, tooltipSetter = SetupFuncs.GildedStashTooltip, conditions = GildedStashTracker},
@@ -547,6 +557,28 @@ local ActivityData = {
 	},
 };
 
+if addon.IS_12_1_0 then
+	local CoiledIsleActivity = {isHeader = true, name = "Zul'jarra's Forces", factionID = 2772, categoryID = 2772, uiMapID = 2512,
+		entries = {
+			{name = "Turn Back the Surge", questID = 96995, isWeeklyQuest = true, uiMapID = 2512, sortToTop = true},
+
+			-- (Underground) Vaults of Atal'Utek
+			{name = "Purging the Vaults", questID = 95520, isWeeklyQuest = true, uiMapID = 2509, sortToTop = true},
+			-- Group Daily
+			{name = "Patrolling the Temple", questID = 96639, uiMapID = 2509, shownIfActive = true}, -- √
+			{name = "Bounty of the Cursed", questID = 96640, uiMapID = 2509, shownIfActive = true},
+			{name = "Relentless Strikes", questID = 96641, uiMapID = 2509, shownIfActive = true},
+			{name = "Decisive Incursions", questID = 96642, uiMapID = 2509, shownIfActive = true}, -- √
+			{name = "From Whence it Came", questID = 96643, uiMapID = 2509, shownIfActive = true},
+			{name = "Essence of Malice", questID = 96644, uiMapID = 2509, shownIfActive = true}, -- √
+			{name = "What's Out There?", questID = 98420, uiMapID = 2509, shownIfActive = true}, -- √
+		},
+	};
+
+	table.insert(ActivityData, 2, CoiledIsleActivity);
+end
+
+
 local function GetActivityEntries(categoryID)
 	for k, v in ipairs(ActivityData) do
 		if v.categoryID == categoryID then
@@ -554,7 +586,6 @@ local function GetActivityEntries(categoryID)
 		end
 	end
 end
-
 
 do  --Add Prey Quests
 	local PreyWorldQuests = {

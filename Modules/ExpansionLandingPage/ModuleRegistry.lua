@@ -5,7 +5,7 @@ local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
 local FactionUtil = addon.FactionUtil;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 
 local function Plumber_ToggleLandingPage()
@@ -58,11 +58,11 @@ EL:SetScript("OnEvent", function(self, event, ...)
 		self:UnregisterEvent(event);
 		if EL.enabled then
 			C_Timer.After(3, function()
-				local factionName = FactionUtil:GetRewardPendingFactioName();
+				local factionName = FactionUtil:GetRewardPendingFactioName(true);
 				if factionName then
 					LandingPageUtil.ShowMinimapButtonAlert(L["Paragon Reward Available"].."\n"..factionName, "ParagonReward");
 				end
-				LandingPageUtil.HandleTraitTreeCurrencyChanged(1186);
+				LandingPageUtil.HandleTraitTreeCurrencyChanged();
 			end);
 		end
 	elseif event == "QUEST_ACCEPTED" then

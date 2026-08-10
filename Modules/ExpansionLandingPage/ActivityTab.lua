@@ -2,7 +2,7 @@ local _, addon = ...
 local API = addon.API;
 local L = addon.L;
 local CallbackRegistry = addon.CallbackRegistry;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local ActivityUtil = addon.ActivityUtil;
 local TooltipUpdator = LandingPageUtil.TooltipUpdator;
 

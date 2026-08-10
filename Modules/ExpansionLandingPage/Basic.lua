@@ -4,6 +4,7 @@ local API = addon.API;
 local Mixin = API.Mixin;
 
 
+---@class LandingPageUtil
 local LandingPageUtil = {};
 addon.LandingPageUtil = LandingPageUtil;
 
@@ -472,12 +473,18 @@ do  --TabUtil
 		return tabInfo.frame
 	end
 
-	function LandingPageUtil.EnumerateTabInfo()
-		return ipairs(Tabs);
+	local function IsTabValid(tabInfo)
+		return (not tabInfo.validityCheck) or tabInfo.validityCheck();
 	end
 
-	function LandingPageUtil.GetNumTabs()
-		return #Tabs
+	function LandingPageUtil.EnumerateValidTabInfo()
+		local validTabs = {};
+		for _, tabInfo in ipairs(Tabs) do
+			if IsTabValid(tabInfo) then
+				table.insert(validTabs, tabInfo);
+			end
+		end
+		return ipairs(validTabs);
 	end
 
 	function LandingPageUtil.SelectTab(tabKey)
@@ -485,8 +492,8 @@ do  --TabUtil
 		if tabKey then
 			for _, tabInfo in ipairs(Tabs) do
 				if tabInfo.key == tabKey then
-					valid = true;
-					break
+					valid = IsTabValid(tabInfo);
+					break;
 				end
 			end
 		end
@@ -553,14 +560,14 @@ do  --Atlas
 	local FACTION_ICONS = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/MajorFactionIcons.png";
 	local FACTION_ICONS_COORDS = {
 		--[factionID] = {icon l, r, t, b, highlight l, r, t, b}
-		[2590] = {0  , 128, 0, 128},      --Council of Dornogal
-		[2594] = {128, 256, 0, 128},      --The Assembly of the Deeps
-		[2570] = {256, 384, 0, 128},      --Hallowfall Arathi
-		[2600] = {384, 512, 0, 128},      --Severed Threads
-		[2653] = {512, 640, 0, 128},      --Cartels of Undermine
-		[2685] = {640, 768, 0, 128},      --Gallagio Loyalty Rewards Club
-		[2688] = {768, 896, 0, 128},      --Flame's Radiance
-		[2658] = {896, 1024, 0, 128},     --The K'aresh Trust
+		[2590] = {0  , 128,   0, 128},    --Council of Dornogal
+		[2594] = {128, 256,   0, 128},    --The Assembly of the Deeps
+		[2570] = {256, 384,   0, 128},    --Hallowfall Arathi
+		[2600] = {384, 512,   0, 128},    --Severed Threads
+		[2653] = {512, 640,   0, 128},    --Cartels of Undermine
+		[2685] = {640, 768,   0, 128},    --Gallagio Loyalty Rewards Club
+		[2688] = {768, 896,   0, 128},    --Flame's Radiance
+		[2658] = {896,1024,   0, 128},    --The K'aresh Trust
 		[2736] = {0  , 128, 256, 384},    --Manaforge Vandals
 
 		[2710] = {128, 256, 256, 384},    --Silvermoon Court
@@ -570,8 +577,13 @@ do  --Atlas
 
 		[2764] = {640, 768, 256, 384},    --Prey
 		[2742] = {768, 896, 256, 384},    --Delves
-		[2792] = {896, 1024, 256, 384},   --Ritual Sites
+		[2792] = {896,1024, 256, 384},    --Ritual Sites
+		[2772] = {0  , 128, 512, 640},    --Zul'jarra's Forces
 	};
+
+	FACTION_ICONS_COORDS[2808] = FACTION_ICONS_COORDS[2764];	--Prey S2
+	FACTION_ICONS_COORDS[2796] = FACTION_ICONS_COORDS[2742];	--Delves S2
+
 
 	local function SetTextureDimension(textureObject, file, width, height, l, r, t, b, useTrilinearFilter)
 		if useTrilinearFilter then
@@ -1752,6 +1764,10 @@ do  --Expansion Select
 			local name = ExpansionData[CurrentExpansionID].name or "Unknown Expansion";
 			return name
 		end
+	end
+
+	function LandingPageUtil.GetCurrentExpansionID()
+		return CurrentExpansionID;
 	end
 
 	function LandingPageUtil.GetAvailableExpansions()

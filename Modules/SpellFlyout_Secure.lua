@@ -488,13 +488,21 @@ do  --VisualButtonMixin
 			self.id = petGUID;
 			local icon = select(9, C_PetJournal.GetPetInfoByPetID(petGUID));
 			self.Icon:SetTexture(icon);
+			return
 		elseif speciesID then   --Summoning not owned pet causes errors
 			local speciesName, icon = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
-			self.tooltipText = speciesName;
-			self.Icon:SetTexture(icon);
-			self:SetUsableVisual(false);
-			self.macroText = nil;
+			if type(speciesName) == "string" then
+				self.tooltipText = speciesName;
+				self.Icon:SetTexture(icon);
+				self:SetUsableVisual(false);
+				self.macroText = nil;
+				return
+			end
 		end
+		self.tooltipText = L["Unknown Pet"];
+		self.Icon:SetTexture(134400);
+		self:SetUsableVisual(false);
+		self.macroText = nil;
 	end
 
 	function VisualButtonMixin:SetCustomEmote(customEmote)

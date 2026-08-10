@@ -375,13 +375,14 @@ do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, inst
 
 		[2393] = {  --Silvermoon
 			--Weekly Meta (https://www.wowhead.com/quests/midnight/meta-quests#0+1+13;name=Midnight%3A)
+			{name = "Midnight: Vaults of Atal'Utek", questID = 98232, shownIfOnQuest = true},
 			{name = "Midnight: Abundance", questID = 93890, shownIfOnQuest = true},
 			{name = "Midnight: Arcantina", questID = 93767, shownIfOnQuest = true},
 			{name = "Midnight: Battlegrounds", questID = 94457, shownIfOnQuest = true},
 			{name = "Midnight: Delves", questID = 93909, shownIfOnQuest = true},
 			{name = "Midnight: Dungeons", questID = 93911, shownIfOnQuest = true},
 			{name = "Midnight: Housing", questID = 93769, shownIfOnQuest = true},
-			{name = "Midnight: Legends of the Haranir", questID = 93891, shownIfOnQuest = true},
+			{name = "Midnight: Offworld Showdowns", questID = 96727, shownIfOnQuest = true},
 			{name = "Midnight: Prey", questID = 93910, shownIfOnQuest = true},
 			{name = "Midnight: Raid", questID = 93912, shownIfOnQuest = true},
 			{name = "Midnight: Ritual Sites", questID = 95843, shownIfOnQuest = true},
@@ -408,6 +409,10 @@ do  --DynamicQuestDataProvider  Dynamic Quests are acquired using Game API, inst
 			{name = "Sparks of War: Voidstorm", questID = 93426, shownIfOnQuest = true},
 		},
 	};
+
+	if addon.IS_12_1_0 then
+		table.insert(MapQuests[2393], 1, {name = "Trailing Xal'atath", questID = 98172});
+	end
 
 	local DynamicQuestMaps = {
 		--Automatically find repeatable quests from these maps

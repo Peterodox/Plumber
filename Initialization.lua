@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.9.3 c";
-local VERSION_DATE = 1783000000;
+local VERSION_TEXT = "1.9.4";
+local VERSION_DATE = 1786300000;
 
 
 local addonName, addon = ...
@@ -572,6 +572,7 @@ do
 	addon.IS_MOP = C_AddOns.GetAddOnMetadata(addonName, "X-Expansion") == "MOP";
 
 	addon.IS_12_0_7 = IsToCVersionEqualOrNewerThan(120007);
+	addon.IS_12_1_0 = IsToCVersionEqualOrNewerThan(120100);
 
 
 	function addon.GetLastLoginTime()

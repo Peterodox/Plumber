@@ -1,6 +1,6 @@
 local _, addon = ...
 local API = addon.API;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local CreateButton = LandingPageUtil.CreateItemUpgradeButton;
 
 

@@ -65,6 +65,10 @@ do  --Show Enemy Group Count bellow affix spell on the ScenarioHeaderDelves
 	local CURRENCY_AFFIX_ACTIVE = 3103;
 	local CURRENCY_AFFIX_MAXIMUM = 3104;
 
+	if addon.IS_12_1_0 then
+		NEMESIS_SPELL_ID = 1307638;
+	end
+
 	function BonusObjectiveTrackerMixin:OnEvent(event, ...)
 		--Fire CURRENCY_DISPLAY_UPDATE 1/2 times After killing one group, 3103 changed to 0 then the actual number
 		if event == "CURRENCY_DISPLAY_UPDATE" then

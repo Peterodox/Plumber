@@ -658,6 +658,7 @@ L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button sta
 L["ModuleName DrawerMacro"] = "Drawer Macro";
 L["ModuleDescription DrawerMacro"] = "Create a custom flyout menu to manage your items, spells, pets, mounts, toys.\n\nTo make a Drawer Macro, create a new macro first, then enter |cffd7c0a3#plumber:drawer|r in the command editbox.";
 L["No Slot For New Character Macro Alert"] = "You need to have a spare Character Specific Macro slot to complete this action.";
+L["Unknown Pet"] = "Unknown Pet";
 
 
 --New Expansion Landing Page
@@ -674,6 +675,7 @@ L["Not On Quest"] = "You are not on this quest";
 L["Factions"] = "Factions";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Activities";
 L["Raids"] = RAIDS or "Raids";
+L["Player Power"] = "Powers";
 L["Instruction Track Achievement"] = "<Shift click to track this achievement>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift click to stop tracking>";
 L["No Data"] = "No data";
@@ -743,6 +745,7 @@ L["Near Completion Tooltip"] = "This entry is visible to you because you are abo
 L["Inactive Currencies Tooltip"] = "These currencies are hidden because you have set them as Unused:";
 L["New Quest"] = "New Quest";
 L["Trait Points Available"] = "Points Available";
+L["Unspent Points"] = "Unspent Points";
 
 
 --ExpansionSummaryMinimapButton
@@ -909,6 +912,7 @@ L["ModuleDescription CatalystUI"] = "Allows you to Ctrl-Click the output item to
 L["ModuleName HuntTable"] = "Prey: Hunt Table";
 L["ModuleDescription HuntTable"] = "- Replaces the generic blue quest icons to show difficulties.\n\n- Shows an indicator if the Prey target is a requirement for an unearned achievement.";
 L["Prey Target Has Achievement"] = "This Prey target is a requirement for an unearned achievement.";
+L["Quest Objective Entry Format"] = "Quest objective for: %s";
 
 
 --PreyQuestSuperTrack

@@ -1,6 +1,6 @@
 local _, addon = ...
 local API = addon.API;
-local LandingPageUtil = addon.LandingPageUtil;
+local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 
 local BUTTON_WIDTH, BUTTON_HEIGHT = 36, 40;
