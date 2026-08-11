@@ -7,6 +7,7 @@
 
 ## Notes: Provides a variety of quality-of-life features.|n|nOpen Settings with Slash Command:|n/plumber
 ## Notes-zhCN: 提供多种便捷功能。|n|n使用此命令打开设置界面|n/plumber
+## Notes-frFR: Fournit diverses améliorations d'ergonomie.|n|nOuvrez les paramètres avec la commande :|n/plumber
 
 ## Author: Peterodox
 ## SavedVariables: PlumberDB, PlumberDevData
