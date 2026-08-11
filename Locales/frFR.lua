@@ -658,6 +658,7 @@ L["Drawer Option Update Frequently Tooltip"] = "Essayer de mettre à jour l'éta
 L["ModuleName DrawerMacro"] = "Macro Plumber";
 L["ModuleDescription DrawerMacro"] = "Créer un menu déroulant personnalisé pour gérer vos objets, sorts, mascottes, montures et jouets.\n\nPour créer une macro Plumber, commencez par créer une nouvelle macro, puis saisissez |cffd7c0a3#plumber:drawer|r dans la zone de saisie de la macro.";
 L["No Slot For New Character Macro Alert"] = "Vous devez disposer d'un emplacement libre pour une macro spécifique au personnage afin d'effectuer cette action.";
+L["Unknown Pet"] = "Mascotte inconnue";
 
 
 --New Expansion Landing Page
@@ -674,6 +675,7 @@ L["Not On Quest"] = "Vous n'êtes pas sur cette quête";
 L["Factions"] = "Factions";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Activités";
 L["Raids"] = RAIDS or "Raids";
+L["Player Power"] = "Pouvoirs";
 L["Instruction Track Achievement"] = "<Clic + Maj pour suivre ce haut fait>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Clic + Maj pour ne plus suivre ce haut fait>";
 L["No Data"] = "Aucune donnée";
@@ -910,6 +912,7 @@ L["ModuleDescription CatalystUI"] = "Ctrl + Clic sur l'objet obtenu pour l'affic
 L["ModuleName HuntTable"] = "Traque : table de traque";
 L["ModuleDescription HuntTable"] = "- Remplacer les icônes de quête bleues pour indiquer les difficultés.\n\n- Afficher un indicateur si la cible de la Traque est une condition requise pour un haut fait non réalisé.";
 L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition requise pour obtenir un haut fait non réalisé .";
+L["Quest Objective Entry Format"] = "Objectif de quête pour : %s";
 
 
 --PreyQuestSuperTrack
