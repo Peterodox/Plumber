@@ -47,6 +47,9 @@ L["Return To Module List"] = "Retour à la liste";
 L["Generic Addon Conflict"] = "Ce module peut être incompatible avec des addons ayant des fonctionnalités similaires :";
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = " : ";
+L["Disabled Module Requires Reload Format"] = "Vous devez %s pour appliquer les changements.";	--We'll replace %s with a clickable "reload the UI"
+L["Reload The UI"] = "recharger l'interface";
+L["Click To Reload UI"] = "Cliquez pour recharger l'interface.";
 
 
 --Settings Category
@@ -738,6 +741,9 @@ L["Delves Completion Reward Cap"] = "Récompenses de complétion";
 L["Delves Completion Reward Cap Tooltip"] = "Une fois cette limite de compte atteinte, terminer un gouffre abondant ne vous accordera plus de progression pour le Périple du Gouffre ni d'expérience de compagnon.\n\nLes récompenses des coffres abondants et des Caches de Némésis ne sont pas affectées par cette limite.\n\nLa limite augmente de 28 chaque semaine.";
 L["Near Completion Tooltip"] = "Cette entrée est visible car vous êtes sur le point d'atteindre la limite hebdomadaire.";
 L["Inactive Currencies Tooltip"] = "Ces Monnaies sont masquées car vous les avez définies comme inutilisées :";
+L["New Quest"] = "Nouvelle quête";
+L["Trait Points Available"] = "Points disponibles";
+L["Unspent Points"] = "Points non dépensés";
 
 
 --ExpansionSummaryMinimapButton
@@ -914,6 +920,12 @@ L["ModuleDescription PreyQuestSuperTrack"] = "Une fois la position de votre proi
 --BlizzFixActionBarArt
 L["ModuleName BlizzFixActionBarArt"] = "Correction rapide : illustration de la barre d'action";
 L["ModuleDescription BlizzFixActionBarArt"] = "Correction d'un problème où les illustrations de la barre d'action (Griffons et Wyvernes) réapparaissaient de manière inattendue après avoir masqué / affiché l'interface utilisateur ou quitté l'Éditeur de maison.";
+
+
+--HouseList
+L["ModuleName Housing_HouseList"] = "Liste des logis";
+L["ModuleDescription Housing_HouseList"] = "Améliore l'interface de la liste des logis :\n\n- Indique la faction du logis avec une image sur la droite.\n\n- Affiche les deux boutons Visiter le logis si le joueur possède deux logis.";
+L["View Houses In Combat Warning"] = "Vous ne pouvez pas afficher les logis en combat.";
 
 
 --Generic
