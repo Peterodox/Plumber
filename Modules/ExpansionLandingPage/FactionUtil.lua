@@ -157,15 +157,17 @@ local OverrideFactionInfo = {
 };
 
 local Seasonal = {
-	Delves = 2742,
-	Prey = 2764,
+	Delves = 2796,
+	Prey = 2808,
 };
 
+--[[
 if addon.IS_12_1_0 then
-	-- MID Season 2
+	-- Reserved for MID Season 3
 	Seasonal.Delves = 2796;
 	Seasonal.Prey = 2808;
 end
+--]]
 
 for k, factionID in pairs(Seasonal) do
 	if not OverrideFactionInfo[factionID] then
@@ -182,15 +184,28 @@ do  --Layout MID
 				{factionID = 2744, creatureDisplayID = 26365, playerCompanionID = 2},     --Valeera Sanguinar. Get playerCompanionID from C_MajorFactions.GetMajorFactionData(C_DelvesUI.GetDelvesFactionForSeason())
 			},
 		},
-		RitualSites = {factionID = 2792},		--Ritual Sites
+		RitualSites = {factionID = 2792, preSpacer = true},		--Ritual Sites
 		OpenWorldPVP = {factionID = 2770, shownAsSubfaction = true, iconFileID = 7448209},     --Slayer's Duellum
-		Zuljarra = {factionID = 2772},	--Zul'jarra's Forces
+		Zuljarra = {factionID = 2772,	--Zul'jarra's Forces
+			subFactions = {
+				{factionID = 2773, creatureDisplayID = 145432},	-- Tokka
+			},
+		},
 	};
 
 	local MajorFactionLayout = {
-		[1] = {},
+		[1] = {
+			MajorFactionEntry.Prey,
+			MajorFactionEntry.Delves,
+		},
 
 		[2] = {
+			MajorFactionEntry.Zuljarra,
+			MajorFactionEntry.RitualSites,
+			MajorFactionEntry.OpenWorldPVP,
+		},
+
+		[3] = {
 			{factionID = 2696},     --Amani Tribe
 			{factionID = 2699},     --The Singularity
 			{factionID = 2704},     --Hara'ti
@@ -206,23 +221,6 @@ do  --Layout MID
 	};
 
 	LandingPageUtil.AddExpansionData(12, "factionLayout", MajorFactionLayout);
-
-	if addon.IS_12_1_0 then  --For PTR
-		MajorFactionLayout[1] = {
-			MajorFactionEntry.Zuljarra,
-			MajorFactionEntry.Prey,
-			MajorFactionEntry.Delves,
-			MajorFactionEntry.RitualSites,
-			MajorFactionEntry.OpenWorldPVP,
-		};
-	else
-		MajorFactionLayout[1] = {
-			MajorFactionEntry.RitualSites,
-			MajorFactionEntry.Prey,
-			MajorFactionEntry.Delves,
-			MajorFactionEntry.OpenWorldPVP,
-		};
-	end
 
 	FactionUtil.ActiveFactionLayout = MajorFactionLayout;
 end
