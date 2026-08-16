@@ -10,11 +10,11 @@
 	<Script file="GameTooltip_ItemQuest.lua"/>
 	<Script file="GameTooltip_DelvesItem.lua"/>
 	<Script file="GameTooltip_TransmogEnsemble.lua"/>
-	<Script file="GameTooltip_DyeDeez.lua"/>
 	<Script file="GameTooltip_RichSoil.lua"/>
 	<Script file="GameTooltip_VendorLocation.lua"/>
 
 
 	<!--No Longer Relevant-->
 	<!--Script file="GameTooltip_MountRecolor.lua"/-->
+	<!--Script file="GameTooltip_DyeDeez.lua"/-->
 </Ui>
