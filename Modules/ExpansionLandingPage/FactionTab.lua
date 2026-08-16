@@ -1222,9 +1222,13 @@ do
 			for _, factionInfo in ipairs(rowInfo) do
 				index = index + 1;
 				local f = self.factionButtonPool:Acquire();
+				f:ClearAllPoints();
 				local majorFactionID = factionInfo.factionID;
 
-				f:ClearAllPoints();
+				if factionInfo.preSpacer then
+					offsetX = offsetX + 2.5 * FACTION_BUTTON_GAP_H;
+				end
+
 				if factionInfo.shownAsSubfaction then
 					f:SetMinimized(true);
 					local childOffsetY = offsetY - 0.5 * (FACTION_BUTTON_SIZE - SUBFACTION_BUTTON_SIZE);

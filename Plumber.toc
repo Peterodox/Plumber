@@ -79,7 +79,6 @@ Modules\QueueStatus.lua
 Modules\RaidCheck\RaidCheck.xml
 Modules\TransmogUtil.lua
 Modules\QuestWatchCycle.lua
-Modules\CraftSearchExtended.lua
 Modules\SourceAchievementLink.lua
 Modules\OutfitSelect.xml
 Modules\BreakTime.xml
@@ -104,3 +103,4 @@ Modules\PreyQuestSuperTrack.lua
 #Modules\Timerunning\LegionRemix.xml
 #Modules\SpellcastInfo.lua
 #Modules\BlizzFix_ModelLoading.lua
+#Modules\CraftSearchExtended.lua

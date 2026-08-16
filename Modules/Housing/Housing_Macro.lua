@@ -234,6 +234,11 @@ local function Blizzard_HousingDashboard_OnLoaded()
 	if not Flags.TeleportToHouseButton then
 		Flags.TeleportToHouseButton = true;
 
+		local blizzardDropdown = API.GetGlobalObject("HousingDashboardFrame.HouseDropdown");
+		if blizzardDropdown then
+			blizzardDropdown.playerHouseList = nil;
+		end
+
 		local TeleportButton = API.GetGlobalObject("HousingDashboardFrame.HouseInfoContent.ContentFrame.HouseUpgradeFrame.TeleportToHouseButton");
 		if TeleportButton then
 			TeleportButton:RegisterForDrag("LeftButton");
