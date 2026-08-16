@@ -53,21 +53,21 @@ do  --MID
 		{currencyID = 3028},    --Restored Coffer Key
 		{currencyID = 3310, hasWeeklyCap = true},	--Coffer Key Shard
 		{currencyID = 3316},    --Voidlight Marl
-		{currencyID = 3405},	--Field Accolade
+		{currencyID = 3363, shownIfOwned = true},	--Community Coupons
+		{currencyID = 3405, shownIfOwned = true},	--Field Accolade
 
 		{itemID = 242241, uiMapID = 2395},   --Latent Arcana
 		{itemID = 246951, uiMapID = 2405},   --Stormarion Core
 
+		{currencyID = 3392},	--Remnant of Anguish
+		{currencyID = 2803},	--Undercoin
+
 		{currencyID = 3379, shownIfOwned = true},   --Brimming Arcana
-		{currencyID = 3392},   --Remnant of Anguish
 		{currencyID = 3376, hasWeeklyCap = true},   --Shard of Dundun
 		{currencyID = 3377, shownIfOwned = true},   --Unalloyed Abundance
 
 		{currencyID = 1602, shownIfOwned = true},   --Conquest
 		{currencyID = 1792, shownIfOwned = true},   --Honor
-
-		{currencyID = 2803},    --Undercoin
-
 		{currencyID = 2123, shownIfOwned = true},   --Bloody Tokens
 		{currencyID = 2797, shownIfOwned = true},   --Trophy of Strife
 	};
