@@ -10,6 +10,57 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10904] = {
 	{
 		type = "date",
+		versionText = "1.9.4 b",
+		timestamp = 1786800000,
+	},
+
+	{
+		type = "h1",
+		text = "Bug Fixes",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Housing Dashboard: Fixed an issue where the House Information tab was sometimes empty.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Housing Editor, Customize Mode: Fixed an error that appeared when changing dyes.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added Captain Tokka to Factions.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added Community Coupons and Coiled Filament to the resource list.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.4",
 		timestamp = 1786300000,
 	},
