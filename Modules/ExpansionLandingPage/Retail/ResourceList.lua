@@ -56,8 +56,9 @@ do  --MID
 		{currencyID = 3363, shownIfOwned = true},	--Community Coupons
 		{currencyID = 3405, shownIfOwned = true},	--Field Accolade
 
-		{itemID = 242241, uiMapID = 2395},   --Latent Arcana
-		{itemID = 246951, uiMapID = 2405},   --Stormarion Core
+		{itemID = 242241, uiMapID = 2395},   		--Latent Arcana
+		{itemID = 246951, uiMapID = 2405},   		--Stormarion Core
+		{currencyID = 3546, uiMapID = {2509, 2512}, shownIfOwned = true},		--Coiled Filament
 
 		{currencyID = 3392},	--Remnant of Anguish
 		{currencyID = 2803},	--Undercoin
