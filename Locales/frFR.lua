@@ -47,6 +47,9 @@ L["Return To Module List"] = "Retour à la liste";
 L["Generic Addon Conflict"] = "Ce module peut être incompatible avec des addons ayant des fonctionnalités similaires :";
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = " : ";
+L["Disabled Module Requires Reload Format"] = "Vous devez %s pour appliquer les modifications.";	--We'll replace %s with a clickable "reload the UI"
+L["Reload The UI"] = "recharger l'interface";
+L["Click To Reload UI"] = "Cliquez pour recharger l'interface.";
 
 
 --Settings Category
@@ -655,6 +658,7 @@ L["Drawer Option Update Frequently Tooltip"] = "Essayer de mettre à jour l'éta
 L["ModuleName DrawerMacro"] = "Macro Plumber";
 L["ModuleDescription DrawerMacro"] = "Créer un menu déroulant personnalisé pour gérer vos objets, sorts, mascottes, montures et jouets.\n\nPour créer une macro Plumber, commencez par créer une nouvelle macro, puis saisissez |cffd7c0a3#plumber:drawer|r dans la zone de saisie de la macro.";
 L["No Slot For New Character Macro Alert"] = "Vous devez disposer d'un emplacement libre pour une macro spécifique au personnage afin d'effectuer cette action.";
+L["Unknown Pet"] = "Mascotte inconnue";
 
 
 --New Expansion Landing Page
@@ -671,6 +675,7 @@ L["Not On Quest"] = "Vous n'êtes pas sur cette quête";
 L["Factions"] = "Factions";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Activités";
 L["Raids"] = RAIDS or "Raids";
+L["Player Power"] = "Pouvoirs";
 L["Instruction Track Achievement"] = "<Clic + Maj pour suivre ce haut fait>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Clic + Maj pour ne plus suivre ce haut fait>";
 L["No Data"] = "Aucune donnée";
@@ -694,8 +699,8 @@ L["Edit Tracker Title"] = "Modifier le suivi";
 L["Type"] = "Type";
 L["Select Instruction"] = LFG_LIST_SELECT or "Sélectionner";
 L["Name"] = "Nom";
-L["Difficulty"] = "Difficulté";
-L["All Difficulties"] = LFG_LIST_DIFFICULTY or "Difficulté";
+L["Difficulty"] = LFG_LIST_DIFFICULTY or "Difficulté";
+L["All Difficulties"] = "Toutes les difficultés";
 L["TrackerType Boss"] = "Boss";
 L["TrackerType Instance"] = "Instance";
 L["TrackerType Quest"] = "Quête";
@@ -724,10 +729,10 @@ L["Weekly Coffer Key Shards Tooltip"] = "Les quatre premières caches hebdomadai
 L["Weekly Cap"] = "Limite hebdomadaire";
 L["Weekly Cap Reached"] = "Limite hebdomadaire atteinte.";
 L["Instruction Right Click To Use"] = "<Clic droit pour utiliser>";
-L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Rejoindre la file";
+L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Rejoindre la file d'attente";
 L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "En file d'attente";
 L["Click To Switch"] = "Cliquez pour passer à  |cffffffff%s|r";
-L["Click To Queue"] = "Cliquez pour rejoindre la file de |cffffffff%s|r";
+L["Click To Queue"] = "Cliquez pour rejoindre la file d'attente de |cffffffff%s|r";
 L["Click to Open Format"] = "Cliquez pour ouvrir %s";
 L["List Is Empty"] = "La liste est vide.";
 L["Prey No Data"] = "Progression de la Traque indisponible";
@@ -738,6 +743,9 @@ L["Delves Completion Reward Cap"] = "Récompenses de complétion";
 L["Delves Completion Reward Cap Tooltip"] = "Une fois cette limite de compte atteinte, terminer un gouffre abondant ne vous accordera plus de progression pour le Périple du Gouffre ni d'expérience de compagnon.\n\nLes récompenses des coffres abondants et des Caches de Némésis ne sont pas affectées par cette limite.\n\nLa limite augmente de 28 chaque semaine.";
 L["Near Completion Tooltip"] = "Cette entrée est visible car vous êtes sur le point d'atteindre la limite hebdomadaire.";
 L["Inactive Currencies Tooltip"] = "Ces Monnaies sont masquées car vous les avez définies comme inutilisées :";
+L["New Quest"] = "Nouvelle quête";
+L["Trait Points Available"] = "Points disponible";
+L["Unspent Points"] = "Points non dépensé";
 
 
 --ExpansionSummaryMinimapButton
@@ -755,7 +763,7 @@ L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "Supprime la bordure do
 L["LandingButtonOption PrimaryUI"] = "Clic gauche : ouvrir";
 L["LandingButtonOption PrimaryUI Tooltip"] = "Choisir quelle interface ouvrir avec un clic gauche sur le bouton de la mini-carte.";
 L["LandingButtonOption SmartExpansion"] = "Choix automatique de l'extension";
-L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activée : clic gauche sur le bouton de la mini-carte ouvre l’interface du jeu adaptée à votre position actuelle, par exemple le rapport du Sanctuaire de Congrégation lorsque vous êtes dans Shadowlands.";
+L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activée : clic gauche sur le bouton de la mini-carte ouvre l'interface du jeu adaptée à votre position actuelle, par exemple le rapport du Sanctuaire de Congrégation lorsque vous êtes dans Shadowlands.";
 L["LandingButtonOption SmartExpansion Tooltip 2"] = "Si désactivée : clic gauche sur le bouton de la mini-carte ouvre toujours %s";
 L["LandingButtonOption ReduceSize"] = "Réduire la taille du bouton";
 L["LandingButtonOption DarkColor"] = "Utiliser le thème sombre";
@@ -789,12 +797,12 @@ L["Press Key To Copy Format"] = "Appuyez sur |cffffd100%s|r pour copier";
 
 
 --TransmogOutfitSelect
-L["ModuleName TransmogOutfitSelect"] = "Collection de Tenues : accès rapide";
-L["ModuleDescription1 TransmogOutfitSelect"] = "Permet d'ouvrir la collection de tenues et d'activer les apparences enregistrées n'importe où.";
-L["ModuleDescription2 TransmogOutfitSelect"] = "Pour ce faire : ouvrez l’interface de transmogrification, puis faites glisser le bouton |cffd7c0a3Accès rapide|r situé au-dessus de la liste des tenues vers vos barres d’action.";
-L["Outfit Collection"] = "Collection de Tenues";
+L["ModuleName TransmogOutfitSelect"] = "Collection de tenues : accès rapide";
+L["ModuleDescription1 TransmogOutfitSelect"] = "Vous permet d'ouvrir la collection de tenues et d'activer une apparence enregistrée où que vous soyez.";
+L["ModuleDescription2 TransmogOutfitSelect"] = "Pour cela : ouvrez l'interface de transmogrification, puis faites glisser le bouton |cffd7c0a3Accès rapide|r situé au-dessus de la liste des tenues vers vos barres d'action.";
+L["Outfit Collection"] = "Collection de tenues";
 L["Quick Access Outfit Button"] = "Accès rapide";
-L["Quick Access Outfit Button Tooltip"] = "Cliquez sur ce bouton et faites-le glisser vers vos barres d'actions pour pouvoir changer de tenue où que vous soyez.";
+L["Quick Access Outfit Button Tooltip"] = "Cliquez sur ce bouton et faites-le glisser vers vos barres d'action afin de pouvoir changer de tenue où que vous soyez.";
 
 
 --QuestWatchCycle
@@ -904,6 +912,7 @@ L["ModuleDescription CatalystUI"] = "Ctrl + Clic sur l'objet obtenu pour l'affic
 L["ModuleName HuntTable"] = "Traque : table de traque";
 L["ModuleDescription HuntTable"] = "- Remplacer les icônes de quête bleues pour indiquer les difficultés.\n\n- Afficher un indicateur si la cible de la Traque est une condition requise pour un haut fait non réalisé.";
 L["Prey Target Has Achievement"] = "Cet objectif de Traque est une condition requise pour obtenir un haut fait non réalisé .";
+L["Quest Objective Entry Format"] = "Objectif de quête pour : %s";
 
 
 --PreyQuestSuperTrack
@@ -914,6 +923,12 @@ L["ModuleDescription PreyQuestSuperTrack"] = "Une fois la position de votre proi
 --BlizzFixActionBarArt
 L["ModuleName BlizzFixActionBarArt"] = "Correction rapide : illustration de la barre d'action";
 L["ModuleDescription BlizzFixActionBarArt"] = "Correction d'un problème où les illustrations de la barre d'action (Griffons et Wyvernes) réapparaissaient de manière inattendue après avoir masqué / affiché l'interface utilisateur ou quitté l'Éditeur de maison.";
+
+
+--HouseList
+L["ModuleName Housing_HouseList"] = "Liste des maisons";
+L["ModuleDescription Housing_HouseList"] = "Améliore l'interface de la liste des maisons :\n\n- Indique la faction de la maison avec une image sur la droite.\n\n- Affiche les deux boutons Visiter la maison si le joueur possède deux maisons.";
+L["View Houses In Combat Warning"] = "Vous ne pouvez pas consulter les maisons pendant un combat.";
 
 
 --Generic
