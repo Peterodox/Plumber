@@ -485,6 +485,23 @@ local ActivityData = {
 		},
 	},
 
+	{isHeader = true, name = "Zul'jarra's Forces", factionID = 2772, categoryID = 2772, uiMapID = 2512,
+			entries = {
+				{name = "Turn Back the Surge", questID = 96995, isWeeklyQuest = true, uiMapID = 2512, sortToTop = true},
+
+				-- (Underground) Vaults of Atal'Utek
+				{name = "Purging the Vaults", questID = 95520, isWeeklyQuest = true, uiMapID = 2509, sortToTop = true},
+				-- Group Daily
+				{name = "Patrolling the Temple", questID = 96639, uiMapID = 2509, shownIfActive = true},
+				{name = "Bounty of the Cursed", questID = 96640, uiMapID = 2509, shownIfActive = true},
+				{name = "Relentless Strikes", questID = 96641, uiMapID = 2509, shownIfActive = true},
+				{name = "Decisive Incursions", questID = 96642, uiMapID = 2509, shownIfActive = true},
+				{name = "From Whence it Came", questID = 96643, uiMapID = 2509, shownIfActive = true},
+				{name = "Essence of Malice", questID = 96644, uiMapID = 2509, shownIfActive = true},
+				{name = "What's Out There?", questID = 98420, uiMapID = 2509, shownIfActive = true},
+		},
+	},
+
 	{isHeader = true, name = "Silvermoon Court", factionID = 2710, categoryID = 2710, uiMapID = 2395,
 		entries = {
 			{name = "Favor of the Court", questID = 89289, isWeeklyQuest = true, uiMapID = 2395, sortToTop = true},
@@ -557,25 +574,9 @@ local ActivityData = {
 	},
 };
 
-if addon.IS_12_1_0 then
-	local CoiledIsleActivity = {isHeader = true, name = "Zul'jarra's Forces", factionID = 2772, categoryID = 2772, uiMapID = 2512,
-		entries = {
-			{name = "Turn Back the Surge", questID = 96995, isWeeklyQuest = true, uiMapID = 2512, sortToTop = true},
-
-			-- (Underground) Vaults of Atal'Utek
-			{name = "Purging the Vaults", questID = 95520, isWeeklyQuest = true, uiMapID = 2509, sortToTop = true},
-			-- Group Daily
-			{name = "Patrolling the Temple", questID = 96639, uiMapID = 2509, shownIfActive = true}, -- √
-			{name = "Bounty of the Cursed", questID = 96640, uiMapID = 2509, shownIfActive = true},
-			{name = "Relentless Strikes", questID = 96641, uiMapID = 2509, shownIfActive = true},
-			{name = "Decisive Incursions", questID = 96642, uiMapID = 2509, shownIfActive = true}, -- √
-			{name = "From Whence it Came", questID = 96643, uiMapID = 2509, shownIfActive = true},
-			{name = "Essence of Malice", questID = 96644, uiMapID = 2509, shownIfActive = true}, -- √
-			{name = "What's Out There?", questID = 98420, uiMapID = 2509, shownIfActive = true}, -- √
-		},
-	};
-
-	table.insert(ActivityData, 2, CoiledIsleActivity);
+if addon.IS_12_1_5 then
+	--local newEntries = {};
+	--table.insert(ActivityData, 3, newEntries);
 end
 
 

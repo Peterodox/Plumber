@@ -90,7 +90,7 @@ local function SetupPin(pin)
 			description = description.."\n\n"..L["Prey Target Has Achievement"];
 		end
 
-		if rootQuestID then
+		if rootQuestID and C_QuestLog.IsOnQuest(rootQuestID) then
 			local questName = addon.API.GetQuestName(rootQuestID);
 			if questName then
 				description = description.."\n\n"..string.format(L["Quest Objective Entry Format"], "|cffffffff"..questName.."|r");

@@ -4535,24 +4535,10 @@ do  -- Delves
 		else
 			GameTooltip_SetTitle(tooltip, WEEKLY_REWARDS_CURRENT_REWARD);
 
-
-			--[[
-			--This default method is unreliable since 11.2.0, so we hardcode itemlevel
-			local itemLink, upgradeItemLink = C_WeeklyRewards.GetExampleRewardItemHyperlinks(id);
-			local itemLevel, upgradeItemLevel;
-
-			if itemLink then
-				itemLevel = C_Item.GetDetailedItemLevelInfo(itemLink);
-			end
-			if upgradeItemLink then
-				upgradeItemLevel = C_Item.GetDetailedItemLevelInfo(upgradeItemLink);
-			end
-			--]]
-
-			local itemLevel = API.GetDelvesGreatVaultItemLevel(level);
+			local itemLevel = API.GetDelvesGreatVaultItemLevel(level, id);
 
 			local nextLevel = level + 1;
-			local upgradeItemLevel = API.GetDelvesGreatVaultItemLevel(nextLevel);
+			local upgradeItemLevel = API.GetDelvesGreatVaultItemLevel(nextLevel, id, true);
 
 			if level > 0 and itemLevel then
 				GameTooltip_AddNormalLine(tooltip, string.format(WEEKLY_REWARDS_ITEM_LEVEL_WORLD, itemLevel, level));

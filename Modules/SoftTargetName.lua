@@ -616,10 +616,10 @@ do  --EL
 				Display:Hide();
 			end
 
-			--Fix the Elite icon on GameObject namepalte
+			--Fix the Elite icon on GameObject nameplate
 			--CompactUnitFrame_UpdateClassificationIndicator(nameplate.UnitFrame);
-			if nameplate.UnitFrame.classificationIndicator then
-				nameplate.UnitFrame.classificationIndicator:Hide();
+			if nameplate.UnitFrame.ClassificationFrame then
+				nameplate.UnitFrame.ClassificationFrame:Hide();
 			end
 		else
 			Display:Hide();
