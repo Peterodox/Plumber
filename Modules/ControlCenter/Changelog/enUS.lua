@@ -10,6 +10,42 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10904] = {
 	{
 		type = "date",
+		versionText = "1.9.4 c",
+		timestamp = 1787500000,
+	},
+
+	{
+		type = "h1",
+		text = "Bug Fixes",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Fixed the wrong item level in the World activity's tooltip.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Nameplate: Soft Target: Fixed an issue that caused rare/elite icons on the nameplate to disappear.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Hunt Table: The extra tooltip for the Prey Season 2 intro quest should no longer appear if you are not on the quest.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.4 b",
 		timestamp = 1786800000,
 	},
