@@ -241,7 +241,7 @@ do
 
 		local CustomizeModeFrame = HouseEditorFrame.CustomizeModeFrame;
 		self.parentFrame = CustomizeModeFrame;
-		self.DyePane = self.parentFrame.DecorCustomizationsPane;
+		self.DyePane = CustomizeModeFrame.DecorCustomizationsPane.CustomizeComponentContainer.DyePane;
 		self.DyePopout = DyeSelectionPopout;
 
 

@@ -24,7 +24,7 @@ do  --Item Upgrade Track
 			3383,   --Adventurer (LFR, H)
 		},
 
-		CrestSources = {    --TODO: Midnight S1: Dawncrest
+		CrestSources = {
 			(PLAYER_DIFFICULTY6 or "Mythic") .. ", +9",
 			(PLAYER_DIFFICULTY2 or "Heroic") .. ", +4",
 			(PLAYER_DIFFICULTY1 or "Normal") .. ", +2",
@@ -48,12 +48,19 @@ do  --Item Upgrade Track
 
 	addon.ItemUpgradeConstant = ItemUpgradeConstant;
 
+	local CrestNameAbbreviation = {
+		L["Upgrade Track 6"],
+		L["Upgrade Track 5"],
+		L["Upgrade Track 4"],
+		L["Upgrade Track 3"],
+		L["Upgrade Track 1"],
+	};
 
-	L["currency-3347"] = L["Upgrade Track 6"];
-	L["currency-3345"] = L["Upgrade Track 5"];
-	L["currency-3343"] = L["Upgrade Track 4"];
-	L["currency-3341"] = L["Upgrade Track 3"];
-	L["currency-3383"] = L["Upgrade Track 1"];
+	for index, currencyID in ipairs(ItemUpgradeConstant.Crests) do
+		L["currency-"..currencyID] = CrestNameAbbreviation[index];
+	end
+
+	CrestNameAbbreviation = nil;
 end
 
 

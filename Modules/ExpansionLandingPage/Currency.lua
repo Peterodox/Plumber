@@ -334,15 +334,26 @@ do
 			elseif v.conditionFunc then
 				valid = v.conditionFunc();
 			elseif v.uiMapID then
+				valid = false;
+
 				if not uiMapID then
 					uiMapID = C_Map.GetBestMapForUnit("player");
 				end
-				if uiMapID and uiMapID == v.uiMapID then
-					valid = true;
-				else
-					valid = false;
+
+				if uiMapID then
+					if type(v.uiMapID) == "table" then
+						for _, id in ipairs(v.uiMapID) do
+							if uiMapID == id then
+								valid = true;
+							end
+						end
+					else
+						valid = uiMapID == v.uiMapID;
+					end
 				end
-			elseif v.shownIfOwned then
+			end
+
+			if valid and v.shownIfOwned then
 				valid = GetResourcesQuantity(v) > 0;
 			end
 

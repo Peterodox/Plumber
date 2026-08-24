@@ -699,8 +699,8 @@ L["Edit Tracker Title"] = "Modifier le suivi";
 L["Type"] = "Type";
 L["Select Instruction"] = LFG_LIST_SELECT or "Sélectionner";
 L["Name"] = "Nom";
-L["Difficulty"] = "Difficulté";
-L["All Difficulties"] = LFG_LIST_DIFFICULTY or "Difficulté";
+L["Difficulty"] = LFG_LIST_DIFFICULTY or "Difficulté";
+L["All Difficulties"] = "Toutes les difficultés";
 L["TrackerType Boss"] = "Boss";
 L["TrackerType Instance"] = "Instance";
 L["TrackerType Quest"] = "Quête";
@@ -729,10 +729,10 @@ L["Weekly Coffer Key Shards Tooltip"] = "Les quatre premières caches hebdomadai
 L["Weekly Cap"] = "Limite hebdomadaire";
 L["Weekly Cap Reached"] = "Limite hebdomadaire atteinte.";
 L["Instruction Right Click To Use"] = "<Clic droit pour utiliser>";
-L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Rejoindre la file";
+L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Rejoindre la file d'attente";
 L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "En file d'attente";
 L["Click To Switch"] = "Cliquez pour passer à  |cffffffff%s|r";
-L["Click To Queue"] = "Cliquez pour rejoindre la file de |cffffffff%s|r";
+L["Click To Queue"] = "Cliquez pour rejoindre la file d'attente de |cffffffff%s|r";
 L["Click to Open Format"] = "Cliquez pour ouvrir %s";
 L["List Is Empty"] = "La liste est vide.";
 L["Prey No Data"] = "Progression de la Traque indisponible";
@@ -763,7 +763,7 @@ L["LandingButtonOption UseLibDBIcon NoBorder Tooltip"] = "Supprime la bordure do
 L["LandingButtonOption PrimaryUI"] = "Clic gauche : ouvrir";
 L["LandingButtonOption PrimaryUI Tooltip"] = "Choisir quelle interface ouvrir avec un clic gauche sur le bouton de la mini-carte.";
 L["LandingButtonOption SmartExpansion"] = "Choix automatique de l'extension";
-L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activée : clic gauche sur le bouton de la mini-carte ouvre l’interface du jeu adaptée à votre position actuelle, par exemple le rapport du Sanctuaire de Congrégation lorsque vous êtes dans Shadowlands.";
+L["LandingButtonOption SmartExpansion Tooltip 1"] = "Si activée : clic gauche sur le bouton de la mini-carte ouvre l'interface du jeu adaptée à votre position actuelle, par exemple le rapport du Sanctuaire de Congrégation lorsque vous êtes dans Shadowlands.";
 L["LandingButtonOption SmartExpansion Tooltip 2"] = "Si désactivée : clic gauche sur le bouton de la mini-carte ouvre toujours %s";
 L["LandingButtonOption ReduceSize"] = "Réduire la taille du bouton";
 L["LandingButtonOption DarkColor"] = "Utiliser le thème sombre";
@@ -797,12 +797,12 @@ L["Press Key To Copy Format"] = "Appuyez sur |cffffd100%s|r pour copier";
 
 
 --TransmogOutfitSelect
-L["ModuleName TransmogOutfitSelect"] = "Collection de Tenues : accès rapide";
-L["ModuleDescription1 TransmogOutfitSelect"] = "Permet d'ouvrir la collection de tenues et d'activer les apparences enregistrées n'importe où.";
-L["ModuleDescription2 TransmogOutfitSelect"] = "Pour ce faire : ouvrez l’interface de transmogrification, puis faites glisser le bouton |cffd7c0a3Accès rapide|r situé au-dessus de la liste des tenues vers vos barres d’action.";
-L["Outfit Collection"] = "Collection de Tenues";
+L["ModuleName TransmogOutfitSelect"] = "Collection de tenues : accès rapide";
+L["ModuleDescription1 TransmogOutfitSelect"] = "Vous permet d'ouvrir la collection de tenues et d'activer une apparence enregistrée où que vous soyez.";
+L["ModuleDescription2 TransmogOutfitSelect"] = "Pour cela : ouvrez l'interface de transmogrification, puis faites glisser le bouton |cffd7c0a3Accès rapide|r situé au-dessus de la liste des tenues vers vos barres d'action.";
+L["Outfit Collection"] = "Collection de tenues";
 L["Quick Access Outfit Button"] = "Accès rapide";
-L["Quick Access Outfit Button Tooltip"] = "Cliquez sur ce bouton et faites-le glisser vers vos barres d'actions pour pouvoir changer de tenue où que vous soyez.";
+L["Quick Access Outfit Button Tooltip"] = "Cliquez sur ce bouton et faites-le glisser vers vos barres d'action afin de pouvoir changer de tenue où que vous soyez.";
 
 
 --QuestWatchCycle
