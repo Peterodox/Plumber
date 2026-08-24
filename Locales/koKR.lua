@@ -658,6 +658,7 @@ L["Drawer Option Update Frequently Tooltip"] = "가방이나 주문책에 변경
 L["ModuleName DrawerMacro"] = "패널 매크로";
 L["ModuleDescription DrawerMacro"] = "아이템, 주문, 애완동물, 탈것, 장난감을 관리할 수 있는 맞춤형 확장 메뉴를 생성하세요.\n\n패널 매크로를 만들려면 먼저 새 매크로를 생성한 후 명령어 편집창에 |cffd7c0a3#plumber:drawer|r 입력하세요.";
 L["No Slot For New Character Macro Alert"] = "이 작업을 완료하려면 여분의 캐릭터 전용 매크로 슬롯이 필요합니다.";
+L["Unknown Pet"] = "알 수 없는 소환수";
 
 
 --New Expansion Landing Page
@@ -674,6 +675,7 @@ L["Not On Quest"] = "이 퀘스트를 진행 중이지 않음";
 L["Factions"] = "평판";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "활동";
 L["Raids"] = RAIDS or "공격대";
+L["Player Power"] = "자원";
 L["Instruction Track Achievement"] = "<Shift 클릭하여 이 업적 추적>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift 클릭으로 추적 중지>";
 L["No Data"] = "데이터 없음";
@@ -743,6 +745,7 @@ L["Near Completion Tooltip"] = "이번 항목은 주간 한도에 곧 도달하�
 L["Inactive Currencies Tooltip"] = "다음 화폐들은 사용하지 않음으로 설정했기 때문에 숨겨져 있습니다:";
 L["New Quest"] = "새로운 퀘스트";
 L["Trait Points Available"] = "사용 가능한 포인트";
+L["Unspent Points"] = "미사용 특성 포인트";
 
 
 --ExpansionSummaryMinimapButton
@@ -919,6 +922,8 @@ L["ModuleDescription PreyQuestSuperTrack"] = "사냥감 대상의 위치가 드�
 --BlizzFixActionBarArt
 L["ModuleName BlizzFixActionBarArt"] = "블리자드 수정: 행동 단축바 아트";
 L["ModuleDescription BlizzFixActionBarArt"] = "UI 숨기기/표시 또는 하우스 에디터 종료 후, 행동 단축바 아트(그리핀과 와이번)가 예상치 못하게 다시 나타나는 문제를 수정했습니다.";
+
+
 --HouseList
 L["ModuleName Housing_HouseList"] = "주택 목록";
 L["ModuleDescription Housing_HouseList"] = "주택 목록 UI를 개선합니다:\n\n- 오른쪽에 이미지로 주택의 진영을 표시합니다.\n\n- 플레이어가 주택을 두 개 보유한 경우 두 방문 버튼을 모두 표시합니다.";
