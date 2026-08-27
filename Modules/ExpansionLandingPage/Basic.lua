@@ -155,7 +155,7 @@ local function SetupThreeSliceBackground(frame, textureFile, leftOffset, rightOf
 end
 API.SetupThreeSliceBackground = SetupThreeSliceBackground;
 
-local function SetupThressSliceHighlight(frame, textureFile, leftOffset, rightOffset)
+local function SetupThreeSliceHighlight(frame, textureFile, leftOffset, rightOffset)
 	CreateThreeSliceTextures(frame, "HIGHLIGHT", "HighlightLeft", "HighlightCenter", "HighlightRight", textureFile, leftOffset, rightOffset);
 	local alpha = 0.25;
 	frame.HighlightLeft:SetBlendMode("ADD");
@@ -165,7 +165,26 @@ local function SetupThressSliceHighlight(frame, textureFile, leftOffset, rightOf
 	frame.HighlightRight:SetBlendMode("ADD");
 	frame.HighlightRight:SetAlpha(alpha);
 end
-API.SetupThressSliceHighlight = SetupThressSliceHighlight;
+API.SetupThreeSliceHighlight = SetupThreeSliceHighlight;
+
+
+---LandingPage: Set GameTooltip title and optional descriptions.
+---@param title string
+---@param lines string|table|nil
+local function SetTooltip(title, lines)
+	local tooltip = GameTooltip;
+	tooltip:SetText(title, 1, 1, 1, 1, true);
+	if lines then
+		if type(lines) == "table" then
+			for _, line in ipairs(lines) do
+				tooltip:AddLine(line, 1, 0.82, 0, true);
+			end
+		else
+			tooltip:AddLine(lines, 1, 0.82, 0, true);
+		end
+	end
+end
+LandingPageUtil.SetTooltip = SetTooltip;
 
 
 local ExpansionThemeFrameMixin = {};
@@ -1175,10 +1194,7 @@ do  --Dropdown Button
 		if textTruncated or self.tooltip then
 			local tooltip = GameTooltip;
 			tooltip:SetOwner(self, "ANCHOR_RIGHT");
-			tooltip:SetText(self.Text:GetText(), 1, 1, 1, 1, true);
-			if self.tooltip then
-				tooltip:AddLine(self.tooltip, 1, 0.82, 0, true);
-			end
+			SetTooltip(self.Text:GetText(), self.tooltip);
 			tooltip:Show();
 		end
 	end
@@ -1258,7 +1274,7 @@ do  --Dropdown Button
 				setupFunc = SetupThreeSliceBackground;
 				prefix = "";
 			else
-				setupFunc = SetupThressSliceHighlight;
+				setupFunc = SetupThreeSliceHighlight;
 				prefix = "Highlight";
 			end
 			setupFunc(f, TEXTURE_FILE, -2.5, 2.5);
@@ -1580,6 +1596,10 @@ do  --Checkbox Button
 		self.onClickFunc = onClickFunc;
 	end
 
+	function CheckboxButtonMixin:SetUseDarkYellowLabel(useDarkYellowLabel)
+		self.useDarkYellowLabel = useDarkYellowLabel;
+	end
+
 	function LandingPageUtil.CreateCheckboxButton(parent)
 		local f = CreateFrame("Button", nil, parent);
 		f:SetSize(24, 24);
@@ -1629,10 +1649,21 @@ do  --IconTextButton
 
 	function BasicIconTextButtonMixin:OnEnter()
 		self:UpdateVisual();
+		if self.onEnterFunc then
+			self.onEnterFunc(self);
+		end
 	end
 
 	function BasicIconTextButtonMixin:OnLeave()
 		self:UpdateVisual();
+		GameTooltip:Hide();
+	end
+
+	function BasicIconTextButtonMixin:OnClick(button)
+		PlayUISound("CheckboxOff");
+		if self.onClickFunc then
+			self.onClickFunc(self, button);
+		end
 	end
 
 	function BasicIconTextButtonMixin:OnEnable()
@@ -1645,21 +1676,35 @@ do  --IconTextButton
 
 	function BasicIconTextButtonMixin:UpdateVisual()
 		if self:IsEnabled() then
+			local r, g, b;
 			if self:IsMouseMotionFocus() then
-				self.Label:SetTextColor(1, 1, 1);
+				r, g, b = 1, 1, 1;
 			else
-				if self.useDarkYellowLabel then
-					self.Label:SetTextColor(1, 0.82, 0);
+				if self.defaultColor then
+					r, g, b = self.defaultColor[1], self.defaultColor[2], self.defaultColor[3];
 				else
-					self.Label:SetTextColor(0.922, 0.871, 0.761);
+					if self.useDarkYellowLabel then
+						r, g, b = 1, 0.82, 0;
+					else
+						r, g, b = 0.922, 0.871, 0.761;
+					end
 				end
+			end
+
+			self.Label:SetTextColor(r, g, b);
+			if self.colorizeIcon then
+				self.Icon:SetVertexColor(r, g, b);
+			else
+				self.Icon:SetVertexColor(1, 1, 1);
 			end
 		else
 			self.Label:SetTextColor(0.5, 0.5, 0.5);
+			self.Icon:SetVertexColor(0.5, 0.5, 0.5);
 		end
 	end
 
 	function BasicIconTextButtonMixin:SetTexture(texture, left, right, top, bottom)
+		texture = texture or TEXTURE_FILE;
 		self.Icon:SetTexture(texture);
 		self.Icon:SetTexCoord(left or 0, right or 1, top or 0, bottom or 1);
 		self.Highlight:SetTexture(texture);
@@ -1670,8 +1715,34 @@ do  --IconTextButton
 		self.Label:SetText(text);
 		if changeWidth then
 			local textWidth = math.max(24, API.Round(self.Label:GetWrappedWidth()));
-			self:SetWidth(textWidth + 24);
+			self:SetWidth(textWidth + self.labelOffset);
 		end
+	end
+
+	function BasicIconTextButtonMixin:EnableColorizeIcon(colorizeIcon)
+		self.colorizeIcon = colorizeIcon;
+	end
+
+	function BasicIconTextButtonMixin:SetUseDarkYellowLabel(useDarkYellowLabel)
+		self.useDarkYellowLabel = useDarkYellowLabel;
+	end
+
+	function BasicIconTextButtonMixin:SetDefaultColor(r, g, b)
+		self.defaultColor = {r, g, b};
+		self:UpdateVisual();
+	end
+
+	function BasicIconTextButtonMixin:ClearDefaultColor()
+		self.defaultColor = nil;
+		self:UpdateVisual();
+	end
+
+	function BasicIconTextButtonMixin:SetOnEnterFunc(onEnterFunc)
+		self.onEnterFunc = onEnterFunc;
+	end
+
+	function BasicIconTextButtonMixin:SetOnClickFunc(onClickFunc)
+		self.onClickFunc = onClickFunc;
 	end
 
 	function LandingPageUtil.CreateBasicIconTextButton(parent)
@@ -1687,18 +1758,22 @@ do  --IconTextButton
 		f.Icon = f:CreateTexture(nil, "OVERLAY");
 		f.Icon:SetSize(32, 32);
 		f.Icon:SetPoint("CENTER", f.Content, "LEFT", 8, 0);
+		API.DisableSharpening(f.Icon);
 
 		f.Label = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
 		f.Label:SetJustifyH("LEFT");
-		f.Label:SetPoint("LEFT", f.Content, "LEFT", 24, 0);
+		f.labelOffset = 20;
+		f.Label:SetPoint("LEFT", f.Content, "LEFT", f.labelOffset, 0);
 
 		f.Highlight = f:CreateTexture(nil, "HIGHLIGHT");
 		f.Highlight:SetPoint("TOPLEFT", f.Icon, "TOPLEFT", 0, 0);
 		f.Highlight:SetPoint("BOTTOMRIGHT", f.Icon, "BOTTOMRIGHT", 0, 0);
 		f.Highlight:SetBlendMode("ADD");
+		f.Highlight:SetVertexColor(0.5, 0.5, 0.5);
 
 		f:SetScript("OnEnter", f.OnEnter);
 		f:SetScript("OnLeave", f.OnLeave);
+		f:SetScript("OnClick", f.OnClick);
 		f:SetScript("OnMouseDown", f.OnMouseDown);
 		f:SetScript("OnMouseUp", f.OnMouseUp);
 
@@ -1901,8 +1976,7 @@ function LandingPageUtil.DisplayInactiveCurrencies(owner, currencyIDs)
 	if owner and currencyIDs then
 		local tooltip = GameTooltip;
 		tooltip:SetOwner(owner, "ANCHOR_RIGHT");
-		tooltip:SetText(UNUSED, 1, 1, 1);
-		tooltip:AddLine(addon.L["Inactive Currencies Tooltip"], 1, 0.82, 0, true);
+		SetTooltip(UNUSED, addon.L["Inactive Currencies Tooltip"]);
 		tooltip:AddLine(" ");
 		for _, currencyID in ipairs(currencyIDs) do
 			API.AddCurrencyToTooltip(tooltip, currencyID);

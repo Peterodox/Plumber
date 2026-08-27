@@ -230,7 +230,7 @@ do
 				setupFunc = API.SetupThreeSliceBackground;
 				prefix = "";
 			else
-				setupFunc = API.SetupThressSliceHighlight;
+				setupFunc = API.SetupThreeSliceHighlight;
 				prefix = "Highlight";
 			end
 			setupFunc(f, TEXTURE_FILE, -2.5, 2.5);
