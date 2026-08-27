@@ -260,7 +260,10 @@ do  --Checklist Button
 	end
 
 	function ChecklistButtonMixin:DisplayTooltip()
+		local shouldShowTooltip;
+
 		if self.type == "Quest" and self.id then
+			shouldShowTooltip = true;
 			TooltipUpdator:SetFocusedObject(self);
 			local data = ActivityUtil.GetActivityData(self.dataIndex);
 			if data and data.useActiveQuestTitle then
@@ -277,6 +280,7 @@ do  --Checklist Button
 				TooltipUpdator:RequestTooltipSetter(data.tooltipSetter);
 			end
 		elseif self.type == "Currency" and self.id then
+			shouldShowTooltip = true;
 			TooltipUpdator:SetFocusedObject(self);
 			TooltipUpdator:SetHeaderText(API.GetCurrencyName(self.id));
 			TooltipUpdator:SetCurrencyID(self.id);
@@ -288,6 +292,7 @@ do  --Checklist Button
 			local data = ActivityUtil.GetActivityData(self.dataIndex);
 			if data then
 				if data.tooltip or data.children or data.tooltipSetter or data.tooltipItem then
+					shouldShowTooltip = true;
 					TooltipUpdator:SetFocusedObject(self);
 					TooltipUpdator:SetHeaderText(data.tooltipHeader or self.Name:GetText());
 					local tooltipLines = {};
@@ -315,6 +320,10 @@ do  --Checklist Button
 					TooltipUpdator:RequestItemID(data.tooltipItem);
 				end
 			end
+		end
+
+		if shouldShowTooltip and ActivityUtil.IsInManageMode() then
+			TooltipUpdator:RequestExtraInfoForManageMode(ActivityUtil.GetActivityData(self.dataIndex));
 		end
 	end
 

@@ -764,6 +764,9 @@ L["Manage Activities"] = "Manage Activities";
 L["Manage Activities Abbr"] = "Manage";
 L["Manage Activities Tooltip"] = "Choose entries to ignore.";
 L["Save And Exit"] = "Save and Exit";
+L["Activity Shown Condition Generic"] = "This entry only becomes visible if certain conditions are met.";
+L["Activity Shown Condition ShownIfActive"] = "This entry only becomes visible if the quest is active.";
+L["Activity Shown Condition ShownIfOnQuest"] = "This entry only becomes visible if you are on the quest.";
 
 
 --ExpansionSummaryMinimapButton
