@@ -108,6 +108,41 @@ local InProgressQuestIconFile = {
 };
 
 
+---Designated UIDs for custom activity entries that don't fall under Quest/Item/Currency.
+local CustomEntryUID = {
+	--[uidLookup] = unique number,
+
+	MID_DelveRep = 10,
+	MID_DelveStash = 9,
+	MID_DelveRewardCap = 8,
+	MID_PreyKills = 7,
+	MID_PreyTable = 6,
+	MID_Runestones = 5,
+	MID_Abundance = 4,
+
+	TWW_CofferKey = 3,
+	TWW_CofferKeyShard = 2,
+	TWW_DelveRep = 1,
+};
+
+local function GenerateEntryUID(entry)
+	if entry.questID then
+		return "q"..entry.questID;
+	elseif entry.itemID then
+		return "i"..entry.itemID;
+	elseif entry.currencyID then
+		return "c"..entry.currencyID;
+	elseif entry.uidLookup then
+		if CustomEntryUID[entry.uidLookup] then
+			return "p"..CustomEntryUID[entry.uidLookup];
+		else
+			API.PrintMessage("Landing Page Missing CustomEntryUID: "..entry.uidLookup);
+		end
+	end
+end
+
+local IgnoredEntry = {};
+
 local Conditions = {};
 do
 	ActivityUtil.Conditions = Conditions;
