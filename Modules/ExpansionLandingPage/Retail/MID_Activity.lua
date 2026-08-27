@@ -578,6 +578,7 @@ local function GetActivityEntries(categoryID)
 end
 
 do  --Add Prey Quests
+	--[[
 	local PreyWorldQuests = {
 		--C_QuestLine.GetQuestLineQuests(5954)
 		91458,
@@ -606,6 +607,7 @@ do  --Add Prey Quests
 			removeSharedPrefix = true,
 		};
 	end
+	--]]
 
 	SetupFuncs.BuildPreyTargetQuests();
 end
