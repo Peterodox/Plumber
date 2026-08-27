@@ -802,3 +802,17 @@ do
 	end
 	addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", ActivityUtil.SetHideCompleted);
 end
+
+do	-- Manage Mode
+	function ActivityUtil.IsManageModeSupported()
+		return false;
+	end
+
+	function ActivityUtil.IsInManageMode()
+		return ActivityUtil.inManageMode;
+	end
+
+	function ActivityUtil.SetManageMode(inManageMode)
+		ActivityUtil.inManageMode = inManageMode;
+	end
+end

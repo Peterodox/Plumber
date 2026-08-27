@@ -694,18 +694,26 @@ local function IndexData(activityData)
 		for _, entry in ipairs(category.entries) do
 			n = n + 1;
 			entry.dataIndex = n;
+			if not entry.uid then
+				entry.uid = GenerateEntryUID(entry);
+			end
 		end
 	end
 	return n
 end
 
-local function FlattenData(activityData, n, outputTbl, numCompleted)
-	if not activityData then return n, 0 end;
+--- Flatten the activityData table into a list.
+---@param activityData table?
+---@param n number Total number of entries
+---@param numCompleted number Number of completed entries
+---@param displayedList table
+local function FlattenData(activityData, n, numCompleted, displayedList)
+	if not activityData then return n, numCompleted; end
 
 	local dataIndex = IndexData(activityData);
-
 	local hideCompleted = ActivityUtil.hideCompleted;
-	numCompleted = numCompleted or 0;
+	local inManageMode = ActivityUtil.IsInManageMode();
+	local numIgnored = 0;
 
 	local uniqueQuests = {};
 
@@ -788,6 +796,9 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 						entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
 					else
 						entry.completed = IsQuestFlaggedCompleted(flagQuest);
+						if flagQuest == 89354 then
+							entry.completed = true;
+						end
 					end
 				else
 					entry.completed = false;
@@ -841,6 +852,20 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 			end
 
 			if showActivity then
+				if entry.uid and IgnoredEntry[entry.uid] then
+					showActivity = false;
+					numIgnored = numIgnored + 1;
+				end
+			end
+
+			if inManageMode then
+				showActivity = true;
+				entry.completed = false;
+				entry.isOnQuest = false;
+				entry.readyForTurnIn = false;
+			end
+
+			if showActivity then
 				if entry.completed then
 					numCompleted = numCompleted + 1;
 				end
@@ -868,7 +893,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 					end
 				end
 
-				if (not hideCompleted) or (entry.isHeader or not entry.completed) then
+				if (not hideCompleted) or (not entry.completed) then
 					if (not entry.questID) or (entry.questID and not uniqueQuests[entry.questID]) then
 						if entry.questID then
 							uniqueQuests[entry.questID] = true;
@@ -891,9 +916,13 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 								dataIndex = dataIndex + 1;
 								local _entry = {questID = questID, name = "", uiMapID = uiMapID, dataIndex = dataIndex, completed = false};
 								InitQuestData(_entry);
-								numEntries = numEntries + 1;
-								entries[numEntries] = _entry;
-								anyIncompleted = true;
+								if IgnoredEntry["q"..questID] then
+									numIgnored = numIgnored + 1;
+								else
+									numEntries = numEntries + 1;
+									entries[numEntries] = _entry;
+									anyIncompleted = true;
+								end
 							end
 						end
 					end
@@ -901,28 +930,14 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 			end
 		end
 
-		if hideCompleted then
-			if anyIncompleted then
+		if numEntries > 0 then
+			if (hideCompleted and anyIncompleted) or (not hideCompleted) then
 				n = n + 1;
-				outputTbl[n] = category;
-				if numEntries > 0 then
-					tsort(entries, SortFuncs.IncompleteFirst);
-					for _, entry in ipairs(entries) do
-						n = n + 1;
-						outputTbl[n] = entry;
-					end
-				end
-			end
-		else
-			if true then
-				if numEntries > 0 then
+				displayedList[n] = category;
+				tsort(entries, SortFuncs.IncompleteFirst);
+				for _, entry in ipairs(entries) do
 					n = n + 1;
-					outputTbl[n] = category;
-					tsort(entries, SortFuncs.IncompleteFirst);
-					for _, entry in ipairs(entries) do
-						n = n + 1;
-						outputTbl[n] = entry;
-					end
+					displayedList[n] = entry;
 				end
 			end
 		end
@@ -938,7 +953,7 @@ function ActivityUtil.GetSortedActivity()
 	DynamicQuestDataProvider:QueryQuests();
 
 
-	local tbl = {};
+	local displayedList = {};
 	local n = 0;
 	local numCompleted = 0;
 
@@ -946,16 +961,16 @@ function ActivityUtil.GetSortedActivity()
 		category.isCollapsed = IsCategoryCollapsed(category.categoryID);
 	end
 
-	n, numCompleted = FlattenData(MapQuestData, n, tbl, numCompleted);
-	n, numCompleted = FlattenData(ActivityData, n, tbl, numCompleted);
+	n, numCompleted = FlattenData(MapQuestData, n, numCompleted, displayedList);
+	n, numCompleted = FlattenData(ActivityData, n, numCompleted, displayedList);
 
-	for k, v in ipairs(tbl) do
+	for k, v in ipairs(displayedList) do
 		v.dataIndex = k;
 	end
 
-	SortedActivity = tbl;
+	SortedActivity = displayedList;
 
-	return tbl, numCompleted
+	return displayedList, numCompleted
 end
 
 function ActivityUtil.UpdateAndGetProgress(dataIndex)
@@ -1001,6 +1016,21 @@ addon.CallbackRegistry:Register("LandingPage.SetActivityData", function(data)
 		ActivityData = data;
 	end
 end);
+
+
+do	-- Manage Mode
+	function ActivityUtil.IsManageModeSupported()
+		return true;
+	end
+
+	function ActivityUtil.IsInManageMode()
+		return ActivityUtil.inManageMode;
+	end
+
+	function ActivityUtil.SetManageMode(inManageMode)
+		ActivityUtil.inManageMode = inManageMode;
+	end
+end
 
 
 --[[

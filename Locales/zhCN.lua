@@ -729,6 +729,10 @@ L["Inactive Currencies Tooltip"] = "以下货币因为被你设为“未使用�
 L["New Quest"] = "新任务";
 L["Trait Points Available"] = "可分配点数";
 L["Unspent Points"] = "你有待分配的点数";
+L["Manage Activities"] = "管理活动";
+L["Manage Activities Abbr"] = "管理活动";
+L["Manage Activities Tooltip"] = "显示或隐藏条目。";
+L["Save And Exit"] = "保存并退出";
 
 
 --ExpansionSummaryMinimapButton

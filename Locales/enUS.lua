@@ -760,6 +760,10 @@ L["Inactive Currencies Tooltip"] = "These currencies are hidden because you have
 L["New Quest"] = "New Quest";
 L["Trait Points Available"] = "Points Available";
 L["Unspent Points"] = "Unspent Points";
+L["Manage Activities"] = "Manage Activities";
+L["Manage Activities Abbr"] = "Manage";
+L["Manage Activities Tooltip"] = "Choose entries to ignore.";
+L["Save And Exit"] = "Save and Exit";
 
 
 --ExpansionSummaryMinimapButton

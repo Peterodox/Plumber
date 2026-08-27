@@ -426,7 +426,6 @@ do
 		self.ScrollView:SetContent(content, retainPosition);
 
 		self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
-		self.WIPLabel:SetShown(LandingPageUtil.IsCurrentExpansionWIP());
 	end
 
 	function ActivityTabMixin:OnShow()
@@ -441,6 +440,9 @@ do
 		API.UnregisterFrameForEvents(self, DynamicEvents);
 		self:SetScript("OnEvent", nil);
 		self:StopAnimating();
+		if ActivityUtil.IsInManageMode() then
+			self:ToggleManageMode();
+		end
 	end
 
 	function ActivityTabMixin:OnEvent(event, ...)
@@ -456,14 +458,6 @@ do
 	function ActivityTabMixin:InitChecklist()
 		local headerWidgetOffsetY = -10;
 
-		--TEMP
-		self.WIPLabel = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-		self.WIPLabel:SetJustifyH("CENTER");
-		self.WIPLabel:SetText(TEMPSCENE);
-		self.WIPLabel:SetTextColor(1, 0.125, 0.125);
-		self.WIPLabel:SetHeight(24);
-		self.WIPLabel:SetPoint("TOP", self, "TOP", 0, headerWidgetOffsetY);
-		self.WIPLabel:Hide();
 
 		local Checkbox_HideCompleted = LandingPageUtil.CreateCheckboxButton(self);
 		self.Checkbox_HideCompleted = Checkbox_HideCompleted;
@@ -471,15 +465,46 @@ do
 		Checkbox_HideCompleted:SetText(L["Filter Hide Completed Format"], true);
 		Checkbox_HideCompleted.dbKey = "LandingPage_Activity_HideCompleted";
 		Checkbox_HideCompleted.textFormat = L["Filter Hide Completed Format"];
-		Checkbox_HideCompleted.useDarkYellowLabel = true;
+		Checkbox_HideCompleted:SetUseDarkYellowLabel(true);
 		Checkbox_HideCompleted:UpdateChecked();
 		addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", self.SetHideCompleted, self);
 
 
+		local ManageSwitch;
+
+		if ActivityUtil.IsManageModeSupported() then
+			ManageSwitch = LandingPageUtil.CreateBasicIconTextButton(self);
+			self.ManageSwitch = ManageSwitch;
+			ManageSwitch:SetPoint("TOPLEFT", self, "TOPLEFT", 55, headerWidgetOffsetY);
+			ManageSwitch:SetTexture(nil, 518/1024, 582/1024, 176/1024, 240/1024);
+			ManageSwitch:SetText(L["Manage Activities Abbr"], true);
+			ManageSwitch:EnableColorizeIcon(false);
+			ManageSwitch:SetUseDarkYellowLabel(true);
+			ManageSwitch:UpdateVisual();
+
+			ManageSwitch:SetOnEnterFunc(function(widget)
+				if not ActivityUtil.IsInManageMode() then
+					GameTooltip:SetOwner(widget, "ANCHOR_RIGHT");
+					LandingPageUtil.SetTooltip(L["Manage Activities"], L["Manage Activities Tooltip"]);
+					GameTooltip:Show();
+				end
+			end);
+
+			ManageSwitch:SetOnClickFunc(function(widget, button)
+				GameTooltip:Hide();
+				self:ToggleManageMode();
+			end);
+		end
+
+
 		local WeeklyResetTimer = LandingPageUtil.CreateTimerFrame(self);
 		self.WeeklyResetTimer = WeeklyResetTimer;
-		WeeklyResetTimer:SetPoint("TOPLEFT", self, "TOPLEFT", 58, headerWidgetOffsetY);
-		if addon.IS_MISTS then
+		if ManageSwitch then
+			WeeklyResetTimer:SetPoint("LEFT", ManageSwitch, "RIGHT", 24, 0);
+		else
+			WeeklyResetTimer:SetPoint("TOPLEFT", self, "TOPLEFT", 58, headerWidgetOffsetY);
+		end
+		if addon.IS_MOP then
 			WeeklyResetTimer:SetTimeGetter(C_DateAndTime.GetSecondsUntilDailyReset);
 			WeeklyResetTimer:SetTimeTextFormat(L["Daily Reset Format"]);
 			WeeklyResetTimer:SetLowThresholdAndColor(2*3600, "ffe24c45");
@@ -514,6 +539,22 @@ do
 
 		CallbackRegistry:Register("Classic.QuestLogged", self.RequestFullUpdateIfShown, self);
 		CallbackRegistry:Register("activeAugustCelestial", self.RequestFullUpdateIfShown, self);
+
+
+		CallbackRegistry:Register("LandingPage.ActivityManageMode", function(inManageMode)
+			if not ManageSwitch then return; end
+			if inManageMode then
+				ManageSwitch:SetText(L["Save And Exit"], true);
+				ManageSwitch:SetDefaultColor(0.098, 1.000, 0.098);
+				ManageSwitch:SetTexture(nil, 582/1024, 646/1024, 176/1024, 240/1024);
+			else
+				ManageSwitch:SetText(L["Manage Activities Abbr"], true);
+				ManageSwitch:ClearDefaultColor();
+				ManageSwitch:SetTexture(nil, 518/1024, 582/1024, 176/1024, 240/1024);
+			end
+			WeeklyResetTimer:SetShown(not inManageMode);
+			Checkbox_HideCompleted:SetShown(not inManageMode);
+		end);
 	end
 
 	function ActivityTabMixin:UpdateScrollViewContent()
@@ -571,6 +612,15 @@ do
 	function ActivityTabMixin:SetHideCompleted(state)
 		ActivityUtil.SetHideCompleted(state);
 		self:FullUpdate();
+	end
+
+	function ActivityTabMixin:ToggleManageMode()
+		local inManageMode = not ActivityUtil.IsInManageMode();
+		ActivityUtil.SetManageMode(inManageMode);
+		CallbackRegistry:Trigger("LandingPage.ActivityManageMode", inManageMode);
+		if self:IsVisible() then
+			self:FullUpdate();
+		end
 	end
 end
 
