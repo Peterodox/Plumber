@@ -7,12 +7,12 @@ local CreateFrame = CreateFrame;
 
 
 local GetItemNameByID = C_Item.GetItemNameByID;
+local TEXTURE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga";
+local CreateEyeButton;
 
 
 local CreateSharedListButton;
 do  --ScrollViewListButton
-	local TEXTURE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga";
-
 	local SharedListButtonMixin = {};
 
 	function SharedListButtonMixin:SetBackgroundColor(r, g, b)
@@ -23,7 +23,7 @@ do  --ScrollViewListButton
 
 	function SharedListButtonMixin:ShouldShowHighlight()
 		--Override when there is a child button
-		return self:IsMouseMotionFocus()
+		return self:IsMouseMotionFocus();
 	end
 
 	function SharedListButtonMixin:UpdateVisual()
@@ -112,8 +112,23 @@ do  --ScrollViewListButton
 		self.Glow:SetShown(showGlow);
 	end
 
+	function SharedListButtonMixin:ShowEyeButton(state)
+		if state then
+			if not self.EyeButton then
+				self.EyeButton = CreateEyeButton(self);
+				self.EyeButton:SetPoint("RIGHT", self, "LEFT", -4, 0);
+			end
+			self.EyeButton.isOdd = self.isOdd;
+			self.EyeButton:UpdateVisual();
+			self.EyeButton:Show();
+		elseif self.EyeButton then
+			self.EyeButton:Hide();
+		end
+	end
+
 	function CreateSharedListButton(parent)
 		local f = CreateFrame("Button", nil, parent);
+		API.Mixin(f, SharedListButtonMixin);
 		f:SetSize(248, 24);
 
 		SetupThreeSliceBackground(f, TEXTURE, -4, 4);
@@ -146,11 +161,92 @@ do  --ScrollViewListButton
 		f.Glow:SetBlendMode("ADD");
 		f.Glow:SetVertexColor(0.5, 0.5, 0.5);
 
-		API.Mixin(f, SharedListButtonMixin);
-
-		return f
+		return f;
 	end
 	LandingPageUtil.CreateSharedListButton = CreateSharedListButton;
+end
+
+
+do	--EyeButton controls visibility
+	local EyeButtonMixin = {};
+
+	function EyeButtonMixin:OnEnter()
+		self:UpdateVisual();
+	end
+
+	function EyeButtonMixin:OnLeave()
+		self:UpdateVisual();
+	end
+
+	function EyeButtonMixin:OnClick(button)
+		self:GetParent():ToggleEntryIgnored();
+	end
+
+	function EyeButtonMixin:UpdateVisual()
+		local l, r;
+		local t, b = 272, 336;
+		if self:IsMouseMotionFocus() then
+			l, r = 400, 464;
+		else
+			if self.isOdd then
+				l, r = 336, 400;
+			else
+				l, r = 272, 336;
+			end
+		end
+		self.Background:SetTexCoord(l/512, r/512, t/512, b/512);
+	end
+
+	function EyeButtonMixin:SetIconCoord(l, r, t, b)
+		self.Icon:SetTexCoord(l, r, t, b);
+		self.IconHighlight:SetTexCoord(l, r, t, b);
+	end
+
+	function EyeButtonMixin:OpenEye()
+		self:SetIconCoord(432/512, 480/512, 208/512, 256/512);
+	end
+
+	function EyeButtonMixin:CloseEye()
+		self:SetIconCoord(384/512, 432/512, 208/512, 256/512);
+	end
+
+	function CreateEyeButton(parent)
+		local f = CreateFrame("Button", nil, parent);
+		Mixin(f, EyeButtonMixin);
+		f:SetSize(24, 24);
+
+		f.Icon = f:CreateTexture(nil, "OVERLAY");
+		f.Icon:SetSize(24, 24);
+		f.Icon:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+		f.IconHighlight = f:CreateTexture(nil, "HIGHLIGHT");
+		f.IconHighlight:SetSize(24, 24);
+		f.IconHighlight:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.IconHighlight:SetVertexColor(0.5, 0.5, 0.5);
+		f.IconHighlight:SetBlendMode("ADD");
+
+		f.Background = f:CreateTexture(nil, "BACKGROUND");
+		f.Background:SetSize(32, 32);
+		f.Background:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+		f.Icon:SetTexture(TEXTURE);
+		f.IconHighlight:SetTexture(TEXTURE);
+		f.Background:SetTexture(TEXTURE);
+
+		API.DisableSharpening(f.Icon);
+		API.DisableSharpening(f.IconHighlight);
+
+		f:UpdateVisual();
+		f:OpenEye();
+
+		f:SetScript("OnEnter", f.OnEnter);
+		f:SetScript("OnLeave", f.OnLeave);
+		f:SetScript("OnClick", f.OnClick);
+
+		f:SetIgnoreParentAlpha(true);
+
+		return f;
+	end
 end
 
 do  --Generic Checklist Button
@@ -224,7 +320,7 @@ do  --Generic Checklist Button
 		if not data then
 			self.type = nil;
 			self.Name:SetText(nil);
-			return
+			return;
 		end
 
 		if data.localizedName then
@@ -331,7 +427,7 @@ do  --Generic Checklist Button
 		f:SetScript("OnLeave", f.OnLeave);
 		f:SetScript("OnClick", f.OnClick);
 
-		return f
+		return f;
 	end
 	LandingPageUtil.CreateChecklistButton = CreateChecklistButton;
 end

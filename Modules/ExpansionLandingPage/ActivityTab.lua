@@ -39,7 +39,7 @@ do  --Checklist Button
 				LandingPageUtil.PlayUISound("CheckboxOn");
 			end
 		else
-			local data = ActivityUtil.GetActivityData(self.dataIndex);
+			local data = self:GetData();
 			if data then
 				--[[    --Disabled because the API cause errors
 				if data.openMap then
@@ -52,6 +52,10 @@ do  --Checklist Button
 				--]]
 			end
 		end
+	end
+
+	function ChecklistButtonMixin:GetData()
+		return self.dataIndex and ActivityUtil.GetActivityData(self.dataIndex);
 	end
 
 	function ChecklistButtonMixin:SetActivity(dataIndex, data)
@@ -265,7 +269,7 @@ do  --Checklist Button
 		if self.type == "Quest" and self.id then
 			shouldShowTooltip = true;
 			TooltipUpdator:SetFocusedObject(self);
-			local data = ActivityUtil.GetActivityData(self.dataIndex);
+			local data = self:GetData();
 			if data and data.useActiveQuestTitle then
 				TooltipUpdator:SetHeaderText(API.GetQuestName(self.id));
 			else
@@ -284,12 +288,12 @@ do  --Checklist Button
 			TooltipUpdator:SetFocusedObject(self);
 			TooltipUpdator:SetHeaderText(API.GetCurrencyName(self.id));
 			TooltipUpdator:SetCurrencyID(self.id);
-			local data = ActivityUtil.GetActivityData(self.dataIndex);
+			local data = self:GetData();
 			if data then
 				TooltipUpdator:RequestTooltipSetter(data.tooltipSetter);
 			end
 		else
-			local data = ActivityUtil.GetActivityData(self.dataIndex);
+			local data = self:GetData();
 			if data then
 				if data.tooltip or data.children or data.tooltipSetter or data.tooltipItem then
 					shouldShowTooltip = true;
@@ -323,13 +327,36 @@ do  --Checklist Button
 		end
 
 		if shouldShowTooltip and ActivityUtil.IsInManageMode() then
-			TooltipUpdator:RequestExtraInfoForManageMode(ActivityUtil.GetActivityData(self.dataIndex));
+			TooltipUpdator:RequestExtraInfoForManageMode(self:GetData());
 		end
 	end
 
 	function ChecklistButtonMixin:UpdateLocationHighlight()
-		local data = self.dataIndex and ActivityUtil.GetActivityData(self.dataIndex);
-		self.Glow:SetShown(data.showGlow);
+		local data = self:GetData();
+		self.Glow:SetShown(data and data.showGlow);
+	end
+
+	function ChecklistButtonMixin:UpdateIgnoredState()
+		local data = self:GetData();
+		if ActivityUtil.IsEntryIgnored(data) then
+			if self.EyeButton then
+				self.EyeButton:CloseEye();
+			end
+			self:SetAlpha(0.5);
+		else
+			if self.EyeButton then
+				self.EyeButton:OpenEye();
+			end
+			self:SetAlpha(1);
+		end
+	end
+
+	function ChecklistButtonMixin:ToggleEntryIgnored()
+		local data = self:GetData();
+		if data then
+			ActivityUtil.ToggleEntryIgnored(data);
+			self:UpdateIgnoredState();
+		end
 	end
 
 	function CreateChecklistButton(parent)
@@ -368,7 +395,7 @@ do
 		end
 	end
 
-	function ActivityTabMixin:FullUpdate()
+	function ActivityTabMixin:FullUpdate(resetScrollOffset)
 		self.fullUpdate = nil;
 
 		local uiMapID = API.GetPlayerMap();
@@ -386,6 +413,7 @@ do
 		local top, bottom;
 		local showActivity, showGroup;
 		local numCompleted;
+		local inManageMode = ActivityUtil.IsInManageMode();
 
 		SortedActivityData, numCompleted = ActivityUtil.GetSortedActivity();
 
@@ -418,11 +446,16 @@ do
 							obj:SetWidth(headerWidth);
 							obj.isCollapsed = v.isCollapsed;
 							obj:SetHeader();
+							obj:ShowEyeButton(false);
 						else
 							obj:SetWidth(entryWidth);
 							obj:SetEntry();
+							obj:ShowEyeButton(inManageMode);
 						end
 						obj:SetActivity(v.dataIndex, v);
+						if inManageMode then
+							obj:UpdateIgnoredState();
+						end
 					end,
 					top = top,
 					bottom = bottom,
@@ -431,7 +464,7 @@ do
 			end
 		end
 
-		local retainPosition = true;
+		local retainPosition = not resetScrollOffset;
 		self.ScrollView:SetContent(content, retainPosition);
 
 		self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
@@ -449,9 +482,6 @@ do
 		API.UnregisterFrameForEvents(self, DynamicEvents);
 		self:SetScript("OnEvent", nil);
 		self:StopAnimating();
-		if ActivityUtil.IsInManageMode() then
-			self:ToggleManageMode();
-		end
 	end
 
 	function ActivityTabMixin:OnEvent(event, ...)
@@ -541,6 +571,7 @@ do
 
 		local function ChecklistButton_OnRemoved(button)
 			button.tooltipWidgetSet = nil;
+			button:SetAlpha(1);
 		end
 
 		ScrollView:AddTemplate("ChecklistButton", ChecklistButton_Create, ChecklistButton_OnAcquired, ChecklistButton_OnRemoved);
@@ -628,7 +659,7 @@ do
 		ActivityUtil.SetManageMode(inManageMode);
 		CallbackRegistry:Trigger("LandingPage.ActivityManageMode", inManageMode);
 		if self:IsVisible() then
-			self:FullUpdate();
+			self:FullUpdate(true);
 		end
 	end
 end

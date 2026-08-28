@@ -815,4 +815,12 @@ do	-- Manage Mode
 	function ActivityUtil.SetManageMode(inManageMode)
 		ActivityUtil.inManageMode = inManageMode;
 	end
+
+	function ActivityUtil.IsEntryIgnored(entry)
+		return false;
+	end
+
+	function ActivityUtil.ToggleEntryIgnored(entry)
+		return false;
+	end
 end

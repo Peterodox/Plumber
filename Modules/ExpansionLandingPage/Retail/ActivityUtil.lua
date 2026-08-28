@@ -851,8 +851,10 @@ local function FlattenData(activityData, n, numCompleted, displayedList)
 				showActivity = entry.shouldShow();
 			end
 
+			entry.ignored = entry.uid and IgnoredEntry[entry.uid];
+
 			if showActivity then
-				if entry.uid and IgnoredEntry[entry.uid] then
+				if entry.ignored then
 					showActivity = false;
 					numIgnored = numIgnored + 1;
 				end
@@ -860,6 +862,7 @@ local function FlattenData(activityData, n, numCompleted, displayedList)
 
 			if inManageMode then
 				showActivity = true;
+				anyIncompleted = true;
 				entry.completed = false;
 				entry.isOnQuest = false;
 				entry.readyForTurnIn = false;
@@ -1029,6 +1032,23 @@ do	-- Manage Mode
 
 	function ActivityUtil.SetManageMode(inManageMode)
 		ActivityUtil.inManageMode = inManageMode;
+	end
+
+	function ActivityUtil.IsEntryIgnored(entry)
+		if entry and entry.uid then
+			return IgnoredEntry[entry.uid];
+		end
+	end
+
+	function ActivityUtil.ToggleEntryIgnored(entry)
+		if entry.uid then
+			ActivityUtil.ignoredListDirty = true;
+			if IgnoredEntry[entry.uid] then
+				IgnoredEntry[entry.uid] = nil;
+			else
+				IgnoredEntry[entry.uid] = true;
+			end
+		end
 	end
 end
 
