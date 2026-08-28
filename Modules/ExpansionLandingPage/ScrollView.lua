@@ -451,12 +451,7 @@ do  --ScrollView Basic Content Render
 	function ScrollViewMixin:SetOffset(offset)
 		self.offset = offset;
 		self.ScrollRef:SetPoint("TOP", self, "TOP", 0, offset);
-
-		if self.scrollable then
-			self.ScrollBar:SetValueByRatio(offset/self.range);
-		else
-			self.ScrollBar:SetValueByRatio(0);
-		end
+		self:UpdateScrollBar();
 	end
 
 	function ScrollViewMixin:UpdateView(useScrollTarget)
@@ -519,6 +514,14 @@ do  --ScrollView Basic Content Render
 					end
 				end
 			end
+		end
+	end
+
+	function ScrollViewMixin:UpdateScrollBar()
+		if self.scrollable then
+			self.ScrollBar:SetValueByRatio(self.offset/self.range);
+		else
+			self.ScrollBar:SetValueByRatio(0);
 		end
 	end
 
@@ -618,12 +621,16 @@ do  --ScrollView Basic Content Render
 			local offset = self.scrollTarget;
 			if (not self.allowOvershoot) and offset > self.range then
 				offset = self.range;
+				self.scrollTarget = offset;
+				self:SnapToScrollTarget();
+			else
+				self:UpdateView(true);
+				self:UpdateScrollBar();
 			end
-			self.scrollTarget = offset;
 		else
 			self.scrollTarget = 0;
+			self:SnapToScrollTarget();
 		end
-		self:SnapToScrollTarget();
 	end
 end
 
