@@ -185,6 +185,11 @@ do	--EyeButton controls visibility
 		self:GetParent():ToggleEntryIgnored();
 		GameTooltip:Hide();
 		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
+		if self.parentEntryIgnored then
+			LandingPageUtil.PlayUISound("CheckboxOff");
+		else
+			LandingPageUtil.PlayUISound("CheckboxOn");
+		end
 	end
 
 	function EyeButtonMixin:UpdateVisual()
