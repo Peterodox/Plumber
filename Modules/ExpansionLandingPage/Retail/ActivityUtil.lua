@@ -964,6 +964,11 @@ function ActivityUtil.GetSortedActivity()
 		category.isCollapsed = IsCategoryCollapsed(category.categoryID);
 	end
 
+	if not ActivityUtil.ignoredListLoaded then
+		ActivityUtil.ignoredListLoaded = true;
+		ActivityUtil.LoadIgnoredList();
+	end
+
 	n, numCompleted = FlattenData(MapQuestData, n, numCompleted, displayedList);
 	n, numCompleted = FlattenData(ActivityData, n, numCompleted, displayedList);
 
@@ -1022,6 +1027,8 @@ end);
 
 
 do	-- Manage Mode
+	local IGNORE_LIST_DBKEY = "LandingPage_Activity_IgnoredList";
+
 	function ActivityUtil.IsManageModeSupported()
 		return true;
 	end
@@ -1032,6 +1039,19 @@ do	-- Manage Mode
 
 	function ActivityUtil.SetManageMode(inManageMode)
 		ActivityUtil.inManageMode = inManageMode;
+		if not inManageMode then
+			if ActivityUtil.ignoredListDirty then
+				ActivityUtil.ignoredListDirty = nil;
+				-- Save ignored entries
+				local tbl = {};
+				for uid, ignored in pairs(IgnoredEntry) do
+					if ignored then
+						table.insert(tbl, uid);
+					end
+				end
+				addon.SetDBValue(IGNORE_LIST_DBKEY, tbl);
+			end
+		end
 	end
 
 	function ActivityUtil.IsEntryIgnored(entry)
@@ -1050,6 +1070,15 @@ do	-- Manage Mode
 			end
 		end
 	end
+
+	function ActivityUtil.LoadIgnoredList()
+		local tbl = addon.GetDBValue(IGNORE_LIST_DBKEY);
+		if tbl then
+			for _, uid in ipairs(tbl) do
+				IgnoredEntry[uid] = true;
+			end
+		end
+	end;
 end
 
 
