@@ -736,6 +736,8 @@ L["Save And Exit"] = "保存并退出";
 L["Activity Shown Condition Generic"] = "此条目仅在特定条件下显示。";
 L["Activity Shown Condition ShownIfActive"] = "此条目仅在任务激活时显示。";
 L["Activity Shown Condition ShownIfOnQuest"] = "此条目仅在你已接受任务后显示。";
+L["Click To Ignore Activity"] = "点击以隐藏";
+L["Click To Enable Activity"] = "点击以启用";
 
 
 --ExpansionSummaryMinimapButton

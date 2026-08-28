@@ -2,6 +2,7 @@ local _, addon = ...
 local API = addon.API;
 local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
+local TimedDispatcher = addon.TimedDispatcher;
 local SetupThreeSliceBackground = API.SetupThreeSliceBackground;
 local CreateFrame = CreateFrame;
 
@@ -172,14 +173,19 @@ do	--EyeButton controls visibility
 
 	function EyeButtonMixin:OnEnter()
 		self:UpdateVisual();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
 	end
 
 	function EyeButtonMixin:OnLeave()
 		self:UpdateVisual();
+		GameTooltip:Hide();
+		TimedDispatcher:Kill();
 	end
 
 	function EyeButtonMixin:OnClick(button)
 		self:GetParent():ToggleEntryIgnored();
+		GameTooltip:Hide();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
 	end
 
 	function EyeButtonMixin:UpdateVisual()
@@ -203,11 +209,23 @@ do	--EyeButton controls visibility
 	end
 
 	function EyeButtonMixin:OpenEye()
+		self.parentEntryIgnored = false;
 		self:SetIconCoord(432/512, 480/512, 208/512, 256/512);
 	end
 
 	function EyeButtonMixin:CloseEye()
+		self.parentEntryIgnored = true;
 		self:SetIconCoord(384/512, 432/512, 208/512, 256/512);
+	end
+
+	function EyeButtonMixin:ShowTooltip()
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		if self.parentEntryIgnored then
+			LandingPageUtil.SetTooltip(addon.L["Click To Enable Activity"]);
+		else
+			LandingPageUtil.SetTooltip(addon.L["Click To Ignore Activity"]);
+		end
+		GameTooltip:Show();
 	end
 
 	function CreateEyeButton(parent)

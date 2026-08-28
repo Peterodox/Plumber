@@ -767,6 +767,8 @@ L["Save And Exit"] = "Save and Exit";
 L["Activity Shown Condition Generic"] = "This entry only becomes visible if certain conditions are met.";
 L["Activity Shown Condition ShownIfActive"] = "This entry only becomes visible if the quest is active.";
 L["Activity Shown Condition ShownIfOnQuest"] = "This entry only becomes visible if you are on the quest.";
+L["Click To Ignore Activity"] = "Click to ignore";
+L["Click To Enable Activity"] = "Click to enable";
 
 
 --ExpansionSummaryMinimapButton
