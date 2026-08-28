@@ -154,6 +154,10 @@ do  --Checklist Button
 			self.Text1:SetText(nil);
 		end
 
+		if self.isInManageMode then
+			self.completed = false;
+		end
+
 		self:UpdateVisual();
 	end
 
@@ -442,6 +446,7 @@ do
 					setupFunc = function(obj)
 						obj.dataIndex = v.dataIndex;
 						obj.isOdd = isOdd;
+						obj.isInManageMode = inManageMode or nil;
 						if v.isHeader then
 							obj:SetWidth(headerWidth);
 							obj.isCollapsed = v.isCollapsed;

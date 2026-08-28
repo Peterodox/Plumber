@@ -45,7 +45,6 @@ do  --ScrollViewListButton
 			end
 			if self.isHeader or self.completed then
 				self.Name:SetTextColor(0.6, 0.6, 0.6);
-				--self.Name:SetTextColor(0.8, 0.8, 0.8);
 			elseif self.readyForTurnIn then
 				self.Name:SetTextColor(0.098, 1.000, 0.098);
 			else
