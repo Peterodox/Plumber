@@ -277,50 +277,6 @@ end
 
 local ListCategoryButtonMixin = {};
 do
-	function ListCategoryButtonMixin:SetName(name)
-		self.Name:SetText(name);
-	end
-
-	function ListCategoryButtonMixin:SetCollapsible(collapsible)
-		self.collapsible = collapsible;
-		if collapsible then
-			self.Left:SetSize(32, 32);
-			self.Left:SetTexCoord(828/1024, 892/1024, 176/1024, 240/1024);
-			self.Center:SetTexCoord(758/1024, 910/1024, 48/1024, 112/1024);
-		else
-			self.Left:SetSize(20, 32);
-			self.Left:SetTexCoord(694/1024, 734/1024, 48/1024, 112/1024);
-			self.Center:SetTexCoord(734/1024, 910/1024, 48/1024, 112/1024);
-		end
-		self.MinimizeButton:SetShown(collapsible);
-	end
-
-	function ListCategoryButtonMixin:SetCollapsed(isCollapsed, userInput)
-		self.isCollapsed = isCollapsed;
-		self.MinimizeButton.isCollapsed = isCollapsed;
-		self.MinimizeButton:OnMouseUp();
-		if userInput then
-			if self.onCollapsed then
-				self.onCollapsed(isCollapsed);
-			end
-		end
-	end
-
-	function ListCategoryButtonMixin:OnEnter()
-		if self.onEnterFunc then
-			self.onEnterFunc(self);
-		end
-	end
-
-	function ListCategoryButtonMixin:OnLeave()
-		GameTooltip:Hide();
-	end
-
-	function ListCategoryButtonMixin:SetOnEnterFunc(onEnterFunc)
-		self.onEnterFunc = onEnterFunc;
-	end
-
-
 	local MinimizeButtonMixin = {};
 
 	function MinimizeButtonMixin:OnMouseDown()
@@ -343,6 +299,126 @@ do
 		self:GetParent():SetCollapsed(not self.isCollapsed, true);
 	end
 
+
+	local CustomizeButtonMixin = {};
+
+	function CustomizeButtonMixin:OnMouseDown()
+		self.Texture:SetTexCoord(266/1024, 314/1024, 520/1024, 568/1024);
+	end
+
+	function CustomizeButtonMixin:OnMouseUp()
+		self.Texture:SetTexCoord(202/1024, 250/1024, 520/1024, 568/1024);
+	end
+
+	function CustomizeButtonMixin:OnClick()
+
+	end
+
+
+	local function CreateUtilityButton(listCategoryButton, buttonMixin)
+		local button = CreateFrame("Button", nil, listCategoryButton);
+		button:Hide();
+		Mixin(button, buttonMixin);
+		button:SetSize(24, 24);
+		button.Texture = button:CreateTexture(nil, "OVERLAY");
+		button.Texture:SetSize(24, 24);
+		button.Texture:SetPoint("CENTER", button, "CENTER", 0, 0);
+		button.Texture:SetTexture(TEXTURE_FILE);
+		button.Highlight = button:CreateTexture(nil, "HIGHLIGHT");
+		button.Highlight:SetPoint("CENTER", button, "CENTER", 0, 0);
+		button.Highlight:SetSize(48, 48);
+		button.Highlight:SetTexture(TEXTURE_FILE);
+		button.Highlight:SetTexCoord(892/1024, 956/1024, 256/1024, 320/1024);
+		button.Highlight:SetBlendMode("ADD");
+		button.Highlight:SetVertexColor(0.4, 0.2, 0.1);
+		button:OnMouseUp();
+		button:SetScript("OnMouseDown", button.OnMouseDown);
+		button:SetScript("OnMouseUp", button.OnMouseUp);
+		button:SetScript("OnClick", button.OnClick);
+		return button;
+	end
+
+
+	function ListCategoryButtonMixin:SetName(name)
+		self.Name:SetText(name);
+	end
+
+	function ListCategoryButtonMixin:OnEnter()
+		if self.onEnterFunc then
+			self.onEnterFunc(self);
+		end
+	end
+
+	function ListCategoryButtonMixin:OnLeave()
+		GameTooltip:Hide();
+	end
+
+	function ListCategoryButtonMixin:SetOnEnterFunc(onEnterFunc)
+		self.onEnterFunc = onEnterFunc;
+	end
+
+	function ListCategoryButtonMixin:SetCollapsible(collapsible)
+		self.collapsible = collapsible;
+		self:UpdateVisual();
+		if collapsible then
+			if not self.MinimizeButton then
+				self.MinimizeButton = CreateUtilityButton(self, MinimizeButtonMixin);
+				self.MinimizeButton:SetPoint("CENTER", self.Left, "CENTER", 0, 0);
+			end
+			self.MinimizeButton:Show();
+		elseif self.MinimizeButton then
+			self.MinimizeButton:Hide();
+		end
+	end
+
+	function ListCategoryButtonMixin:SetCollapsed(isCollapsed, userInput)
+		self.isCollapsed = isCollapsed;
+		self.MinimizeButton.isCollapsed = isCollapsed;
+		self.MinimizeButton:OnMouseUp();
+		if userInput then
+			if self.onCollapsed then
+				self.onCollapsed(isCollapsed);
+			end
+		end
+	end
+
+	function ListCategoryButtonMixin:SetCustomizable(customizable)
+		self.customizable = customizable;
+		self:UpdateVisual();
+		if customizable then
+			if not self.CustomizeButton then
+				self.CustomizeButton = CreateUtilityButton(self, CustomizeButtonMixin);
+				self.CustomizeButton:SetPoint("CENTER", self.Right, "CENTER", 0, 0);
+			end
+			self.CustomizeButton:Show();
+		elseif self.CustomizeButton then
+			self.CustomizeButton:Hide();
+		end
+	end
+
+	function ListCategoryButtonMixin:UpdateVisual()
+		local l, r;
+		if self.collapsible then
+			self.Left:SetSize(32, 32);
+			self.Left:SetTexCoord(828/1024, 892/1024, 176/1024, 240/1024);
+			l = 758;
+		else
+			self.Left:SetSize(20, 32);
+			self.Left:SetTexCoord(694/1024, 734/1024, 48/1024, 112/1024);
+			l = 734;
+		end
+		if self.customizable then
+			self.Right:SetSize(32, 32);
+			self.Right:SetTexCoord(128/1024, 192/1024, 512/1024, 576/1024);
+			r = 886;
+		else
+			self.Right:SetSize(20, 32);
+			self.Right:SetTexCoord(910/1024, 950/1024, 48/1024, 112/1024);
+			r = 910;
+		end
+		self.Center:SetTexCoord(l/1024, r/1024, 48/1024, 112/1024);
+	end
+
 	function LandingPageUtil.CreateListCategoryButton(parent, name, onEnterFunc)
 		local f = CreateFrame("Button", nil, parent);
 		Mixin(f, ListCategoryButtonMixin);
@@ -353,10 +429,10 @@ do
 		--f.bg:SetColorTexture(1, 1, 1, 0.2);
 
 		f.Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-		f.Name:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.Name:SetPoint("LEFT", f, "LEFT", 28, 0);
+		f.Name:SetPoint("RIGHT", f, "RIGHT", -28, 0);
 		f.Name:SetJustifyH("CENTER");
 		f.Name:SetTextColor(0.804, 0.667, 0.498);
-		--f.Name:SetTextColor(176/255, 174/255, 208/255);
 
 		SetupThreeSliceBackground(f, TEXTURE_FILE, -3, 3);
 		f.Left:SetSize(20, 32);
@@ -372,28 +448,6 @@ do
 		if name then
 			f:SetName(name);
 		end
-
-		local MinimizeButton = CreateFrame("Button", nil, f);
-		f.MinimizeButton = MinimizeButton;
-		MinimizeButton:Hide();
-		Mixin(MinimizeButton, MinimizeButtonMixin);
-		MinimizeButton:SetSize(24, 24);
-		MinimizeButton:SetPoint("CENTER", f.Left, "CENTER", 0, 0);
-		MinimizeButton.Texture = MinimizeButton:CreateTexture(nil, "OVERLAY");
-		MinimizeButton.Texture:SetSize(24, 24);
-		MinimizeButton.Texture:SetPoint("CENTER", MinimizeButton, "CENTER", 0, 0);
-		MinimizeButton.Texture:SetTexture(TEXTURE_FILE);
-		MinimizeButton.Highlight = MinimizeButton:CreateTexture(nil, "HIGHLIGHT");
-		MinimizeButton.Highlight:SetPoint("CENTER", MinimizeButton, "CENTER", 0, 0);
-		MinimizeButton.Highlight:SetSize(48, 48);
-		MinimizeButton.Highlight:SetTexture(TEXTURE_FILE);
-		MinimizeButton.Highlight:SetTexCoord(892/1024, 956/1024, 256/1024, 320/1024);
-		MinimizeButton.Highlight:SetBlendMode("ADD");
-		MinimizeButton.Highlight:SetVertexColor(0.4, 0.2, 0.1);
-		MinimizeButton:OnMouseUp();
-		MinimizeButton:SetScript("OnMouseDown", MinimizeButton.OnMouseDown);
-		MinimizeButton:SetScript("OnMouseUp", MinimizeButton.OnMouseUp);
-		MinimizeButton:SetScript("OnClick", MinimizeButton.OnClick);
 
 		return f
 	end

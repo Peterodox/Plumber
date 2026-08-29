@@ -391,7 +391,7 @@ do
 		local categories = {
 			{name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
 			{name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
-			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
+			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList, menuInfoGetter = true},
 		};
 
 		local numCategories = #categories;
@@ -408,6 +408,7 @@ do
 				local categoryButton = LandingPageUtil.CreateListCategoryButton(container, v.name);
 				categoryButton:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 				offsetY = offsetY + categoryButtonHeight;
+
 				if v.frameGetter then
 					offsetY = offsetY + lineGap;
 					local frame, height, categoryOnEnterFunc = v.frameGetter(container);
@@ -425,6 +426,13 @@ do
 					end
 					categoryButton:SetOnEnterFunc(categoryOnEnterFunc);
 				end
+
+				if v.menuInfoGetter then
+					categoryButton:SetCustomizable(true);
+				else
+					categoryButton:SetCustomizable(false);
+				end
+
 				offsetY = offsetY + paragraphGap;
 			end
 		end
