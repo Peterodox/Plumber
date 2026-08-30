@@ -311,7 +311,7 @@ do
 	end
 
 	function CustomizeButtonMixin:OnClick()
-
+		addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, self:GetParent().menuInfoGetter);
 	end
 
 
@@ -394,6 +394,10 @@ do
 		elseif self.CustomizeButton then
 			self.CustomizeButton:Hide();
 		end
+	end
+
+	function ListCategoryButtonMixin:SetCustomizeButtonMenuInfoGetter(menuInfoGetter)
+		self.menuInfoGetter = menuInfoGetter;
 	end
 
 	function ListCategoryButtonMixin:UpdateVisual()

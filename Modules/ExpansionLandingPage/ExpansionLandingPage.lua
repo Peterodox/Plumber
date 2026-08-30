@@ -411,7 +411,7 @@ do
 
 				if v.frameGetter then
 					offsetY = offsetY + lineGap;
-					local frame, height, categoryOnEnterFunc = v.frameGetter(container);
+					local frame, height, categoryOnEnterFunc, menuInfoGetter = v.frameGetter(container);
 					frame.listCategoryButton = categoryButton;
 					frame:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 					offsetY = offsetY + height;
@@ -425,12 +425,13 @@ do
 						frame:OnShow();
 					end
 					categoryButton:SetOnEnterFunc(categoryOnEnterFunc);
-				end
 
-				if v.menuInfoGetter then
-					categoryButton:SetCustomizable(true);
-				else
-					categoryButton:SetCustomizable(false);
+					if menuInfoGetter then
+						categoryButton:SetCustomizable(true);
+						categoryButton:SetCustomizeButtonMenuInfoGetter(menuInfoGetter);
+					else
+						categoryButton:SetCustomizable(false);
+					end
 				end
 
 				offsetY = offsetY + paragraphGap;
