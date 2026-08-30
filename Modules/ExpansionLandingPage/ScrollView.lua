@@ -403,6 +403,7 @@ local function CreateScrollView(parent, scrollBar)
 	f.range = 0;
 	f.viewportSize = 0;
 	f.blendSpeed = 0.15;
+	f.dataIndexOffset = 0;
 
 	f:SetStepSize(32);
 	f:SetBottomOvershoot(0);
@@ -485,7 +486,12 @@ do  --ScrollView Basic Content Render
 					end
 				end
 			end
+
+			fromDataIndex = fromDataIndex or 1;
 			toDataIndex = toDataIndex or self.numContent;
+
+			fromDataIndex = fromDataIndex - self.dataIndexOffset;
+			toDataIndex = toDataIndex + self.dataIndexOffset;
 
 			for dataIndex, obj in pairs(self.indexedObjects) do
 				if dataIndex < fromDataIndex or dataIndex > toDataIndex then
@@ -504,7 +510,7 @@ do  --ScrollView Basic Content Render
 
 				else
 					contentData = self.content[dataIndex];
-					obj = self:AcquireObject(contentData.templateKey);
+					obj = contentData and self:AcquireObject(contentData.templateKey);
 					if obj then
 						if contentData.setupFunc then
 							contentData.setupFunc(obj);
@@ -601,7 +607,7 @@ do  --ScrollView Basic Content Render
 
 		if self.numContent > 0 then
 			local range = content[self.numContent].bottom - self.viewportSize;
-			if true or range > 0 then
+			if range > 0 then	-- or true?
 				range = range + self.bottomOvershoot;
 			end
 			self:SetScrollRange(range);
@@ -842,10 +848,6 @@ do  --ScrollView Scroll Behavior
 		end
 	end
 
-	function ScrollViewMixin:SetBottomOvershoot(bottomOvershoot)
-		self.bottomOvershoot = bottomOvershoot;
-	end
-
 	function ScrollViewMixin:EnableMouseBlocker(state)
 		self.useMouseBlocker = state;
 		if state then
@@ -874,6 +876,10 @@ do  --ScrollView Scroll Behavior
 		--If the entries are collapsible, the header button's position may change with scroll range
 		--If true, the button will retain its position until scroll
 		self.allowOvershoot = state;
+	end
+
+	function ScrollViewMixin:SetBottomOvershoot(bottomOvershoot)
+		self.bottomOvershoot = bottomOvershoot;
 	end
 
 	function ScrollViewMixin:SetAlwaysShowScrollBar(state)
@@ -970,6 +976,14 @@ do  --ScrollView Scroll Behavior
 		if self.ScrollBar and self.ScrollBar.SetMinimized then
 			self.ScrollBar:SetMinimized(minimized);
 		end
+	end
+
+	function ScrollViewMixin:ExtendRenderDataIndex(dataIndexOffset)
+		-- We calculate which content is visible with its offsetY
+		-- But there could be issue if two objects have the same offsetY
+		-- In such case, we need to extend the fromDataIndex and toDataIndex
+
+		self.dataIndexOffset = dataIndexOffset;
 	end
 end
 
