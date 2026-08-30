@@ -769,6 +769,9 @@ L["Activity Shown Condition ShownIfActive"] = "This entry only becomes visible i
 L["Activity Shown Condition ShownIfOnQuest"] = "This entry only becomes visible if you are on the quest.";
 L["Click To Ignore Activity"] = "Click to ignore";
 L["Click To Enable Activity"] = "Click to enable";
+L["Currency Button Layout 1"] = "Name and Icon";
+L["Currency Button Layout 2"] = "Icon Only";
+L["Edit Resource List"] = "Edit";
 
 
 --ExpansionSummaryMinimapButton

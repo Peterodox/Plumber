@@ -12,6 +12,8 @@ local GetItemNameByID = C_Item.GetItemNameByID;
 
 
 local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
+local MINIENTRY_GAP = 4;
+
 local ResourceList = {}; ---@type ResourceListEntry[]
 local MainFrame;
 
@@ -27,7 +29,7 @@ local function GetResourcesQuantity(data)
 	return 0
 end
 
-local CurrencyButtonMixin = {};
+local CurrencyButtonMixin = {}; -- Name, Quantity, Icon
 do
 	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc, hasWeeklyCap)
 		self.currencyID = currencyID;
@@ -76,7 +78,7 @@ do
 				isOverflow = quantity > 0 and maxQuantity > 0 and (((maxQuantity - totalEarned) == 0) or (quantity >= maxQuantity))
 				if self.buttonDitry then
 					self.buttonDitry = nil;
-					self.Name:SetText(info.name);
+					self:TrySetName(info.name)
 					self.Icon:SetTexture(info.iconFileID);
 				end
 			else
@@ -89,11 +91,11 @@ do
 				self.Icon:SetTexture(GetItemIconByID(self.itemID));
 				local itemName = GetItemNameByID(self.itemID);
 				if itemName then
-					self.Name:SetText(itemName);
+					self:TrySetName(itemName);
 				else
 					CallbackRegistry:LoadItem(self.itemID, function(itemID)
 						if self.itemID == itemID then
-							self.Name:SetText(GetItemNameByID(self.itemID));
+							self:TrySetName(GetItemNameByID(self.itemID));
 							self.Icon:SetTexture(GetItemIconByID(self.itemID));
 						end
 					end);
@@ -116,11 +118,15 @@ do
 
 			if quantity > 0 or isOverflow then
 				self.anyOwned = true;
-				self.Name:SetTextColor(0.922, 0.871, 0.761);
+				if self.Name then
+					self.Name:SetTextColor(0.922, 0.871, 0.761);
+				end
 				self:SetCount(quantity, isOverflow);
 			else
 				self.anyOwned = false;
-				self.Name:SetTextColor(0.5, 0.5, 0.5);
+				if self.Name then
+					self.Name:SetTextColor(0.5, 0.5, 0.5);
+				end
 				self:SetCount(quantity);
 			end
 
@@ -132,7 +138,9 @@ do
 	end
 
 	function CurrencyButtonMixin:SetShownAsMinor(isMinor)
-		self.Name:SetPoint("LEFT", self, "LEFT", (isMinor and 22) or 8, 0);
+		if self.Name then
+			self.Name:SetPoint("LEFT", self, "LEFT", (isMinor and 22) or 8, 0);
+		end
 	end
 
 	function CurrencyButtonMixin:SetupActionButton()
@@ -164,7 +172,12 @@ do
 
 	function CurrencyButtonMixin:ShowTooltip()
 		local tooltip = GameTooltip;
-		tooltip:SetOwner(self, "ANCHOR_RIGHT", -6, 0);
+
+		if self.isMiniEntry then
+			tooltip:SetOwner(self, "ANCHOR_RIGHT", -4, 0);
+		else
+			tooltip:SetOwner(self.Icon, "ANCHOR_RIGHT", 0, 0);
+		end
 
 		if self.currencyID then
 			tooltip:SetCurrencyByID(self.currencyID);
@@ -244,20 +257,24 @@ do
 
 	function CurrencyButtonMixin:UpdateVisual()
 		if self:IsMouseMotionFocus() then
-			self.Name:SetTextColor(1, 1, 1);
-			self.Background:Show();
-		else
-			if self.anyOwned then
-				self.Name:SetTextColor(0.922, 0.871, 0.761);
-			else
-				self.Name:SetTextColor(0.5, 0.5, 0.5);
+			if self.Name then
+				self.Name:SetTextColor(1, 1, 1);
 			end
-			self.Background:Hide();
+			self.Highlight:Show();
+		else
+			if self.Name then
+				if self.anyOwned then
+					self.Name:SetTextColor(0.922, 0.871, 0.761);
+				else
+					self.Name:SetTextColor(0.5, 0.5, 0.5);
+				end
+			end
+			self.Highlight:Hide();
 		end
 	end
 end
 
-local function CreateButton(parent)
+local function CreateStandardEntry(parent)
 	local f = CreateFrame("Button", nil, parent, "PlumberStrikethroughNumberTemplate");
 	f:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 	API.Mixin(f, CurrencyButtonMixin);
@@ -280,21 +297,100 @@ local function CreateButton(parent)
 	f.Name:SetText("0/0");
 	f.Name:SetMaxLines(1);
 
-	f.Background = f:CreateTexture(nil, "BACKGROUND");
-	f.Background:SetAllPoints(true);
-	f.Background:Hide();
-	f.Background:SetTextureSliceMode(1);
+	f.Highlight = f:CreateTexture(nil, "BACKGROUND");
+	f.Highlight:SetAllPoints(true);
+	f.Highlight:Hide();
+	f.Highlight:SetTextureSliceMode(1);
 	local m = 8;
-	f.Background:SetTextureSliceMargins(m, m, m, m);
-	f.Background:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/SmallListButtonHighlight");
-	f.Background:SetBlendMode("ADD");
-	f.Background:SetAlpha(0.08);
+	f.Highlight:SetTextureSliceMargins(m, m, m, m);
+	f.Highlight:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/SmallListButtonHighlight");
+	f.Highlight:SetBlendMode("ADD");
+	f.Highlight:SetAlpha(0.08);
 
 	f:SetScript("OnEnter", f.OnEnter);
 	f:SetScript("OnLeave", f.OnLeave);
 	f:SetScript("OnClick", f.OnClick);
 
-	return f
+	return f;
+end
+
+local function MiniEntry_AlignByColumn(self, isLeft)
+	self.Icon:ClearAllPoints();
+	self.Count:ClearAllPoints();
+	if isLeft then
+		self.Icon:SetPoint("RIGHT", self, "RIGHT", -12, 0);
+		self.Count:SetPoint("LEFT", self, "LEFT", 12, 0);
+		self.Count:SetPoint("RIGHT", self, "RIGHT", -8, 0);
+		self.Count:SetJustifyH("LEFT");
+	else
+		self.Icon:SetPoint("LEFT", self, "LEFT", 12, 0);
+		self.Count:SetPoint("LEFT", self, "LEFT", 32, 0);
+		self.Count:SetPoint("RIGHT", self, "RIGHT", -8, 0);
+		self.Count:SetJustifyH("RIGHT");
+	end
+end
+
+local function MiniEntry_AlignToLeft(self, _isLeft)
+	self.Icon:ClearAllPoints();
+	self.Count:ClearAllPoints();
+	self.Icon:SetPoint("LEFT", self, "LEFT", 8, 0);
+	self.Count:SetPoint("LEFT", self, "LEFT", 32, 0);
+	self.Count:SetPoint("RIGHT", self, "RIGHT", -8, 0);
+	self.Count:SetJustifyH("LEFT");
+end
+
+local function MiniEntry_AlignToRight(self, _isLeft)
+	self.Icon:ClearAllPoints();
+	self.Count:ClearAllPoints();
+	self.Icon:SetPoint("RIGHT", self, "RIGHT", -8, 0);
+	self.Count:SetPoint("LEFT", self, "LEFT", 8, 0);
+	self.Count:SetPoint("RIGHT", self, "RIGHT", -32, 0);
+	self.Count:SetJustifyH("RIGHT");
+end
+
+local function MiniEntry_AlignBothSides(self, _isLeft)
+	local offset = 12;
+	self.Icon:ClearAllPoints();
+	self.Count:ClearAllPoints();
+	self.Icon:SetPoint("LEFT", self, "LEFT", offset, 0);
+	self.Count:SetPoint("LEFT", self, "LEFT", 32, 0);
+	self.Count:SetPoint("RIGHT", self, "RIGHT", -offset, 0);
+	self.Count:SetJustifyH("RIGHT");
+end
+
+local function CreateMiniEntry(parent)
+	local f = CreateFrame("Button", nil, parent, "PlumberStrikethroughNumberTemplate");
+	f:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+	f.isMiniEntry = true;
+	API.Mixin(f, CurrencyButtonMixin);
+
+	f.Icon = f:CreateTexture(nil, "ARTWORK");
+	f.Icon:SetSize(20, 20);
+	--f.Icon:SetTexCoord(6/64, 58/64, 6/64, 58/64);
+
+	f.breakupLargeNumbers = true;
+	f.Count:SetMaxLines(1);
+	f.Count:SetJustifyH("LEFT");
+	f.Count:SetTextColor(1, 1, 1);
+	f.Count:SetText("0");
+
+	MiniEntry_AlignBothSides(f);
+
+	f.Highlight = f:CreateTexture(nil, "BACKGROUND");
+	f.Highlight:SetAllPoints(true);
+	f.Highlight:Hide();
+	f.Highlight:SetTextureSliceMode(1);
+	local m = 8;
+	f.Highlight:SetTextureSliceMargins(m, m, m, m);
+	f.Highlight:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/SmallListButtonHighlight");
+	f.Highlight:SetBlendMode("ADD");
+	f.Highlight:SetAlpha(0.08);
+
+	f:SetScript("OnEnter", f.OnEnter);
+	f:SetScript("OnLeave", f.OnLeave);
+	f:SetScript("OnClick", f.OnClick);
+
+	return f;
 end
 
 
@@ -357,7 +453,7 @@ do
 		end
 	end
 
-	function CurrencyListMixin:FullUpdate()
+	function CurrencyListMixin:FullUpdate(resetScrollOffset)
 		self.anyCurrency = nil;
 		self.anyItem = nil;
 		self.anyRep = nil;
@@ -370,10 +466,18 @@ do
 		local offsetX = -0.5 * BUTTON_WIDTH;
 		local gap = 0;
 		local repBarGap = 10;
+		local miniEntryMode = addon.GetDBValue("LandingPage_Currency_Layout") == 2;
+		local isLeftCol = true;
 		local top, bottom;
 		local objectHeight;
 		local valid;
 		local uiMapID;
+
+		if miniEntryMode then
+			self.ScrollView:ExtendRenderDataIndex(2);
+		else
+			self.ScrollView:ExtendRenderDataIndex(0);
+		end
 
 		for _, v in ipairs(ResourceList) do
 			valid = true;
@@ -450,37 +554,65 @@ do
 					};
 				else
 					objectHeight = BUTTON_HEIGHT;
-					bottom = offsetY + objectHeight + gap;
-					content[n] = {
-						templateKey = "CurrencyButton",
-						top = top,
-						bottom = bottom,
-						point = "TOPLEFT",
-						offsetX = offsetX,
-					};
-					if v.currencyID then
-						self.anyCurrency = true;
-						content[n].setupFunc = function(obj)
-							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
-							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
-						end;
-					elseif v.itemID then
-						self.anyItem = true;
-						content[n].setupFunc = function(obj)
-							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
-							obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
-						end;
+					if miniEntryMode then
+						local buttonOffsetX;
+						local isLeft = isLeftCol;
+						if isLeftCol then
+							buttonOffsetX = -0.5 * BUTTON_WIDTH;
+							bottom = offsetY;
+						else
+							buttonOffsetX = MINIENTRY_GAP;
+							bottom = offsetY + objectHeight + MINIENTRY_GAP;
+						end
+						content[n] = {
+							templateKey = "MiniCurrencyButton",
+							top = top,
+							bottom = bottom,
+							point = "TOPLEFT",
+							offsetX = buttonOffsetX,
+						};
+						if v.currencyID then
+							self.anyCurrency = true;
+							content[n].setupFunc = function(obj)
+								obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
+							end;
+						elseif v.itemID then
+							self.anyItem = true;
+							content[n].setupFunc = function(obj)
+								obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc, v.useActionButton);
+							end;
+						end
+						isLeftCol = not isLeftCol;
+					else
+						bottom = offsetY + objectHeight + gap;
+						content[n] = {
+							templateKey = "CurrencyButton",
+							top = top,
+							bottom = bottom,
+							point = "TOPLEFT",
+							offsetX = offsetX,
+						};
+						if v.currencyID then
+							self.anyCurrency = true;
+							content[n].setupFunc = function(obj)
+								obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+								obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
+							end;
+						elseif v.itemID then
+							self.anyItem = true;
+							content[n].setupFunc = function(obj)
+								obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+								obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
+							end;
+						end
 					end
 
-					if v.usableItemID then
-						self.anyAction = true;
-					end
 				end
 				offsetY = bottom;
 			end
 		end
 
-		local retainPosition = true;
+		local retainPosition = not resetScrollOffset;
 		self.ScrollView:Show();
 		self.ScrollView:SetContent(content, retainPosition);
 
@@ -523,6 +655,7 @@ do
 	function CurrencyListMixin:UpdateScrollViewContent()
 		if self.ScrollView then
 			self.ScrollView:CallObjectMethod("CurrencyButton", "Refresh");
+			self.ScrollView:CallObjectMethod("MiniCurrencyButton", "Refresh");
 		end
 	end
 
@@ -540,6 +673,41 @@ local function CategoryButtonOnEnterFunc(listCategoryButton)
 	end
 end
 
+local function MenuInfoGetter_CurrencySettings()
+	local tbl = {
+		key = "LandingPageCurrencySettings",
+	};
+
+	local tinsert = table.insert;
+
+	local widgets = {
+		{type = "Header", text = L["Quick Slot Layout"]},
+	};
+
+
+	local selectedIndex = addon.GetDBValue("LandingPage_Currency_Layout");
+
+	for i = 1, 2 do
+		tinsert(widgets, {
+			type = "Radio",
+			text = L["Currency Button Layout "..i];
+			closeAfterClick = true,
+			onClickFunc = function()
+				addon.SetDBValue("LandingPage_Currency_Layout", i);
+				MainFrame:FullUpdate(true);
+			end,
+			selected = i == selectedIndex,
+		});
+	end
+
+	tinsert(widgets, {type = "Divider"});
+	tinsert(widgets, {type = "Button", text = L["Edit Resource List"], tooltip = nil, closeAfterClick = true,
+		onClickFunc = function() end,
+	});
+
+	tbl.widgets = widgets;
+	return tbl
+end
 
 function LandingPageUtil.CreateCurrencyList(parent)
 	local f = CreateFrame("Frame", nil, parent);
@@ -566,7 +734,7 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	ScrollView:SetBoundaryGradientSize(BUTTON_HEIGHT);
 
 	local function CurrencyButton_Create()
-		return CreateButton(ScrollView)
+		return CreateStandardEntry(ScrollView);
 	end
 
 	local function CurrencyButton_OnAcquired(obj)
@@ -583,6 +751,21 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	end
 
 	ScrollView:AddTemplate("CurrencyButton", CurrencyButton_Create, CurrencyButton_OnAcquired, CurrencyButton_OnRemoved);
+
+
+	local function MiniCurrencyButton_Create()
+		return CreateMiniEntry(ScrollView);
+	end
+
+	local function MiniCurrencyButton_OnAcquired(obj)
+		if ScrollView:IsScrollable() then
+			obj:SetWidth((BUTTON_WIDTH - MINIENTRY_GAP - 10) / 2);
+		else
+			obj:SetWidth((BUTTON_WIDTH - MINIENTRY_GAP) / 2);
+		end
+	end
+
+	ScrollView:AddTemplate("MiniCurrencyButton", MiniCurrencyButton_Create, MiniCurrencyButton_OnAcquired, CurrencyButton_OnRemoved);
 
 
 	local function HeaderTitle_Create()
@@ -622,7 +805,7 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	f:SetScript("OnHide", f.OnHide);
 	f:SetScript("OnEvent", f.OnEvent);
 
-	return f, height, CategoryButtonOnEnterFunc
+	return f, height, CategoryButtonOnEnterFunc, MenuInfoGetter_CurrencySettings;
 end
 
 
