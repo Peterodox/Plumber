@@ -69,7 +69,7 @@ do  --Checklist Button
 			self.conditions = data.conditions;
 			self.Icon:Show();
 
-			if self.completed then
+			if self.completed and not self.isInManageMode then
 				self.Icon:SetAtlas("checkmark-minimal-disabled");
 			elseif data.icon then
 				if data.itemID or data.removeIconBorder then
@@ -111,6 +111,11 @@ do  --Checklist Button
 	end
 
 	function ChecklistButtonMixin:UpdateProgress(updateCompletion)
+		if self.isInManageMode then
+			self:UpdateVisual();
+			return;
+		end
+
 		self.readyForTurnIn = nil;
 		if self.flagQuest then
 			self.readyForTurnIn = ReadyForTurnIn(self.flagQuest);
