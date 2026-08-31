@@ -355,7 +355,6 @@ local function MiniEntry_AlignBothSides(self, _isLeft)
 	self.Icon:ClearAllPoints();
 	self.Count:ClearAllPoints();
 	self.Icon:SetPoint("LEFT", self, "LEFT", offset, 0);
-	self.Count:SetPoint("LEFT", self, "LEFT", 32, 0);
 	self.Count:SetPoint("RIGHT", self, "RIGHT", -offset, 0);
 	self.Count:SetJustifyH("RIGHT");
 end
