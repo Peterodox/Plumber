@@ -314,6 +314,7 @@ local function CreateStandardEntry(parent)
 	return f;
 end
 
+--[[
 local function MiniEntry_AlignByColumn(self, isLeft)
 	self.Icon:ClearAllPoints();
 	self.Count:ClearAllPoints();
@@ -347,6 +348,7 @@ local function MiniEntry_AlignToRight(self, _isLeft)
 	self.Count:SetPoint("RIGHT", self, "RIGHT", -32, 0);
 	self.Count:SetJustifyH("RIGHT");
 end
+--]]
 
 local function MiniEntry_AlignBothSides(self, _isLeft)
 	local offset = 12;
@@ -475,8 +477,10 @@ do
 
 		if miniEntryMode then
 			self.ScrollView:ExtendRenderDataIndex(2);
+			self.ScrollView:SetStepSize(2 * (BUTTON_HEIGHT + MINIENTRY_GAP));
 		else
 			self.ScrollView:ExtendRenderDataIndex(0);
+			self.ScrollView:SetStepSize(2.5 * BUTTON_HEIGHT);
 		end
 
 		for _, v in ipairs(ResourceList) do
@@ -556,14 +560,12 @@ do
 					objectHeight = BUTTON_HEIGHT;
 					if miniEntryMode then
 						local buttonOffsetX;
-						local isLeft = isLeftCol;
 						if isLeftCol then
 							buttonOffsetX = -0.5 * BUTTON_WIDTH;
-							bottom = offsetY;
 						else
 							buttonOffsetX = MINIENTRY_GAP;
-							bottom = offsetY + objectHeight + MINIENTRY_GAP;
 						end
+						bottom = offsetY + objectHeight + MINIENTRY_GAP;
 						content[n] = {
 							templateKey = "MiniCurrencyButton",
 							top = top,
@@ -582,6 +584,12 @@ do
 								obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc, v.useActionButton);
 							end;
 						end
+
+						if isLeftCol then
+							-- Reset bottom so the button on the right col has the same top.
+							bottom = offsetY;
+						end
+
 						isLeftCol = not isLeftCol;
 					else
 						bottom = offsetY + objectHeight + gap;
