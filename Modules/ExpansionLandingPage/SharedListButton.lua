@@ -35,13 +35,13 @@ do  --ScrollViewListButton
 			self.Name:SetTextColor(1, 1, 1);
 		else
 			if self.isOdd then
-				self.Left:SetTexCoord(0/512, 64/512, 64/512, 128/512);
-				self.Right:SetTexCoord(448/512, 512/512, 64/512, 128/512);
-				self.Center:SetTexCoord(64/512, 448/512, 64/512, 128/512);
-			else
 				self.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
 				self.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
 				self.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
+			else
+				self.Left:SetTexCoord(0/512, 64/512, 64/512, 128/512);
+				self.Right:SetTexCoord(448/512, 512/512, 64/512, 128/512);
+				self.Center:SetTexCoord(64/512, 448/512, 64/512, 128/512);
 			end
 			if self.isHeader or self.completed then
 				self.Name:SetTextColor(0.6, 0.6, 0.6);

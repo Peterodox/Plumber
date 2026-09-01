@@ -595,7 +595,7 @@ do	--Shared
 
 		if highlighted then
 			if not BlackOverlay then
-				local offset = 8;
+				local offset = 7;
 				local alpha = 0.8;
 
 				BlackOverlay = CreateFrame("Frame", nil, MainFrame);

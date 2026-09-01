@@ -1112,7 +1112,7 @@ do
 
 			if showEntry then
 				n = n + 1;
-				local isOdd = n % 2 == 0;
+				local isOdd = n % 2 == 1;
 				top = offsetY;
 				bottom = offsetY + buttonHeight + gap;
 				content[n] = {
