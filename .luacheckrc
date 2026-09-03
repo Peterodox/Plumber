@@ -1280,6 +1280,7 @@ stds.wow = {
 				"GetSecondarySlotState",
 				"GetTransmogOutfitSlotFromInventorySlot",
 				"GetViewedOutfitSlotInfo",
+				"GetWeaponOptionsForSlot",
 				"HasPendingOutfitTransmogs",
 				"IsEquippedGearOutfitDisplayed",
 				"IsLockedOutfit",

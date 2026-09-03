@@ -16,6 +16,8 @@ do
 		[12] = true,    --Finger2
 		[13] = true,    --Trinket1
 		[14] = true,    --Trinket2
+		[16] = true,    --MainHand, see CaptureWeaponOptionsPending
+		[17] = true,    --SecondaryHand, see CaptureWeaponOptionsPending
 		[18] = true,    --Ranged
 	};
 
@@ -63,13 +65,7 @@ do
 					SetPendingFromSlot(invSlotID, Enum.TransmogOutfitSlot.ShoulderLeft, secondaryAppearanceID);
 				else
 					local slot = C_TransmogOutfitInfo.GetTransmogOutfitSlotFromInventorySlot(invSlotID - 1);
-					local illusionID, weaponOption;
-					if invSlotID == 16 or invSlotID == 17 then
-						--Weapon slots must be written under the equipped weapon's option, or SetPendingTransmog silently does nothing
-						illusionID = transmogInfo.illusionID;
-						weaponOption = slot and C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot);
-					end
-					SetPendingFromSlot(invSlotID, slot, transmogID, illusionID, weaponOption);
+					SetPendingFromSlot(invSlotID, slot, transmogID);
 				end
 			end
 		end
@@ -81,37 +77,72 @@ do
 		end
 	end
 
-	local function GetWeaponSheatheCategory(slot, weaponOption)
-		if not slot or not weaponOption or weaponOption == Enum.TransmogOutfitSlotOption.None then return nil end;
+	--Records are {invSlotID, weaponOption, transmogID, illusionID, sheatheCategory}, false marks a field as not captured
+	local function CaptureWeaponOptionRecord(invSlotID, slot, weaponOption)
+		local transmogID, illusionID, sheatheCategory;
 
-		local slotInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
-		return slotInfo and slotInfo.sheatheCategory;
+		--hasPending means unsaved, not just currently equipped or already saved
+		local appearanceInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
+		if appearanceInfo and appearanceInfo.hasPending then
+			transmogID = appearanceInfo.transmogID;
+			sheatheCategory = appearanceInfo.sheatheCategory;
+		end
+
+		local illusionInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Illusion, weaponOption);
+		if illusionInfo and illusionInfo.hasPending then
+			illusionID = illusionInfo.transmogID;
+		end
+
+		if transmogID or illusionID then
+			return {invSlotID, weaponOption, transmogID or false, illusionID or false, sheatheCategory or false};
+		end
 	end
 
-	function EL.CaptureWeaponSheatheCategories()
-		local sheatheCategories;
-		for invSlotID, slot in pairs(WEAPON_SLOTS) do
-			local weaponOption = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot);
-			local category = GetWeaponSheatheCategory(slot, weaponOption);
-			if category then
-				sheatheCategories = sheatheCategories or {};
-				sheatheCategories[invSlotID] = category;
+	--Shared so the same capture logic runs for both weaponOptionsInfo and artifactOptionsInfo without duplicating it
+	local function CaptureOptionsInfoList(weaponOptionsPending, invSlotID, slot, optionsInfo)
+		if not optionsInfo then return weaponOptionsPending end;
+
+		for _, optionInfo in ipairs(optionsInfo) do
+			if optionInfo.enabled then
+				local record = CaptureWeaponOptionRecord(invSlotID, slot, optionInfo.weaponOption);
+				if record then
+					weaponOptionsPending = weaponOptionsPending or {};
+					table.insert(weaponOptionsPending, record);
+				end
 			end
 		end
-		return sheatheCategories;
+
+		return weaponOptionsPending;
 	end
 
-	function EL.RestoreWeaponSheatheCategories(sheatheCategories)
-		if not sheatheCategories then return end;
-
+	function EL.CaptureWeaponOptionsPending()
+		local weaponOptionsPending;
 		for invSlotID, slot in pairs(WEAPON_SLOTS) do
-			local category = sheatheCategories[invSlotID];
-			if category then
-				--Must match the equipped weapon's current option, or SetPendingTransmogSheatheCategory silently does nothing
-				local weaponOption = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot);
-				if weaponOption and weaponOption ~= Enum.TransmogOutfitSlotOption.None then
-					C_TransmogOutfitInfo.SetPendingTransmogSheatheCategory(slot, weaponOption, category);
-				end
+			--Artifact spec options use separate enum values, so they never collide with the weapon options here
+			local weaponOptionsInfo, artifactOptionsInfo = C_TransmogOutfitInfo.GetWeaponOptionsForSlot(slot);
+			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, invSlotID, slot, weaponOptionsInfo);
+			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, invSlotID, slot, artifactOptionsInfo);
+		end
+		return weaponOptionsPending;
+	end
+
+	function EL.RestoreWeaponOptionsPending(weaponOptionsPending)
+		if not weaponOptionsPending then return end;
+
+		for _, record in ipairs(weaponOptionsPending) do
+			local invSlotID, weaponOption, transmogID, illusionID, sheatheCategory = record[1], record[2], record[3], record[4], record[5];
+			local slot = WEAPON_SLOTS[invSlotID];
+
+			if transmogID then
+				SetPendingFromSlot(invSlotID, slot, transmogID, illusionID, weaponOption);
+			elseif illusionID then
+				--SetPendingFromSlot already writes the illusion when transmogID is set, this covers illusion-only changes
+				local illusionDisplayType = (illusionID == 0) and Enum.TransmogOutfitDisplayType.Unassigned or Enum.TransmogOutfitDisplayType.Assigned;
+				C_TransmogOutfitInfo.SetPendingTransmog(slot, Enum.TransmogType.Illusion, weaponOption, illusionID, illusionDisplayType);
+			end
+
+			if sheatheCategory then
+				C_TransmogOutfitInfo.SetPendingTransmogSheatheCategory(slot, weaponOption, sheatheCategory);
 			end
 		end
 	end
@@ -152,7 +183,7 @@ do
 			PlumberDB_PC.TransmogRestorePending = {
 				snapshot = SerializeSnapshot(EL.pendingSnapshot),
 				shoulderSecondary = EL.pendingShoulderSecondary,
-				sheatheCategories = EL.pendingSheatheCategories,
+				weaponOptions = EL.pendingWeaponOptions,
 			};
 		else
 			PlumberDB_PC.TransmogRestorePending = nil;
@@ -170,7 +201,7 @@ do
 				EL.pendingSnapshot = saved.snapshot;
 			end
 			EL.pendingShoulderSecondary = saved.shoulderSecondary;
-			EL.pendingSheatheCategories = saved.sheatheCategories;
+			EL.pendingWeaponOptions = saved.weaponOptions;
 		end
 	end
 
@@ -180,11 +211,11 @@ do
 		if not C_TransmogOutfitInfo.HasPendingOutfitTransmogs() then
 			EL.pendingSnapshot = nil;
 			EL.pendingShoulderSecondary = nil;
-			EL.pendingSheatheCategories = nil;
+			EL.pendingWeaponOptions = nil;
 		else
 			EL.pendingSnapshot = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
 			EL.pendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
-			EL.pendingSheatheCategories = EL.CaptureWeaponSheatheCategories();
+			EL.pendingWeaponOptions = EL.CaptureWeaponOptionsPending();
 		end
 
 		SaveSnapshotToDB();
@@ -194,10 +225,10 @@ do
 		--Clear early, a write below can retrigger CaptureSnapshot mid-call
 		local snapshot = EL.pendingSnapshot;
 		local shoulderSecondary = EL.pendingShoulderSecondary;
-		local sheatheCategories = EL.pendingSheatheCategories;
+		local weaponOptions = EL.pendingWeaponOptions;
 		EL.pendingSnapshot = nil;
 		EL.pendingShoulderSecondary = nil;
-		EL.pendingSheatheCategories = nil;
+		EL.pendingWeaponOptions = nil;
 		EL.SaveSnapshotToDB();
 
 		EL.ForceWeaponSlotWidgetRebuild();
@@ -206,7 +237,7 @@ do
 		EL.RestoreShoulderSecondaryState(shoulderSecondary);
 		EL.ApplySnapshotToPending(snapshot);
 		--Must run after ApplySnapshotToPending, setting a weapon's appearance resets its sheathe category to Default
-		EL.RestoreWeaponSheatheCategories(sheatheCategories);
+		EL.RestoreWeaponOptionsPending(weaponOptions);
 		--If we ever want to notify the user their outfit was restored, this is where it'd happen.
 	end
 
@@ -258,7 +289,7 @@ do
 			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
 			EL.pendingSnapshot = nil;
 			EL.pendingShoulderSecondary = nil;
-			EL.pendingSheatheCategories = nil;
+			EL.pendingWeaponOptions = nil;
 			EL.SaveSnapshotToDB();
 		end
 	end
