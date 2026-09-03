@@ -7,6 +7,60 @@ local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
+changelogs[10905] = {
+	{
+		type = "date",
+		versionText = "1.9.5",
+		timestamp = 1788400000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName TransmogRaestorePending"],
+		dbKey = "TransmogRaestorePending",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "TransmogRaestorePending",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = L["ModuleDescription TransmogRaestorePending"],
+	},
+
+	{
+		type = "img",
+		fileName = "Changelog_TransmogRaestorePending",
+		canvasWidth = 512,
+		canvasHeight = 256,
+		imageRight = 512,
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Skyriding Race Medal: Fixed an error that occurred when interacting with Skyriding NPCs during combat.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber Housing Macro: You can now rename this macro. Clicking Save will no longer reset its name.",
+	},
+};
+
 changelogs[10904] = {
 	{
 		type = "date",

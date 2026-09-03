@@ -807,7 +807,7 @@ L["Quick Access Outfit Button Tooltip"] = "Click and drag this button to your ac
 
 --TransmogRaestorePending
 L["ModuleName TransmogRaestorePending"] = "Transmog UI: Restore Pending Changes";
-L["ModuleDescription TransmogRaestorePending"] = "Pending Transmog changes will be automatically restored when reopening the window.";
+L["ModuleDescription TransmogRaestorePending"] = "Pending Transmog changes are automatically restored when reopening the window.";
 
 
 --QuestWatchCycle
