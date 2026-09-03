@@ -3,6 +3,10 @@ local L = addon.L;
 
 local EL = CreateFrame("Frame");
 local SHOULDER_RIGHT = Enum.TransmogOutfitSlot.ShoulderRight;
+local WEAPON_SLOTS = {
+	[16] = Enum.TransmogOutfitSlot.WeaponMainHand,
+	[17] = Enum.TransmogOutfitSlot.WeaponOffHand,
+};
 
 
 do
@@ -79,6 +83,43 @@ do
 	end
 	EL.RestoreShoulderSecondaryState = RestoreShoulderSecondaryState;
 
+	local function GetWeaponSheatheCategory(slot, weaponOption)
+		if not slot or not weaponOption or weaponOption == Enum.TransmogOutfitSlotOption.None then return nil end;
+
+		local slotInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
+		return slotInfo and slotInfo.sheatheCategory;
+	end
+
+	local function CaptureWeaponSheatheCategories()
+		local sheatheCategories;
+		for invSlotID, slot in pairs(WEAPON_SLOTS) do
+			local weaponOption = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot);
+			local category = GetWeaponSheatheCategory(slot, weaponOption);
+			if category then
+				sheatheCategories = sheatheCategories or {};
+				sheatheCategories[invSlotID] = category;
+			end
+		end
+		return sheatheCategories;
+	end
+	EL.CaptureWeaponSheatheCategories = CaptureWeaponSheatheCategories;
+
+	local function RestoreWeaponSheatheCategories(sheatheCategories)
+		if not sheatheCategories then return end;
+
+		for invSlotID, slot in pairs(WEAPON_SLOTS) do
+			local category = sheatheCategories[invSlotID];
+			if category then
+				--Must match the equipped weapon's current option, or SetPendingTransmogSheatheCategory silently does nothing
+				local weaponOption = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot);
+				if weaponOption and weaponOption ~= Enum.TransmogOutfitSlotOption.None then
+					C_TransmogOutfitInfo.SetPendingTransmogSheatheCategory(slot, weaponOption, category);
+				end
+			end
+		end
+	end
+	EL.RestoreWeaponSheatheCategories = RestoreWeaponSheatheCategories;
+
 	local function ForceWeaponSlotWidgetRebuild()
 		--Toggling shoulder secondary state forces a weapon slot widget rebuild, working around a Blizzard display
 		--bug where the widget caches the wrong option (e.g. 1H for an equipped 2H) on first build. Must run first.
@@ -116,6 +157,7 @@ do
 			PlumberDB_PC.TransmogRestorePending = {
 				snapshot = SerializeSnapshot(EL.pendingSnapshot),
 				shoulderSecondary = EL.pendingShoulderSecondary,
+				sheatheCategories = EL.pendingSheatheCategories,
 			};
 		else
 			PlumberDB_PC.TransmogRestorePending = nil;
@@ -133,6 +175,7 @@ do
 				EL.pendingSnapshot = saved.snapshot;
 			end
 			EL.pendingShoulderSecondary = saved.shoulderSecondary;
+			EL.pendingSheatheCategories = saved.sheatheCategories;
 		end
 	end
 	EL.LoadSnapshotFromDB = LoadSnapshotFromDB;
@@ -143,9 +186,11 @@ do
 		if not C_TransmogOutfitInfo.HasPendingOutfitTransmogs() then
 			EL.pendingSnapshot = nil;
 			EL.pendingShoulderSecondary = nil;
+			EL.pendingSheatheCategories = nil;
 		else
 			EL.pendingSnapshot = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
 			EL.pendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+			EL.pendingSheatheCategories = EL.CaptureWeaponSheatheCategories();
 		end
 
 		SaveSnapshotToDB();
@@ -155,8 +200,10 @@ do
 		--Clear early, a write below can retrigger CaptureSnapshot mid-call
 		local snapshot = EL.pendingSnapshot;
 		local shoulderSecondary = EL.pendingShoulderSecondary;
+		local sheatheCategories = EL.pendingSheatheCategories;
 		EL.pendingSnapshot = nil;
 		EL.pendingShoulderSecondary = nil;
+		EL.pendingSheatheCategories = nil;
 		EL.SaveSnapshotToDB();
 
 		EL.ForceWeaponSlotWidgetRebuild();
@@ -164,6 +211,8 @@ do
 		--Must run before ApplySnapshotToPending, toggling this after would wipe the left shoulder's pending value
 		EL.RestoreShoulderSecondaryState(shoulderSecondary);
 		EL.ApplySnapshotToPending(snapshot);
+		--Must run after ApplySnapshotToPending, setting a weapon's appearance resets its sheathe category to Default
+		EL.RestoreWeaponSheatheCategories(sheatheCategories);
 		--If we ever want to notify the user their outfit was restored, this is where it'd happen.
 	end
 
@@ -216,6 +265,7 @@ do
 			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
 			EL.pendingSnapshot = nil;
 			EL.pendingShoulderSecondary = nil;
+			EL.pendingSheatheCategories = nil;
 			EL.SaveSnapshotToDB();
 		end
 	end

@@ -1279,11 +1279,13 @@ stds.wow = {
 				"GetOutfitsInfo",
 				"GetSecondarySlotState",
 				"GetTransmogOutfitSlotFromInventorySlot",
+				"GetViewedOutfitSlotInfo",
 				"HasPendingOutfitTransmogs",
 				"IsEquippedGearOutfitDisplayed",
 				"IsLockedOutfit",
 				"PickupOutfit",
 				"SetPendingTransmog",
+				"SetPendingTransmogSheatheCategory",
 				"SetSecondarySlotState",
 			},
 		},
@@ -1574,6 +1576,8 @@ stds.wow = {
 					fields = {
 						"ShoulderLeft",
 						"ShoulderRight",
+						"WeaponMainHand",
+						"WeaponOffHand",
 					},
 				},
 
