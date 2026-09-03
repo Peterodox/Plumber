@@ -805,9 +805,9 @@ L["Quick Access Outfit Button"] = "Quick Access";
 L["Quick Access Outfit Button Tooltip"] = "Click and drag this button to your action bars so you can change outfits anywhere.";
 
 
---TransmogRestorePending
-L["ModuleName TransmogRestorePending"] = "Transmog UI: Restore Pending Changes";
-L["ModuleDescription TransmogRestorePending"] = "Your pending Transmog changes are restored automatically the next time you open the window.";
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "Transmog UI: Restore Pending Changes";
+L["ModuleDescription TransmogRaestorePending"] = "Pending Transmog changes will be automatically restored when reopening the window.";
 
 
 --QuestWatchCycle

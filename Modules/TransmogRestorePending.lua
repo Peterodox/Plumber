@@ -295,12 +295,13 @@ do
 	end
 
 	local moduleData = {
-		name = L["ModuleName TransmogRestorePending"],
+		name = L["ModuleName TransmogRaestorePending"],
 		dbKey = "TransmogRaestorePending",
-		description = L["ModuleDescription TransmogRestorePending"],
+		description = L["ModuleDescription TransmogRaestorePending"],
 		toggleFunc = EnableModule,
-		moduleAddedTime = 1788399603,
+		moduleAddedTime = 1788400000,
 		categoryKeys = {"Collection"},
+		consultant = 2,
 	};
 
 	addon.ControlCenter:AddModule(moduleData);

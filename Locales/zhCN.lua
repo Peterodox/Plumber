@@ -773,6 +773,11 @@ L["Quick Access Outfit Button"] = "快捷访问";
 L["Quick Access Outfit Button Tooltip"] = "点击并拖动此按钮到技能栏上，以便随时随地访问外观列表。";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "幻化界面: 恢复未保存的改动";
+L["ModuleDescription TransmogRaestorePending"] = "未保存的改动将在你重新打开幻化界面时自动恢复。";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "快捷键：任务焦点";
 L["ModuleDescription QuestWatchCycle"] = "允许你设置快捷键来设下一个或上一个任务为焦点。\n\n|cffd4641c请前往以下位置设置按键：游戏设置> 快捷键> Plumber 插件.|r";
