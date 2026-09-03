@@ -141,7 +141,7 @@ L["Catalyst Charges"] = "充能层数";
 
 
 --GossipFrameMedal
-L["ModuleName GossipFrameMedal"] = "驭龙竞速评级";
+L["ModuleName GossipFrameMedal"] = "驭空术竞速评级";
 L["ModuleDescription GossipFrameMedal Format"] = "将默认图标 %s 替换为你获得的奖章 %s。\n\n在你与青铜时光守护者对话后，可能需要短暂的时间来从服务器获取记录。";
 
 

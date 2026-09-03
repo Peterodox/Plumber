@@ -141,7 +141,7 @@ L["Catalyst Charges"] = "Catalyst Charges";
 
 
 --GossipFrameMedal
-L["ModuleName GossipFrameMedal"] = "Dragonriding Race Medal";
+L["ModuleName GossipFrameMedal"] = "Skyriding Race Medal";
 L["ModuleDescription GossipFrameMedal Format"] = "Replace the default icon %s with the medal %s you earn.\n\nIt may take a brief moment to acquire your records when you interact with the NPC.";
 
 
