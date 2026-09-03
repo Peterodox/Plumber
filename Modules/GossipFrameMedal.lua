@@ -277,9 +277,9 @@ end
 
 
 function EL:UpdateRaceTimesFromAura()
-    if C_Secrets and C_Secrets.ShouldAurasBeSecret and C_Secrets.ShouldAurasBeSecret() then
-        return;
-    end
+	if C_Secrets and C_Secrets.ShouldAurasBeSecret and C_Secrets.ShouldAurasBeSecret() then
+		return;
+	end
 
 	local unit = "player";
 	local filter = "HELPFUL";
@@ -312,13 +312,13 @@ local function EL_OnEvent(self, event, ...)
 		end
 
 	elseif event == "ADDON_RESTRICTION_STATE_CHANGED" then
-        if not self.pauseUpdate then
-            self.pauseUpdate = true;
-            C_Timer.After(0.2, function()
-                self.pauseUpdate = nil;
-                EL:UpdateRaceTimesFromAura();
-            end);
-        end
+		if not self.pauseUpdate then
+			self.pauseUpdate = true;
+			C_Timer.After(0.2, function()
+				self.pauseUpdate = nil;
+				EL:UpdateRaceTimesFromAura();
+			end);
+		end
 	end
 end
 
