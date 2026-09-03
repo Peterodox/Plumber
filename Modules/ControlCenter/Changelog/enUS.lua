@@ -2329,6 +2329,7 @@ changelogs[10801] = {
 };
 
 
+--[[
 changelogs[10800] = {
 	{
 		type = "date",
@@ -2417,3 +2418,4 @@ changelogs[10800] = {
 		text = "Loot Window, Link Item: You can link an item in chat by Shift + clicking an item in Manual Loot mode.",
 	},
 };
+--]]
