@@ -1,7 +1,7 @@
 ## X-Flavor: classic
 ## X-Expansion: MOP
 ## Interface: 50504
-## Version: 1.9.4
+## Version: 1.9.5
 
 ## Title: Plumber
 
@@ -11,6 +11,7 @@
 
 ## Author: Peterodox
 ## SavedVariables: PlumberDB, PlumberDevData
+## SavedVariablesPerCharacter: PlumberDB_PC
 
 ## IconTexture: Interface\AddOns\Plumber\Art\Logo\PlumberLogo64
 
@@ -28,3 +29,5 @@ Modules\Macros.lua
 
 Modules\ExpansionLandingPage\ExpansionLandingPage_MOP.xml
 Modules\OutfitSelect.xml
+Modules\TransmogUtil.lua
+Modules\TransmogRestorePending.lua

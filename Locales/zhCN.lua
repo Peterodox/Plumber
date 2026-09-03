@@ -141,7 +141,7 @@ L["Catalyst Charges"] = "充能层数";
 
 
 --GossipFrameMedal
-L["ModuleName GossipFrameMedal"] = "驭龙竞速评级";
+L["ModuleName GossipFrameMedal"] = "驭空术竞速评级";
 L["ModuleDescription GossipFrameMedal Format"] = "将默认图标 %s 替换为你获得的奖章 %s。\n\n在你与青铜时光守护者对话后，可能需要短暂的时间来从服务器获取记录。";
 
 
@@ -771,6 +771,11 @@ L["ModuleDescription TransmogOutfitSelect"] = "允许你随时随地打开外观
 L["Outfit Collection"] = "外观列表";
 L["Quick Access Outfit Button"] = "快捷访问";
 L["Quick Access Outfit Button Tooltip"] = "点击并拖动此按钮到技能栏上，以便随时随地访问外观列表。";
+
+
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "幻化界面: 恢复未保存的改动";
+L["ModuleDescription TransmogRaestorePending"] = "未保存的改动将在你重新打开幻化界面时自动恢复。";
 
 
 --QuestWatchCycle

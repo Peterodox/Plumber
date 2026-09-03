@@ -1113,6 +1113,12 @@ stds.wow = {
 			},
 		},
 
+		C_Secrets = {
+			fields = {
+				"ShouldAurasBeSecret",
+			},
+		},
+
 		C_Scenario = {
 			fields = {
 				"GetStepInfo",

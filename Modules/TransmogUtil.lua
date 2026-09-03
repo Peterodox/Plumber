@@ -271,8 +271,7 @@ local function AddCopyButtonToDropdowns()
 end
 
 
-
-
+--[[
 do
 	local function EnableModule(state)
 		if state and not D.enabled then
@@ -295,7 +294,6 @@ do
 		categoryKeys = {"Collection"},
 	};
 
-	if not addon.IS_MIDNIGHT then
-		addon.ControlCenter:AddModule(moduleData);
-	end
+	addon.ControlCenter:AddModule(moduleData);
 end
+--]]
