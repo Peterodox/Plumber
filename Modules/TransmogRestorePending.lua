@@ -184,6 +184,7 @@ do
 				snapshot = SerializeSnapshot(EL.pendingSnapshot),
 				shoulderSecondary = EL.pendingShoulderSecondary,
 				weaponOptions = EL.pendingWeaponOptions,
+				outfitID = EL.pendingOutfitID,
 			};
 		else
 			PlumberDB_PC.TransmogRestorePending = nil;
@@ -202,6 +203,7 @@ do
 			end
 			EL.pendingShoulderSecondary = saved.shoulderSecondary;
 			EL.pendingWeaponOptions = saved.weaponOptions;
+			EL.pendingOutfitID = saved.outfitID;
 		end
 	end
 
@@ -212,13 +214,25 @@ do
 			EL.pendingSnapshot = nil;
 			EL.pendingShoulderSecondary = nil;
 			EL.pendingWeaponOptions = nil;
+			EL.pendingOutfitID = nil;
 		else
 			EL.pendingSnapshot = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
 			EL.pendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
 			EL.pendingWeaponOptions = EL.CaptureWeaponOptionsPending();
+			--Frame reopens on the active outfit, so remember which one was actually being edited.
+			EL.pendingOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
 		end
 
 		SaveSnapshotToDB();
+	end
+
+	local function RestoreViewedOutfit(outfitID)
+		if outfitID == nil then return end;
+		if outfitID == C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID() then return end;
+		--0 is the equipped-gear view (always valid); other outfits may have been deleted since capture.
+		if outfitID == 0 or C_TransmogOutfitInfo.GetOutfitInfo(outfitID) then
+			C_TransmogOutfitInfo.ChangeViewedOutfit(outfitID);
+		end
 	end
 
 	local function RestorePendingSnapshot()
@@ -226,10 +240,15 @@ do
 		local snapshot = EL.pendingSnapshot;
 		local shoulderSecondary = EL.pendingShoulderSecondary;
 		local weaponOptions = EL.pendingWeaponOptions;
+		local outfitID = EL.pendingOutfitID;
 		EL.pendingSnapshot = nil;
 		EL.pendingShoulderSecondary = nil;
 		EL.pendingWeaponOptions = nil;
+		EL.pendingOutfitID = nil;
 		EL.SaveSnapshotToDB();
+
+		--Must run first, since Blizzard's OnShow forces the active outfit and switching outfits wipes pending changes.
+		RestoreViewedOutfit(outfitID);
 
 		EL.ForceWeaponSlotWidgetRebuild();
 
@@ -290,6 +309,7 @@ do
 			EL.pendingSnapshot = nil;
 			EL.pendingShoulderSecondary = nil;
 			EL.pendingWeaponOptions = nil;
+			EL.pendingOutfitID = nil;
 			EL.SaveSnapshotToDB();
 		end
 	end
