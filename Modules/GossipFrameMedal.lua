@@ -252,6 +252,7 @@ function EL:PostDataFullyRetrieved()
 	self.auraInstanceID = nil;
 	self:UnregisterEvent("UNIT_AURA");
 	self:UnregisterEvent("GOSSIP_CLOSED");
+	self:UnregisterEvent("ADDON_RESTRICTION_STATE_CHANGED");
 	self:SetScript("OnUpdate", nil);
 end
 
@@ -276,6 +277,10 @@ end
 
 
 function EL:UpdateRaceTimesFromAura()
+    if C_Secrets and C_Secrets.ShouldAurasBeSecret and C_Secrets.ShouldAurasBeSecret() then
+        return;
+    end
+
 	local unit = "player";
 	local filter = "HELPFUL";
 	local usePackedAura = true;
@@ -289,6 +294,7 @@ local function EL_OnEvent(self, event, ...)
 		if IsDragonRacingNPC() then
 			self:RegisterUnitEvent("UNIT_AURA", "player");
 			self:RegisterEvent("GOSSIP_CLOSED");
+			self:RegisterEvent("ADDON_RESTRICTION_STATE_CHANGED");
 			EL:ResetQueryCounter();
 			EL:UpdateRaceTimesFromAura();
 		end
@@ -304,6 +310,15 @@ local function EL_OnEvent(self, event, ...)
 		if dataInstanceID == self.dataInstanceID then
 			EL:UpdateRaceTimesFromAura();
 		end
+
+	elseif event == "ADDON_RESTRICTION_STATE_CHANGED" then
+        if not self.pauseUpdate then
+            self.pauseUpdate = true;
+            C_Timer.After(0.2, function()
+                self.pauseUpdate = nil;
+                EL:UpdateRaceTimesFromAura();
+            end);
+        end
 	end
 end
 
