@@ -48,7 +48,7 @@ do
 		end
 	end
 
-	local function ApplySnapshotToPending(itemTransmogInfoList)
+	function EL.ApplySnapshotToPending(itemTransmogInfoList)
 		for invSlotID, transmogInfo in ipairs(itemTransmogInfoList) do
 			if not IgnoredInvSlots[invSlotID] then
 				local transmogID = transmogInfo.appearanceID;
@@ -74,14 +74,12 @@ do
 			end
 		end
 	end
-	EL.ApplySnapshotToPending = ApplySnapshotToPending;
 
-	local function RestoreShoulderSecondaryState(enabled)
+	function EL.RestoreShoulderSecondaryState(enabled)
 		if enabled ~= nil then
 			C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, enabled);
 		end
 	end
-	EL.RestoreShoulderSecondaryState = RestoreShoulderSecondaryState;
 
 	local function GetWeaponSheatheCategory(slot, weaponOption)
 		if not slot or not weaponOption or weaponOption == Enum.TransmogOutfitSlotOption.None then return nil end;
@@ -90,7 +88,7 @@ do
 		return slotInfo and slotInfo.sheatheCategory;
 	end
 
-	local function CaptureWeaponSheatheCategories()
+	function EL.CaptureWeaponSheatheCategories()
 		local sheatheCategories;
 		for invSlotID, slot in pairs(WEAPON_SLOTS) do
 			local weaponOption = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot);
@@ -102,9 +100,8 @@ do
 		end
 		return sheatheCategories;
 	end
-	EL.CaptureWeaponSheatheCategories = CaptureWeaponSheatheCategories;
 
-	local function RestoreWeaponSheatheCategories(sheatheCategories)
+	function EL.RestoreWeaponSheatheCategories(sheatheCategories)
 		if not sheatheCategories then return end;
 
 		for invSlotID, slot in pairs(WEAPON_SLOTS) do
@@ -118,16 +115,14 @@ do
 			end
 		end
 	end
-	EL.RestoreWeaponSheatheCategories = RestoreWeaponSheatheCategories;
 
-	local function ForceWeaponSlotWidgetRebuild()
+	function EL.ForceWeaponSlotWidgetRebuild()
 		--Toggling shoulder secondary state forces a weapon slot widget rebuild, working around a Blizzard display
 		--bug where the widget caches the wrong option (e.g. 1H for an equipped 2H) on first build. Must run first.
 		local liveSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
 		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, not liveSecondary);
 		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, liveSecondary);
 	end
-	EL.ForceWeaponSlotWidgetRebuild = ForceWeaponSlotWidgetRebuild;
 end
 
 
@@ -165,7 +160,7 @@ do
 	end
 	EL.SaveSnapshotToDB = SaveSnapshotToDB;
 
-	local function LoadSnapshotFromDB()
+	function EL.LoadSnapshotFromDB()
 		local saved = PlumberDB_PC and PlumberDB_PC.TransmogRestorePending;
 		if saved then
 			if type(saved.snapshot) == "string" then
@@ -178,7 +173,6 @@ do
 			EL.pendingSheatheCategories = saved.sheatheCategories;
 		end
 	end
-	EL.LoadSnapshotFromDB = LoadSnapshotFromDB;
 
 	local function CaptureSnapshot()
 		if not EL.enabled then return end;
@@ -238,7 +232,7 @@ do
 		EL:UnregisterAllEvents();
 	end
 
-	local function SnapshotFrame_OnLoad()
+	function EL.SnapshotFrame_OnLoad()
 		if EL.snapshotHooked then return end;
 		EL.snapshotHooked = true;
 
@@ -250,7 +244,6 @@ do
 			TransmogFrame_OnShow();
 		end
 	end
-	EL.SnapshotFrame_OnLoad = SnapshotFrame_OnLoad;
 end
 
 
