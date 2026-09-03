@@ -62,6 +62,7 @@ local function GetHiddenSourceIDForSlot(slotID)
 	end
 end
 TransmogUtil.GetAppearanceSources = GetAppearanceSources;
+TransmogUtil.GetHiddenSourceIDForSlot = GetHiddenSourceIDForSlot;
 
 
 local function PopupateInfoListWithHiddenVisuals(itemTransmogInfoList)

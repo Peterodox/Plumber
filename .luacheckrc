@@ -465,6 +465,7 @@ stds.wow = {
 		"TransmogFrame",
 		"TransmogAndMountDressupFrame",
 		"Transmog_LoadUI",
+		"TransmogUtil",
 		"UIErrorsFrame",
 		"UIParent",
 		"UISpecialFrames",
@@ -1264,6 +1265,7 @@ stds.wow = {
 				"GetSourceInfo",
 				"GetSourceItemID",
 				"GetValidAppearanceSourcesForClass",
+				"IsAppearanceHiddenVisual",
 				"IsSearchInProgress",
 				"PlayerHasTransmogItemModifiedAppearance",
 			},
@@ -1273,10 +1275,19 @@ stds.wow = {
 			fields = {
 				"ChangeToOutfit",
 				"GetActiveOutfitID",
+				"GetEquippedSlotOptionFromTransmogSlot",
 				"GetOutfitsInfo",
+				"GetSecondarySlotState",
+				"GetTransmogOutfitSlotFromInventorySlot",
+				"GetViewedOutfitSlotInfo",
+				"GetWeaponOptionsForSlot",
+				"HasPendingOutfitTransmogs",
 				"IsEquippedGearOutfitDisplayed",
 				"IsLockedOutfit",
 				"PickupOutfit",
+				"SetPendingTransmog",
+				"SetPendingTransmogSheatheCategory",
+				"SetSecondarySlotState",
 			},
 		},
 
@@ -1554,9 +1565,39 @@ stds.wow = {
 					},
 				},
 
+				TransmogOutfitDisplayType = {
+					fields = {
+						"Assigned",
+						"Hidden",
+						"Unassigned",
+					},
+				},
+
+				TransmogOutfitSlot = {
+					fields = {
+						"ShoulderLeft",
+						"ShoulderRight",
+						"WeaponMainHand",
+						"WeaponOffHand",
+					},
+				},
+
+				TransmogOutfitSlotOption = {
+					fields = {
+						"None",
+					},
+				},
+
 				TransmogPendingType = {
 					fields = {
 						"Apply",
+					},
+				},
+
+				TransmogType = {
+					fields = {
+						"Appearance",
+						"Illusion",
 					},
 				},
 

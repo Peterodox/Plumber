@@ -805,6 +805,11 @@ L["Quick Access Outfit Button"] = "Quick Access";
 L["Quick Access Outfit Button Tooltip"] = "Click and drag this button to your action bars so you can change outfits anywhere.";
 
 
+--TransmogRestorePending
+L["ModuleName TransmogRestorePending"] = "Transmog UI: Restore Pending Changes";
+L["ModuleDescription TransmogRestorePending"] = "Your pending Transmog changes are restored automatically the next time you open the window.";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Keybindings: Focus On Quest";
 L["ModuleDescription QuestWatchCycle"] = "Allows you to press hotkeys to focus on the next/previous quest in the objective tracker.\n\n|cffd4641cSet your hotkeys in Keybindings> Plumber Addon.|r";
