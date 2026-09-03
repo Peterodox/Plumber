@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.3 c
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.4 c
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -657,7 +657,8 @@ L["Drawer Option Update Frequently"] = "Часто обновляйте";
 L["Drawer Option Update Frequently Tooltip"] = "Попробуйте обновить состояние кнопок всякий раз, когда в ваших сумках или книгах заклинаний происходят изменения. Включение этой опции может немного увеличить использование ресурсов.";
 L["ModuleName DrawerMacro"] = "Макрос ящика";
 L["ModuleDescription DrawerMacro"] = "Создайте пользовательское всплывающее меню для управления вашими предметами, заклинаниями, питомцами, маунтами и игрушками.\n\nЧтобы создать макрос Ящика, сначала создайте новый макрос, затем введите |cffd7c0a3#plumber:drawer|r в поле редактирования команд.";
-L["No Slot For New Character Macro Alert"] = "You need to have a spare Character Specific Macro slot to complete this action.";
+L["No Slot For New Character Macro Alert"] = "Для завершения этого действия у вас должна быть свободная ячейка в макросах персонажа.";
+L["Unknown Pet"] = "Неизвестный питомец";
 
 
 --New Expansion Landing Page
@@ -674,6 +675,7 @@ L["Not On Quest"] = "Вы не выполняете это задание";
 L["Factions"] = "Фракции";
 L["Activities"] = MAP_LEGEND_CATEGORY_ACTIVITIES or "Активности";
 L["Raids"] = RAIDS or "Рейды";
+L["Player Power"] = "Силы";
 L["Instruction Track Achievement"] = "<Shift + клик, чтобы отслеживать это достижение>";
 L["Instruction Untrack Achievement"] = CONTENT_TRACKING_UNTRACK_TOOLTIP_PROMPT or "<Shift + клик, чтобы прекратить отслеживание>";
 L["No Data"] = "Нет данных";
@@ -743,6 +745,7 @@ L["Near Completion Tooltip"] = "Эта запись видна вам, так к
 L["Inactive Currencies Tooltip"] = "Эти валюты скрыты, так как вы пометили их как «Неиспользуемые»:";
 L["New Quest"] = "Новое задание";
 L["Trait Points Available"] = "Доступно очков";
+L["Unspent Points"] = "Нераспределенные очки";
 
 
 --ExpansionSummaryMinimapButton
@@ -909,6 +912,7 @@ L["ModuleDescription CatalystUI"] = "Позволяет нажать Ctrl+кли
 L["ModuleName HuntTable"] = "Добыча: Таблица охоты";
 L["ModuleDescription HuntTable"] = "- Заменяет стандартные синие значки заданий на значки с указанием сложности.\n\n- Показывает индикатор, если цель охоты необходима для получения еще не выполненного достижения.";
 L["Prey Target Has Achievement"] = "Эта цель охоты необходима для получения еще не выполненного достижения.";
+L["Quest Objective Entry Format"] = "Задача задания для: %s";
 
 
 --PreyQuestSuperTrack
