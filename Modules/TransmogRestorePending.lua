@@ -154,12 +154,58 @@ do
 		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, not liveSecondary);
 		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, liveSecondary);
 	end
+
+	--Save all situations-related data (4 id fields) in one string, making it a simple per line row for SavedVariables.
+	local function SituationOptionKey(option)
+		return string.format("%d,%d,%d,%d", option.situationID, option.specID, option.loadoutID, option.equipmentSetID);
+	end
+
+	function EL.CaptureSituationsPending()
+		local situationsPending = {
+			enabled = C_TransmogOutfitInfo.GetOutfitSituationsEnabled(),
+			options = {},
+		};
+
+		local situationsData = C_TransmogOutfitInfo.GetUISituationCategoriesAndOptions();
+		for _, categoryData in ipairs(situationsData or {}) do
+			for _, groupData in ipairs(categoryData.groupData) do
+				for _, optionData in ipairs(groupData.optionData) do
+					local option = optionData.option;
+					situationsPending.options[SituationOptionKey(option)] = C_TransmogOutfitInfo.GetOutfitSituation(option);
+				end
+			end
+		end
+
+		return situationsPending;
+	end
+
+	function EL.RestoreSituationsPending(situationsPending)
+		if not situationsPending then return end;
+
+		C_TransmogOutfitInfo.SetOutfitSituationsEnabled(situationsPending.enabled);
+
+		--Fetch options live so a deleted loadout or equipment set is skipped, not restored.
+		local situationsData = C_TransmogOutfitInfo.GetUISituationCategoriesAndOptions();
+		for _, categoryData in ipairs(situationsData or {}) do
+			for _, groupData in ipairs(categoryData.groupData) do
+				for _, optionData in ipairs(groupData.optionData) do
+					local option = optionData.option;
+					local value = situationsPending.options[SituationOptionKey(option)];
+					if value ~= nil then
+						C_TransmogOutfitInfo.UpdatePendingSituation(option, value);
+					end
+				end
+			end
+		end
+	end
 end
 
 
 do
-	local SNAPSHOT_EVENTS = {
+	local TRACKED_EVENTS = {
 		"VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH", -- Queue a transmog change
+		"VIEWED_TRANSMOG_OUTFIT_CHANGED", -- Outfit slot switched
+		"VIEWED_TRANSMOG_OUTFIT_SITUATIONS_CHANGED", -- Queue a situation change
 	};
 
 	--Piggyback on Blizzard's /customset format to store this as a string instead of a nested table.
@@ -176,23 +222,26 @@ do
 		return parseFunc and parseFunc(str);
 	end
 
-	local function SaveSnapshotToDB()
+	local function SavePendingToDB()
 		if not PlumberDB_PC then return end;
 
-		if EL.pendingSnapshot then
+		if EL.pendingSnapshot or EL.pendingSituations then
+			--SerializeSnapshot expects a real list, only call it when there's actually a snapshot
+			local snapshot = EL.pendingSnapshot and SerializeSnapshot(EL.pendingSnapshot);
 			PlumberDB_PC.TransmogRestorePending = {
-				snapshot = SerializeSnapshot(EL.pendingSnapshot),
+				snapshot = snapshot,
 				shoulderSecondary = EL.pendingShoulderSecondary,
 				weaponOptions = EL.pendingWeaponOptions,
+				situations = EL.pendingSituations,
 				outfitID = EL.pendingOutfitID,
 			};
 		else
 			PlumberDB_PC.TransmogRestorePending = nil;
 		end
 	end
-	EL.SaveSnapshotToDB = SaveSnapshotToDB;
+	EL.SavePendingToDB = SavePendingToDB;
 
-	function EL.LoadSnapshotFromDB()
+	function EL.LoadPendingFromDB()
 		local saved = PlumberDB_PC and PlumberDB_PC.TransmogRestorePending;
 		if saved then
 			if type(saved.snapshot) == "string" then
@@ -203,27 +252,32 @@ do
 			end
 			EL.pendingShoulderSecondary = saved.shoulderSecondary;
 			EL.pendingWeaponOptions = saved.weaponOptions;
+			EL.pendingSituations = saved.situations;
 			EL.pendingOutfitID = saved.outfitID;
 		end
 	end
 
-	local function CaptureSnapshot()
+	local function CapturePending()
 		if not EL.enabled then return end;
 
-		if not C_TransmogOutfitInfo.HasPendingOutfitTransmogs() then
-			EL.pendingSnapshot = nil;
-			EL.pendingShoulderSecondary = nil;
-			EL.pendingWeaponOptions = nil;
-			EL.pendingOutfitID = nil;
-		else
+		local hasTransmogsPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
+		if hasTransmogsPending then
 			EL.pendingSnapshot = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
 			EL.pendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
 			EL.pendingWeaponOptions = EL.CaptureWeaponOptionsPending();
-			--Frame reopens on the active outfit, so remember which one was actually being edited.
-			EL.pendingOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
+		else
+			EL.pendingSnapshot = nil;
+			EL.pendingShoulderSecondary = nil;
+			EL.pendingWeaponOptions = nil;
 		end
 
-		SaveSnapshotToDB();
+		local hasSituationsPending = C_TransmogOutfitInfo.HasPendingOutfitSituations();
+		EL.pendingSituations = hasSituationsPending and EL.CaptureSituationsPending() or nil;
+
+		--Frame reopens on the active outfit, so remember which one was actually being edited.
+		EL.pendingOutfitID = (hasTransmogsPending or hasSituationsPending) and C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID() or nil;
+
+		SavePendingToDB();
 	end
 
 	local function RestoreViewedOutfit(outfitID)
@@ -235,20 +289,16 @@ do
 		end
 	end
 
-	local function RestorePendingSnapshot()
-		--Clear early, a write below can retrigger CaptureSnapshot mid-call
-		local snapshot = EL.pendingSnapshot;
-		local shoulderSecondary = EL.pendingShoulderSecondary;
-		local weaponOptions = EL.pendingWeaponOptions;
-		local outfitID = EL.pendingOutfitID;
+	local function ClearPendingState()
 		EL.pendingSnapshot = nil;
 		EL.pendingShoulderSecondary = nil;
 		EL.pendingWeaponOptions = nil;
+		EL.pendingSituations = nil;
 		EL.pendingOutfitID = nil;
-		EL.SaveSnapshotToDB();
+	end
 
-		--Must run first, since Blizzard's OnShow forces the active outfit and switching outfits wipes pending changes.
-		RestoreViewedOutfit(outfitID);
+	local function ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions)
+		if not snapshot then return end;
 
 		EL.ForceWeaponSlotWidgetRebuild();
 
@@ -257,24 +307,87 @@ do
 		EL.ApplySnapshotToPending(snapshot);
 		--Must run after ApplySnapshotToPending, setting a weapon's appearance resets its sheathe category to Default
 		EL.RestoreWeaponOptionsPending(weaponOptions);
+	end
+
+	local function RestoreAllPending()
+		--Clear early, a write below can retrigger CapturePending mid-call
+		local snapshot = EL.pendingSnapshot;
+		local shoulderSecondary = EL.pendingShoulderSecondary;
+		local weaponOptions = EL.pendingWeaponOptions;
+		local situations = EL.pendingSituations;
+		local outfitID = EL.pendingOutfitID;
+		ClearPendingState();
+		EL.SavePendingToDB();
+
+		--Must run first, since Blizzard's OnShow forces the active outfit and switching outfits wipes pending changes.
+		RestoreViewedOutfit(outfitID);
+		ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions);
+		EL.RestoreSituationsPending(situations);
 		--If we ever want to notify the user their outfit was restored, this is where it'd happen.
 	end
 
-	local function OnSnapshotEvent()
+	local function ReapplyPendingOnOutfitSwitch()
+		--Nothing pending, or this switch is our own RestoreViewedOutfit call above, already handled.
+		if not EL.pendingSnapshot and not EL.pendingSituations then return end;
+
+		local snapshot = EL.pendingSnapshot;
+		local shoulderSecondary = EL.pendingShoulderSecondary;
+		local weaponOptions = EL.pendingWeaponOptions;
+		local situations = EL.pendingSituations;
+		ClearPendingState();
+		EL.SavePendingToDB();
+
+		--The user already landed on the outfit they picked, just replay the edits onto it.
+		ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions);
+		EL.RestoreSituationsPending(situations);
+	end
+
+	local isHandlingSituationsChanged = false;
+
+	local function OnSituationsChanged()
+		--SetOutfitSituationsEnabled/UpdatePendingSituation below re-fire this event, guard against the recursion.
+		if isHandlingSituationsChanged then return end;
+		isHandlingSituationsChanged = true;
+
+		local wipedTransmogs = EL.pendingSnapshot and not C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
+		local wipedSituations = EL.pendingSituations and not C_TransmogOutfitInfo.HasPendingOutfitSituations();
+
+		if not (wipedTransmogs or wipedSituations) then
+			CapturePending();
+		else
+			--Blizzard's own Situations auto-switch can silently discard pending edits, fight back with what we had.
+			if wipedTransmogs then
+				ApplyPendingSnapshot(EL.pendingSnapshot, EL.pendingShoulderSecondary, EL.pendingWeaponOptions);
+			end
+			if wipedSituations then
+				EL.RestoreSituationsPending(EL.pendingSituations);
+			end
+		end
+
+		isHandlingSituationsChanged = false;
+	end
+
+	local function OnTrackedEvent(_, event)
 		if not EL.enabled then return end;
 
-		CaptureSnapshot();
+		if event == "VIEWED_TRANSMOG_OUTFIT_CHANGED" then
+			ReapplyPendingOnOutfitSwitch();
+		elseif event == "VIEWED_TRANSMOG_OUTFIT_SITUATIONS_CHANGED" then
+			OnSituationsChanged();
+		else
+			CapturePending();
+		end
 	end
 
 	local function TransmogFrame_OnShow()
 		if not EL.enabled then return end;
 
-		for _, event in ipairs(SNAPSHOT_EVENTS) do
+		for _, event in ipairs(TRACKED_EVENTS) do
 			EL:RegisterEvent(event);
 		end
 
-		if EL.pendingSnapshot then
-			RestorePendingSnapshot();
+		if EL.pendingSnapshot or EL.pendingSituations then
+			RestoreAllPending();
 		end
 	end
 
@@ -282,13 +395,53 @@ do
 		EL:UnregisterAllEvents();
 	end
 
+	local function OnStaticPopupShown(which, _, _, data)
+		if which ~= "TRANSMOG_PENDING_CHANGES" or not EL.enabled then return end;
+		local hasPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs() or C_TransmogOutfitInfo.HasPendingOutfitSituations();
+		if not hasPending then return end;
+
+		--Both appearance and situation pending changes now survive an outfit switch, so this warning is stale.
+		StaticPopup_Hide(which, data);
+		if data and data.confirmCallback then
+			data.confirmCallback();
+		end
+	end
+
+	--Only treat this as an intentional Undo while the frame is open, otherwise OnSituationsChanged
+	--would fight back against it and recurse into a stack overflow (oops!). Blizzard also runs these on
+	--every close (OnHide), and treating that as intentional too would break restore-on-reopen.
+	local function HookExplicitClears()
+		local originalClearTransmogs = C_TransmogOutfitInfo.ClearAllPendingTransmogs;
+		C_TransmogOutfitInfo.ClearAllPendingTransmogs = function(...)
+			if TransmogFrame:IsShown() then
+				EL.pendingSnapshot = nil;
+				EL.pendingShoulderSecondary = nil;
+				EL.pendingWeaponOptions = nil;
+				EL.SavePendingToDB();
+			end
+			return originalClearTransmogs(...);
+		end;
+
+		local originalClearSituations = C_TransmogOutfitInfo.ClearAllPendingSituations;
+		C_TransmogOutfitInfo.ClearAllPendingSituations = function(...)
+			if TransmogFrame:IsShown() then
+				EL.pendingSituations = nil;
+				EL.SavePendingToDB();
+			end
+			return originalClearSituations(...);
+		end;
+	end
+
 	function EL.SnapshotFrame_OnLoad()
 		if EL.snapshotHooked then return end;
 		EL.snapshotHooked = true;
 
-		EL:SetScript("OnEvent", OnSnapshotEvent);
+		EL:SetScript("OnEvent", OnTrackedEvent);
 		TransmogFrame:HookScript("OnShow", TransmogFrame_OnShow);
 		TransmogFrame:HookScript("OnHide", TransmogFrame_OnHide);
+		-- If we decide not to disable/skip the popup, comment/remove this hooksecurefunc below.
+		hooksecurefunc("StaticPopup_Show", OnStaticPopupShown);
+		HookExplicitClears();
 
 		if TransmogFrame:IsShown() then
 			TransmogFrame_OnShow();
@@ -301,7 +454,7 @@ do
 	local function EnableModule(state)
 		if state and not EL.enabled then
 			EL.enabled = true;
-			EL.LoadSnapshotFromDB();
+			EL.LoadPendingFromDB();
 			addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
@@ -309,8 +462,9 @@ do
 			EL.pendingSnapshot = nil;
 			EL.pendingShoulderSecondary = nil;
 			EL.pendingWeaponOptions = nil;
+			EL.pendingSituations = nil;
 			EL.pendingOutfitID = nil;
-			EL.SaveSnapshotToDB();
+			EL.SavePendingToDB();
 		end
 	end
 
