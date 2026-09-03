@@ -805,6 +805,11 @@ L["Quick Access Outfit Button"] = "Acesso Rápido";
 L["Quick Access Outfit Button Tooltip"] = "Clique e arraste este botão para suas barras de ações para que você possa mudar roupas em qualquer lugar.";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "Transmogrificação: Restaurar alterações";
+L["ModuleDescription TransmogRaestorePending"] = "As alterações de transmogrificação pendentes são automaticamente restauradas ao reabrir a janela.";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Atalhos do teclado: Focar na missão";
 L["ModuleDescription QuestWatchCycle"] = "Permite usar atalhos para focar na missão próxima/anterior no rastreador de objetivos.\n\n|cffd4641cEscolha suas teclas de atalho em Atalhos do teclado > Plumber.";
