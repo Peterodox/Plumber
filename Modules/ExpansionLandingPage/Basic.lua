@@ -602,6 +602,7 @@ do  --TabUtil
 		end
 
 		addon.SetDBValue("LandingPage_DefaultTab", tabKey);
+		addon.CallbackRegistry:Trigger("LandingPage_TabChanged", tabKey);
 	end
 
 	function LandingPageUtil.SelectTabByIndex(index)

@@ -411,7 +411,7 @@ do
 
 				if v.frameGetter then
 					offsetY = offsetY + lineGap;
-					local frame, height, categoryOnEnterFunc, menuInfoGetter = v.frameGetter(container);
+					local frame, height, categoryOnEnterFunc, menuInfoGetter = v.frameGetter(categoryButton);
 					frame.listCategoryButton = categoryButton;
 					frame:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 					offsetY = offsetY + height;

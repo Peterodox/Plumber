@@ -172,6 +172,7 @@ do	--EyeButton controls visibility
 
 	function EyeButtonMixin:OnEnter()
 		self:UpdateVisual();
+		GameTooltip:Hide();
 		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
 	end
 
@@ -194,14 +195,14 @@ do	--EyeButton controls visibility
 
 	function EyeButtonMixin:UpdateVisual()
 		local l, r;
-		local t, b = 272, 336;
+		local t, b = 0, 64;
 		if self:IsMouseMotionFocus() then
-			l, r = 400, 464;
+			l, r = 128, 192;
 		else
 			if self.isOdd then
-				l, r = 336, 400;
+				l, r = 0, 64;
 			else
-				l, r = 272, 336;
+				l, r = 64, 128;
 			end
 		end
 		self.Background:SetTexCoord(l/512, r/512, t/512, b/512);
@@ -214,12 +215,12 @@ do	--EyeButton controls visibility
 
 	function EyeButtonMixin:OpenEye()
 		self.parentEntryIgnored = false;
-		self:SetIconCoord(432/512, 480/512, 208/512, 256/512);
+		self:SetIconCoord(48/512, 96/512, 64/512, 112/512);
 	end
 
 	function EyeButtonMixin:CloseEye()
 		self.parentEntryIgnored = true;
-		self:SetIconCoord(384/512, 432/512, 208/512, 256/512);
+		self:SetIconCoord(0/512, 48/512, 64/512, 112/512);
 	end
 
 	function EyeButtonMixin:ShowTooltip()
@@ -251,9 +252,10 @@ do	--EyeButton controls visibility
 		f.Background:SetSize(32, 32);
 		f.Background:SetPoint("CENTER", f, "CENTER", 0, 0);
 
-		f.Icon:SetTexture(TEXTURE);
-		f.IconHighlight:SetTexture(TEXTURE);
-		f.Background:SetTexture(TEXTURE);
+		local texture = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistUtilityButton.tga";
+		f.Icon:SetTexture(texture);
+		f.IconHighlight:SetTexture(texture);
+		f.Background:SetTexture(texture);
 
 		API.DisableSharpening(f.Icon);
 		API.DisableSharpening(f.IconHighlight);
@@ -269,6 +271,102 @@ do	--EyeButton controls visibility
 
 		return f;
 	end
+	LandingPageUtil.CreateEyeButton = CreateEyeButton;
+end
+
+
+do	--DeleteButton
+	local DeleteButtonMixin = {};
+
+	function DeleteButtonMixin:OnEnter()
+		self:UpdateVisual();
+		GameTooltip:Hide();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
+	end
+
+	function DeleteButtonMixin:OnLeave()
+		self:UpdateVisual();
+		GameTooltip:Hide();
+		TimedDispatcher:Kill();
+	end
+
+	function DeleteButtonMixin:OnClick(button)
+		self:GetParent():ToggleEntryDeleted();
+		GameTooltip:Hide();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
+		if self.parentEntryMarkedDeleted then
+			LandingPageUtil.PlayUISound("CheckboxOff");
+		else
+			LandingPageUtil.PlayUISound("CheckboxOn");
+		end
+	end
+
+	function DeleteButtonMixin:UpdateVisual()
+		if self.parentEntryMarkedDeleted then -- Undo
+			self.Icon:SetTexCoord(144/512, 192/512, 64/512, 112/512);
+		else -- X
+			self.Icon:SetTexCoord(96/512, 144/512, 64/512, 112/512);
+		end
+
+		local l, r;
+		local t, b = 0, 64;
+		if self:IsMouseMotionFocus() then
+			if self.parentEntryMarkedDeleted then
+				l, r = 128, 192;
+			else
+				l, r = 192, 256;
+			end
+			self.Icon:SetVertexColor(1, 1, 1);
+		else
+			if self.isOdd then
+				l, r = 0, 64;
+			else
+				l, r = 64, 128;
+			end
+			self.Icon:SetVertexColor(0.922, 0.871, 0.761);
+		end
+		self.Background:SetTexCoord(l/512, r/512, t/512, b/512);
+	end
+
+	function DeleteButtonMixin:ShowTooltip()
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		if self.parentEntryMarkedDeleted then
+			LandingPageUtil.SetTooltip(addon.L["Click To Cancel Deletion"]);
+		else
+			LandingPageUtil.SetTooltip(addon.L["Click To Mark As Deleted"]);
+		end
+		GameTooltip:Show();
+	end
+
+	function CreateDeleteButton(parent)
+		local f = CreateFrame("Button", nil, parent);
+		Mixin(f, DeleteButtonMixin);
+		f:SetSize(24, 24);
+
+		f.Icon = f:CreateTexture(nil, "OVERLAY");
+		f.Icon:SetSize(24, 24);
+		f.Icon:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.Icon:SetTexCoord(96/512, 144/512, 64/512, 112/512);
+
+		f.Background = f:CreateTexture(nil, "BACKGROUND");
+		f.Background:SetSize(32, 32);
+		f.Background:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+		local texture = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistUtilityButton.tga";
+		f.Icon:SetTexture(texture);
+		f.Background:SetTexture(texture);
+
+		API.DisableSharpening(f.Icon);
+
+		f:UpdateVisual();
+
+		f:SetScript("OnEnter", f.OnEnter);
+		f:SetScript("OnLeave", f.OnLeave);
+		f:SetScript("OnClick", f.OnClick);
+
+		return f;
+	end
+	LandingPageUtil.CreateDeleteButton = CreateDeleteButton;
 end
 
 do  --Generic Checklist Button

@@ -11,8 +11,12 @@ local GetItemCount = C_Item.GetItemCount;
 local GetItemNameByID = C_Item.GetItemNameByID;
 
 
-local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
-local MINIENTRY_GAP = 4;
+local Def = {
+	ButtonWidth = 240,
+	ButtonHeight = 24,
+	MiniEntryGap = 4,
+	MiniEntrySidePadding = 12,
+};
 
 local ResourceList = {}; ---@type ResourceListEntry[]
 local MainFrame;
@@ -175,6 +179,8 @@ do
 
 		if self.isMiniEntry then
 			tooltip:SetOwner(self, "ANCHOR_RIGHT", -4, 0);
+		elseif self.isManagerEntry then
+			tooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
 		else
 			tooltip:SetOwner(self.Icon, "ANCHOR_RIGHT", 0, 0);
 		end
@@ -276,7 +282,7 @@ end
 
 local function CreateStandardEntry(parent)
 	local f = CreateFrame("Button", nil, parent, "PlumberStrikethroughNumberTemplate");
-	f:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+	f:SetSize(Def.ButtonWidth, Def.ButtonHeight);
 	API.Mixin(f, CurrencyButtonMixin);
 
 	f.Icon = f:CreateTexture(nil, "ARTWORK");
@@ -294,7 +300,6 @@ local function CreateStandardEntry(parent)
 	f.Name:SetPoint("RIGHT", f.Count, "LEFT", -20, 0);
 	f.Name:SetJustifyH("LEFT");
 	f.Name:SetTextColor(1, 1, 1);
-	f.Name:SetText("0/0");
 	f.Name:SetMaxLines(1);
 
 	f.Highlight = f:CreateTexture(nil, "BACKGROUND");
@@ -314,68 +319,24 @@ local function CreateStandardEntry(parent)
 	return f;
 end
 
---[[
-local function MiniEntry_AlignByColumn(self, isLeft)
-	self.Icon:ClearAllPoints();
-	self.Count:ClearAllPoints();
-	if isLeft then
-		self.Icon:SetPoint("RIGHT", self, "RIGHT", -12, 0);
-		self.Count:SetPoint("LEFT", self, "LEFT", 12, 0);
-		self.Count:SetPoint("RIGHT", self, "RIGHT", -8, 0);
-		self.Count:SetJustifyH("LEFT");
-	else
-		self.Icon:SetPoint("LEFT", self, "LEFT", 12, 0);
-		self.Count:SetPoint("LEFT", self, "LEFT", 32, 0);
-		self.Count:SetPoint("RIGHT", self, "RIGHT", -8, 0);
-		self.Count:SetJustifyH("RIGHT");
-	end
-end
-
-local function MiniEntry_AlignToLeft(self, _isLeft)
-	self.Icon:ClearAllPoints();
-	self.Count:ClearAllPoints();
-	self.Icon:SetPoint("LEFT", self, "LEFT", 8, 0);
-	self.Count:SetPoint("LEFT", self, "LEFT", 32, 0);
-	self.Count:SetPoint("RIGHT", self, "RIGHT", -8, 0);
-	self.Count:SetJustifyH("LEFT");
-end
-
-local function MiniEntry_AlignToRight(self, _isLeft)
-	self.Icon:ClearAllPoints();
-	self.Count:ClearAllPoints();
-	self.Icon:SetPoint("RIGHT", self, "RIGHT", -8, 0);
-	self.Count:SetPoint("LEFT", self, "LEFT", 8, 0);
-	self.Count:SetPoint("RIGHT", self, "RIGHT", -32, 0);
-	self.Count:SetJustifyH("RIGHT");
-end
---]]
-
-local function MiniEntry_AlignBothSides(self, _isLeft)
-	local offset = 12;
-	self.Icon:ClearAllPoints();
-	self.Count:ClearAllPoints();
-	self.Icon:SetPoint("LEFT", self, "LEFT", offset, 0);
-	self.Count:SetPoint("RIGHT", self, "RIGHT", -offset, 0);
-	self.Count:SetJustifyH("RIGHT");
-end
 
 local function CreateMiniEntry(parent)
 	local f = CreateFrame("Button", nil, parent, "PlumberStrikethroughNumberTemplate");
-	f:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+	f:SetSize(Def.ButtonWidth, Def.ButtonHeight);
 	f.isMiniEntry = true;
 	API.Mixin(f, CurrencyButtonMixin);
 
 	f.Icon = f:CreateTexture(nil, "ARTWORK");
 	f.Icon:SetSize(20, 20);
+	f.Icon:SetPoint("LEFT", f, "LEFT", Def.MiniEntrySidePadding, 0);
 	--f.Icon:SetTexCoord(6/64, 58/64, 6/64, 58/64);
 
 	f.breakupLargeNumbers = true;
+	f.Count:SetPoint("RIGHT", f, "RIGHT", -Def.MiniEntrySidePadding, 0);
 	f.Count:SetMaxLines(1);
-	f.Count:SetJustifyH("LEFT");
+	f.Count:SetJustifyH("RIGHT");
 	f.Count:SetTextColor(1, 1, 1);
 	f.Count:SetText("0");
-
-	MiniEntry_AlignBothSides(f);
 
 	f.Highlight = f:CreateTexture(nil, "BACKGROUND");
 	f.Highlight:SetAllPoints(true);
@@ -392,6 +353,358 @@ local function CreateMiniEntry(parent)
 	f:SetScript("OnClick", f.OnClick);
 
 	return f;
+end
+
+
+local ListManager = {};
+do	-- ManagerFrame / ManagerEntry
+	local ManagerFrame;
+
+	local ManagerEntryMixin = {};
+
+	function ManagerEntryMixin:OnEnter()
+		self:UpdateVisual();
+		if not (self.EyeButton:IsMouseMotionFocus() or self.DeleteButton:IsMouseMotionFocus()) then
+			CurrencyButtonMixin.ShowTooltip(self);
+		end
+	end
+
+	function ManagerEntryMixin:OnLeave()
+		GameTooltip:Hide();
+		self:UpdateVisual();
+	end
+
+	function ManagerEntryMixin:SetCurrency(currencyID)
+		self.currencyID = currencyID;
+		self.itemID = nil;
+		self.isCustomItem = false;
+		local info = GetCurrencyInfo(self.currencyID);
+		if info then
+			self.Name:SetText(info.name)
+			self.Icon:SetTexture(info.iconFileID);
+		else
+			self.Name:SetText("Currency:"..currencyID);
+			self.Icon:SetTexture(134400);
+		end
+		self:UpdateVisual();
+	end
+
+	function ManagerEntryMixin:SetItem(itemID)
+		self.currencyID = nil;
+		self.itemID = itemID;
+		self.isCustomItem = true; -- TEMP
+		self.Icon:SetTexture(GetItemIconByID(self.itemID));
+		local itemName = GetItemNameByID(self.itemID);
+		if itemName then
+			self.Name:SetText(itemName);
+		else
+			CallbackRegistry:LoadItem(self.itemID, function(itemID)
+				if self.itemID == itemID then
+					self.Name:SetText(GetItemNameByID(self.itemID));
+					self.Icon:SetTexture(GetItemIconByID(self.itemID));
+				end
+			end);
+		end
+		self:UpdateVisual();
+	end
+
+	function ManagerEntryMixin:IsFocused()
+		return self:IsMouseMotionFocus() or self.EyeButton:IsMouseMotionFocus() or self.DeleteButton:IsMouseMotionFocus();
+	end
+
+	function ManagerEntryMixin:UpdateVisual()
+		if self.ignored and not self.markedDeleted then
+			self:SetAlpha(0.5);
+		else
+			self:SetAlpha(1);
+		end
+
+		if self:IsFocused() then
+			self.Name:SetTextColor(1, 1, 1);
+			self.Highlight:Show();
+		else
+			self.Name:SetTextColor(0.922, 0.871, 0.761);
+			self.Highlight:Hide();
+		end
+
+		self.EyeButton:UpdateVisual();
+		self.DeleteButton:UpdateVisual();
+
+		self.EyeButton:SetShown(not self.markedDeleted);
+		self.DeleteButton:SetShown(self.isCustomItem);
+
+		if self.markedDeleted then
+			self.Name:SetTextColor(1, 0.125, 0.125);
+			self.Icon:SetVertexColor(0.5, 0.5, 0.5);
+		else
+			self.Icon:SetVertexColor(1, 1, 1);
+		end
+	end
+
+	function ManagerEntryMixin:ToggleEntryIgnored()
+		if self.markedDeleted then return; end
+
+		self.ignored = not self.ignored;
+		self.EyeButton.parentEntryIgnored = self.ignored;
+		if self.ignored then
+			self.EyeButton:CloseEye();
+		else
+			self.EyeButton:OpenEye();
+		end
+		self:UpdateVisual();
+	end
+
+	function ManagerEntryMixin:ToggleEntryDeleted()
+		self.markedDeleted = not self.markedDeleted;
+		self.DeleteButton.parentEntryMarkedDeleted = self.markedDeleted;
+		self:UpdateVisual();
+	end
+
+	local function EyeButton_UpdateVisual(self)
+		local l, r;
+		local t, b = 0, 64;
+		if self:IsMouseMotionFocus() then
+			l, r = 128, 192;
+			self.Background:Show();
+		elseif self:GetParent():IsMouseMotionFocus() then
+			l, r = 0, 64;
+			self.Background:Show();
+		else
+			l, r = 64, 128;
+			self.Background:Hide();
+		end
+		self.Background:SetTexCoord(l/512, r/512, t/512, b/512);
+	end
+
+	local function DeleteButton_UpdateVisual(self)
+		if self.parentEntryMarkedDeleted then -- Undo
+			self.Icon:SetTexCoord(144/512, 192/512, 64/512, 112/512);
+		else -- X
+			self.Icon:SetTexCoord(96/512, 144/512, 64/512, 112/512);
+		end
+
+		local l, r;
+		local t, b = 0, 64;
+		if self:IsMouseMotionFocus() then
+			if self.parentEntryMarkedDeleted then
+				l, r = 128, 192;
+			else
+				l, r = 192, 256;
+			end
+			self.Background:Show();
+			self.Icon:SetVertexColor(1, 1, 1);
+		else
+			if self:GetParent():IsMouseMotionFocus() then
+				l, r = 0, 64;
+				self.Background:Show();
+			else
+				l, r = 64, 128;
+				self.Background:Hide();
+			end
+			self.Icon:SetVertexColor(0.922, 0.871, 0.761);
+		end
+		self.Background:SetTexCoord(r/512, l/512, t/512, b/512);
+	end
+
+	local function CreateManagerEntry(parent)
+		local f = CreateFrame("Button", nil, parent);
+		f:SetSize(Def.ButtonWidth, Def.ButtonHeight);
+		API.Mixin(f, ManagerEntryMixin);
+		f.isManagerEntry = true;
+
+		f.Icon = f:CreateTexture(nil, "ARTWORK");
+		f.Icon:SetSize(20, 20);
+		f.Icon:SetPoint("RIGHT", f, "RIGHT", -32, 0);
+
+		f.Name = f:CreateFontString(nil, "ARTWORK", "GameFontNormal");
+		f.Name:SetPoint("LEFT", f, "LEFT", 32, 0);
+		f.Name:SetPoint("RIGHT", f.Icon, "LEFT", -8, 0);
+		f.Name:SetJustifyH("LEFT");
+		f.Name:SetTextColor(1, 1, 1);
+		f.Name:SetMaxLines(1);
+
+		f.Highlight = f:CreateTexture(nil, "BACKGROUND");
+		f.Highlight:SetAllPoints(true);
+		f.Highlight:Hide();
+		f.Highlight:SetTextureSliceMode(1);
+		local m = 8;
+		f.Highlight:SetTextureSliceMargins(m, m, m, m);
+		f.Highlight:SetTexture("Interface/AddOns/Plumber/Art/ExpansionLandingPage/SmallListButtonHighlight");
+		f.Highlight:SetBlendMode("ADD");
+		f.Highlight:SetAlpha(0.08);
+
+		f.EyeButton = LandingPageUtil.CreateEyeButton(f);
+		f.EyeButton:SetPoint("LEFT", f, "LEFT", 0, 0);
+		f.EyeButton.UpdateVisual = EyeButton_UpdateVisual;
+		f.EyeButton:SetPropagateMouseMotion(true);
+		f.EyeButton:SetIgnoreParentAlpha(true);
+
+		f.DeleteButton = LandingPageUtil.CreateDeleteButton(f);
+		f.DeleteButton:SetPoint("RIGHT", f, "RIGHT", 0, 0);
+		f.DeleteButton.UpdateVisual = DeleteButton_UpdateVisual;
+		f.DeleteButton:SetPropagateMouseMotion(true);
+		f.DeleteButton:SetIgnoreParentAlpha(true);
+
+		f:SetScript("OnEnter", f.OnEnter);
+		f:SetScript("OnLeave", f.OnLeave);
+
+		return f;
+	end
+
+	function ListManager:Init()
+		if ManagerFrame then return; end
+
+		local container = MainFrame.listCategoryButton:GetParent();
+		local relativeTo = PlumberExpansionLandingPage.LeftSection;
+
+
+		local f = CreateFrame("Frame", nil, container);
+		ManagerFrame = f;
+		f:SetPoint("TOPLEFT", relativeTo, "TOPLEFT", 0, 0);
+		f:SetPoint("BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", 0, 0);
+		f:EnableMouse(true);
+		f:EnableMouseMotion(true);
+		f:SetFrameLevel(227);
+
+		f.Background = f:CreateTexture(nil, "BACKGROUND");
+		f.Background:SetPoint("TOPLEFT", relativeTo, "TOPLEFT", 8, -8);
+		f.Background:SetPoint("BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -8, 8);
+		f.Background:SetColorTexture(0.067, 0.040, 0.024);
+
+		-- Header
+		local categoryButtonHeight = 36;
+		local categoryButtonOffsetY = 96;
+		local categoryButton = LandingPageUtil.CreateListCategoryButton(f, L["Resources"]);
+		categoryButton:SetPoint("TOP", f, "TOP", 0, -categoryButtonOffsetY);
+
+		-- Footer: Save and Cancel buttons
+		local redButtonOffsetY = 18;
+		local redButtonGap = 8;
+		local redbuttonWidth = 0.5 * (Def.ButtonWidth - redButtonGap);
+		f.SaveButton = LandingPageUtil.CreateRedButton(f);
+		f.SaveButton:SetWidth(redbuttonWidth);
+		f.SaveButton:SetButtonText(SAVE);
+		f.SaveButton:SetPoint("BOTTOMRIGHT", relativeTo, "BOTTOM", -0.5 * redButtonGap, redButtonOffsetY);
+		f.SaveButton:SetScript("OnClick", function()
+			ListManager:SaveChanges();
+		end);
+		f.CancelButton = LandingPageUtil.CreateRedButton(f);
+		f.CancelButton:SetWidth(redbuttonWidth);
+		f.CancelButton:SetButtonText(CANCEL);
+		f.CancelButton:SetPoint("BOTTOMLEFT", relativeTo, "BOTTOM", 0.5 * redButtonGap, redButtonOffsetY);
+		f.CancelButton:SetScript("OnClick", function()
+			ListManager:Cancel();
+		end);
+
+		local headerHeight = categoryButtonOffsetY + categoryButtonHeight;
+		local footerHeight = 24 + 2 * redButtonOffsetY;
+
+		local ScrollView = LandingPageUtil.CreateScrollViewForTab(f);
+		f.ScrollView = ScrollView;
+		ScrollView:Hide();
+		ScrollView:ClearAllPoints();
+		ScrollView:SetWidth(Def.ButtonWidth);
+		ScrollView:SetPoint("TOP", f, "TOP", 0, -headerHeight);
+		ScrollView:SetPoint("BOTTOM", f, "BOTTOM", 0, footerHeight);
+		ScrollView:MinimizeScrollBar(true);
+		ScrollView:OnSizeChanged();
+		ScrollView:SetAlwaysShowScrollBar(false);
+		ScrollView:SetSmartClipsChildren(true);
+		ScrollView:SetStepSize(2.5 * Def.ButtonHeight);
+		ScrollView:SetBottomOvershoot(Def.ButtonHeight);
+		ScrollView:ResetScrollBarPosition();
+		ScrollView:UseBoundaryGradient(true);
+		ScrollView:SetBoundaryGradientSize(Def.ButtonHeight);
+
+		local function EntryButton_Create()
+			return CreateManagerEntry(ScrollView);
+		end
+
+		local function EntryButton_OnAcquired(obj)
+			if ScrollView:IsScrollable() then
+				obj:SetWidth(Def.ButtonWidth - 24);
+			else
+				obj:SetWidth(Def.ButtonWidth);
+			end
+		end
+
+		local function EntryButton_OnRemoved(obj)
+			obj.currencyID = nil;
+			obj.itemID = nil;
+		end
+
+		ScrollView:AddTemplate("ManagerEntry", EntryButton_Create, EntryButton_OnAcquired, EntryButton_OnRemoved);
+
+		-- Exit if tab changes
+		addon.CallbackRegistry:Register("LandingPage_TabChanged", self.Cancel, self);
+	end
+
+	function ListManager:SaveChanges()
+
+	end
+
+	function ListManager:Cancel()
+		self:HideFrame();
+	end
+
+	function ListManager:ShowFrame()
+		self:Init();
+		ManagerFrame:Show();
+		self:FullUpdate();
+		MainFrame:Hide();
+		LandingPageUtil.HighlightWidget(ManagerFrame, true);
+	end
+
+	function ListManager:HideFrame()
+		if ManagerFrame and ManagerFrame:IsShown() then
+			ManagerFrame:Hide();
+			MainFrame:Show();
+			LandingPageUtil.HighlightWidget(nil);
+		end
+	end
+
+	function ListManager:UpdateIfVisible()
+		if ManagerFrame and ManagerFrame:IsShown() then
+			self:FullUpdate();
+		end
+	end
+
+	function ListManager:FullUpdate()
+		local n = 0;
+		local content = {};
+		local offsetY = 0;
+		local offsetX = -0.5 * Def.ButtonWidth;
+		local objectHeight = Def.ButtonHeight;
+		local gap = 0;
+		local top, bottom;
+
+		for _, v in ipairs(ResourceList) do
+			n = n + 1;
+			top = offsetY;
+			bottom = offsetY + objectHeight + gap;
+			content[n] = {
+				templateKey = "ManagerEntry",
+				top = top,
+				bottom = bottom,
+				point = "TOPLEFT",
+				offsetX = offsetX,
+			};
+			if v.currencyID then
+				content[n].setupFunc = function(obj)
+					obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
+				end;
+			elseif v.itemID then
+				content[n].setupFunc = function(obj)
+					obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc, v.useActionButton);
+				end;
+			end
+			offsetY = bottom;
+		end
+
+		local retainPosition = false;
+		ManagerFrame.ScrollView:Show();
+		ManagerFrame.ScrollView:SetContent(content, retainPosition);
+	end
 end
 
 
@@ -464,7 +777,7 @@ do
 		local n = 0;
 		local content = {};
 		local offsetY = 0;
-		local offsetX = -0.5 * BUTTON_WIDTH;
+		local offsetX = -0.5 * Def.ButtonWidth;
 		local gap = 0;
 		local repBarGap = 10;
 		local miniEntryMode = addon.GetDBValue("LandingPage_Currency_Layout") == 2;
@@ -476,10 +789,10 @@ do
 
 		if miniEntryMode then
 			self.ScrollView:ExtendRenderDataIndex(2);
-			self.ScrollView:SetStepSize(2 * (BUTTON_HEIGHT + MINIENTRY_GAP));
+			self.ScrollView:SetStepSize(2 * (Def.ButtonHeight + Def.MiniEntryGap));
 		else
 			self.ScrollView:ExtendRenderDataIndex(0);
-			self.ScrollView:SetStepSize(2.5 * BUTTON_HEIGHT);
+			self.ScrollView:SetStepSize(2.5 * Def.ButtonHeight);
 		end
 
 		for _, v in ipairs(ResourceList) do
@@ -542,7 +855,7 @@ do
 					};
 				elseif v.faction then
 					self.anyRep = true;
-					objectHeight = BUTTON_HEIGHT;
+					objectHeight = Def.ButtonHeight;
 					bottom = offsetY + objectHeight + repBarGap;
 					content[n] = {
 						templateKey = "RepBar",
@@ -556,15 +869,15 @@ do
 						end;
 					};
 				else
-					objectHeight = BUTTON_HEIGHT;
+					objectHeight = Def.ButtonHeight;
 					if miniEntryMode then
 						local buttonOffsetX;
 						if isLeftCol then
-							buttonOffsetX = -0.5 * BUTTON_WIDTH;
+							buttonOffsetX = -0.5 * Def.ButtonWidth;
 						else
-							buttonOffsetX = MINIENTRY_GAP;
+							buttonOffsetX = Def.MiniEntryGap;
 						end
-						bottom = offsetY + objectHeight + MINIENTRY_GAP;
+						bottom = offsetY + objectHeight + Def.MiniEntryGap;
 						content[n] = {
 							templateKey = "MiniCurrencyButton",
 							top = top,
@@ -680,6 +993,14 @@ local function CategoryButtonOnEnterFunc(listCategoryButton)
 	end
 end
 
+local function GenerateSettingsPopupInfo()
+	local popupInfo = {
+		title = L["Edit Resource List"],
+	};
+
+	return popupInfo;
+end
+
 local function MenuInfoGetter_CurrencySettings()
 	local tbl = {
 		key = "LandingPageCurrencySettings",
@@ -709,7 +1030,9 @@ local function MenuInfoGetter_CurrencySettings()
 
 	tinsert(widgets, {type = "Divider"});
 	tinsert(widgets, {type = "Button", text = L["Edit Resource List"], tooltip = nil, closeAfterClick = true,
-		onClickFunc = function() end,
+		onClickFunc = function()
+			ListManager:ShowFrame();
+		end,
 	});
 
 	tbl.widgets = widgets;
@@ -721,8 +1044,8 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	MainFrame = f;
 	API.Mixin(f, CurrencyListMixin);
 
-	local height = 7 * BUTTON_HEIGHT;
-	f:SetSize(BUTTON_WIDTH, height);
+	local height = 7 * Def.ButtonHeight;
+	f:SetSize(Def.ButtonWidth, height);
 
 
 	local ScrollView = LandingPageUtil.CreateScrollViewForTab(f);
@@ -734,11 +1057,11 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	ScrollView:OnSizeChanged();
 	ScrollView:SetAlwaysShowScrollBar(false);
 	ScrollView:SetSmartClipsChildren(true);
-	ScrollView:SetStepSize(2.5 * BUTTON_HEIGHT);
-	ScrollView:SetBottomOvershoot(BUTTON_HEIGHT);
+	ScrollView:SetStepSize(2.5 * Def.ButtonHeight);
+	ScrollView:SetBottomOvershoot(Def.ButtonHeight);
 	ScrollView:ResetScrollBarPosition();
 	ScrollView:UseBoundaryGradient(true);
-	ScrollView:SetBoundaryGradientSize(BUTTON_HEIGHT);
+	ScrollView:SetBoundaryGradientSize(Def.ButtonHeight);
 
 	local function CurrencyButton_Create()
 		return CreateStandardEntry(ScrollView);
@@ -746,9 +1069,9 @@ function LandingPageUtil.CreateCurrencyList(parent)
 
 	local function CurrencyButton_OnAcquired(obj)
 		if ScrollView:IsScrollable() then
-			obj:SetWidth(BUTTON_WIDTH - 10);
+			obj:SetWidth(Def.ButtonWidth - 10);
 		else
-			obj:SetWidth(BUTTON_WIDTH);
+			obj:SetWidth(Def.ButtonWidth);
 		end
 	end
 
@@ -766,9 +1089,9 @@ function LandingPageUtil.CreateCurrencyList(parent)
 
 	local function MiniCurrencyButton_OnAcquired(obj)
 		if ScrollView:IsScrollable() then
-			obj:SetWidth((BUTTON_WIDTH - MINIENTRY_GAP - 10) / 2);
+			obj:SetWidth((Def.ButtonWidth - Def.MiniEntryGap - 10) / 2);
 		else
-			obj:SetWidth((BUTTON_WIDTH - MINIENTRY_GAP) / 2);
+			obj:SetWidth((Def.ButtonWidth - Def.MiniEntryGap) / 2);
 		end
 	end
 
@@ -794,9 +1117,9 @@ function LandingPageUtil.CreateCurrencyList(parent)
 
 	local function RepBar_OnAcquired(obj)
 		if ScrollView:IsScrollable() then
-			obj:SetWidth(BUTTON_WIDTH - 20);
+			obj:SetWidth(Def.ButtonWidth - 20);
 		else
-			obj:SetWidth(BUTTON_WIDTH);
+			obj:SetWidth(Def.ButtonWidth);
 		end
 	end
 
@@ -820,6 +1143,7 @@ local function UpdateIfVisible()
 	if MainFrame and MainFrame:IsVisible() then
 		MainFrame:FullUpdate();
 	end
+	ListManager:UpdateIfVisible();
 end
 
 CallbackRegistry:Register("LandingPage.SetResourceList", function(list)

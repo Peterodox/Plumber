@@ -924,12 +924,12 @@ do  --ScrollView Scroll Behavior
 			local BottomGradient = CreateFrame("Frame", nil, self:GetParent());
 			self.BottomGradient = BottomGradient;
 			BottomGradient:SetSize(224, self.boundaryGradientSize or 40);
-			BottomGradient:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 6, -1);
+			BottomGradient:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, -1);
 			BottomGradient:SetPoint("BOTTOMRIGHT", self.ScrollBar, "BOTTOMLEFT", -1, -1);
 			local tex = BottomGradient:CreateTexture(nil, "OVERLAY");
 			tex:SetAllPoints(true);
-			local topColor = CreateColor(0.082, 0.047, 0.027, 0);
-			local bottomColor = CreateColor(0.082, 0.047, 0.027, 1)
+			local topColor = CreateColor(0.067, 0.040, 0.024, 0);
+			local bottomColor = CreateColor(0.067, 0.040, 0.024, 1)
 			tex:SetColorTexture(1, 1, 1);
 			tex:SetGradient("VERTICAL", bottomColor, topColor);
 			BottomGradient:SetFrameLevel(self:GetFrameLevel() + 2);
