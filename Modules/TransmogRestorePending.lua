@@ -226,15 +226,15 @@ do
 	local function SavePendingToDB()
 		if not PlumberDB_PC then return end;
 
-		if EL.pendingSnapshot or EL.pendingSituations then
+		if EL.PendingSnapshot or EL.PendingSituations then
 			--SerializeSnapshot expects a real list, only call it when there's actually a snapshot
-			local snapshot = EL.pendingSnapshot and SerializeSnapshot(EL.pendingSnapshot);
+			local snapshot = EL.PendingSnapshot and SerializeSnapshot(EL.PendingSnapshot);
 			PlumberDB_PC.TransmogRestorePending = {
 				snapshot = snapshot,
-				shoulderSecondary = EL.pendingShoulderSecondary,
-				weaponOptions = EL.pendingWeaponOptions,
-				situations = EL.pendingSituations,
-				outfitID = EL.pendingOutfitID,
+				shoulderSecondary = EL.PendingShoulderSecondary,
+				weaponOptions = EL.PendingWeaponOptions,
+				situations = EL.PendingSituations,
+				outfitID = EL.PendingOutfitID,
 			};
 		else
 			PlumberDB_PC.TransmogRestorePending = nil;
@@ -246,15 +246,15 @@ do
 		local saved = PlumberDB_PC and PlumberDB_PC.TransmogRestorePending;
 		if saved then
 			if type(saved.snapshot) == "string" then
-				EL.pendingSnapshot = DeserializeSnapshot(saved.snapshot);
+				EL.PendingSnapshot = DeserializeSnapshot(saved.snapshot);
 			else
 				--Older Plumber versions stored a plain table snapshot directly
-				EL.pendingSnapshot = saved.snapshot;
+				EL.PendingSnapshot = saved.snapshot;
 			end
-			EL.pendingShoulderSecondary = saved.shoulderSecondary;
-			EL.pendingWeaponOptions = saved.weaponOptions;
-			EL.pendingSituations = saved.situations;
-			EL.pendingOutfitID = saved.outfitID;
+			EL.PendingShoulderSecondary = saved.shoulderSecondary;
+			EL.PendingWeaponOptions = saved.weaponOptions;
+			EL.PendingSituations = saved.situations;
+			EL.PendingOutfitID = saved.outfitID;
 		end
 	end
 
@@ -263,20 +263,20 @@ do
 
 		local hasTransmogsPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
 		if hasTransmogsPending then
-			EL.pendingSnapshot = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
-			EL.pendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
-			EL.pendingWeaponOptions = EL.CaptureWeaponOptionsPending();
+			EL.PendingSnapshot = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
+			EL.PendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+			EL.PendingWeaponOptions = EL.CaptureWeaponOptionsPending();
 		else
-			EL.pendingSnapshot = nil;
-			EL.pendingShoulderSecondary = nil;
-			EL.pendingWeaponOptions = nil;
+			EL.PendingSnapshot = nil;
+			EL.PendingShoulderSecondary = nil;
+			EL.PendingWeaponOptions = nil;
 		end
 
 		local hasSituationsPending = C_TransmogOutfitInfo.HasPendingOutfitSituations();
-		EL.pendingSituations = hasSituationsPending and EL.CaptureSituationsPending() or nil;
+		EL.PendingSituations = hasSituationsPending and EL.CaptureSituationsPending() or nil;
 
 		--Frame reopens on the active outfit, so remember which one was actually being edited.
-		EL.pendingOutfitID = (hasTransmogsPending or hasSituationsPending) and C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID() or nil;
+		EL.PendingOutfitID = (hasTransmogsPending or hasSituationsPending) and C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID() or nil;
 
 		SavePendingToDB();
 	end
@@ -291,11 +291,11 @@ do
 	end
 
 	local function ClearPendingState()
-		EL.pendingSnapshot = nil;
-		EL.pendingShoulderSecondary = nil;
-		EL.pendingWeaponOptions = nil;
-		EL.pendingSituations = nil;
-		EL.pendingOutfitID = nil;
+		EL.PendingSnapshot = nil;
+		EL.PendingShoulderSecondary = nil;
+		EL.PendingWeaponOptions = nil;
+		EL.PendingSituations = nil;
+		EL.PendingOutfitID = nil;
 	end
 
 	local function ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions)
@@ -312,11 +312,11 @@ do
 
 	local function RestoreAllPending()
 		--Clear early, a write below can retrigger CapturePending mid-call
-		local snapshot = EL.pendingSnapshot;
-		local shoulderSecondary = EL.pendingShoulderSecondary;
-		local weaponOptions = EL.pendingWeaponOptions;
-		local situations = EL.pendingSituations;
-		local outfitID = EL.pendingOutfitID;
+		local snapshot = EL.PendingSnapshot;
+		local shoulderSecondary = EL.PendingShoulderSecondary;
+		local weaponOptions = EL.PendingWeaponOptions;
+		local situations = EL.PendingSituations;
+		local outfitID = EL.PendingOutfitID;
 		ClearPendingState();
 		EL.SavePendingToDB();
 
@@ -329,12 +329,12 @@ do
 
 	local function ReapplyPendingOnOutfitSwitch()
 		--Nothing pending, or this switch is our own RestoreViewedOutfit call above, already handled.
-		if not EL.pendingSnapshot and not EL.pendingSituations then return; end
+		if not EL.PendingSnapshot and not EL.PendingSituations then return; end
 
-		local snapshot = EL.pendingSnapshot;
-		local shoulderSecondary = EL.pendingShoulderSecondary;
-		local weaponOptions = EL.pendingWeaponOptions;
-		local situations = EL.pendingSituations;
+		local snapshot = EL.PendingSnapshot;
+		local shoulderSecondary = EL.PendingShoulderSecondary;
+		local weaponOptions = EL.PendingWeaponOptions;
+		local situations = EL.PendingSituations;
 		ClearPendingState();
 		EL.SavePendingToDB();
 
@@ -350,18 +350,18 @@ do
 		if isHandlingSituationsChanged then return; end
 		isHandlingSituationsChanged = true;
 
-		local wipedTransmogs = EL.pendingSnapshot and not C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
-		local wipedSituations = EL.pendingSituations and not C_TransmogOutfitInfo.HasPendingOutfitSituations();
+		local wipedTransmogs = EL.PendingSnapshot and not C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
+		local wipedSituations = EL.PendingSituations and not C_TransmogOutfitInfo.HasPendingOutfitSituations();
 
 		if not (wipedTransmogs or wipedSituations) then
 			CapturePending();
 		else
 			--Blizzard's own Situations auto-switch can silently discard pending edits, fight back with what we had.
 			if wipedTransmogs then
-				ApplyPendingSnapshot(EL.pendingSnapshot, EL.pendingShoulderSecondary, EL.pendingWeaponOptions);
+				ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
 			end
 			if wipedSituations then
-				EL.RestoreSituationsPending(EL.pendingSituations);
+				EL.RestoreSituationsPending(EL.PendingSituations);
 			end
 		end
 
@@ -385,7 +385,7 @@ do
 
 		API.RegisterFrameForEvents(EL, TRACKED_EVENTS);
 
-		if EL.pendingSnapshot or EL.pendingSituations then
+		if EL.PendingSnapshot or EL.PendingSituations then
 			RestoreAllPending();
 		end
 	end
@@ -413,9 +413,9 @@ do
 		local originalClearTransmogs = C_TransmogOutfitInfo.ClearAllPendingTransmogs;
 		C_TransmogOutfitInfo.ClearAllPendingTransmogs = function(...)
 			if TransmogFrame:IsShown() then
-				EL.pendingSnapshot = nil;
-				EL.pendingShoulderSecondary = nil;
-				EL.pendingWeaponOptions = nil;
+				EL.PendingSnapshot = nil;
+				EL.PendingShoulderSecondary = nil;
+				EL.PendingWeaponOptions = nil;
 				EL.SavePendingToDB();
 			end
 			return originalClearTransmogs(...);
@@ -424,7 +424,7 @@ do
 		local originalClearSituations = C_TransmogOutfitInfo.ClearAllPendingSituations;
 		C_TransmogOutfitInfo.ClearAllPendingSituations = function(...)
 			if TransmogFrame:IsShown() then
-				EL.pendingSituations = nil;
+				EL.PendingSituations = nil;
 				EL.SavePendingToDB();
 			end
 			return originalClearSituations(...);
@@ -458,11 +458,11 @@ do
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
 			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
-			EL.pendingSnapshot = nil;
-			EL.pendingShoulderSecondary = nil;
-			EL.pendingWeaponOptions = nil;
-			EL.pendingSituations = nil;
-			EL.pendingOutfitID = nil;
+			EL.PendingSnapshot = nil;
+			EL.PendingShoulderSecondary = nil;
+			EL.PendingWeaponOptions = nil;
+			EL.PendingSituations = nil;
+			EL.PendingOutfitID = nil;
 			EL.SavePendingToDB();
 		end
 	end
