@@ -9,6 +9,12 @@ local WEAPON_SLOTS = {
 	[17] = Enum.TransmogOutfitSlot.WeaponOffHand,
 };
 
+--True if two appearance snapshots match.
+local function SameAppearance(liveInfo, recordedInfo)
+	return liveInfo.appearanceID == recordedInfo.appearanceID
+		and liveInfo.secondaryAppearanceID == recordedInfo.secondaryAppearanceID;
+end
+
 
 do
 	local IgnoredInvSlots = {
@@ -51,9 +57,11 @@ do
 		end
 	end
 
-	function EL.ApplySnapshotToPending(itemTransmogInfoList)
+	--Only replays the tracked pendingSlots, not the whole outfit.
+	--Always writes, since right after switching outfits the character preview hasn't caught up yet.
+	function EL.ApplySnapshotToPending(itemTransmogInfoList, pendingSlots)
 		for invSlotID, transmogInfo in ipairs(itemTransmogInfoList) do
-			if not IgnoredInvSlots[invSlotID] then
+			if pendingSlots[invSlotID] then
 				local transmogID = transmogInfo.appearanceID;
 
 				if invSlotID == 3 then
@@ -72,26 +80,77 @@ do
 		end
 	end
 
+	local function SlotHasPending(slot)
+		local info = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, Enum.TransmogOutfitSlotOption.None);
+		return info and info.hasPending;
+	end
+
+	--Which invSlotIDs have an unsaved change.
+	--A slot stays tracked while its value still matches what we last set, even once Blizzard stops calling it pending.
+	function EL.CapturePendingSlots(liveList, previousSnapshot, previousSlots)
+		local pendingSlots = {};
+		for invSlotID = 1, 19 do
+			if not IgnoredInvSlots[invSlotID] then
+				local hasPending;
+				if invSlotID == 3 then
+					--Either shoulder counts, the left one is its own slot only while separate shoulders are on
+					hasPending = SlotHasPending(SHOULDER_RIGHT) or SlotHasPending(Enum.TransmogOutfitSlot.ShoulderLeft);
+				else
+					local slot = C_TransmogOutfitInfo.GetTransmogOutfitSlotFromInventorySlot(invSlotID - 1);
+					hasPending = slot and SlotHasPending(slot);
+				end
+
+				if hasPending then
+					pendingSlots[invSlotID] = true;
+				elseif previousSlots and previousSlots[invSlotID] then
+					local liveInfo = liveList[invSlotID];
+					local recordedInfo = previousSnapshot and previousSnapshot[invSlotID];
+					if liveInfo and recordedInfo and SameAppearance(liveInfo, recordedInfo) then
+						pendingSlots[invSlotID] = true;
+					end
+				end
+			end
+		end
+		return pendingSlots;
+	end
+
 	function EL.RestoreShoulderSecondaryState(enabled)
 		if enabled ~= nil then
 			C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, enabled);
 		end
 	end
 
-	--Records are {invSlotID, weaponOption, transmogID, illusionID, sheatheCategory}, false marks a field as not captured
-	local function CaptureWeaponOptionRecord(invSlotID, slot, weaponOption)
+	local function FindPreviousWeaponOption(previousWeaponOptions, invSlotID, weaponOption)
+		for _, record in ipairs(previousWeaponOptions or {}) do
+			if record[1] == invSlotID and record[2] == weaponOption then
+				return record;
+			end
+		end
+	end
+
+	--Records are {invSlotID, weaponOption, transmogID, illusionID, sheatheCategory}, false marks a field as not captured.
+	--previous keeps a value tracked the same way EL.CapturePendingSlots does.
+	local function CaptureWeaponOptionRecord(invSlotID, slot, weaponOption, previous)
 		local transmogID, illusionID, sheatheCategory;
 
-		--hasPending means unsaved, not just currently equipped or already saved
 		local appearanceInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
-		if appearanceInfo and appearanceInfo.hasPending then
-			transmogID = appearanceInfo.transmogID;
-			sheatheCategory = appearanceInfo.sheatheCategory;
+		if appearanceInfo then
+			if appearanceInfo.hasPending then
+				transmogID = appearanceInfo.transmogID;
+				sheatheCategory = appearanceInfo.sheatheCategory;
+			elseif previous and previous[3] and appearanceInfo.transmogID == previous[3] then
+				transmogID = previous[3];
+				sheatheCategory = appearanceInfo.sheatheCategory;
+			end
 		end
 
 		local illusionInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Illusion, weaponOption);
-		if illusionInfo and illusionInfo.hasPending then
-			illusionID = illusionInfo.transmogID;
+		if illusionInfo then
+			if illusionInfo.hasPending then
+				illusionID = illusionInfo.transmogID;
+			elseif previous and previous[4] and illusionInfo.transmogID == previous[4] then
+				illusionID = previous[4];
+			end
 		end
 
 		if transmogID or illusionID then
@@ -100,12 +159,13 @@ do
 	end
 
 	--Shared so the same capture logic runs for both weaponOptionsInfo and artifactOptionsInfo without duplicating it
-	local function CaptureOptionsInfoList(weaponOptionsPending, invSlotID, slot, optionsInfo)
+	local function CaptureOptionsInfoList(weaponOptionsPending, previousWeaponOptions, invSlotID, slot, optionsInfo)
 		if not optionsInfo then return weaponOptionsPending; end
 
 		for _, optionInfo in ipairs(optionsInfo) do
 			if optionInfo.enabled then
-				local record = CaptureWeaponOptionRecord(invSlotID, slot, optionInfo.weaponOption);
+				local previous = FindPreviousWeaponOption(previousWeaponOptions, invSlotID, optionInfo.weaponOption);
+				local record = CaptureWeaponOptionRecord(invSlotID, slot, optionInfo.weaponOption, previous);
 				if record then
 					weaponOptionsPending = weaponOptionsPending or {};
 					table.insert(weaponOptionsPending, record);
@@ -116,13 +176,13 @@ do
 		return weaponOptionsPending;
 	end
 
-	function EL.CaptureWeaponOptionsPending()
+	function EL.CaptureWeaponOptionsPending(previousWeaponOptions)
 		local weaponOptionsPending;
 		for invSlotID, slot in pairs(WEAPON_SLOTS) do
 			--Artifact spec options use separate enum values, so they never collide with the weapon options here
 			local weaponOptionsInfo, artifactOptionsInfo = C_TransmogOutfitInfo.GetWeaponOptionsForSlot(slot);
-			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, invSlotID, slot, weaponOptionsInfo);
-			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, invSlotID, slot, artifactOptionsInfo);
+			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, previousWeaponOptions, invSlotID, slot, weaponOptionsInfo);
+			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, previousWeaponOptions, invSlotID, slot, artifactOptionsInfo);
 		end
 		return weaponOptionsPending;
 	end
@@ -223,8 +283,32 @@ do
 		return parseFunc and parseFunc(str);
 	end
 
+	--EL.PendingSlots is a set of invSlotIDs, saved and loaded as a simple comma-joined list.
+	local function SerializePendingSlots(pendingSlots)
+		local list = {};
+		for invSlotID in pairs(pendingSlots) do
+			table.insert(list, invSlotID);
+		end
+		if #list == 0 then return nil; end
+		table.sort(list);
+		return table.concat(list, ",");
+	end
+
+	local function DeserializePendingSlots(str)
+		local pendingSlots = {};
+		if str then
+			for token in str:gmatch("[^,]+") do
+				pendingSlots[tonumber(token)] = true;
+			end
+		end
+		return pendingSlots;
+	end
+
 	local function SavePendingToDB()
 		if not PlumberDB_PC then return end;
+
+		--Saved on its own, separate from pending edits, so it survives even with nothing pending.
+		PlumberDB_PC.TransmogRestoreLastOutfit = EL.LastViewedOutfitID;
 
 		if EL.PendingSnapshot or EL.PendingSituations then
 			--SerializeSnapshot expects a real list, only call it when there's actually a snapshot
@@ -234,7 +318,7 @@ do
 				shoulderSecondary = EL.PendingShoulderSecondary,
 				weaponOptions = EL.PendingWeaponOptions,
 				situations = EL.PendingSituations,
-				outfitID = EL.PendingOutfitID,
+				pendingSlots = EL.PendingSlots and SerializePendingSlots(EL.PendingSlots),
 			};
 		else
 			PlumberDB_PC.TransmogRestorePending = nil;
@@ -243,6 +327,8 @@ do
 	EL.SavePendingToDB = SavePendingToDB;
 
 	function EL.LoadPendingFromDB()
+		EL.LastViewedOutfitID = PlumberDB_PC and PlumberDB_PC.TransmogRestoreLastOutfit;
+
 		local saved = PlumberDB_PC and PlumberDB_PC.TransmogRestorePending;
 		if saved then
 			if type(saved.snapshot) == "string" then
@@ -254,29 +340,37 @@ do
 			EL.PendingShoulderSecondary = saved.shoulderSecondary;
 			EL.PendingWeaponOptions = saved.weaponOptions;
 			EL.PendingSituations = saved.situations;
-			EL.PendingOutfitID = saved.outfitID;
+			--Older Plumber versions didn't record this, better to restore nothing than the whole outfit
+			EL.PendingSlots = EL.PendingSnapshot and DeserializePendingSlots(saved.pendingSlots);
 		end
 	end
 
-	local function CapturePending()
-		if not EL.enabled then return end;
+	local isRestoringPending = false;
 
-		local hasTransmogsPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
+	local function CapturePending()
+		if not EL.enabled or isRestoringPending then return end;
+
+		local liveList = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
+		--Tracked even when nothing's pending, so reopening the frame lands back on the outfit last selected/viewed.
+		EL.LastViewedOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
+		local pendingSlots = EL.CapturePendingSlots(liveList, EL.PendingSnapshot, EL.PendingSlots);
+		local weaponOptions = EL.CaptureWeaponOptionsPending(EL.PendingWeaponOptions);
+		local hasTransmogsPending = next(pendingSlots) ~= nil or weaponOptions ~= nil;
+
 		if hasTransmogsPending then
-			EL.PendingSnapshot = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
+			EL.PendingSnapshot = liveList;
+			EL.PendingSlots = pendingSlots;
+			EL.PendingWeaponOptions = weaponOptions;
 			EL.PendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
-			EL.PendingWeaponOptions = EL.CaptureWeaponOptionsPending();
 		else
 			EL.PendingSnapshot = nil;
-			EL.PendingShoulderSecondary = nil;
+			EL.PendingSlots = nil;
 			EL.PendingWeaponOptions = nil;
+			EL.PendingShoulderSecondary = nil;
 		end
 
 		local hasSituationsPending = C_TransmogOutfitInfo.HasPendingOutfitSituations();
 		EL.PendingSituations = hasSituationsPending and EL.CaptureSituationsPending() or nil;
-
-		--Frame reopens on the active outfit, so remember which one was actually being edited.
-		EL.PendingOutfitID = (hasTransmogsPending or hasSituationsPending) and C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID() or nil;
 
 		SavePendingToDB();
 	end
@@ -290,86 +384,105 @@ do
 		end
 	end
 
-	local function ClearPendingState()
-		EL.PendingSnapshot = nil;
-		EL.PendingShoulderSecondary = nil;
-		EL.PendingWeaponOptions = nil;
-		EL.PendingSituations = nil;
-		EL.PendingOutfitID = nil;
-	end
-
-	local function ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions)
+	local function ApplyPendingSnapshot(snapshot, pendingSlots, shoulderSecondary, weaponOptions)
 		if not snapshot then return; end
 
 		EL.ForceWeaponSlotWidgetRebuild();
 
 		--Must run before ApplySnapshotToPending, toggling this after would wipe the left shoulder's pending value
 		EL.RestoreShoulderSecondaryState(shoulderSecondary);
-		EL.ApplySnapshotToPending(snapshot);
+		EL.ApplySnapshotToPending(snapshot, pendingSlots or {});
 		--Must run after ApplySnapshotToPending, setting a weapon's appearance resets its sheathe category to Default
 		EL.RestoreWeaponOptionsPending(weaponOptions);
 	end
 
 	local function RestoreAllPending()
-		--Clear early, a write below can retrigger CapturePending mid-call
-		local snapshot = EL.PendingSnapshot;
-		local shoulderSecondary = EL.PendingShoulderSecondary;
-		local weaponOptions = EL.PendingWeaponOptions;
-		local situations = EL.PendingSituations;
-		local outfitID = EL.PendingOutfitID;
-		ClearPendingState();
-		EL.SavePendingToDB();
-
+		--Nothing is cleared first, the carry-forward check needs the old values while replaying.
+		--isRestoringPending blocks our own writes from being treated as new edits until the real one lands.
+		isRestoringPending = true;
 		--Must run first, since Blizzard's OnShow forces the active outfit and switching outfits wipes pending changes.
-		RestoreViewedOutfit(outfitID);
-		ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions);
-		EL.RestoreSituationsPending(situations);
+		RestoreViewedOutfit(EL.LastViewedOutfitID);
+		ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingSlots, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
+		EL.RestoreSituationsPending(EL.PendingSituations);
+		isRestoringPending = false;
 		--If we ever want to notify the user their outfit was restored, this is where it'd happen.
 	end
 
 	local function ReapplyPendingOnOutfitSwitch()
-		--Nothing pending, or this switch is our own RestoreViewedOutfit call above, already handled.
+		--Tracked even when nothing's pending, so reopening later still lands back on the outfit last selected/viewed.
+		EL.LastViewedOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
 		if not EL.PendingSnapshot and not EL.PendingSituations then return; end
 
-		local snapshot = EL.PendingSnapshot;
-		local shoulderSecondary = EL.PendingShoulderSecondary;
-		local weaponOptions = EL.PendingWeaponOptions;
-		local situations = EL.PendingSituations;
-		ClearPendingState();
-		EL.SavePendingToDB();
-
+		isRestoringPending = true;
 		--The user already landed on the outfit they picked, just replay the edits onto it.
-		ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions);
-		EL.RestoreSituationsPending(situations);
+		ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingSlots, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
+		EL.RestoreSituationsPending(EL.PendingSituations);
+		isRestoringPending = false;
 	end
 
 	local isHandlingSituationsChanged = false;
+
+	--HasPendingOutfitTransmogs reads false once a tracked slot just happens to match its outfit.
+	--So the wipe check below compares actual values instead of trusting that flag.
+	local function PendingStillApplied()
+		if EL.PendingSnapshot and EL.PendingSlots then
+			local liveList = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
+			for invSlotID in pairs(EL.PendingSlots) do
+				local liveInfo = liveList[invSlotID];
+				local recordedInfo = EL.PendingSnapshot[invSlotID];
+				if not (liveInfo and recordedInfo and SameAppearance(liveInfo, recordedInfo)) then
+					return false;
+				end
+			end
+		end
+
+		if EL.PendingWeaponOptions then
+			for _, record in ipairs(EL.PendingWeaponOptions) do
+				local invSlotID, weaponOption, transmogID, illusionID = record[1], record[2], record[3], record[4];
+				local slot = WEAPON_SLOTS[invSlotID];
+				if transmogID then
+					local info = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
+					if not (info and info.transmogID == transmogID) then return false; end
+				end
+				if illusionID then
+					local info = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Illusion, weaponOption);
+					if not (info and info.transmogID == illusionID) then return false; end
+				end
+			end
+		end
+
+		return true;
+	end
 
 	local function OnSituationsChanged()
 		--SetOutfitSituationsEnabled/UpdatePendingSituation below re-fire this event, guard against the recursion.
 		if isHandlingSituationsChanged then return; end
 		isHandlingSituationsChanged = true;
 
-		local wipedTransmogs = EL.PendingSnapshot and not C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
+		local wipedTransmogs = (EL.PendingSnapshot or EL.PendingWeaponOptions) and not PendingStillApplied();
 		local wipedSituations = EL.PendingSituations and not C_TransmogOutfitInfo.HasPendingOutfitSituations();
 
 		if not (wipedTransmogs or wipedSituations) then
 			CapturePending();
 		else
 			--Blizzard's own Situations auto-switch can silently discard pending edits, fight back with what we had.
+			isRestoringPending = true;
 			if wipedTransmogs then
-				ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
+				ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingSlots, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
 			end
 			if wipedSituations then
 				EL.RestoreSituationsPending(EL.PendingSituations);
 			end
+			isRestoringPending = false;
 		end
 
 		isHandlingSituationsChanged = false;
 	end
 
 	local function OnTrackedEvent(_, event)
-		if not EL.enabled then return end;
+		--Our own writes fire these same events, and so can Blizzard's close sequence before OnHide unregisters us.
+		--A stray capture in either case would look like everything just got reverted.
+		if not EL.enabled or isRestoringPending or not TransmogFrame:IsShown() then return end;
 
 		if event == "VIEWED_TRANSMOG_OUTFIT_CHANGED" then
 			ReapplyPendingOnOutfitSwitch();
@@ -384,10 +497,9 @@ do
 		if not EL.enabled then return end;
 
 		API.RegisterFrameForEvents(EL, TRACKED_EVENTS);
-
-		if EL.PendingSnapshot or EL.PendingSituations then
-			RestoreAllPending();
-		end
+		--Always restores the last-viewed outfit, whether or not anything is pending.
+		--RestoreAllPending's own pieces already safely do nothing when there's nothing to reapply.
+		RestoreAllPending();
 	end
 
 	local function TransmogFrame_OnHide()
@@ -406,14 +518,14 @@ do
 		end
 	end
 
-	--Only treat this as an intentional Undo while the frame is open, otherwise OnSituationsChanged
-	--would fight back against it and recurse into a stack overflow (oops!). Blizzard also runs these on
-	--every close (OnHide), and treating that as intentional too would break restore-on-reopen.
+	--Only treated as a real Undo while the frame is open, otherwise OnSituationsChanged fights back into a stack overflow (oops!).
+	--Blizzard also calls these on every close, so treating that the same way would break restore-on-reopen.
 	local function HookExplicitClears()
 		local originalClearTransmogs = C_TransmogOutfitInfo.ClearAllPendingTransmogs;
 		C_TransmogOutfitInfo.ClearAllPendingTransmogs = function(...)
 			if TransmogFrame:IsShown() then
 				EL.PendingSnapshot = nil;
+				EL.PendingSlots = nil;
 				EL.PendingShoulderSecondary = nil;
 				EL.PendingWeaponOptions = nil;
 				EL.SavePendingToDB();
@@ -459,10 +571,11 @@ do
 			EL.enabled = nil;
 			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
 			EL.PendingSnapshot = nil;
+			EL.PendingSlots = nil;
 			EL.PendingShoulderSecondary = nil;
 			EL.PendingWeaponOptions = nil;
 			EL.PendingSituations = nil;
-			EL.PendingOutfitID = nil;
+			EL.LastViewedOutfitID = nil;
 			EL.SavePendingToDB();
 		end
 	end
