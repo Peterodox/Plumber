@@ -101,7 +101,7 @@ do
 
 	--Shared so the same capture logic runs for both weaponOptionsInfo and artifactOptionsInfo without duplicating it
 	local function CaptureOptionsInfoList(weaponOptionsPending, invSlotID, slot, optionsInfo)
-		if not optionsInfo then return weaponOptionsPending end;
+		if not optionsInfo then return weaponOptionsPending; end
 
 		for _, optionInfo in ipairs(optionsInfo) do
 			if optionInfo.enabled then
@@ -128,7 +128,7 @@ do
 	end
 
 	function EL.RestoreWeaponOptionsPending(weaponOptionsPending)
-		if not weaponOptionsPending then return end;
+		if not weaponOptionsPending then return; end
 
 		for _, record in ipairs(weaponOptionsPending) do
 			local invSlotID, weaponOption, transmogID, illusionID, sheatheCategory = record[1], record[2], record[3], record[4], record[5];
@@ -181,7 +181,7 @@ do
 	end
 
 	function EL.RestoreSituationsPending(situationsPending)
-		if not situationsPending then return end;
+		if not situationsPending then return; end
 
 		C_TransmogOutfitInfo.SetOutfitSituationsEnabled(situationsPending.enabled);
 
@@ -282,8 +282,8 @@ do
 	end
 
 	local function RestoreViewedOutfit(outfitID)
-		if outfitID == nil then return end;
-		if outfitID == C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID() then return end;
+		if outfitID == nil then return; end
+		if outfitID == C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID() then return; end
 		--0 is the equipped-gear view (always valid); other outfits may have been deleted since capture.
 		if outfitID == 0 or C_TransmogOutfitInfo.GetOutfitInfo(outfitID) then
 			C_TransmogOutfitInfo.ChangeViewedOutfit(outfitID);
@@ -299,7 +299,7 @@ do
 	end
 
 	local function ApplyPendingSnapshot(snapshot, shoulderSecondary, weaponOptions)
-		if not snapshot then return end;
+		if not snapshot then return; end
 
 		EL.ForceWeaponSlotWidgetRebuild();
 
@@ -329,7 +329,7 @@ do
 
 	local function ReapplyPendingOnOutfitSwitch()
 		--Nothing pending, or this switch is our own RestoreViewedOutfit call above, already handled.
-		if not EL.pendingSnapshot and not EL.pendingSituations then return end;
+		if not EL.pendingSnapshot and not EL.pendingSituations then return; end
 
 		local snapshot = EL.pendingSnapshot;
 		local shoulderSecondary = EL.pendingShoulderSecondary;
@@ -347,7 +347,7 @@ do
 
 	local function OnSituationsChanged()
 		--SetOutfitSituationsEnabled/UpdatePendingSituation below re-fire this event, guard against the recursion.
-		if isHandlingSituationsChanged then return end;
+		if isHandlingSituationsChanged then return; end
 		isHandlingSituationsChanged = true;
 
 		local wipedTransmogs = EL.pendingSnapshot and not C_TransmogOutfitInfo.HasPendingOutfitTransmogs();
@@ -395,9 +395,9 @@ do
 	end
 
 	local function OnStaticPopupShown(which, _, _, data)
-		if which ~= "TRANSMOG_PENDING_CHANGES" or not EL.enabled then return end;
+		if which ~= "TRANSMOG_PENDING_CHANGES" or not EL.enabled then return; end
 		local hasPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs() or C_TransmogOutfitInfo.HasPendingOutfitSituations();
-		if not hasPending then return end;
+		if not hasPending then return; end
 
 		--Both appearance and situation pending changes now survive an outfit switch, so this warning is stale.
 		StaticPopup_Hide(which, data);
