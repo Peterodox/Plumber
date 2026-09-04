@@ -1,5 +1,6 @@
 local _, addon = ...
 local L = addon.L;
+local API = addon.API;
 
 local EL = CreateFrame("Frame");
 local SHOULDER_RIGHT = Enum.TransmogOutfitSlot.ShoulderRight;
@@ -382,9 +383,7 @@ do
 	local function TransmogFrame_OnShow()
 		if not EL.enabled then return end;
 
-		for _, event in ipairs(TRACKED_EVENTS) do
-			EL:RegisterEvent(event);
-		end
+		API.RegisterFrameForEvents(EL, TRACKED_EVENTS);
 
 		if EL.pendingSnapshot or EL.pendingSituations then
 			RestoreAllPending();
@@ -392,7 +391,7 @@ do
 	end
 
 	local function TransmogFrame_OnHide()
-		EL:UnregisterAllEvents();
+		API.UnregisterFrameForEvents(EL, TRACKED_EVENTS);
 	end
 
 	local function OnStaticPopupShown(which, _, _, data)
