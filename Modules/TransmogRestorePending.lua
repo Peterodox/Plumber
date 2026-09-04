@@ -472,17 +472,18 @@ do
 	end
 
 	local function OnSituationsChanged()
-		--SetOutfitSituationsEnabled/UpdatePendingSituation below re-fire this event, guard against the recursion.
+		--Restores below re-fire this event, guard against the recursion.
 		if isHandlingSituationsChanged then return; end
 		isHandlingSituationsChanged = true;
 
 		local wipedTransmogs = (EL.PendingSnapshot or EL.PendingWeaponOptions) and not PendingStillApplied();
-		local wipedSituations = EL.PendingSituations and not C_TransmogOutfitInfo.HasPendingOutfitSituations();
+		--Situations only need fighting back when the outfit just changed, not on a same-outfit toggle.
+		local isOutfitSwitch = EL.LastViewedOutfitID and EL.LastViewedOutfitID ~= C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
+		local wipedSituations = isOutfitSwitch and EL.PendingSituations and not C_TransmogOutfitInfo.HasPendingOutfitSituations();
 
 		if not (wipedTransmogs or wipedSituations) then
 			CapturePending();
 		else
-			--Blizzard's own Situations auto-switch can silently discard pending edits, fight back with what we had.
 			isRestoringPending = true;
 			if wipedTransmogs then
 				ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingSlots, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
