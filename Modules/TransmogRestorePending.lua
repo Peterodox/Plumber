@@ -504,6 +504,15 @@ do
 			local isSeparated = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
 			EL.ReapplyShoulderAppearance(EL.LiveShoulderInfo, isSeparated);
 		end
+
+		--Re-merging shoulders clears the left shoulder slot selection, which then defaults to head.
+		--Re-select the right shoulder instead.
+		if not TransmogFrame.CharacterPreview:GetSelectedSlotData() then
+			local rightSlotFrame = TransmogFrame.CharacterPreview:GetSlotFrame(SHOULDER_RIGHT, Enum.TransmogType.Appearance);
+			if rightSlotFrame then
+				TransmogFrame:SelectSlot(rightSlotFrame, true);
+			end
+		end
 	end
 
 	local function OnTrackedEvent(_, event)
