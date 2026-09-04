@@ -57,24 +57,31 @@ do
 		end
 	end
 
+	--Right always wins, left mirrors it while separated unless left was set independently.
+	--Once merged, right and left can share the same slot, so writing left too would override right back.
+	function EL.ReapplyShoulderAppearance(transmogInfo, isSeparated)
+		local transmogID = transmogInfo.appearanceID;
+		SetPendingFromSlot(3, SHOULDER_RIGHT, transmogID);
+		if isSeparated then
+			local secondaryAppearanceID = transmogInfo.secondaryAppearanceID;
+			if secondaryAppearanceID == 0 then
+				--0 means the left shoulder was never set independently, mirror the right
+				secondaryAppearanceID = transmogID;
+			end
+			SetPendingFromSlot(3, Enum.TransmogOutfitSlot.ShoulderLeft, secondaryAppearanceID);
+		end
+	end
+
 	--Only replays the tracked pendingSlots, not the whole outfit.
 	--Always writes, since right after switching outfits the character preview hasn't caught up yet.
 	function EL.ApplySnapshotToPending(itemTransmogInfoList, pendingSlots)
 		for invSlotID, transmogInfo in ipairs(itemTransmogInfoList) do
 			if pendingSlots[invSlotID] then
-				local transmogID = transmogInfo.appearanceID;
-
 				if invSlotID == 3 then
-					local secondaryAppearanceID = transmogInfo.secondaryAppearanceID;
-					SetPendingFromSlot(invSlotID, SHOULDER_RIGHT, transmogID);
-					if secondaryAppearanceID == 0 then
-						--0 means the left shoulder was never set independently, mirror the right
-						secondaryAppearanceID = transmogID;
-					end
-					SetPendingFromSlot(invSlotID, Enum.TransmogOutfitSlot.ShoulderLeft, secondaryAppearanceID);
+					EL.ReapplyShoulderAppearance(transmogInfo, true);
 				else
 					local slot = C_TransmogOutfitInfo.GetTransmogOutfitSlotFromInventorySlot(invSlotID - 1);
-					SetPendingFromSlot(invSlotID, slot, transmogID);
+					SetPendingFromSlot(invSlotID, slot, transmogInfo.appearanceID);
 				end
 			end
 		end
@@ -89,12 +96,17 @@ do
 	--A slot stays tracked while its value still matches what we last set, even once Blizzard stops calling it pending.
 	function EL.CapturePendingSlots(liveList, previousSnapshot, previousSlots)
 		local pendingSlots = {};
+		local shoulderSecondary;
 		for invSlotID = 1, 19 do
 			if not IgnoredInvSlots[invSlotID] then
 				local hasPending;
 				if invSlotID == 3 then
 					--Either shoulder counts, the left one is its own slot only while separate shoulders are on
 					hasPending = SlotHasPending(SHOULDER_RIGHT) or SlotHasPending(Enum.TransmogOutfitSlot.ShoulderLeft);
+					if hasPending then
+						--Only capture when fresh, a switch briefly resets this and reading it then would lose our value
+						shoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+					end
 				else
 					local slot = C_TransmogOutfitInfo.GetTransmogOutfitSlotFromInventorySlot(invSlotID - 1);
 					hasPending = slot and SlotHasPending(slot);
@@ -111,7 +123,7 @@ do
 				end
 			end
 		end
-		return pendingSlots;
+		return pendingSlots, shoulderSecondary;
 	end
 
 	function EL.RestoreShoulderSecondaryState(enabled)
@@ -267,6 +279,7 @@ do
 		"VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH", -- Queue a transmog change
 		"VIEWED_TRANSMOG_OUTFIT_CHANGED", -- Outfit slot switched
 		"VIEWED_TRANSMOG_OUTFIT_SITUATIONS_CHANGED", -- Queue a situation change
+		"VIEWED_TRANSMOG_OUTFIT_SECONDARY_SLOTS_CHANGED", -- Separate shoulders toggled
 	};
 
 	--Piggyback on Blizzard's /customset format to store this as a string instead of a nested table.
@@ -351,9 +364,11 @@ do
 		if not EL.enabled or isRestoringPending then return end;
 
 		local liveList = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
+		--Kept even when nothing's pending, so the separate-shoulders fix has a value to fall back to.
+		EL.LiveShoulderInfo = liveList[3];
 		--Tracked even when nothing's pending, so reopening the frame lands back on the outfit last selected/viewed.
 		EL.LastViewedOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
-		local pendingSlots = EL.CapturePendingSlots(liveList, EL.PendingSnapshot, EL.PendingSlots);
+		local pendingSlots, shoulderSecondary = EL.CapturePendingSlots(liveList, EL.PendingSnapshot, EL.PendingSlots);
 		local weaponOptions = EL.CaptureWeaponOptionsPending(EL.PendingWeaponOptions);
 		local hasTransmogsPending = next(pendingSlots) ~= nil or weaponOptions ~= nil;
 
@@ -361,7 +376,9 @@ do
 			EL.PendingSnapshot = liveList;
 			EL.PendingSlots = pendingSlots;
 			EL.PendingWeaponOptions = weaponOptions;
-			EL.PendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+			if shoulderSecondary ~= nil then
+				EL.PendingShoulderSecondary = shoulderSecondary;
+			end
 		else
 			EL.PendingSnapshot = nil;
 			EL.PendingSlots = nil;
@@ -479,6 +496,15 @@ do
 		isHandlingSituationsChanged = false;
 	end
 
+	--Blizzard doesn't carry the shoulder appearance across this toggle.
+	--Uses EL.LiveShoulderInfo instead of a fresh read, which could already show the same reset.
+	local function FixShoulderSecondaryToggle()
+		if EL.LiveShoulderInfo then
+			local isSeparated = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+			EL.ReapplyShoulderAppearance(EL.LiveShoulderInfo, isSeparated);
+		end
+	end
+
 	local function OnTrackedEvent(_, event)
 		--Our own writes fire these same events, and so can Blizzard's close sequence before OnHide unregisters us.
 		--A stray capture in either case would look like everything just got reverted.
@@ -488,6 +514,8 @@ do
 			ReapplyPendingOnOutfitSwitch();
 		elseif event == "VIEWED_TRANSMOG_OUTFIT_SITUATIONS_CHANGED" then
 			OnSituationsChanged();
+		elseif event == "VIEWED_TRANSMOG_OUTFIT_SECONDARY_SLOTS_CHANGED" then
+			FixShoulderSecondaryToggle();
 		else
 			CapturePending();
 		end
