@@ -5,11 +5,6 @@ local _G = _G;
 local pairs = pairs;
 
 
-local SIDE_SPACING = 8;
-local TITLE_DESC_GAP = 4;
-local MAX_TEXT_WIDTH = 256;
-
-
 local StaticPopupUtil = CreateFrame("Frame");
 addon.StaticPopupUtil = StaticPopupUtil;
 
@@ -148,4 +143,33 @@ end
 function StaticPopupUtil:RequestUpdate()
 	self.updateTimer = 0;
 	self:SetScript("OnUpdate", self.OnUpdate);
+end
+
+local function StaticPopup_Show_Callback(which, ...)
+	-- ...: text_arg1, text_arg2, data, insertedFrame, customOnHideScript
+
+	if which and StaticPopupUtil.staticPopupHandlers[which] then
+		local hideOriginalPopup = StaticPopupUtil.staticPopupHandlers[which](which, ...);
+		if hideOriginalPopup then
+			StaticPopup_Hide(which);
+		end
+	end
+end
+
+---Set a callback for a type of StaticPopup.
+---@param which string
+---@param callback function
+function StaticPopupUtil:SetStaticPopupHandler(which, callback)
+	if not self.staticPopupHandlers then
+		self.staticPopupHandlers = {};
+		hooksecurefunc("StaticPopup_Show", StaticPopup_Show_Callback);
+	end
+
+	self.staticPopupHandlers[which] = callback;
+end
+
+function StaticPopupUtil:RemoveStaticPopupHandler(which)
+	if which and self.staticPopupHandlers[which] then
+		self.staticPopupHandlers[which] = nil;
+	end
 end
