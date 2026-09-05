@@ -707,18 +707,10 @@
 		</Anchors>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString parentKey="Text" inherits="GameFontHighlight" justifyH="CENTER" justifyV="TOP"/>
+				<FontString parentKey="Text" inherits="GameFontHighlight" justifyH="CENTER" justifyV="TOP" spacing="2"/>
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame parentKey="BackgroundFrame" inherits="DialogBorderDarkTemplate"/> <!--DialogBorderTemplate-->
-
-			<Button parentKey="CloseButton" inherits="UIPanelCloseButton">
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="-3" y="-3"/>
-				</Anchors>
-			</Button>
-
 			<EditBox parentKey="EditBox" multiLine="false" autoFocus="false">
 				<Size x="130" y="24"/>
 				<FontString inherits="NumberFont_Shadow_Small" justifyH="LEFT"/>
