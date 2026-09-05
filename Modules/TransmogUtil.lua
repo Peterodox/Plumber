@@ -208,7 +208,7 @@ local function AddCopyButtonToDropdowns()
 			rootDescription:CreateTitle("Plumber");
 
 			local function CopyButton_OnClick()
-				addon.ShowClipboard(slashCommand);
+				addon.ShowClipboard(slashCommand, TRANSMOG_OUTFIT_COPY_TO_CLIPBOARD_NOTICE);
 			end
 
 			local button1 = rootDescription:CreateButton(L["Copy To Clipboard"], CopyButton_OnClick);
@@ -255,7 +255,7 @@ local function AddCopyButtonToDropdowns()
 			rootDescription:CreateDivider();
 
 			local function CopyButton_OnClick()
-				addon.ShowClipboard(slashCommand);
+				addon.ShowClipboard(slashCommand, TRANSMOG_OUTFIT_COPY_TO_CLIPBOARD_NOTICE);
 				C_Timer.After(0, function()
 					GameTooltip:Hide();
 				end);
