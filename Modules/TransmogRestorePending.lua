@@ -601,6 +601,20 @@ do
 			end
 			return originalClearSituations(...);
 		end;
+
+		--A save commits pending changes permanently, our carry-forward tracking would otherwise keep them marked pending forever.
+		local originalCommitAllPending = C_TransmogOutfitInfo.CommitAndApplyAllPending;
+		C_TransmogOutfitInfo.CommitAndApplyAllPending = function(...)
+			if TransmogFrame:IsShown() then
+				EL.PendingSnapshot = nil;
+				EL.PendingSlots = nil;
+				EL.PendingShoulderSecondary = nil;
+				EL.PendingWeaponOptions = nil;
+				EL.PendingSituations = nil;
+				EL.SavePendingToDB();
+			end
+			return originalCommitAllPending(...);
+		end;
 	end
 
 	function EL.SnapshotFrame_OnLoad()

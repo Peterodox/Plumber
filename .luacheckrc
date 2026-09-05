@@ -99,6 +99,7 @@ stds.wow = {
 			fields = {
 				"ClearAllPendingSituations",
 				"ClearAllPendingTransmogs",
+				"CommitAndApplyAllPending",
 			},
 		},
 
