@@ -95,6 +95,14 @@ stds.wow = {
 		"WardrobeItemModelMixin",
 		"WardrobeItemsCollectionSlotButtonMixin",
 
+		C_TransmogOutfitInfo = {
+			fields = {
+				"ClearAllPendingSituations",
+				"ClearAllPendingTransmogs",
+				"CommitAndApplyAllPending",
+			},
+		},
+
 		GameTooltip = {
 			fields = {
 				"factionID",
@@ -446,6 +454,7 @@ stds.wow = {
 		"SocketInventoryItem",
 		"SplashFrame",
 		"SpellIsTargeting",
+		"StaticPopup_Hide",
 		"StaticPopup_Show",
 		"StopSound",
 		"Storyline_DialogChoicesScrollFrame",
@@ -1280,20 +1289,29 @@ stds.wow = {
 		C_TransmogOutfitInfo = {
 			fields = {
 				"ChangeToOutfit",
+				"ChangeViewedOutfit",
 				"GetActiveOutfitID",
+				"GetCurrentlyViewedOutfitID",
 				"GetEquippedSlotOptionFromTransmogSlot",
+				"GetOutfitInfo",
+				"GetOutfitSituation",
+				"GetOutfitSituationsEnabled",
 				"GetOutfitsInfo",
 				"GetSecondarySlotState",
 				"GetTransmogOutfitSlotFromInventorySlot",
+				"GetUISituationCategoriesAndOptions",
 				"GetViewedOutfitSlotInfo",
 				"GetWeaponOptionsForSlot",
+				"HasPendingOutfitSituations",
 				"HasPendingOutfitTransmogs",
 				"IsEquippedGearOutfitDisplayed",
 				"IsLockedOutfit",
 				"PickupOutfit",
+				"SetOutfitSituationsEnabled",
 				"SetPendingTransmog",
 				"SetPendingTransmogSheatheCategory",
 				"SetSecondarySlotState",
+				"UpdatePendingSituation",
 			},
 		},
 
