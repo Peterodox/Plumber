@@ -366,7 +366,7 @@ do
 		local liveList = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
 		--Kept even when nothing's pending, so the separate-shoulders fix has a value to fall back to.
 		EL.LiveShoulderInfo = liveList[3];
-		--Tracked even when nothing's pending, so reopening the frame lands back on the outfit last selected/viewed.
+		--Tracked even when nothing's pending, so later checks can tell if the outfit actually changed.
 		EL.LastViewedOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
 		local pendingSlots, shoulderSecondary = EL.CapturePendingSlots(liveList, EL.PendingSnapshot, EL.PendingSlots);
 		local weaponOptions = EL.CaptureWeaponOptionsPending(EL.PendingWeaponOptions);
@@ -438,8 +438,10 @@ do
 		--Nothing is cleared first, the carry-forward check needs the old values while replaying.
 		--isRestoringPending blocks our own writes from being treated as new edits until the real one lands.
 		isRestoringPending = true;
-		--Must run first, since Blizzard's OnShow forces the active outfit and switching outfits wipes pending changes.
-		RestoreViewedOutfit(EL.LastViewedOutfitID);
+		--With nothing pending, Blizzard's own default outfit is fine as is.
+		if EL.PendingSnapshot then
+			RestoreViewedOutfit(EL.LastViewedOutfitID);
+		end
 		ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingSlots, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
 		EL.RestoreSituationsPending(EL.PendingSituations);
 		isRestoringPending = false;
@@ -447,7 +449,7 @@ do
 	end
 
 	local function ReapplyPendingOnOutfitSwitch()
-		--Tracked even when nothing's pending, so reopening later still lands back on the outfit last selected/viewed.
+		--Tracked even when nothing's pending, so later checks can tell if the outfit actually changed.
 		EL.LastViewedOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
 		if EL.PendingSnapshot or EL.PendingSituations then
 			isRestoringPending = true;
@@ -557,8 +559,6 @@ do
 		if not EL.enabled then return end;
 
 		API.RegisterFrameForEvents(EL, TRACKED_EVENTS);
-		--Always restores the last-viewed outfit, whether or not anything is pending.
-		--RestoreAllPending's own pieces already safely do nothing when there's nothing to reapply.
 		RestoreAllPending();
 	end
 
