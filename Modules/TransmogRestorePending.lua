@@ -401,6 +401,27 @@ do
 		end
 	end
 
+	local function GetShoulderSlotFrame(isSeparated)
+		local slot = isSeparated and Enum.TransmogOutfitSlot.ShoulderLeft or SHOULDER_RIGHT;
+		return TransmogFrame.CharacterPreview:GetSlotFrame(slot, Enum.TransmogType.Appearance);
+	end
+
+	--Slot frames get released and recreated on every outfit switch, so track the slot enum instead of the frame.
+	local function OnSlotSelected(_, slotFrame)
+		local transmogLocation = slotFrame and slotFrame.slotData and slotFrame.slotData.transmogLocation;
+		EL.LastSelectedSlot = transmogLocation and transmogLocation:GetSlot();
+	end
+
+	--Always reselects explicitly, Blizzard can clear the left shoulder before our pending restore re-separates it.
+	local function ReselectShoulderOnOutfitSwitch()
+		if EL.LastSelectedSlot ~= Enum.TransmogOutfitSlot.ShoulderLeft then return; end
+
+		local slotFrame = GetShoulderSlotFrame(true) or GetShoulderSlotFrame(false);
+		if slotFrame then
+			TransmogFrame:SelectSlot(slotFrame, true);
+		end
+	end
+
 	local function ApplyPendingSnapshot(snapshot, pendingSlots, shoulderSecondary, weaponOptions)
 		if not snapshot then return; end
 
@@ -428,13 +449,14 @@ do
 	local function ReapplyPendingOnOutfitSwitch()
 		--Tracked even when nothing's pending, so reopening later still lands back on the outfit last selected/viewed.
 		EL.LastViewedOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
-		if not EL.PendingSnapshot and not EL.PendingSituations then return; end
-
-		isRestoringPending = true;
-		--The user already landed on the outfit they picked, just replay the edits onto it.
-		ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingSlots, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
-		EL.RestoreSituationsPending(EL.PendingSituations);
-		isRestoringPending = false;
+		if EL.PendingSnapshot or EL.PendingSituations then
+			isRestoringPending = true;
+			--The user already landed on the outfit they picked, just replay the edits onto it.
+			ApplyPendingSnapshot(EL.PendingSnapshot, EL.PendingSlots, EL.PendingShoulderSecondary, EL.PendingWeaponOptions);
+			EL.RestoreSituationsPending(EL.PendingSituations);
+			isRestoringPending = false;
+		end
+		ReselectShoulderOnOutfitSwitch();
 	end
 
 	local isHandlingSituationsChanged = false;
@@ -508,7 +530,7 @@ do
 		--Re-merging shoulders clears the left shoulder slot selection, which then defaults to head.
 		--Re-select the right shoulder instead.
 		if not TransmogFrame.CharacterPreview:GetSelectedSlotData() then
-			local rightSlotFrame = TransmogFrame.CharacterPreview:GetSlotFrame(SHOULDER_RIGHT, Enum.TransmogType.Appearance);
+			local rightSlotFrame = GetShoulderSlotFrame(false);
 			if rightSlotFrame then
 				TransmogFrame:SelectSlot(rightSlotFrame, true);
 			end
@@ -590,6 +612,7 @@ do
 		TransmogFrame:HookScript("OnHide", TransmogFrame_OnHide);
 		-- If we decide not to disable/skip the popup, comment/remove this hooksecurefunc below.
 		hooksecurefunc("StaticPopup_Show", OnStaticPopupShown);
+		hooksecurefunc(TransmogFrame, "SelectSlot", OnSlotSelected);
 		HookExplicitClears();
 
 		if TransmogFrame:IsShown() then
