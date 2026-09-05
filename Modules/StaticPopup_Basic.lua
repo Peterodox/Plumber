@@ -149,7 +149,7 @@ local function StaticPopup_Show_Callback(which, ...)
 	-- ...: text_arg1, text_arg2, data, insertedFrame, customOnHideScript
 
 	if which and StaticPopupUtil.staticPopupHandlers[which] then
-		local hideOriginalPopup = StaticPopupUtil.staticPopupHandlers[which](...);
+		local hideOriginalPopup = StaticPopupUtil.staticPopupHandlers[which](which, ...);
 		if hideOriginalPopup then
 			StaticPopup_Hide(which);
 		end
