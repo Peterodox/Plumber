@@ -584,7 +584,7 @@ stds.wow = {
 					fields = {
 						"NoTransmogID",
 					},
-				}
+				},
 
 				TransmogOutfitDataConsts = {
 					fields = {
