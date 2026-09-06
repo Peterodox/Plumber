@@ -247,7 +247,7 @@ local DefaultValues = {
 	HuntTable = true,					--Replace generic quest icons with difficulties and add achievement indicators.
 	PreyQuestSuperTrack = true,			--During the final stage, clicking the Prey widget also super track the target location.
 	TransmogRaestorePending = true,		--Restore unsaved transmog changes
-		TransmogRaestorePending_AlwaysMoveChanges = false,
+	TransmogRaestorePending_AlwaysMoveChanges = false,
 
 	--Tooltip
 	TooltipChestKeys = true,            --Show keys that unlocked the current chest or door
