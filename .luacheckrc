@@ -580,6 +580,12 @@ stds.wow = {
 					},
 				},
 
+				Transmog = {
+					fields = {
+						"NoTransmogID",
+					},
+				}
+
 				TransmogOutfitDataConsts = {
 					fields = {
 						"EQUIP_TRANSMOG_OUTFIT_MANUAL_SPELL_ID",
@@ -980,6 +986,7 @@ stds.wow = {
 		C_PaperDollInfo = {
 			fields = {
 				"CanCursorCanGoInSlot",
+				"IsRangedSlotShown",
 			},
 		},
 
@@ -1610,6 +1617,12 @@ stds.wow = {
 				TransmogOutfitSlotOption = {
 					fields = {
 						"None",
+					},
+				},
+
+				TransmogOutfitSlotWarning = {
+					fields = {
+						"WeaponDoesNotSupportIllusions",
 					},
 				},
 
