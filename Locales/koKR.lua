@@ -805,6 +805,18 @@ L["Quick Access Outfit Button"] = "빠른 접근";
 L["Quick Access Outfit Button Tooltip"] = "의상을 어디서나 변경할 수 있도록 이 버튼을 행동 단축바로 클릭하여 드래그하세요.";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "형상변환 UI: 대기 중인 변경 사항 복원";
+L["ModuleDescription TransmogRaestorePending"] = "형상변환 창을 다시 열면 대기 중인 변경 사항이 자동으로 복원됩니다.\n\n대기 중인 변경 사항을 다른 의상으로 옮길 수 있습니다.";
+L["Outfit Popup Warning"] = "현재 의상에 대기 중인 변경 사항이 있습니다.\n\n이 변경 사항을 새 의상으로 옮기시겠습니까, 아니면 폐기하시겠습니까?";
+L["Outfit Popup Move Changes"] = "이동";
+L["Outfit Popup Move Changes Tooltip"] = "대기 중인 변경 사항을 새로 선택한 의상으로 옮깁니다.";
+L["Outfit Popup Always Move Changes Over"] = "항상 변경 사항 이동";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "대기 중인 변경 사항을 항상 새로 선택한 의상으로 옮깁니다.\n\n이 창이 더 이상 표시되지 않습니다.";
+L["Outfit Popup Discard Changes"] = "폐기";
+L["Outfit Popup Discard Changes Tooltip"] = "대기 중인 변경 사항을 폐기합니다.";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "단축키: 퀘스트 추적 대상 지정";
 L["ModuleDescription QuestWatchCycle"] = "단축키를 눌러 목표 추적기에서 다음/이전 퀘스트를 대상으로 지정할 수 있습니다.\n\n|cffd4641c단축키 설정은 단축키 > Plumber 애드온에서 하세요.|r";

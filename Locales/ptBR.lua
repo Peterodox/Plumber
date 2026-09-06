@@ -807,7 +807,14 @@ L["Quick Access Outfit Button Tooltip"] = "Clique e arraste este botão para sua
 
 --TransmogRaestorePending
 L["ModuleName TransmogRaestorePending"] = "Transmogrificação: Restaurar alterações";
-L["ModuleDescription TransmogRaestorePending"] = "As alterações de transmogrificação pendentes são automaticamente restauradas ao reabrir a janela.";
+L["ModuleDescription TransmogRaestorePending"] = "As alterações de transmogrificação pendentes são automaticamente restauradas ao reabrir a janela.\n\nAs alterações pendentes podem ser movidas para outra roupa.";
+L["Outfit Popup Warning"] = "A roupa atual possui alterações pendentes.\n\nDeseja mover essas alterações para a nova roupa ou descartá-las?";
+L["Outfit Popup Move Changes"] = "Mover";
+L["Outfit Popup Move Changes Tooltip"] = "Move as alterações pendentes para a roupa recém-selecionada.";
+L["Outfit Popup Always Move Changes Over"] = "Sempre Mover as Alterações";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "Sempre move as alterações pendentes para a roupa recém-selecionada.\n\nVocê não verá mais esta janela.";
+L["Outfit Popup Discard Changes"] = "Descartar";
+L["Outfit Popup Discard Changes Tooltip"] = "Descarta as alterações pendentes.";
 
 
 --QuestWatchCycle

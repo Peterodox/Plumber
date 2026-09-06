@@ -805,6 +805,18 @@ L["Quick Access Outfit Button"] = "Accès rapide";
 L["Quick Access Outfit Button Tooltip"] = "Cliquez sur ce bouton et faites-le glisser vers vos barres d'action afin de pouvoir changer de tenue où que vous soyez.";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "Interface de transmogrification : restaurer les modifications en attente";
+L["ModuleDescription TransmogRaestorePending"] = "Les modifications de transmogrification en attente sont automatiquement restaurées lorsque vous rouvrez la fenêtre.\n\nLes modifications en attente peuvent être transférées vers une autre tenue.";
+L["Outfit Popup Warning"] = "La tenue actuelle comporte des modifications en attente.\n\nSouhaitez-vous transférer ces modifications vers la nouvelle tenue ou les abandonner ?";
+L["Outfit Popup Move Changes"] = "Transférer";
+L["Outfit Popup Move Changes Tooltip"] = "Transfère les modifications en attente vers la tenue nouvellement sélectionnée.";
+L["Outfit Popup Always Move Changes Over"] = "Toujours transférer les modifications";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "Transfère toujours les modifications en attente vers la tenue nouvellement sélectionnée.\n\nCette fenêtre ne s'affichera plus.";
+L["Outfit Popup Discard Changes"] = "Abandonner";
+L["Outfit Popup Discard Changes Tooltip"] = "Abandonne les modifications en attente.";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Raccourcis clavier : focalisation sur la quête";
 L["ModuleDescription QuestWatchCycle"] = "Permet d'utiliser des raccourcis clavier pour passer à la quête suivante/précédente dans le suivi des objectifs.\n\n|cffd4641cConfigurer vos raccourcis clavier dans Raccourcis clavier > Plumber.|r";

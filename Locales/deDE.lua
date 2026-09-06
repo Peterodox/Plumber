@@ -702,6 +702,18 @@ L["Missing Appearances Format"] = "%d |4Vorlage:Vorlagen fehlen;";
 L["Press Key To Copy Format"] = "Zum Kopieren auf die |cffffd100%s|r-Taste drücken";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "Transmog-UI: Ausstehende Änderungen wiederherstellen";
+L["ModuleDescription TransmogRaestorePending"] = "Ausstehende Transmog-Änderungen werden automatisch wiederhergestellt, wenn Ihr das Fenster erneut öffnet.\n\nAusstehende Änderungen können auf ein anderes Outfit übertragen werden.";
+L["Outfit Popup Warning"] = "Das aktuelle Outfit hat ausstehende Änderungen.\n\nMöchtet Ihr diese Änderungen auf das neue Outfit übertragen oder verwerfen?";
+L["Outfit Popup Move Changes"] = "Übertragen";
+L["Outfit Popup Move Changes Tooltip"] = "Überträgt die ausstehenden Änderungen auf das neu ausgewählte Outfit.";
+L["Outfit Popup Always Move Changes Over"] = "Änderungen immer übertragen";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "Überträgt die ausstehenden Änderungen immer auf das neu ausgewählte Outfit.\n\nDieses Fenster wird nicht mehr angezeigt.";
+L["Outfit Popup Discard Changes"] = "Verwerfen";
+L["Outfit Popup Discard Changes Tooltip"] = "Verwirft die ausstehenden Änderungen.";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Tastenkürzel: Auf ein Quest focussieren";
 L["ModuleDescription QuestWatchCycle"] = "Per Tastendruck kann man das vorherige oder nächste Quest im Questzielverfolgungs-Menü auswählen und verfolgen.\n\n|cffd4641cDas Tastenkürzel kann unter \'Optionen> Tastaturbelegung>Plumber Addon\' festgelegt werden.|r";
