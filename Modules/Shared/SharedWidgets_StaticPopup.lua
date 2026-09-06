@@ -159,6 +159,7 @@ do
 	end
 
 	function StaticPopupMixin:Setup(popupInfo)
+		self.identifier = popupInfo.identifier;
 		self:ReleaseAllWidgets();
 
 		if popupInfo.text then
@@ -381,6 +382,7 @@ local function ShowClipboard(text, copySuccessMessage)
 
 	MainFrame:ClearAllPoints();
 	MainFrame:ReleaseAllWidgets();
+	MainFrame.identifier = "clipboard";
 
 	MainFrame.EditBox:Show();
 	MainFrame.EditBox:SetDefaultText(text);
@@ -424,3 +426,13 @@ local function ShowCustomPopup(popupInfo)
 	StaticPopup_Show(WHICH_DUMMY, nil, nil, nil, MainFrame);
 end
 addon.ShowCustomPopup = ShowCustomPopup;
+
+
+local function HideCustomPopup(identifier)
+	if MainFrame then
+		if (not identifier) or (MainFrame.identifier == identifier) then
+			StaticPopup_Hide(WHICH_DUMMY);
+		end
+	end
+end
+addon.HideCustomPopup = HideCustomPopup;

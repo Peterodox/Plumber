@@ -4,6 +4,7 @@ local API = addon.API;
 
 local EL = CreateFrame("Frame");
 local DBKEY_ALWAYS_MOVE_CHANGED = "TransmogRaestorePending_AlwaysMoveChanges";
+local POPUP_IDENTIFIER = "transmogPendingChanges";
 local SHOULDER_RIGHT = Enum.TransmogOutfitSlot.ShoulderRight;
 local WEAPON_SLOTS = {
 	[16] = Enum.TransmogOutfitSlot.WeaponMainHand,
@@ -569,6 +570,7 @@ do
 
 	local function TransmogFrame_OnHide()
 		API.UnregisterFrameForEvents(EL, TRACKED_EVENTS);
+		addon.HideCustomPopup(POPUP_IDENTIFIER);
 	end
 
 	local function OnStaticPopupShown(_, _, _, data)
@@ -582,6 +584,7 @@ do
 				confirmCallback();
 			else
 				addon.ShowCustomPopup({
+					identifier = POPUP_IDENTIFIER,
 					text = L["Outfit Popup Warning"],
 					buttons = {
 						{label = L["Outfit Popup Move Changes"], tooltip = L["Outfit Popup Move Changes Tooltip"], closePopup = true, onClickFunc = confirmCallback},
