@@ -331,6 +331,20 @@ do
 	end
 	EL.SavePendingToDB = SavePendingToDB;
 
+	function EL.WipePendingAppearanceFromDB(includeSituations, includeLastViewedOutfitID)
+		EL.PendingSnapshot = nil;
+		EL.PendingSlots = nil;
+		EL.PendingShoulderSecondary = nil;
+		EL.PendingWeaponOptions = nil;
+		if includeSituations then
+			EL.PendingSituations = nil;
+		end
+		if includeLastViewedOutfitID then
+			EL.LastViewedOutfitID = nil;
+		end
+		EL.SavePendingToDB();
+	end
+
 	function EL.LoadPendingFromDB()
 		EL.LastViewedOutfitID = PlumberDB_PC and PlumberDB_PC.TransmogRestoreLastOutfit;
 
@@ -574,11 +588,7 @@ do
 		local originalClearTransmogs = C_TransmogOutfitInfo.ClearAllPendingTransmogs;
 		C_TransmogOutfitInfo.ClearAllPendingTransmogs = function(...)
 			if TransmogFrame:IsShown() then
-				EL.PendingSnapshot = nil;
-				EL.PendingSlots = nil;
-				EL.PendingShoulderSecondary = nil;
-				EL.PendingWeaponOptions = nil;
-				EL.SavePendingToDB();
+				EL.WipePendingAppearanceFromDB();
 			end
 			return originalClearTransmogs(...);
 		end;
@@ -596,12 +606,7 @@ do
 		local originalCommitAllPending = C_TransmogOutfitInfo.CommitAndApplyAllPending;
 		C_TransmogOutfitInfo.CommitAndApplyAllPending = function(...)
 			if TransmogFrame:IsShown() then
-				EL.PendingSnapshot = nil;
-				EL.PendingSlots = nil;
-				EL.PendingShoulderSecondary = nil;
-				EL.PendingWeaponOptions = nil;
-				EL.PendingSituations = nil;
-				EL.SavePendingToDB();
+				EL.WipePendingAppearanceFromDB(true);
 			end
 			return originalCommitAllPending(...);
 		end;
@@ -696,13 +701,7 @@ do
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
 			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
-			EL.PendingSnapshot = nil;
-			EL.PendingSlots = nil;
-			EL.PendingShoulderSecondary = nil;
-			EL.PendingWeaponOptions = nil;
-			EL.PendingSituations = nil;
-			EL.LastViewedOutfitID = nil;
-			EL.SavePendingToDB();
+			EL.WipePendingAppearanceFromDB(true, true);
 		end
 	end
 
