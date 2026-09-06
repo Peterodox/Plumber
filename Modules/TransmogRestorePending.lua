@@ -566,16 +566,16 @@ do
 		API.UnregisterFrameForEvents(EL, TRACKED_EVENTS);
 	end
 
-	local function OnStaticPopupShown(which, _, _, data)
-		if which ~= "TRANSMOG_PENDING_CHANGES" or not EL.enabled then return; end
+	local function OnStaticPopupShown(_, _, _, data)
+		if not EL.enabled then return; end
 		local hasPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs() or C_TransmogOutfitInfo.HasPendingOutfitSituations();
 		if not hasPending then return; end
 
-		--Both appearance and situation pending changes now survive an outfit switch, so this warning is stale.
-		StaticPopup_Hide(which, data);
 		if data and data.confirmCallback then
 			data.confirmCallback();
 		end
+
+		return true;
 	end
 
 	--Only treated as a real Undo while the frame is open, otherwise OnSituationsChanged fights back into a stack overflow (oops!).
@@ -624,14 +624,15 @@ do
 		EL:SetScript("OnEvent", OnTrackedEvent);
 		TransmogFrame:HookScript("OnShow", TransmogFrame_OnShow);
 		TransmogFrame:HookScript("OnHide", TransmogFrame_OnHide);
-		-- If we decide not to disable/skip the popup, comment/remove this hooksecurefunc below.
-		hooksecurefunc("StaticPopup_Show", OnStaticPopupShown);
+
 		hooksecurefunc(TransmogFrame, "SelectSlot", OnSlotSelected);
 		HookExplicitClears();
 
 		if TransmogFrame:IsShown() then
 			TransmogFrame_OnShow();
 		end
+
+		addon.StaticPopupUtil:SetStaticPopupHandler("TRANSMOG_PENDING_CHANGES", OnStaticPopupShown);
 	end
 end
 
