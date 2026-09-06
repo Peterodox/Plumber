@@ -592,7 +592,7 @@ do
 								confirmCallback();
 							end
 						},
-						{label = CANCEL, closePopup = true},
+						{label = CANCEL, closePopup = true, onClickFunc = function() addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false); end},
 					},
 					widgets = {
 						{type = "checkbox", label = L["Outfit Popup Always Move Changes Over"], tooltip = L["Outfit Popup Always Move Changes Over Tooltip"], dbKey = DBKEY_ALWAYS_MOVE_CHANGED},
