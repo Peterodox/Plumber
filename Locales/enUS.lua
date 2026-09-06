@@ -808,6 +808,13 @@ L["Quick Access Outfit Button Tooltip"] = "Click and drag this button to your ac
 --TransmogRaestorePending
 L["ModuleName TransmogRaestorePending"] = "Transmog UI: Restore Pending Changes";
 L["ModuleDescription TransmogRaestorePending"] = "Pending Transmog changes are automatically restored when reopening the window.";
+L["Outfit Popup Warning"] = "The current outfit has pending changes.|n|nDo you wish to move these changes over to the new outfit or discard them?";
+L["Outfit Popup Move Changes"] = "Move";
+L["Outfit Popup Move Changes Tooltip"] = "Move the pending changes over to the newly selected outfit.";
+L["Outfit Popup Always Move Changes Over"] = "Always Move Changes Over";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "Always move the pending changes to the newly selected outfit.|n|nYou will stop seeing this popup window.";
+L["Outfit Popup Discard Changes"] = "Discard";
+L["Outfit Popup Discard Changes Tooltip"] = "Discard the pending changes.";
 
 
 --QuestWatchCycle

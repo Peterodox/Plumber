@@ -176,7 +176,7 @@ do
 				local button = self.uiPanelButtonPool:Acquire();
 				button:SetWidth(120);
 				button:SetText(v.label);
-				button.onEnterFunc = v.onClickFunc;
+				button.onEnterFunc = v.onEnterFunc;
 				button.onLeaveFunc = v.onLeaveFunc;
 
 				button.onEnterCallback = function(f)
@@ -202,7 +202,16 @@ do
 				button.onLeaveCallback = v.onLeaveFunc;
 
 				if v.onClickFunc then
-					button:SetScript("OnClick", v.onClickFunc);
+					button:SetScript("OnClick", function(f, mouseButton)
+						v.onClickFunc(f, mouseButton);
+						if v.closePopup then
+							self:Hide();
+						end
+					end);
+				elseif v.closePopup then
+					button:SetScript("OnClick", function()
+						self:Hide();
+					end);
 				else
 					button:SetScript("OnClick", nil);
 				end

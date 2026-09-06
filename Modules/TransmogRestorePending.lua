@@ -3,6 +3,7 @@ local L = addon.L;
 local API = addon.API;
 
 local EL = CreateFrame("Frame");
+local DBKEY_ALWAYS_MOVE_CHANGED = "TransmogRaestorePending_AlwaysMoveChanges";
 local SHOULDER_RIGHT = Enum.TransmogOutfitSlot.ShoulderRight;
 local WEAPON_SLOTS = {
 	[16] = Enum.TransmogOutfitSlot.WeaponMainHand,
@@ -575,11 +576,34 @@ do
 		local hasPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs() or C_TransmogOutfitInfo.HasPendingOutfitSituations();
 		if not hasPending then return; end
 
-		if data and data.confirmCallback then
-			data.confirmCallback();
-		end
+		local confirmCallback = data and data.confirmCallback;
+		if confirmCallback then
+			if addon.GetDBBool(DBKEY_ALWAYS_MOVE_CHANGED) then
+				confirmCallback();
+			else
+				addon.ShowCustomPopup({
+					text = L["Outfit Popup Warning"],
+					buttons = {
+						{label = L["Outfit Popup Move Changes"], tooltip = L["Outfit Popup Move Changes Tooltip"], closePopup = true, onClickFunc = confirmCallback},
+						{label = L["Outfit Popup Discard Changes"], tooltip = L["Outfit Popup Discard Changes Tooltip"], closePopup = true,
+							onClickFunc = function()
+								addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false);
+								EL.WipePendingAppearanceFromDB();
+								confirmCallback();
+							end
+						},
+						{label = CANCEL, closePopup = true},
+					},
+					widgets = {
+						{type = "checkbox", label = L["Outfit Popup Always Move Changes Over"], tooltip = L["Outfit Popup Always Move Changes Over Tooltip"], dbKey = DBKEY_ALWAYS_MOVE_CHANGED},
+					},
+				});
+			end
 
-		return true;
+			return true; -- This hides the original popup
+		else
+			return;
+		end
 	end
 
 	--Only treated as a real Undo while the frame is open, otherwise OnSituationsChanged fights back into a stack overflow (oops!).
@@ -702,6 +726,7 @@ do
 			EL.enabled = nil;
 			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
 			EL.WipePendingAppearanceFromDB(true, true);
+			addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false);
 		end
 	end
 

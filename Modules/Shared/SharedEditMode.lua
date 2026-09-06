@@ -299,9 +299,8 @@ do  --EditModeSettingsDialog
 		checkbox.useWhiteLabel = true;
 
 		checkbox:SetData(widgetData);
-		checkbox:SetChecked(addon.GetDBValue(checkbox.dbKey));
 
-		return checkbox
+		return checkbox;
 	end
 
 	function EditModeSettingsDialogMixin:CreateSlider(widgetData)
