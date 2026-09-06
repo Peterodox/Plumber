@@ -591,7 +591,7 @@ do
 						{label = L["Outfit Popup Discard Changes"], tooltip = L["Outfit Popup Discard Changes Tooltip"], closePopup = true,
 							onClickFunc = function()
 								addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false);
-								EL.WipePendingAppearanceFromDB();
+								EL.WipePendingAppearanceFromDB(true);
 								confirmCallback();
 							end
 						},
