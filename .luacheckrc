@@ -100,6 +100,7 @@ stds.wow = {
 				"ClearAllPendingSituations",
 				"ClearAllPendingTransmogs",
 				"CommitAndApplyAllPending",
+				"GetItemModifiedAppearanceEffectiveCategory",
 			},
 		},
 
@@ -1704,6 +1705,12 @@ stds.wow = {
 			fields = {
 				"CreateEmpty",
 				"SetEquipmentSlot",
+			},
+		},
+
+		ItemUtil = {
+			fields = {
+				"CreateItemTransmogInfo",
 			},
 		},
 

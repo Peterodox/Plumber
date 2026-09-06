@@ -220,14 +220,6 @@ do
 		end
 	end
 
-	function EL.ForceWeaponSlotWidgetRebuild()
-		--Toggling shoulder secondary state forces a weapon slot widget rebuild, working around a Blizzard display
-		--bug where the widget caches the wrong option (e.g. 1H for an equipped 2H) on first build. Must run first.
-		local liveSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
-		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, not liveSecondary);
-		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, liveSecondary);
-	end
-
 	--Save all situations-related data (4 id fields) in one string, making it a simple per line row for SavedVariables.
 	local function SituationOptionKey(option)
 		return string.format("%d,%d,%d,%d", option.situationID, option.specID, option.loadoutID, option.equipmentSetID);
@@ -425,8 +417,6 @@ do
 	local function ApplyPendingSnapshot(snapshot, pendingSlots, shoulderSecondary, weaponOptions)
 		if not snapshot then return; end
 
-		EL.ForceWeaponSlotWidgetRebuild();
-
 		--Must run before ApplySnapshotToPending, toggling this after would wipe the left shoulder's pending value
 		EL.RestoreShoulderSecondaryState(shoulderSecondary);
 		EL.ApplySnapshotToPending(snapshot, pendingSlots or {});
@@ -617,6 +607,65 @@ do
 		end;
 	end
 
+	local function OnRefreshSlots()
+		local f = TransmogFrame.CharacterPreview;
+
+		local mainOrOHSlotSelected = f.selectedSlotData and f.selectedSlotData.transmogLocation:IsEitherHand();
+		local rangedSlotSelected = f.selectedSlotData and f.selectedSlotData.transmogLocation:IsRangedSlot();
+		local previewRangedWeapon = C_PaperDollInfo.IsRangedSlotShown() and ((C_CVar.GetCVarBool("transmogPreviewedWeaponToggle") and not mainOrOHSlotSelected) or rangedSlotSelected);
+
+		if previewRangedWeapon then return; end
+
+		local actor = f.ModelScene:GetPlayerActor();
+		if not actor then return; end
+
+		local weaponSlotItemTransmogInfo = {};
+
+		for slotFrame in f.CharacterAppearanceSlotFramePool:EnumerateActive() do
+			local transmogLocation = slotFrame:GetTransmogLocation();
+			if transmogLocation then
+				local slotID = transmogLocation:GetSlotID();
+				if slotID == 16 or slotID == 17 then
+					local illusionSlotFrame = slotFrame:GetIllusionSlotFrame();
+					local illusionID = Constants.Transmog.NoTransmogID;
+					if illusionSlotFrame then
+						local illusionSlotInfo = illusionSlotFrame:GetSlotInfo();
+						if illusionSlotInfo and illusionSlotInfo.warning ~= Enum.TransmogOutfitSlotWarning.WeaponDoesNotSupportIllusions then
+							illusionID = illusionSlotInfo.transmogID;
+						end
+					end
+
+					local secondaryAppearanceID = Constants.Transmog.NoTransmogID;
+					local appearanceID = slotFrame:GetEffectiveTransmogID();
+					local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, secondaryAppearanceID, illusionID);
+
+					local mainHandCategoryID;
+					local isLegionArtifact = false;
+					if transmogLocation:IsMainHand() then
+						mainHandCategoryID = C_TransmogOutfitInfo.GetItemModifiedAppearanceEffectiveCategory(appearanceID);
+						isLegionArtifact = TransmogUtil.IsCategoryLegionArtifact(mainHandCategoryID);
+						itemTransmogInfo:ConfigureSecondaryForMainHand(isLegionArtifact);
+					end
+
+					if appearanceID == Constants.Transmog.NoTransmogID then
+						actor:UndressSlot(slotID);
+					else
+						local slotToSetID = slotID;
+						weaponSlotItemTransmogInfo[slotToSetID] = itemTransmogInfo;
+					end
+				end
+			end
+		end
+
+		-- Weapons must be equipped in specific order
+		-- So main-hand can correctly override off-hand
+		for slotToSetID = 17, 16, -1 do
+			if weaponSlotItemTransmogInfo[slotToSetID] then
+				actor:SetItemTransmogInfo(weaponSlotItemTransmogInfo[slotToSetID], slotToSetID);
+			end
+		end
+	end
+
 	function EL.SnapshotFrame_OnLoad()
 		if EL.snapshotHooked then return end;
 		EL.snapshotHooked = true;
@@ -626,6 +675,7 @@ do
 		TransmogFrame:HookScript("OnHide", TransmogFrame_OnHide);
 
 		hooksecurefunc(TransmogFrame, "SelectSlot", OnSlotSelected);
+		hooksecurefunc(TransmogFrame.CharacterPreview, "RefreshSlots", OnRefreshSlots);
 		HookExplicitClears();
 
 		if TransmogFrame:IsShown() then
