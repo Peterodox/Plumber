@@ -159,6 +159,7 @@ do
 	end
 
 	function StaticPopupMixin:Setup(popupInfo)
+		self.identifier = popupInfo.identifier;
 		self:ReleaseAllWidgets();
 
 		if popupInfo.text then
@@ -176,7 +177,7 @@ do
 				local button = self.uiPanelButtonPool:Acquire();
 				button:SetWidth(120);
 				button:SetText(v.label);
-				button.onEnterFunc = v.onClickFunc;
+				button.onEnterFunc = v.onEnterFunc;
 				button.onLeaveFunc = v.onLeaveFunc;
 
 				button.onEnterCallback = function(f)
@@ -202,7 +203,16 @@ do
 				button.onLeaveCallback = v.onLeaveFunc;
 
 				if v.onClickFunc then
-					button:SetScript("OnClick", v.onClickFunc);
+					button:SetScript("OnClick", function(f, mouseButton)
+						v.onClickFunc(f, mouseButton);
+						if v.closePopup then
+							self:Hide();
+						end
+					end);
+				elseif v.closePopup then
+					button:SetScript("OnClick", function()
+						self:Hide();
+					end);
 				else
 					button:SetScript("OnClick", nil);
 				end
@@ -372,6 +382,7 @@ local function ShowClipboard(text, copySuccessMessage)
 
 	MainFrame:ClearAllPoints();
 	MainFrame:ReleaseAllWidgets();
+	MainFrame.identifier = "clipboard";
 
 	MainFrame.EditBox:Show();
 	MainFrame.EditBox:SetDefaultText(text);
@@ -415,3 +426,13 @@ local function ShowCustomPopup(popupInfo)
 	StaticPopup_Show(WHICH_DUMMY, nil, nil, nil, MainFrame);
 end
 addon.ShowCustomPopup = ShowCustomPopup;
+
+
+local function HideCustomPopup(identifier)
+	if MainFrame then
+		if (not identifier) or (MainFrame.identifier == identifier) then
+			StaticPopup_Hide(WHICH_DUMMY);
+		end
+	end
+end
+addon.HideCustomPopup = HideCustomPopup;

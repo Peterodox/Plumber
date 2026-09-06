@@ -3,6 +3,8 @@ local L = addon.L;
 local API = addon.API;
 
 local EL = CreateFrame("Frame");
+local DBKEY_ALWAYS_MOVE_CHANGED = "TransmogRaestorePending_AlwaysMoveChanges";
+local POPUP_IDENTIFIER = "transmogPendingChanges";
 local SHOULDER_RIGHT = Enum.TransmogOutfitSlot.ShoulderRight;
 local WEAPON_SLOTS = {
 	[16] = Enum.TransmogOutfitSlot.WeaponMainHand,
@@ -220,14 +222,6 @@ do
 		end
 	end
 
-	function EL.ForceWeaponSlotWidgetRebuild()
-		--Toggling shoulder secondary state forces a weapon slot widget rebuild, working around a Blizzard display
-		--bug where the widget caches the wrong option (e.g. 1H for an equipped 2H) on first build. Must run first.
-		local liveSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
-		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, not liveSecondary);
-		C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, liveSecondary);
-	end
-
 	--Save all situations-related data (4 id fields) in one string, making it a simple per line row for SavedVariables.
 	local function SituationOptionKey(option)
 		return string.format("%d,%d,%d,%d", option.situationID, option.specID, option.loadoutID, option.equipmentSetID);
@@ -339,6 +333,20 @@ do
 	end
 	EL.SavePendingToDB = SavePendingToDB;
 
+	function EL.WipePendingAppearanceFromDB(includeSituations, includeLastViewedOutfitID)
+		EL.PendingSnapshot = nil;
+		EL.PendingSlots = nil;
+		EL.PendingShoulderSecondary = nil;
+		EL.PendingWeaponOptions = nil;
+		if includeSituations then
+			EL.PendingSituations = nil;
+		end
+		if includeLastViewedOutfitID then
+			EL.LastViewedOutfitID = nil;
+		end
+		EL.SavePendingToDB();
+	end
+
 	function EL.LoadPendingFromDB()
 		EL.LastViewedOutfitID = PlumberDB_PC and PlumberDB_PC.TransmogRestoreLastOutfit;
 
@@ -424,8 +432,6 @@ do
 
 	local function ApplyPendingSnapshot(snapshot, pendingSlots, shoulderSecondary, weaponOptions)
 		if not snapshot then return; end
-
-		EL.ForceWeaponSlotWidgetRebuild();
 
 		--Must run before ApplySnapshotToPending, toggling this after would wipe the left shoulder's pending value
 		EL.RestoreShoulderSecondaryState(shoulderSecondary);
@@ -564,17 +570,42 @@ do
 
 	local function TransmogFrame_OnHide()
 		API.UnregisterFrameForEvents(EL, TRACKED_EVENTS);
+		addon.HideCustomPopup(POPUP_IDENTIFIER);
 	end
 
-	local function OnStaticPopupShown(which, _, _, data)
-		if which ~= "TRANSMOG_PENDING_CHANGES" or not EL.enabled then return; end
+	local function OnStaticPopupShown(_, _, _, data)
+		if not EL.enabled then return; end
 		local hasPending = C_TransmogOutfitInfo.HasPendingOutfitTransmogs() or C_TransmogOutfitInfo.HasPendingOutfitSituations();
 		if not hasPending then return; end
 
-		--Both appearance and situation pending changes now survive an outfit switch, so this warning is stale.
-		StaticPopup_Hide(which, data);
-		if data and data.confirmCallback then
-			data.confirmCallback();
+		local confirmCallback = data and data.confirmCallback;
+		if confirmCallback then
+			if addon.GetDBBool(DBKEY_ALWAYS_MOVE_CHANGED) then
+				confirmCallback();
+			else
+				addon.ShowCustomPopup({
+					identifier = POPUP_IDENTIFIER,
+					text = L["Outfit Popup Warning"],
+					buttons = {
+						{label = L["Outfit Popup Move Changes"], tooltip = L["Outfit Popup Move Changes Tooltip"], closePopup = true, onClickFunc = confirmCallback},
+						{label = L["Outfit Popup Discard Changes"], tooltip = L["Outfit Popup Discard Changes Tooltip"], closePopup = true,
+							onClickFunc = function()
+								addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false);
+								EL.WipePendingAppearanceFromDB();
+								confirmCallback();
+							end
+						},
+						{label = CANCEL, closePopup = true, onClickFunc = function() addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false); end},
+					},
+					widgets = {
+						{type = "checkbox", label = L["Outfit Popup Always Move Changes Over"], tooltip = L["Outfit Popup Always Move Changes Over Tooltip"], dbKey = DBKEY_ALWAYS_MOVE_CHANGED},
+					},
+				});
+			end
+
+			return true; -- This hides the original popup
+		else
+			return;
 		end
 	end
 
@@ -584,11 +615,7 @@ do
 		local originalClearTransmogs = C_TransmogOutfitInfo.ClearAllPendingTransmogs;
 		C_TransmogOutfitInfo.ClearAllPendingTransmogs = function(...)
 			if TransmogFrame:IsShown() then
-				EL.PendingSnapshot = nil;
-				EL.PendingSlots = nil;
-				EL.PendingShoulderSecondary = nil;
-				EL.PendingWeaponOptions = nil;
-				EL.SavePendingToDB();
+				EL.WipePendingAppearanceFromDB();
 			end
 			return originalClearTransmogs(...);
 		end;
@@ -606,15 +633,69 @@ do
 		local originalCommitAllPending = C_TransmogOutfitInfo.CommitAndApplyAllPending;
 		C_TransmogOutfitInfo.CommitAndApplyAllPending = function(...)
 			if TransmogFrame:IsShown() then
-				EL.PendingSnapshot = nil;
-				EL.PendingSlots = nil;
-				EL.PendingShoulderSecondary = nil;
-				EL.PendingWeaponOptions = nil;
-				EL.PendingSituations = nil;
-				EL.SavePendingToDB();
+				EL.WipePendingAppearanceFromDB(true);
 			end
 			return originalCommitAllPending(...);
 		end;
+	end
+
+	local function OnRefreshSlots()
+		local f = TransmogFrame.CharacterPreview;
+
+		local mainOrOHSlotSelected = f.selectedSlotData and f.selectedSlotData.transmogLocation:IsEitherHand();
+		local rangedSlotSelected = f.selectedSlotData and f.selectedSlotData.transmogLocation:IsRangedSlot();
+		local previewRangedWeapon = C_PaperDollInfo.IsRangedSlotShown() and ((C_CVar.GetCVarBool("transmogPreviewedWeaponToggle") and not mainOrOHSlotSelected) or rangedSlotSelected);
+
+		if previewRangedWeapon then return; end
+
+		local actor = f.ModelScene:GetPlayerActor();
+		if not actor then return; end
+
+		local weaponSlotItemTransmogInfo = {};
+
+		for slotFrame in f.CharacterAppearanceSlotFramePool:EnumerateActive() do
+			local transmogLocation = slotFrame:GetTransmogLocation();
+			if transmogLocation then
+				local slotID = transmogLocation:GetSlotID();
+				if slotID == 16 or slotID == 17 then
+					local illusionSlotFrame = slotFrame:GetIllusionSlotFrame();
+					local illusionID = Constants.Transmog.NoTransmogID;
+					if illusionSlotFrame then
+						local illusionSlotInfo = illusionSlotFrame:GetSlotInfo();
+						if illusionSlotInfo and illusionSlotInfo.warning ~= Enum.TransmogOutfitSlotWarning.WeaponDoesNotSupportIllusions then
+							illusionID = illusionSlotInfo.transmogID;
+						end
+					end
+
+					local secondaryAppearanceID = Constants.Transmog.NoTransmogID;
+					local appearanceID = slotFrame:GetEffectiveTransmogID();
+					local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, secondaryAppearanceID, illusionID);
+
+					local mainHandCategoryID;
+					local isLegionArtifact = false;
+					if transmogLocation:IsMainHand() then
+						mainHandCategoryID = C_TransmogOutfitInfo.GetItemModifiedAppearanceEffectiveCategory(appearanceID);
+						isLegionArtifact = TransmogUtil.IsCategoryLegionArtifact(mainHandCategoryID);
+						itemTransmogInfo:ConfigureSecondaryForMainHand(isLegionArtifact);
+					end
+
+					if appearanceID == Constants.Transmog.NoTransmogID then
+						actor:UndressSlot(slotID);
+					else
+						local slotToSetID = slotID;
+						weaponSlotItemTransmogInfo[slotToSetID] = itemTransmogInfo;
+					end
+				end
+			end
+		end
+
+		-- Weapons must be equipped in specific order
+		-- So main-hand can correctly override off-hand
+		for slotToSetID = 17, 16, -1 do
+			if weaponSlotItemTransmogInfo[slotToSetID] then
+				actor:SetItemTransmogInfo(weaponSlotItemTransmogInfo[slotToSetID], slotToSetID);
+			end
+		end
 	end
 
 	function EL.SnapshotFrame_OnLoad()
@@ -624,14 +705,16 @@ do
 		EL:SetScript("OnEvent", OnTrackedEvent);
 		TransmogFrame:HookScript("OnShow", TransmogFrame_OnShow);
 		TransmogFrame:HookScript("OnHide", TransmogFrame_OnHide);
-		-- If we decide not to disable/skip the popup, comment/remove this hooksecurefunc below.
-		hooksecurefunc("StaticPopup_Show", OnStaticPopupShown);
+
 		hooksecurefunc(TransmogFrame, "SelectSlot", OnSlotSelected);
+		hooksecurefunc(TransmogFrame.CharacterPreview, "RefreshSlots", OnRefreshSlots);
 		HookExplicitClears();
 
 		if TransmogFrame:IsShown() then
 			TransmogFrame_OnShow();
 		end
+
+		addon.StaticPopupUtil:SetStaticPopupHandler("TRANSMOG_PENDING_CHANGES", OnStaticPopupShown);
 	end
 end
 
@@ -645,13 +728,8 @@ do
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
 			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
-			EL.PendingSnapshot = nil;
-			EL.PendingSlots = nil;
-			EL.PendingShoulderSecondary = nil;
-			EL.PendingWeaponOptions = nil;
-			EL.PendingSituations = nil;
-			EL.LastViewedOutfitID = nil;
-			EL.SavePendingToDB();
+			EL.WipePendingAppearanceFromDB(true, true);
+			addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false);
 		end
 	end
 
