@@ -583,23 +583,35 @@ do
 			if addon.GetDBBool(DBKEY_ALWAYS_MOVE_CHANGED) then
 				confirmCallback();
 			else
+				local checkboxTempDBKey = POPUP_IDENTIFIER.."_TEMP";
+				addon.SetDBValue(checkboxTempDBKey, nil)
+
 				addon.ShowCustomPopup({
 					identifier = POPUP_IDENTIFIER,
 					text = L["Outfit Popup Warning"],
+
 					buttons = {
-						{label = L["Outfit Popup Move Changes"], tooltip = L["Outfit Popup Move Changes Tooltip"], closePopup = true, onClickFunc = confirmCallback},
+						{label = L["Outfit Popup Move Changes"], tooltip = L["Outfit Popup Move Changes Tooltip"], closePopup = true, onClickFunc = function()
+								addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, addon.GetDBBool(checkboxTempDBKey));
+								confirmCallback();
+							end
+						},
 						{label = L["Outfit Popup Discard Changes"], tooltip = L["Outfit Popup Discard Changes Tooltip"], closePopup = true,
 							onClickFunc = function()
-								addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false);
 								EL.WipePendingAppearanceFromDB(true);
 								confirmCallback();
 							end
 						},
 						{label = CANCEL, closePopup = true, onClickFunc = function() addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false); end},
 					},
+
 					widgets = {
-						{type = "checkbox", label = L["Outfit Popup Always Move Changes Over"], tooltip = L["Outfit Popup Always Move Changes Over Tooltip"], dbKey = DBKEY_ALWAYS_MOVE_CHANGED},
+						{type = "checkbox", label = L["Outfit Popup Always Move Changes Over"], tooltip = L["Outfit Popup Always Move Changes Over Tooltip"], dbKey = checkboxTempDBKey},
 					},
+
+					onHideFunc = function()
+						addon.SetDBValue(checkboxTempDBKey, nil);
+					end,
 				});
 			end
 

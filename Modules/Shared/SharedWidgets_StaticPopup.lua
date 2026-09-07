@@ -74,6 +74,9 @@ do
 	function StaticPopupMixin:OnHide()
 		PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE);
 		StaticPopup_Hide(WHICH_DUMMY, self.data);
+		if self.onHideCallback then
+			self.onHideCallback(self);
+		end
 	end
 
 	function StaticPopupMixin:OnLoad()
@@ -160,6 +163,8 @@ do
 
 	function StaticPopupMixin:Setup(popupInfo)
 		self.identifier = popupInfo.identifier;
+		self.onHideCallback = popupInfo.onHideFunc;
+
 		self:ReleaseAllWidgets();
 
 		if popupInfo.text then
@@ -383,6 +388,7 @@ local function ShowClipboard(text, copySuccessMessage)
 	MainFrame:ClearAllPoints();
 	MainFrame:ReleaseAllWidgets();
 	MainFrame.identifier = "clipboard";
+	MainFrame.onHideCallback = nil;
 
 	MainFrame.EditBox:Show();
 	MainFrame.EditBox:SetDefaultText(text);
