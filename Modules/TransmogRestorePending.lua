@@ -580,7 +580,7 @@ do
 
 		local confirmCallback = data and data.confirmCallback;
 		if confirmCallback then
-			if addon.GetDBBool(DBKEY_ALWAYS_MOVE_CHANGED) then
+			if addon.GetDBBool(DBKEY_ALWAYS_MOVE_CHANGED) or (not C_Transmog.IsAtTransmogNPC()) then
 				confirmCallback();
 			else
 				local checkboxTempDBKey = POPUP_IDENTIFIER.."_TEMP";
