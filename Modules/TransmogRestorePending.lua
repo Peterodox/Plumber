@@ -369,7 +369,7 @@ do
 	local isRestoringPending = false;
 
 	local function CapturePending()
-		if not EL.enabled or isRestoringPending then return end;
+		if not EL.enabled or isRestoringPending then return; end
 
 		local liveList = TransmogFrame.CharacterPreview:GetItemTransmogInfoList();
 		--Kept even when nothing's pending, so the separate-shoulders fix has a value to fall back to.
@@ -398,6 +398,19 @@ do
 		EL.PendingSituations = hasSituationsPending and EL.CaptureSituationsPending() or nil;
 
 		SavePendingToDB();
+	end
+
+	-- Due to unknown reasons our frame could receive "VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH" before TransmogFrame does
+	-- And we will end up capturing the old items
+	-- Use this instead of always capture the current slots
+	function EL.TryCapturePending()
+		if not EL.capturePendingQueued then
+			EL.capturePendingQueued = true;
+			C_Timer.After(0, function()
+				EL.capturePendingQueued = nil;
+				CapturePending();
+			end);
+		end
 	end
 
 	local function RestoreViewedOutfit(outfitID)
@@ -512,7 +525,7 @@ do
 		local wipedSituations = isOutfitSwitch and EL.PendingSituations and not C_TransmogOutfitInfo.HasPendingOutfitSituations();
 
 		if not (wipedTransmogs or wipedSituations) then
-			CapturePending();
+			EL.TryCapturePending();
 		else
 			isRestoringPending = true;
 			if wipedTransmogs then
@@ -557,15 +570,19 @@ do
 		elseif event == "VIEWED_TRANSMOG_OUTFIT_SECONDARY_SLOTS_CHANGED" then
 			FixShoulderSecondaryToggle();
 		else
-			CapturePending();
+			EL.TryCapturePending();
 		end
 	end
 
 	local function TransmogFrame_OnShow()
 		if not EL.enabled then return end;
 
-		API.RegisterFrameForEvents(EL, TRACKED_EVENTS);
-		RestoreAllPending();
+		-- You can open TransmogFrame anywhere, like Plumber's OutfitSelect
+		-- But we only restore and save changes when interacting with transmog NPC
+		if C_Transmog.IsAtTransmogNPC() then
+			API.RegisterFrameForEvents(EL, TRACKED_EVENTS);
+			RestoreAllPending();
+		end
 	end
 
 	local function TransmogFrame_OnHide()
