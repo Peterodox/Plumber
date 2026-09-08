@@ -111,7 +111,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 
 		local name = DifficultyUtil.GetDifficultyName(difficultyID);
 		local size = GetEJDifficultySize(difficultyID);
-		if size then
+		if size and difficultyID ~= DifficultyUtil.ID.RaidWorld then
 			return string.format(ENCOUNTER_JOURNAL_DIFF_TEXT, size, name);
 		else
 			return name;
