@@ -824,9 +824,9 @@ do  --SelectorUI
 	end
 
 	function SelectorUI:TrySelectDiffulty(difficultyID)
-		if difficultyID == self.selectedDifficulty then return end
+		if difficultyID == self.selectedDifficulty then return; end
 
-		if not DataProvider:IsDiffultySelectable(difficultyID) then return false; end
+		if not DataProvider:IsDiffultySelectable(difficultyID) then return; end
 
 		GameTooltip:Hide();
 
@@ -843,7 +843,7 @@ do  --SelectorUI
 			SetDungeonDifficultyID(difficultyID);
 		end
 
-		return true and canChange;
+		return canChange;
 	end
 
 	function SelectorUI:HighlightButton(button)
