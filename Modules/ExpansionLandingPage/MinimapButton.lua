@@ -14,7 +14,7 @@ local EL = CreateFrame("Frame");
 local DragController = CreateFrame("Frame", nil, UIParent);
 local UIParentContainer = CreateFrame("Frame", nil, UIParent);
 local MiniButton;
-local MenuSchematc;
+local MenuSchematic;
 
 
 local Def = {
@@ -608,9 +608,9 @@ do  --Order Hall, RightClickMenu
 	end
 
 	local function InitMenuSchematic()
-		if MenuSchematc then return end;
+		if MenuSchematic then return end;
 
-		MenuSchematc = {
+		MenuSchematic = {
 			tag = "PlumberLandingButtonMenu",
 			objects = {};
 			onMenuClosedCallback = function()
@@ -620,45 +620,45 @@ do  --Order Hall, RightClickMenu
 		};
 
 		if GetDBBool("LandingButton_SmartExpansion") then
-			table.insert(MenuSchematc.objects, {type = "Button", name = L["Abbr NewExpansionLandingPage"],
+			table.insert(MenuSchematic.objects, {type = "Button", name = L["Abbr NewExpansionLandingPage"],
 				OnClick = function()
 					LandingPageUtil.ToggleUI();
 				end,
 			});
 
-			table.insert(MenuSchematc.objects, {type = "Button", name = JOURNEYS_LABEL,
+			table.insert(MenuSchematic.objects, {type = "Button", name = JOURNEYS_LABEL,
 				OnClick = function()
 					OrderHallUtil.ToggleBlizzardJourneys();
 				end,
 			});
 
-			table.insert(MenuSchematc.objects, {type = "Divider"});
+			table.insert(MenuSchematic.objects, {type = "Divider"});
 		else
 			--Add a button to open the other UI
 			if Options.GetChoice_PrimaryUI() == 2 then
-				table.insert(MenuSchematc.objects, {type = "Button", name = L["Abbr NewExpansionLandingPage"],
+				table.insert(MenuSchematic.objects, {type = "Button", name = L["Abbr NewExpansionLandingPage"],
 					OnClick = function()
 						LandingPageUtil.ToggleUI();
 					end,
 				});
 			else
-				table.insert(MenuSchematc.objects, {type = "Button", name = JOURNEYS_LABEL,
+				table.insert(MenuSchematic.objects, {type = "Button", name = JOURNEYS_LABEL,
 					OnClick = function()
 						OrderHallUtil.ToggleBlizzardJourneys();
 					end,
 				});
 			end
 
-			table.insert(MenuSchematc.objects, {type = "Divider"});
+			table.insert(MenuSchematic.objects, {type = "Divider"});
 		end
 
 		for k, v in ipairs(OrderHallButtons) do
-			table.insert(MenuSchematc.objects, v);
+			table.insert(MenuSchematic.objects, v);
 		end
 
-		table.insert(MenuSchematc.objects, {type = "Divider"});
+		table.insert(MenuSchematic.objects, {type = "Divider"});
 
-		table.insert(MenuSchematc.objects, {type = "Button", name = L["LandingButton Customize"],
+		table.insert(MenuSchematic.objects, {type = "Button", name = L["LandingButton Customize"],
 			OnClick = function()
 				MiniButton:ToggleSettings();
 			end,
@@ -756,7 +756,7 @@ do  --Order Hall, RightClickMenu
 		GameTooltip:Hide();
 		InitMenuSchematic();
 		local contextData = {};
-		local menu = addon.API.ShowBlizzardMenu(self, MenuSchematc, contextData);
+		local menu = addon.API.ShowBlizzardMenu(self, MenuSchematic, contextData);
 		self.shownMenu = menu;
 		menu:ClearAllPoints();
 		menu:SetPoint("TOPLEFT", self, "BOTTOMRIGHT", 0, 4);
@@ -774,7 +774,7 @@ do  --Order Hall, RightClickMenu
 	function ButtonManager.OpenContextMenu(widget)
 		InitMenuSchematic();
 		local contextData = {};
-		local menu = addon.API.ShowBlizzardMenu(widget, MenuSchematc, contextData);
+		local menu = addon.API.ShowBlizzardMenu(widget, MenuSchematic, contextData);
 		menu:ClearAllPoints();
 		menu:SetPoint("TOPLEFT", widget, "BOTTOMRIGHT", 2, -2);
 	end
@@ -1104,7 +1104,7 @@ do  --Button Settings/Customize
 	end
 
 	function ButtonMixin:LoadSettings()
-		MenuSchematc = nil;
+		MenuSchematic = nil;
 
 		self.darkMode = GetDBBool("LandingButton_DarkColor");
 
