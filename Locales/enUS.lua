@@ -785,6 +785,7 @@ L["EditMode Instruction InstanceDifficulty"] = "The frame width is affected by t
 L["Difficulty Locked To Format"] = "The instance is locked to |cffffffff%s|r due to boss kill.";
 L["Difficulty Locked To Current Alert"] = "The instance is locked to this difficulty due to boss kill.";
 L["Shared Difficulty Alert"] = "Defeating a boss will lock the instance to this difficulty.";
+L["Can Only Change Difficulty Via Native UI"] = "This difficulty can only be selected when interacting with the entrance portal.";
 
 
 --TransmogChatCommand

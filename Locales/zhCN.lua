@@ -754,6 +754,7 @@ L["EditMode Instruction InstanceDifficulty"] = "此窗口的实际宽度由选�
 L["Difficulty Locked To Format"] = "此副本难度被锁定为|cffffffff%s|r，因为你已击败了一个首领。";
 L["Difficulty Locked To Current Alert"] = "此副本难度被锁定为当前难度，因为你已击败了一个首领。";
 L["Shared Difficulty Alert"] = "击败任何一个首领将会使副本锁定至此难度。";
+L["Can Only Change Difficulty Via Native UI"] = "你必须与副本入口交互才能选择此难度。";
 
 
 --TransmogChatCommand

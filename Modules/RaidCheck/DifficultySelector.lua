@@ -107,7 +107,10 @@ local function ShowLockoutTooltip(self, instanceName, difficultyName, instanceID
 	end
 
 	if showInstruction then
-		if not CanChangeDifficulty() then
+		if not DataProvider:IsDiffultySelectable(currentDifficultyID) then
+			tooltip:AddLine(" ");
+			tooltip:AddLine(L["Can Only Change Difficulty Via Native UI"], 0.5, 0.5, 0.5, true);
+		elseif not CanChangeDifficulty() then
 			tooltip:AddLine(" ");
 			tooltip:AddLine(L["Cannot Change Difficulty"], 1, 0.125, 0.125, true);
 		end
@@ -819,7 +822,9 @@ do  --SelectorUI
 	end
 
 	function SelectorUI:TrySelectDiffulty(difficultyID)
-		if difficultyID == self.selectedDifficulty then return end;
+		if difficultyID == self.selectedDifficulty then return end
+
+		if not DataProvider:IsDiffultySelectable(difficultyID) then return false; end
 
 		GameTooltip:Hide();
 
@@ -836,7 +841,7 @@ do  --SelectorUI
 			SetDungeonDifficultyID(difficultyID);
 		end
 
-		return true and canChange
+		return true and canChange;
 	end
 
 	function SelectorUI:HighlightButton(button)
