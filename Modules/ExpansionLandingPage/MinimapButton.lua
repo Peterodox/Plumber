@@ -566,6 +566,18 @@ do  --Order Hall, RightClickMenu
 		return false
 	end
 
+	function OrderHallUtil.ToggleNativeLandingPage()
+		if API.CheckAndDisplayErrorIfInCombat() then return; end
+
+		local f = ExpansionLandingPage;
+		if f:IsShown() then
+			HideUIPanel(f);
+		else
+			f:RefreshExpansionOverlay();
+			ShowUIPanel(f);
+		end
+	end
+
 	local OrderHallButtons = {
 		--WoD Garrison
 		{type = "Button", name = GARRISON_LANDING_PAGE_TITLE, garrTypeID = Enum.GarrisonType.Type_6_0_Garrison},
@@ -654,6 +666,11 @@ do  --Order Hall, RightClickMenu
 
 		for k, v in ipairs(OrderHallButtons) do
 			table.insert(MenuSchematic.objects, v);
+		end
+
+		if C_PlayerInfo.IsExpansionLandingPageUnlockedForPlayer(11) then -- LE_EXPANSION_MIDNIGHT
+			local name = RUNES_OF_POWER .. " (Blizzard)";
+			table.insert(MenuSchematic.objects, {type = "Button", name = name, OnClick = OrderHallUtil.ToggleNativeLandingPage});
 		end
 
 		table.insert(MenuSchematic.objects, {type = "Divider"});
