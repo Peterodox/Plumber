@@ -117,6 +117,7 @@ do
 	function HandlerMixin:CallSubModules(tooltip, id, hyperlink)
 		self.altModeState = nil;
 		self.hideGenericAltInstruction = nil;
+		self.anyChange = nil;
 		self.currentTooltip = tooltip;
 
 		for _, m in ipairs(self.modules) do
@@ -304,6 +305,8 @@ do  --GameTooltipManager
 
 			if useLeftTextAsArgument then
 				function handler.ProcessDisplayedData(tooltip)
+					if tooltip.IsEmbedded then return; end -- Disabled for embedded tooltip. Maybe it will fix the taint?
+
 					local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
 					if tooltipData and tooltipData.type == tooltipDataType then
 						local leftText = tooltipData.lines and tooltipData.lines[1] and tooltipData.lines[1].leftText;
@@ -321,6 +324,8 @@ do  --GameTooltipManager
 				end
 			else
 				function handler.ProcessDisplayedData(tooltip)
+					if tooltip.IsEmbedded then return; end -- Disabled for embedded tooltip. Maybe it will fix the taint?
+
 					local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
 					if tooltipData and tooltipData.type == tooltipDataType then
 						local arg1 = tooltipData.id;

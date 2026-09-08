@@ -98,6 +98,8 @@ local EncounterData = {
 
 
 local Difficulties;
+local OverrideDifficulties = {};
+
 if addon.IS_MOP then
 	Difficulties = {
 		DifficultyUtil.ID.RaidLFR,
@@ -112,6 +114,17 @@ else
 		DifficultyUtil.ID.PrimaryRaidNormal,
 		DifficultyUtil.ID.PrimaryRaidHeroic,
 		DifficultyUtil.ID.PrimaryRaidMythic,
+	};
+
+	local Lairs = {
+		DifficultyUtil.ID.RaidWorld,
+		DifficultyUtil.ID.PrimaryRaidNormal,
+		DifficultyUtil.ID.PrimaryRaidHeroic,
+		DifficultyUtil.ID.PrimaryRaidMythic,
+	};
+
+	OverrideDifficulties = {
+		[2987] = Lairs,		-- Nymrissa Wavecaller
 	};
 end
 LandingPageUtil.RaidDifficulties = Difficulties;
@@ -201,8 +214,9 @@ function LandingPageUtil.GetEncounterProgress(instanceID, dungeonEncounterID)
 	--instanceID = mapID
 
 	local progress = {};    --{boolean1, boolean2, ...}
+	local difficulties = OverrideDifficulties[instanceID] or Difficulties;
 
-	for i, difficultyID in ipairs(Difficulties) do
+	for i, difficultyID in ipairs(difficulties) do
 		progress[i] = IsEncounterComplete(instanceID, dungeonEncounterID, difficultyID);
 	end
 
@@ -211,8 +225,9 @@ end
 
 function LandingPageUtil.GetInstanceProgress(instanceID, dungeonEncounterIDs)
 	local consolidatedProgress = {};    --{numComplete1, numComplete2, ...}
+	local difficulties = OverrideDifficulties[instanceID] or Difficulties;
 
-	for i, difficultyID in ipairs(Difficulties) do
+	for i, difficultyID in ipairs(difficulties) do
 		local numComplete = 0;
 		for _, dungeonEncounterID in ipairs(dungeonEncounterIDs) do
 			if IsEncounterComplete(instanceID, dungeonEncounterID, difficultyID) then

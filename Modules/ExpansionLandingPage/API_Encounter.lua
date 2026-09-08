@@ -70,6 +70,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 		DifficultyUtil.ID.Raid10Heroic,
 		DifficultyUtil.ID.Raid25Normal,
 		DifficultyUtil.ID.Raid25Heroic,
+		DifficultyUtil.ID.RaidWorld,
 		DifficultyUtil.ID.PrimaryRaidLFR,
 		DifficultyUtil.ID.PrimaryRaidNormal,
 		DifficultyUtil.ID.PrimaryRaidHeroic,
@@ -86,6 +87,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 		DifficultyUtil.ID.Raid10Heroic,
 		DifficultyUtil.ID.Raid25Normal,
 		DifficultyUtil.ID.Raid25Heroic,
+		DifficultyUtil.ID.RaidWorld,
 		DifficultyUtil.ID.PrimaryRaidNormal,
 		DifficultyUtil.ID.PrimaryRaidHeroic,
 		DifficultyUtil.ID.PrimaryRaidMythic,
@@ -109,7 +111,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 
 		local name = DifficultyUtil.GetDifficultyName(difficultyID);
 		local size = GetEJDifficultySize(difficultyID);
-		if size then
+		if size and difficultyID ~= DifficultyUtil.ID.RaidWorld then
 			return string.format(ENCOUNTER_JOURNAL_DIFF_TEXT, size, name);
 		else
 			return name;
@@ -124,7 +126,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 		SelectInstanceAndEncounter(journalInstanceID, encounterID);
 
 		for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
-			if EJ_IsValidInstanceDifficulty(difficultyID) then
+			if difficultyID and EJ_IsValidInstanceDifficulty(difficultyID) then
 				local text = GetEJDifficultyString(difficultyID);
 				n = n + 1;
 				tbl[n] = {
@@ -172,7 +174,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 		local difficulties = {};
 
 		for index, difficultyID in ipairs(VALID_DIFFUICULTY_OPEN_WORLD) do
-			if EJ_IsValidInstanceDifficulty(difficultyID) then
+			if difficultyID and EJ_IsValidInstanceDifficulty(difficultyID) then
 				local text = GetEJDifficultyString(difficultyID);
 				n = n + 1;
 				difficulties[n] = {

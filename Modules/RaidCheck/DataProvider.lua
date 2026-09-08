@@ -1,5 +1,4 @@
 local _, addon = ...
-local API = addon.API;
 
 
 local RaidCheck = {};
@@ -21,4 +20,10 @@ end
 
 function DataProvider:GetRaidDifficultyID()
 	return GetRaidDifficultyID(), GetLegacyRaidDifficultyID()
+end
+
+-- Some difficulty can only be selected via Blizzard's DifficultyPicker
+-- Such as "World" for Lair "The Tidebound Grotto"
+function DataProvider:IsDiffultySelectable(difficultyID)
+	return difficultyID and difficultyID ~= 250; -- DifficultyUtil.ID.RaidWorld
 end

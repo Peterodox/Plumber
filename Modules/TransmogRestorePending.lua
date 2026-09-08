@@ -767,7 +767,7 @@ do
 		dbKey = "TransmogRaestorePending",
 		description = L["ModuleDescription TransmogRaestorePending"],
 		toggleFunc = EnableModule,
-		moduleAddedTime = 1788400000,
+		moduleAddedTime = 1788800000,
 		categoryKeys = {"Collection"},
 		consultant = 2,
 	};

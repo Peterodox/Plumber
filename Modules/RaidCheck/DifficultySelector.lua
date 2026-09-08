@@ -13,9 +13,9 @@ local GetInstanceInfoForSelector = API.GetInstanceInfoForSelector;    --See Expa
 local GetInstanceEncounters = API.GetInstanceEncounters;
 
 
-local DifficultyAnnouncer = CreateFrame("Frame", nil, UIParent, "PlumberPropagateMouseTemplate");    --Show difficulty when entering the instance
+local DifficultyAnnouncer = CreateFrame("Frame", "PlumberInstanceDifficultyAnnouncer", UIParent, "PlumberPropagateMouseTemplate");    --Show difficulty when entering the instance
 RaidCheck.DifficultyAnnouncer = DifficultyAnnouncer;
-local SelectorUI = CreateFrame("Frame", nil, UIParent);             --Show difficulty selector at the entrance
+local SelectorUI = CreateFrame("Frame", "PlumberInstanceDifficultySelector", UIParent);             --Show difficulty selector at the entrance
 RaidCheck.SelectorUI = SelectorUI;
 DifficultyAnnouncer:Hide();
 SelectorUI:Hide();
@@ -107,7 +107,10 @@ local function ShowLockoutTooltip(self, instanceName, difficultyName, instanceID
 	end
 
 	if showInstruction then
-		if not CanChangeDifficulty() then
+		if not DataProvider:IsDiffultySelectable(currentDifficultyID) then
+			tooltip:AddLine(" ");
+			tooltip:AddLine(L["Can Only Change Difficulty Via Native UI"], 0.5, 0.5, 0.5, true);
+		elseif not CanChangeDifficulty() then
 			tooltip:AddLine(" ");
 			tooltip:AddLine(L["Cannot Change Difficulty"], 1, 0.125, 0.125, true);
 		end
@@ -585,6 +588,8 @@ do  --SelectorUI
 		self:SetScript("OnEvent", self.OnEvent);
 
 		LoadFramePosition();
+
+		EventRegistry:TriggerEvent("Plumber.DifficultySelector.OnInit", self);
 	end
 
 	function SelectorUI:OnShow()
@@ -819,7 +824,9 @@ do  --SelectorUI
 	end
 
 	function SelectorUI:TrySelectDiffulty(difficultyID)
-		if difficultyID == self.selectedDifficulty then return end;
+		if difficultyID == self.selectedDifficulty then return; end
+
+		if not DataProvider:IsDiffultySelectable(difficultyID) then return; end
 
 		GameTooltip:Hide();
 
@@ -836,7 +843,7 @@ do  --SelectorUI
 			SetDungeonDifficultyID(difficultyID);
 		end
 
-		return true and canChange
+		return canChange;
 	end
 
 	function SelectorUI:HighlightButton(button)
@@ -963,6 +970,8 @@ do  --DifficultyAnnouncer
 		self:SetScript("OnMouseDown", self.OnMouseDown);
 
 		LoadFramePosition();
+
+		EventRegistry:TriggerEvent("Plumber.DifficultyAnnouncer.OnInit", self);
 	end
 
 	function DifficultyAnnouncer:Enable(state)
