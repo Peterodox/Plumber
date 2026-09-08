@@ -13,9 +13,9 @@ local GetInstanceInfoForSelector = API.GetInstanceInfoForSelector;    --See Expa
 local GetInstanceEncounters = API.GetInstanceEncounters;
 
 
-local DifficultyAnnouncer = CreateFrame("Frame", nil, UIParent, "PlumberPropagateMouseTemplate");    --Show difficulty when entering the instance
+local DifficultyAnnouncer = CreateFrame("Frame", "PlumberInstanceDifficultyAnnouncer", UIParent, "PlumberPropagateMouseTemplate");    --Show difficulty when entering the instance
 RaidCheck.DifficultyAnnouncer = DifficultyAnnouncer;
-local SelectorUI = CreateFrame("Frame", nil, UIParent);             --Show difficulty selector at the entrance
+local SelectorUI = CreateFrame("Frame", "PlumberInstanceDifficultySelector", UIParent);             --Show difficulty selector at the entrance
 RaidCheck.SelectorUI = SelectorUI;
 DifficultyAnnouncer:Hide();
 SelectorUI:Hide();
@@ -588,6 +588,8 @@ do  --SelectorUI
 		self:SetScript("OnEvent", self.OnEvent);
 
 		LoadFramePosition();
+
+		EventRegistry:TriggerEvent("Plumber.DifficultySelector.OnInit", self);
 	end
 
 	function SelectorUI:OnShow()
@@ -968,6 +970,8 @@ do  --DifficultyAnnouncer
 		self:SetScript("OnMouseDown", self.OnMouseDown);
 
 		LoadFramePosition();
+
+		EventRegistry:TriggerEvent("Plumber.DifficultyAnnouncer.OnInit", self);
 	end
 
 	function DifficultyAnnouncer:Enable(state)
