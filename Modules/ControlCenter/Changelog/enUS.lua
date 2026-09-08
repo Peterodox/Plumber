@@ -10,6 +10,63 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10905] = {
 	{
 		type = "date",
+		versionText = "1.9.5 b",
+		timestamp = 1788800000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName TransmogRaestorePending"],
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Pending changes can now be moved over to another outfit.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Pending situations are also stored now.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Closing the Transmog UI with pending changes and then reopening it will automatically select the outfit you were editing, instead of jumping to the active one.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The \"World\" difficulty for The Tidebound Grotto now correctly appears on the Instance Difficulty Selector and the Raids tab in the Expansion Summary UI.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary Minimap Button: You can access Blizzard's Omnium Folio UI from the right-click menu once unlocked.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.5",
 		timestamp = 1788400000,
 	},
@@ -28,7 +85,7 @@ changelogs[10905] = {
 	{
 		type = "p",
 		bullet = true,
-		text = L["ModuleDescription TransmogRaestorePending"],
+		text = "Pending Transmog changes are automatically restored when reopening the window.",
 	},
 
 	{
