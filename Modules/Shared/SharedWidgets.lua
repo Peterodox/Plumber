@@ -351,7 +351,7 @@ do  -- Checkbox
 		local newState;
 
 		if self.dbKey then
-			newState = not addon.GetDBValue(self.dbKey)
+			newState = not addon.GetDBBool(self.dbKey)
 			addon.SetDBValue(self.dbKey, newState, true);
 			self:SetChecked(newState);
 		else
@@ -405,6 +405,12 @@ do  -- Checkbox
 		self.checked = state;
 	end
 
+	function CheckboxMixin:UpdateChecked()
+		if self.dbKey then
+			self:SetChecked(addon.GetDBBool(self.dbKey));
+		end
+	end
+
 	function CheckboxMixin:SetFixedWidth(width)
 		self.fixedWidth = width;
 		self:SetWidth(width);
@@ -453,6 +459,8 @@ do  -- Checkbox
 		self.restrictionInstance = data.restrictionInstance;
 		self.parentDBKey = data.parentDBKey;
 		self.shouldEnableOption = data.shouldEnableOption;
+
+		self:UpdateChecked();
 
 		if data.label then
 			return self:SetLabel(data.label)

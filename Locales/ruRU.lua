@@ -805,6 +805,18 @@ L["Quick Access Outfit Button"] = "Быстрый доступ";
 L["Quick Access Outfit Button Tooltip"] = "Нажмите и перетащите эту кнопку на панель действий, чтобы менять образы в любом месте.";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "Интерфейс трансмогрификации: восстановление несохранённых изменений";
+L["ModuleDescription TransmogRaestorePending"] = "Несохранённые изменения трансмогрификации автоматически восстанавливаются при повторном открытии окна.\n\nНесохранённые изменения можно перенести на другой образ.";
+L["Outfit Popup Warning"] = "В текущем образе есть несохранённые изменения.\n\nХотите перенести эти изменения на новый образ или отклонить их?";
+L["Outfit Popup Move Changes"] = "Перенести";
+L["Outfit Popup Move Changes Tooltip"] = "Переносит несохранённые изменения на новый выбранный образ.";
+L["Outfit Popup Always Move Changes Over"] = "Всегда переносить изменения";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "Всегда переносит несохранённые изменения на новый выбранный образ.\n\nЭто окно больше не будет отображаться.";
+L["Outfit Popup Discard Changes"] = "Отклонить";
+L["Outfit Popup Discard Changes Tooltip"] = "Отклоняет несохранённые изменения.";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Клавиши: Фокус на задание";
 L["ModuleDescription QuestWatchCycle"] = "Позволяет использовать горячие клавиши для фокусировки на следующем/предыдущем задании в трекере целей.\n\n|cffd4641cНастройте горячие клавиши в Привязки клавиш > Аддона Plumber.|r";

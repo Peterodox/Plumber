@@ -715,6 +715,18 @@ L["Quick Access Outfit Button"] = "快捷訪問";
 L["Quick Access Outfit Button Tooltip"] = "點擊並拖動此按鈕到技能欄上，以便隨時隨地訪問外觀列表。";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "塑形介面：恢復未保存的改動";
+L["ModuleDescription TransmogRaestorePending"] = "未保存的改動將在你重新開啟塑形介面時自動恢復。\n\n未保存的改動可以轉移至另一個外觀方案。";
+L["Outfit Popup Warning"] = "當前外觀方案有未保存的改動。\n\n你想將這些改動轉移至新的外觀方案，還是要捨棄它們？";
+L["Outfit Popup Move Changes"] = "轉移";
+L["Outfit Popup Move Changes Tooltip"] = "將未保存的改動轉移至新選擇的外觀方案。";
+L["Outfit Popup Always Move Changes Over"] = "永遠轉移改動";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "永遠將未保存的改動轉移至新選擇的外觀方案。\n\n你將不會再看到這個彈出視窗。";
+L["Outfit Popup Discard Changes"] = "捨棄";
+L["Outfit Popup Discard Changes Tooltip"] = "捨棄未保存的改動。";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "快捷鍵：任務焦點";
 L["ModuleDescription QuestWatchCycle"] = "允許你設定快捷鍵來聚焦下一個或上一個任務。\n\n|cffd4641c請前往以下位置設定按鍵：遊戲設定> 快捷鍵> Plumber 插件.|r";

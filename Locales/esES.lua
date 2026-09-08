@@ -762,6 +762,18 @@ L["Quick Access Outfit Button"] = "Acceso rápido";
 L["Quick Access Outfit Button Tooltip"] = "Haz click y arrastra este botón a tus barras de acción para poder cambiar de atuendo en cualquier lugar.";
 
 
+--TransmogRaestorePending
+L["ModuleName TransmogRaestorePending"] = "Interfaz de transfiguración: restaurar cambios pendientes";
+L["ModuleDescription TransmogRaestorePending"] = "Los cambios de transfiguración pendientes se restauran automáticamente al volver a abrir la ventana.\n\nLos cambios pendientes se pueden trasladar a otro atuendo.";
+L["Outfit Popup Warning"] = "El atuendo actual tiene cambios pendientes.\n\n¿Deseas trasladar estos cambios al nuevo atuendo o descartarlos?";
+L["Outfit Popup Move Changes"] = "Trasladar";
+L["Outfit Popup Move Changes Tooltip"] = "Traslada los cambios pendientes al atuendo recién seleccionado.";
+L["Outfit Popup Always Move Changes Over"] = "Trasladar Siempre los Cambios";
+L["Outfit Popup Always Move Changes Over Tooltip"] = "Traslada siempre los cambios pendientes al atuendo recién seleccionado.\n\nDejarás de ver esta ventana emergente.";
+L["Outfit Popup Discard Changes"] = "Descartar";
+L["Outfit Popup Discard Changes Tooltip"] = "Descarta los cambios pendientes.";
+
+
 --QuestWatchCycle
 L["ModuleName QuestWatchCycle"] = "Atajos de teclado: Centrarse en la misión";
 L["ModuleDescription QuestWatchCycle"] = "Te permite presionar teclas de acceso rápido para centrarse en la siguiente/anterior misión en el rastreador de objetivos.\n\n|cffd4641cConfigura tus teclas de acceso rápido en Opciones/Atajos de teclado/Plumber.|r";
