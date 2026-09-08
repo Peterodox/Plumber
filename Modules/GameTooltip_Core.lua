@@ -117,6 +117,7 @@ do
 	function HandlerMixin:CallSubModules(tooltip, id, hyperlink)
 		self.altModeState = nil;
 		self.hideGenericAltInstruction = nil;
+		self.anyChange = nil;
 		self.currentTooltip = tooltip;
 
 		for _, m in ipairs(self.modules) do
