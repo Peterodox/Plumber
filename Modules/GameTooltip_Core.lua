@@ -80,23 +80,23 @@ local SubModuleMixin = {};
 do
 	function SubModuleMixin:ProcessData(tooltip, itemID)
 		if self.enabled then
-
+			-- Override
 		else
 			return false
 		end
 	end
 
 	function SubModuleMixin:GetDBKey()
-		return "dbkey"
+		return self.dbKey;
 	end
 
 	function SubModuleMixin:SetEnabled(enabled)
-		self.enabled = enabled == true
+		self.enabled = enabled == true;
 		self.parentManager:RequestUpdate();
 	end
 
 	function SubModuleMixin:IsEnabled()
-		return self.enabled == true
+		return self.enabled == true;
 	end
 end
 
@@ -302,9 +302,11 @@ do  --GameTooltipManager
 			handler.tooltipDataType = tooltipDataType;
 			handler.noModuleEnabled = true;
 			handler.isItemHandler = tooltipDataType == 0;
+			handler.isItemHandler = tooltipDataType == Enum.TooltipDataType.Item;
 
 			if useLeftTextAsArgument then
 				function handler.ProcessDisplayedData(tooltip)
+					if handler.noModuleEnabled then return; end
 					if tooltip.IsEmbedded then return; end -- Disabled for embedded tooltip. Maybe it will fix the taint?
 
 					local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
@@ -324,6 +326,7 @@ do  --GameTooltipManager
 				end
 			else
 				function handler.ProcessDisplayedData(tooltip)
+					if handler.noModuleEnabled then return; end
 					if tooltip.IsEmbedded then return; end -- Disabled for embedded tooltip. Maybe it will fix the taint?
 
 					local tooltipData = tooltip.infoList and tooltip.infoList[1] and tooltip.infoList[1].tooltipData;
