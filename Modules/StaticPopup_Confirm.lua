@@ -72,11 +72,11 @@ local function EnableModule(state)
 	if state and not MODULE_ENABLED then
 		MODULE_ENABLED = true;
 		ModifyDialogs();
-		addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_ItemInteractionUI", ModifyDialogs);
+		addon.BlizzardFrameUtil:AddFrameModifier("ItemInteractionFrame", ModifyDialogs);
 	elseif (not state) and MODULE_ENABLED then
 		MODULE_ENABLED = false;
 		RestoreDialogs();
-		addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_ItemInteractionUI", ModifyDialogs);
+		addon.BlizzardFrameUtil:RemoveFrameModifier("ItemInteractionFrame", ModifyDialogs);
 	end
 end
 

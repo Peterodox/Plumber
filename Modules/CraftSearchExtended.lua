@@ -422,7 +422,7 @@ end
 
 
 
-local function Blizzard_Professions_OnLoaded()
+local function Blizzard_Professions_OnLoaded(ProfessionsFrame)
 	if MainFrame then return end;
 
 	CreateUI();
@@ -445,10 +445,10 @@ do  --Module Registry
 	local function EnabledModule(state)
 		MODULE_ENABLED = state;
 		if state then
-			addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_Professions", Blizzard_Professions_OnLoaded);
+			addon.BlizzardFrameUtil:AddFrameModifier("ProfessionsFrame", Blizzard_Professions_OnLoaded);
 			EventRegistry:RegisterCallback("ProfessionsFrame.Minimized", SearchBox_OnTextChanged, DummyOwner);
 		else
-			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Professions", Blizzard_Professions_OnLoaded);
+			addon.BlizzardFrameUtil:RemoveFrameModifier("ProfessionsFrame", Blizzard_Professions_OnLoaded);
 			EventRegistry:UnregisterCallback("ProfessionsFrame.Minimized", DummyOwner);
 			HideUI();
 		end

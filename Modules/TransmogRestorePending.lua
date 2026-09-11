@@ -727,7 +727,7 @@ do
 		end
 	end
 
-	function EL.SnapshotFrame_OnLoad()
+	function EL.SnapshotFrame_OnLoad(TransmogFrame)
 		if EL.snapshotHooked then return end;
 		EL.snapshotHooked = true;
 
@@ -753,10 +753,10 @@ do
 		if state and not EL.enabled then
 			EL.enabled = true;
 			EL.LoadPendingFromDB();
-			addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
+			addon.BlizzardFrameUtil:AddFrameModifier("TransmogFrame", EL.SnapshotFrame_OnLoad);
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
-			addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_Transmog", EL.SnapshotFrame_OnLoad);
+			addon.BlizzardFrameUtil:RemoveFrameModifier("TransmogFrame", EL.SnapshotFrame_OnLoad);
 			EL.WipePendingAppearanceFromDB(true, true);
 			addon.SetDBValue(DBKEY_ALWAYS_MOVE_CHANGED, false);
 		end

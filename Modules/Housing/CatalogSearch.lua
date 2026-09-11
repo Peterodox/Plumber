@@ -278,7 +278,7 @@ local function ModifySearcherBase(f, ownedOnly)
 end
 
 
-local function Blizzard_HouseEditor_OnLoad()
+local function Blizzard_HouseEditor_OnLoad(HouseEditorFrame)
 	Housing.DataProvider:Init();
 
 	C_Timer.After(0, function()
@@ -288,7 +288,7 @@ local function Blizzard_HouseEditor_OnLoad()
 end
 
 
-local function Blizzard_HousingDashboard_OnLoad()
+local function Blizzard_HousingDashboard_OnLoad(HousingDashboardFrame)
 	Housing.DataProvider:Init();
 
 	C_Timer.After(0, function()
@@ -298,8 +298,8 @@ end
 
 
 local BlizzardAddOns = {
-	{name = "Blizzard_HousingDashboard", callback = Blizzard_HousingDashboard_OnLoad},
-	{name = "Blizzard_HouseEditor", callback = Blizzard_HouseEditor_OnLoad},
+	{frameName = "HousingDashboardFrame", callback = Blizzard_HousingDashboard_OnLoad},
+	{frameName = "HouseEditorFrame", callback = Blizzard_HouseEditor_OnLoad},
 };
 
 
@@ -338,14 +338,14 @@ do
 	local function EnableModule(state)
 		if state then
 			for _, v in ipairs(BlizzardAddOns) do
-				addon.CallbackRegistry:RegisterAddOnLoadedCallback(v.name, v.callback);
+				addon.BlizzardFrameUtil:AddFrameModifier(v.frameName, v.callback);
 			end
 			ModifyContextMenu();
 			MODULE_ENABLED = true;
 		else
 			MODULE_ENABLED = false;
 			for _, v in ipairs(BlizzardAddOns) do
-				addon.CallbackRegistry:UnregisterAddOnLoadedCallback(v.name, v.callback);
+				addon.BlizzardFrameUtil:RemoveFrameModifier(v.frameName, v.callback);
 			end
 		end
 	end
