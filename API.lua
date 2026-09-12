@@ -162,13 +162,16 @@ do  -- String
 	end
 	API.GetUnitIDGeneral = GetUnitIDGeneral;
 
-	local function GetGlobalObject(objNameKey)
+	local function GetGlobalObject(objNameKey, showTrace)
 		--Get object via string "FrameName.Key1.Key2"
 		local obj = _G;
 
 		for k in string.gmatch(objNameKey, "%w+") do
 			obj = obj[k];
 			if not obj then
+				if showTrace then
+					API.PrintMessage(string.format("Failed to find %s (stopped at %s)", objNameKey, k));
+				end
 				return
 			end
 		end
