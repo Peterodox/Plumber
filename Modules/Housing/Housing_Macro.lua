@@ -230,16 +230,16 @@ addon.CallbackRegistry:Register("DBLoaded", function()
 end);
 
 
-local function Blizzard_HousingDashboard_OnLoaded()
+local function HousingDashboard_OnLoaded(HousingDashboardFrame)
 	if not Flags.TeleportToHouseButton then
 		Flags.TeleportToHouseButton = true;
 
-		local blizzardDropdown = API.GetGlobalObject("HousingDashboardFrame.HouseDropdown");
+		local blizzardDropdown = HousingDashboardFrame.HouseDropdown;
 		if blizzardDropdown then
 			blizzardDropdown.playerHouseList = nil;
 		end
 
-		local TeleportButton = API.GetGlobalObject("HousingDashboardFrame.HouseInfoContent.ContentFrame.HouseUpgradeFrame.TeleportToHouseButton");
+		local TeleportButton = HousingDashboardFrame.HouseInfoContent.ContentFrame.HouseUpgradeFrame.TeleportToHouseButton;
 		if TeleportButton then
 			TeleportButton:RegisterForDrag("LeftButton");
 
@@ -262,6 +262,8 @@ local function Blizzard_HousingDashboard_OnLoaded()
 					tooltip:Show();
 				end
 			end);
+		else
+			API.PrintMessage("TeleportToHouseButton is missing");
 		end
 	end
 end
@@ -272,9 +274,9 @@ local function EnableModule(state)
 	Housing.RequestUpdateHouseInfo();
 	Flags.macroEnabled = state;
 	if state then
-		addon.CallbackRegistry:RegisterAddOnLoadedCallback("Blizzard_HousingDashboard", Blizzard_HousingDashboard_OnLoaded);
+		addon.BlizzardFrameUtil:AddFrameModifier("HousingDashboardFrame", HousingDashboard_OnLoaded);
 	else
-		addon.CallbackRegistry:UnregisterAddOnLoadedCallback("Blizzard_HousingDashboard", Blizzard_HousingDashboard_OnLoaded);
+		addon.BlizzardFrameUtil:RemoveFrameModifier("HousingDashboardFrame", HousingDashboard_OnLoaded);
 	end
 end
 

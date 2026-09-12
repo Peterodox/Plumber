@@ -20,7 +20,6 @@ local EL = CreateFrame("Frame");
 
 local CallbackRegistry = {};
 CallbackRegistry.events = {};
-CallbackRegistry.addonLoadedCallbacks = {};
 addon.CallbackRegistry = CallbackRegistry;
 
 local tinsert = table.insert;
@@ -117,26 +116,6 @@ do  --CallbackRegistry
 				end
 				cb = callbacks[i];
 			end
-		end
-	end
-
-	function CallbackRegistry:RegisterAddOnLoadedCallback(name, callback)
-		if C_AddOns.IsAddOnLoaded(name) then
-			callback();
-			return
-		end
-
-		if not self.addonLoadedCallbacks[name] then
-			self.addonLoadedCallbacks[name] = {};
-			EL:RegisterEvent("ADDON_LOADED");
-		end
-
-		self.addonLoadedCallbacks[name][callback] = true;
-	end
-
-	function CallbackRegistry:UnregisterAddOnLoadedCallback(name, callback)
-		if self.addonLoadedCallbacks[name] then
-			self.addonLoadedCallbacks[name][callback] = nil;
 		end
 	end
 end
@@ -485,17 +464,8 @@ EL:SetScript("OnEvent", function(self, event, ...)
 	if event == "ADDON_LOADED" then
 		local name = ...
 		if name == addonName then
-			self.plumberLoaded = true;
 			self:UnregisterEvent(event);
 			LoadDatabase();
-		elseif self.plumberLoaded then
-			if CallbackRegistry.addonLoadedCallbacks[name] then
-				local tbl = CallbackRegistry.addonLoadedCallbacks[name];
-				CallbackRegistry.addonLoadedCallbacks[name] = nil;
-				for callback in pairs(tbl) do
-					callback();
-				end
-			end
 		end
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		self:UnregisterEvent(event);

@@ -84,7 +84,7 @@ end
 
 do	--ItemInteractionFrame
 	local SubModule = {};
-	SubModule.name = "Blizzard_ItemInteractionUI";
+	SubModule.frameName = "ItemInteractionFrame";
 
 	local function GetOutputItemLink()
 		local info = C_TooltipInfo.GetItemInteractionItem();
@@ -162,16 +162,15 @@ end
 
 do
 	local function EnableModule(state)
-		local registry = addon.CallbackRegistry;
 		if state and not MODULE_ENABLED then
 			MODULE_ENABLED = true;
 			for _, subModule in ipairs(SubModules) do
-				registry:RegisterAddOnLoadedCallback(subModule.name, subModule.callback);
+				addon.BlizzardFrameUtil:AddFrameModifier(subModule.frameName, subModule.callback);
 			end
 		elseif (not state) and MODULE_ENABLED then
 			MODULE_ENABLED = false;
 			for _, subModule in ipairs(SubModules) do
-				registry:UnregisterAddOnLoadedCallback(subModule.name, subModule.callback);
+				addon.BlizzardFrameUtil:RemoveFrameModifier(subModule.frameName, subModule.callback);
 			end
 		end
 	end

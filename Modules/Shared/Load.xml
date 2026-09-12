@@ -5,6 +5,7 @@
 	<Include file="SharedTooltip.lua"/>
 	<Include file="SharedEditMode.lua"/>
 	<Include file="CooldownUtil.lua"/>
+	<Include file="BlizzardFrameUtil.lua"/>
 	<Include file="BlizzardEditMode.lua"/>
 	<Include file="WidgetSetUtil.lua"/>
 	<Include file="TraitSystem.lua"/>

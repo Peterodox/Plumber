@@ -393,7 +393,7 @@ do  --Decor Catalog
 		end
 	end
 
-	function Blizzard_HousingDashboard_OnLoad()
+	function Blizzard_HousingDashboard_OnLoad(HousingDashboardFrame)
 		C_Timer.After(0, function()
 			ModifyTextContainer(HousingDashboardFrame.CatalogContent.PreviewFrame);
 		end);
@@ -402,20 +402,20 @@ end
 
 
 local BlizzardAddOns = {
-	{name = "Blizzard_HousingDashboard", callback = Blizzard_HousingDashboard_OnLoad},
-	{name = "Blizzard_Collections", callback = Blizzard_Collections_OnLoad},
+	{frameName = "HousingDashboardFrame", callback = Blizzard_HousingDashboard_OnLoad},
+	{frameName = "MountJournal", callback = Blizzard_Collections_OnLoad},
 };
 
 do
 	local function EnableModule(state)
 		if state then
 			for _, v in ipairs(BlizzardAddOns) do
-				addon.CallbackRegistry:RegisterAddOnLoadedCallback(v.name, v.callback);
+				addon.BlizzardFrameUtil:AddFrameModifier(v.frameName, v.callback);
 			end
 			MODULE_ENABLED = true;
 		else
 			for _, v in ipairs(BlizzardAddOns) do
-				addon.CallbackRegistry:UnregisterAddOnLoadedCallback(v.name, v.callback);
+				addon.BlizzardFrameUtil:RemoveFrameModifier(v.frameName, v.callback);
 			end
 			MODULE_ENABLED = false;
 		end
