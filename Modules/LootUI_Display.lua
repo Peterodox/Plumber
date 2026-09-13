@@ -605,7 +605,12 @@ do  --Event Handler
 			tsort(self.currentLoots, SortFunc_LootSlot);
 			MainFrame:DisplayPendingLoot();
 		else
-			if MainFrame:IsShown() and MainFrame.manualMode and not MainFrame.errorMode then
+			if MainFrame.errorMode then
+				--LOOT_OPENED can keep re-firing after a failed attempt (e.g. bag full), so don't retry LootSlot() here or it'll spam the server (and DC you)
+				return
+			end
+
+			if MainFrame:IsShown() and MainFrame.manualMode then
 				MainFrame:Hide();
 				MainFrame:SetAlpha(0);
 				MainFrame:SetManualMode(false);
