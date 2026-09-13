@@ -51,6 +51,7 @@ EL.instancePos = {
 	[1023]= {0.71979, 0.15423},         --Siege of Boralus (Alliance)
 	[1200]= {0.73039, 0.55700},			--Vault of the Incarnate
 	[1304]= {0.56979, 0.61049, false},  --Murder Row (Outdoor only)
+	[74]  = {0.38465, 0.80562},         --Throne of the Four Winds
 };
 
 EL.instancePos_Horde = {
