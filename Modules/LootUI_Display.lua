@@ -617,8 +617,10 @@ do  --Event Handler
 			end
 			MainFrame.manualMode = false;
 
-			for slotIndex = 1, numItems do
-				LootSlot(slotIndex);
+			if not isAutoLoot then
+				for slotIndex = 1, numItems do
+					LootSlot(slotIndex);
+				end
 			end
 		end
 	end
