@@ -372,7 +372,7 @@ do  --Tooltip Module
 				self:UpdateProfessionInfo();
 			end
 
-			if spellID == self.profSpell1 then
+			if self.prof1Spells and self.prof1Spells[spellID] then
 				if not self.unspentPoints1 then
 					self.unspentPoints1 = GetProfessionUnspentPoints(1) or 0;
 				end
@@ -380,7 +380,7 @@ do  --Tooltip Module
 					tooltip:AddLine(" ");
 					tooltip:AddLine(L["Available Knowledge Format"]:format(self.unspentPoints1), 1, 0.82, 0, true);
 				end
-			elseif spellID == self.profSpell2 then
+			elseif self.prof2Spells and self.prof2Spells[spellID] then
 				if not self.unspentPoints2 then
 					self.unspentPoints2 = GetProfessionUnspentPoints(2) or 0;
 				end
@@ -407,8 +407,8 @@ do  --Tooltip Module
 	end
 
 	function SubModule:UpdateProfessionInfo()
-		self.profSpell1 = nil;
-		self.profSpell2 = nil;
+		self.prof1Spells = nil;
+		self.prof2Spells = nil;
 		self.unspentPoints1 = nil;
 		self.unspentPoints2 = nil;
 		self.isDirty = false;
@@ -416,7 +416,19 @@ do  --Tooltip Module
 		for i = 1, 2 do
 			local info = API.GetProfessionSpellInfo(i);
 			if info and info.spellID then
-				self["profSpell"..i] = info.spellID;
+				local tbl = self["prof"..i.."Spells"];
+				if not tbl then
+					tbl = {};
+					self["prof"..i.."Spells"] = tbl;
+				end
+				tbl[info.spellID] = true;
+
+				if info.skillLine == 202 then
+					-- For Engineering, hovering over the spell "Gnomish Engineer" or "Goblin Engineer"
+					-- should also show unspent points
+					tbl[20219] = true;
+					tbl[20222] = true;
+				end
 			end
 		end
 
