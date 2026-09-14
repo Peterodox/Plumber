@@ -605,15 +605,22 @@ do  --Event Handler
 			tsort(self.currentLoots, SortFunc_LootSlot);
 			MainFrame:DisplayPendingLoot();
 		else
-			if MainFrame:IsShown() and MainFrame.manualMode and not MainFrame.errorMode then
+			if MainFrame.errorMode then
+				--LOOT_OPENED can keep re-firing after a failed attempt (e.g. bag full), so don't retry LootSlot() here or it'll spam the server (and DC you)
+				return
+			end
+
+			if MainFrame:IsShown() and MainFrame.manualMode then
 				MainFrame:Hide();
 				MainFrame:SetAlpha(0);
 				MainFrame:SetManualMode(false);
 			end
 			MainFrame.manualMode = false;
 
-			for slotIndex = 1, numItems do
-				LootSlot(slotIndex);
+			if not isAutoLoot then
+				for slotIndex = 1, numItems do
+					LootSlot(slotIndex);
+				end
 			end
 		end
 	end
@@ -1251,6 +1258,7 @@ do  --UI Notification Mode
 		self:ReleaseAll();
 		self.isFocused = false;
 		self.manualMode = nil;
+		self.errorMode = nil;
 		self:StopQueue();
 		self:UnregisterEvent("GLOBAL_MOUSE_UP");
 		self:UnregisterEvent("BAG_UPDATE_DELAYED");
