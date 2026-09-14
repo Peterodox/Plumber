@@ -136,7 +136,7 @@ end
 local PointsDisplayMixin = {};
 do
 	function PointsDisplayMixin:SetPoints(points)
-		if points and points > 0 then
+		if points and points > 0 and EL.enabled then
 			self.points = points;
 			if points > 99 then
 				points = "99+";
@@ -243,10 +243,12 @@ function EL:ListenEvents(state)
 	if state then
 		self:RegisterEvent("TRAIT_TREE_CURRENCY_INFO_UPDATED");   --Trigger 3 times when clicking Apply Knowledge (event without Applying Changes) because 3 specs use the same currency
 		self:RegisterEvent("TRAIT_CONFIG_UPDATED");
+		self:RegisterEvent("SKILL_LINES_CHANGED");
 		self:SetScript("OnEvent", self.OnEvent);
 	else
 		self:UnregisterEvent("TRAIT_TREE_CURRENCY_INFO_UPDATED");
 		self:UnregisterEvent("TRAIT_CONFIG_UPDATED");
+		self:UnregisterEvent("SKILL_LINES_CHANGED");
 		self:SetScript("OnEvent", nil);
 	end
 end
