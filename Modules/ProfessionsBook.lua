@@ -361,7 +361,7 @@ end
 
 
 do  --Tooltip Module
-	local SubModule = CreateFrame("Frame");
+	local SubModule = GameTooltipManager:CreateSubModule("TooltipProfessionKnowledge", true);
 
 	function SubModule:ProcessData(tooltip, spellID)
 		if self.enabled then
@@ -394,13 +394,7 @@ do  --Tooltip Module
 		end
 	end
 
-	function SubModule:GetDBKey()
-		return "TooltipProfessionKnowledge";
-	end
-
-	function SubModule:SetEnabled(enabled)
-		self.enabled = enabled == true
-		GameTooltipManager:RequestUpdate();
+	function SubModule:OnEnabledStateChanged(enabled)
 		if enabled then
 			self:SetScript("OnEvent", self.OnEvent);
 			self:UpdateProfessionInfo();
@@ -409,11 +403,6 @@ do  --Tooltip Module
 			self:UnregisterAllEvents();
 		end
 	end
-
-	function SubModule:IsEnabled()
-		return self.enabled == true;
-	end
-
 
 	function SubModule:UpdateProfessionInfo()
 		self.profSpell1 = nil;
