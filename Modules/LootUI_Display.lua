@@ -1256,6 +1256,7 @@ do  --UI Notification Mode
 		self:ReleaseAll();
 		self.isFocused = false;
 		self.manualMode = nil;
+		self.errorMode = nil;
 		self:StopQueue();
 		self:UnregisterEvent("GLOBAL_MOUSE_UP");
 		self:UnregisterEvent("BAG_UPDATE_DELAYED");
