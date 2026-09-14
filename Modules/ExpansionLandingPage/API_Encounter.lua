@@ -46,6 +46,10 @@ local function NullifyEJEvents()
 	end
 end
 
+local function IsValidDifficulty(difficultyID)
+	return difficultyID and EJ_IsValidInstanceDifficulty(difficultyID) and C_EncounterJournal.InstanceHasDifficultyID(difficultyID);
+end
+
 local function SelectInstanceAndEncounter(journalInstanceID, journalEncounterID)
 	NullifyEJEvents();
 	EJ_SelectInstance(journalInstanceID);
@@ -126,7 +130,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 		SelectInstanceAndEncounter(journalInstanceID, encounterID);
 
 		for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
-			if difficultyID and EJ_IsValidInstanceDifficulty(difficultyID) then
+			if IsValidDifficulty(difficultyID) then
 				local text = GetEJDifficultyString(difficultyID);
 				n = n + 1;
 				tbl[n] = {
@@ -174,7 +178,7 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 		local difficulties = {};
 
 		for index, difficultyID in ipairs(VALID_DIFFUICULTY_OPEN_WORLD) do
-			if difficultyID and EJ_IsValidInstanceDifficulty(difficultyID) then
+			if IsValidDifficulty(difficultyID) then
 				local text = GetEJDifficultyString(difficultyID);
 				n = n + 1;
 				difficulties[n] = {

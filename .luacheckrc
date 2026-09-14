@@ -748,6 +748,7 @@ stds.wow = {
 				"GetInstanceForGameMap",
 				"GetLootInfoByIndex",
 				"InitalizeSelectedTier",
+				"InstanceHasDifficultyID",
 				"SetSlotFilter",
 			},
 		},
