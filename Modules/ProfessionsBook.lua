@@ -34,7 +34,7 @@ local function GetPrimaryProfessionID(index)
 	local prof = select(index, GetProfessions());
 	if prof then
 		local subcateogryName = select(11, GetProfessionInfo(prof));
-		if not subcateogryName or subcateogryName == "" then return end;
+		if not subcateogryName or subcateogryName == "" then return; end
 
 		local info;
 		local skillLines = GetAllProfessionTradeSkillLines();
@@ -42,7 +42,7 @@ local function GetPrimaryProfessionID(index)
 		for i, skillLine in ipairs(skillLines) do
 			info = GetProfessionInfoBySkillLineID(skillLine)
 			if info and info.professionName == subcateogryName then
-				return skillLine, info.professionName
+				return skillLine, info.professionName;
 			end
 		end
 	end
@@ -55,7 +55,7 @@ local function GetNodeRanks(configID, nodeInfo, nodeID)
 	local numUnlockPoints = nodeEntryInfo and nodeEntryInfo.maxRanks or 0;
 	local currRank = (nodeInfo.currentRank > 0) and (nodeInfo.currentRank - numUnlockPoints) or nodeInfo.currentRank;
 	local maxRank = nodeInfo.maxRanks - numUnlockPoints;
-	return currRank, maxRank
+	return currRank, maxRank;
 end
 
 
@@ -129,7 +129,7 @@ local function GetProfessionUnspentPoints(index)
 	end
 
 	if anyPurchasableNode then
-		return total, professionID, progressionName
+		return total, professionID, progressionName;
 	end
 end
 
@@ -150,7 +150,7 @@ do
 	end
 
 	function PointsDisplayMixin:OnEnter()
-		if not (self.points and self.points > 0) then return end;
+		if not (self.points and self.points > 0) then return; end
 		local tooltip = GameTooltip;
 		tooltip:SetOwner(self, "ANCHOR_RIGHT");
 		tooltip:SetText(PROFESSIONS_SPECIALIZATION_UNSPENT_POINTS, 1, 1, 1, 1, true);
@@ -211,28 +211,8 @@ function EL:OnEvent(event, ...)
 	self:RequestUpdate();
 end
 
-function EL:HookProfessionBook()
-	local BlizFrame = ProfessionsBookFrame;
-	if BlizFrame then
-		BlizFrame:HookScript("OnShow", function()
-			if self.enabled then
-				EL:ListenEvents(true);
-				self:UpdateCurrency();
-			end
-		end);
-
-		BlizFrame:HookScript("OnHide", function()
-			EL:ListenEvents(false);
-		end);
-
-		self.blizFrameFound = true;
-	else
-		Debug.ProfessionsBookFrame = false;
-	end
-end
-
 function EL:CreateWidgets()
-	if not self.blizFrameFound then return end;
+	if not self.blizFrameFound then return; end
 
 	if not self.widgets then
 		local BlizFrame = ProfessionsBookFrame;
@@ -271,37 +251,47 @@ function EL:ListenEvents(state)
 	end
 end
 
-if ProfessionsBook_LoadUI then
-	hooksecurefunc("ProfessionsBook_LoadUI", function()
-		if EL.initialized then return end;
+local function ProfessionsBookFrame_OnLoaded(ProfessionsBookFrame)
+	if not EL.initialized then
 		EL.initialized = true;
-		EL:HookProfessionBook();
-		if EL.enabled and EL.blizFrameFound then
-			if ProfessionsBookFrame:IsShown() then
+
+		ProfessionsBookFrame:HookScript("OnShow", function()
+			if EL.enabled then
 				EL:ListenEvents(true);
-				EL:CreateWidgets();
 				EL:UpdateCurrency();
 			end
+		end);
+
+		ProfessionsBookFrame:HookScript("OnHide", function()
+			EL:ListenEvents(false);
+		end);
+
+		EL.blizFrameFound = true;
+	end
+
+	if EL.enabled then
+		if ProfessionsBookFrame:IsShown() then
+			EL:ListenEvents(true);
+			EL:CreateWidgets();
+			EL:UpdateCurrency();
 		end
-	end);
-else
-	Debug.ProfessionsBook_LoadUI = false;
+	end
 end
 
 function EL:EnableModule(state)
 	if state then
-		if self.enabled then return end;
+		if self.enabled then return; end
 		self.enabled = true;
-	else
-		if self.enabled then
-			self.enabled = false;
-			self:ListenEvents(false)
-			if self.widgets then
-				for _, widget in ipairs(self.widgets) do
-					widget:Hide();
-				end
+		addon.BlizzardFrameUtil:AddFrameModifier("ProfessionsBookFrame", ProfessionsBookFrame_OnLoaded);
+	elseif self.enabled then
+		self.enabled = false;
+		self:ListenEvents(false)
+		if self.widgets then
+			for _, widget in ipairs(self.widgets) do
+				widget:Hide();
 			end
 		end
+		addon.BlizzardFrameUtil:RemoveFrameModifier("ProfessionsBookFrame", ProfessionsBookFrame_OnLoaded);
 	end
 end
 
@@ -398,14 +388,14 @@ do  --Tooltip Module
 				end
 			end
 
-			return false
+			return false;
 		else
-			return false
+			return false;
 		end
 	end
 
 	function SubModule:GetDBKey()
-		return "TooltipProfessionKnowledge"
+		return "TooltipProfessionKnowledge";
 	end
 
 	function SubModule:SetEnabled(enabled)
@@ -421,7 +411,7 @@ do  --Tooltip Module
 	end
 
 	function SubModule:IsEnabled()
-		return self.enabled == true
+		return self.enabled == true;
 	end
 
 
