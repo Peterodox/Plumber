@@ -123,79 +123,90 @@ do  --Derivative of Blizzard_EncounterJournal.lua
 	end
 	API.GetRaidDifficultyString = GetEJDifficultyString;
 
+	---Get a list of valid difficulties for an instance
+	---@param difficultyPool table The difficulties to iterate
+	---@param journalInstanceID number journalInstanceID
+	---@param encounterID number? If not nil, return the valid difficulties for a specific encounter
+	---@param showAllDifficulties boolean? If true, Show an "All Difficulties" as an entry.
+	local function GetValidDifficulties(difficultyPool, journalInstanceID, encounterID, showAllDifficulties)
+		-- A derivative of "EncounterJournal_SetupDifficultyDropdown"
+		-- Interface/AddOns/Blizzard_EncounterJournal/Mainline/Blizzard_EncounterJournal.lua
 
-	local function GetValidDifficulties(journalInstanceID, encounterID, showAllDifficulties)
-		local n = 0;
-		local tbl = {};
 		SelectInstanceAndEncounter(journalInstanceID, encounterID);
 
-		for index, difficultyID in ipairs(EJ_DIFFICULTIES) do
-			if IsValidDifficulty(difficultyID) then
-				local text = GetEJDifficultyString(difficultyID);
-				n = n + 1;
-				tbl[n] = {
-					difficultyID = difficultyID,
-					text = text,
-				};
+		local n = 0;
+		local difficulties = {};
+
+		local function AddDifficulty(difficultyID)
+			n = n + 1;
+			difficulties[n] = {
+				difficultyID = difficultyID,
+				text = GetEJDifficultyString(difficultyID),
+				isLegacy = IsLegacyDifficulty(difficultyID),
+			};
+		end
+
+		local difficultiesOverridden = {};
+		for index, difficultyID in ipairs(difficultyPool) do
+			if EJ_IsValidInstanceDifficulty(difficultyID) then
+				local baseDifficultyID = C_EncounterJournal.GetBaseDifficultyID(difficultyID);
+				if (baseDifficultyID ~= difficultyID) and EJ_IsValidInstanceDifficulty(baseDifficultyID) then
+					-- This difficulty has a base so we will skip it in the loop below regardless.
+					difficultiesOverridden[difficultyID] = true;
+
+					if C_EncounterJournal.InstanceHasDifficultyID(difficultyID) then
+						AddDifficulty(difficultyID);
+						difficultiesOverridden[baseDifficultyID] = true;
+					end
+				end
+			end
+		end
+
+		-- Add all regular difficulties that didn't have a base or were not the base of one already overridden.
+		for index, difficultyID in ipairs(difficultyPool) do
+			if EJ_IsValidInstanceDifficulty(difficultyID) and not difficultiesOverridden[difficultyID] then
+				AddDifficulty(difficultyID);
 			end
 		end
 
 		if n > 0 then
 			if showAllDifficulties then
-				n = n + 1;
-				tbl[n] = {
-					difficultyID = ALL_DIFFICULTY_ID;
-					text = GetEJDifficultyString(ALL_DIFFICULTY_ID);
-				}
+				AddDifficulty(ALL_DIFFICULTY_ID);
 			end
-			return tbl
 		end
+
+		return difficulties;
 	end
 
 	local function GetValidDifficultiesForEncounter(instanceID, encounterID, showAllDifficulties)
-		return GetValidDifficulties(instanceID, encounterID, showAllDifficulties)
+		return GetValidDifficulties(EJ_DIFFICULTIES, instanceID, encounterID, showAllDifficulties)
 	end
 	API.GetValidDifficultiesForEncounter = GetValidDifficultiesForEncounter;
 
 	local function GetValidDifficultiesForInstance(instanceID, showAllDifficulties)
-		return GetValidDifficulties(instanceID, nil, showAllDifficulties)
+		return GetValidDifficulties(EJ_DIFFICULTIES, instanceID, nil, showAllDifficulties)
 	end
 	API.GetValidDifficultiesForInstance = GetValidDifficultiesForInstance;
 
 	function API.GetInstanceInfoForSelector(journalInstanceID)
-		--Selectable at the raid entrance
-		local n = 0;
+		--For Instance Difficulty Selector
 		local tbl = {};
-
-		SelectInstanceAndEncounter(journalInstanceID, nil);
 
 		local instanceName, description, bgImage, buttonImage1, loreImage, buttonImage2, dungeonAreaMapID, link, shouldDisplayDifficulty, mapID, covenantID, isRaid = EJ_GetInstanceInfo(journalInstanceID);
 		tbl.name = instanceName;
 		tbl.isRaid = isRaid;
 		tbl.instanceID = mapID;
 
-		local isLegacyRaid;
-		local difficulties = {};
+		tbl.difficulties = GetValidDifficulties(VALID_DIFFUICULTY_OPEN_WORLD, journalInstanceID);
 
-		for index, difficultyID in ipairs(VALID_DIFFUICULTY_OPEN_WORLD) do
-			if IsValidDifficulty(difficultyID) then
-				local text = GetEJDifficultyString(difficultyID);
-				n = n + 1;
-				difficulties[n] = {
-					difficultyID = difficultyID,
-					text = text,
-				};
-
-				if IsLegacyDifficulty(difficultyID) then
-					isLegacyRaid = true;
-				end
+		for _, v in ipairs(tbl.difficulties) do
+			if v.isLegacy then
+				tbl.isLegacyRaid = true;
+				break;
 			end
 		end
 
-		tbl.difficulties = difficulties;
-		tbl.isLegacyRaid = isLegacyRaid;
-
-		return tbl
+		return tbl;
 	end
 
 	function API.GetInstanceEncounters(journalInstanceID, difficultyID)
