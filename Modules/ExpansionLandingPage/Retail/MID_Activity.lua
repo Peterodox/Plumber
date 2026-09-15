@@ -498,6 +498,7 @@ local ActivityData = {
 				{name = "Decisive Incursions", questID = 96642, uiMapID = 2509, shownIfActive = true},
 				{name = "From Whence it Came", questID = 96643, uiMapID = 2509, shownIfActive = true},
 				{name = "Essence of Malice", questID = 96644, uiMapID = 2509, shownIfActive = true},
+				{name = "Shoulder to Shoulder", questID = 98419, uiMapID = 2509, shownIfActive = true},
 				{name = "What's Out There?", questID = 98420, uiMapID = 2509, shownIfActive = true},
 		},
 	},
