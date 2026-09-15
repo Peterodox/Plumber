@@ -52,6 +52,7 @@ EL.instancePos = {
 	[1023]= {0.71979, 0.15423},         --Siege of Boralus (Alliance)
 	[1200]= {0.73039, 0.55700},         --Vault of the Incarnate
 	[1304]= {0.56979, 0.61049, false},  --Murder Row (Outdoor only)
+	[1317]= {0.59800, 0.66200},         --The Tidebound Grotto (Pin sometimes vanishes)
 };
 
 EL.instancePos_Horde = {
@@ -71,7 +72,7 @@ EL.extraPins = {
 	--[uimapID] = { {position = {x = 0, y = 0}, journalInstanceID = 0} }
 
 	[42] = {
-		{position = {x = 0.46691, y = 0.70226}, journalInstanceID = 860},    --Karazhan Side Entrance (Return to Karazhan, the dungeon) Main Entrance is the old raid
+		{position = {x = 0.46691, y = 0.70226}, journalInstanceID = 860},	--Karazhan Side Entrance (Return to Karazhan, the dungeon) Main Entrance is the old raid
 	},
 
 	[55] = {
@@ -79,7 +80,11 @@ EL.extraPins = {
 	},
 
 	[1528] = {
-		{position = {x = 0.47607, y = 0.32849}, journalInstanceID = 1179},    --The Eternal Palace (not shown on map)
+		{position = {x = 0.47607, y = 0.32849}, journalInstanceID = 1179},	--The Eternal Palace (not shown on map)
+	},
+
+	[2512] = {
+		{position = {x = 0.59800, y = 0.66200}, journalInstanceID = 1317},	--The Tidebound Grotto (Pin sometimes vanishes)
 	},
 };
 
