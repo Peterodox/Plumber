@@ -1364,6 +1364,11 @@ do  --Currency Change Handler (SHOW_ALL_CURRENCY_CHANGE)
 				return
 			end
 
+			--Blizzard sometimes fires this event twice for a single gain (e.g. Bonus Roll currencies)
+			if quantity and self.lastCurrencyQuantity and self.lastCurrencyQuantity[currencyID] == quantity then
+				return
+			end
+
 			local name, icon, quality = GetCurrencyDisplayInfo(currencyID);
 			if name then
 				--print(name, currencyID, quantity, quantityChange, quantityGainSource);    --debug
@@ -1377,6 +1382,13 @@ do  --Currency Change Handler (SHOW_ALL_CURRENCY_CHANGE)
 				local data = CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, icon, name, quantityChange, quality);
 				MainFrame:QueueDisplayLoot(data);
 			end
+		end
+
+		if quantity then
+			if not self.lastCurrencyQuantity then
+				self.lastCurrencyQuantity = {};
+			end
+			self.lastCurrencyQuantity[currencyID] = quantity;
 		end
 	end
 
