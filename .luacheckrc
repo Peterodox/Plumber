@@ -744,10 +744,12 @@ stds.wow = {
 
 		C_EncounterJournal = {
 			fields = {
+				"GetBaseDifficultyID",
 				"GetDungeonEntrancesForMap",
 				"GetInstanceForGameMap",
 				"GetLootInfoByIndex",
 				"InitalizeSelectedTier",
+				"InstanceHasDifficultyID",
 				"SetSlotFilter",
 			},
 		},
