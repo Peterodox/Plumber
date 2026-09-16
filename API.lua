@@ -1671,6 +1671,17 @@ do  -- Currency
 		end
 	end
 
+	local HiddenDuplicateCurrencies = {
+		--No API exposes a currency's CategoryID, so hidden duplicates have to be hardcoded
+		--Midnight Season 2
+		[3437] = true,	--Adventurer Mistcrest
+		[3438] = true,	--Veteran Mistcrest
+		[3439] = true,	--Champion Mistcrest
+		[3440] = true,	--Hero Mistcrest
+		[3441] = true,	--Myth Mistcrest
+		[3513] = true,	--Nebulous Voidcore
+	};
+
 	function API.GetCurrencyDisplayInfo(currencyID)
 		if not currencyID then return end;
 
@@ -1678,7 +1689,7 @@ do  -- Currency
 			local info = GetCurrencyInfo(currencyID);
 			local name = info and info.name;
 			if name then
-				if info.iconFileID and info.iconFileID ~= 0 and info.description and info.description ~= "" and (not find(info.description, "(Hidden)")) and (not find(info.description, "DNT")) then
+				if info.iconFileID and info.iconFileID ~= 0 and info.description and info.description ~= "" and (not find(info.description, "(Hidden)")) and (not find(info.description, "DNT")) and (not HiddenDuplicateCurrencies[currencyID]) then
 					CurrencyDataProvider.shouldDisplayForUI[currencyID] = true;
 					CurrencyDataProvider:CacheCurrencyInfo(currencyID, info);
 				else
