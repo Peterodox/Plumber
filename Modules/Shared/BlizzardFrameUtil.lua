@@ -25,6 +25,9 @@ local FrameToAddon = {
 	-- SourceAchievementLink
 	MountJournal = "Blizzard_Collections",
 
+	-- ProfessionsBook
+	ProfessionsBookFrame = "Blizzard_ProfessionsBook", -- Features a [Bootstrap] in TOC
+
 	-- CraftSearchExtended(Retired)
 	ProfessionsFrame = "Blizzard_Professions",
 

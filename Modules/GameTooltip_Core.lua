@@ -82,7 +82,7 @@ do
 		if self.enabled then
 			-- Override
 		else
-			return false
+			return false;
 		end
 	end
 
@@ -93,6 +93,10 @@ do
 	function SubModuleMixin:SetEnabled(enabled)
 		self.enabled = enabled == true;
 		self.parentManager:RequestUpdate();
+
+		if self.OnEnabledStateChanged then
+			self:OnEnabledStateChanged(enabled);
+		end
 	end
 
 	function SubModuleMixin:IsEnabled()
@@ -235,8 +239,9 @@ do
 		end
 	end
 
-	function HandlerMixin:CreateSubModule(dbKey)
-		local module = Mixin({}, SubModuleMixin);
+	function HandlerMixin:CreateSubModule(dbKey, asFrame)
+		local module = (asFrame and CreateFrame("Frame")) or {};
+		Mixin(module, SubModuleMixin);
 
 		module.parentManager = self;
 		module.dbKey = dbKey;
