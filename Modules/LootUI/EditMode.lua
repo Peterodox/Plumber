@@ -154,11 +154,7 @@ local function Options_OpacitySlider_OnMouseUp(slider)
 end
 
 local function Options_ForceAutoLoot_ValidityCheck()
-	return GetCVarBool("autoLootDefault")
-end
-
-local function Options_UseHotkey_OnClick(self, state)
-
+	return C_CVar.GetCVarBool("autoLootDefault");
 end
 
 local function Options_ResetPosition_OnClick(self)
@@ -244,7 +240,7 @@ local OPTIONS_SCHEMATIC = {
 		{type = "Divider"},
 		{type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = nil, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
 		{type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
-		{type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = Options_UseHotkey_OnClick, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
+		{type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = nil, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
 		{type = "Keybind", label = L["Take All"], dbKey = "LootUI_HotkeyName", tooltip = L["LootUI Option Use Hotkey Tooltip"], defaultKey = "E"},
 
 		{type = "Divider"},
