@@ -8,47 +8,11 @@ local EventListeners = LootUI.EventListeners;
 
 local ENABLE_MODULE = false;
 local STOCK_UI_MUTED = false;
+local IS_RESOLVING_SYSTEM_STATUS = false;
 
 
-local function SettingChanged_UseStockUI(state, userInput)
-	Def.USE_STOCK_UI = state == true;
-	local f = LootFrame;
-	if Def.USE_STOCK_UI then
-		if f then
-			if STOCK_UI_MUTED then
-				STOCK_UI_MUTED = false;
-				if not C_AddOns.IsAddOnLoaded("Xloot") then
-					f:RegisterEvent("LOOT_OPENED");
-					f:RegisterEvent("LOOT_CLOSED");
-				end
-			end
-		end
-
-		if not MainFrame.inEditMode then
-			MainFrame:Disable();
-		end
-
-		EventListeners.Primary:ListenAlertSystemEvent(false);
-	else
-		if addon.GetDBBool("LootUI") then
-			if f then
-				if not STOCK_UI_MUTED then
-					STOCK_UI_MUTED = true;
-					f:UnregisterEvent("LOOT_OPENED");
-					f:UnregisterEvent("LOOT_CLOSED");
-				end
-			end
-
-			if addon.GetDBBool("LootUI_ReplaceDefaultAlert") then
-				EventListeners.Primary:ListenAlertSystemEvent(true);
-			end
-		end
-	end
-end
-addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseStockUI", SettingChanged_UseStockUI);
-
-local function EnableModule(state)
-	if state then
+local function ResolveSystemStatus()
+	if addon.GetDBBool("LootUI") then
 		ENABLE_MODULE = true;
 
 		EventListeners:Enable();
@@ -59,18 +23,60 @@ local function EnableModule(state)
 
 		MainFrame:OnUIScaleChanged();
 
-		if addon.GetDBBool("LootUI_UseStockUI") then
-			SettingChanged_UseStockUI(true);
-		else
-			SettingChanged_UseStockUI(false);
-		end
-
-	elseif ENABLE_MODULE then
+		Def.USE_STOCK_UI = addon.GetDBBool("LootUI_UseStockUI") == true;
+	else
 		ENABLE_MODULE = false;
 
-		EventListeners:Dsiable();
+		EventListeners:Disable();
 		MainFrame:Disable();
-		SettingChanged_UseStockUI(true);
+		Def.USE_STOCK_UI = false;
+	end
+
+	if ENABLE_MODULE and not Def.USE_STOCK_UI then
+		if not STOCK_UI_MUTED then
+			STOCK_UI_MUTED = true;
+			LootFrame:UnregisterEvent("LOOT_OPENED");
+			LootFrame:UnregisterEvent("LOOT_CLOSED");
+		end
+
+		if addon.GetDBBool("LootUI_ReplaceDefaultAlert") then
+			EventListeners.Primary:ListenAlertSystemEvent(true);
+		else
+			EventListeners.Primary:ListenAlertSystemEvent(false);
+		end
+	else
+		if STOCK_UI_MUTED then
+			STOCK_UI_MUTED = false;
+			if not C_AddOns.IsAddOnLoaded("Xloot") then
+				LootFrame:RegisterEvent("LOOT_OPENED");
+				LootFrame:RegisterEvent("LOOT_CLOSED");
+			end
+		end
+
+		if not MainFrame.inEditMode then
+			MainFrame:Disable();
+		end
+	end
+end
+
+local function TryResolveSystemStatus()
+	if not IS_RESOLVING_SYSTEM_STATUS then
+		IS_RESOLVING_SYSTEM_STATUS = true;
+		C_Timer.After(0, function()
+			IS_RESOLVING_SYSTEM_STATUS = false;
+			ResolveSystemStatus();
+		end);
+	end
+end
+
+local function SettingChanged_UseStockUI(state, userInput)
+	TryResolveSystemStatus();
+end
+addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseStockUI", SettingChanged_UseStockUI);
+
+local function EnableModule(state)
+	if state or ENABLE_MODULE then
+		TryResolveSystemStatus();
 	end
 end
 
