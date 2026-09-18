@@ -57,13 +57,12 @@ Modules\SoftTargetName.lua
 Modules\Housing\Housing.xml
 
 
-#TWW
+Modules\LootUI\LootUI.xml
 Modules\DelvesScenario.lua
 Modules\DelvesDashboard.lua
 Modules\DelvesAutomation.lua
 Modules\ExpansionLandingPage.xml
 Modules\GameTooltipExtension.xml
-Modules\LootUI.xml
 Modules\UnderlightAngler.lua
 Modules\ChatOptions.lua
 Modules\NameplateResources.lua

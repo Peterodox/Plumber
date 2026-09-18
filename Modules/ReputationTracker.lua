@@ -207,7 +207,7 @@ function EL:SetFactionStanding(factionID, updatedStanding)
 		--print(factionID, info.name, newStanding, delta);
 
 		if delta and delta > 0 then
-			addon.LootWindow:QueueDisplayReputation(factionID, info.name, delta);
+			addon.LootUI.QueueDisplayReputation(factionID, info.name, delta);
 		end
 	end
 end
