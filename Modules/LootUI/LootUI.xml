@@ -9,8 +9,13 @@
 		</Shadow>
 	</Font>
 
-	<Script file="LootUI_Main.lua"/>
-	<Script file="LootUI_Display.lua"/>
+	<Script file="Basic.lua"/>
+	<Script file="ItemFrame.lua"/>
+	<Script file="MiscWidgets.lua"/>
+	<Script file="MainFrame.lua"/>
+	<Script file="Controller.lua"/>
+	<Script file="EditMode.lua"/>
+	<Script file="ModuleRegistry.lua"/>
 
 	<Frame name="PlumberLootUISharedIconTemplate" virtual="true">
 		<Size x="32" y="32"/>
