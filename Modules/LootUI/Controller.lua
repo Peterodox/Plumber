@@ -1159,13 +1159,8 @@ function EventListeners:Enable()
 	self.Primary:ListenStaticEvent(true);
 	self.Primary:SetScript("OnEvent", self.Primary.OnEvent);
 
-	if addon.GetDBBool("LootUI_ReplaceDefaultAlert") and (not addon.GetDBBool("LootUI_UseStockUI")) then
-		self.Primary:ListenAlertSystemEvent(true);
-	else
-		self.Primary:ListenAlertSystemEvent(false);
-	end
-
 	self.MoneyListener:OnSettingsChanged();
+	FastLoot:ResetFlags();
 end
 
 function EventListeners:Disable()
