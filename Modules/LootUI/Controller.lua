@@ -695,7 +695,7 @@ do
 		end
 
 		if string.find(event, "LOOT_") then
-			print(event, GetTimePreciseSec(), ...);
+			print(event, GetTimePreciseSec(), ...); -- DEBUG
 		end
 	end
 

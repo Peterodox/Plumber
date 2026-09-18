@@ -323,6 +323,7 @@ stds.wow = {
 		"GetSpellCooldown",
 		"GetText",
 		"GetTime",
+		"GetTimePreciseSec",
 		"GetTitleName",
 		"GetTrackedAchievements",
 		"GetCurrentTitle",
