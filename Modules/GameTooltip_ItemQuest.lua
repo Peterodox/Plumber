@@ -29,7 +29,8 @@ do
 
 		if self.enabled then
 			local _, _, _, _, _, classID, subClassID = GetItemInfoInstant(itemID);
-			if classID == 12 then
+			--Some Misc items (15) can also be quest starter items
+			if classID == 12 or classID == 15 then
 				local info = tooltip.processingInfo;
 				if info and info.getterName == "GetBagItem" and info.getterArgs then
 					local bag, slot = info.getterArgs[1], info.getterArgs[2];
