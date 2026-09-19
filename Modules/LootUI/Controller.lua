@@ -198,10 +198,13 @@ local function ShouldAutoLoot(isAutoLoot)
 end
 
 
-local FastLoot = {};
+local FastLoot = CreateFrame("Frame");
 do
+	---Reset everything. Called after LOOT_CLOSED
 	function FastLoot:ResetFlags()
 		self.slotProcessed = nil;
+		self.t = nil;
+		self:SetScript("OnUpdate", nil);
 	end
 
 	function FastLoot:Start()
@@ -219,9 +222,26 @@ do
 		end
 	end
 
+	---@param slotIndex number
+	---@param flag boolean `true` if LOOT_SLOT_CLEARED. `false` if LOOT_SLOT_CHANGED
 	function FastLoot:SetSlotFlag(slotIndex, flag)
 		if self.slotProcessed then
 			self.slotProcessed[slotIndex] = flag;
+			if not flag then
+				self.t = 0;
+				self:SetScript("OnUpdate", self.OnUpdate_RetryFastLoot);
+			end
+		end
+	end
+
+	function FastLoot:OnUpdate_RetryFastLoot(elapsed)
+		self.t = self.t + elapsed;
+		if self.t > 0.4 then
+			if not MainFrame:IsInMaualModeOrEditMode() then
+				self.t = 0;
+				self:SetScript("OnUpdate", nil);
+				self:Start();
+			end
 		end
 	end
 end
