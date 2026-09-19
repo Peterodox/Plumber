@@ -946,7 +946,7 @@ do
 	function QueueFrame:QueueDisplayLoot(lootData)
 		if Def.HIDE_PLUMBER_LOOT_UI == true then return; end
 		if not (lootData and lootData.quantity) then return; end
-		if MainFrame.manualMode or MainFrame.inEditMode then return; end
+		if MainFrame:IsInMaualModeOrEditMode() then return; end
 
 
 		if not self.lootQueue then
@@ -1131,7 +1131,7 @@ do
 
 	function EmptyLootWatcher:OnUpdate(elapsed)
 		self.t = self.t + elapsed;
-		if self.t > 0.5 then
+		if self.t > 1.0 then
 			self.t = 0;
 			if GetNumLootItems() <= 0 then
 				self:SetScript("OnUpdate", nil);

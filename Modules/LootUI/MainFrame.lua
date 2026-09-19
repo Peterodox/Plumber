@@ -728,7 +728,7 @@ do
 		self:SetMaxPage(math.ceil(numTotal / Def.MAX_ITEM_PER_PAGE));
 
 		if self.isUpdatingPage then
-			return
+			return;
 		end
 
 		table.sort(lootQueue, SortFunc_LootSlot);
@@ -739,7 +739,6 @@ do
 		local lootThisPage;
 
 		if multipage then
-			self.isUpdatingPage = true;
 			lootThisPage = {};
 			local numThisPage = Def.MAX_ITEM_PER_PAGE - numExisting;
 			for i = 1, numThisPage do
@@ -747,6 +746,7 @@ do
 			end
 		else
 			lootThisPage = lootQueue;
+			LootUI.WipeLootQueue();
 		end
 
 		local enableState = Def.AUTO_LOOT_ENABLE_TOOLTIP and 2 or 0;
@@ -796,10 +796,6 @@ do
 			end
 
 			self:LayoutActiveFrames();
-
-			if not multipage then
-				LootUI.WipeLootQueue();
-			end
 
 			self.t = 0;
 			self.toAlpha = 1;
