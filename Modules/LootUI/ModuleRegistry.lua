@@ -68,6 +68,7 @@ local function TryResolveSystemStatus()
 		end);
 	end
 end
+LootUI.TryResolveSystemStatus = TryResolveSystemStatus;
 
 local function SettingChanged_UseStockUI(state, userInput)
 	TryResolveSystemStatus();
