@@ -1,4 +1,4 @@
-## Interface: 120100, 120105, 50504, 40402, 30404, 20506, 11508
+## Interface: 120100, 120105, 50504, 40402, 30404, 20506, 11508, 16001
 ## Version: 1.9.5
 
 ## Title: Plumber
@@ -33,6 +33,8 @@ Modules\ControlCenter\ControlCenter.xml
 Modules\LootUI.xml
 Modules\SpellFlyout_Secure.lua
 Modules\Macros.lua
+
+Modules\ExpansionLandingPage\SettingsPanelUtil.xml
 
 Modules\ExpansionLandingPage\ExpansionLandingPage_MOP.xml [AllowLoadGameType classic]
 
