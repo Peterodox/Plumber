@@ -39,7 +39,7 @@ Modules\ExpansionLandingPage\SettingsPanelUtil.xml
 Modules\ExpansionLandingPage\ExpansionLandingPage_MOP.xml [AllowLoadGameType classic]
 
 Modules\GossipFrameMedal.lua [AllowLoadGameType standard]
-Modules\BackpackItemTracker.lua [AllowLoadGameType standard]
+Modules\BackpackItemTracker.lua [AllowLoadGameType standard, camelot]
 Modules\AutoJoinEvents.lua [AllowLoadGameType standard]
 Modules\PlayerChoiceFrameToken.lua [AllowLoadGameType standard]
 Modules\QuickSlot.xml [AllowLoadGameType standard]
