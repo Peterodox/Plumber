@@ -21,7 +21,7 @@ API.lua
 Modules\Shared\Load.xml
 
 Modules\ScenarioTracker.lua [AllowLoadGameType standard]
-Modules\ReputationTracker.lua [AllowLoadGameType standard]
+Modules\ReputationTracker.lua [AllowLoadGameType standard, camelot]
 #Modules\DirectionArrow.lua [AllowLoadGameType standard]
 #Modules\SuperTrack.xml [AllowLoadGameType standard]
 
