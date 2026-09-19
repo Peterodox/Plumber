@@ -54,7 +54,7 @@ Modules\Lockpicking.lua [AllowLoadGameType standard]
 #Modules\BlizzFix_EventToast.lua [AllowLoadGameType standard]
 Modules\TalkingHead.lua [AllowLoadGameType standard]
 Modules\AzerothianArchives.lua [AllowLoadGameType standard]
-Modules\MerchantPrice.lua [AllowLoadGameType standard]
+Modules\MerchantPrice.lua [AllowLoadGameType standard, camelot]
 Modules\BossBanner.lua [AllowLoadGameType standard]
 Modules\SoftTargetName.lua [AllowLoadGameType standard]
 
