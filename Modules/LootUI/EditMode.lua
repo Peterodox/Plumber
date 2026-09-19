@@ -91,9 +91,7 @@ function MainFrame:ExitEditMode()
 
 	self:ShowOptions(false);
 
-	if addon.GetDBBool("LootUI") then
-		EventListeners:Enable();
-	end
+	LootUI.TryResolveSystemStatus();
 end
 
 local function Options_FontSizeSlider_OnValueChanged(value)
