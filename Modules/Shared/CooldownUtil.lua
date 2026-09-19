@@ -12,7 +12,7 @@ local GetSpellCharges = API.GetSpellCharges;
 local GetItemCooldown = C_Container.GetItemCooldown;
 
 
-if not addon.IS_MIDNIGHT then
+if not (addon.IS_MODERN and C_Spell.GetSpellCooldownDuration) then
 	function CooldownUtil.SetSpellCooldown(cooldownFrame, spellID, hideCountdownNumbers)
 		local startTime, duration, modRate, fromChargeCooldown;
 

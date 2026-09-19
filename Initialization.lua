@@ -528,19 +528,26 @@ end
 
 
 do
-	local tocVersion = select(4, GetBuildInfo());
-	tocVersion = tonumber(tocVersion or 0);
+	local currentToCVersion = select(4, GetBuildInfo());
+	if not currentToCVersion then
+		print("API Changed: GetBuildInfo()")
+		currentToCVersion = 999999;
+	end
+	currentToCVersion = tonumber(currentToCVersion);
 
 	local function IsToCVersionEqualOrNewerThan(targetVersion)
-		return tocVersion >= targetVersion
+		return currentToCVersion >= targetVersion
 	end
 	addon.IsToCVersionEqualOrNewerThan = IsToCVersionEqualOrNewerThan;
 
-	addon.IS_MIDNIGHT = IsToCVersionEqualOrNewerThan(120000);
+	addon.IS_CLASSIC = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE;
+	addon.IS_FOREVER = currentToCVersion >= 16000 and currentToCVersion < 20000; -- In future, this will be WOW_PROJECT_ID == 18
+	addon.IS_MISTS = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC;
+	addon.IS_RETAIL = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and currentToCVersion >= 120000;
 
-	addon.IS_CLASSIC = C_AddOns.GetAddOnMetadata(addonName, "X-Flavor") ~= "retail";
-
-	addon.IS_MOP = C_AddOns.GetAddOnMetadata(addonName, "X-Expansion") == "MOP";
+	-- Family checks, distinguish forever from classic and modern (Standard & Forever) have Secrets, etc.
+	addon.IS_CLASSIC = addon.IS_CLASSIC and not addon.IS_FOREVER;
+	addon.IS_MODERN = addon.IS_RETAIL or addon.IS_FOREVER;
 
 	addon.IS_12_0_7 = IsToCVersionEqualOrNewerThan(120007);
 	addon.IS_12_1_0 = IsToCVersionEqualOrNewerThan(120100);

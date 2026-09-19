@@ -19,7 +19,7 @@ local JournalInstanceIDs = {
 	1273,   --Nerub-ar Palace
 };
 
-if addon.IS_MOP then
+if addon.IS_MISTS then
 	JournalInstanceIDs = {
 		317,    --Mogu'shan Vaults
 		330,    --Heart of Fear

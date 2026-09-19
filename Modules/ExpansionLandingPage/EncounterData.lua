@@ -100,7 +100,7 @@ local EncounterData = {
 local Difficulties;
 local OverrideDifficulties = {};
 
-if addon.IS_MOP then
+if addon.IS_MISTS then
 	Difficulties = {
 		DifficultyUtil.ID.RaidLFR,
 		DifficultyUtil.ID.Raid10Normal,
@@ -160,7 +160,7 @@ local PlayerClassList_MOP = {
 	11, --DRUID
 };
 
-if addon.IS_MOP then
+if addon.IS_MISTS then
 	LandingPageUtil.PlayerClassList = PlayerClassList_MOP;
 else
 	LandingPageUtil.PlayerClassList = PlayerClassList_Modern;
@@ -253,7 +253,7 @@ function LandingPageUtil.GetDefaultRaidDifficulty()
 end
 
 function LandingPageUtil.GetBaseRaidDifficulty()
-	if addon.IS_MOP then
+	if addon.IS_MISTS then
 		return DifficultyUtil.ID.Raid25Heroic;
 	else
 		return DifficultyUtil.ID.PrimaryRaidNormal;

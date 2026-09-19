@@ -1332,7 +1332,7 @@ local function CreateTrackerTab(f)
 end
 
 
-if not addon.IS_MOP then
+if not addon.IS_MISTS then
 	LandingPageUtil.AddTab(
 		{
 			key = "tracker",

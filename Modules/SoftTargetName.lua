@@ -45,7 +45,7 @@ local Settings = {
 	showObjectives = false,
 	hideIconInHouse = false,
 	hideNameInHouse = false,
-	IS_MIDNIGHT = addon.IS_MIDNIGHT,
+	IS_MODERN = addon.IS_MODERN,
 };
 
 
@@ -327,7 +327,7 @@ do  --Display
 		end
 	end
 
-	if Settings.IS_MIDNIGHT then
+	if Settings.IS_MODERN then
 		function Display:UpdateCastingIndicator()
 			local duo = UnitCastingDuration("player");
 			if not duo then
