@@ -729,6 +729,7 @@ L["Weekly Coffer Key Shards Tooltip"] = "The first four weekly caches you earn e
 L["Weekly Cap"] = "Weekly Cap";
 L["Weekly Cap Reached"] = "Weekly cap reached.";
 L["Instruction Right Click To Use"] = "<Right Click to Use>";
+L["Instruction Right Click To Use Format"] = "<Right Click to Use %s>";
 L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Join Queue";
 L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "In Queue";
 L["Click To Switch"] = "Click to switch to |cffffffff%s|r";
