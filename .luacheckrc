@@ -1306,6 +1306,7 @@ stds.wow = {
 				"GetActiveOutfitID",
 				"GetCurrentlyViewedOutfitID",
 				"GetEquippedSlotOptionFromTransmogSlot",
+				"GetOptionsForSlot",
 				"GetOutfitInfo",
 				"GetOutfitSituation",
 				"GetOutfitSituationsEnabled",
@@ -1605,6 +1606,7 @@ stds.wow = {
 				TransmogOutfitDisplayType = {
 					fields = {
 						"Assigned",
+						"Equipped",
 						"Hidden",
 						"Unassigned",
 					},

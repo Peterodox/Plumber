@@ -6,10 +6,19 @@ local EL = CreateFrame("Frame");
 local DBKEY_ALWAYS_MOVE_CHANGED = "TransmogRaestorePending_AlwaysMoveChanges";
 local POPUP_IDENTIFIER = "transmogPendingChanges";
 local SHOULDER_RIGHT = Enum.TransmogOutfitSlot.ShoulderRight;
+local SHOULDER_LEFT = Enum.TransmogOutfitSlot.ShoulderLeft;
 local WEAPON_SLOTS = {
 	[16] = Enum.TransmogOutfitSlot.WeaponMainHand,
 	[17] = Enum.TransmogOutfitSlot.WeaponOffHand,
 };
+
+--Forever renamed the weapon options API, and armor slots have options there too.
+local GetOptionsForSlot = C_TransmogOutfitInfo.GetOptionsForSlot or C_TransmogOutfitInfo.GetWeaponOptionsForSlot;
+local HAS_ARMOR_OPTIONS = C_TransmogOutfitInfo.GetOptionsForSlot ~= nil;
+
+local function GetOptionType(optionInfo)
+	return optionInfo.type or optionInfo.weaponOption;
+end
 
 --True if two appearance snapshots match.
 local function SameAppearance(liveInfo, recordedInfo)
@@ -29,6 +38,24 @@ do
 		[17] = true,    --SecondaryHand, see CaptureWeaponOptionsPending
 		[18] = true,    --Ranged
 	};
+
+	local function SlotHasOptions(slot)
+		local optionsInfo, artifactOptionsInfo = GetOptionsForSlot(slot);
+		return (optionsInfo and #optionsInfo > 0) or (artifactOptionsInfo and #artifactOptionsInfo > 0);
+	end
+
+	--Slots tracked per option instead of by EL.CapturePendingSlots, see CaptureWeaponOptionsPending.
+	local function GetOptionSlot(invSlotID)
+		local slot = WEAPON_SLOTS[invSlotID];
+		if slot then return slot; end
+
+		if HAS_ARMOR_OPTIONS and not IgnoredInvSlots[invSlotID] then
+			slot = C_TransmogOutfitInfo.GetTransmogOutfitSlotFromInventorySlot(invSlotID - 1);
+			if slot and SlotHasOptions(slot) then
+				return slot;
+			end
+		end
+	end
 
 	local function SetPendingFromSlot(invSlotID, slot, transmogID, illusionID, weaponOption)
 		local option = weaponOption or Enum.TransmogOutfitSlotOption.None;
@@ -100,7 +127,7 @@ do
 		local pendingSlots = {};
 		local shoulderSecondary;
 		for invSlotID = 1, 19 do
-			if not IgnoredInvSlots[invSlotID] then
+			if not IgnoredInvSlots[invSlotID] and not GetOptionSlot(invSlotID) then
 				local hasPending;
 				if invSlotID == 3 then
 					--Either shoulder counts, the left one is its own slot only while separate shoulders are on
@@ -134,31 +161,44 @@ do
 		end
 	end
 
-	local function FindPreviousWeaponOption(previousWeaponOptions, invSlotID, weaponOption)
+	--Older records have no slot, they're all weapons.
+	local function FindPreviousWeaponOption(previousWeaponOptions, invSlotID, slot, weaponOption)
 		for _, record in ipairs(previousWeaponOptions or {}) do
-			if record[1] == invSlotID and record[2] == weaponOption then
+			if record[1] == invSlotID and record[2] == weaponOption and (record[6] == nil or record[6] == slot) then
 				return record;
 			end
 		end
 	end
 
-	--Records are {invSlotID, weaponOption, transmogID, illusionID, sheatheCategory}, false marks a field as not captured.
+	--Left shoulder only exists while separated, writing it otherwise would override the right one.
+	local function GetRecordSlot(record)
+		local slot = record[6] or GetOptionSlot(record[1]);
+		if slot == SHOULDER_LEFT and not C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT) then return; end
+		return slot;
+	end
+	EL.GetRecordSlot = GetRecordSlot;
+
+	--weaponOption also covers Forever's armor options.
+	--Records are {invSlotID, weaponOption, transmogID, illusionID, sheatheCategory, slot}, false marks a field as not captured.
 	--previous keeps a value tracked the same way EL.CapturePendingSlots does.
 	local function CaptureWeaponOptionRecord(invSlotID, slot, weaponOption, previous)
 		local transmogID, illusionID, sheatheCategory;
 
 		local appearanceInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
 		if appearanceInfo then
+			--Forever only, an untouched slot can share a recorded transmogID (hidden shoulder), don't carry it
+			local displayType = appearanceInfo.displayType;
+			local isUntouched = HAS_ARMOR_OPTIONS and (displayType == Enum.TransmogOutfitDisplayType.Equipped or displayType == Enum.TransmogOutfitDisplayType.Unassigned);
 			if appearanceInfo.hasPending then
 				transmogID = appearanceInfo.transmogID;
 				sheatheCategory = appearanceInfo.sheatheCategory;
-			elseif previous and previous[3] and appearanceInfo.transmogID == previous[3] then
+			elseif previous and previous[3] and not isUntouched and appearanceInfo.transmogID == previous[3] then
 				transmogID = previous[3];
 				sheatheCategory = appearanceInfo.sheatheCategory;
 			end
 		end
 
-		local illusionInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Illusion, weaponOption);
+		local illusionInfo = WEAPON_SLOTS[invSlotID] and C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Illusion, weaponOption);
 		if illusionInfo then
 			if illusionInfo.hasPending then
 				illusionID = illusionInfo.transmogID;
@@ -168,7 +208,7 @@ do
 		end
 
 		if transmogID or illusionID then
-			return {invSlotID, weaponOption, transmogID or false, illusionID or false, sheatheCategory or false};
+			return {invSlotID, weaponOption, transmogID or false, illusionID or false, sheatheCategory or false, slot};
 		end
 	end
 
@@ -178,8 +218,9 @@ do
 
 		for _, optionInfo in ipairs(optionsInfo) do
 			if optionInfo.enabled then
-				local previous = FindPreviousWeaponOption(previousWeaponOptions, invSlotID, optionInfo.weaponOption);
-				local record = CaptureWeaponOptionRecord(invSlotID, slot, optionInfo.weaponOption, previous);
+				local weaponOption = GetOptionType(optionInfo);
+				local previous = FindPreviousWeaponOption(previousWeaponOptions, invSlotID, slot, weaponOption);
+				local record = CaptureWeaponOptionRecord(invSlotID, slot, weaponOption, previous);
 				if record then
 					weaponOptionsPending = weaponOptionsPending or {};
 					table.insert(weaponOptionsPending, record);
@@ -190,34 +231,63 @@ do
 		return weaponOptionsPending;
 	end
 
+	local function CaptureSlotOptions(weaponOptionsPending, previousWeaponOptions, invSlotID, slot)
+		--Artifact spec options use separate enum values, so they never collide with the weapon options here
+		local weaponOptionsInfo, artifactOptionsInfo = GetOptionsForSlot(slot);
+		weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, previousWeaponOptions, invSlotID, slot, weaponOptionsInfo);
+		return CaptureOptionsInfoList(weaponOptionsPending, previousWeaponOptions, invSlotID, slot, artifactOptionsInfo);
+	end
+
+	--Also returns the separate-shoulders state, only when fresh like in EL.CapturePendingSlots.
 	function EL.CaptureWeaponOptionsPending(previousWeaponOptions)
-		local weaponOptionsPending;
-		for invSlotID, slot in pairs(WEAPON_SLOTS) do
-			--Artifact spec options use separate enum values, so they never collide with the weapon options here
-			local weaponOptionsInfo, artifactOptionsInfo = C_TransmogOutfitInfo.GetWeaponOptionsForSlot(slot);
-			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, previousWeaponOptions, invSlotID, slot, weaponOptionsInfo);
-			weaponOptionsPending = CaptureOptionsInfoList(weaponOptionsPending, previousWeaponOptions, invSlotID, slot, artifactOptionsInfo);
+		local weaponOptionsPending, shoulderSecondary;
+		for invSlotID = 1, 19 do
+			local slot = GetOptionSlot(invSlotID);
+			if slot then
+				weaponOptionsPending = CaptureSlotOptions(weaponOptionsPending, previousWeaponOptions, invSlotID, slot);
+			end
 		end
-		return weaponOptionsPending;
+
+		if HAS_ARMOR_OPTIONS then
+			local isSeparated = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+			if isSeparated then
+				weaponOptionsPending = CaptureSlotOptions(weaponOptionsPending, previousWeaponOptions, 3, SHOULDER_LEFT);
+			end
+
+			for _, record in ipairs(weaponOptionsPending or {}) do
+				if record[1] == 3 then
+					shoulderSecondary = isSeparated;
+					break;
+				end
+			end
+		end
+
+		return weaponOptionsPending, shoulderSecondary;
+	end
+
+	local function ApplyOptionRecord(record, slot)
+		local invSlotID, weaponOption, transmogID, illusionID, sheatheCategory = record[1], record[2], record[3], record[4], record[5];
+
+		if transmogID then
+			SetPendingFromSlot(invSlotID, slot, transmogID, illusionID, weaponOption);
+		elseif illusionID then
+			--SetPendingFromSlot already writes the illusion when transmogID is set, this covers illusion-only changes
+			local illusionDisplayType = (illusionID == 0) and Enum.TransmogOutfitDisplayType.Unassigned or Enum.TransmogOutfitDisplayType.Assigned;
+			C_TransmogOutfitInfo.SetPendingTransmog(slot, Enum.TransmogType.Illusion, weaponOption, illusionID, illusionDisplayType);
+		end
+
+		if sheatheCategory and WEAPON_SLOTS[invSlotID] then
+			C_TransmogOutfitInfo.SetPendingTransmogSheatheCategory(slot, weaponOption, sheatheCategory);
+		end
 	end
 
 	function EL.RestoreWeaponOptionsPending(weaponOptionsPending)
 		if not weaponOptionsPending then return; end
 
 		for _, record in ipairs(weaponOptionsPending) do
-			local invSlotID, weaponOption, transmogID, illusionID, sheatheCategory = record[1], record[2], record[3], record[4], record[5];
-			local slot = WEAPON_SLOTS[invSlotID];
-
-			if transmogID then
-				SetPendingFromSlot(invSlotID, slot, transmogID, illusionID, weaponOption);
-			elseif illusionID then
-				--SetPendingFromSlot already writes the illusion when transmogID is set, this covers illusion-only changes
-				local illusionDisplayType = (illusionID == 0) and Enum.TransmogOutfitDisplayType.Unassigned or Enum.TransmogOutfitDisplayType.Assigned;
-				C_TransmogOutfitInfo.SetPendingTransmog(slot, Enum.TransmogType.Illusion, weaponOption, illusionID, illusionDisplayType);
-			end
-
-			if sheatheCategory then
-				C_TransmogOutfitInfo.SetPendingTransmogSheatheCategory(slot, weaponOption, sheatheCategory);
+			local slot = GetRecordSlot(record);
+			if slot then
+				ApplyOptionRecord(record, slot);
 			end
 		end
 	end
@@ -377,7 +447,10 @@ do
 		--Tracked even when nothing's pending, so later checks can tell if the outfit actually changed.
 		EL.LastViewedOutfitID = C_TransmogOutfitInfo.GetCurrentlyViewedOutfitID();
 		local pendingSlots, shoulderSecondary = EL.CapturePendingSlots(liveList, EL.PendingSnapshot, EL.PendingSlots);
-		local weaponOptions = EL.CaptureWeaponOptionsPending(EL.PendingWeaponOptions);
+		local weaponOptions, optionsShoulderSecondary = EL.CaptureWeaponOptionsPending(EL.PendingWeaponOptions);
+		if optionsShoulderSecondary ~= nil then
+			shoulderSecondary = optionsShoulderSecondary;
+		end
 		local hasTransmogsPending = next(pendingSlots) ~= nil or weaponOptions ~= nil;
 
 		if hasTransmogsPending then
@@ -498,15 +571,17 @@ do
 
 		if EL.PendingWeaponOptions then
 			for _, record in ipairs(EL.PendingWeaponOptions) do
-				local invSlotID, weaponOption, transmogID, illusionID = record[1], record[2], record[3], record[4];
-				local slot = WEAPON_SLOTS[invSlotID];
-				if transmogID then
-					local info = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
-					if not (info and info.transmogID == transmogID) then return false; end
-				end
-				if illusionID then
-					local info = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Illusion, weaponOption);
-					if not (info and info.transmogID == illusionID) then return false; end
+				local weaponOption, transmogID, illusionID = record[2], record[3], record[4];
+				local slot = EL.GetRecordSlot(record);
+				if slot then
+					if transmogID then
+						local info = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Appearance, weaponOption);
+						if not (info and info.transmogID == transmogID) then return false; end
+					end
+					if illusionID then
+						local info = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, Enum.TransmogType.Illusion, weaponOption);
+						if not (info and info.transmogID == illusionID) then return false; end
+					end
 				end
 			end
 		end
@@ -540,10 +615,10 @@ do
 		isHandlingSituationsChanged = false;
 	end
 
-	--Blizzard doesn't carry the shoulder appearance across this toggle.
+	--Standard only, Forever keeps the shoulder appearance across this toggle.
 	--Uses EL.LiveShoulderInfo instead of a fresh read, which could already show the same reset.
 	local function FixShoulderSecondaryToggle()
-		if EL.LiveShoulderInfo then
+		if not HAS_ARMOR_OPTIONS and EL.LiveShoulderInfo then
 			local isSeparated = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
 			EL.ReapplyShoulderAppearance(EL.LiveShoulderInfo, isSeparated);
 		end
