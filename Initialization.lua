@@ -549,7 +549,6 @@ do
 	addon.IS_CLASSIC = addon.IS_CLASSIC and not addon.IS_FOREVER;
 	addon.IS_MODERN = addon.IS_RETAIL or addon.IS_FOREVER;
 
-	addon.IS_12_0_7 = IsToCVersionEqualOrNewerThan(120007);
 	addon.IS_12_1_0 = IsToCVersionEqualOrNewerThan(120100);
 
 
