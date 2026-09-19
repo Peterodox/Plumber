@@ -51,7 +51,7 @@ end
 do  --MID
 	local ResourceList = {
 		{currencyID = 3028},    --Restored Coffer Key
-		{currencyID = 3310, hasWeeklyCap = true},	--Coffer Key Shard
+		{currencyID = 3310, hasWeeklyCap = true, useItemID = 267291},	--Coffer Key Shard
 		{currencyID = 3316},    --Voidlight Marl
 		{currencyID = 3363, shownIfOwned = true},	--Community Coupons
 		{currencyID = 3405, shownIfOwned = true},	--Field Accolade

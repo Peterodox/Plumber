@@ -29,13 +29,14 @@ end
 
 local CurrencyButtonMixin = {};
 do
-	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc, hasWeeklyCap)
+	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc, hasWeeklyCap, useItemID)
 		self.currencyID = currencyID;
 		self.itemID = nil;
 		self.buttonDitry = true;
 		self.appendTooltipFunc = appendTooltipFunc;
 		self.hasWeeklyCap = hasWeeklyCap;
 		self.useActionButton = nil;
+		self.useCurrencyItemID = useItemID;
 		self:Refresh();
 		self:SetShownAsMinor(isMinor);
 	end
@@ -47,6 +48,7 @@ do
 		self.appendTooltipFunc = appendTooltipFunc;
 		self.hasWeeklyCap = nil;
 		self.useActionButton = useActionButton;
+		self.useCurrencyItemID = nil;
 		self:Refresh();
 		self:SetShownAsMinor(isMinor);
 	end
@@ -124,15 +126,22 @@ do
 	end
 
 	function CurrencyButtonMixin:SetupActionButton()
-		if not self.itemID then return end;
-		if addon.IS_RETAIL then return end;
+		local usableItemID = self.itemID or self.useCurrencyItemID;
+
+		--Items that interact with currency are not checked earlier for usability (e.g.: Player does not have item/toy),
+		--so we check that here to ensure we don't show a misleading tooltip or error text.
+		if self.useCurrencyItemID and (not API.CanPlayerPerformAction("item", self.useCurrencyItemID)) then return end;
+
+		if not usableItemID then return end;
+		--if IS_MIDNIGHT then return end;
 
 		local propagateMouseMotion = true;
 		local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion);
 		if actionButton then
 			actionButton:SetParent(self);
 			actionButton:CoverParent();
-			actionButton:SetUseItem(self.itemID, "RightButton");
+			actionButton:SetUseItem(usableItemID, "RightButton");
+			actionButton:RegisterForClicks("RightButtonDown", "RightButtonUp");
 			actionButton:Show();
 			actionButton.onHideCallback = function()
 				if self:IsMouseMotionFocus() then
@@ -173,10 +182,18 @@ do
 		self:ShowTooltip();
 
 		local contextualTooltipFunc;
-		if self.itemID and self.useActionButton and self:SetupActionButton() then
-			contextualTooltipFunc = function(tooltip)
-				tooltip:AddLine(L["Instruction Right Click To Use"], 0.098, 1.000, 0.098, true);
-				return true
+		if ((self.itemID and self.useActionButton) or (self.currencyID and self.useCurrencyItemID)) and self:SetupActionButton() then
+			if self.itemID then
+				contextualTooltipFunc = function(tooltip)
+					tooltip:AddLine(L["Instruction Right Click To Use"], 0.098, 1.000, 0.098, true);
+					return true
+				end
+			elseif self.currencyID and self.useCurrencyItemID then
+				local itemName = API.GetColorizedItemName(self.useCurrencyItemID);
+				contextualTooltipFunc = function(tooltip)
+					tooltip:AddLine(L["Instruction Right Click To Use Format"]:format(itemName), 0.098, 1.000, 0.098, true);
+					return true
+				end
 			end
 		end
 
@@ -409,7 +426,7 @@ do
 					if v.currencyID then
 						self.anyCurrency = true;
 						content[n].setupFunc = function(obj)
-							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
+							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap, v.useItemID);
 						end;
 					elseif v.itemID then
 						self.anyItem = true;
