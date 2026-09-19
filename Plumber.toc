@@ -56,7 +56,7 @@ Modules\TalkingHead.lua [AllowLoadGameType standard]
 Modules\AzerothianArchives.lua [AllowLoadGameType standard]
 Modules\MerchantPrice.lua [AllowLoadGameType standard, camelot]
 Modules\BossBanner.lua [AllowLoadGameType standard]
-Modules\SoftTargetName.lua [AllowLoadGameType standard]
+Modules\SoftTargetName.lua [AllowLoadGameType standard, camelot]
 
 
 Modules\Housing\Housing.xml [AllowLoadGameType standard]

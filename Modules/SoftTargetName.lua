@@ -188,6 +188,8 @@ do  --Display
 	end
 
 	function Display:UpdateInHouseStatus(state)
+		if addon.IS_FOREVER then return end;    --Forever does not have Housing
+
 		if state ~= nil then
 			self.inHouseArea = state;
 		else
@@ -745,6 +747,14 @@ do  --Options, Settings
 			{type = "Checkbox", label = L["SoftTargetName HideName"], tooltip = L["SoftTargetName HideName Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideName"},
 		},
 	};
+
+	if addon.IS_FOREVER then
+		--Remove the Housing options (Divider, Header, 2 Checkboxes)
+		local widgets = OPTIONS_SCHEMATIC.widgets;
+		for i = #widgets, #widgets - 3, -1 do
+			widgets[i] = nil;
+		end
+	end
 
 	function OptionToggle_OnClick(self, button)
 		local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
