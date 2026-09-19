@@ -305,7 +305,7 @@ do
 				end
 			end
 
-			if not self.inEditMode then
+			if not MainFrame.inEditMode then
 				self:ListenDynamicEvents(true);
 			end
 		elseif self.alertSystemMuted then
@@ -437,7 +437,7 @@ do
 	end
 
 	function EL:SetManualMode(state)
-		MainFrame:SetManualMode(false);
+		MainFrame:SetManualMode(state);
 		if state then
 			self:ListenDynamicEvents(false);
 			EventListeners.EmptyLootWatcher:StartWatching();
@@ -450,6 +450,9 @@ do
 
 	function EL:OnLootReady(isAutoLoot)
 		if ShouldAutoLoot(isAutoLoot) then
+			-- If we loot too fast, sometimes LOOT_OPENED doesn't fire
+			-- Only LOOT_READY and LOOT_CLOSED
+			self:ListenDynamicEvents(true);
 			FastLoot:Start();
 		end
 	end
@@ -485,7 +488,9 @@ do
 	end
 
 	function EL:ListenDynamicEvents(state)
-		if state then
+		if state and not self.dynamicEventsRegistered then
+			self.dynamicEventsRegistered = true;
+
 			if not self.playerGUID then
 				self.playerGUID = UnitGUID("player"); -- Never secret for "player" it seems
 			end
@@ -504,7 +509,8 @@ do
 
 			self.t = 0;
 			self:SetScript("OnUpdate", nil);
-		else
+		elseif (not state) and self.dynamicEventsRegistered then
+			self.dynamicEventsRegistered = nil;
 			self:UnregisterEvent("CHAT_MSG_LOOT");
 			self:UnregisterEvent("CHAT_MSG_CURRENCY");
 			self:UnregisterEvent("PLAYER_MONEY");
@@ -516,7 +522,6 @@ do
 		self.t = 0;
 		self:SetScript("OnUpdate", self.OnUpdate_UnregisterDynamicEvents);
 	end
-
 
 	function EL:OnUpdate_ProcessSlotChanged(elapsed)
 		self.t = self.t + elapsed;
@@ -667,10 +672,13 @@ do
 	end
 
 	function EL:OnEvent(event, ...)
+		--if string.find(event, "LOOT_") then
+		--	print(event, GetTimePreciseSec(), ...); -- DEBUG
+		--end
+
 		if event == "LOOT_OPENED" then
 			self:OnLootOpened(...);
 		elseif event == "LOOT_READY" then
-			local isAutoLoot =  ...
 			self:OnLootReady(...);
 		elseif event == "LOOT_CLOSED" then
 			--Usually fire two times in a row. In this case "GetNumLootItems" returns the re-looted value during the first trigger.
@@ -682,14 +690,15 @@ do
 			--ERR_INV_FULL, ERR_LOOT_CANT_LOOT_THAT, ERR_LOOT_CANT_LOOT_THAT_NOW, ERR_LOOT_ROLL_PENDING
 			if self.lootOpened then
 				local errorType, message = ...
-				if errorType == 3 or true then
+				-- I'm not 100% certain which errorTypes are loot error so let's check everything
+				if true or errorType then
 					self:CheckRemainingLoot();
 				end
 			end
 		elseif event == "CHAT_MSG_LOOT" or event == "CHAT_MSG_CURRENCY" then
 			--This is the most robust way to determine what's been looted.
 			--Less responsive and more costly
-			if (not IsMerchantFrameVisible()) and (self.currentLoots) then
+			if not IsMerchantFrameVisible() then
 				if event == "CHAT_MSG_LOOT" then
 					if self:IsMessageSenderPlayer(...) then
 						self:ProcessMessageItem(...);
@@ -712,10 +721,6 @@ do
 		--elseif event == "SHOW_LOOT_TOAST" then
 			--not used. When this option is enabled, we'll listen chat loot events all the time instead of after looting
 		--    self:OnLootToast(...);
-		end
-
-		if string.find(event, "LOOT_") then
-			print(event, GetTimePreciseSec(), ...); -- DEBUG
 		end
 	end
 
@@ -768,6 +773,7 @@ do
 
 	local tonumber = tonumber;
 	local match = string.match;
+	local find = string.find;
 	local ITEM_CHANGED = L["Item Changed"];
 
 	function EL:ProcessMessageItem(text)
@@ -777,37 +783,16 @@ do
 			itemID = tonumber(itemID);
 			if itemID then
 				--Debug_LogLootMessage(text)
-				if self.alwaysListenLootMsg then
-					local link, name = match(text, "(|Hitem:.+|h)%[(.+)%]|h");
-					if link then
-						if not string.find(text, ITEM_CHANGED) then
-							--Ignore item upgrade: Your %s was changed to %s.
-							local slotIndex = 0;
-							local quantity = GetItemCountFromText(text);
-							local data = CreateItemDataFromLink(link, slotIndex, nil, name, quantity);
-							if data then
-								data.looted = true;
-								LootUI.QueueDisplayLoot(data);
-							end
-						end
-					end
-				else
-					for _, data in ipairs(self.currentLoots) do
-						if not data.looted then
-							if data.slotType == Def.SLOT_TYPE_ITEM and data.id == itemID then
-								data.looted = true;
-								local quantity = GetItemCountFromText(text);
-								if quantity then
-									data.quantity = quantity;
-								end
-								if Def.AUTO_LOOT_ENABLE_TOOLTIP then
-									local link = match(text, "|H(item[:%d]+)|h", 1);
-									if link then
-										data.link = link;
-									end
-								end
-								LootUI.QueueDisplayLoot(data);
-							end
+				local link, name = match(text, "(|Hitem:.+|h)%[(.+)%]|h");
+				if link then
+					if not find(text, ITEM_CHANGED) then
+						--Ignore item upgrade: Your %s was changed to %s.
+						local slotIndex = 0;
+						local quantity = GetItemCountFromText(text);
+						local data = CreateItemDataFromLink(link, slotIndex, nil, name, quantity);
+						if data then
+							data.looted = true;
+							LootUI.QueueDisplayLoot(data);
 						end
 					end
 				end
@@ -823,33 +808,18 @@ do
 			currencyID = tonumber(currencyID);
 			--Debug_LogLootMessage(text)
 			if currencyID then
-				if self.alwaysListenLootMsg then
-					local link, _name = match(text, "(|Hcurrency:.+|h)%[(.+)%]|h");
-					local currencyInfo = link and GetCurrencyInfoFromLink(link);
-					if currencyInfo then
-						local slotIndex = 0;
-						local icon = currencyInfo.iconFileID;
-						local name = currencyInfo.name;
-						local quantity = GetItemCountFromText(text);
-						local quality = currencyInfo.quality;
-						local data = CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, icon, name, quantity, quality);
-						if data then
-							data.looted = true;
-							LootUI.QueueDisplayLoot(data);
-						end
-					end
-				else
-					for _, data in ipairs(self.currentLoots) do
-						if not data.looted then
-							if data.slotType == Def.SLOT_TYPE_CURRENCY and data.id == currencyID then
-								data.looted = true;
-								local count = GetItemCountFromText(text);
-								if count then
-									data.quantity = count;
-								end
-								LootUI.QueueDisplayLoot(data);
-							end
-						end
+				local link, _name = match(text, "(|Hcurrency:.+|h)%[(.+)%]|h");
+				local currencyInfo = link and GetCurrencyInfoFromLink(link);
+				if currencyInfo then
+					local slotIndex = 0;
+					local icon = currencyInfo.iconFileID;
+					local name = currencyInfo.name;
+					local quantity = GetItemCountFromText(text);
+					local quality = currencyInfo.quality;
+					local data = CreateCurrencyDataFromCurrencyID(link, currencyID, slotIndex, icon, name, quantity, quality);
+					if data then
+						data.looted = true;
+						LootUI.QueueDisplayLoot(data);
 					end
 				end
 			end
