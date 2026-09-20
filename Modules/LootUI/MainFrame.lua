@@ -957,12 +957,12 @@ do
 		self:LayoutActiveFrames(fixedFrameWidth);
 	end
 
-	function MainFrame:OnErrored(errorType) -- current
+	function MainFrame:OnErrored(errorType)
+		local lootList = LootUI.GetCurrentLoot();
+		if not (lootList and #lootList > 0) then return; end
+
 		if self.errorMode then return; end
 		self.errorMode = true;
-
-		local lootList = LootUI.GetCurrentLoot();
-		if not lootList then return; end
 
 		self:SetManualMode(true);
 

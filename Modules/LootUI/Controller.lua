@@ -260,6 +260,11 @@ do
 		--"TRANSMOG_COLLECTION_SOURCE_ADDED",
 	};
 
+	local LootResponseEvents = {
+		"UI_ERROR_MESSAGE",
+		"LOOT_BIND_CONFIRM", "LOOT_SLOT_CHANGED", "LOOT_SLOT_CLEARED",
+	};
+
 	local AlertSystemEvents;
 	if C_EventUtils.IsEventValid("SHOW_LOOT_TOAST") then
 		AlertSystemEvents = {
@@ -271,13 +276,9 @@ do
 
 	function EL:ListenStaticEvent(state)
 		if state then
-			for _, event in ipairs(StaticEvents) do
-				EL:RegisterEvent(event);
-			end
+			API.RegisterFrameForEvents(self, StaticEvents);
 		else
-			for _, event in ipairs(StaticEvents) do
-				EL:UnregisterEvent(event);
-			end
+			API.UnregisterFrameForEvents(self, StaticEvents);
 		end
 
 		if state and addon.GetDBBool("LootUI_ShowAllCurrencyChange") then
@@ -285,6 +286,14 @@ do
 			self:UnregisterEvent("CHAT_MSG_CURRENCY");
 		else
 			self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
+		end
+	end
+
+	function EL:ListenLootResponseEvent(state)
+		if state then
+			API.RegisterFrameForEvents(self, LootResponseEvents);
+		else
+			API.UnregisterFrameForEvents(self, LootResponseEvents);
 		end
 	end
 
@@ -401,10 +410,7 @@ do
 		end
 
 		self:ListenDynamicEvents(true);
-		self:RegisterEvent("UI_ERROR_MESSAGE");
-		self:RegisterEvent("LOOT_BIND_CONFIRM");
-		self:RegisterEvent("LOOT_SLOT_CHANGED");
-		self:RegisterEvent("LOOT_SLOT_CLEARED");
+		self:ListenLootResponseEvent(true);
 
 		if acquiredFromItem then
 			PlaySound(SOUNDKIT.UI_CONTAINER_ITEM_OPEN);
@@ -449,17 +455,20 @@ do
 	end
 
 	function EL:OnLootReady(isAutoLoot)
+		self.lootReady = true;
 		if ShouldAutoLoot(isAutoLoot) then
 			-- If we loot too fast, sometimes LOOT_OPENED doesn't fire
 			-- Only LOOT_READY and LOOT_CLOSED
 			self:ListenDynamicEvents(true);
+			self:RegisterEvent("UI_ERROR_MESSAGE");
 			FastLoot:Start();
 		end
 	end
 
 	function EL:OnLootClosed()
 		self:RequestUnregisterDynamicEvents();
-		self.lootOpened = false;
+		self.lootOpened = nil;
+		self.lootReady = nil;
 		self.anyLootInSlot = nil;
 		self.dirtySlots = nil;
 		CloseLoot();
@@ -470,10 +479,10 @@ do
 		MainFrame.errorMode = nil;
 		EventListeners.EmptyLootWatcher:StopWatching();
 		FastLoot:ResetFlags();
-		self:UnregisterEvent("UI_ERROR_MESSAGE");
-		self:UnregisterEvent("LOOT_BIND_CONFIRM");
-		self:UnregisterEvent("LOOT_SLOT_CHANGED");
-		self:UnregisterEvent("LOOT_SLOT_CLEARED");
+		if self.alwaysListenLootMsg then
+			self:ListenDynamicEvents(true);
+		end
+		self:ListenLootResponseEvent(false);
 	end
 
 	function EL:OnUpdate_UnregisterDynamicEvents(elapsed)
@@ -515,7 +524,10 @@ do
 			self:UnregisterEvent("CHAT_MSG_CURRENCY");
 			self:UnregisterEvent("PLAYER_MONEY");
 			self.playerMoney = nil;
+		else
+			return;
 		end
+		--print("ListenDynamicEvents", state);
 	end
 
 	function EL:RequestUnregisterDynamicEvents()
@@ -538,7 +550,7 @@ do
 	end
 
 	function EL:ProcessDirtySlots()
-		if not self.dirtySlots then return end;
+		if not self.dirtySlots then return; end
 
 		for slotIndex, dirty in pairs(self.dirtySlots) do
 			if dirty then
@@ -563,15 +575,6 @@ do
 		FastLoot:SetSlotFlag(slotIndex, false);
 	end
 
-	function EL:OnUpdate_CheckRemainingLoot(elapsed)
-		self.t = self.t + elapsed;
-		if self.t > 0.05 then
-			self.t = 0;
-			self:SetScript("OnUpdate", nil);
-			self:CheckRemainingLoot();
-		end
-	end
-
 	function EL:CheckRemainingLoot()
 		local anyLeft = false;
 		local numItems = GetNumLootItems();
@@ -582,7 +585,7 @@ do
 			end
 		end
 
-		if anyLeft and self.lootOpened then
+		if anyLeft then
 			MainFrame:OnErrored();
 			self:ListenDynamicEvents(false);
 		end
@@ -596,9 +599,6 @@ do
 					MainFrame:SetLootSlotCleared(slotIndex);
 				end
 			end
-		else
-			--self.t = 0;
-			--self:SetScript("OnUpdate", self.OnUpdate_CheckRemainingLoot);
 		end
 		FastLoot:SetSlotFlag(slotIndex, true);
 	end
@@ -672,7 +672,7 @@ do
 	end
 
 	function EL:OnEvent(event, ...)
-		--if string.find(event, "LOOT_") then
+		--if true or string.find(event, "LOOT_") then
 		--	print(event, GetTimePreciseSec(), ...); -- DEBUG
 		--end
 
@@ -688,7 +688,7 @@ do
 			MainFrame:OnUIScaleChanged();
 		elseif event == "UI_ERROR_MESSAGE" or event == "LOOT_BIND_CONFIRM" then
 			--ERR_INV_FULL, ERR_LOOT_CANT_LOOT_THAT, ERR_LOOT_CANT_LOOT_THAT_NOW, ERR_LOOT_ROLL_PENDING
-			if self.lootOpened then
+			if self.lootOpened or self.lootReady then
 				local errorType, message = ...
 				-- I'm not 100% certain which errorTypes are loot error so let's check everything
 				if true or errorType then
@@ -1156,11 +1156,12 @@ end
 function EventListeners:Disable()
 	self.enabled = false;
 
-	self.Primary.currentLoots = {};
+	self.Primary.currentLoots = nil;
 	self.Primary.playerMoney = nil;
 	self.Primary.overflowedCurrencies = nil;
 	self.Primary:ListenStaticEvent(false);
 	self.Primary:ListenDynamicEvents(false);
+	self.Primary:ListenLootResponseEvent(false);
 	self.Primary:ListenAlertSystemEvent(false);
 	self.Primary:SetScript("OnEvent", nil);
 	self.Primary:SetScript("OnUpdate", nil);
