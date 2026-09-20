@@ -24,6 +24,7 @@ local LootSlotHasItem = LootSlotHasItem;
 local CloseLoot = CloseLoot;
 local Secret_CanAccess = API.Secret_CanAccess;
 local StripHyperlinks = API.StripHyperlinks;
+local time = time;
 
 
 local EventListeners = {};
@@ -177,6 +178,19 @@ local function BuildSlotData(slotIndex)
 	end
 
 	return data;
+end
+
+local function ShouldRebuildSlotData(slotIndex, existingData)
+	local slotType = GetLootSlotType(slotIndex) or 0;
+	local icon, name, quantity, currencyID, quality, locked, isQuestItem, questID, isActive, isCoin = GetLootSlotInfo(slotIndex);
+	if isCoin then
+		slotType = Def.SLOT_TYPE_MONEY;
+	end
+	if slotType == existingData.slotType and icon == existingData.icon and quantity == existingData.quantity and quality == existingData.quality then
+		return false;
+	else
+		return true;
+	end
 end
 
 
@@ -333,7 +347,7 @@ do
 	end
 
 	function EL:BuildLootData()
-		self.currentLoots = {};
+		self.currentLoot = {};
 		self.anyLootInSlot = {};
 		self.overflowedCurrencies = nil;
 
@@ -345,7 +359,7 @@ do
 			if LootSlotHasItem(slotIndex) then
 				index = index + 1;
 				data = BuildSlotData(slotIndex);
-				self.currentLoots[index] = data;
+				self.currentLoot[index] = data;
 
 				if data and data.overflow then
 					if not self.overflowedCurrencies then
@@ -365,8 +379,59 @@ do
 		end
 	end
 
+	function EL:BuildLootDataAdditive()
+		local numItems = GetNumLootItems();
+		if numItems <= 0 then return; end
+		if numItems ~= self.lastLootCount then
+			self:ClearCurrentLootData();
+			self.lastLootCount = numItems;
+		end
+
+		if not self.currentLoot then
+			self.currentLoot = {};
+		end
+		if not self.anyLootInSlot then
+			self.anyLootInSlot = {};
+		end
+
+		local index = 0;
+		local data;
+
+		for slotIndex = 1, numItems do
+			if LootSlotHasItem(slotIndex) then
+				--should
+				index = index + 1;
+				if (not self.currentLoot[slotIndex]) or ShouldRebuildSlotData(slotIndex, self.currentLoot[slotIndex]) then
+					data = BuildSlotData(slotIndex);
+					self.currentLoot[slotIndex] = data;
+
+					if data and data.overflow then
+						if not self.overflowedCurrencies then
+							self.overflowedCurrencies = {};
+						end
+						table.insert(self.overflowedCurrencies, {
+							id = data.id,
+							slotType = Def.SLOT_TYPE_OVERFLOW,
+							slotIndex = slotIndex,
+							quality = data.quality,
+						});
+					end
+				end
+				self.anyLootInSlot[slotIndex] = true;
+			else
+				self.anyLootInSlot[slotIndex] = false;
+			end
+		end
+	end
+
+	function EL:ClearCurrentLootData()
+		self.currentLoot = nil;
+		self.anyLootInSlot = nil;
+		self.lastLootCount = nil;
+	end
+
 	function LootUI.GetCurrentLoot()
-		return EL.currentLoots;
+		return EL.currentLoot;
 	end
 
 	function LootUI.HasAnyOverflowedCurrency()
@@ -418,7 +483,7 @@ do
 			PlaySound(SOUNDKIT.FISHING_REEL_IN);
 		end
 
-		self:BuildLootData();
+		self:BuildLootDataAdditive();
 
 		if useManualMode then
 			MainFrame:DisplayPendingLoot();
@@ -461,6 +526,7 @@ do
 			-- Only LOOT_READY and LOOT_CLOSED
 			self:ListenDynamicEvents(true);
 			self:RegisterEvent("UI_ERROR_MESSAGE");
+			self:BuildLootDataAdditive();
 			FastLoot:Start();
 		end
 	end
@@ -471,6 +537,7 @@ do
 		self.lootReady = nil;
 		self.anyLootInSlot = nil;
 		self.dirtySlots = nil;
+		self:ClearCurrentLootData();
 		CloseLoot();
 		if MainFrame.manualMode then
 			EventListeners.QueueFrame:WipeQueue();
@@ -672,7 +739,7 @@ do
 	end
 
 	function EL:OnEvent(event, ...)
-		--if true or string.find(event, "LOOT_") then
+		--if string.find(event, "LOOT_") then
 		--	print(event, GetTimePreciseSec(), ...); -- DEBUG
 		--end
 
@@ -1145,7 +1212,6 @@ end
 function EventListeners:Enable()
 	self.enabled = true;
 
-	self.Primary.currentLoots = {};
 	self.Primary:ListenStaticEvent(true);
 	self.Primary:SetScript("OnEvent", self.Primary.OnEvent);
 
@@ -1156,7 +1222,7 @@ end
 function EventListeners:Disable()
 	self.enabled = false;
 
-	self.Primary.currentLoots = nil;
+	self.Primary.currentLoot = nil;
 	self.Primary.playerMoney = nil;
 	self.Primary.overflowedCurrencies = nil;
 	self.Primary:ListenStaticEvent(false);
