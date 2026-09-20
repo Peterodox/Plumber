@@ -859,12 +859,10 @@ do  --Module Registry
 		categoryKeys = {"Collection"},
 	};
 
-	local IS_MISTS_TRANSMOG = addon.IS_MISTS and addon.IsToCVersionEqualOrNewerThan(50504); -- Modern Transmog system has been added to 5.5.4
-
-	if addon.IS_MODERN or IS_MISTS_TRANSMOG then
+	if C_GameRules.IsGameRuleActive(Enum.GameRule.TransmogEnabled) then
 		addon.ControlCenter:AddModule(moduleData);
 
-		if IS_MISTS_TRANSMOG then
+		if addon.IS_MISTS then
 			Def.MacroIcon = 135025;
 		end
 	end

@@ -772,6 +772,12 @@ stds.wow = {
 			},
 		},
 
+		C_GameRules = {
+			fields = {
+				"IsGameRuleActive",
+			},
+		},
+
 		C_Garrison = {
 			fields = {
 				"GetAvailableMissions",
@@ -1443,6 +1449,12 @@ stds.wow = {
 					fields = {
 						"Achievement",
 						"Decor",
+					},
+				},
+
+				GameRule = {
+					fields = {
+						"TransmogEnabled",
 					},
 				},
 
