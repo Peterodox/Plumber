@@ -279,11 +279,12 @@ do
 		end
 	end
 
+	---@return LootUI_ItemFrame
 	function MainFrame:AcquireItemFrame()
 		local f = self.itemFramePool:Acquire();
 		f.Text:SetWidth(Formatter.NAME_WIDTH);
 		f:SetWidth(Formatter.BUTTON_WIDTH);
-		return f
+		return f;
 	end
 
 	function MainFrame:HighlightItemFrame(itemFrame)

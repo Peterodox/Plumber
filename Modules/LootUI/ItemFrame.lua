@@ -70,6 +70,7 @@ end
 local IsMidnightCrafting = {}; -- Midnight crafting items use different crafting quality icons
 
 
+---@class LootUI_ItemFrame
 local ItemFrameMixin = {};
 
 function ItemFrameMixin:ShowHoverVisual()
@@ -662,19 +663,20 @@ function ItemFrameMixin:OnClick(button)
 	end
 end
 
+---@param enableState 1 | 2 | nil
+---- `1`: Enable Clicks and Hover. For Manual Loot.
+---- `2`: Only enable Hover to display tooltip. For Loot Notification.
+---- `nil`: Non-interactable.
 function ItemFrameMixin:EnableMouseScript(enableState)
 	if enableState == 1 then
-		--Manual Loot: Enable Clicks and Hover
 		self:EnableMouse(true);
 		self:EnableMouseMotion(true);
 		self.enableState = 1;
 	elseif enableState == 2 then
-		--Auto Loot: Only enable Hover to display tooltip
 		self:EnableMouse(false);
 		self:EnableMouseMotion(true);
 		self.enableState = 2;
 	else
-		--Auto Loot: Non-interactable
 		self:EnableMouse(false);
 		self:EnableMouseMotion(false);
 		self.enableState = 0;
