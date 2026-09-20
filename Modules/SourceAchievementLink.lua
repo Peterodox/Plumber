@@ -4,7 +4,7 @@ local API = addon.API;
 
 
 local GetGlobalObject = API.GetGlobalObject;
-local Database_DecorAchievement = addon.Housing and addon.Housing.Database.DecorAchievement;  --Housing is Standard only
+local Database_DecorAchievement = addon.Housing.Database.DecorAchievement;
 
 
 local SharedAchievementLinkScripts = {};
@@ -87,7 +87,6 @@ local function TrackAchievement(achievementID, state)
 end
 
 local function ToggleTrackingAchievement(achievementID)
-	if not C_ContentTracking then return end;
 	local newState = not C_ContentTracking.IsTracking(Enum.ContentTrackingType.Achievement, achievementID);
 	TrackAchievement(achievementID, newState);
 end
@@ -132,7 +131,7 @@ do  --SharedAchievementLinkScripts
 					};
 				};
 
-				if C_ContentTracking and not completed then
+				if not completed then
 					if C_ContentTracking.IsTracking(Enum.ContentTrackingType.Achievement, achievementID) then
 						table.insert(ContextMenu.objects, {
 							type = "Button",
@@ -321,10 +320,6 @@ do  --MountJournal
 			return
 		end
 
-		if not (GetAchievementLink and SetAchievementSearchString and GetNumFilteredAchievements) then
-			return
-		end
-
 		hooksecurefunc("MountJournal_UpdateMountDisplay", Callback_UpdateMountDisplay);
 
 		InfoButton:SetScript("OnHyperlinkClick", SharedAchievementLinkScripts.OnHyperlinkClick);
@@ -407,12 +402,9 @@ end
 
 
 local BlizzardAddOns = {
+	{frameName = "HousingDashboardFrame", callback = Blizzard_HousingDashboard_OnLoad},
 	{frameName = "MountJournal", callback = Blizzard_Collections_OnLoad},
 };
-
-if Database_DecorAchievement then
-	table.insert(BlizzardAddOns, {frameName = "HousingDashboardFrame", callback = Blizzard_HousingDashboard_OnLoad});
-end
 
 do
 	local function EnableModule(state)
