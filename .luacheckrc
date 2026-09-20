@@ -341,6 +341,7 @@ stds.wow = {
 		"IsAccountSecured",
 		"IsAltKeyDown",
 		"IsControlKeyDown",
+		"IsChatAFK",
 		"IsCurrentTitle",
 		"IsFishingLoot",
 		"IsFlying",

@@ -632,19 +632,16 @@ do  --Controller
 	local Scheduler = CreateFrame("Frame");
 	Controller.Scheduler = Scheduler;
 
-	Scheduler:SetScript("OnEvent", function(self, event, ...)
-		--only CHAT_MSG_SYSTEM
-		--UnitIsAFK doesn't change immediately
-		self.afkUpdateElapsed = 0;
+	Scheduler:SetScript("OnEvent", function(self, event, unit)
+		--only PLAYER_FLAGS_CHANGED
+		--Unlike CHAT_MSG_SYSTEM, the AFK state is already updated when this fires
+		if unit == "player" then
+			self:UpdateAFKStatus();
+		end
 	end);
 
 	function Scheduler:UpdateAFKStatus()
-		local isAFK = UnitIsAFK("player");
-		if API.Secret_CanAccess(isAFK) then
-			isAFK = isAFK;
-		else
-			isAFK = false;
-		end
+		local isAFK = IsChatAFK();
 
 		if isAFK ~= self.isAFK then
 			if (self.isAFK and not isAFK) and self.afkStartTime then
@@ -914,14 +911,6 @@ do  --Controller
 				Scheduler:SetScript("OnUpdate", function(f, elapsed)
 					--elapsed = elapsed * 50;  --Debug Time multiplier
 
-					if f.afkUpdateElapsed then
-						f.afkUpdateElapsed = f.afkUpdateElapsed + elapsed;
-						if f.afkUpdateElapsed >= 1 then
-							f.afkUpdateElapsed = nil;
-							f:UpdateAFKStatus();
-						end
-					end
-
 					if f.isAFK or f.pauseUpdate then
 						return
 					end
@@ -1022,10 +1011,10 @@ do  --Controller
 	function Controller.EnableModule(state)
 		Controller:UpdateSchedule();
 		if state then
-			Controller.Scheduler:RegisterEvent("CHAT_MSG_SYSTEM");
+			Controller.Scheduler:RegisterEvent("PLAYER_FLAGS_CHANGED");
 			Controller.Scheduler:UpdateAFKStatus();
 		else
-			Controller.Scheduler:UnregisterEvent("CHAT_MSG_SYSTEM");
+			Controller.Scheduler:UnregisterEvent("PLAYER_FLAGS_CHANGED");
 		end
 	end
 end
