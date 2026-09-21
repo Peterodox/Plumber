@@ -57,6 +57,8 @@ local function ResolveSystemStatus()
 			MainFrame:Disable();
 		end
 	end
+
+	LootUI.FastLoot:ResolveSystemStatus();
 end
 
 local function TryResolveSystemStatus()
@@ -76,9 +78,7 @@ end
 addon.CallbackRegistry:RegisterSettingCallback("LootUI_UseStockUI", SettingChanged_UseStockUI);
 
 local function EnableModule(state)
-	if state or ENABLE_MODULE then
-		TryResolveSystemStatus();
-	end
+	TryResolveSystemStatus();
 end
 
 local function EnterEditMode()
@@ -120,7 +120,7 @@ local function GetModuleConflictWarning()
 	end
 end
 
-local moduleData = {
+local LootUI_ModuleData = {
 	name = L["ModuleName LootUI"],
 	dbKey = "LootUI",
 	description = L["ModuleDescription LootUI"],
@@ -138,5 +138,19 @@ local moduleData = {
 		"Signature", "Loot",
 	},
 };
+addon.ControlCenter:AddModule(LootUI_ModuleData);
 
-addon.ControlCenter:AddModule(moduleData);
+local FastLoot_ModuleData = {
+	name = L["ModuleName FastLoot"],
+	dbKey = "FastLoot",
+	description = L["ModuleDescription FastLoot"],
+	descriptionFunc = GetModuleConflictWarning,
+	toggleFunc = EnableModule,
+	categoryID = 1,
+	uiOrder = 0,
+	moduleAddedTime = 1727793830,
+	categoryKeys = {
+		"Loot",
+	},
+};
+addon.ControlCenter:AddModule(FastLoot_ModuleData);

@@ -4,6 +4,7 @@ local API = addon.API;
 local LootUI = addon.LootUI; ---@class LootUISystem
 local Def = LootUI.Defination;
 local MainFrame = LootUI.MainFrame;
+local FastLoot = LootUI.FastLoot;
 
 
 local GetCurrencyDisplayInfo = API.GetCurrencyDisplayInfo;
@@ -209,55 +210,6 @@ local function ShouldAutoLoot(isAutoLoot)
 		end
 	end
 	return isAutoLoot;
-end
-
-
-local FastLoot = CreateFrame("Frame");
-do
-	---Reset everything. Called after LOOT_CLOSED
-	function FastLoot:ResetFlags()
-		self.slotProcessed = nil;
-		self.t = nil;
-		self:SetScript("OnUpdate", nil);
-	end
-
-	function FastLoot:Start()
-		local numItems = GetNumLootItems();
-		for slotIndex = 1, numItems do
-			if LootSlotHasItem(slotIndex) then
-				if not self.slotProcessed then
-					self.slotProcessed = {};
-				end
-				if not self.slotProcessed[slotIndex] then
-					self.slotProcessed[slotIndex] = true;
-					LootSlot(slotIndex);
-				end
-			end
-		end
-	end
-
-	---@param slotIndex number
-	---@param flag boolean `true` if LOOT_SLOT_CLEARED. `false` if LOOT_SLOT_CHANGED
-	function FastLoot:SetSlotFlag(slotIndex, flag)
-		if self.slotProcessed then
-			self.slotProcessed[slotIndex] = flag;
-			if not flag then
-				self.t = 0;
-				self:SetScript("OnUpdate", self.OnUpdate_RetryFastLoot);
-			end
-		end
-	end
-
-	function FastLoot:OnUpdate_RetryFastLoot(elapsed)
-		self.t = self.t + elapsed;
-		if self.t > 0.4 then
-			if not MainFrame:IsInMaualModeOrEditMode() then
-				self.t = 0;
-				self:SetScript("OnUpdate", nil);
-				self:Start();
-			end
-		end
-	end
 end
 
 

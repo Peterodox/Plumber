@@ -568,7 +568,7 @@ L["ModuleDescription StaticPopup_Confirm"] = "Adjust the confirmation dialog tha
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
-L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide some optional features:\n\n- Loot items fast.\n\n- Fix Auto Loot failure bug.\n\n- Show a Take All button when looting manually.";
+L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide optional features like:\n\n- Loot items fast.\n\n- Show number of owned items.\n\n- Merge junks as one notification.\n\n- Show a Take All button when looting manually.";
 L["Take All"] = "Take All";     --Take all items from a loot window
 L["You Received"] = YOU_RECEIVED_LABEL or "You received";
 L["Reach Currency Cap"] = "Reached currency caps";
@@ -616,6 +616,11 @@ L["LootUI Option Show All Currency"] = "Show Any Currency Changes";
 L["LootUI Option Show All Currency Tooltip"] = "Show currencies earned from all sources, not just loot.\n\n|cffff4800You may sometimes see currencies that are not displayed in the chat window.|r";
 L["LootUI Option Hide Title"] = "Hide \"You Received\" Text";
 L["LootUI Option Hide Title Tooltip"] = "Hide the \"You received\" text on the top of the loot window.";
+
+
+--Fast Loot
+L["ModuleName FastLoot"] = "Fast Loot";
+L["ModuleDescription FastLoot"] = "Loot items fast.";
 
 
 --Quick Slot For Third-party Dev

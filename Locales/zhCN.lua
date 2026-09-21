@@ -568,7 +568,7 @@ L["ModuleDescription StaticPopup_Confirm"] = "调整购买不可退款物品时�
 
 --Loot UI
 L["ModuleName LootUI"] = "拾取窗口";
-L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取所有物品\n\n- 修复自动拾取有时失效的问题\n\n- 手动拾取时显示“全部拾取”按钮";
+L["ModuleDescription LootUI"] = "替换默认的拾取窗口并提供以下功能：\n\n- 快速拾取物品\n\n- 显示已拥有的物品数量\n\n- 将垃圾物品整合成一条提示\n\n- 手动拾取时显示“全部拾取”按钮";
 L["Take All"] = "全部拾取";
 L["You Received"] = "你获得了";
 L["Reach Currency Cap"] = "货币已达到上限";
@@ -616,6 +616,11 @@ L["LootUI Option Show All Currency"] = "显示任何货币变动";
 L["LootUI Option Show All Currency Tooltip"] = "显示从任何来源获得的货币，而不仅限于从战利品中拾取到的。\n\n|cffff4800你可能偶尔会看到不在聊天窗口内显示的货币。|r";
 L["LootUI Option Hide Title"] = "隐藏“你获得了”标题";
 L["LootUI Option Hide Title Tooltip"] = "隐藏拾取窗口上方显示的“你获得了”标题。";
+
+
+--Fast Loot
+L["ModuleName FastLoot"] = "快速拾取";
+L["ModuleDescription FastLoot"] = "快速拾取物品。";
 
 
 --Quick Slot For Third-party Dev

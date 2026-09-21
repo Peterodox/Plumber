@@ -13,6 +13,7 @@
 	<Script file="ItemFrame.lua"/>
 	<Script file="MiscWidgets.lua"/>
 	<Script file="MainFrame.lua"/>
+	<Script file="FastLoot.lua"/>
 	<Script file="Controller.lua"/>
 	<Script file="EditMode.lua"/>
 	<Script file="ModuleRegistry.lua"/>

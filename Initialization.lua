@@ -290,6 +290,8 @@ local DefaultValues = {
 		LootUI_HotkeyName = "E",
 		LootUI_UseStockUI = false,
 
+	FastLoot = false,					--FastLoot now works independently instead instead of being a LootUI suboptions.
+
 
 	--Unified Map Pin System
 	WorldMapPin_TWW = true,             --Master Switch for TWW Map Pins
