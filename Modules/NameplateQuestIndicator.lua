@@ -84,7 +84,7 @@ end
 
 do  --Widget
 	local QuestWidgetMixin = {};
-	local PLAYER_NAME = UnitName("player");
+	local PLAYER_GUID = UnitGUID("player");
 
 	function QuestWidgetMixin:ShowNormalIcon()
 		--self.Icon:SetTexCoord(0, 0.25, 0, 0.25);
@@ -144,7 +144,7 @@ do  --Widget
 							i = i + 1;
 						elseif l.type == LineType.QuestPlayer then
 							if Secret_CanAccess(l.leftText) then
-								local isPlayer = l.leftText == PLAYER_NAME;
+								local isPlayer = l.guid == PLAYER_GUID;    --leftText only shows the first word of the name (Forever bug?)
 								i = i + 1;
 								l = lines[i];
 								if l then
