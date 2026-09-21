@@ -139,15 +139,19 @@ local function Options_OpacitySlider_OnValueChanged(value)
 	MainFrame:SetBackgroundAlpha(Def.BG_OPACITY);
 end
 
-local function Options_OpacitySlider_OnMouseDown()
+local function ShowModeSelection(visible)
 	if MainFrame.Selection then
-		MainFrame.Selection:SetAlpha(0);
+		MainFrame.Selection:SetAlpha(visible and 1 or 0);
 	end
 end
 
+local function Options_OpacitySlider_OnMouseDown()
+	ShowModeSelection(false);
+end
+
 local function Options_OpacitySlider_OnMouseUp(slider)
-	if MainFrame.Selection and (not slider:IsMouseMotionFocus()) then
-		MainFrame.Selection:SetAlpha(1);
+	if not slider:IsMouseMotionFocus() then
+		ShowModeSelection(true);
 	end
 end
 
@@ -217,7 +221,10 @@ local OPTIONS_SCHEMATIC = {
 			onMouseDownFunc = Options_OpacitySlider_OnMouseDown, onMouseUpFunc = Options_OpacitySlider_OnMouseUp, onEnterFunc = Options_OpacitySlider_OnMouseDown, onLeaveFunc = Options_OpacitySlider_OnMouseUp},
 		{type = "Checkbox", label = L["LootUI Option Owned Count"], onClickFunc = nil, dbKey = "LootUI_ShowItemCount"},
 		{type = "Checkbox", label = L["LootUI Option New Transmog"], onClickFunc = nil, dbKey = "LootUI_NewTransmogIcon", tooltip = L["LootUI Option New Transmog Tooltip"]:format("|TInterface/AddOns/Plumber/Art/LootUI/NewTransmogIcon:0:0|t"), validityCheckFunc = Validation_TransmogInvented},
-		{type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor", validityCheckFunc = function() return ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end},
+		{type = "Checkbox", label = L["LootUI Option Custom Quality Color"], tooltip = L["LootUI Option Custom Quality Color Tooltip"], onClickFunc = nil, dbKey = "LootUI_UseCustomColor",
+			validityCheckFunc = function() return ColorManager and ColorManager.GetColorDataForItemQuality ~= nil end,
+			onEnterFunc = function() ShowModeSelection(false) end, onLeaveFunc = function() ShowModeSelection(true) end,
+		},
 		{type = "Checkbox", label = L["LootUI Option Grow Direction"], tooltip = Tooltip_GrowDirection, onClickFunc = Options_GrowDirection_OnClick, dbKey = "LootUI_GrowUpwards", keepTooltipAfterClicks = true},
 		{type = "Checkbox", label = L["LootUI Option Combine Items"], tooltip = L["LootUI Option Combine Items Tooltip"], onClickFunc = nil, dbKey = "LootUI_CombineItem"},
 		{type = "Checkbox", label = L["LootUI Option Low Frame Strata"], tooltip = L["LootUI Option Low Frame Strata Tooltip"], onClickFunc = nil, dbKey = "LootUI_LowFrameStrata"},
