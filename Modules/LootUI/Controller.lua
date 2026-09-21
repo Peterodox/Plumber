@@ -20,9 +20,9 @@ local GetLootSlotLink = GetLootSlotLink;
 local GetLootSlotType = GetLootSlotType;
 local GetLootSlotInfo = GetLootSlotInfo;
 local GetNumLootItems = GetNumLootItems;
-local LootSlot = LootSlot;
 local LootSlotHasItem = LootSlotHasItem;
 local CloseLoot = CloseLoot;
+local IsFishingLoot = IsFishingLoot;
 local Secret_CanAccess = API.Secret_CanAccess;
 local StripHyperlinks = API.StripHyperlinks;
 local time = time;
@@ -424,8 +424,6 @@ do
 
 		if acquiredFromItem then
 			PlaySound(SOUNDKIT.UI_CONTAINER_ITEM_OPEN);
-		elseif IsFishingLoot() then
-			PlaySound(SOUNDKIT.FISHING_REEL_IN);
 		end
 
 		self:BuildLootDataAdditive();
@@ -465,10 +463,15 @@ do
 	end
 
 	function EL:OnLootReady(isAutoLoot)
+		-- If we loot too fast, sometimes LOOT_OPENED doesn't fire
+		-- Only LOOT_READY and LOOT_CLOSED
+
 		self.lootReady = true;
 		if ShouldAutoLoot(isAutoLoot) then
-			-- If we loot too fast, sometimes LOOT_OPENED doesn't fire
-			-- Only LOOT_READY and LOOT_CLOSED
+			if (not self.soundEffectPlayed) and IsFishingLoot() then
+				self.soundEffectPlayed = true;
+				PlaySound(SOUNDKIT.FISHING_REEL_IN);
+			end
 			self:ListenDynamicEvents(true);
 			self:RegisterEvent("UI_ERROR_MESSAGE");
 			self:BuildLootDataAdditive();
@@ -482,6 +485,7 @@ do
 		self.lootReady = nil;
 		self.anyLootInSlot = nil;
 		self.dirtySlots = nil;
+		self.soundEffectPlayed = nil;
 		self:ClearCurrentLootData();
 		CloseLoot();
 		if MainFrame.manualMode then
