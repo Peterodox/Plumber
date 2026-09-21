@@ -419,13 +419,6 @@ do
 			return
 		end
 
-		if Def.USE_STOCK_UI then
-			if not useManualMode then
-				FastLoot:Start();
-			end
-			return;
-		end
-
 		self:ListenDynamicEvents(true);
 		self:ListenLootResponseEvent(true);
 
@@ -953,7 +946,6 @@ do
 	end
 
 	function QueueFrame:QueueDisplayLoot(lootData)
-		if Def.HIDE_PLUMBER_LOOT_UI == true then return; end
 		if not (lootData and lootData.quantity) then return; end
 		if MainFrame:IsInMaualModeOrEditMode() then return; end
 
@@ -979,11 +971,13 @@ do
 	end
 
 	function LootUI.QueueDisplayLoot(data)
-		QueueFrame:QueueDisplayLoot(data);
+		if EventListeners.enabled then
+			QueueFrame:QueueDisplayLoot(data);
+		end
 	end
 
 	function LootUI.QueueDisplaySpell(spellData)
-		if not spellData.spellID then return false end;
+		if not (EventListeners.enabled and spellData.spellID) then return false end;
 
 		local spellID = spellData.spellID;
 		local icon = spellData.icon or C_Spell.GetSpellTexture(spellID);

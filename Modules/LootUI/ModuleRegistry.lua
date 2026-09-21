@@ -23,16 +23,14 @@ local function ResolveSystemStatus()
 
 		MainFrame:OnUIScaleChanged();
 
-		Def.USE_STOCK_UI = addon.GetDBBool("LootUI_UseStockUI") == true;
 	else
 		ENABLE_MODULE = false;
 
 		EventListeners:Disable();
 		MainFrame:Disable();
-		Def.USE_STOCK_UI = false;
 	end
 
-	if ENABLE_MODULE and not Def.USE_STOCK_UI then
+	if ENABLE_MODULE then
 		if not STOCK_UI_MUTED then
 			STOCK_UI_MUTED = true;
 			LootFrame:UnregisterEvent("LOOT_OPENED");
@@ -154,3 +152,15 @@ local FastLoot_ModuleData = {
 	},
 };
 addon.ControlCenter:AddModule(FastLoot_ModuleData);
+
+-- FastLoot can now be enabled without LootUI.
+-- For players who have enabled Plumber LootUI for the auto-loot fix but opted not to use our UI
+-- enable the new FastLoot option and disable LootUI.
+addon.CallbackRegistry:Register("DBPreload", function(db)
+	if db.FastLoot == nil and db.LootUI then
+		if db.LootUI_UseStockUI or db.LootUI_WindowHide then
+			db.LootUI = false;
+			db.FastLoot = true;
+		end
+	end
+end)

@@ -197,12 +197,6 @@ local function Validation_IsRetail()
 	return addon.IsToCVersionEqualOrNewerThan(110000)
 end
 
-local function Tooltip_HideWindow()
-	if addon.GetDBBool("LootUI_UseStockUI") then
-		return "|cffff4800"..L["LootUI Option Hide Window Tooltip 2"].."|r";
-	end
-end
-
 local function Tooltip_ShowReputation()
 	local tooltip = L["LootUI Option Show Reputation Tooltip"];
 	if not C_EventUtils.IsEventValid("FACTION_STANDING_CHANGED") then
@@ -240,10 +234,6 @@ local OPTIONS_SCHEMATIC = {
 		{type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
 		{type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = nil, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
 		{type = "Keybind", label = L["Take All"], dbKey = "LootUI_HotkeyName", tooltip = L["LootUI Option Use Hotkey Tooltip"], defaultKey = "E"},
-
-		{type = "Divider"},
-		{type = "Checkbox", label = L["LootUI Option Use Default UI"], onClickFunc = nil, dbKey = "LootUI_UseStockUI", tooltip = L["LootUI Option Use Default UI Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
-		{type = "Checkbox", label = L["LootUI Option Hide Window"], onClickFunc = nil, dbKey = "LootUI_WindowHide", tooltip = L["LootUI Option Hide Window Tooltip"], tooltip2 = Tooltip_HideWindow},
 
 		{type = "Divider"},
 		{type = "UIPanelButton", label = L["Reset To Default Position"], onClickFunc = Options_ResetPosition_OnClick, stateCheckFunc = Options_ResetPosition_ShouldEnable, widgetKey = "ResetButton"},
@@ -335,7 +325,7 @@ end
 CallbackRegistry:RegisterSettingCallback("LootUI_BackgroundAlpha", SettingChanged_BackgroundAlpha);
 
 local function SettingChanged_ReplaceDefaultAlert(state, userInput)
-	if state and addon.GetDBBool("LootUI") and not addon.GetDBBool("LootUI_UseStockUI") then
+	if state and addon.GetDBBool("LootUI") then
 		EventListeners.Primary:ListenAlertSystemEvent(true);
 	else
 		EventListeners.Primary:ListenAlertSystemEvent(false);
@@ -367,11 +357,6 @@ local function SettingChanged_LowFrameStrata(state, userInput)
 	Def.LOW_FRAME_STRATA = state;
 end
 CallbackRegistry:RegisterSettingCallback("LootUI_LowFrameStrata", SettingChanged_LowFrameStrata);
-
-local function SettingChanged_WindowDisabled(state, userInput)
-	Def.HIDE_PLUMBER_LOOT_UI = state;
-end
-CallbackRegistry:RegisterSettingCallback("LootUI_WindowHide", SettingChanged_WindowDisabled);
 
 local function SettingChanged_ShowAllMoneyChange(state, userInput)
 	Def.SHOW_ALL_MONEY_CHANGE = state;
