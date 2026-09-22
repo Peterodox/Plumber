@@ -71,7 +71,7 @@ Modules\UnderlightAngler.lua [AllowLoadGameType standard]
 Modules\ChatOptions.lua [AllowLoadGameType standard, camelot]
 Modules\NameplateResources.lua [AllowLoadGameType standard]
 Modules\NameplateQuestIndicator.lua [AllowLoadGameType standard, camelot]
-Modules\StaticPopup_Basic.lua [AllowLoadGameType standard, camelot]
+Modules\StaticPopup_Basic.lua
 Modules\StaticPopupEnhancement.xml [AllowLoadGameType standard]
 Modules\PlayerTitleUI.lua [AllowLoadGameType standard]
 Modules\BlizzardSuperTrack.lua [AllowLoadGameType standard]
