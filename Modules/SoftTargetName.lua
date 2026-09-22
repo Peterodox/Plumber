@@ -55,6 +55,9 @@ local IgnoredGameObjects = {
 
 local SpecialGameObjects = {};
 
+local function IsHousingAvailable()
+	return addon.IS_RETAIL;
+end
 
 do  --Display
 	Display:Hide();
@@ -188,7 +191,7 @@ do  --Display
 	end
 
 	function Display:UpdateInHouseStatus(state)
-		if addon.IS_FOREVER then return end;    --Forever does not have Housing
+		if not IsHousingAvailable() then return end;    --Forever does not have Housing
 
 		if state ~= nil then
 			self.inHouseArea = state;
@@ -741,20 +744,12 @@ do  --Options, Settings
 			{type = "Checkbox", label = L["SoftTargetName ShowNPC"], tooltip = L["SoftTargetName ShowNPC Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_ShowNPC"},
 
 
-			{type = "Divider"},
-			{type = "Header", label = L["SC Housing"]},
-			{type = "Checkbox", label = L["SoftTargetName HideIcon"], tooltip = L["SoftTargetName HideIcon Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideIcon"},
-			{type = "Checkbox", label = L["SoftTargetName HideName"], tooltip = L["SoftTargetName HideName Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideName"},
+			{type = "Divider", validityCheckFunc = IsHousingAvailable},
+			{type = "Header", label = L["SC Housing"], validityCheckFunc = IsHousingAvailable},
+			{type = "Checkbox", label = L["SoftTargetName HideIcon"], tooltip = L["SoftTargetName HideIcon Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideIcon", validityCheckFunc = IsHousingAvailable},
+			{type = "Checkbox", label = L["SoftTargetName HideName"], tooltip = L["SoftTargetName HideName Tooltip"], onClickFunc = CheckboxShared_OnClick, dbKey = "SoftTarget_House_HideName", validityCheckFunc = IsHousingAvailable},
 		},
 	};
-
-	if addon.IS_FOREVER then
-		--Remove the Housing options (Divider, Header, 2 Checkboxes)
-		local widgets = OPTIONS_SCHEMATIC.widgets;
-		for i = #widgets, #widgets - 3, -1 do
-			widgets[i] = nil;
-		end
-	end
 
 	function OptionToggle_OnClick(self, button)
 		local OptionFrame = addon.ToggleSettingsDialog(self, OPTIONS_SCHEMATIC);
