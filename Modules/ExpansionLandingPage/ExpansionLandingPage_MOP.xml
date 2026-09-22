@@ -10,8 +10,6 @@
 	<Script file="ItemUpgrade.lua"/>
 	<Script file="Currency.lua"/>
 	<Script file="FactionUtil.lua"/>
-	<!--Script file="FactionTab.lua"/-->
-	<!--Script file="MajorFactionRenown.lua"/-->
 	<Script file="EncounterData.lua"/>
 	<Script file="EncounterJournal.lua"/>
 	<Script file="TrackerTab.lua"/>

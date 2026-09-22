@@ -33,10 +33,11 @@ Modules\ControlCenter\ControlCenter.xml
 Modules\LootUI.xml
 Modules\SpellFlyout_Secure.lua
 Modules\Macros.lua
+Modules\StaticPopup_Basic.lua
 
-Modules\ExpansionLandingPage\SettingsPanelUtil.xml
-
+Modules\ExpansionLandingPage\Basic.xml
 Modules\ExpansionLandingPage\ExpansionLandingPage_MOP.xml [AllowLoadGameType classic]
+Modules\ExpansionLandingPage\ExpansionLandingPage_Retail.xml [AllowLoadGameType standard]
 
 Modules\GossipFrameMedal.lua [AllowLoadGameType standard]
 Modules\BackpackItemTracker.lua [AllowLoadGameType standard, camelot]
@@ -58,11 +59,8 @@ Modules\MerchantPrice.lua [AllowLoadGameType standard, camelot]
 Modules\BossBanner.lua [AllowLoadGameType standard]
 Modules\SoftTargetName.lua [AllowLoadGameType standard, camelot]
 
-
 Modules\Housing\Housing.xml [AllowLoadGameType standard]
 
-
-#TWW
 Modules\DelvesScenario.lua [AllowLoadGameType standard]
 Modules\DelvesDashboard.lua [AllowLoadGameType standard]
 Modules\DelvesAutomation.lua [AllowLoadGameType standard]
@@ -71,13 +69,11 @@ Modules\UnderlightAngler.lua [AllowLoadGameType standard]
 Modules\ChatOptions.lua [AllowLoadGameType standard, camelot]
 Modules\NameplateResources.lua [AllowLoadGameType standard]
 Modules\NameplateQuestIndicator.lua [AllowLoadGameType standard, camelot]
-Modules\StaticPopup_Basic.lua
 Modules\StaticPopupEnhancement.xml [AllowLoadGameType standard]
 Modules\PlayerTitleUI.lua [AllowLoadGameType standard]
 Modules\BlizzardSuperTrack.lua [AllowLoadGameType standard]
 Modules\ItemUpgradeUI.xml [AllowLoadGameType standard]
 Modules\ProfessionsBook.lua [AllowLoadGameType standard]
-Modules\ExpansionLandingPage\ExpansionLandingPage_Retail.xml [AllowLoadGameType standard]
 Modules\HolidayDungeon.lua [AllowLoadGameType standard]
 Modules\QueueStatus.lua [AllowLoadGameType standard]
 Modules\RaidCheck\RaidCheck.xml [AllowLoadGameType standard]
@@ -90,7 +86,6 @@ Modules\CatalystUI.lua [AllowLoadGameType standard]
 Modules\HuntTable.lua [AllowLoadGameType standard]
 Modules\PreyQuestSuperTrack.lua [AllowLoadGameType standard]
 Modules\TransmogRestorePending.lua [AllowLoadGameType standard, mists, camelot]
-
 
 #Modules\MerchantUI\MerchantUI.xml [AllowLoadGameType standard]
 
