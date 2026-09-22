@@ -1011,7 +1011,7 @@ do  --Controller
 	function Controller.EnableModule(state)
 		Controller:UpdateSchedule();
 		if state then
-			Controller.Scheduler:RegisterEvent("PLAYER_FLAGS_CHANGED");
+			Controller.Scheduler:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", "player");
 			Controller.Scheduler:UpdateAFKStatus();
 		else
 			Controller.Scheduler:UnregisterEvent("PLAYER_FLAGS_CHANGED");
