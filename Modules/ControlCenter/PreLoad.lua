@@ -305,6 +305,28 @@ do  --Settings Panel Revamp
 		SortFunc.Date,
 	};
 
+	-- Modules that affect each other should be shown next to each other regardless of sort method
+	local function RegroupLinkedModules(modules)
+		local index = 1;
+		while modules[index] do
+			local module = modules[index];
+			if module.linkedReason then
+				local j = index + 1;
+				local tempModule = modules[j];
+				while tempModule do
+					if tempModule.linkedReason == module.linkedReason then
+						table.remove(modules, j);
+						index = index + 1;
+						table.insert(modules, index, tempModule);
+					end
+					j = j + 1;
+					tempModule = modules[j];
+				end
+			end
+			index = index + 1;
+		end
+	end
+
 	function ControlCenter:ClearFilterCache()
 		self.sortedModules = nil;
 	end
@@ -422,6 +444,7 @@ do  --Settings Panel Revamp
 
 		for cateKey, v in pairs(categoryXModule) do
 			table.sort(v, CurrentSortMethod);
+			RegroupLinkedModules(v);
 		end
 
 		local numModules;

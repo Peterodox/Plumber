@@ -651,6 +651,12 @@ do
 
 	function EntryButtonMixin:OnClick()
 		if self.dbKey and self.data.toggleFunc then
+			if self.data.getOverrideState then
+				if self.data.getOverrideState() ~= nil then
+					return;
+				end
+			end
+
 			local newState = not GetDBBool(self.dbKey);
 			addon.SetDBValue(self.dbKey, newState, true);
 			self.data.toggleFunc(newState);
@@ -673,7 +679,13 @@ do
 	end
 
 	function EntryButtonMixin:UpdateState()
-		if self.virtual then
+		local overrideState;
+		if self.data.getOverrideState then
+			---overrideState: true (Always On) | false (Always OFF) | nil (No Override)
+			overrideState = self.data.getOverrideState();
+		end
+
+		if self.virtual or overrideState then
 			self:Enable();
 			self.OptionToggle:SetShown(self.hasOptions);
 			SetTexCoord(self.Box, 736, 784, 64, 112);
@@ -683,6 +695,10 @@ do
 		local disabled;
 		if self.parentDBKey and not GetDBBool(self.parentDBKey) then
 			disabled = true;
+		end
+
+		if overrideState == false then
+			disabled = false;
 		end
 
 		if GetDBBool(self.dbKey) then

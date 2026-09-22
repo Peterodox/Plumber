@@ -568,7 +568,7 @@ L["ModuleDescription StaticPopup_Confirm"] = "Adjust the confirmation dialog tha
 
 --Loot UI
 L["ModuleName LootUI"] = HUD_EDIT_MODE_LOOT_FRAME_LABEL or "Loot Window";
-L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide optional features like:\n\n- Loot items fast.\n\n- Show number of owned items.\n\n- Merge junks as one notification.\n\n- Show a Take All button when looting manually.";
+L["ModuleDescription LootUI"] = "Replace the default Loot Window and provide optional features like:\n\n- Fast Loot.\n\n- Show number of owned items.\n\n- Merge junks as one notification.\n\n- Show a Take All button when looting manually.";
 L["Take All"] = "Take All";     --Take all items from a loot window
 L["You Received"] = YOU_RECEIVED_LABEL or "You received";
 L["Reach Currency Cap"] = "Reached currency caps";

@@ -135,8 +135,15 @@ local LootUI_ModuleData = {
 	categoryKeys = {
 		"Signature", "Loot",
 	},
+	linkedReason = "LootFrame",
 };
 addon.ControlCenter:AddModule(LootUI_ModuleData);
+
+local function FastLoot_GetOverrideState()
+	if addon.GetDBBool("LootUI") then
+		return true;
+	end
+end
 
 local FastLoot_ModuleData = {
 	name = L["ModuleName FastLoot"],
@@ -150,6 +157,8 @@ local FastLoot_ModuleData = {
 	categoryKeys = {
 		"Loot",
 	},
+	linkedReason = "LootFrame",
+	getOverrideState = FastLoot_GetOverrideState;
 };
 addon.ControlCenter:AddModule(FastLoot_ModuleData);
 
@@ -163,4 +172,4 @@ addon.CallbackRegistry:Register("DBPreload", function(db)
 			db.FastLoot = true;
 		end
 	end
-end)
+end);
