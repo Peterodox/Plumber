@@ -407,7 +407,7 @@ do
 	function EL:OnLootOpened(isAutoLoot, acquiredFromItem)
 		self.lootOpened = true;
 		self.dirtySlots = {};
-		self.playerMoney = GetMoney();
+		self:RecordPlayerMoney();
 		self.lootOpenedTime = time();
 
 		local useManualMode = not ShouldAutoLoot(isAutoLoot);
@@ -462,11 +462,19 @@ do
 		end
 	end
 
+	function EL:RecordPlayerMoney()
+		if not self.playerMoney then
+			self.playerMoney = GetMoney();
+		end
+	end
+
 	function EL:OnLootReady(isAutoLoot)
 		-- If we loot too fast, sometimes LOOT_OPENED doesn't fire
 		-- Only LOOT_READY and LOOT_CLOSED
 
 		self.lootReady = true;
+		self:RecordPlayerMoney();
+
 		if ShouldAutoLoot(isAutoLoot) then
 			if (not self.soundEffectPlayed) and IsFishingLoot() then
 				self.soundEffectPlayed = true;
