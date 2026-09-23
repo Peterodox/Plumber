@@ -850,7 +850,9 @@ do
 		--loots have been sorted so the key is no longer slotIndex
 
 		table.sort(lootList, SortFunc_LootSlot);
-		self:SetManualMode(true);
+		if not self.manualMode then
+			self:SetManualMode(true);
+		end
 
 		local itemFrame;
 		local activeFrames = {};
@@ -964,7 +966,9 @@ do
 		if self.errorMode then return; end
 		self.errorMode = true;
 
-		self:SetManualMode(true);
+		if not self.manualMode then
+			self:SetManualMode(true);
+		end
 
 		local itemFrame, slotIndex;
 		local activeFrames = {};

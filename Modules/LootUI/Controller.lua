@@ -429,8 +429,8 @@ do
 		self:BuildLootDataAdditive();
 
 		if useManualMode then
+			self:SetManualMode(true);
 			MainFrame:DisplayPendingLoot();
-			self:ListenDynamicEvents(false);
 		else
 			if MainFrame.errorMode then
 				--LOOT_OPENED can keep re-firing after a failed attempt (e.g. bag full), so don't retry LootSlot() here or it'll spam the server (and DC you)
@@ -614,8 +614,8 @@ do
 		end
 
 		if anyLeft then
+			self:SetManualMode(true);
 			MainFrame:OnErrored();
-			self:ListenDynamicEvents(false);
 		end
 	end
 
