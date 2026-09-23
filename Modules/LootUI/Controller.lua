@@ -513,6 +513,11 @@ do
 	end
 
 	function EL:ListenDynamicEvents(state)
+		if state and self:GetScript("OnUpdate") == self.OnUpdate_UnregisterDynamicEvents then
+			self.t = 0;
+			self:SetScript("OnUpdate", nil);
+		end
+
 		if state and not self.dynamicEventsRegistered then
 			self.dynamicEventsRegistered = true;
 
@@ -532,8 +537,6 @@ do
 				self:RegisterEvent("PLAYER_MONEY");
 			end
 
-			self.t = 0;
-			self:SetScript("OnUpdate", nil);
 		elseif (not state) and self.dynamicEventsRegistered then
 			self.dynamicEventsRegistered = nil;
 			self:UnregisterEvent("CHAT_MSG_LOOT");
