@@ -1734,7 +1734,7 @@ do  --Expansion Select
 		[5] = {name = EXPANSION_NAME4},     --MOP
 	};
 
-	if addon.IS_MIDNIGHT then
+	if addon.IS_RETAIL then
 		ExpansionList = {11, 12};
 	else
 		ExpansionList = {5};

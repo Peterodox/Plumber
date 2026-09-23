@@ -56,7 +56,7 @@ local EventGenerator = CreateFrame("Frame");
 
 
 local ENABLE_MODULE = false;
-local IS_CLASSIC = not addon.IsToCVersionEqualOrNewerThan(110000);
+local IS_CLASSIC = addon.IS_CLASSIC;
 local ITEM_CHANGED = L["Item Changed"];
 
 

@@ -153,7 +153,7 @@ do  --Checklist Button
 		self:UpdateVisual();
 	end
 
-	if addon.IS_MOP then
+	if addon.IS_MISTS then
 		--Classic
 		local DailyUtil = addon.DailyUtil;
 
@@ -479,7 +479,7 @@ do
 		local WeeklyResetTimer = LandingPageUtil.CreateTimerFrame(self);
 		self.WeeklyResetTimer = WeeklyResetTimer;
 		WeeklyResetTimer:SetPoint("TOPLEFT", self, "TOPLEFT", 58, headerWidgetOffsetY);
-		if addon.IS_MOP then
+		if addon.IS_MISTS then
 			WeeklyResetTimer:SetTimeGetter(C_DateAndTime.GetSecondsUntilDailyReset);
 			WeeklyResetTimer:SetTimeTextFormat(L["Daily Reset Format"]);
 			WeeklyResetTimer:SetLowThresholdAndColor(2*3600, "ffe24c45");

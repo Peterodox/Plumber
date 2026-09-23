@@ -341,6 +341,7 @@ stds.wow = {
 		"IsAccountSecured",
 		"IsAltKeyDown",
 		"IsControlKeyDown",
+		"IsChatAFK",
 		"IsCurrentTitle",
 		"IsFishingLoot",
 		"IsFlying",
@@ -507,6 +508,9 @@ stds.wow = {
 		"UpdateContainerFrameAnchors",
 		"Vector2D_CalculateAngleBetween",
 		"Vector2D_Normalize",
+		"WOW_PROJECT_ID",
+		"WOW_PROJECT_MAINLINE",
+		"WOW_PROJECT_MISTS_CLASSIC",
 		"WardrobeCollectionFrame",
 		"WardrobeTransmogFrame",
 		"WatchFrame_Update",
@@ -766,6 +770,12 @@ stds.wow = {
 				"GetWhoInfo",
 				"SendWho",
 				"SetWhoToUi",
+			},
+		},
+
+		C_GameRules = {
+			fields = {
+				"IsGameRuleActive",
 			},
 		},
 
@@ -1303,6 +1313,7 @@ stds.wow = {
 				"GetActiveOutfitID",
 				"GetCurrentlyViewedOutfitID",
 				"GetEquippedSlotOptionFromTransmogSlot",
+				"GetOptionsForSlot",
 				"GetOutfitInfo",
 				"GetOutfitSituation",
 				"GetOutfitSituationsEnabled",
@@ -1439,6 +1450,12 @@ stds.wow = {
 					fields = {
 						"Achievement",
 						"Decor",
+					},
+				},
+
+				GameRule = {
+					fields = {
+						"TransmogEnabled",
 					},
 				},
 
@@ -1602,6 +1619,7 @@ stds.wow = {
 				TransmogOutfitDisplayType = {
 					fields = {
 						"Assigned",
+						"Equipped",
 						"Hidden",
 						"Unassigned",
 					},

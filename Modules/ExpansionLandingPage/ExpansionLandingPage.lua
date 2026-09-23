@@ -3,7 +3,6 @@ local API = addon.API;
 local L = addon.L;
 local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 local CallbackRegistry = addon.CallbackRegistry;
-local IS_MOP = addon.IS_MOP;
 
 
 local MainFrame;
@@ -232,7 +231,7 @@ do
 		NineSlice:ShowCloseButton(true);
 		NineSlice:SetCloseButtonOwner(self);
 
-		if not IS_MOP then
+		if not addon.IS_MISTS then
 			NineSlice.Background:SetAtlas("thewarwithin-landingpage-background", false);
 			local a = 0.25;
 			NineSlice.Background:SetVertexColor(a, a, a);
@@ -436,7 +435,7 @@ do
 	end
 
 	function PlumberExpansionLandingPageMixin:DimBackground(state)
-		if IS_MOP then
+		if addon.IS_MISTS then
 			self.LeftSection.NineSlice.Background:SetAlpha(0.8);
 			self.RightSection.NineSlice.Background:SetAlpha(0.8);
 			self:EnableMouse(false);
@@ -454,7 +453,7 @@ do
 
 	function PlumberExpansionLandingPageMixin:ResetPosition()
 		self:ClearAllPoints();
-		if IS_MOP then
+		if addon.IS_MISTS then
 			self:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 16, -116);
 		else
 			self:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 64, -150);

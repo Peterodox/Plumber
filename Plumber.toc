@@ -1,6 +1,4 @@
-## X-Flavor: retail
-## X-Expansion: TWW
-## Interface: 120100, 120105
+## Interface: 120100, 120105, 50504, 40402, 30404, 20506, 11508, 16001
 ## Version: 1.9.5
 
 ## Title: Plumber
@@ -22,87 +20,88 @@ API.lua
 
 Modules\Shared\Load.xml
 
-Modules\ScenarioTracker.lua
-Modules\ReputationTracker.lua
-#Modules\DirectionArrow.lua
-#Modules\SuperTrack.xml
+Modules\ScenarioTracker.lua [AllowLoadGameType standard]
+Modules\ReputationTracker.lua [AllowLoadGameType standard, camelot]
+#Modules\DirectionArrow.lua [AllowLoadGameType standard]
+#Modules\SuperTrack.xml [AllowLoadGameType standard]
 
-#Modules\DevTool.lua
-#Modules\DevTool_HyperlinkEditor.lua
+#Modules\DevTool.lua [AllowLoadGameType standard]
+#Modules\DevTool_HyperlinkEditor.lua [AllowLoadGameType standard]
 
 Modules\ControlCenter\ControlCenter.xml
 
-Modules\GossipFrameMedal.lua
-Modules\BackpackItemTracker.lua
-Modules\AutoJoinEvents.lua
-Modules\PlayerChoiceFrameToken.lua
-Modules\QuickSlot.xml
-#Modules\SpellFlyout.lua
-Modules\SpellFlyout_Secure.lua
-Modules\QuestAreaTrigger.lua
-Modules\Dreamseed.lua
-#Modules\EventMap.lua
-#Modules\MapPin.xml
-Modules\RareAnnouncement.lua
-Modules\PlayerChoiceUI.lua
-Modules\Lockpicking.lua
-#Modules\BlizzFix_EventToast.lua
-Modules\TalkingHead.lua
-Modules\AzerothianArchives.lua
-Modules\MerchantPrice.lua
-Modules\BossBanner.lua
-Modules\SoftTargetName.lua
-
-
-Modules\Housing\Housing.xml
-
-
-#TWW
-Modules\DelvesScenario.lua
-Modules\DelvesDashboard.lua
-Modules\DelvesAutomation.lua
-Modules\ExpansionLandingPage.xml
-Modules\GameTooltipExtension.xml
 Modules\LootUI.xml
-Modules\UnderlightAngler.lua
-Modules\ChatOptions.lua
-Modules\NameplateResources.lua
-Modules\NameplateQuestIndicator.lua
-Modules\StaticPopupEnhancement.xml
-Modules\PlayerTitleUI.lua
-Modules\BlizzardSuperTrack.lua
-Modules\ItemUpgradeUI.xml
+Modules\SpellFlyout_Secure.lua
 Modules\Macros.lua
-Modules\ProfessionsBook.lua
-Modules\ExpansionLandingPage\ExpansionLandingPage_Retail.xml
-Modules\HolidayDungeon.lua
-Modules\QueueStatus.lua
-Modules\RaidCheck\RaidCheck.xml
-Modules\TransmogUtil.lua
-Modules\QuestWatchCycle.lua
-Modules\SourceAchievementLink.lua
-Modules\OutfitSelect.xml
-Modules\BreakTime.xml
-Modules\CatalystUI.lua
-Modules\HuntTable.lua
-Modules\PreyQuestSuperTrack.lua
-Modules\TransmogRestorePending.lua
+Modules\StaticPopup_Basic.lua
 
+Modules\ExpansionLandingPage\Basic.xml
+Modules\ExpansionLandingPage\ExpansionLandingPage_MOP.xml [AllowLoadGameType classic]
+Modules\ExpansionLandingPage\ExpansionLandingPage_Retail.xml [AllowLoadGameType standard]
 
-#Modules\MerchantUI\MerchantUI.xml
+Modules\GossipFrameMedal.lua [AllowLoadGameType standard]
+Modules\BackpackItemTracker.lua [AllowLoadGameType standard, camelot]
+Modules\AutoJoinEvents.lua [AllowLoadGameType standard]
+Modules\PlayerChoiceFrameToken.lua [AllowLoadGameType standard]
+Modules\QuickSlot.xml [AllowLoadGameType standard, camelot]
+#Modules\SpellFlyout.lua [AllowLoadGameType standard]
+Modules\QuestAreaTrigger.lua [AllowLoadGameType standard]
+Modules\Dreamseed.lua [AllowLoadGameType standard]
+#Modules\EventMap.lua [AllowLoadGameType standard]
+#Modules\MapPin.xml [AllowLoadGameType standard]
+Modules\RareAnnouncement.lua [AllowLoadGameType standard]
+Modules\PlayerChoiceUI.lua [AllowLoadGameType standard]
+Modules\Lockpicking.lua [AllowLoadGameType standard]
+#Modules\BlizzFix_EventToast.lua [AllowLoadGameType standard]
+Modules\TalkingHead.lua [AllowLoadGameType standard]
+Modules\AzerothianArchives.lua [AllowLoadGameType standard]
+Modules\MerchantPrice.lua [AllowLoadGameType standard, camelot]
+Modules\BossBanner.lua [AllowLoadGameType standard]
+Modules\SoftTargetName.lua [AllowLoadGameType standard, camelot]
 
-#Modules\DruidModelFix.lua
-#Modules\MovieSubtitle.lua
-#Modules\QuestSpecialItemCooldown.lua
-#Modules\SecretOfAzeroth.lua
-#Modules\AddonList.lua
-#Modules\WoWAnniversary.lua
-#Modules\Navigator_Dreamseed.lua
-#Modules\AccountStore.lua
-#Modules\MinimapMouseover.lua
-#Modules\ObjectiveTrackerModule.xml
-#Modules\BlizzFix_EndCaps.lua
-#Modules\Timerunning\LegionRemix.xml
-#Modules\SpellcastInfo.lua
-#Modules\BlizzFix_ModelLoading.lua
-#Modules\CraftSearchExtended.lua
+Modules\Housing\Housing.xml [AllowLoadGameType standard]
+
+Modules\DelvesScenario.lua [AllowLoadGameType standard]
+Modules\DelvesDashboard.lua [AllowLoadGameType standard]
+Modules\DelvesAutomation.lua [AllowLoadGameType standard]
+Modules\GameTooltipExtension_[Game].xml [AllowLoadGameType standard, camelot]
+Modules\UnderlightAngler.lua [AllowLoadGameType standard]
+Modules\ChatOptions.lua [AllowLoadGameType standard, camelot]
+Modules\NameplateResources.lua [AllowLoadGameType standard]
+Modules\NameplateQuestIndicator.lua [AllowLoadGameType standard, camelot]
+Modules\StaticPopupEnhancement.xml [AllowLoadGameType standard]
+Modules\PlayerTitleUI.lua [AllowLoadGameType standard]
+Modules\BlizzardSuperTrack.lua [AllowLoadGameType standard]
+Modules\ItemUpgradeUI.xml [AllowLoadGameType standard]
+Modules\ProfessionsBook.lua [AllowLoadGameType standard]
+Modules\HolidayDungeon.lua [AllowLoadGameType standard]
+Modules\QueueStatus.lua [AllowLoadGameType standard]
+Modules\RaidCheck\RaidCheck.xml [AllowLoadGameType standard]
+Modules\TransmogUtil.lua [AllowLoadGameType standard, mists, camelot]
+Modules\QuestWatchCycle.lua [AllowLoadGameType standard, camelot]
+Modules\SourceAchievementLink.lua [AllowLoadGameType standard]
+Modules\OutfitSelect.xml [AllowLoadGameType standard, mists, camelot]
+Modules\BreakTime.xml [AllowLoadGameType standard, camelot]
+Modules\CatalystUI.lua [AllowLoadGameType standard]
+Modules\HuntTable.lua [AllowLoadGameType standard]
+Modules\PreyQuestSuperTrack.lua [AllowLoadGameType standard]
+Modules\TransmogRestorePending.lua [AllowLoadGameType standard, mists, camelot]
+
+#Modules\MerchantUI\MerchantUI.xml [AllowLoadGameType standard]
+
+#Modules\DruidModelFix.lua [AllowLoadGameType standard]
+#Modules\MovieSubtitle.lua [AllowLoadGameType standard]
+#Modules\QuestSpecialItemCooldown.lua [AllowLoadGameType standard]
+#Modules\SecretOfAzeroth.lua [AllowLoadGameType standard]
+#Modules\AddonList.lua [AllowLoadGameType standard]
+#Modules\WoWAnniversary.lua [AllowLoadGameType standard]
+#Modules\Navigator_Dreamseed.lua [AllowLoadGameType standard]
+#Modules\AccountStore.lua [AllowLoadGameType standard]
+#Modules\MinimapMouseover.lua [AllowLoadGameType standard]
+#Modules\ObjectiveTrackerModule.xml [AllowLoadGameType standard]
+#Modules\BlizzFix_EndCaps.lua [AllowLoadGameType standard]
+#Modules\Timerunning\LegionRemix.xml [AllowLoadGameType standard]
+#Modules\SpellcastInfo.lua [AllowLoadGameType standard]
+#Modules\BlizzFix_ModelLoading.lua [AllowLoadGameType standard]
+#Modules\CraftSearchExtended.lua [AllowLoadGameType standard]
+#Modules\ExpansionLandingPage.xml [AllowLoadGameType standard]

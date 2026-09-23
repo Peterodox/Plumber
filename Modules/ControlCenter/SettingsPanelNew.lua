@@ -1,5 +1,5 @@
 local _, addon = ...
-if not addon.IsToCVersionEqualOrNewerThan(110000) then return end;
+if not addon.IS_MODERN then return end;
 
 local L = addon.L;
 local API = addon.API;
