@@ -92,6 +92,7 @@ local function OptionToggle_OnClick(self, button)
 		ExitEditMode();
 	else
 		EnterEditMode();
+		MainFrame:ShowOptions(true);
 	end
 end
 

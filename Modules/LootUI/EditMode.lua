@@ -72,8 +72,6 @@ function MainFrame:EnterEditMode()
 	self:UnregisterEvent("GLOBAL_MOUSE_UP");
 	self:UnregisterEvent("BAG_UPDATE_DELAYED");
 
-	self:ShowOptions(true);
-
 	EventListeners:Disable();
 end
 
