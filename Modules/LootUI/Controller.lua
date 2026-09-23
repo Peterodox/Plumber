@@ -51,9 +51,10 @@ local function CreateItemDataFromLink(link, slotIndex, icon, name, quantity, qua
 	local craftQuality = GetItemCraftingQuality(link);
 
 	if not (name and quality) then
-		--From chat events. Ignore quest item
+		-- For quest item, always skip if you receive it outside the loot time window.
+		-- Example: If you fly past a World Quest area and receive a quest item, don't show it.
 		if classID == 12 then
-			if (not EventListeners.Primary.lootOpenedTime) or (time() - EventListeners.Primary.lootOpenedTime) > 2 then
+			if (not EventListeners.Primary.lootEventTime) or (time() - EventListeners.Primary.lootEventTime) > 2 then
 				return
 			end
 		end
@@ -408,7 +409,6 @@ do
 		self.lootOpened = true;
 		self.dirtySlots = {};
 		self:RecordPlayerMoney();
-		self.lootOpenedTime = time();
 
 		local useManualMode = not ShouldAutoLoot(isAutoLoot);
 
@@ -473,6 +473,7 @@ do
 		-- Only LOOT_READY and LOOT_CLOSED
 
 		self.lootReady = true;
+		self.lootEventTime = time();
 		self:RecordPlayerMoney();
 
 		if ShouldAutoLoot(isAutoLoot) then
