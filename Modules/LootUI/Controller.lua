@@ -299,39 +299,6 @@ do
 		self.alwaysListenLootMsg = state;
 	end
 
-	function EL:BuildLootData()
-		self.currentLoot = {};
-		self.anyLootInSlot = {};
-		self.overflowedCurrencies = nil;
-
-		local numItems = GetNumLootItems();
-		local index = 0;
-		local data;
-
-		for slotIndex = 1, numItems do
-			if LootSlotHasItem(slotIndex) then
-				index = index + 1;
-				data = BuildSlotData(slotIndex);
-				self.currentLoot[index] = data;
-
-				if data and data.overflow then
-					if not self.overflowedCurrencies then
-						self.overflowedCurrencies = {};
-					end
-					table.insert(self.overflowedCurrencies, {
-						id = data.id,
-						slotType = Def.SLOT_TYPE_OVERFLOW,
-						slotIndex = slotIndex,
-						quality = data.quality,
-					});
-				end
-				self.anyLootInSlot[slotIndex] = true;
-			else
-				self.anyLootInSlot[slotIndex] = false;
-			end
-		end
-	end
-
 	function EL:BuildLootDataAdditive()
 		local numItems = GetNumLootItems();
 		if numItems <= 0 then return; end
@@ -347,15 +314,11 @@ do
 			self.anyLootInSlot = {};
 		end
 
-		local index = 0;
-		local data;
-
 		for slotIndex = 1, numItems do
 			if LootSlotHasItem(slotIndex) then
 				--should
-				index = index + 1;
 				if (not self.currentLoot[slotIndex]) or ShouldRebuildSlotData(slotIndex, self.currentLoot[slotIndex]) then
-					data = BuildSlotData(slotIndex);
+					local data = BuildSlotData(slotIndex);
 					self.currentLoot[slotIndex] = data;
 
 					if data and data.overflow then
@@ -383,8 +346,22 @@ do
 		self.lastLootCount = nil;
 	end
 
-	function LootUI.GetCurrentLoot()
-		return EL.currentLoot;
+	function LootUI.GetSortedLootList()
+		if EL.currentLoot then
+			local lootList = {};
+			local n = 0;
+
+			for _, data in pairs(EL.currentLoot) do
+				n = n + 1;
+				lootList[n] = data;
+				data.looted = not LootSlotHasItem(data.slotIndex);
+			end
+
+			if n > 0 then
+				table.sort(lootList, LootUI.SortFunc_LootSlot);
+				return lootList;
+			end
+		end
 	end
 
 	function LootUI.HasAnyOverflowedCurrency()
@@ -442,7 +419,7 @@ do
 				MainFrame:SetAlpha(0);
 			end
 
-			self:SetManualMode(useManualMode);
+			self:SetManualMode(false);
 
 			if not isAutoLoot then
 				FastLoot:Start();
@@ -451,7 +428,6 @@ do
 	end
 
 	function EL:SetManualMode(state)
-		MainFrame:SetManualMode(state);
 		if state then
 			self:ListenDynamicEvents(false);
 			EventListeners.EmptyLootWatcher:StartWatching();
@@ -614,8 +590,10 @@ do
 		end
 
 		if anyLeft then
-			self:SetManualMode(true);
-			MainFrame:OnErrored();
+			if self.lootOpened then
+				self:SetManualMode(true);
+				MainFrame:OnErrored();
+			end
 		end
 	end
 

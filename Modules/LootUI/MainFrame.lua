@@ -519,7 +519,6 @@ do
 	local AUTO_HIDE_DELAY = 3.0; -- Determined by the number of items. From 2.0s to 3.0s
 
 	local MergeSimilarItems = LootUI.MergeSimilarItems;
-	local SortFunc_LootSlot = LootUI.SortFunc_LootSlot;
 
 	local function MergeData(d1, d2)
 		if d1 and d2 then
@@ -732,7 +731,7 @@ do
 			return;
 		end
 
-		table.sort(lootQueue, SortFunc_LootSlot);
+		table.sort(lootQueue, LootUI.SortFunc_LootSlot);
 
 		self.alpha = self:GetAlpha();
 		local fadeIndividualFrame = self:IsShown() and self.alpha > 0.25;
@@ -845,14 +844,11 @@ do
 	end
 
 	function MainFrame:DisplayPendingLoot()
-		local lootList = LootUI.GetCurrentLoot();
+		local lootList = LootUI.GetSortedLootList();
 		if not lootList then return; end
 		--loots have been sorted so the key is no longer slotIndex
 
-		table.sort(lootList, SortFunc_LootSlot);
-		if not self.manualMode then
-			self:SetManualMode(true);
-		end
+		self:SetManualMode(true);
 
 		local itemFrame;
 		local activeFrames = {};
@@ -924,7 +920,7 @@ do
 	end
 
 	local function MainFrame_DisplayUnlootedItems(self)
-		local lootList = LootUI.GetCurrentLoot();
+		local lootList = LootUI.GetSortedLootList();
 		if not lootList then return; end
 
 		self:ReleaseAll();
@@ -960,15 +956,13 @@ do
 	end
 
 	function MainFrame:OnErrored(errorType)
-		local lootList = LootUI.GetCurrentLoot();
+		local lootList = LootUI.GetSortedLootList();
 		if not (lootList and #lootList > 0) then return; end
 
 		if self.errorMode then return; end
 		self.errorMode = true;
 
-		if not self.manualMode then
-			self:SetManualMode(true);
-		end
+		self:SetManualMode(true);
 
 		local itemFrame, slotIndex;
 		local activeFrames = {};
@@ -985,8 +979,6 @@ do
 				data.looted = true;
 			end
 		end
-
-		table.sort(lootList, SortFunc_LootSlot);
 
 		for i, data in ipairs(lootList) do
 			itemFrame = self:AcquireItemFrame();
