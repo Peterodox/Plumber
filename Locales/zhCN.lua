@@ -621,6 +621,8 @@ L["LootUI Option Hide Title Tooltip"] = "隐藏拾取窗口上方显示的“你
 --Fast Loot
 L["ModuleName FastLoot"] = "快速拾取";
 L["ModuleDescription FastLoot"] = "快速拾取物品。";
+L["FastLoot Always On Reason"] = "快速拾取功能将一直生效，因为你已启用Plumber拾取窗口。";
+L["FastLoot User Notes"] = "*Plumber快速拾取只干一项任务...快速拾取。若你想要更多功能，请尝试其它拾取插件例如\"Speedy AutoLoot\"或\"XLoot\".";
 
 
 --Quick Slot For Third-party Dev

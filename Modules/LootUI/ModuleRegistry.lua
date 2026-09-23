@@ -114,9 +114,23 @@ local function GetModuleConflictWarning()
 	end
 
 	if name then
-		return string.format("|cffd4641c%s\n\n- %s|r", L["Generic Addon Conflict"], name);
+		return string.format("|cffd4641c%s\n- %s|r", L["Generic Addon Conflict"], name);
 	end
 end
+
+local function GetFastLootExtraDescription()
+	local warning = GetModuleConflictWarning();
+	if warning then
+		return warning;
+	end
+
+	if addon.GetDBBool("LootUI") then
+		return L["FastLoot Always On Reason"];
+	end
+
+	return L["FastLoot User Notes"];
+end
+
 
 local LootUI_ModuleData = {
 	name = L["ModuleName LootUI"],
@@ -139,6 +153,7 @@ local LootUI_ModuleData = {
 };
 addon.ControlCenter:AddModule(LootUI_ModuleData);
 
+
 local function FastLoot_GetOverrideState()
 	if addon.GetDBBool("LootUI") then
 		return true;
@@ -149,7 +164,7 @@ local FastLoot_ModuleData = {
 	name = L["ModuleName FastLoot"],
 	dbKey = "FastLoot",
 	description = L["ModuleDescription FastLoot"],
-	descriptionFunc = GetModuleConflictWarning,
+	descriptionFunc = GetFastLootExtraDescription,
 	toggleFunc = EnableModule,
 	categoryID = 1,
 	uiOrder = 0,
@@ -161,6 +176,7 @@ local FastLoot_ModuleData = {
 	getOverrideState = FastLoot_GetOverrideState;
 };
 addon.ControlCenter:AddModule(FastLoot_ModuleData);
+
 
 -- FastLoot can now be enabled without LootUI.
 -- For players who have enabled Plumber LootUI for the auto-loot fix but opted not to use our UI

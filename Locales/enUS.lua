@@ -621,6 +621,8 @@ L["LootUI Option Hide Title Tooltip"] = "Hide the \"You received\" text on the t
 --Fast Loot
 L["ModuleName FastLoot"] = "Fast Loot";
 L["ModuleDescription FastLoot"] = "Loot items fast.";
+L["FastLoot Always On Reason"] = "Fast Loot is always enabled with Plumber Loot Window.";
+L["FastLoot User Notes"] = "*Plumber Fast Loot only does one thing... fast loot. If you prefer finer control, try addons like \"Speedy AutoLoot\" or \"XLoot\".";
 
 
 --Quick Slot For Third-party Dev
