@@ -984,6 +984,9 @@ do
 		self.t = 0;
 		self:SetScript("OnUpdate", nil);
 		self.lootQueue = nil;
+
+		-- Also wipes this yet-displayed table
+		EventListeners.Primary.overflowedCurrencies = nil;
 	end
 
 	function LootUI.QueueDisplayLoot(data)
