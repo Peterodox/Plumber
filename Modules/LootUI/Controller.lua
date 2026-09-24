@@ -385,7 +385,6 @@ do
 	function EL:OnLootOpened(isAutoLoot, acquiredFromItem)
 		self.lootOpened = true;
 		self.dirtySlots = {};
-		self:RecordPlayerMoney();
 
 		local useManualMode = not ShouldAutoLoot(isAutoLoot);
 
@@ -419,6 +418,7 @@ do
 				MainFrame:SetAlpha(0);
 			end
 
+			self:RecordPlayerMoney();
 			self:SetManualMode(false);
 
 			if not isAutoLoot then
@@ -452,17 +452,19 @@ do
 
 		self.lootReady = true;
 		self.lootEventTime = time();
-		self:RecordPlayerMoney();
 
 		if ShouldAutoLoot(isAutoLoot) then
 			if (not self.soundEffectPlayed) and IsFishingLoot() then
 				self.soundEffectPlayed = true;
 				PlaySound(SOUNDKIT.FISHING_REEL_IN);
 			end
+			self:RecordPlayerMoney();
 			self:ListenDynamicEvents(true);
 			self:RegisterEvent("UI_ERROR_MESSAGE");
 			self:BuildLootDataAdditive();
 			FastLoot:Start();
+		else
+			self.playerMoney = nil;
 		end
 	end
 
@@ -680,7 +682,7 @@ do
 	end
 
 	function EL:OnEvent(event, ...)
-		--if string.find(event, "LOOT_") then
+		--if string.find(event, "LOOT_") or event == "PLAYER_MONEY" then
 		--	print(event, GetTimePreciseSec(), ...); -- DEBUG
 		--end
 
