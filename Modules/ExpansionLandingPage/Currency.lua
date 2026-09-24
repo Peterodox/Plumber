@@ -138,6 +138,10 @@ do
 	function CurrencyButtonMixin:SetupActionButton()
 		if not self:HasUsableAction() then return; end
 
+		-- When entering combat, PlayerIsInCombat turns true earlier than InCombatLockdown
+		-- We need this additional check so the tooltip will no long show <...Use Item> on PLAYER_IN_COMBAT_CHANGED
+		if PlayerIsInCombat() then return; end
+
 		local propagateMouseMotion = true;
 		local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion);
 		if actionButton then
@@ -145,11 +149,6 @@ do
 			actionButton:CoverParent();
 			actionButton:SetUseItem(self.usableItemID, "RightButton");
 			actionButton:Show();
-			actionButton.onHideCallback = function()
-				if self:IsMouseMotionFocus() then
-					self:OnEnter();
-				end
-			end;
 			return true
 		end
 	end
@@ -310,6 +309,7 @@ do
 		self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
 		self:UnregisterEvent("BAG_UPDATE_DELAYED");
 		self:UnregisterEvent("UPDATE_FACTION");
+		self:UnregisterEvent("PLAYER_IN_COMBAT_CHANGED");
 		self.anyCurrency = nil;
 		self.anyItem = nil;
 	end
@@ -341,6 +341,14 @@ do
 			self.ScrollView:ProcessActiveObjects("CurrencyButton", processFunc);
 		elseif event == "UPDATE_FACTION" then
 			self.ScrollView:CallObjectMethod("RepBar", "Refresh");
+		elseif event == "PLAYER_IN_COMBAT_CHANGED" then
+			local processFunc = function(obj)
+				if obj.usableItemID and obj:IsMouseMotionFocus() then
+					obj:OnEnter();
+					return true;
+				end
+			end
+			self.ScrollView:ProcessActiveObjects("CurrencyButton", processFunc);
 		end
 	end
 
@@ -348,6 +356,7 @@ do
 		self.anyCurrency = nil;
 		self.anyItem = nil;
 		self.anyRep = nil;
+		self.anyAction = nil;
 		self.inactiveCurrencyIDs = nil;
 
 		local n = 0;
@@ -457,6 +466,10 @@ do
 							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
 						end;
 					end
+
+					if v.usableItemID then
+						self.anyAction = true;
+					end
 				end
 				offsetY = bottom;
 			end
@@ -493,6 +506,12 @@ do
 			self:RegisterEvent("UPDATE_FACTION");
 		else
 			self:UnregisterEvent("UPDATE_FACTION");
+		end
+
+		if self.anyAction then
+			self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED");
+		else
+			self:UnregisterEvent("PLAYER_IN_COMBAT_CHANGED");
 		end
 	end
 

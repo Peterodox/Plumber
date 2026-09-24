@@ -419,6 +419,7 @@ stds.wow = {
 		"PlayerChoiceFrame",
 		"PlayerGetTimerunningSeasonID",
 		"PlayerHasToy",
+		"PlayerIsInCombat",
 		"ProfessionsBook_LoadUI",
 		"ProfessionsBookFrame",
 		"ProfessionsFrame",
