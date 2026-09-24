@@ -24,7 +24,7 @@ LootUI.Defination = {
 	QUEST_TYPE_NEW = 2,
 	QUEST_TYPE_ONGOING = 1,
 
-	IS_CLASSIC = not addon.IsToCVersionEqualOrNewerThan(110000),
+	IS_CLASSIC = addon.IS_CLASSIC,
 
 	AUTO_LOOT_ENABLE_TOOLTIP = true,
 
