@@ -143,8 +143,7 @@ do
 		if actionButton then
 			actionButton:SetParent(self);
 			actionButton:CoverParent();
-			actionButton:SetUseItem(usableItemID, "RightButton");
-			actionButton:RegisterForClicks("RightButtonDown", "RightButtonUp");
+			actionButton:SetUseItem(self.usableItemID, "RightButton");
 			actionButton:Show();
 			actionButton.onHideCallback = function()
 				if self:IsMouseMotionFocus() then

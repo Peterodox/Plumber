@@ -2104,6 +2104,9 @@ do  --(In)Secure Button Pool
 		else
 			self:SetMacroText("/use "..item);
 		end
+
+		self:SetAttribute("useOnKeyDown", false);
+		self:RegisterForClicks("AnyDown", "AnyUp");
 	end
 
 	function SecureButtonMixin:SetEquipOutfit(playerFacingOutfitIndex)
