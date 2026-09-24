@@ -594,7 +594,7 @@ do
 		end
 
 		if anyLeft then
-			if self.lootOpened then
+			if self.lootOpened and not MainFrame:IsInMaualModeOrEditMode() then
 				self:SetManualMode(true);
 				MainFrame:OnErrored();
 			end
