@@ -30,7 +30,7 @@ Modules\ReputationTracker.lua [AllowLoadGameType standard, camelot]
 
 Modules\ControlCenter\ControlCenter.xml
 
-Modules\LootUI.xml
+Modules\LootUI\LootUI.xml
 Modules\SpellFlyout_Secure.lua
 Modules\Macros.lua
 Modules\StaticPopup_Basic.lua

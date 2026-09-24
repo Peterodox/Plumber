@@ -1538,7 +1538,7 @@ do	--CommitUtil
 				icon = icon,
 				name = string.format("%s\n|cff19ff19%s|r", name, L["Rank Increased"]),
 			};
-			addon.LootWindow:QueueDisplaySpell(data);
+			addon.LootUI.QueueDisplaySpell(data);
 		end
 
 		--local spellLink = string.format("|Hspell:%d:0|h[%s]|h", spellID, name);

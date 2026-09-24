@@ -33,7 +33,7 @@ function EL:OnEvent(event, ...)
 					quality = quality,
 					subtitle = addon.L["Power Borrowed"],
 				}
-				addon.LootWindow:QueueDisplaySpell(data);
+				addon.LootUI.QueueDisplaySpell(data);
 			end
 			local text = string.format("|Hspell:%d:0|h[%s]|h", spellID, header);
 			local msg = string.format("|cffffd100%s|r %s", addon.L["Auto Select"], ColorManager.GetFormattedStringForItemQuality(text, quality));

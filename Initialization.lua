@@ -118,6 +118,10 @@ do  --CallbackRegistry
 			end
 		end
 	end
+
+	function CallbackRegistry:WipeCallbacksForEvent(event)
+		self.events[event] = nil;
+	end
 end
 
 
@@ -276,7 +280,6 @@ local DefaultValues = {
 		LootUI_NewTransmogIcon = true,
 		LootUI_UseCustomColor = false,
 		LootUI_GrowUpwards = false,
-		LootUI_WindowHide = false,
 		LootUI_CombineItem = true,
 		LootUI_LowFrameStrata = false,
 		LootUI_HideTitle = false,
@@ -288,7 +291,10 @@ local DefaultValues = {
 		LootUI_LootUnderMouse = false,
 		LootUI_UseHotkey = true,
 		LootUI_HotkeyName = "E",
-		LootUI_UseStockUI = false,
+		--LootUI_UseStockUI = false,	--Deprecated and merged into FastLoot
+		--LootUI_WindowHide = false,	--Deprecated and merged into FastLoot
+
+	FastLoot = false,					--FastLoot now works independently instead instead of being a LootUI suboptions.
 
 
 	--Unified Map Pin System
@@ -418,6 +424,8 @@ local function LoadDatabase()
 	local alwaysEnableNew = DB.EnableNewByDefault or false;
 	local newDBKeys = {};
 
+	CallbackRegistry:Trigger("DBPreload", DB);
+
 	for dbKey, value in pairs(DefaultValues) do
 		if DB[dbKey] == nil then
 			DB[dbKey] = value;
@@ -450,8 +458,9 @@ local function LoadDatabase()
 	CallbackRegistry:Trigger("NewDBKeysAdded", newDBKeys);
 	CallbackRegistry:Trigger("DBLoaded", DB);
 
-
-	PlumberStorage.CreatureSpells = nil;    --Store SpellcastingInfo, retired in  Midnight
+	CallbackRegistry:WipeCallbacksForEvent("DBPreload");
+	CallbackRegistry:WipeCallbacksForEvent("NewDBKeysAdded");
+	CallbackRegistry:WipeCallbacksForEvent("DBLoaded");
 end
 
 
