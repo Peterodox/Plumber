@@ -749,7 +749,7 @@ do
 			LootUI.WipeLootQueue();
 		end
 
-		local enableState = Def.AUTO_LOOT_ENABLE_TOOLTIP and 2 or 0;
+		local enableState = Def.AUTO_LOOT_ENABLE_TOOLTIP and 2 or 0; ---@type ItemFrameInteractionState
 
 		for i, data in ipairs(lootThisPage) do
 			if data.slotType == Def.SLOT_TYPE_MONEY then

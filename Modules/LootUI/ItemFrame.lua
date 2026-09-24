@@ -663,10 +663,12 @@ function ItemFrameMixin:OnClick(button)
 	end
 end
 
----@param enableState 1 | 2 | nil
----- `1`: Enable Clicks and Hover. For Manual Loot.
----- `2`: Only enable Hover to display tooltip. For Loot Notification.
----- `nil`: Non-interactable.
+---@alias ItemFrameInteractionState
+---| 0 # Non-interactable.
+---| 1 # Enable Clicks and Hover. For Manual Loot.
+---| 2 # Only enable Hover to display tooltip. For Loot Notification.
+
+---@param enableState ItemFrameInteractionState?
 function ItemFrameMixin:EnableMouseScript(enableState)
 	if enableState == 1 then
 		self:EnableMouse(true);
