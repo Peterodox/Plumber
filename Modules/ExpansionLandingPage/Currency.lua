@@ -136,10 +136,14 @@ do
 	end
 
 	function CurrencyButtonMixin:SetupActionButton()
-		if not self:HasUsableAction() then return; end
+		-- Release the SAB so a previously acquired one doesn't stay usable after criteria are no longer met
+		if not self:HasUsableAction() then
+			self:ReleaseActionButton();
+			return;
+		end
 
 		-- When entering combat, PlayerIsInCombat turns true earlier than InCombatLockdown
-		-- We need this additional check so the tooltip will no long show <...Use Item> on PLAYER_IN_COMBAT_CHANGED
+		-- We need this additional check so the tooltip will no longer show <...Use Item> on PLAYER_IN_COMBAT_CHANGED
 		if PlayerIsInCombat() then return; end
 
 		local propagateMouseMotion = true;
