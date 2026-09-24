@@ -143,7 +143,8 @@ do
 		if PlayerIsInCombat() then return; end
 
 		local propagateMouseMotion = true;
-		local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion);
+		local propagateMouseClick = true;
+		local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion, propagateMouseClick);
 		if actionButton then
 			actionButton:SetParent(self);
 			actionButton:CoverParent();
