@@ -461,14 +461,14 @@ do
 					if v.currencyID then
 						self.anyCurrency = true;
 						content[n].setupFunc = function(obj)
-							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
 							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
 						end;
 					elseif v.itemID then
 						self.anyItem = true;
 						content[n].setupFunc = function(obj)
-							obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
 							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+							obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
 						end;
 					end
 
