@@ -50,8 +50,10 @@ end
 
 do  --MID
 	local ResourceList = {
+		{itemID = 273000},		--Corrosive Soul
+		{currencyID = 3448},	--Corrosive Coin
 		{currencyID = 3028},    --Restored Coffer Key
-		{currencyID = 3310, hasWeeklyCap = true, useItemID = 267291},	--Coffer Key Shard
+		{currencyID = 3310, hasWeeklyCap = true, usableItemID = 267291},	--Coffer Key Shard. Use [Coffer Key Glue]
 		{currencyID = 3316},    --Voidlight Marl
 		{currencyID = 3363, shownIfOwned = true},	--Community Coupons
 		{currencyID = 3405, shownIfOwned = true},	--Field Accolade
@@ -81,11 +83,6 @@ do  --MID
 		});
 	end
 
-	if addon.IS_12_1_0 then
-		AddEntry("currencyID", 3448);	-- Corrosive Coin
-		AddEntry("itemID", 273000);		-- Corrosive Soul
-	end
-
 	if addon.ItemUpgradeConstant.CatalystCurrencyID then
 		AddEntry("currencyID", addon.ItemUpgradeConstant.CatalystCurrencyID, true);
 	end
@@ -100,7 +97,7 @@ do  --TWW
 	local ResourceList = {
 		{currencyID = 3269, shownIfOwned = true},
 		{currencyID = 3028},    --Restored Coffer Key
-		{itemID = 245653, isMinor = false, useActionButton = true},   --Coffer Key Shard
+		{itemID = 245653, isMinor = false},   --Coffer Key Shard
 		{itemID = addon.ItemUpgradeConstant.RadiantEchoItemID},      --Radiant Echo
 
 		{currencyID = 1602, shownIfOwned = true},    --Conquest
