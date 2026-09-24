@@ -431,7 +431,9 @@ do
 		if state then
 			self:ListenDynamicEvents(false);
 			EventListeners.EmptyLootWatcher:StartWatching();
+			-- Clear any queued entries when entering Manual Mode
 			EventListeners.QueueFrame:WipeQueue();
+			self.overflowedCurrencies = nil;
 		else
 			self:ListenDynamicEvents(true);
 			EventListeners.EmptyLootWatcher:StopWatching();
@@ -962,9 +964,6 @@ do
 		self.t = 0;
 		self:SetScript("OnUpdate", nil);
 		self.lootQueue = nil;
-
-		-- Also wipes this yet-displayed table
-		EventListeners.Primary.overflowedCurrencies = nil;
 	end
 
 	function LootUI.QueueDisplayLoot(data)
