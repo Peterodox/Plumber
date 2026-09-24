@@ -2030,6 +2030,7 @@ do  --(In)Secure Button Pool
 		end
 		if self.onHideCallback then
 			self.onHideCallback(self);
+			self.onHideCallback = nil;
 		end
 	end
 
