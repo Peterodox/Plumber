@@ -104,7 +104,7 @@ do
 		end
 
 		if self:IsMouseMotionFocus() then
-			self:ShowTooltip();
+			self:OnEnter();
 		end
 
 		if quantity then
@@ -147,7 +147,7 @@ do
 			actionButton:Show();
 			actionButton.onHideCallback = function()
 				if self:IsMouseMotionFocus() then
-					self:ShowTooltip();
+					self:OnEnter();
 				end
 			end;
 			return true
@@ -222,6 +222,8 @@ do
 			if shouldRefreshTooltip then
 				self.UpdateTooltip = self.OnEnter;
 			end
+
+			-- We don't show item cooldown or cast bar for now until we need it.
 		end
 
 		self:ShowTooltip();

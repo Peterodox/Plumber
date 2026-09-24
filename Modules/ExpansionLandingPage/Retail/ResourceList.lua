@@ -48,12 +48,20 @@ end
 --]]
 
 
+local function CreateCurrencyQuantityCriteria(currencyID, numRequired)
+	return function()
+		local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+		return info and info.quantity and info.quantity >= numRequired;
+	end
+end
+
+
 do  --MID
 	local ResourceList = {
 		{itemID = 273000},		--Corrosive Soul
 		{currencyID = 3448},	--Corrosive Coin
 		{currencyID = 3028},    --Restored Coffer Key
-		{currencyID = 3310, hasWeeklyCap = true, usableItemID = 267291},	--Coffer Key Shard. Use [Coffer Key Glue]
+		{currencyID = 3310, hasWeeklyCap = true, usableItemID = 267291, criteriaFunc = CreateCurrencyQuantityCriteria(3310, 100)},	--Coffer Key Shard. Use [Coffer Key Glue]
 		{currencyID = 3316},    --Voidlight Marl
 		{currencyID = 3363, shownIfOwned = true},	--Community Coupons
 		{currencyID = 3405, shownIfOwned = true},	--Field Accolade
