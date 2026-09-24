@@ -12,7 +12,7 @@ local GetItemNameByID = C_Item.GetItemNameByID;
 
 
 local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
-local ResourceList = {};
+local ResourceList = {}; ---@type ResourceListEntry[]
 local MainFrame;
 
 

@@ -2,6 +2,24 @@ local _, addon = ...
 local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 
+---@class ResourceListEntry
+---@field currencyID number? This entry is a currency
+---@field itemID number? This entry is an item
+---@field hasWeeklyCap boolean? If true, check the currency's weekly cap and colorize it if applicable
+---@field shownIfOwned boolean? Valid if quantity > 0
+---@field uiMapID number|table? Valid if on specific maps
+---@field shownInDelves boolean? Valid if in a delve
+---@field conditionFunc function? A custom function to determine if the entry is valid
+---@field appendTooltipFunc function? Append extra info to the tooltip
+---@field usableItemID number? Right-click to use an item by ID
+---@field criteriaFunc function? A custom function to determine if the "usable item" should be used
+---@field hidden boolean? Ignore this entry if true
+---@field isMinor boolean? Unused. If true, there will be extra padding to the left of the name
+---@field isHeader boolean? Classic Only. This entry is a header
+---@field name string? The header's name
+---@field faction number? This entry is a reputation bar
+
+
 --Greedy Emissary Events
 --[[
 local IsBaseSetCollected = C_TransmogSets.IsBaseSetCollected;
@@ -57,6 +75,7 @@ end
 
 
 do  --MID
+	---@type ResourceListEntry[]
 	local ResourceList = {
 		{itemID = 273000},		--Corrosive Soul
 		{currencyID = 3448},	--Corrosive Coin
