@@ -7,6 +7,89 @@ local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
+changelogs[10906] = {
+	{
+		type = "date",
+		versionText = "1.9.6",
+		timestamp = 1790300000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName LootUI"],
+		dbKey = "LootUI",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "LootUI",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The loot speed has become faster.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Fast Loot can now be enabled separately without enabling Plumber Loot Window. You can find that option in Plumber Settings> Loot.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "We made lots of changes behind the scene to make this module easier to maintain, but please expect temporary issues :)",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = "Bug Fixes",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Instance Difficulty Selector: \"World\" difficulty should no longer appear for raids.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Instance Difficulty Selector: The UI should reliably show when you approach the entrance of Throne of the Four Winds and The Tidebound Grotto.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot Window: Fixed an issue that could lead to disconnection if you kept looting the same corpse while the bag was full.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot Window: Fixed an issue where currencies (such as crests) received from a chest could show double if you had enabled \"Show Any Currency Changes\" in the settings.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Unspent Engineering Knowledge: The unspent points are now also displayed on tooltip of Gnomish/Goblin Engineer.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Fixed a wrong achievement for Nek'zali the Soulcoiler.",
+	},
+};
+
+
 changelogs[10905] = {
 	{
 		type = "date",
@@ -2369,6 +2452,7 @@ changelogs[10802] = {
 };
 
 
+--[[
 changelogs[10801] = {
 	{
 		type = "date",
@@ -2440,7 +2524,6 @@ changelogs[10801] = {
 };
 
 
---[[
 changelogs[10800] = {
 	{
 		type = "date",
