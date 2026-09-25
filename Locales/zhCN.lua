@@ -705,6 +705,7 @@ L["Weekly Coffer Key Shards Tooltip"] = "每周获得的前四个周常宝箱里
 L["Weekly Cap"] = "每周上限";
 L["Weekly Cap Reached"] = "已达到每周上限。";
 L["Instruction Right Click To Use"] = "<右键单击来使用>"
+L["Instruction Right Click To Use Format"] = "<右键单击来使用%s>";
 L["Join Queue"] = "加入队列";
 L["In Queue"] = "在队列中";
 L["Click To Switch"] = "点击以切换为|cffffffff%s|r";

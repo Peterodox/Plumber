@@ -12,7 +12,7 @@ local GetItemNameByID = C_Item.GetItemNameByID;
 
 
 local BUTTON_WIDTH, BUTTON_HEIGHT = 240, 24;
-local ResourceList = {};
+local ResourceList = {}; ---@type ResourceListEntry[]
 local MainFrame;
 
 
@@ -29,28 +29,38 @@ end
 
 local CurrencyButtonMixin = {};
 do
-	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc, hasWeeklyCap, useItemID)
+	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc, hasWeeklyCap)
 		self.currencyID = currencyID;
 		self.itemID = nil;
 		self.buttonDitry = true;
 		self.appendTooltipFunc = appendTooltipFunc;
 		self.hasWeeklyCap = hasWeeklyCap;
-		self.useActionButton = nil;
-		self.useCurrencyItemID = useItemID;
 		self:Refresh();
 		self:SetShownAsMinor(isMinor);
 	end
 
-	function CurrencyButtonMixin:SetItem(itemID, isMinor, appendTooltipFunc, useActionButton)
+	function CurrencyButtonMixin:SetItem(itemID, isMinor, appendTooltipFunc)
 		self.currencyID = nil;
 		self.itemID = itemID;
 		self.buttonDitry = true;
 		self.appendTooltipFunc = appendTooltipFunc;
 		self.hasWeeklyCap = nil;
-		self.useActionButton = useActionButton;
-		self.useCurrencyItemID = nil;
 		self:Refresh();
 		self:SetShownAsMinor(isMinor);
+	end
+
+	---Allow right-click to use an item via SAB
+	---@param usableItemID number?
+	---@param criteriaFunc function?
+	function CurrencyButtonMixin:SetUsableAction(usableItemID, criteriaFunc)
+		self.usableItemID = usableItemID;
+		self.criteriaFunc = criteriaFunc;
+	end
+
+	function CurrencyButtonMixin:HasUsableAction()
+		if self.usableItemID then
+			return ((not self.criteriaFunc) or self.criteriaFunc()) and API.CanPlayerPerformAction("item", self.usableItemID);
+		end
 	end
 
 	function CurrencyButtonMixin:Refresh()
@@ -94,7 +104,7 @@ do
 		end
 
 		if self:IsMouseMotionFocus() then
-			self:ShowTooltip();
+			self:OnEnter();
 		end
 
 		if quantity then
@@ -126,28 +136,24 @@ do
 	end
 
 	function CurrencyButtonMixin:SetupActionButton()
-		local usableItemID = self.itemID or self.useCurrencyItemID;
+		-- Release the SAB so a previously acquired one doesn't stay usable after criteria are no longer met
+		if not self:HasUsableAction() then
+			self:ReleaseActionButton();
+			return;
+		end
 
-		--Items that interact with currency are not checked earlier for usability (e.g.: Player does not have item/toy),
-		--so we check that here to ensure we don't show a misleading tooltip or error text.
-		if self.useCurrencyItemID and (not API.CanPlayerPerformAction("item", self.useCurrencyItemID)) then return end;
-
-		if not usableItemID then return end;
-		--if IS_MIDNIGHT then return end;
+		-- When entering combat, PlayerIsInCombat turns true earlier than InCombatLockdown
+		-- We need this additional check so the tooltip will no longer show <...Use Item> on PLAYER_IN_COMBAT_CHANGED
+		if PlayerIsInCombat() then return; end
 
 		local propagateMouseMotion = true;
-		local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion);
+		local propagateMouseClick = true;
+		local actionButton = addon.AcquireSecureActionButton("ExpansionLandingPage", propagateMouseMotion, propagateMouseClick);
 		if actionButton then
 			actionButton:SetParent(self);
 			actionButton:CoverParent();
-			actionButton:SetUseItem(usableItemID, "RightButton");
-			actionButton:RegisterForClicks("RightButtonDown", "RightButtonUp");
+			actionButton:SetUseItem(self.usableItemID, "RightButton");
 			actionButton:Show();
-			actionButton.onHideCallback = function()
-				if self:IsMouseMotionFocus() then
-					self:ShowTooltip();
-				end
-			end;
 			return true
 		end
 	end
@@ -158,8 +164,7 @@ do
 
 	function CurrencyButtonMixin:ShowTooltip()
 		local tooltip = GameTooltip;
-		local owner = self.Icon;
-		tooltip:SetOwner(owner, "ANCHOR_RIGHT", 0, 0);
+		tooltip:SetOwner(self, "ANCHOR_RIGHT", -6, 0);
 
 		if self.currencyID then
 			tooltip:SetCurrencyByID(self.currencyID);
@@ -167,45 +172,65 @@ do
 			tooltip:SetItemByID(self.itemID);
 		end
 
-		if tooltip.ProcessInfo then
+		if tooltip.ProcessInfo and (self.appendTooltipFunc or self.contextualTooltipFunc) then
+			local anyChanges;
+			local info = API.CreateAppendTooltipInfo();
+
 			if self.appendTooltipFunc then
-				local info = API.CreateAppendTooltipInfo();
 				if self.appendTooltipFunc(info) then
-					API.DisplayTooltipInfoOnTooltip(tooltip, info);
+					anyChanges = true;
 				end
+			end
+
+			if self.contextualTooltipFunc then
+				if self.contextualTooltipFunc(info) then
+					anyChanges = true;
+				end
+			end
+
+			if anyChanges then
+				API.DisplayTooltipInfoOnTooltip(tooltip, info);
 			end
 		end
 	end
 
 	function CurrencyButtonMixin:OnEnter()
 		self:UpdateVisual();
-		self:ShowTooltip();
+		self.UpdateTooltip = nil;
+		self.contextualTooltipFunc = nil;
 
-		local contextualTooltipFunc;
-		if ((self.itemID and self.useActionButton) or (self.currencyID and self.useCurrencyItemID)) and self:SetupActionButton() then
-			if self.itemID then
-				contextualTooltipFunc = function(tooltip)
+		if self:SetupActionButton() then
+			local shouldRefreshTooltip;
+
+			-- Show item name if the usable item is not the base item.
+			-- Refresh the tooltip if the name is not received.
+			if self.itemID ~= self.usableItemID then
+				local itemName = API.GetColorizedItemName(self.usableItemID);
+				if itemName then
+					self.contextualTooltipFunc = function(tooltip)
+						tooltip:AddLine(L["Instruction Right Click To Use Format"]:format(itemName), 0.098, 1.000, 0.098, true);
+						return true;
+					end
+				else
+					shouldRefreshTooltip = true;
+				end
+			end
+
+			if not self.contextualTooltipFunc then
+				self.contextualTooltipFunc = function(tooltip)
 					tooltip:AddLine(L["Instruction Right Click To Use"], 0.098, 1.000, 0.098, true);
 					return true
 				end
-			elseif self.currencyID and self.useCurrencyItemID then
-				local itemName = API.GetColorizedItemName(self.useCurrencyItemID);
-				contextualTooltipFunc = function(tooltip)
-					tooltip:AddLine(L["Instruction Right Click To Use Format"]:format(itemName), 0.098, 1.000, 0.098, true);
-					return true
-				end
 			end
+
+			if shouldRefreshTooltip then
+				self.UpdateTooltip = self.OnEnter;
+			end
+
+			-- We don't show item cooldown or cast bar for now until we need it.
 		end
 
-		if contextualTooltipFunc then
-			local tooltip = GameTooltip;
-			if tooltip.ProcessInfo then
-				local info = API.CreateAppendTooltipInfo();
-				if contextualTooltipFunc(info) then
-					API.DisplayTooltipInfoOnTooltip(tooltip, info);
-				end
-			end
-		end
+		self:ShowTooltip();
 	end
 
 	function CurrencyButtonMixin:OnLeave()
@@ -289,6 +314,7 @@ do
 		self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE");
 		self:UnregisterEvent("BAG_UPDATE_DELAYED");
 		self:UnregisterEvent("UPDATE_FACTION");
+		self:UnregisterEvent("PLAYER_IN_COMBAT_CHANGED");
 		self.anyCurrency = nil;
 		self.anyItem = nil;
 	end
@@ -320,6 +346,14 @@ do
 			self.ScrollView:ProcessActiveObjects("CurrencyButton", processFunc);
 		elseif event == "UPDATE_FACTION" then
 			self.ScrollView:CallObjectMethod("RepBar", "Refresh");
+		elseif event == "PLAYER_IN_COMBAT_CHANGED" then
+			local processFunc = function(obj)
+				if obj.usableItemID and obj:IsMouseMotionFocus() then
+					obj:OnEnter();
+					return true;
+				end
+			end
+			self.ScrollView:ProcessActiveObjects("CurrencyButton", processFunc);
 		end
 	end
 
@@ -327,6 +361,7 @@ do
 		self.anyCurrency = nil;
 		self.anyItem = nil;
 		self.anyRep = nil;
+		self.anyAction = nil;
 		self.inactiveCurrencyIDs = nil;
 
 		local n = 0;
@@ -426,13 +461,19 @@ do
 					if v.currencyID then
 						self.anyCurrency = true;
 						content[n].setupFunc = function(obj)
-							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap, v.useItemID);
+							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
 						end;
 					elseif v.itemID then
 						self.anyItem = true;
 						content[n].setupFunc = function(obj)
-							obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc, v.useActionButton);
+							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+							obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
 						end;
+					end
+
+					if v.usableItemID then
+						self.anyAction = true;
 					end
 				end
 				offsetY = bottom;
@@ -470,6 +511,12 @@ do
 			self:RegisterEvent("UPDATE_FACTION");
 		else
 			self:UnregisterEvent("UPDATE_FACTION");
+		end
+
+		if self.anyAction then
+			self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED");
+		else
+			self:UnregisterEvent("PLAYER_IN_COMBAT_CHANGED");
 		end
 	end
 

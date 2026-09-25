@@ -2,6 +2,24 @@ local _, addon = ...
 local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
 
 
+---@class ResourceListEntry
+---@field currencyID number? This entry is a currency
+---@field itemID number? This entry is an item
+---@field hasWeeklyCap boolean? If true, check the currency's weekly cap and colorize it if applicable
+---@field shownIfOwned boolean? Valid if quantity > 0
+---@field uiMapID number|table? Valid if on specific maps
+---@field shownInDelves boolean? Valid if in a delve
+---@field conditionFunc function? A custom function to determine if the entry is valid
+---@field appendTooltipFunc function? Append extra info to the tooltip
+---@field usableItemID number? Right-click to use an item by ID
+---@field criteriaFunc function? A custom function to determine if the "usable item" should be used
+---@field hidden boolean? Ignore this entry if true
+---@field isMinor boolean? Unused. If true, there will be extra padding to the left of the name
+---@field isHeader boolean? Classic Only. This entry is a header
+---@field name string? The header's name
+---@field faction number? This entry is a reputation bar
+
+
 --Greedy Emissary Events
 --[[
 local IsBaseSetCollected = C_TransmogSets.IsBaseSetCollected;
@@ -48,10 +66,21 @@ end
 --]]
 
 
+local function CreateCurrencyQuantityCriteria(currencyID, numRequired)
+	return function()
+		local info = C_CurrencyInfo.GetCurrencyInfo(currencyID);
+		return info and info.quantity and info.quantity >= numRequired;
+	end
+end
+
+
 do  --MID
+	---@type ResourceListEntry[]
 	local ResourceList = {
+		{itemID = 273000},		--Corrosive Soul
+		{currencyID = 3448},	--Corrosive Coin
 		{currencyID = 3028},    --Restored Coffer Key
-		{currencyID = 3310, hasWeeklyCap = true, useItemID = 267291},	--Coffer Key Shard
+		{currencyID = 3310, hasWeeklyCap = true, usableItemID = 267291, criteriaFunc = CreateCurrencyQuantityCriteria(3310, 100)},	--Coffer Key Shard. Use [Coffer Key Glue]
 		{currencyID = 3316},    --Voidlight Marl
 		{currencyID = 3363, shownIfOwned = true},	--Community Coupons
 		{currencyID = 3405, shownIfOwned = true},	--Field Accolade
@@ -81,11 +110,6 @@ do  --MID
 		});
 	end
 
-	if addon.IS_12_1_0 then
-		AddEntry("currencyID", 3448);	-- Corrosive Coin
-		AddEntry("itemID", 273000);		-- Corrosive Soul
-	end
-
 	if addon.ItemUpgradeConstant.CatalystCurrencyID then
 		AddEntry("currencyID", addon.ItemUpgradeConstant.CatalystCurrencyID, true);
 	end
@@ -100,7 +124,7 @@ do  --TWW
 	local ResourceList = {
 		{currencyID = 3269, shownIfOwned = true},
 		{currencyID = 3028},    --Restored Coffer Key
-		{itemID = 245653, isMinor = false, useActionButton = true},   --Coffer Key Shard
+		{itemID = 245653, isMinor = false},   --Coffer Key Shard
 		{itemID = addon.ItemUpgradeConstant.RadiantEchoItemID},      --Radiant Echo
 
 		{currencyID = 1602, shownIfOwned = true},    --Conquest
