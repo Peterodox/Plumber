@@ -28,19 +28,19 @@ changelogs[10906] = {
 	{
 		type = "p",
 		bullet = true,
-		text = "The loot speed has become faster.",
+		text = "Loot speed has become faster.",
 	},
 
 	{
 		type = "p",
 		bullet = true,
-		text = "Fast Loot can now be enabled separately without enabling Plumber Loot Window. You can find that option in Plumber Settings> Loot.",
+		text = "Fast Loot can now be enabled separately without enabling Plumber Loot Window. You can find that option in Plumber Settings > Loot.",
 	},
 
 	{
 		type = "p",
 		bullet = true,
-		text = "We made lots of changes behind the scene to make this module easier to maintain, but please expect temporary issues :)",
+		text = "We made lots of changes behind the scenes to make this module easier to maintain, but please expect temporary issues :)",
 	},
 
 	{
@@ -67,7 +67,7 @@ changelogs[10906] = {
 	{
 		type = "p",
 		bullet = true,
-		text = "Loot Window: Fixed an issue that could lead to disconnection if you kept looting the same corpse while the bag was full.",
+		text = "Loot Window: Fixed an issue that could lead to disconnections if you kept looting the same corpse while the bag was full.",
 	},
 
 	{
@@ -79,13 +79,34 @@ changelogs[10906] = {
 	{
 		type = "p",
 		bullet = true,
-		text = "Unspent Engineering Knowledge: The unspent points are now also displayed on tooltip of Gnomish/Goblin Engineer.",
+		text = "Unspent Engineering Knowledge: The unspent points are now also displayed on the tooltip of Gnomish/Goblin Engineer.",
 	},
 
 	{
 		type = "p",
 		bullet = true,
-		text = "Expansion Summary UI: Fixed a wrong achievement for Nek'zali the Soulcoiler.",
+		text = "Expansion Summary UI: Fixed an incorrect achievement for Nek'zali the Soulcoiler.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary UI: Added Zul'jarra's Forces to Activities > Delves > Bonus Renowns.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber now supports WoW: Forever.",
 	},
 };
 
