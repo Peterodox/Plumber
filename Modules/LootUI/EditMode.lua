@@ -76,6 +76,8 @@ function MainFrame:EnterEditMode()
 end
 
 function MainFrame:ExitEditMode()
+	if not self.inEditMode then return; end
+
 	self.inEditMode = nil;
 	self:Disable();
 	self:SetAlpha(0);
