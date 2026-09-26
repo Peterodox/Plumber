@@ -152,7 +152,7 @@ do
 		end
 
 		if self.anyChange then
-			tooltip:Show();
+			pcall(tooltip.Show, tooltip);
 		end
 	end
 
