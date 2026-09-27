@@ -4547,7 +4547,7 @@ do  --DropdownFrame--
 	end
 
 	function DropdownFrameMixin:UpdateEnabledState()
-		local enabled = self.menuData and self.menuData.ShouldEnable and self.menuData.ShouldEnable();
+		local enabled = self.menuData and (not self.ShouldEnable) or (self.menuData.ShouldEnable and self.menuData.ShouldEnable());
 		self:SetEnabled(enabled);
 	end
 
@@ -4618,7 +4618,11 @@ do  --DropdownFrame--
 			tooltip:SetOwner(self, "ANCHOR_RIGHT");
 			tooltip:SetText(self.Text:GetText(), 1, 1, 1);
 			if self.tooltip then
-				tooltip:AddLine(self.tooltip, 1, 0.82, 0, true);
+				if type(self.tooltip) == "function" then
+					tooltip:AddLine(self.tooltip(), 1, 0.82, 0, true);
+				else
+					tooltip:AddLine(self.tooltip, 1, 0.82, 0, true);
+				end
 			end
 			tooltip:Show();
 		end
