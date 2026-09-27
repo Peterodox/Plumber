@@ -39,6 +39,7 @@ EL.instancePos = {
 	--Some map pins don't show on map until you complete relevant quests or discover the map
 	--[journalInstanceID] = {x, y, indoors}
 	[74]  = {0.38465, 0.80562},         --Throne of the Four Winds
+	[75]  = {0.47643, 0.51756},         --Baradin Hold
 	[184] = {0.57381, 0.29142},         --End Time
 	[187] = {0.61534, 0.26397},         --Dragon Soul
 	[251] = {0.26814, 0.35114},         --Old Hillsbrad Foothills
