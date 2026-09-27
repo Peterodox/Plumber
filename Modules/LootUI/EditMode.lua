@@ -194,11 +194,7 @@ local function Options_GrowDirection_OnClick(self)
 end
 
 local function Validation_TransmogInvented()
-	return addon.IsToCVersionEqualOrNewerThan(40000)
-end
-
-local function Validation_IsRetail()
-	return addon.IsToCVersionEqualOrNewerThan(110000)
+	return C_GameRules.IsGameRuleActive(Enum.GameRule.TransmogEnabled);
 end
 
 local function Tooltip_ShowReputation()
@@ -231,10 +227,10 @@ local OPTIONS_SCHEMATIC = {
 		{type = "Checkbox", label = L["LootUI Option Hide Title"], tooltip = L["LootUI Option Hide Title Tooltip"], onClickFunc = nil, dbKey = "LootUI_HideTitle"},
 
 		{type = "Divider"},
-		{newFeature = true, type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = Tooltip_ShowReputation, onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = Validation_IsRetail},
-		{newFeature = true, type = "Checkbox", label = L["LootUI Option Show All Money"], tooltip = L["LootUI Option Show All Money Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowAllMoneyChange"},
-		{newFeature = true, type = "Checkbox", label = L["LootUI Option Show All Currency"], tooltip = L["LootUI Option Show All Currency Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowAllCurrencyChange"},
-		{type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"], validityCheckFunc = Validation_IsRetail},
+		{type = "Checkbox", label = L["LootUI Option Show Reputation"], tooltip = Tooltip_ShowReputation, onClickFunc = nil, dbKey = "LootUI_ShowReputation", validityCheckFunc = function() return addon.IS_MODERN; end},
+		{type = "Checkbox", label = L["LootUI Option Show All Money"], tooltip = L["LootUI Option Show All Money Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowAllMoneyChange"},
+		{type = "Checkbox", label = L["LootUI Option Show All Currency"], tooltip = L["LootUI Option Show All Currency Tooltip"], onClickFunc = nil, dbKey = "LootUI_ShowAllCurrencyChange"},
+		{type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"], validityCheckFunc = function() return addon.IS_RETAIL; end},
 
 		{type = "Divider"},
 		{type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = nil, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
