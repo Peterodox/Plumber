@@ -4547,7 +4547,8 @@ do  --DropdownFrame--
 	end
 
 	function DropdownFrameMixin:UpdateEnabledState()
-		local enabled = self.menuData and (not self.ShouldEnable) or (self.menuData.ShouldEnable and self.menuData.ShouldEnable());
+		local menuData = self.menuData;
+		local enabled = menuData and ((not menuData.ShouldEnable) or menuData.ShouldEnable());
 		self:SetEnabled(enabled);
 	end
 
