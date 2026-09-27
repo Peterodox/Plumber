@@ -217,14 +217,7 @@ do
 		end
 	end
 
-	MenuData_LootSpeed.tooltip = function()
-		local value = FastLoot:GetSelectedLootSpeed();
-		for _, v in ipairs(FastLoot.LootSpeedOptions) do
-			if v.value == value then
-				return v.tooltip;
-			end
-		end
-	end
+	MenuData_LootSpeed.tooltip = FastLoot.GetSelectedLootSpeedTooltip;
 
 	MenuData_LootSpeed.UpdateSettings = function ()
 		addon.UpdateSettingsDialog();

@@ -153,3 +153,12 @@ end
 function FastLoot:UpdateLootSpeed()
 	self.lootSpeed = self:GetSelectedLootSpeed(); ---@type FastLootSpeed
 end
+
+function FastLoot:GetSelectedLootSpeedTooltip()
+	local value = FastLoot:GetSelectedLootSpeed();
+	for _, v in ipairs(FastLoot.LootSpeedOptions) do
+		if v.value == value then
+			return v.tooltip;
+		end
+	end
+end

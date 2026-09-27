@@ -126,7 +126,8 @@ local function GetFastLootExtraDescription()
 	end
 
 	if addon.GetDBBool("LootUI") then
-		return L["FastLoot Always On Reason"];
+		local lootSpeedTooltip = FastLoot:GetSelectedLootSpeedTooltip();
+		return L["FastLoot Always On Reason"].."\n\n"..lootSpeedTooltip;
 	end
 
 	return L["FastLoot User Notes"];
