@@ -931,6 +931,9 @@ end
 
 do  --Right Section
 	function MainFrame:ShowFeaturePreview(moduleData, parentDBKey)
+		self.previewedModuleData = moduleData;
+		self.previewedParentDBKey = parentDBKey;
+
 		if not moduleData then return end;
 		local desc = moduleData.description;
 		local additonalDesc = moduleData.descriptionFunc and moduleData.descriptionFunc() or nil;
@@ -963,6 +966,11 @@ do  --Right Section
 			self.FooterTexture:Hide();
 		end
 	end
+
+	function MainFrame:RefreshPreview()
+		self:ShowFeaturePreview(self.previewedModuleData, self.previewedParentDBKey);
+	end
+	addon.CallbackRegistry:Register("SettingsPanel.RefreshPreview", MainFrame.RefreshPreview, MainFrame);
 end
 
 

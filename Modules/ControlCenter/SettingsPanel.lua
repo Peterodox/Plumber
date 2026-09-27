@@ -370,6 +370,8 @@ local function CreateUI()
 		if DEV_MODE then
 			print(self.data.uiOrder);
 		end
+
+		MainFrame.lastFocusedCheckbox = self;
 	end
 
 	local function Checkbox_OnLeave(self)
@@ -654,6 +656,14 @@ function MainFrame:UpdateContent()
 	self.ScrollView:SetContent(content, retainPosition);
 	self:ShowScrollBar(self.ScrollView:IsScrollable());
 end
+
+function MainFrame:RefreshPreview()
+	if self.lastFocusedCheckbox then
+		local onEnterFunc = self.lastFocusedCheckbox:GetScript("OnEnter");
+		onEnterFunc(self.lastFocusedCheckbox);
+	end
+end
+addon.CallbackRegistry:Register("SettingsPanel.RefreshPreview", MainFrame.RefreshPreview, MainFrame);
 
 function MainFrame:HandleEscape()
 	self:Hide();

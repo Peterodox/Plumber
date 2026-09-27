@@ -185,6 +185,7 @@ local function InfoGetter_FastLootSettings()
 			onClickFunc = function()
 				addon.SetDBValue(FastLoot.LootSpeedDBKey, v.value);
 				FastLoot:ResolveSystemStatus();
+				addon.CallbackRegistry:Trigger("SettingsPanel.RefreshPreview");
 			end,
 			selected = v.value == value,
 		});
