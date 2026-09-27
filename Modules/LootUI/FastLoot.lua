@@ -1,4 +1,5 @@
 local _, addon = ...
+local L = addon.L;
 local LootUI = addon.LootUI; ---@class LootUISystem
 local MainFrame = LootUI.MainFrame;
 
@@ -10,6 +11,21 @@ local LootSlotHasItem = LootSlotHasItem;
 
 local FastLoot = CreateFrame("Frame");
 LootUI.FastLoot = FastLoot;
+
+
+FastLoot.LootSpeedDBKey = "FastLoot_Speed";
+
+FastLoot.LootSpeed = {
+	Moderate = 1,
+	Maximum = 2,
+};
+
+FastLoot.lootSpeed = FastLoot.LootSpeed.Maximum;
+
+FastLoot.LootSpeedOptions = {
+	{value = FastLoot.LootSpeed.Moderate, label = L["LootUI Option Loot Speed Moderate"], tooltip = L["LootUI Option Loot Speed Moderate Tooltip"]},
+	{value = FastLoot.LootSpeed.Maximum, label = L["LootUI Option Loot Speed Maximum"], tooltip = L["LootUI Option Loot Speed Maximum Tooltip"]},
+};
 
 
 ---Reset everything. Called after LOOT_CLOSED
@@ -87,17 +103,23 @@ function FastLoot:ResolveSystemStatus()
 			self:SetScript("OnUpdate", nil);
 		end
 	end
+
+	self:UpdateLootSpeed();
 end
 
 function FastLoot:LOOT_READY(isAutoLoot)
 	if isAutoLoot then
-		self:Start();
+		if self.lootSpeed == self.LootSpeed.Maximum then
+			self:Start();
+		end
 	end
 end
 
 function FastLoot:LOOT_OPENED(isAutoLoot)
 	if isAutoLoot then
-		self:Start();
+		if self.lootSpeed == self.LootSpeed.Moderate then
+			self:Start();
+		end
 	end
 end
 
@@ -111,4 +133,32 @@ end
 
 function FastLoot:LOOT_SLOT_CLEARED(slotIndex)
 	self:SetSlotFlag(slotIndex, true);
+end
+
+---@alias FastLootSpeed
+---| 1 Moderate. Loot on LOOT_OPENED
+---| 2 Maximum. Loot on LOOT_READY. Might break other addons.
+
+---@return FastLootSpeed
+function FastLoot:GetSelectedLootSpeed()
+	local value = addon.GetDBValue(FastLoot.LootSpeedDBKey);
+	for _, v in pairs(FastLoot.LootSpeed) do
+		if v == value then
+			return value;
+		end
+	end
+	return FastLoot.LootSpeed.Maximum;
+end
+
+function FastLoot:UpdateLootSpeed()
+	self.lootSpeed = self:GetSelectedLootSpeed(); ---@type FastLootSpeed
+end
+
+function FastLoot:GetSelectedLootSpeedTooltip()
+	local value = FastLoot:GetSelectedLootSpeed();
+	for _, v in ipairs(FastLoot.LootSpeedOptions) do
+		if v.value == value then
+			return v.tooltip;
+		end
+	end
 end

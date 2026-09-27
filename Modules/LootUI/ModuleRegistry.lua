@@ -1,8 +1,8 @@
 local _, addon = ...
 local L = addon.L;
 local LootUI = addon.LootUI; ---@class LootUISystem
-local Def = LootUI.Defination;
 local MainFrame = LootUI.MainFrame;
+local FastLoot = LootUI.FastLoot;
 local EventListeners = LootUI.EventListeners;
 
 
@@ -56,7 +56,7 @@ local function ResolveSystemStatus()
 		end
 	end
 
-	LootUI.FastLoot:ResolveSystemStatus();
+	FastLoot:ResolveSystemStatus();
 end
 
 local function TryResolveSystemStatus()
@@ -87,7 +87,7 @@ local function ExitEditMode()
 	MainFrame:ExitEditMode();
 end
 
-local function OptionToggle_OnClick(self, button)
+local function LootUI_OptionToggle_OnClick(self, button)
 	if MainFrame.OptionFrame and MainFrame.OptionFrame:IsShown() and (MainFrame.OptionFrame:IsOwner(self) or MainFrame.OptionFrame:IsOwner(MainFrame)) then
 		ExitEditMode();
 	else
@@ -126,7 +126,8 @@ local function GetFastLootExtraDescription()
 	end
 
 	if addon.GetDBBool("LootUI") then
-		return L["FastLoot Always On Reason"];
+		local lootSpeedTooltip = FastLoot:GetSelectedLootSpeedTooltip();
+		return L["FastLoot Always On Reason"].."\n\n"..lootSpeedTooltip;
 	end
 
 	return L["FastLoot User Notes"];
@@ -141,8 +142,8 @@ local LootUI_ModuleData = {
 	toggleFunc = EnableModule,
 	categoryID = 1,
 	uiOrder = 0,
-	moduleAddedTime = 1727793830,
-	optionToggleFunc = OptionToggle_OnClick,
+	moduleAddedTime = 1790500000,
+	optionToggleFunc = LootUI_OptionToggle_OnClick,
 	hasMovableWidget = true,
 	visibleInEditMode = true,
 	enterEditMode = EnterEditMode,
@@ -161,6 +162,42 @@ local function FastLoot_GetOverrideState()
 	end
 end
 
+local function InfoGetter_FastLootSettings()
+	local tbl = {
+		key = "FastLootSettings",
+		independent = true,
+	};
+
+	local widgets = {
+		{type = "Header", text = L["LootUI Option Loot Speed"]},
+	};
+
+	tbl.widgets = widgets;
+
+	local value = FastLoot:GetSelectedLootSpeed();
+
+	for _, v in ipairs(FastLoot.LootSpeedOptions) do
+		table.insert(widgets, {
+			type = "Radio",
+			text = v.label,
+			tooltip = v.tooltip,
+			closeAfterClick = true,
+			onClickFunc = function()
+				addon.SetDBValue(FastLoot.LootSpeedDBKey, v.value);
+				FastLoot:ResolveSystemStatus();
+				addon.CallbackRegistry:Trigger("SettingsPanel.RefreshPreview");
+			end,
+			selected = v.value == value,
+		});
+	end
+
+	return tbl;
+end
+
+local function FastLoot_OptionToggle_OnClick(self)
+	addon.LandingPageUtil.DropdownMenu:ToggleMenu(self, InfoGetter_FastLootSettings);
+end
+
 local FastLoot_ModuleData = {
 	name = L["ModuleName FastLoot"],
 	dbKey = "FastLoot",
@@ -169,7 +206,8 @@ local FastLoot_ModuleData = {
 	toggleFunc = EnableModule,
 	categoryID = 1,
 	uiOrder = 0,
-	moduleAddedTime = 1727793830,
+	moduleAddedTime = 1790500000,
+	optionToggleFunc = FastLoot_OptionToggle_OnClick,
 	categoryKeys = {
 		"Loot",
 	},

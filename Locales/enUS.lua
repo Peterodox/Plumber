@@ -616,6 +616,11 @@ L["LootUI Option Show All Currency"] = "Show Any Currency Changes";
 L["LootUI Option Show All Currency Tooltip"] = "Show currencies earned from all sources, not just loot.\n\n|cffff4800You may sometimes see currencies that are not displayed in the chat window.|r";
 L["LootUI Option Hide Title"] = "Hide \"You Received\" Text";
 L["LootUI Option Hide Title Tooltip"] = "Hide the \"You received\" text on the top of the loot window.";
+L["LootUI Option Loot Speed"] = "Loot Speed";
+L["LootUI Option Loot Speed Moderate"] = "Moderate";
+L["LootUI Option Loot Speed Moderate Tooltip"] = "Fast loot at moderate speed.";
+L["LootUI Option Loot Speed Maximum"] = "Maximum";
+L["LootUI Option Loot Speed Maximum Tooltip"] = "Fast loot at maximum speed.\n\n|cffff4800Other addons that rely on tracking looted items might break at this speed.|r";
 
 
 --Fast Loot
