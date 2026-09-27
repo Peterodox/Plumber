@@ -616,6 +616,11 @@ L["LootUI Option Show All Currency"] = "显示任何货币变动";
 L["LootUI Option Show All Currency Tooltip"] = "显示从任何来源获得的货币，而不仅限于从战利品中拾取到的。\n\n|cffff4800你可能偶尔会看到不在聊天窗口内显示的货币。|r";
 L["LootUI Option Hide Title"] = "隐藏“你获得了”标题";
 L["LootUI Option Hide Title Tooltip"] = "隐藏拾取窗口上方显示的“你获得了”标题。";
+L["LootUI Option Loot Speed"] = "拾取速度";
+L["LootUI Option Loot Speed Moderate"] = "适中";
+L["LootUI Option Loot Speed Moderate Tooltip"] = "用适中速度进行快速拾取。";
+L["LootUI Option Loot Speed Maximum"] = "最大";
+L["LootUI Option Loot Speed Maximum Tooltip"] = "用最大速度进行快速拾取。\n\n|cffff4800其他统计拾取物品的插件可能在此速度下失效。|r";
 
 
 --Fast Loot

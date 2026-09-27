@@ -6,6 +6,7 @@ local LootUI = addon.LootUI; ---@class LootUISystem
 local Def = LootUI.Defination;
 local Formatter = LootUI.Formatter;
 local MainFrame = LootUI.MainFrame;
+local FastLoot = LootUI.FastLoot;
 local EventListeners = LootUI.EventListeners;
 
 
@@ -205,6 +206,66 @@ local function Tooltip_ShowReputation()
 	return tooltip
 end
 
+local MenuData_LootSpeed = {};
+do
+	MenuData_LootSpeed.GetSelectedText = function()
+		local value = FastLoot:GetSelectedLootSpeed();
+		for _, v in ipairs(FastLoot.LootSpeedOptions) do
+			if v.value == value then
+				return v.label;
+			end
+		end
+	end
+
+	MenuData_LootSpeed.tooltip = function()
+		local value = FastLoot:GetSelectedLootSpeed();
+		for _, v in ipairs(FastLoot.LootSpeedOptions) do
+			if v.value == value then
+				return v.tooltip;
+			end
+		end
+	end
+
+	MenuData_LootSpeed.UpdateSettings = function ()
+		addon.UpdateSettingsDialog();
+		FastLoot:ResolveSystemStatus();
+	end
+
+	MenuData_LootSpeed.OnClick = function(self, button)
+		MenuData_LootSpeed.UpdateSettings();
+	end
+
+	MenuData_LootSpeed.MenuInfoGetter = function()
+		local tbl = {
+			key = "LootUIFastLootSpeed",
+			blizzardTheme = true,
+		};
+
+		local widgets = {};
+		tbl.widgets = widgets;
+
+		local value = FastLoot:GetSelectedLootSpeed();
+
+		for _, v in ipairs(FastLoot.LootSpeedOptions) do
+			table.insert(widgets, {
+				type = "Radio",
+				text = v.label,
+				tooltip = v.tooltip,
+				closeAfterClick = true,
+				onClickFunc = function()
+					addon.SetDBValue(FastLoot.LootSpeedDBKey, v.value);
+					MenuData_LootSpeed.UpdateSettings();
+				end,
+				selected = v.value == value,
+			});
+		end
+
+		return tbl;
+	end
+end
+
+
+
 local OPTIONS_SCHEMATIC = {
 	title = L["Addon Name Colon"]..L["ModuleName LootUI"],
 	moduleDBKey = "LootUI",
@@ -233,6 +294,10 @@ local OPTIONS_SCHEMATIC = {
 		{type = "Checkbox", label = L["LootUI Option Replace Default"], onClickFunc = nil, dbKey = "LootUI_ReplaceDefaultAlert", tooltip = L["LootUI Option Replace Default Tooltip"], validityCheckFunc = function() return addon.IS_RETAIL; end},
 
 		{type = "Divider"},
+		{newFeature = true, type = "Dropdown", label = L["LootUI Option Loot Speed"], onClickFunc = MenuData_LootSpeed.OnClick, dbKey = FastLoot.LootSpeedDBKey,
+			tooltipTitle = L["LootUI Option Loot Speed"],
+			menuData = MenuData_LootSpeed,
+		},
 		{type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = nil, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
 		{type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
 		{type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = nil, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},

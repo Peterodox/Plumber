@@ -1,4 +1,5 @@
 local _, addon = ...
+local L = addon.L;
 local LootUI = addon.LootUI; ---@class LootUISystem
 local MainFrame = LootUI.MainFrame;
 
@@ -10,6 +11,19 @@ local LootSlotHasItem = LootSlotHasItem;
 
 local FastLoot = CreateFrame("Frame");
 LootUI.FastLoot = FastLoot;
+
+
+FastLoot.LootSpeedDBKey = "FastLoot_Speed";
+
+FastLoot.LootSpeed = {
+	Moderate = 1,
+	Maximum = 2,
+};
+
+FastLoot.LootSpeedOptions = {
+	{value = FastLoot.LootSpeed.Moderate, label = L["LootUI Option Loot Speed Moderate"], tooltip = L["LootUI Option Loot Speed Moderate Tooltip"]},
+	{value = FastLoot.LootSpeed.Maximum, label = L["LootUI Option Loot Speed Maximum"], tooltip = L["LootUI Option Loot Speed Maximum Tooltip"]},
+};
 
 
 ---Reset everything. Called after LOOT_CLOSED
@@ -87,6 +101,8 @@ function FastLoot:ResolveSystemStatus()
 			self:SetScript("OnUpdate", nil);
 		end
 	end
+
+	self:SetLootSpeed(self:GetSelectedLootSpeed());
 end
 
 function FastLoot:LOOT_READY(isAutoLoot)
@@ -111,4 +127,24 @@ end
 
 function FastLoot:LOOT_SLOT_CLEARED(slotIndex)
 	self:SetSlotFlag(slotIndex, true);
+end
+
+---@alias FastLootSpeed
+---| 1 Moderate. Loot on LOOT_OPENED
+---| 2 Maximum. Loot on LOOT_READY. Might break other addons.
+
+---@param lootSpeed FastLootSpeed
+function FastLoot:SetLootSpeed(lootSpeed)
+	self.lootSpeed = lootSpeed;
+end
+FastLoot:SetLootSpeed(FastLoot.LootSpeed.Maximum);
+
+function FastLoot:GetSelectedLootSpeed()
+	local value = addon.GetDBValue(FastLoot.LootSpeedDBKey);
+	for _, v in pairs(FastLoot.LootSpeed) do
+		if v == value then
+			return value;
+		end
+	end
+	return FastLoot.LootSpeed.Maximum;
 end

@@ -295,6 +295,7 @@ local DefaultValues = {
 		--LootUI_WindowHide = false,	--Deprecated and merged into FastLoot
 
 	FastLoot = false,					--FastLoot now works independently instead instead of being a LootUI suboptions.
+		FastLoot_Speed = 2,				--0: Disabled 1: Moderate 2: Extreme. This setting is also shared with LootUI
 
 
 	--Unified Map Pin System
