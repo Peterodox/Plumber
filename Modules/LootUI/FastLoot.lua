@@ -20,6 +20,8 @@ FastLoot.LootSpeed = {
 	Maximum = 2,
 };
 
+FastLoot.lootSpeed = FastLoot.LootSpeed.Maximum;
+
 FastLoot.LootSpeedOptions = {
 	{value = FastLoot.LootSpeed.Moderate, label = L["LootUI Option Loot Speed Moderate"], tooltip = L["LootUI Option Loot Speed Moderate Tooltip"]},
 	{value = FastLoot.LootSpeed.Maximum, label = L["LootUI Option Loot Speed Maximum"], tooltip = L["LootUI Option Loot Speed Maximum Tooltip"]},
@@ -102,18 +104,22 @@ function FastLoot:ResolveSystemStatus()
 		end
 	end
 
-	self:SetLootSpeed(self:GetSelectedLootSpeed());
+	self:UpdateLootSpeed();
 end
 
 function FastLoot:LOOT_READY(isAutoLoot)
 	if isAutoLoot then
-		self:Start();
+		if self.lootSpeed == self.LootSpeed.Maximum then
+			self:Start();
+		end
 	end
 end
 
 function FastLoot:LOOT_OPENED(isAutoLoot)
 	if isAutoLoot then
-		self:Start();
+		if self.lootSpeed == self.LootSpeed.Moderate then
+			self:Start();
+		end
 	end
 end
 
@@ -133,12 +139,7 @@ end
 ---| 1 Moderate. Loot on LOOT_OPENED
 ---| 2 Maximum. Loot on LOOT_READY. Might break other addons.
 
----@param lootSpeed FastLootSpeed
-function FastLoot:SetLootSpeed(lootSpeed)
-	self.lootSpeed = lootSpeed;
-end
-FastLoot:SetLootSpeed(FastLoot.LootSpeed.Maximum);
-
+---@return FastLootSpeed
 function FastLoot:GetSelectedLootSpeed()
 	local value = addon.GetDBValue(FastLoot.LootSpeedDBKey);
 	for _, v in pairs(FastLoot.LootSpeed) do
@@ -147,4 +148,8 @@ function FastLoot:GetSelectedLootSpeed()
 		end
 	end
 	return FastLoot.LootSpeed.Maximum;
+end
+
+function FastLoot:UpdateLootSpeed()
+	self.lootSpeed = self:GetSelectedLootSpeed(); ---@type FastLootSpeed
 end

@@ -421,9 +421,7 @@ do
 			self:RecordPlayerMoney();
 			self:SetManualMode(false);
 
-			if not isAutoLoot then
-				FastLoot:Start();
-			end
+			FastLoot:LOOT_OPENED(true); -- true to force auto loot
 		end
 	end
 
@@ -462,7 +460,7 @@ do
 			self:ListenDynamicEvents(true);
 			self:RegisterEvent("UI_ERROR_MESSAGE");
 			self:BuildLootDataAdditive();
-			FastLoot:Start();
+			FastLoot:LOOT_READY(isAutoLoot);
 		else
 			self.playerMoney = nil;
 		end

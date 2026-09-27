@@ -228,7 +228,7 @@ do
 
 	MenuData_LootSpeed.UpdateSettings = function ()
 		addon.UpdateSettingsDialog();
-		FastLoot:ResolveSystemStatus();
+		FastLoot:UpdateLootSpeed();
 	end
 
 	MenuData_LootSpeed.OnClick = function(self, button)
