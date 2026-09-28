@@ -120,7 +120,10 @@ do  --SharedAchievementLinkScripts
 						{type = "Button", name = OBJECTIVES_VIEW_ACHIEVEMENT.." "..closedFrameName,
 							OnClick = function()
 								if not InCombatLockdown() then
-									OpenAchievementFrameToAchievement(achievementID);
+									local OpenToAchievement = ShowAchievementFrameForAchievement or OpenAchievementFrameToAchievement;
+									if OpenToAchievement then
+										OpenToAchievement(achievementID);
+									end
 								end
 							end,
 

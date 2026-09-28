@@ -448,6 +448,7 @@ stds.wow = {
 		"SetRaidDifficultyID",
 		"SetUnitCursorTexture",
 		"ShoppingTooltip1",
+		"ShowAchievementFrameForAchievement",
 		"ShowGarrisonLandingPage",
 		"ShowUIPanel",
 		"SideDressUpFrame",
