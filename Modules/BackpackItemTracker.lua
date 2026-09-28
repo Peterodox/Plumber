@@ -1016,7 +1016,7 @@ function SettingsFrame:AnchorToTrackerFrame(state)
 		f:SetPoint("BOTTOMLEFT", TrackerFrame, "TOPLEFT", 0, 4);
 	else
 		f:SetParent(UIParent);
-		local x, y = GetScaledCursorPosition();
+		local x, y = API.GetScaledCursorPosition();
 		f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x + 16, y);
 	end
 end

@@ -315,7 +315,6 @@ stds.wow = {
 		"GetRaidTargetIndex",
 		"GetSavedInstanceChatLink",
 		"GetSavedInstanceInfo",
-		"GetScaledCursorPosition",
 		"GetServerExpansionLevel",
 		"GetSpellBookItemInfo",
 		"GetSpellBookItemType",
