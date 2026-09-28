@@ -10,6 +10,45 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10906] = {
 	{
 		type = "date",
+		versionText = "1.9.6 b",
+		timestamp = 1790500000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName FastLoot"],
+		dbKey = "LootUI",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "FastLoot",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "You can now choose between \"Moderate\" and \"Maximum\" fast loot speeds.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "\"Maximum\" is the fastest option, but it might affect other addons that track looted items, such as ore, herbs, and fish.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		textGetter = "LootUI.GetFastLootWarningForChangelog",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.6",
 		timestamp = 1790300000,
 	},
@@ -34,7 +73,7 @@ changelogs[10906] = {
 	{
 		type = "p",
 		bullet = true,
-		text = "Fast Loot can now be enabled separately without enabling Plumber Loot Window. You can find that option in Plumber Settings > Loot.",
+		text = "Fast Loot can now be enabled separately without enabling the Plumber Loot Window. You can find that option in Plumber Settings > Loot.",
 	},
 
 	{
