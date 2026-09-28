@@ -48,6 +48,24 @@ changelogs[10906] = {
 	},
 
 	{
+		type = "h1",
+		text = "Bug Fix",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Fixed an error that occurred when using WoW Edit Mode if Plumber Loot Window was disabled.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
 		type = "date",
 		versionText = "1.9.6",
 		timestamp = 1790300000,
