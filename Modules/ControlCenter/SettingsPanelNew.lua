@@ -1680,109 +1680,120 @@ do  --ChangelogTab
 			local extraLeftOffset = 0;
 
 			if info.type == "h1" or info.type == "p" then
-				local text = info.text;
-				if info.isNewFeature then
-					text = text .. postfixNewFeature;
-				end
-				local textWidthShrink;
-				if info.bullet then
-					if info.bullet == 2 then
-						textWidthShrink = Def.ChangelogIndent2;
-						extraLeftOffset = Def.ChangelogIndent2;
-					else
-						textWidthShrink = Def.ChangelogIndent;
-						extraLeftOffset = Def.ChangelogIndent;
+				local text;
+				if info.textGetter then
+					local textGetter = API.GetPrivateObject(info.textGetter);
+					if textGetter then
+						text = textGetter();
 					end
 				else
-					textWidthShrink = 0;
-				end
-				local textWidth = objectWidth - textWidthShrink;
-				objectHeight = Formatter:GetTextHeight(info.type, text, textWidthShrink);
-				bottom = offsetY + objectHeight;
-				if not (changelog[i + 1] and changelog[i + 1].type == "Checkbox") then
-					bottom = bottom + Def.ChangelogParagraphSpacing;
+					text = info.text;
 				end
 
-				n = n + 1;
-				content[n] = {
-					dataIndex = n,
-					templateKey = "FontString",
-					top = top,
-					bottom = bottom,
-					point = "TOPLEFT",
-					relativePoint = "TOPLEFT",
-					setupFunc = function(obj)
-						obj:SetWidth(textWidth);
-						obj:SetFontObject(Formatter.TagFonts[info.type]);
-						obj:SetText(text);
-						SetTextColor(obj, Def.TextColorReadable);
-
-						if redacted then
-							local redactor = self.redactorPool:Acquire();
-							local fontObject = Formatter.TagFonts[info.type];
-							local _, fontHeight = _G[fontObject]:GetFont();
-							redactor:RedactFontString(obj, fontHeight, text);
+				if text then
+					if info.isNewFeature then
+						text = text .. postfixNewFeature;
+					end
+					local textWidthShrink;
+					if info.bullet then
+						if info.bullet == 2 then
+							textWidthShrink = Def.ChangelogIndent2;
+							extraLeftOffset = Def.ChangelogIndent2;
+						else
+							textWidthShrink = Def.ChangelogIndent;
+							extraLeftOffset = Def.ChangelogIndent;
 						end
-					end;
-				};
+					else
+						textWidthShrink = 0;
+					end
+					local textWidth = objectWidth - textWidthShrink;
+					objectHeight = Formatter:GetTextHeight(info.type, text, textWidthShrink);
+					bottom = offsetY + objectHeight;
+					if not (changelog[i + 1] and changelog[i + 1].type == "Checkbox") then
+						bottom = bottom + Def.ChangelogParagraphSpacing;
+					end
 
-				if info.type == "h1" then
-					content[n].offsetX = leftOffset;
+					n = n + 1;
+					content[n] = {
+						dataIndex = n,
+						templateKey = "FontString",
+						top = top,
+						bottom = bottom,
+						point = "TOPLEFT",
+						relativePoint = "TOPLEFT",
+						setupFunc = function(obj)
+							obj:SetWidth(textWidth);
+							obj:SetFontObject(Formatter.TagFonts[info.type]);
+							obj:SetText(text);
+							SetTextColor(obj, Def.TextColorReadable);
 
-					--Add Keywords
-					if info.dbKey then
-						local _text = ControlCenter:GetModuleCategoryName(info.dbKey);
-						if _text then
-							_text = L["Category Colon"].._text;
-							objectHeight = Formatter:GetTextHeight(info.type, _text);
-							top = bottom + Def.ChangelogLineSpacing;
-							bottom = top + objectHeight;
+							if redacted then
+								local redactor = self.redactorPool:Acquire();
+								local fontObject = Formatter.TagFonts[info.type];
+								local _, fontHeight = _G[fontObject]:GetFont();
+								redactor:RedactFontString(obj, fontHeight, text);
+							end
+						end;
+					};
+
+					if info.type == "h1" then
+						content[n].offsetX = leftOffset;
+
+						--Add Keywords
+						if info.dbKey then
+							local _text = ControlCenter:GetModuleCategoryName(info.dbKey);
+							if _text then
+								_text = L["Category Colon"].._text;
+								objectHeight = Formatter:GetTextHeight(info.type, _text);
+								top = bottom + Def.ChangelogLineSpacing;
+								bottom = top + objectHeight;
+								n = n + 1;
+								content[n] = {
+									dataIndex = n,
+									templateKey = "FontString",
+									setupFunc = function(obj)
+										obj:SetFontObject(Formatter.TagFonts["p"]);
+										obj:SetText(_text);
+										SetTextColor(obj, Def.TextColorNonInteractable);
+
+										if redacted then
+											local redactor = self.redactorPool:Acquire();
+											local fontObject = Formatter.TagFonts["p"];
+											local _, fontHeight = _G[fontObject]:GetFont();
+											redactor:RedactFontString(obj, fontHeight, _text);
+										end
+									end,
+									top = top,
+									bottom = bottom,
+									point = "TOPLEFT",
+									relativePoint = "TOPLEFT",
+									offsetX = leftOffset,
+								};
+								top = bottom;
+							end
+						end
+					else
+						content[n].offsetX = leftOffset + extraLeftOffset;
+						if info.bullet then
 							n = n + 1;
 							content[n] = {
 								dataIndex = n,
-								templateKey = "FontString",
-								setupFunc = function(obj)
-									obj:SetFontObject(Formatter.TagFonts["p"]);
-									obj:SetText(_text);
-									SetTextColor(obj, Def.TextColorNonInteractable);
-
-									if redacted then
-										local redactor = self.redactorPool:Acquire();
-										local fontObject = Formatter.TagFonts["p"];
-										local _, fontHeight = _G[fontObject]:GetFont();
-										redactor:RedactFontString(obj, fontHeight, _text);
-									end
-								end,
-								top = top,
+								templateKey = "Texture",
+								top = top + 6,
 								bottom = bottom,
-								point = "TOPLEFT",
+								point = "LEFT",
 								relativePoint = "TOPLEFT",
-								offsetX = leftOffset,
+								offsetX = leftOffset + extraLeftOffset - 22,
+								setupFunc = function(obj)
+									obj:SetSize(20, 20);
+									obj:SetTexture(Def.TextureFile);
+									SetTexCoord(obj, 904, 944, 80, 120); --864, 904, 80, 120
+									local color = Def.TextColorReadable;
+									local a = info.bullet == 2 and 0.6 or 1;
+									obj:SetVertexColor(a * color[1], a * color[2], a * color[3]);
+								end;
 							};
-							top = bottom;
 						end
-					end
-				else
-					content[n].offsetX = leftOffset + extraLeftOffset;
-					if info.bullet then
-						n = n + 1;
-						content[n] = {
-							dataIndex = n,
-							templateKey = "Texture",
-							top = top + 6,
-							bottom = bottom,
-							point = "LEFT",
-							relativePoint = "TOPLEFT",
-							offsetX = leftOffset + extraLeftOffset - 22,
-							setupFunc = function(obj)
-								obj:SetSize(20, 20);
-								obj:SetTexture(Def.TextureFile);
-								SetTexCoord(obj, 904, 944, 80, 120); --864, 904, 80, 120
-								local color = Def.TextColorReadable;
-								local a = info.bullet == 2 and 0.6 or 1;
-								obj:SetVertexColor(a * color[1], a * color[2], a * color[3]);
-							end;
-						};
 					end
 				end
 

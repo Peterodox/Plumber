@@ -162,23 +162,33 @@ do  -- String
 	end
 	API.GetUnitIDGeneral = GetUnitIDGeneral;
 
-	local function GetGlobalObject(objNameKey, showTrace)
-		--Get object via string "FrameName.Key1.Key2"
-		local obj = _G;
-
+	local function GetObjectByKey(tbl, objNameKey, showTrace)
+		local obj = tbl;
 		for k in string.gmatch(objNameKey, "%w+") do
 			obj = obj[k];
 			if not obj then
 				if showTrace then
 					API.PrintMessage(string.format("Failed to find %s (stopped at %s)", objNameKey, k));
 				end
-				return
+				return;
 			end
 		end
-
-		return obj
+		return obj;
 	end
-	API.GetGlobalObject = GetGlobalObject;
+
+	---Get object via string "_G.Key1.Key2..."
+	---@param objNameKey string "Key1.Key2..."
+	---@param showTrace boolean? If true, show where it fails
+	function API.GetGlobalObject(objNameKey, showTrace)
+		return GetObjectByKey(_G, objNameKey, showTrace);
+	end
+
+	---Get object via string "addon.Key1.Key2..."
+	---@param objNameKey string "Key1.Key2..."
+	---@param showTrace boolean? If true, show where it fails
+	function API.GetPrivateObject(objNameKey, showTrace)
+		return GetObjectByKey(addon, objNameKey, showTrace);
+	end
 
 	local function JoinText(delimiter, l, r)
 		if l and r then

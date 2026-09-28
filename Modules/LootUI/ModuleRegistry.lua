@@ -96,9 +96,9 @@ local function LootUI_OptionToggle_OnClick(self, button)
 	end
 end
 
-local function GetModuleConflictWarning()
+local function GetConflictAddOnName()
 	local names = {
-		"SpeedyAutoLoot", "XLoot",
+		"SpeedyAutoLoot", "XLoot", "FasterLoot",
 	};
 
 	local name;
@@ -106,7 +106,7 @@ local function GetModuleConflictWarning()
 	for _, addonName in ipairs(names) do
 		if C_AddOns.IsAddOnLoaded(addonName) then
 			name = addonName;
-			break
+			break;
 		end
 	end
 
@@ -114,6 +114,19 @@ local function GetModuleConflictWarning()
 		name = "Leatrix Plus: Faster auto loot";
 	end
 
+	return name;
+end
+
+local function GetFastLootWarningForChangelog()
+	local name = GetConflictAddOnName();
+	if name then
+		return "|cffd4641c"..string.format(L["Addon Conflict Format"], name).."|r";
+	end
+end
+LootUI.GetFastLootWarningForChangelog = GetFastLootWarningForChangelog;
+
+local function GetModuleConflictWarning()
+	local name = GetConflictAddOnName();
 	if name then
 		return string.format("|cffd4641c%s\n- %s|r", L["Generic Addon Conflict"], name);
 	end
