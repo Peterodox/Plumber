@@ -2331,6 +2331,7 @@ changelogs[10803] = {
 		type = "br",
 	},
 
+	--[[
 	{
 		type = "h1",
 		text = "Extend Search Results",
@@ -2362,7 +2363,9 @@ changelogs[10803] = {
 	{
 		type = "br",
 	},
+	--]]
 
+	--[[
 	{
 		type = "h1",
 		text = "Tooltip: Dye Pigment",
@@ -2394,6 +2397,7 @@ changelogs[10803] = {
 	{
 		type = "br",
 	},
+	--]]
 
 	{
 		type = "h1",
