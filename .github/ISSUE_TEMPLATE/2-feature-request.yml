@@ -1,0 +1,73 @@
+name: Feature Request
+description: Suggest an idea for us
+title: "[FEATURE]: "
+labels: ["enhancement", "needs triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing feature request for this?
+      description: Please search to see if a similar request already exists.
+      options:
+        - label: I have searched the existing feature requests
+          required: true
+  - type: dropdown
+    id: flavors
+    attributes:
+      label: WoW flavor(s)
+      description: Select every flavor this feature would be useful for.
+      multiple: true
+      options:
+        - Retail
+        - Forever
+        - Classic (Era)
+        - Classic TBC
+        - MoP Classic
+    validations:
+      required: true
+  - type: input
+    id: module
+    attributes:
+      label: Related module/area
+      description: Which existing part of Plumber would this extend? Use "New" if it's something new entirely.
+      placeholder: e.g. Drawer, Loot Window, Expansion Summary, New
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Problem
+      description: A clear and concise description of what the problem is.
+      placeholder: Ex. I'm always frustrated when [...]
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed solution
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives considered
+      description: A clear and concise description of any alternative solutions or features considered.
+    validations:
+      required: false
+  - type: textarea
+    id: existing-addon
+    attributes:
+      label: Existing addons
+      description: Does another addon already offer this? If so, which one, and why would you like it in Plumber?
+    validations:
+      required: false
+  - type: upload
+    id: screenshots
+    attributes:
+      label: Upload screenshots
+      description: Add screenshots if applicable to support your feature request.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context related to the feature request.
+    validations:
+      required: false
