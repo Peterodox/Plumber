@@ -1,0 +1,106 @@
+name: Bug Report
+description: Create a report to help us improve
+title: "[BUG]: "
+labels: ["bug", "needs triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: dropdown
+    id: flavors
+    attributes:
+      label: WoW flavor(s)
+      description: Select every flavor where you've seen this bug. If you've only tested one, just pick that one.
+      multiple: true
+      options:
+        - Retail
+        - Forever
+        - Classic (Era)
+        - Classic TBC
+        - MoP Classic
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plumber version
+      description: |
+        The version shown in the addon list or on CurseForge/Wago.
+        Latest version: https://www.curseforge.com/wow/addons/plumber/files
+      placeholder: e.g. 1.9.6-b
+    validations:
+      required: true
+  - type: input
+    id: module
+    attributes:
+      label: Affected module/feature
+      description: Which part of Plumber is affected? Leave empty if you're not sure.
+      placeholder: e.g. Loot Window, Drawer, Housing, Expansion Summary
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A concise description of what you're experiencing.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Issue checklist
+      description: Please select any applicable options.
+      options:
+        - label: The issue occurs with the latest version of the addon.
+        - label: The issue occurs with Plumber as the only enabled addon.
+        - label: The issue occurs only with other addon(s) enabled (please list them below).
+  - type: textarea
+    id: other-addons
+    attributes:
+      label: Other addons involved
+      description: If the issue only happens alongside other addons, list them here.
+      placeholder: e.g. ElvUI, Baganator, MoveAny
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: lua-error
+    attributes:
+      label: Lua error
+      description: |
+        If you got a Lua error, paste the full text here. It will be formatted as code automatically.
+        To capture errors, we recommend BugSack: https://www.curseforge.com/wow/addons/bugsack
+      render: text
+    validations:
+      required: false
+  - type: upload
+    id: attachments
+    attributes:
+      label: Attach files (screenshots, videos)
+      description: Upload any relevant files such as screenshots or videos.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any extra context about the issue or the attached files.
+    validations:
+      required: false
