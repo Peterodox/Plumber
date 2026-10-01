@@ -45,6 +45,7 @@ L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "Este módulo está sempre ativado.";
 L["Return To Module List"] = "Retornar ao addon";
 L["Generic Addon Conflict"] = "Esse módulo pode ser incompatível com addons de funcionalidades semelhantes:";
+L["Addon Conflict Format"] = "Esse módulo pode ser incompatível com %s."; -- Show one addon name. Used in changelogs.
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = ": ";
 L["Disabled Module Requires Reload Format"] = "Você precisa %s para aplicar estas mudanças.";	--We'll replace %s with a clickable "reload the UI"
@@ -616,6 +617,18 @@ L["LootUI Option Show All Currency"] = "Exibir mudanças de moedas";
 L["LootUI Option Show All Currency Tooltip"] = "Exibe quaisquer moedas ganhas de todas as fontes, não apenas de saque.\n\n|cffff4800Você pode às vezes ver moedas que não são exibidas na janela do bate-papo.|r";
 L["LootUI Option Hide Title"] = "Ocultar o texto \"Você recebeu\"";
 L["LootUI Option Hide Title Tooltip"] = "Esconde o texto \"Você recebeu\" no topo da janela de saque.";
+L["LootUI Option Loot Speed"] = "Velocidade de Saque";
+L["LootUI Option Loot Speed Moderate"] = "Moderada";
+L["LootUI Option Loot Speed Moderate Tooltip"] = "Saque rápido em velocidade moderada.";
+L["LootUI Option Loot Speed Maximum"] = "Máxima";
+L["LootUI Option Loot Speed Maximum Tooltip"] = "Saque rápido em velocidade máxima.\n\n|cffff4800Addons de terceiros que dependem do rastreamento de itens saqueados podem falhar com essa opção.|r";
+
+
+--Fast Loot
+L["ModuleName FastLoot"] = "Saque rápido";
+L["ModuleDescription FastLoot"] = "Saqueie itens rapidamente.";
+L["FastLoot Always On Reason"] = "Saque rápido está sempre ativado com a Janela de Saque do Plumber.";
+L["FastLoot User Notes"] = "*Saque Rápido do Plumber faz apenas uma coisa... saque rápido. Se você prefere controle mais preciso, tente addons como \"Speedy AutoLoot\" ou \"XLoot\".";
 
 
 --Quick Slot For Third-party Dev
@@ -729,6 +742,7 @@ L["Weekly Coffer Key Shards Tooltip"] = "Os primeiros quatro baús semanais que 
 L["Weekly Cap"] = "Limite semanal.";
 L["Weekly Cap Reached"] = "Limite semanal atingido.";
 L["Instruction Right Click To Use"] = "<Clique direito para usar>";
+L["Instruction Right Click To Use Format"] = "<Clique direito para usar %s>";
 L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Entrar na fila";
 L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "Na fila";
 L["Click To Switch"] = "Clique para trocar para |cffffffff%s|r";
@@ -785,6 +799,7 @@ L["EditMode Instruction InstanceDifficulty"] = "A largura do quadro é afetada p
 L["Difficulty Locked To Format"] = "A instância está bloqueada para |cffffffff%s|r devido a um chefe derrotado.";
 L["Difficulty Locked To Current Alert"] = "A instância está bloqueada nesta dificuldade devido a um chefe derrotado.";
 L["Shared Difficulty Alert"] = "Derrotar um chefe bloqueará a instância nesta dificuldade.";
+L["Can Only Change Difficulty Via Native UI"] = "Essa dificuldade só pode ser selecionada ao interagir com o portal de entrada.";
 
 
 --TransmogChatCommand
