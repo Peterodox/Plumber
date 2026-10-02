@@ -510,6 +510,7 @@ stds.wow = {
 		"UpdateContainerFrameAnchors",
 		"Vector2D_CalculateAngleBetween",
 		"Vector2D_Normalize",
+		"WOW_PROJECT_CAMELOT",
 		"WOW_PROJECT_ID",
 		"WOW_PROJECT_MAINLINE",
 		"WOW_PROJECT_MISTS_CLASSIC",
