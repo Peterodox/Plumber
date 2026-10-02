@@ -13,6 +13,9 @@
 
 ## IconTexture: Interface\AddOns\Plumber\Art\Logo\PlumberLogo64
 
+## X-Game: [Game]
+## X-Family: [Family]
+
 
 Initialization.lua
 Locales\Localization.xml

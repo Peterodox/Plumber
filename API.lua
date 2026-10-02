@@ -2775,7 +2775,7 @@ do  -- ObjectPool
 end
 
 do  -- Transmog
-	if addon.IsToCVersionEqualOrNewerThan(40000) then
+	if addon.IS_MODERN or addon.IsToCVersionEqualOrNewerThan(40000) then
 		local GetSourceInfo = C_TransmogCollection.GetSourceInfo;
 		local GetAllAppearanceSources = C_TransmogCollection.GetAllAppearanceSources;
 		local GetItemInfo = C_TransmogCollection.GetItemInfo;

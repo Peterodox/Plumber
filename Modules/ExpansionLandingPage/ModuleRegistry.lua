@@ -115,7 +115,7 @@ do
 		moduleAddedTime = 1750160000,
 		optionToggleFunc = LandingPageUtil.ToggleMinimapSettings,
 		validityCheck = function()
-			return addon.IsToCVersionEqualOrNewerThan(50000);
+			return addon.IS_RETAIL or addon.IS_MISTS;
 		end,
 		categoryKeys = {
 			"Signature",

@@ -1888,11 +1888,11 @@ do  --Edit Mode
 	end
 
 	local function Validation_TransmogInvented()
-		return addon.IsToCVersionEqualOrNewerThan(40000)
+		return addon.IS_MODERN or addon.IsToCVersionEqualOrNewerThan(40000)
 	end
 
 	local function Validation_IsRetail()
-		return addon.IsToCVersionEqualOrNewerThan(110000)
+		return addon.IS_RETAIL
 	end
 
 	local function Tooltip_HideWindow()
