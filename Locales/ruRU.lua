@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.4 c
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.6 b
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -45,6 +45,7 @@ L["Format Month Day"] = EVENT_SCHEDULER_DAY_FORMAT or "%s %d";
 L["Always On Module"] = "Этот модуль всегда включен.";
 L["Return To Module List"] = "Вернуться к списку";
 L["Generic Addon Conflict"] = "Этот модуль может быть несовместим с аддонами, обладающими аналогичными функциональными возможностями:";
+L["Addon Conflict Format"] = "Этот модуль может быть несовместим с %s."; -- Show one addon name. Used in changelogs.
 L["Work In Progress Tag"] = "[ВТЗ]";
 L["Colon With Space"] = ": ";
 L["Disabled Module Requires Reload Format"] = "Вы должны %s, чтобы применить изменения.";	--We'll replace %s with a clickable "reload the UI"
@@ -616,6 +617,18 @@ L["LootUI Option Show All Currency"] = "Показывать все измене
 L["LootUI Option Show All Currency Tooltip"] = "Показывать валюту, полученную из всех источников, а не только из добычи.\n\n|cffff4800Иногда могут отображаться валюты, которые не выводятся в обычном окне чата.|r";
 L["LootUI Option Hide Title"] = "Скрыть текст \"Вы получили\"";
 L["LootUI Option Hide Title Tooltip"] = "Скрыть текст \"Вы получили\" в верхней части окна добычи.";
+L["LootUI Option Loot Speed"] = "Скорость сбора добычи";
+L["LootUI Option Loot Speed Moderate"] = "Умеренная";
+L["LootUI Option Loot Speed Moderate Tooltip"] = "Быстрый сбор добычи на умеренной скорости.";
+L["LootUI Option Loot Speed Maximum"] = "Максимальная";
+L["LootUI Option Loot Speed Maximum Tooltip"] = "Быстрый сбор добычи на максимальной скорости.\n\n|cffff4800Другие аддоны, отслеживающие получение предметов, могут работать некорректно на этой скорости.|r";
+
+
+--Fast Loot
+L["ModuleName FastLoot"] = "Быстрый сбор добычи";
+L["ModuleDescription FastLoot"] = "Быстрый сбор предметов.";
+L["FastLoot Always On Reason"] = "Быстрый сбор добычи всегда включен при использовании окна добычи Plumber.";
+L["FastLoot User Notes"] = "*Функция быстрого сбора добычи в Plumber делает только одно... быстро собирает добычу. Если вам нужен более точный контроль, попробуйте такие аддоны, как \"Speedy AutoLoot\" или \"XLoot\".";
 
 
 --Quick Slot For Third-party Dev
@@ -729,6 +742,7 @@ L["Weekly Coffer Key Shards Tooltip"] = "Первые четыре еженед�
 L["Weekly Cap"] = "Еженедельный лимит";
 L["Weekly Cap Reached"] = "Достигнут недельный лимит.";
 L["Instruction Right Click To Use"] = "<ПКМ, чтобы использовать>";
+L["Instruction Right Click To Use Format"] = "<ПКМ: использовать %s>";
 L["Join Queue"] = WOW_LABS_JOIN_QUEUE or "Присоединиться к очереди";
 L["In Queue"] = BATTLEFIELD_QUEUE_STATUS or "В очереди";
 L["Click To Switch"] = "Нажмите, чтобы переключиться на |cffffffff%s|r";
@@ -785,6 +799,7 @@ L["EditMode Instruction InstanceDifficulty"] = "Ширина рамки зави
 L["Difficulty Locked To Format"] = "Для этого подземелья установлена сложность |cffffffff%s|r из-за убитого босса.";
 L["Difficulty Locked To Current Alert"] = "Для этого подземелья установлена текущая сложность из-за убитого босса.";
 L["Shared Difficulty Alert"] = "Победа над боссом привяжет это подземелье к текущей сложности.";
+L["Can Only Change Difficulty Via Native UI"] = "Эту сложность можно выбрать только при взаимодействии с входным порталом.";
 
 
 --TransmogChatCommand
