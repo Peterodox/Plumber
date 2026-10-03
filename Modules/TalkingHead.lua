@@ -35,10 +35,12 @@ local PVP_CREATURE_DISPLAYID = {
 	[118482] = true,    --Ruffious
 };
 
+local DEFAULT_FRAME_STRATA = "FULLSCREEN";
+
 
 local NewTalkingHead = CreateFrame("Frame", nil, UIParent);
 NewTalkingHead:Hide();
-NewTalkingHead:SetFrameStrata("FULLSCREEN");  --LOW
+NewTalkingHead:SetFrameStrata(DEFAULT_FRAME_STRATA);
 NewTalkingHead:SetFrameLevel(980);
 NewTalkingHead:SetSize(TEXT_WIDTH, 32);
 
@@ -297,7 +299,7 @@ function NewTalkingHead:WorldMapOnHide()
 
 	if self.belowWorldMap then
 		if self:IsShown() then
-			self:SetFrameStrata("FULLSCREEN");
+			self:SetFrameStrata(DEFAULT_FRAME_STRATA);
 		end
 	end
 end
@@ -498,6 +500,7 @@ function NewTalkingHead:EnterEditMode()
 	if not self.enabled then return end;
 
 	self:Init();
+	self:SetFrameStrata("MEDIUM");
 
 	if not self.Selection then
 		local uiName = L["ModuleName TalkingHead"];
@@ -520,6 +523,7 @@ function NewTalkingHead:ExitEditMode()
 	self:ShowOptions(false);
 	self.isEditing = false;
 	self:CloseImmediately();
+	self:SetFrameStrata(DEFAULT_FRAME_STRATA);
 end
 
 local function FadeIn_TypeWriter_NoAutoHide_OnUpdate(self, elapsed)
@@ -589,7 +593,7 @@ local function Options_BelowWorldMap_OnClick(self, state)
 	if WorldMapFrame:IsVisible() then
 		NewTalkingHead:WorldMapOnShow();
 	else
-		NewTalkingHead:SetFrameStrata("FULLSCREEN");
+		NewTalkingHead:SetFrameStrata(DEFAULT_FRAME_STRATA);
 	end
 end
 
