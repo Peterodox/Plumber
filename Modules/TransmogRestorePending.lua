@@ -636,7 +636,7 @@ do
 	local function OnTrackedEvent(_, event)
 		--Our own writes fire these same events, and so can Blizzard's close sequence before OnHide unregisters us.
 		--A stray capture in either case would look like everything just got reverted.
-		if not EL.enabled or isRestoringPending or not TransmogFrame:IsShown() then return end;
+		if not EL.enabled or isRestoringPending or not TransmogFrame:IsVisible() then return end;
 
 		if event == "VIEWED_TRANSMOG_OUTFIT_CHANGED" then
 			ReapplyPendingOnOutfitSwitch();
@@ -713,12 +713,13 @@ do
 		end
 	end
 
+	--IsVisible rather than IsShown, hiding UIParent (Alt+Z, Narcissus) fires OnHide while IsShown is still true.
 	--Only treated as a real Undo while the frame is open, otherwise OnSituationsChanged fights back into a stack overflow (oops!).
 	--Blizzard also calls these on every close, so treating that the same way would break restore-on-reopen.
 	local function HookExplicitClears()
 		local originalClearTransmogs = C_TransmogOutfitInfo.ClearAllPendingTransmogs;
 		C_TransmogOutfitInfo.ClearAllPendingTransmogs = function(...)
-			if TransmogFrame:IsShown() then
+			if TransmogFrame:IsVisible() then
 				EL.WipePendingAppearanceFromDB();
 			end
 			return originalClearTransmogs(...);
@@ -726,7 +727,7 @@ do
 
 		local originalClearSituations = C_TransmogOutfitInfo.ClearAllPendingSituations;
 		C_TransmogOutfitInfo.ClearAllPendingSituations = function(...)
-			if TransmogFrame:IsShown() then
+			if TransmogFrame:IsVisible() then
 				EL.PendingSituations = nil;
 				EL.SavePendingToDB();
 			end
@@ -736,7 +737,7 @@ do
 		--A save commits pending changes permanently, our carry-forward tracking would otherwise keep them marked pending forever.
 		local originalCommitAllPending = C_TransmogOutfitInfo.CommitAndApplyAllPending;
 		C_TransmogOutfitInfo.CommitAndApplyAllPending = function(...)
-			if TransmogFrame:IsShown() then
+			if TransmogFrame:IsVisible() then
 				EL.WipePendingAppearanceFromDB(true);
 			end
 			return originalCommitAllPending(...);
