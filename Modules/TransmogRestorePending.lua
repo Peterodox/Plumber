@@ -165,12 +165,10 @@ do
 		return displayTypes;
 	end
 
-	--Left shoulder only exists while separated.
-	function EL.RestoreShoulderDisplayTypes(displayTypes, isSeparated)
+	--Also writes the left shoulder while merged, the model still draws it.
+	function EL.RestoreShoulderDisplayTypes(displayTypes)
 		for slot, displayType in pairs(displayTypes or {}) do
-			if slot ~= SHOULDER_LEFT or isSeparated then
-				SetPendingDisplayType(slot, Enum.TransmogOutfitSlotOption.None, displayType);
-			end
+			SetPendingDisplayType(slot, Enum.TransmogOutfitSlotOption.None, displayType);
 		end
 	end
 
@@ -611,7 +609,7 @@ do
 		EL.RestoreShoulderSecondaryState(shoulderSecondary);
 		EL.ApplySnapshotToPending(snapshot, pendingSlots or {});
 		--Must run after ApplySnapshotToPending, which writes untouched shoulders as Hidden
-		EL.RestoreShoulderDisplayTypes(EL.PendingShoulderDisplayTypes, shoulderSecondary);
+		EL.RestoreShoulderDisplayTypes(EL.PendingShoulderDisplayTypes);
 		--Must run after ApplySnapshotToPending, setting a weapon's appearance resets its sheathe category to Default
 		EL.RestoreWeaponOptionsPending(weaponOptions);
 	end
@@ -713,7 +711,7 @@ do
 			local rightDisplayType = EL.LiveShoulderDisplayTypes and EL.LiveShoulderDisplayTypes[SHOULDER_RIGHT];
 			if rightDisplayType then
 				--Its live info is just the hidden source, copy the display type instead
-				EL.RestoreShoulderDisplayTypes({[SHOULDER_LEFT] = rightDisplayType}, isSeparated);
+				EL.RestoreShoulderDisplayTypes({[SHOULDER_LEFT] = rightDisplayType});
 			elseif EL.LiveShoulderInfo then
 				EL.ReapplyShoulderAppearance(EL.LiveShoulderInfo, isSeparated);
 			end
