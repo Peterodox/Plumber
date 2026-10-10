@@ -417,6 +417,19 @@ do  --Display
 		self.SubtextContainer:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
 	end
 
+	function Display:UpdateTextAnchor(unitFrame)
+		self.Title:ClearAllPoints();
+		self.Subtext:ClearAllPoints();
+		local healthBar = unitFrame.HealthBarsContainer and unitFrame.HealthBarsContainer.healthBar;
+		if healthBar and healthBar:IsShown() then
+			self.Title:SetPoint("BOTTOM", healthBar, "TOP", 0, 3);
+			self.Subtext:SetPoint("TOP", healthBar, "BOTTOM", 0, -3);
+		else
+			self.Title:SetPoint("TOP", self, "TOP", 0, 0);
+			self.Subtext:SetPoint("TOP", self.Title, "BOTTOM", 0, -2);
+		end
+	end
+
 	function Display:Remove()
 		self:SetScript("OnUpdate", nil);
 		self:SetParent(nil);
@@ -586,6 +599,8 @@ do  --EL
 				else
 					Display.Background:Show();
 				end
+
+				Display:UpdateTextAnchor(nameplate.UnitFrame);
 
 				local subtextFontHeight = Round(Settings.subtextHeight*uiScale);
 				Display.subtextFontHeight = subtextFontHeight;
