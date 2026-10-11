@@ -694,6 +694,7 @@ do
 
 		local itemFrame;
 		local numExisting = self.activeFrames and #self.activeFrames or 0;
+		local updateExisting = false;
 
 		if numExisting > 0 then
 			local foundIndex;
@@ -715,6 +716,7 @@ do
 				end
 
 				if foundIndex then
+					updateExisting = true;
 					tremove(lootQueue, dataIndex);
 					numQueued = numQueued - 1;
 				else
@@ -727,7 +729,9 @@ do
 		local numTotal = numQueued + numExisting;
 		self:SetMaxPage(math.ceil(numTotal / Def.MAX_ITEM_PER_PAGE));
 
-		if self.isUpdatingPage then
+		-- Don't update if we are switching pages
+		-- Unless currently displayed items change
+		if self.isUpdatingPage and not updateExisting then
 			return;
 		end
 
