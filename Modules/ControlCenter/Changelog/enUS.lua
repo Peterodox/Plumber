@@ -10,6 +10,62 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10906] = {
 	{
 		type = "date",
+		versionText = "1.9.6 c",
+		timestamp = 1791600000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName TransmogRaestorePending"],
+	},
+
+	{
+		type = "p",
+		text = "Fixed several Shoulder Slot issues.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Shoulder slots that were set to \"Show Equipped Gear\" or \"Ignore Slot\" no longer turn \"Hidden\" after reopening the Transmog UI.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The Left Shoulder no longer keeps showing the old appearance after you reset the Right Shoulder or turn off Separate Shoulders.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Turning off Separate Shoulders now stays off after reopening the Transmog UI.",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Nameplate: Soft Target: Fixed NPC names and quest objectives overlapping with health bars.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.6 b",
 		timestamp = 1790500000,
 	},
