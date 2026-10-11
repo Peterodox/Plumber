@@ -554,9 +554,10 @@ do  --EL
 			if f:IsShown() then
 				local unitID = GetUnitIDGeneral(unit);
 				--print("GameObject:", unitID);
+
 				if unitID and IgnoredGameObjects[unitID] then
 					Display:Hide();
-					return
+					return;
 				end
 
 				local objectName = UnitName(unit);
@@ -899,6 +900,7 @@ do  --SpecialGameObjects
 	local function SubtextFunc_MisplacedTome()
 		return SubtextFunc_Item(242241)
 	end
+	SpecialGameObjects[531477] = SubtextFunc_MisplacedTome; --Coalesced Light
 	SpecialGameObjects[531478] = SubtextFunc_MisplacedTome;
 	SpecialGameObjects[531479] = SubtextFunc_MisplacedTome;	--Ranger's Cache
 end
