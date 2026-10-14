@@ -76,6 +76,10 @@ local OverrideFactionInfo = {
 		barColor = {108/255, 181/255, 139/255},
 		rewardQuestID = 93798,
 	},
+	
+	[2836] = {	-- The Labyrinth of Kindo'jan
+		barColor = {215/255, 160/255, 65/255},
+	},
 
 	---- TWW ----
 	[2570] = {  --Hallowfall Arathi
@@ -182,6 +186,7 @@ do  --Layout MID
 		Delves = {factionID = Seasonal.Delves,	--Delves
 			subFactions = {
 				{factionID = 2744, creatureDisplayID = 26365, playerCompanionID = 2},     --Valeera Sanguinar. Get playerCompanionID from C_MajorFactions.GetMajorFactionData(C_DelvesUI.GetDelvesFactionForSeason())
+				{factionID = 2836}, -- The Labyrinth of Kindo'jan
 			},
 		},
 		RitualSites = {factionID = 2792, preSpacer = true},		--Ritual Sites
