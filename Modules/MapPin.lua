@@ -3,7 +3,6 @@ local API = addon.API;
 local L = addon.L;
 local SetDBValue = addon.SetDBValue;
 local GetDBValue = addon.GetDBValue;
-local Mixin = API.Mixin;
 
 local MapFrame = WorldMapFrame;
 local TooltipFrame = GameTooltip;
@@ -689,7 +688,9 @@ do
 end
 
 
-do  --Master Switch
+--Disabled. We only have one map pin module "PlayerPing" now
+--[[
+do
 	local function EnableMapPinSystem(state)
 		PinController:RequestLoadSettings();
 	end
@@ -709,6 +710,7 @@ do  --Master Switch
 
 	addon.ControlCenter:AddModule(moduleData);
 end
+--]]
 
 
 do  --Dev Tool

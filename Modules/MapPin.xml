@@ -1,9 +1,10 @@
 
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="MapPin.lua"/>
-	<Script file="MapPin_Delves.lua"/>
-	<Script file="MapPin_TWW_Quest.lua"/>
-	<Script file="MapPin_Dreamseed.lua"/>
+
+	<!--Script file="MapPin_Delves.lua"/-->
+	<!--Script file="MapPin_TWW_Quest.lua"/-->
+	<!--Script file="MapPin_Dreamseed.lua"/-->
 	<!--Script file="MapPin_TargetHealth.lua"/-->	<!--API isn't functioning-->
 
 	<Script file="MapPin_PlayerPing.lua"/>	<!--Ping player arrow-->
@@ -35,8 +36,7 @@
 		</Scripts>
 	</Frame>
 
-	<!--We will remove this in TWW-->
-	<Frame name="PlumberDreamseedMapPinTemplate" enableMouseMotion="true" enableMouse="false" mixin="PlumberDreamseedMapPinMixin" virtual="true">
+	<!--Frame name="PlumberDreamseedMapPinTemplate" enableMouseMotion="true" enableMouse="false" mixin="PlumberDreamseedMapPinMixin" virtual="true">
 		<Size x="32" y="32"/>
 		<Layers>
 			<Layer level="ARTWORK">
@@ -71,5 +71,5 @@
 		<Scripts>
 			<OnLoad method="OnCreated"/>
 		</Scripts>
-	</Frame>
+	</Frame-->
 </Ui>
