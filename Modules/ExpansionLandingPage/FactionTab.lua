@@ -1219,13 +1219,13 @@ do
 
 		for row, rowInfo in ipairs(FactionUtil.ActiveFactionLayout) do
 			offsetX = 0;
-			for _, factionInfo in ipairs(rowInfo) do
+			for j, factionInfo in ipairs(rowInfo) do
 				index = index + 1;
 				local f = self.factionButtonPool:Acquire();
 				f:ClearAllPoints();
 				local majorFactionID = factionInfo.factionID;
 
-				if factionInfo.preSpacer then
+				if rowInfo[j - 1] and rowInfo[j - 1].postSpacer then
 					offsetX = offsetX + 2.5 * FACTION_BUTTON_GAP_H;
 				end
 

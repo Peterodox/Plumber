@@ -179,14 +179,19 @@ end
 do  --Layout MID
 	local MajorFactionEntry = {
 		Prey = {factionID = Seasonal.Prey},		--Prey
+
 		Delves = {factionID = Seasonal.Delves,	--Delves
 			subFactions = {
 				{factionID = 2744, creatureDisplayID = 26365, playerCompanionID = 2},     --Valeera Sanguinar. Get playerCompanionID from C_MajorFactions.GetMajorFactionData(C_DelvesUI.GetDelvesFactionForSeason())
 			},
 		},
-		RitualSites = {factionID = 2792, preSpacer = true},		--Ritual Sites
+
+		RitualSites = {factionID = 2792},		--Ritual Sites
+
 		OpenWorldPVP = {factionID = 2770, shownAsSubfaction = true, iconFileID = 7448209},     --Slayer's Duellum
+
 		Zuljarra = {factionID = 2772,	--Zul'jarra's Forces
+			postSpacer = true,
 			subFactions = {
 				{factionID = 2773, creatureDisplayID = 145432},	-- Tokka
 			},
@@ -195,6 +200,7 @@ do  --Layout MID
 
 	local MajorFactionLayout = {
 		[1] = {
+			MajorFactionEntry.Kindojan,
 			MajorFactionEntry.Prey,
 			MajorFactionEntry.Delves,
 		},
