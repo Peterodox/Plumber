@@ -1,4 +1,4 @@
-## Interface: 120105, 120100, 50504, 20506, 11509, 16001
+## Interface: 120107, 120105, 50504, 20506, 11509, 16001
 ## Version: 1.9.6 c
 
 ## Title: Plumber
@@ -13,8 +13,9 @@
 
 ## IconTexture: Interface\AddOns\Plumber\Art\Logo\PlumberLogo64
 
-## X-Game: [Game]
-## X-Family: [Family]
+## X-GameType: Camelot [AllowLoadGameType camelot]
+## X-GameType: Standard [AllowLoadGameType standard]
+## X-GameType: Mists [AllowLoadGameType mists]
 
 
 Initialization.lua
