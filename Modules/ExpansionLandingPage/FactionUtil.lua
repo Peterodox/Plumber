@@ -77,6 +77,14 @@ local OverrideFactionInfo = {
 		rewardQuestID = 93798,
 	},
 
+	[2836] = {  --The Labyrinth of Kindo'jan
+		barColor = {55/255, 192/255, 158/255},
+	},
+
+	[2838] = {  --Aqir Research Enclave
+		barColor = {251/255, 137/255, 119/255},
+	},
+
 	---- TWW ----
 	[2570] = {  --Hallowfall Arathi
 		barColor = {244/255, 186/255, 130/255},
@@ -194,6 +202,13 @@ do  --Layout MID
 			postSpacer = true,
 			subFactions = {
 				{factionID = 2773, creatureDisplayID = 145432},	-- Tokka
+			},
+		},
+
+		Kindojan = {factionID = 2836, -- The Labyrinth of Kindo'jan
+			postSpacer = true,
+			subFactions = {
+				{factionID = 2838, iconFileID = 2914897}, -- Aqir Research Enclave
 			},
 		},
 	};
