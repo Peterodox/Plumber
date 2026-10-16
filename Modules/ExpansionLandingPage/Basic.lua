@@ -579,6 +579,7 @@ do  --Atlas
 		[2742] = {768, 896, 256, 384},    --Delves
 		[2792] = {896,1024, 256, 384},    --Ritual Sites
 		[2772] = {0  , 128, 512, 640},    --Zul'jarra's Forces
+		[2836] = {128, 256, 512, 640},    --The Labyrinth of Kindo'jan
 	};
 
 	FACTION_ICONS_COORDS[2808] = FACTION_ICONS_COORDS[2764];	--Prey S2
