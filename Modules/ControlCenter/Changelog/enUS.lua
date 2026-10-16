@@ -10,6 +10,73 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10906] = {
 	{
 		type = "date",
+		versionText = "1.9.6 d",
+		timestamp = 1792100000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName PlayerPing"],
+		dbKey = "WorldMapPin_PlayerPing",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "WorldMapPin_PlayerPing",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Highlight the player's location with a ping effect when you open the World Map or press the ALT key.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "By default, WoW only shows the player ping when you change maps.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "This module was taken down at the beginning of Midnight when we investigated a map pin-related issue.",
+	},
+
+	{
+		type = "img",
+		dbKey = "WorldMapPin_PlayerPing",
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName NewExpansionLandingPage"],
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Added Labyrinth of Kindo\'jan and Aqir Research Enclave to the Faction tab.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName TransmogRaestorePending"],
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.6 c",
 		timestamp = 1791600000,
 	},
