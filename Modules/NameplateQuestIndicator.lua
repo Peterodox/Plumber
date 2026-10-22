@@ -1,6 +1,7 @@
 local _, addon = ...
 local L = addon.L;
 local API = addon.API;
+local IS_FOREVER = addon.IS_FOREVER;
 
 
 local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit;
@@ -455,8 +456,11 @@ do  --Event Listener
 					widget:SetPoint("RIGHT", UnitFrame.HealthBarsContainer.healthBar, "LEFT", -2, 0);
 				end
 			else
-				local relativeTo = UnitFrame.AurasFrame.CrowdControlListFrame;
-				widget:SetPoint("LEFT", relativeTo, "RIGHT", -4, 0);
+				if IS_FOREVER then
+					widget:SetPoint("LEFT", UnitFrame.PlayerLevelDiffFrame, "RIGHT", 2, 0);
+				else
+					widget:SetPoint("LEFT", UnitFrame.AurasFrame.CrowdControlListFrame, "RIGHT", -4, 0);
+				end
 			end
 		else
 			if Def.Side == "LEFT" then
