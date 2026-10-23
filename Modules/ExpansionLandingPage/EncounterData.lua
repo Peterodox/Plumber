@@ -18,6 +18,7 @@ local EncounterData = {
 
 	--https://wago.tools/db2/JournalEncounter?page=1
 	--/dump GetMouseFoci()[1].icon:GetTexture()
+	[2896] = {icon = 8214194, achv = {63692, 63693, 63694}},	--Kith'ix
 	[2849] = {icon = 3012069, achv = {63683, 63681, 63682}},	--Nymrissa Wavecaller
 
 	[2888] = {icon = 7966621, achv = {63523, 63418}},      --Nek'zali the Soulcoiler
@@ -289,9 +290,10 @@ LandingPageUtil.GetDifficultyName = GetEJDifficultyString;
 do
 	local MID_EncounterTabInfo = {
 		JournalInstanceIDs = {
-			1317,	--The Tidebound Grotto
-			1320,	--The Venomous Abyss
-			1305,	--Sporefall
+			1324,   --The Unbinding of Kith'ix
+			1317,   --The Tidebound Grotto
+			1320,   --The Venomous Abyss
+			1305,   --Sporefall
 			1314,   --The Dreamrift
 			1307,   --The Voidspire
 			1308,   --March on Quel'Danas

@@ -13,11 +13,7 @@ local EJ_GetEncounterInfoByIndex = EJ_GetEncounterInfoByIndex;
 
 local SHOW_LOOT = true;    --Boss achievements and loot
 
-local JournalInstanceIDs = {
-	1302,   --Manaforge Omega
-	1296,   --Liberation of Undermine
-	1273,   --Nerub-ar Palace
-};
+local JournalInstanceIDs = {};
 
 if addon.IS_MISTS then
 	JournalInstanceIDs = {
