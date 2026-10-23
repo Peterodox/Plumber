@@ -370,7 +370,7 @@ do	-- ManagerFrame / ManagerEntry
 
 	function ManagerEntryMixin:OnEnter()
 		self:UpdateVisual();
-		if not (self.EyeButton:IsMouseMotionFocus() or self.DeleteButton:IsMouseMotionFocus()) then
+		if not self.EyeButton:IsMouseMotionFocus() then
 			CurrencyButtonMixin.ShowTooltip(self);
 		end
 	end
@@ -415,11 +415,11 @@ do	-- ManagerFrame / ManagerEntry
 	end
 
 	function ManagerEntryMixin:IsFocused()
-		return self:IsMouseMotionFocus() or self.EyeButton:IsMouseMotionFocus() or self.DeleteButton:IsMouseMotionFocus();
+		return self:IsMouseMotionFocus() or self.EyeButton:IsMouseMotionFocus();
 	end
 
 	function ManagerEntryMixin:UpdateVisual()
-		if self.ignored and not self.markedDeleted then
+		if self.ignored then
 			self:SetAlpha(0.5);
 		else
 			self:SetAlpha(1);
@@ -434,22 +434,11 @@ do	-- ManagerFrame / ManagerEntry
 		end
 
 		self.EyeButton:UpdateVisual();
-		self.DeleteButton:UpdateVisual();
 
-		self.EyeButton:SetShown(not self.markedDeleted);
-		self.DeleteButton:SetShown(self.isCustomItem);
-
-		if self.markedDeleted then
-			self.Name:SetTextColor(1, 0.125, 0.125);
-			self.Icon:SetVertexColor(0.5, 0.5, 0.5);
-		else
-			self.Icon:SetVertexColor(1, 1, 1);
-		end
+		self.Icon:SetVertexColor(1, 1, 1);
 	end
 
 	function ManagerEntryMixin:ToggleEntryIgnored()
-		if self.markedDeleted then return; end
-
 		self.ignored = not self.ignored;
 		self.EyeButton.parentEntryIgnored = self.ignored;
 		if self.ignored then
@@ -457,12 +446,6 @@ do	-- ManagerFrame / ManagerEntry
 		else
 			self.EyeButton:OpenEye();
 		end
-		self:UpdateVisual();
-	end
-
-	function ManagerEntryMixin:ToggleEntryDeleted()
-		self.markedDeleted = not self.markedDeleted;
-		self.DeleteButton.parentEntryMarkedDeleted = self.markedDeleted;
 		self:UpdateVisual();
 	end
 
@@ -520,7 +503,7 @@ do	-- ManagerFrame / ManagerEntry
 
 		f.Icon = f:CreateTexture(nil, "ARTWORK");
 		f.Icon:SetSize(20, 20);
-		f.Icon:SetPoint("RIGHT", f, "RIGHT", -32, 0);
+		f.Icon:SetPoint("RIGHT", f, "RIGHT", -2, 0);
 
 		f.Name = f:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 		f.Name:SetPoint("LEFT", f, "LEFT", 32, 0);
@@ -544,12 +527,7 @@ do	-- ManagerFrame / ManagerEntry
 		f.EyeButton.UpdateVisual = EyeButton_UpdateVisual;
 		f.EyeButton:SetPropagateMouseMotion(true);
 		f.EyeButton:SetIgnoreParentAlpha(true);
-
-		f.DeleteButton = LandingPageUtil.CreateDeleteButton(f);
-		f.DeleteButton:SetPoint("RIGHT", f, "RIGHT", 0, 0);
-		f.DeleteButton.UpdateVisual = DeleteButton_UpdateVisual;
-		f.DeleteButton:SetPropagateMouseMotion(true);
-		f.DeleteButton:SetIgnoreParentAlpha(true);
+		f.EyeButton:HookScript("OnLeave", UtilityButton_OnLeave);
 
 		f:SetScript("OnEnter", f.OnEnter);
 		f:SetScript("OnLeave", f.OnLeave);
