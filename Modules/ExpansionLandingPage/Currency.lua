@@ -18,7 +18,7 @@ local Def = {
 	MiniEntrySidePadding = 12,
 };
 
-local ResourceList = {}; ---@type ResourceListEntry[]
+local CurrentExpansionResources = {}; ---@type ResourceListEntry[]
 local MainFrame;
 
 
@@ -364,6 +364,11 @@ end
 
 local ListManager = {};
 do	-- ManagerFrame / ManagerEntry
+	ListManager.ignoredCurrencyDBKey = "LandingPage_Resource_IgnoreCurrency";
+	ListManager.ignoredItemDBKey = "LandingPage_Resource_IgnoreItem";
+	ListManager.customOrderDBKey = "LandingPage_Resource_CustomOrder"; -- Unused
+	ListManager.customEntryDBKey = "LandingPage_Resource_CustomEntry"; -- Unused
+
 	local ManagerFrame;
 
 	local ManagerEntryMixin = {};
@@ -383,7 +388,7 @@ do	-- ManagerFrame / ManagerEntry
 	function ManagerEntryMixin:SetCurrency(currencyID)
 		self.currencyID = currencyID;
 		self.itemID = nil;
-		self.isCustomItem = false;
+		self.ignored = ListManager:IsCurrencyFlaggedIgnored(currencyID);
 		local info = GetCurrencyInfo(self.currencyID);
 		if info then
 			self.Name:SetText(info.name)
@@ -392,13 +397,13 @@ do	-- ManagerFrame / ManagerEntry
 			self.Name:SetText("Currency:"..currencyID);
 			self.Icon:SetTexture(134400);
 		end
-		self:UpdateVisual();
+		self:OnStateChanged();
 	end
 
 	function ManagerEntryMixin:SetItem(itemID)
 		self.currencyID = nil;
 		self.itemID = itemID;
-		self.isCustomItem = true; -- TEMP
+		self.ignored = ListManager:IsItemFlaggedIgnored(itemID);
 		self.Icon:SetTexture(GetItemIconByID(self.itemID));
 		local itemName = GetItemNameByID(self.itemID);
 		if itemName then
@@ -411,7 +416,7 @@ do	-- ManagerFrame / ManagerEntry
 				end
 			end);
 		end
-		self:UpdateVisual();
+		self:OnStateChanged();
 	end
 
 	function ManagerEntryMixin:IsFocused()
@@ -438,15 +443,19 @@ do	-- ManagerFrame / ManagerEntry
 		self.Icon:SetVertexColor(1, 1, 1);
 	end
 
+	function ManagerEntryMixin:UpdateEyeButton()
+		self.EyeButton:SetParentEntryIgnored(self.ignored);
+	end
+
 	function ManagerEntryMixin:ToggleEntryIgnored()
-		self.ignored = not self.ignored;
-		self.EyeButton.parentEntryIgnored = self.ignored;
-		if self.ignored then
-			self.EyeButton:CloseEye();
-		else
-			self.EyeButton:OpenEye();
-		end
+		ListManager:ToggleEntryIgnored(self);
+		self:OnStateChanged();
+	end
+
+	---Call this after setting an item/currency or toggling Ignored
+	function ManagerEntryMixin:OnStateChanged()
 		self:UpdateVisual();
+		self:UpdateEyeButton();
 	end
 
 	local function EyeButton_UpdateVisual(self)
@@ -465,6 +474,7 @@ do	-- ManagerFrame / ManagerEntry
 		self.Background:SetTexCoord(l/512, r/512, t/512, b/512);
 	end
 
+	---Shelve the "Delete Entry" idea for now
 	local function DeleteButton_UpdateVisual(self)
 		if self.parentEntryMarkedDeleted then -- Undo
 			self.Icon:SetTexCoord(144/512, 192/512, 64/512, 112/512);
@@ -493,6 +503,12 @@ do	-- ManagerFrame / ManagerEntry
 			self.Icon:SetVertexColor(0.922, 0.871, 0.761);
 		end
 		self.Background:SetTexCoord(r/512, l/512, t/512, b/512);
+	end
+
+	local function UtilityButton_OnLeave(self)
+		if self:GetParent():IsMouseMotionFocus() then
+			self:GetParent():OnEnter();
+		end
 	end
 
 	local function CreateManagerEntry(parent)
@@ -536,6 +552,9 @@ do	-- ManagerFrame / ManagerEntry
 	end
 
 	function ListManager:Init()
+		self.pendingIgnoredCurrency = {};
+		self.pendingIgnoredItem = {};
+
 		if ManagerFrame then return; end
 
 		local container = MainFrame.listCategoryButton:GetParent();
@@ -557,7 +576,7 @@ do	-- ManagerFrame / ManagerEntry
 
 		-- Header
 		local categoryButtonHeight = 36;
-		local categoryButtonOffsetY = 96;
+		local categoryButtonOffsetY = 16;
 		local categoryButton = LandingPageUtil.CreateListCategoryButton(f, L["Resources"]);
 		categoryButton:SetPoint("TOP", f, "TOP", 0, -categoryButtonOffsetY);
 
@@ -623,8 +642,42 @@ do	-- ManagerFrame / ManagerEntry
 		addon.CallbackRegistry:Register("LandingPage_TabChanged", self.Cancel, self);
 	end
 
-	function ListManager:SaveChanges()
+	---Convert a `[id] = ignored` table to a list of ignored IDs.
+	local function SavePendingChanges(savedUnderDBKey, pendingTbl)
+		local idList = addon.GetDBValue(savedUnderDBKey) or {};
+		local ignoredID = {};
+		for _, id in ipairs(idList) do
+			ignoredID[id] = true;
+		end
+		for id, ignored in pairs(pendingTbl) do
+			ignoredID[id] = ignored;
+		end
+		local newList = {};
+		local n = 0;
+		for id, ignored in pairs(ignoredID) do
+			if ignored then
+				n = n + 1;
+				newList[n] = id;
+			end
+		end
+		table.sort(newList, function(a, b) return a < b; end);
+		addon.SetDBValue(savedUnderDBKey, newList);
+	end
 
+	function ListManager:SaveChanges()
+		if self.pendingIgnoredCurrency then
+			SavePendingChanges(self.ignoredCurrencyDBKey, self.pendingIgnoredCurrency);
+			self.pendingIgnoredCurrency = nil;
+		end
+
+		if self.pendingIgnoredItem then
+			SavePendingChanges(self.ignoredItemDBKey, self.pendingIgnoredItem);
+			self.pendingIgnoredItem = nil;
+		end
+
+		self:HideFrame();
+		self:LoadIgnoreList();
+		MainFrame:FullUpdate();
 	end
 
 	function ListManager:Cancel()
@@ -662,7 +715,7 @@ do	-- ManagerFrame / ManagerEntry
 		local gap = 0;
 		local top, bottom;
 
-		for _, v in ipairs(ResourceList) do
+		for _, v in ipairs(self:GetResourceList()) do
 			n = n + 1;
 			top = offsetY;
 			bottom = offsetY + objectHeight + gap;
@@ -688,6 +741,164 @@ do	-- ManagerFrame / ManagerEntry
 		local retainPosition = false;
 		ManagerFrame.ScrollView:Show();
 		ManagerFrame.ScrollView:SetContent(content, retainPosition);
+	end
+
+	function ListManager:GetIgnoredCurrencyDB()
+		return addon.GetDBValue(self.ignoredCurrencyDBKey) or {};
+	end
+
+	function ListManager:GetIgnoredItemDB()
+		return addon.GetDBValue(self.ignoredItemDBKey) or {};
+	end
+
+	function ListManager:LoadIgnoreList()
+		local ignoredCurrency = {};
+		local ignoredItem = {};
+
+		self.ignoredCurrency = ignoredCurrency;
+		self.ignoredItem = ignoredItem
+
+		for _, id in ipairs(self:GetIgnoredCurrencyDB()) do
+			ignoredCurrency[id] = true;
+		end
+
+		for _, id in ipairs(self:GetIgnoredItemDB()) do
+			ignoredItem[id] = true;
+		end
+	end
+
+	---@return boolean ignored `True` if the currency is truly ignored
+	function ListManager:IsCurrencyIgnored(currencyID)
+		if not self.ignoredCurrency then
+			self:LoadIgnoreList();
+		end
+		return self.ignoredCurrency[currencyID];
+	end
+
+	---@return boolean ignored `True` if the item is truly ignored
+	function ListManager:IsItemIgnored(itemID)
+		if not self.ignoredItem then
+			self:LoadIgnoreList();
+		end
+		return self.ignoredItem[itemID];
+	end
+
+	---@return boolean ignored `True` if the item is ignored either permanently or temporarily (before clicking Save)
+	function ListManager:IsCurrencyFlaggedIgnored(currencyID)
+		if self.pendingIgnoredCurrency[currencyID] ~= nil then
+			return self.pendingIgnoredCurrency[currencyID];
+		else
+			return self:IsCurrencyIgnored(currencyID);
+		end
+	end
+
+	---@return boolean ignored `True` if the item is ignored either permanently or temporarily (before clicking Save)
+	function ListManager:IsItemFlaggedIgnored(itemID)
+		if self.pendingIgnoredItem[itemID] ~= nil then
+			return self.pendingIgnoredItem[itemID];
+		else
+			return self:IsItemIgnored(itemID);
+		end
+	end
+
+	function ListManager:ToggleEntryIgnored(managerEntryButton)
+		local newState;
+		local id = managerEntryButton.currencyID;
+		if id then
+			newState = not self:IsCurrencyFlaggedIgnored(id);
+			self.pendingIgnoredCurrency[id] = newState;
+		else
+			id = managerEntryButton.itemID;
+			if id then
+				newState = not self:IsItemFlaggedIgnored(id);
+				self.pendingIgnoredItem[id] = newState;
+			end
+		end
+		if newState ~= nil then
+			managerEntryButton.ignored = newState;
+		end
+	end
+
+	function ListManager:GetResourceList()
+		if self.resouceList then return self.resouceList; end
+
+		local customEntry = addon.GetDBValue(self.customEntryDBKey);
+		local customOrder = addon.GetDBValue(self.customOrderDBKey);
+
+		if not (customEntry or customOrder) then
+			-- Use the default list if the user changed nothing
+			self.resouceList = CurrentExpansionResources;
+		else
+			local tbl = {};
+			self.resouceList = tbl;
+
+			local n = 0;
+			local trackedCurrency = {};
+			local trackedItem = {};
+
+			local function AssignEntry(entry)
+				if entry.currencyID and not trackedCurrency[entry.currencyID]then
+					trackedCurrency[entry.currencyID] = entry;
+				elseif entry.itemID and not trackedItem[entry.itemID] then
+					trackedItem[entry.itemID] = entry;
+				end
+			end
+
+			for index, entry in ipairs(CurrentExpansionResources) do
+				entry.originalOrder = index;
+				AssignEntry(entry);
+			end
+
+			if customEntry then
+				for index, entry in ipairs(CurrentExpansionResources) do
+					entry.overrideOrder = index;
+					AssignEntry(entry);
+				end
+			end
+
+			if customOrder then
+				for _, v in pairs(customOrder) do
+					if v.order then
+						if v.currencyID and trackedCurrency[v.currencyID] then
+							trackedCurrency[v.currencyID].overrideOrder = v.order;
+						elseif v.itemID and trackedItem[v.itemID] then
+							trackedItem[v.itemID].overrideOrder = v.order;
+						end
+					end
+				end
+			end
+
+			-- Merge two table into a list
+			for _, entry in pairs(trackedCurrency) do
+				n = n + 1;
+				tbl[n] = entry;
+			end
+			for _, entry in pairs(trackedItem) do
+				n = n + 1;
+				tbl[n] = entry;
+			end
+
+			local function SortFunc(a, b)
+				if a.originalOrder and b.originalOrder then
+					return a.originalOrder < b.originalOrder;
+				else
+					if a.originalOrder and b.overrideOrder and (a.originalOrder ~= b.overrideOrder) then
+						return a.originalOrder < b.overrideOrder;
+					elseif a.overrideOrder and b.originalOrder and (a.originalOrder ~= b.overrideOrder) then
+						return a.originalOrder < b.originalOrder;
+					end
+				end
+				return false;
+			end
+
+			table.sort(tbl, SortFunc);
+		end
+
+		return self.resouceList;
+	end
+
+	function ListManager:ClearResourceList()
+		self.resouceList = nil;
 	end
 end
 
@@ -779,7 +990,7 @@ do
 			self.ScrollView:SetStepSize(2.5 * Def.ButtonHeight);
 		end
 
-		for _, v in ipairs(ResourceList) do
+		for _, v in ipairs(ListManager:GetResourceList()) do
 			valid = true;
 			if v.hidden then
 				valid = false;      --for transition between WoW content updates
@@ -805,6 +1016,12 @@ do
 						valid = uiMapID == v.uiMapID;
 					end
 				end
+			end
+
+			if v.currencyID then
+				valid = not ListManager:IsCurrencyIgnored(v.currencyID);
+			elseif v.itemID then
+				valid = not ListManager:IsItemIgnored(v.itemID);
 			end
 
 			if valid and v.shownIfOwned then
@@ -1121,7 +1338,8 @@ end
 
 CallbackRegistry:Register("LandingPage.SetResourceList", function(list)
 	if list then
-		ResourceList = list;
+		ListManager:ClearResourceList();
+		CurrentExpansionResources = list;
 		UpdateIfVisible();
 	end
 end);

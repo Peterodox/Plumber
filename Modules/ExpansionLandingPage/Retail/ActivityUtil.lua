@@ -1027,7 +1027,7 @@ end);
 
 
 do	-- Manage Mode
-	local IGNORE_LIST_DBKEY = "LandingPage_Activity_IgnoredList";
+	local IGNORE_LIST_DBKEY = "LandingPage_Activity_IgnoreList";
 
 	function ActivityUtil.IsManageModeSupported()
 		return true;

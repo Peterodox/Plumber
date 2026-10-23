@@ -223,6 +223,14 @@ do	--EyeButton controls visibility
 		self:SetIconCoord(0/512, 48/512, 64/512, 112/512);
 	end
 
+	function EyeButtonMixin:SetParentEntryIgnored(ignored)
+		if ignored then
+			self:CloseEye();
+		else
+			self:OpenEye();
+		end
+	end
+
 	function EyeButtonMixin:ShowTooltip()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 		if self.parentEntryIgnored then
