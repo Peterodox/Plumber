@@ -346,7 +346,7 @@ do	--DeleteButton
 		GameTooltip:Show();
 	end
 
-	function CreateDeleteButton(parent)
+	local function CreateDeleteButton(parent)
 		local f = CreateFrame("Button", nil, parent);
 		Mixin(f, DeleteButtonMixin);
 		f:SetSize(24, 24);

@@ -409,8 +409,8 @@ do	-- ManagerFrame / ManagerEntry
 		if itemName then
 			self.Name:SetText(itemName);
 		else
-			CallbackRegistry:LoadItem(self.itemID, function(itemID)
-				if self.itemID == itemID then
+			CallbackRegistry:LoadItem(self.itemID, function(id)
+				if self.itemID == id then
 					self.Name:SetText(GetItemNameByID(self.itemID));
 					self.Icon:SetTexture(GetItemIconByID(self.itemID));
 				end
