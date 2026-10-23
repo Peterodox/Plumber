@@ -35,6 +35,12 @@ end
 
 local CurrencyButtonMixin = {}; -- Name, Quantity, Icon
 do
+	function CurrencyButtonMixin:TrySetName(name)
+		if self.Name then
+			self.Name:SetText(name);
+		end
+	end
+
 	function CurrencyButtonMixin:SetCurrency(currencyID, isMinor, appendTooltipFunc, hasWeeklyCap)
 		self.currencyID = currencyID;
 		self.itemID = nil;
@@ -885,17 +891,6 @@ do
 							point = "TOPLEFT",
 							offsetX = buttonOffsetX,
 						};
-						if v.currencyID then
-							self.anyCurrency = true;
-							content[n].setupFunc = function(obj)
-								obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
-							end;
-						elseif v.itemID then
-							self.anyItem = true;
-							content[n].setupFunc = function(obj)
-								obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc, v.useActionButton);
-							end;
-						end
 
 						if isLeftCol then
 							-- Reset bottom so the button on the right col has the same top.
@@ -912,21 +907,21 @@ do
 							point = "TOPLEFT",
 							offsetX = offsetX,
 						};
-						if v.currencyID then
-							self.anyCurrency = true;
-							content[n].setupFunc = function(obj)
-								obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
-								obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
-							end;
-						elseif v.itemID then
-							self.anyItem = true;
-							content[n].setupFunc = function(obj)
-								obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
-								obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
-							end;
-						end
 					end
 
+					if v.currencyID then
+						self.anyCurrency = true;
+						content[n].setupFunc = function(obj)
+							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+							obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
+						end;
+					elseif v.itemID then
+						self.anyItem = true;
+						content[n].setupFunc = function(obj)
+							obj:SetUsableAction(v.usableItemID, v.criteriaFunc);
+							obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc);
+						end;
+					end
 				end
 				offsetY = bottom;
 			end
