@@ -29,7 +29,7 @@ Modules\ReputationTracker.lua [AllowLoadGameType standard, camelot]
 #Modules\DirectionArrow.lua [AllowLoadGameType standard]
 #Modules\SuperTrack.xml [AllowLoadGameType standard]
 
-#Modules\DevTool.lua [AllowLoadGameType standard]
+#Modules\DevTool.lua [AllowLoadGameType standard, camelot]
 #Modules\DevTool_HyperlinkEditor.lua [AllowLoadGameType standard]
 
 Modules\ControlCenter\ControlCenter.xml
