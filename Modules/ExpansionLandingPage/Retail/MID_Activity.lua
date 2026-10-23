@@ -35,13 +35,8 @@ local DelvesBonusRepQuestFlags = {
 
 local Seasonal = {
 	DelveWeeklyQuestID = 93784,
-	DelveBountyItemID = 252415,
+	DelveBountyItemID = 274374,
 };
-
-if addon.IS_12_1_0 then
-	--Seasonal.DelveWeeklyQuestID = 0; -- Unchanged
-	Seasonal.DelveBountyItemID = 274374;
-end
 
 
 local GildedStashTracker = {};
@@ -482,6 +477,7 @@ local ActivityData = {
 		entries = {
 			{name = "Kill Count", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png", sortToTop = true, setupFunc = SetupFuncs.KillCount, tooltipHeader = L["Defeated Prey"], tooltipSetter = SetupFuncs.DefeatedPreyTooltip},
 			{name = "Hunt Table", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png", sortToTop = true, setupFunc = SetupFuncs.HuntTable, removeSharedPrefix = true},
+			{name = "Tormented Soul", itemID = 276548, flagQuest = 97628, icon = 236300, tooltipItem = 276548}, -- Auto-fill Nightmare Hunt progress & extra Hero chest
 		},
 	},
 
