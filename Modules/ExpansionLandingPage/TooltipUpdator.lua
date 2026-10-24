@@ -330,7 +330,7 @@ function TooltipUpdator:OnUpdate(elapsed)
 					end
 					if extraInfo then
 						tooltip:AddLine(" ");
-						tooltip:AddLine(extraInfo, 1, 0.82, 0, true);
+						tooltip:AddLine(extraInfo, 0.000, 0.800, 1.000, true);
 					end
 				end
 

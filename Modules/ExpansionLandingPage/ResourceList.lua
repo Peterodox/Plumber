@@ -388,7 +388,7 @@ do	-- ManagerFrame / ManagerEntry
 				if text then
 					local tooltip = GameTooltip;
 					tooltip:AddLine(" ");
-					tooltip:AddLine(text, 1, 0.82, 0, true);
+					tooltip:AddLine(text, 0.000, 0.800, 1.000, true);
 					tooltip:Show();
 				end
 			end
