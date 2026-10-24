@@ -391,7 +391,7 @@ do
 		local categories = {
 			{name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
 			{name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
-			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList},
+			{name = L["Resources"], frameGetter = LandingPageUtil.CreateResourceList, menuInfoGetter = true},
 		};
 
 		local numCategories = #categories;
@@ -408,9 +408,10 @@ do
 				local categoryButton = LandingPageUtil.CreateListCategoryButton(container, v.name);
 				categoryButton:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 				offsetY = offsetY + categoryButtonHeight;
+
 				if v.frameGetter then
 					offsetY = offsetY + lineGap;
-					local frame, height, categoryOnEnterFunc = v.frameGetter(container);
+					local frame, height, categoryOnEnterFunc, menuInfoGetter = v.frameGetter(categoryButton);
 					frame.listCategoryButton = categoryButton;
 					frame:SetPoint("TOP", relativeTo, "TOP", 0, -offsetY);
 					offsetY = offsetY + height;
@@ -424,7 +425,15 @@ do
 						frame:OnShow();
 					end
 					categoryButton:SetOnEnterFunc(categoryOnEnterFunc);
+
+					if menuInfoGetter then
+						categoryButton:SetCustomizable(true);
+						categoryButton:SetCustomizeButtonMenuInfoGetter(menuInfoGetter);
+					else
+						categoryButton:SetCustomizable(false);
+					end
 				end
+
 				offsetY = offsetY + paragraphGap;
 			end
 		end
@@ -586,7 +595,7 @@ do	--Shared
 
 		if highlighted then
 			if not BlackOverlay then
-				local offset = 8;
+				local offset = 7;
 				local alpha = 0.8;
 
 				BlackOverlay = CreateFrame("Frame", nil, MainFrame);

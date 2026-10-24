@@ -729,6 +729,22 @@ L["Inactive Currencies Tooltip"] = "以下货币因为被你设为“未使用�
 L["New Quest"] = "新任务";
 L["Trait Points Available"] = "可分配点数";
 L["Unspent Points"] = "你有待分配的点数";
+L["Manage Activities"] = "管理活动";
+L["Manage Activities Abbr"] = "管理活动";
+L["Manage Activities Tooltip"] = "显示或隐藏条目。\n\n所有角色将共享此设置。";
+L["Save And Exit"] = "保存并退出";
+L["Activity Shown Condition Generic"] = "此条目仅在特定条件下显示。";
+L["Activity Shown Condition ShownIfActive"] = "此条目仅在任务激活时显示。";
+L["Activity Shown Condition ShownIfOnQuest"] = "此条目仅在你已接受任务后显示。";
+L["Click To Ignore Activity"] = "点击以隐藏";
+L["Click To Enable Activity"] = "点击以启用";
+L["Click To Mark As Deleted"] = "设为待删除";
+L["Click To Cancel Deletion"] = "取消删除";
+L["Currency Button Layout 1"] = "名称和图标";
+L["Currency Button Layout 2"] = "仅图标";
+L["Edit Resource List"] = "编辑";
+L["Resource Shown Condition Generic"] = "此条目仅在特定条件下显示。";
+L["Resource Shown Condition ShownIfOwned"] = "此条目仅在你持有数量大于零时显示。";
 
 
 --ExpansionSummaryMinimapButton

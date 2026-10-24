@@ -30,13 +30,15 @@ local ActivityData = {  --Constant
 
 			{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, removeIconBorder = true,
 				children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
+				uidLoolup = "TWW_CofferKey",
 			},
 
 			{name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, removeIconBorder = true,
 				children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyShardFlags),
+				uidLoolup = "TWW_CofferKeyShard",
 			},
 
-			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFunc_WeeklyBonusRenown, children = DelvesBonusRepQuestFlags},
+			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFunc_WeeklyBonusRenown, children = DelvesBonusRepQuestFlags, uidLoolup = "TWW_DelveRep"},
 		}
 	},
 
@@ -83,11 +85,6 @@ local ActivityData = {  --Constant
 					{name = "Devourer Attack: Tazavesh", questID = 86465, uiMapID = 2371},
 				},
 			},
-
-			--{name = "Making a Deposit", questID = 85722, shownIfOnQuest = true, uiMapID = 2371},
-			--{name = "Making a Deposit", questID = 89061, shownIfOnQuest = true, uiMapID = 2371},
-			--{name = "Making a Deposit", questID = 89062, shownIfOnQuest = true, uiMapID = 2371},
-			--{name = "Making a Deposit", questID = 89063, shownIfOnQuest = true, uiMapID = 2371},
 		}
 	},
 

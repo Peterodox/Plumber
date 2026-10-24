@@ -760,6 +760,22 @@ L["Inactive Currencies Tooltip"] = "These currencies are hidden because you have
 L["New Quest"] = "New Quest";
 L["Trait Points Available"] = "Points Available";
 L["Unspent Points"] = "Unspent Points";
+L["Manage Activities"] = "Manage Activities";
+L["Manage Activities Abbr"] = "Manage";
+L["Manage Activities Tooltip"] = "Choose entries to ignore.\n\nThe settings are shared across your characters.";
+L["Save And Exit"] = "Save and Exit";
+L["Activity Shown Condition Generic"] = "This entry only becomes visible if certain conditions are met.";
+L["Activity Shown Condition ShownIfActive"] = "This entry only becomes visible if the quest is active.";
+L["Activity Shown Condition ShownIfOnQuest"] = "This entry only becomes visible if you are on the quest.";
+L["Click To Ignore Activity"] = "Click to ignore";
+L["Click To Enable Activity"] = "Click to enable";
+L["Click To Mark As Deleted"] = "Mark as Deleted";
+L["Click To Cancel Deletion"] = "Cancel Deletion";
+L["Currency Button Layout 1"] = "Name and Icon";
+L["Currency Button Layout 2"] = "Icon Only";
+L["Edit Resource List"] = "Edit";
+L["Resource Shown Condition Generic"] = "This entry only becomes visible if certain conditions are met.";
+L["Resource Shown Condition ShownIfOwned"] = "This entry only becomes visible if you have any.";
 
 
 --ExpansionSummaryMinimapButton

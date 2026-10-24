@@ -403,6 +403,7 @@ local function CreateScrollView(parent, scrollBar)
 	f.range = 0;
 	f.viewportSize = 0;
 	f.blendSpeed = 0.15;
+	f.dataIndexOffset = 0;
 
 	f:SetStepSize(32);
 	f:SetBottomOvershoot(0);
@@ -451,12 +452,7 @@ do  --ScrollView Basic Content Render
 	function ScrollViewMixin:SetOffset(offset)
 		self.offset = offset;
 		self.ScrollRef:SetPoint("TOP", self, "TOP", 0, offset);
-
-		if self.scrollable then
-			self.ScrollBar:SetValueByRatio(offset/self.range);
-		else
-			self.ScrollBar:SetValueByRatio(0);
-		end
+		self:UpdateScrollBar();
 	end
 
 	function ScrollViewMixin:UpdateView(useScrollTarget)
@@ -490,7 +486,12 @@ do  --ScrollView Basic Content Render
 					end
 				end
 			end
+
+			fromDataIndex = fromDataIndex or 1;
 			toDataIndex = toDataIndex or self.numContent;
+
+			fromDataIndex = fromDataIndex - self.dataIndexOffset;
+			toDataIndex = toDataIndex + self.dataIndexOffset;
 
 			for dataIndex, obj in pairs(self.indexedObjects) do
 				if dataIndex < fromDataIndex or dataIndex > toDataIndex then
@@ -509,7 +510,7 @@ do  --ScrollView Basic Content Render
 
 				else
 					contentData = self.content[dataIndex];
-					obj = self:AcquireObject(contentData.templateKey);
+					obj = contentData and self:AcquireObject(contentData.templateKey);
 					if obj then
 						if contentData.setupFunc then
 							contentData.setupFunc(obj);
@@ -519,6 +520,14 @@ do  --ScrollView Basic Content Render
 					end
 				end
 			end
+		end
+	end
+
+	function ScrollViewMixin:UpdateScrollBar()
+		if self.scrollable then
+			self.ScrollBar:SetValueByRatio(self.offset/self.range);
+		else
+			self.ScrollBar:SetValueByRatio(0);
 		end
 	end
 
@@ -598,7 +607,7 @@ do  --ScrollView Basic Content Render
 
 		if self.numContent > 0 then
 			local range = content[self.numContent].bottom - self.viewportSize;
-			if true or range > 0 then
+			if range > 0 then	-- or true?
 				range = range + self.bottomOvershoot;
 			end
 			self:SetScrollRange(range);
@@ -618,12 +627,16 @@ do  --ScrollView Basic Content Render
 			local offset = self.scrollTarget;
 			if (not self.allowOvershoot) and offset > self.range then
 				offset = self.range;
+				self.scrollTarget = offset;
+				self:SnapToScrollTarget();
+			else
+				self:UpdateView(true);
+				self:UpdateScrollBar();
 			end
-			self.scrollTarget = offset;
 		else
 			self.scrollTarget = 0;
+			self:SnapToScrollTarget();
 		end
-		self:SnapToScrollTarget();
 	end
 end
 
@@ -835,10 +848,6 @@ do  --ScrollView Scroll Behavior
 		end
 	end
 
-	function ScrollViewMixin:SetBottomOvershoot(bottomOvershoot)
-		self.bottomOvershoot = bottomOvershoot;
-	end
-
 	function ScrollViewMixin:EnableMouseBlocker(state)
 		self.useMouseBlocker = state;
 		if state then
@@ -867,6 +876,10 @@ do  --ScrollView Scroll Behavior
 		--If the entries are collapsible, the header button's position may change with scroll range
 		--If true, the button will retain its position until scroll
 		self.allowOvershoot = state;
+	end
+
+	function ScrollViewMixin:SetBottomOvershoot(bottomOvershoot)
+		self.bottomOvershoot = bottomOvershoot;
 	end
 
 	function ScrollViewMixin:SetAlwaysShowScrollBar(state)
@@ -911,12 +924,12 @@ do  --ScrollView Scroll Behavior
 			local BottomGradient = CreateFrame("Frame", nil, self:GetParent());
 			self.BottomGradient = BottomGradient;
 			BottomGradient:SetSize(224, self.boundaryGradientSize or 40);
-			BottomGradient:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 6, -1);
+			BottomGradient:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, -1);
 			BottomGradient:SetPoint("BOTTOMRIGHT", self.ScrollBar, "BOTTOMLEFT", -1, -1);
 			local tex = BottomGradient:CreateTexture(nil, "OVERLAY");
 			tex:SetAllPoints(true);
-			local topColor = CreateColor(0.082, 0.047, 0.027, 0);
-			local bottomColor = CreateColor(0.082, 0.047, 0.027, 1)
+			local topColor = CreateColor(0.067, 0.040, 0.024, 0);
+			local bottomColor = CreateColor(0.067, 0.040, 0.024, 1)
 			tex:SetColorTexture(1, 1, 1);
 			tex:SetGradient("VERTICAL", bottomColor, topColor);
 			BottomGradient:SetFrameLevel(self:GetFrameLevel() + 2);
@@ -963,6 +976,14 @@ do  --ScrollView Scroll Behavior
 		if self.ScrollBar and self.ScrollBar.SetMinimized then
 			self.ScrollBar:SetMinimized(minimized);
 		end
+	end
+
+	function ScrollViewMixin:ExtendRenderDataIndex(dataIndexOffset)
+		-- We calculate which content is visible with its offsetY
+		-- But there could be issue if two objects have the same offsetY
+		-- In such case, we need to extend the fromDataIndex and toDataIndex
+
+		self.dataIndexOffset = dataIndexOffset;
 	end
 end
 

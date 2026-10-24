@@ -2,17 +2,18 @@ local _, addon = ...
 local API = addon.API;
 local CallbackRegistry = addon.CallbackRegistry;
 local LandingPageUtil = addon.LandingPageUtil; ---@class LandingPageUtil
+local TimedDispatcher = addon.TimedDispatcher;
 local SetupThreeSliceBackground = API.SetupThreeSliceBackground;
 local CreateFrame = CreateFrame;
 
 
 local GetItemNameByID = C_Item.GetItemNameByID;
+local TEXTURE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga";
+local CreateEyeButton;
 
 
 local CreateSharedListButton;
 do  --ScrollViewListButton
-	local TEXTURE = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistButton.tga";
-
 	local SharedListButtonMixin = {};
 
 	function SharedListButtonMixin:SetBackgroundColor(r, g, b)
@@ -23,7 +24,7 @@ do  --ScrollViewListButton
 
 	function SharedListButtonMixin:ShouldShowHighlight()
 		--Override when there is a child button
-		return self:IsMouseMotionFocus()
+		return self:IsMouseMotionFocus();
 	end
 
 	function SharedListButtonMixin:UpdateVisual()
@@ -34,17 +35,16 @@ do  --ScrollViewListButton
 			self.Name:SetTextColor(1, 1, 1);
 		else
 			if self.isOdd then
-				self.Left:SetTexCoord(0/512, 64/512, 64/512, 128/512);
-				self.Right:SetTexCoord(448/512, 512/512, 64/512, 128/512);
-				self.Center:SetTexCoord(64/512, 448/512, 64/512, 128/512);
-			else
 				self.Left:SetTexCoord(0/512, 64/512, 0/512, 64/512);
 				self.Right:SetTexCoord(448/512, 512/512, 0/512, 64/512);
 				self.Center:SetTexCoord(64/512, 448/512, 0/512, 64/512);
+			else
+				self.Left:SetTexCoord(0/512, 64/512, 64/512, 128/512);
+				self.Right:SetTexCoord(448/512, 512/512, 64/512, 128/512);
+				self.Center:SetTexCoord(64/512, 448/512, 64/512, 128/512);
 			end
 			if self.isHeader or self.completed then
 				self.Name:SetTextColor(0.6, 0.6, 0.6);
-				--self.Name:SetTextColor(0.8, 0.8, 0.8);
 			elseif self.readyForTurnIn then
 				self.Name:SetTextColor(0.098, 1.000, 0.098);
 			else
@@ -112,8 +112,23 @@ do  --ScrollViewListButton
 		self.Glow:SetShown(showGlow);
 	end
 
+	function SharedListButtonMixin:ShowEyeButton(state)
+		if state then
+			if not self.EyeButton then
+				self.EyeButton = CreateEyeButton(self);
+				self.EyeButton:SetPoint("RIGHT", self, "LEFT", -4, 0);
+			end
+			self.EyeButton.isOdd = self.isOdd;
+			self.EyeButton:UpdateVisual();
+			self.EyeButton:Show();
+		elseif self.EyeButton then
+			self.EyeButton:Hide();
+		end
+	end
+
 	function CreateSharedListButton(parent)
 		local f = CreateFrame("Button", nil, parent);
+		API.Mixin(f, SharedListButtonMixin);
 		f:SetSize(248, 24);
 
 		SetupThreeSliceBackground(f, TEXTURE, -4, 4);
@@ -146,11 +161,220 @@ do  --ScrollViewListButton
 		f.Glow:SetBlendMode("ADD");
 		f.Glow:SetVertexColor(0.5, 0.5, 0.5);
 
-		API.Mixin(f, SharedListButtonMixin);
-
-		return f
+		return f;
 	end
 	LandingPageUtil.CreateSharedListButton = CreateSharedListButton;
+end
+
+
+do	--EyeButton controls visibility
+	local EyeButtonMixin = {};
+
+	function EyeButtonMixin:OnEnter()
+		self:UpdateVisual();
+		GameTooltip:Hide();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
+	end
+
+	function EyeButtonMixin:OnLeave()
+		self:UpdateVisual();
+		GameTooltip:Hide();
+		TimedDispatcher:Kill();
+	end
+
+	function EyeButtonMixin:OnClick(button)
+		self:GetParent():ToggleEntryIgnored();
+		GameTooltip:Hide();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
+		if self.parentEntryIgnored then
+			LandingPageUtil.PlayUISound("CheckboxOff");
+		else
+			LandingPageUtil.PlayUISound("CheckboxOn");
+		end
+	end
+
+	function EyeButtonMixin:UpdateVisual()
+		local l, r;
+		local t, b = 0, 64;
+		if self:IsMouseMotionFocus() then
+			l, r = 128, 192;
+		else
+			if self.isOdd then
+				l, r = 0, 64;
+			else
+				l, r = 64, 128;
+			end
+		end
+		self.Background:SetTexCoord(l/512, r/512, t/512, b/512);
+	end
+
+	function EyeButtonMixin:SetIconCoord(l, r, t, b)
+		self.Icon:SetTexCoord(l, r, t, b);
+		self.IconHighlight:SetTexCoord(l, r, t, b);
+	end
+
+	function EyeButtonMixin:OpenEye()
+		self.parentEntryIgnored = false;
+		self:SetIconCoord(48/512, 96/512, 64/512, 112/512);
+	end
+
+	function EyeButtonMixin:CloseEye()
+		self.parentEntryIgnored = true;
+		self:SetIconCoord(0/512, 48/512, 64/512, 112/512);
+	end
+
+	function EyeButtonMixin:SetParentEntryIgnored(ignored)
+		if ignored then
+			self:CloseEye();
+		else
+			self:OpenEye();
+		end
+	end
+
+	function EyeButtonMixin:ShowTooltip()
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		if self.parentEntryIgnored then
+			LandingPageUtil.SetTooltip(addon.L["Click To Enable Activity"]);
+		else
+			LandingPageUtil.SetTooltip(addon.L["Click To Ignore Activity"]);
+		end
+		GameTooltip:Show();
+	end
+
+	function CreateEyeButton(parent)
+		local f = CreateFrame("Button", nil, parent);
+		Mixin(f, EyeButtonMixin);
+		f:SetSize(24, 24);
+
+		f.Icon = f:CreateTexture(nil, "OVERLAY");
+		f.Icon:SetSize(24, 24);
+		f.Icon:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+		f.IconHighlight = f:CreateTexture(nil, "HIGHLIGHT");
+		f.IconHighlight:SetSize(24, 24);
+		f.IconHighlight:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.IconHighlight:SetVertexColor(0.5, 0.5, 0.5);
+		f.IconHighlight:SetBlendMode("ADD");
+
+		f.Background = f:CreateTexture(nil, "BACKGROUND");
+		f.Background:SetSize(32, 32);
+		f.Background:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+		local texture = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistUtilityButton.tga";
+		f.Icon:SetTexture(texture);
+		f.IconHighlight:SetTexture(texture);
+		f.Background:SetTexture(texture);
+
+		API.DisableSharpening(f.Icon);
+		API.DisableSharpening(f.IconHighlight);
+
+		f:UpdateVisual();
+		f:OpenEye();
+
+		f:SetScript("OnEnter", f.OnEnter);
+		f:SetScript("OnLeave", f.OnLeave);
+		f:SetScript("OnClick", f.OnClick);
+
+		f:SetIgnoreParentAlpha(true);
+
+		return f;
+	end
+	LandingPageUtil.CreateEyeButton = CreateEyeButton;
+end
+
+
+do	--DeleteButton
+	local DeleteButtonMixin = {};
+
+	function DeleteButtonMixin:OnEnter()
+		self:UpdateVisual();
+		GameTooltip:Hide();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
+	end
+
+	function DeleteButtonMixin:OnLeave()
+		self:UpdateVisual();
+		GameTooltip:Hide();
+		TimedDispatcher:Kill();
+	end
+
+	function DeleteButtonMixin:OnClick(button)
+		self:GetParent():ToggleEntryDeleted();
+		GameTooltip:Hide();
+		TimedDispatcher:ShowWidgetTooltipAfterDelay(self);
+		if self.parentEntryMarkedDeleted then
+			LandingPageUtil.PlayUISound("CheckboxOff");
+		else
+			LandingPageUtil.PlayUISound("CheckboxOn");
+		end
+	end
+
+	function DeleteButtonMixin:UpdateVisual()
+		if self.parentEntryMarkedDeleted then -- Undo
+			self.Icon:SetTexCoord(144/512, 192/512, 64/512, 112/512);
+		else -- X
+			self.Icon:SetTexCoord(96/512, 144/512, 64/512, 112/512);
+		end
+
+		local l, r;
+		local t, b = 0, 64;
+		if self:IsMouseMotionFocus() then
+			if self.parentEntryMarkedDeleted then
+				l, r = 128, 192;
+			else
+				l, r = 192, 256;
+			end
+			self.Icon:SetVertexColor(1, 1, 1);
+		else
+			if self.isOdd then
+				l, r = 0, 64;
+			else
+				l, r = 64, 128;
+			end
+			self.Icon:SetVertexColor(0.922, 0.871, 0.761);
+		end
+		self.Background:SetTexCoord(l/512, r/512, t/512, b/512);
+	end
+
+	function DeleteButtonMixin:ShowTooltip()
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		if self.parentEntryMarkedDeleted then
+			LandingPageUtil.SetTooltip(addon.L["Click To Cancel Deletion"]);
+		else
+			LandingPageUtil.SetTooltip(addon.L["Click To Mark As Deleted"]);
+		end
+		GameTooltip:Show();
+	end
+
+	local function CreateDeleteButton(parent)
+		local f = CreateFrame("Button", nil, parent);
+		Mixin(f, DeleteButtonMixin);
+		f:SetSize(24, 24);
+
+		f.Icon = f:CreateTexture(nil, "OVERLAY");
+		f.Icon:SetSize(24, 24);
+		f.Icon:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.Icon:SetTexCoord(96/512, 144/512, 64/512, 112/512);
+
+		f.Background = f:CreateTexture(nil, "BACKGROUND");
+		f.Background:SetSize(32, 32);
+		f.Background:SetPoint("CENTER", f, "CENTER", 0, 0);
+
+		local texture = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/ChecklistUtilityButton.tga";
+		f.Icon:SetTexture(texture);
+		f.Background:SetTexture(texture);
+
+		API.DisableSharpening(f.Icon);
+
+		f:UpdateVisual();
+
+		f:SetScript("OnEnter", f.OnEnter);
+		f:SetScript("OnLeave", f.OnLeave);
+		f:SetScript("OnClick", f.OnClick);
+
+		return f;
+	end
+	LandingPageUtil.CreateDeleteButton = CreateDeleteButton;
 end
 
 do  --Generic Checklist Button
@@ -224,7 +448,7 @@ do  --Generic Checklist Button
 		if not data then
 			self.type = nil;
 			self.Name:SetText(nil);
-			return
+			return;
 		end
 
 		if data.localizedName then
@@ -331,7 +555,7 @@ do  --Generic Checklist Button
 		f:SetScript("OnLeave", f.OnLeave);
 		f:SetScript("OnClick", f.OnClick);
 
-		return f
+		return f;
 	end
 	LandingPageUtil.CreateChecklistButton = CreateChecklistButton;
 end

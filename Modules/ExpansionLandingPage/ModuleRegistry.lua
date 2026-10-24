@@ -124,3 +124,6 @@ do
 
 	addon.ControlCenter:AddModule(moduleData);
 end
+
+--- Command for Screenshot:
+--- /script local n="PlumberExpansionLandingPage";local f=_G[n];f:SetParent(nil);f:SetScale(768/720);f:ClearAllPoints();f:SetPoint("CENTER", 0, 0);for k, v in ipairs(UISpecialFrames) do if v==n then table.remove(UISpecialFrames, i) end end
