@@ -1288,7 +1288,7 @@ function LandingPageUtil.CreateResourceList(parent)
 
 	local function MiniCurrencyButton_OnAcquired(obj)
 		if ScrollView:IsScrollable() then
-			obj:SetWidth((Def.ButtonWidth - Def.MiniEntryGap - 10) / 2);
+			obj:SetWidth((Def.ButtonWidth - Def.MiniEntryGap - 22) / 2);
 		else
 			obj:SetWidth((Def.ButtonWidth - Def.MiniEntryGap) / 2);
 		end
