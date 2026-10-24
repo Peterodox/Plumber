@@ -391,7 +391,7 @@ do
 		local categories = {
 			{name = L["Great Vault"], frameGetter = LandingPageUtil.CreateGreatVaultFrame, validate = API.IsGreatVaultFeatureAvailable},
 			{name = L["Item Upgrade"], frameGetter = LandingPageUtil.CreateItemUpgradeFrame},
-			{name = L["Resources"], frameGetter = LandingPageUtil.CreateCurrencyList, menuInfoGetter = true},
+			{name = L["Resources"], frameGetter = LandingPageUtil.CreateResourceList, menuInfoGetter = true},
 		};
 
 		local numCategories = #categories;

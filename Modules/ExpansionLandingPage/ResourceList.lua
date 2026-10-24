@@ -975,7 +975,7 @@ do
 		local offsetX = -0.5 * Def.ButtonWidth;
 		local gap = 0;
 		local repBarGap = 10;
-		local miniEntryMode = addon.GetDBValue("LandingPage_Currency_Layout") == 2;
+		local miniEntryMode = addon.GetDBValue("LandingPage_Resource_Layout") == 2;
 		local isLeftCol = true;
 		local top, bottom;
 		local objectHeight;
@@ -1183,7 +1183,7 @@ local function CategoryButtonOnEnterFunc(listCategoryButton)
 	end
 end
 
-local function MenuInfoGetter_CurrencySettings()
+local function MenuInfoGetter_ResourceSettings()
 	local tbl = {
 		key = "LandingPageCurrencySettings",
 	};
@@ -1195,7 +1195,7 @@ local function MenuInfoGetter_CurrencySettings()
 	};
 
 
-	local selectedIndex = addon.GetDBValue("LandingPage_Currency_Layout");
+	local selectedIndex = addon.GetDBValue("LandingPage_Resource_Layout") or 1;
 
 	for i = 1, 2 do
 		tinsert(widgets, {
@@ -1203,7 +1203,7 @@ local function MenuInfoGetter_CurrencySettings()
 			text = L["Currency Button Layout "..i];
 			closeAfterClick = true,
 			onClickFunc = function()
-				addon.SetDBValue("LandingPage_Currency_Layout", i);
+				addon.SetDBValue("LandingPage_Resource_Layout", i);
 				MainFrame:FullUpdate(true);
 			end,
 			selected = i == selectedIndex,
@@ -1221,7 +1221,7 @@ local function MenuInfoGetter_CurrencySettings()
 	return tbl
 end
 
-function LandingPageUtil.CreateCurrencyList(parent)
+function LandingPageUtil.CreateResourceList(parent)
 	local f = CreateFrame("Frame", nil, parent);
 	MainFrame = f;
 	API.Mixin(f, CurrencyListMixin);
@@ -1317,7 +1317,7 @@ function LandingPageUtil.CreateCurrencyList(parent)
 	f:SetScript("OnHide", f.OnHide);
 	f:SetScript("OnEvent", f.OnEvent);
 
-	return f, height, CategoryButtonOnEnterFunc, MenuInfoGetter_CurrencySettings;
+	return f, height, CategoryButtonOnEnterFunc, MenuInfoGetter_ResourceSettings;
 end
 
 

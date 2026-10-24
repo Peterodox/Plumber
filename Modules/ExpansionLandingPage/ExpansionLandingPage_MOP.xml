@@ -9,7 +9,7 @@
 	<Script file="TooltipUpdator.lua"/>
 	<Script file="Search.lua"/>
 	<Script file="ItemUpgrade.lua"/>
-	<Script file="Currency.lua"/>
+	<Script file="ResourceList.lua"/>
 	<Script file="FactionUtil.lua"/>
 	<Script file="EncounterData.lua"/>
 	<Script file="EncounterJournal.lua"/>

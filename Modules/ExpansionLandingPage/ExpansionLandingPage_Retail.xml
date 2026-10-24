@@ -23,7 +23,7 @@
 
 	<!--Include file="LegionRemix/LegionRemix.xml"/-->
 
-	<Script file="Currency.lua"/>
+	<Script file="ResourceList.lua"/>
 	<Script file="FactionUtil.lua"/>
 	<Script file="FactionTab.lua"/>
 	<Script file="ActivityTab.lua"/>
