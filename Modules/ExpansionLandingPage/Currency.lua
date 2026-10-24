@@ -1183,14 +1183,6 @@ local function CategoryButtonOnEnterFunc(listCategoryButton)
 	end
 end
 
-local function GenerateSettingsPopupInfo()
-	local popupInfo = {
-		title = L["Edit Resource List"],
-	};
-
-	return popupInfo;
-end
-
 local function MenuInfoGetter_CurrencySettings()
 	local tbl = {
 		key = "LandingPageCurrencySettings",
