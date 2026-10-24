@@ -774,6 +774,8 @@ L["Click To Cancel Deletion"] = "Cancel Deletion";
 L["Currency Button Layout 1"] = "Name and Icon";
 L["Currency Button Layout 2"] = "Icon Only";
 L["Edit Resource List"] = "Edit";
+L["Resource Shown Condition Generic"] = "This entry only becomes visible if certain conditions are met.";
+L["Resource Shown Condition ShownIfOwned"] = "This entry only becomes visible if you have any.";
 
 
 --ExpansionSummaryMinimapButton

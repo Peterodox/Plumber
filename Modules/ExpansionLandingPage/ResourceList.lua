@@ -377,6 +377,21 @@ do	-- ManagerFrame / ManagerEntry
 		self:UpdateVisual();
 		if not self.EyeButton:IsMouseMotionFocus() then
 			CurrencyButtonMixin.ShowTooltip(self);
+
+			if self.data then
+				local text;
+				if self.data.shownIfOwned then
+					text = L["Resource Shown Condition ShownIfOwned"];
+				elseif self.data.shownInDelves or self.data.conditionFunc or self.data.uiMapID then
+					text = L["Resource Shown Condition Generic"];
+				end
+				if text then
+					local tooltip = GameTooltip;
+					tooltip:AddLine(" ");
+					tooltip:AddLine(text, 1, 0.82, 0, true);
+					tooltip:Show();
+				end
+			end
 		end
 	end
 
@@ -728,10 +743,12 @@ do	-- ManagerFrame / ManagerEntry
 			};
 			if v.currencyID then
 				content[n].setupFunc = function(obj)
+					obj.data = v;
 					obj:SetCurrency(v.currencyID, v.isMinor, v.appendTooltipFunc, v.hasWeeklyCap);
 				end;
 			elseif v.itemID then
 				content[n].setupFunc = function(obj)
+					obj.data = v;
 					obj:SetItem(v.itemID, v.isMinor, v.appendTooltipFunc, v.useActionButton);
 				end;
 			end
@@ -1211,7 +1228,7 @@ local function MenuInfoGetter_ResourceSettings()
 	end
 
 	tinsert(widgets, {type = "Divider"});
-	tinsert(widgets, {type = "Button", text = L["Edit Resource List"], tooltip = nil, closeAfterClick = true,
+	tinsert(widgets, {type = "Button", text = L["Edit Resource List"], tooltip = L["Manage Activities Tooltip"], closeAfterClick = true,
 		onClickFunc = function()
 			ListManager:ShowFrame();
 		end,

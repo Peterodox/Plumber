@@ -743,6 +743,8 @@ L["Click To Cancel Deletion"] = "取消删除";
 L["Currency Button Layout 1"] = "名称和图标";
 L["Currency Button Layout 2"] = "仅图标";
 L["Edit Resource List"] = "编辑";
+L["Resource Shown Condition Generic"] = "此条目仅在特定条件下显示。";
+L["Resource Shown Condition ShownIfOwned"] = "此条目仅在你持有数量大于零时显示。";
 
 
 --ExpansionSummaryMinimapButton
