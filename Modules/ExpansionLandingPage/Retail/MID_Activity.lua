@@ -467,8 +467,8 @@ local ActivityData = {
 
 	{isHeader = true, name = "Prey", localizedName = L["Prey System"], categoryID = 120000, nameGetter = SetupFuncs.GetPreyHeader,
 		entries = {
-			{name = "Kill Count", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png", sortToTop = true, setupFunc = SetupFuncs.KillCount, tooltipHeader = L["Defeated Prey"], tooltipSetter = SetupFuncs.DefeatedPreyTooltip},
-			{name = "Hunt Table", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png", sortToTop = true, setupFunc = SetupFuncs.HuntTable, removeSharedPrefix = true},
+			{name = "Kill Count", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png", sortToTop = true, setupFunc = SetupFuncs.KillCount, tooltipHeader = L["Defeated Prey"], tooltipSetter = SetupFuncs.DefeatedPreyTooltip, uidLookup = "MID_PreyKills"},
+			{name = "Hunt Table", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png", sortToTop = true, setupFunc = SetupFuncs.HuntTable, removeSharedPrefix = true, uidLookup = "MID_PreyTable"},
 			{name = "Tormented Soul", itemID = 276548, flagQuest = 97628, icon = 236300, tooltipItem = 276548}, -- Auto-fill Nightmare Hunt progress & extra Hero chest
 		},
 	},
