@@ -26,17 +26,19 @@ local ActivityData = {  --Constant
 	{isHeader = true, name = "Delves", localizedName = DELVES_LABEL, categoryID = 10000,
 		entries = {
 			{name = "The Key to Success", questID = 84370, isWeeklyQuest = true, accountwide = true},
-			{name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187, conditions = ActivityUtil.Conditions.DelversBounty, tooltipItem = 233071},
+			--{name = "Delver\'s Bounty", itemID = 233071, flagQuest = 86371, icon = 1064187, conditions = ActivityUtil.Conditions.DelversBounty, tooltipItem = 233071},
 
 			{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, removeIconBorder = true,
 				children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
 				uidLookup = "TWW_CofferKey",
 			},
 
+			--[[
 			{name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, removeIconBorder = true,
 				children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyShardFlags),
 				uidLookup = "TWW_CofferKeyShard",
 			},
+			--]]
 
 			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFunc_WeeklyBonusRenown, children = DelvesBonusRepQuestFlags, uidLookup = "TWW_DelveRep"},
 		}
@@ -84,6 +86,7 @@ local ActivityData = {  --Constant
 					{name = "Devourer Attack: Atrium", questID = 86464, uiMapID = 2371},
 					{name = "Devourer Attack: Tazavesh", questID = 86465, uiMapID = 2371},
 				},
+				uidLookup = "TWW_DevourerMount",
 			},
 		}
 	},

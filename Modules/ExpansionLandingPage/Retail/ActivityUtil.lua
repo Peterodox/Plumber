@@ -123,6 +123,7 @@ local CustomEntryUID = {
 	TWW_CofferKey = 3,
 	TWW_CofferKeyShard = 2,
 	TWW_DelveRep = 1,
+	TWW_DevourerMount = 0,
 };
 
 local function GenerateEntryUID(entry)
