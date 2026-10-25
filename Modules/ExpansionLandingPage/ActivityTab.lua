@@ -421,10 +421,10 @@ do
 
 		local top, bottom;
 		local showActivity, showGroup;
-		local numCompleted;
+		local numCompleted, numIgnored;
 		local inManageMode = ActivityUtil.IsInManageMode();
 
-		SortedActivityData, numCompleted = ActivityUtil.GetSortedActivity();
+		SortedActivityData, numCompleted, numIgnored = ActivityUtil.GetSortedActivity();
 
 		for k, v in ipairs(SortedActivityData) do
 			if v.isHeader then
@@ -478,6 +478,7 @@ do
 		self.ScrollView:SetContent(content, retainPosition);
 
 		self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
+		self.ManageSwitch.numIgnored = numIgnored;
 	end
 
 	function ActivityTabMixin:OnShow()
@@ -519,7 +520,7 @@ do
 		addon.CallbackRegistry:RegisterSettingCallback("LandingPage_Activity_HideCompleted", self.SetHideCompleted, self);
 
 
-		local ManageSwitch;
+		local ManageSwitch; -- ManageButton
 
 		if ActivityUtil.IsManageModeSupported() then
 			ManageSwitch = LandingPageUtil.CreateBasicIconTextButton(self);
@@ -535,6 +536,10 @@ do
 				if not ActivityUtil.IsInManageMode() then
 					GameTooltip:SetOwner(widget, "ANCHOR_RIGHT");
 					LandingPageUtil.SetTooltip(L["Manage Activities"], L["Manage Activities Tooltip"]);
+					if ManageSwitch.numIgnored and ManageSwitch.numIgnored > 0 then
+						GameTooltip:AddLine(" ");
+						GameTooltip:AddLine(string.format(L["Total Ignored Tooltip Format"], ManageSwitch.numIgnored), 0.5, 0.5, 0.5, true);
+					end
 					GameTooltip:Show();
 				end
 			end);
@@ -542,6 +547,9 @@ do
 			ManageSwitch:SetOnClickFunc(function(widget, button)
 				GameTooltip:Hide();
 				self:ToggleManageMode();
+				if widget:IsMouseMotionFocus() then
+					widget:OnEnter();
+				end
 			end);
 		end
 

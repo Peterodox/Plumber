@@ -707,13 +707,14 @@ end
 ---@param n number Total number of entries
 ---@param numCompleted number Number of completed entries
 ---@param displayedList table
-local function FlattenData(activityData, n, numCompleted, displayedList)
-	if not activityData then return n, numCompleted; end
+---@param numIgnored number Number of ignored entries
+local function FlattenData(activityData, n, numCompleted, displayedList, numIgnored)
+	if not activityData then return n, numCompleted, numIgnored end
 
 	local dataIndex = IndexData(activityData);
 	local hideCompleted = ActivityUtil.hideCompleted;
 	local inManageMode = ActivityUtil.IsInManageMode();
-	local numIgnored = 0;
+	numIgnored = numIgnored or 0;
 
 	local uniqueQuests = {};
 
@@ -852,11 +853,13 @@ local function FlattenData(activityData, n, numCompleted, displayedList)
 			end
 
 			entry.ignored = entry.uid and IgnoredEntry[entry.uid];
+			if entry.ignored then
+				numIgnored = numIgnored + 1;
+			end
 
 			if showActivity then
 				if entry.ignored then
 					showActivity = false;
-					numIgnored = numIgnored + 1;
 				end
 			end
 
@@ -915,17 +918,15 @@ local function FlattenData(activityData, n, numCompleted, displayedList)
 					for _, questID in ipairs(questIDs) do
 						if not uniqueQuests[questID] then
 							uniqueQuests[questID] = true;
-							if IsOnQuest(questID) then
+							if IgnoredEntry["q"..questID] then
+								numIgnored = numIgnored + 1;
+							elseif IsOnQuest(questID) then
 								dataIndex = dataIndex + 1;
 								local _entry = {questID = questID, name = "", uiMapID = uiMapID, dataIndex = dataIndex, completed = false};
 								InitQuestData(_entry);
-								if IgnoredEntry["q"..questID] then
-									numIgnored = numIgnored + 1;
-								else
-									numEntries = numEntries + 1;
-									entries[numEntries] = _entry;
-									anyIncompleted = true;
-								end
+								numEntries = numEntries + 1;
+								entries[numEntries] = _entry;
+								anyIncompleted = true;
 							end
 						end
 					end
@@ -946,7 +947,7 @@ local function FlattenData(activityData, n, numCompleted, displayedList)
 		end
 	end
 
-	return n, numCompleted
+	return n, numCompleted, numIgnored;
 end
 
 function ActivityUtil.GetSortedActivity()
@@ -959,6 +960,7 @@ function ActivityUtil.GetSortedActivity()
 	local displayedList = {};
 	local n = 0;
 	local numCompleted = 0;
+	local numIgnored = 0;
 
 	for _, category in ipairs(ActivityData) do
 		category.isCollapsed = IsCategoryCollapsed(category.categoryID);
@@ -969,8 +971,8 @@ function ActivityUtil.GetSortedActivity()
 		ActivityUtil.LoadIgnoredList();
 	end
 
-	n, numCompleted = FlattenData(MapQuestData, n, numCompleted, displayedList);
-	n, numCompleted = FlattenData(ActivityData, n, numCompleted, displayedList);
+	n, numCompleted, numIgnored = FlattenData(MapQuestData, n, numCompleted, displayedList, numIgnored);
+	n, numCompleted, numIgnored = FlattenData(ActivityData, n, numCompleted, displayedList, numIgnored);
 
 	for k, v in ipairs(displayedList) do
 		v.dataIndex = k;
@@ -978,7 +980,7 @@ function ActivityUtil.GetSortedActivity()
 
 	SortedActivity = displayedList;
 
-	return displayedList, numCompleted
+	return displayedList, numCompleted, numIgnored;
 end
 
 function ActivityUtil.UpdateAndGetProgress(dataIndex)

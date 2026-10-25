@@ -764,6 +764,7 @@ L["Unspent Points"] = "Unspent Points";
 L["Manage Activities"] = "Manage Activities";
 L["Manage Activities Abbr"] = "Manage";
 L["Manage Activities Tooltip"] = "Choose entries to ignore.\n\nThe settings are shared across your characters.";
+L["Total Ignored Tooltip Format"] = "%d |4entry is:entries are; ignored.";
 L["Save And Exit"] = "Save and Exit";
 L["Activity Shown Condition Generic"] = "This entry only becomes visible if certain conditions are met.";
 L["Activity Shown Condition ShownIfActive"] = "This entry only becomes visible if the quest is active.";

@@ -733,6 +733,7 @@ L["Unspent Points"] = "你有待分配的点数";
 L["Manage Activities"] = "管理活动";
 L["Manage Activities Abbr"] = "管理活动";
 L["Manage Activities Tooltip"] = "显示或隐藏条目。\n\n所有角色将共享此设置。";
+L["Total Ignored Tooltip Format"] = "%d个条目已被隐藏。";
 L["Save And Exit"] = "保存并退出";
 L["Activity Shown Condition Generic"] = "此条目仅在特定条件下显示。";
 L["Activity Shown Condition ShownIfActive"] = "此条目仅在任务激活时显示。";
