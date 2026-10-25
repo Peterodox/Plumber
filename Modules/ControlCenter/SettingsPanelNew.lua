@@ -1647,6 +1647,7 @@ do  --ChangelogTab
 		local content = {};
 		local objectHeight;
 		local postfixNewFeature = " ("..L["New Feature Abbr"]..")";
+		local maxImageWidth = math.floor(self.ChangelogTab.ScrollView:GetWidth() - 2 * leftOffset - 12); -- account for the slider
 
 		for i, info in ipairs(changelog) do
 			top = offsetY;
@@ -1855,6 +1856,10 @@ do  --ChangelogTab
 						t = 0;
 						b = (info.imageBottom and info.imageBottom / info.canvasHeight) or 1;
 						width = height / info.canvasHeight * info.imageRight;
+						if width > maxImageWidth then
+							width = maxImageWidth;
+							height = width * info.canvasHeight / info.imageRight;
+						end
 					else
 						l, r, t, b = 0, 1, 0, 1;
 					end
