@@ -304,7 +304,7 @@ do  -- Blizzard Frame Modification
 	function Mod.Transmog_OnLoad()
 		if Mod.loaded then return end;
 		Mod.loaded = true;
-
+		Mod.FlagTransmogFrameOpenedByPlumber();
 		TransmogFrame:HookScript("OnShow", Mod.SwitchMode);
 		if TransmogFrame:IsShown() then
 			Mod.SwitchMode();
@@ -352,10 +352,19 @@ do  -- Blizzard Frame Modification
 	end
 
 	function Mod.SwitchMode()
-		if C_Transmog.IsAtTransmogNPC() then
+		if C_Transmog.IsAtTransmogNPC() or (not Mod.openedByPlumber) then
 			Mod.MaximizeTransmogUI();
 		else
 			Mod.MinimizeTransmogUI();
+		end
+	end
+
+	function Mod.FlagTransmogFrameOpenedByPlumber()
+		if not Mod.openedByPlumber then
+			Mod.openedByPlumber = true;
+			C_Timer.After(0.2, function()
+				Mod.openedByPlumber = false;
+			end);
 		end
 	end
 end
@@ -411,6 +420,7 @@ do  --SecureHandler
 				if API.CheckAndDisplayErrorIfInCombat() then
 					return
 				end
+				Mod.FlagTransmogFrameOpenedByPlumber();
 			end);
 
 			self:SetFrameRef("TransmogFrame", TransmogFrame);
