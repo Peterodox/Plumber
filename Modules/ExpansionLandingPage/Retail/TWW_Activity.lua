@@ -30,15 +30,15 @@ local ActivityData = {  --Constant
 
 			{name = "Coffer Keys", label = L["Restored Coffer Key"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyRestoredCofferKey, icon = 4622270, removeIconBorder = true,
 				children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyFlags),
-				uidLoolup = "TWW_CofferKey",
+				uidLookup = "TWW_CofferKey",
 			},
 
 			{name = "Coffer Key Shards", label = L["Coffer Key Shard"], questClassification = 5, tooltipSetter = ActivityUtil.TooltipFuncs.WeeklyCofferKeyShard, icon = 133016, removeIconBorder = true,
 				children = ActivityUtil.CreateChildrenFromQuestList(addon.WeeklyRewardsConstant.CofferKeyShardFlags),
-				uidLoolup = "TWW_CofferKeyShard",
+				uidLookup = "TWW_CofferKeyShard",
 			},
 
-			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFunc_WeeklyBonusRenown, children = DelvesBonusRepQuestFlags, uidLoolup = "TWW_DelveRep"},
+			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFunc_WeeklyBonusRenown, children = DelvesBonusRepQuestFlags, uidLookup = "TWW_DelveRep"},
 		}
 	},
 
