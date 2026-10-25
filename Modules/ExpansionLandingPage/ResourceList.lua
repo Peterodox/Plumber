@@ -16,6 +16,7 @@ local Def = {
 	ButtonHeight = 24,
 	MiniEntryGap = 4,
 	MiniEntrySidePadding = 12,
+	CanCustomize = addon.IS_RETAIL,
 };
 
 local CurrentExpansionResources = {}; ---@type ResourceListEntry[]
@@ -773,7 +774,9 @@ do	-- ManagerFrame / ManagerEntry
 		local ignoredItem = {};
 
 		self.ignoredCurrency = ignoredCurrency;
-		self.ignoredItem = ignoredItem
+		self.ignoredItem = ignoredItem;
+
+		if not Def.CanCustomize then return; end
 
 		for _, id in ipairs(self:GetIgnoredCurrencyDB()) do
 			ignoredCurrency[id] = true;
@@ -993,7 +996,7 @@ do
 		local gap = 0;
 		local repBarGap = 10;
 		local numIgnored = 0;
-		local miniEntryMode = addon.GetDBValue("LandingPage_Resource_Layout") == 2;
+		local miniEntryMode = Def.CanCustomize and addon.GetDBValue("LandingPage_Resource_Layout") == 2;
 		local isLeftCol = true;
 		local top, bottom;
 		local objectHeight;
@@ -1350,6 +1353,10 @@ function LandingPageUtil.CreateResourceList(parent)
 	f:SetScript("OnShow", f.OnShow);
 	f:SetScript("OnHide", f.OnHide);
 	f:SetScript("OnEvent", f.OnEvent);
+
+	if not Def.CanCustomize then
+		MenuInfoGetter_ResourceSettings = nil;
+	end
 
 	return f, height, CategoryButtonOnEnterFunc, MenuInfoGetter_ResourceSettings;
 end

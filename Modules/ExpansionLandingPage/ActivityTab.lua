@@ -478,7 +478,10 @@ do
 		self.ScrollView:SetContent(content, retainPosition);
 
 		self.Checkbox_HideCompleted:SetFormattedText(numCompleted);
-		self.ManageSwitch.numIgnored = numIgnored;
+
+		if self.ManageSwitch then
+			self.ManageSwitch.numIgnored = numIgnored;
+		end
 	end
 
 	function ActivityTabMixin:OnShow()
