@@ -992,6 +992,7 @@ do
 		local offsetX = -0.5 * Def.ButtonWidth;
 		local gap = 0;
 		local repBarGap = 10;
+		local numIgnored = 0;
 		local miniEntryMode = addon.GetDBValue("LandingPage_Resource_Layout") == 2;
 		local isLeftCol = true;
 		local top, bottom;
@@ -1036,9 +1037,15 @@ do
 			end
 
 			if v.currencyID then
-				valid = not ListManager:IsCurrencyIgnored(v.currencyID);
+				if ListManager:IsCurrencyIgnored(v.currencyID) then
+					numIgnored = numIgnored + 1;
+					valid = false;
+				end
 			elseif v.itemID then
-				valid = not ListManager:IsItemIgnored(v.itemID);
+				if ListManager:IsItemIgnored(v.itemID) then
+					numIgnored = numIgnored + 1;
+					valid = false;
+				end
 			end
 
 			if valid and v.shownIfOwned then
@@ -1177,6 +1184,8 @@ do
 		else
 			self:UnregisterEvent("PLAYER_IN_COMBAT_CHANGED");
 		end
+
+		ListManager.numIgnored = numIgnored;
 	end
 
 	function CurrencyListMixin:UpdateScrollViewContent()
@@ -1198,6 +1207,14 @@ local function CategoryButtonOnEnterFunc(listCategoryButton)
 	if MainFrame then
 		LandingPageUtil.DisplayInactiveCurrencies(listCategoryButton, MainFrame.inactiveCurrencyIDs);
 	end
+end
+
+local function EditButton_TooltipFunc()
+	local tooltipText = L["Manage Activities Tooltip"];
+	if ListManager.numIgnored and ListManager.numIgnored > 0 then
+		tooltipText = string.format("%s\n\n|cff808080%s|r", tooltipText, L["Total Ignored Tooltip Format"]:format(ListManager.numIgnored));
+	end
+	return tooltipText;
 end
 
 local function MenuInfoGetter_ResourceSettings()
@@ -1228,7 +1245,7 @@ local function MenuInfoGetter_ResourceSettings()
 	end
 
 	tinsert(widgets, {type = "Divider"});
-	tinsert(widgets, {type = "Button", text = L["Edit Resource List"], tooltip = L["Manage Activities Tooltip"], closeAfterClick = true,
+	tinsert(widgets, {type = "Button", text = L["Edit Resource List"], tooltip = EditButton_TooltipFunc, closeAfterClick = true,
 		onClickFunc = function()
 			ListManager:ShowFrame();
 		end,

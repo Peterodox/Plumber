@@ -713,8 +713,21 @@ do  --Dropdown Menu
 				tooltip:SetPoint("TOPLEFT", self, "TOPRIGHT", 4, 4);
 			end
 			tooltip:SetText(self.Text:GetText(), 1, 1, 1, 1, true);
-			tooltip:AddLine(self.tooltip, 1, 0.82, 0, true);
-			tooltip:Show();
+
+			local tooltipText;
+
+			if type(self.tooltip) == "function" then
+				tooltipText = self.tooltip();
+			else
+				tooltipText = self.tooltip;
+			end
+
+			if tooltipText then
+				tooltip:AddLine(tooltipText, 1, 0.82, 0, true);
+				tooltip:Show();
+			else
+				tooltip:Hide();
+			end
 		end
 	end
 
