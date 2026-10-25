@@ -46,6 +46,7 @@ L["Always On Module"] = "此模块将被一直启用。";
 L["Return To Module List"] = "返回模块列表";
 L["Generic Addon Conflict"] = "此模块可能与以下功能类似的插件不兼容：";
 L["Addon Conflict Format"] = "此模块可能与 %s 不兼容。";
+L["Module Disabled Due To Addon Conflict"] = "由于“%s”提供类似功能，此模块已被禁用。";
 L["Work In Progress Tag"] = "[施工中]";
 L["Colon With Space"] = "：";
 L["Disabled Module Requires Reload Format"] = "你必须%s才能使改变生效。";	--We'll replace %s with a clickable "reload the UI"

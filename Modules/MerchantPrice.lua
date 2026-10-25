@@ -619,7 +619,24 @@ local function PanelTemplates_SelectTab_Callback(tab)
 	end
 end
 
+--- Don't show this module at all if a conflicting is found.
+--- 1. Krowi_ExtendedVendorUI: Essentially does the same thing (display tokens).
+local function GetConflictingAddOnName()
+	local addOnNames = {"Krowi_ExtendedVendorUI"};
+	for _, name in ipairs(addOnNames) do
+		if C_AddOns.IsAddOnLoaded(name) then
+			return name;
+		end
+	end
+end
+
+local function DoesConflictingAddOnExist()
+	return GetConflictingAddOnName() ~= nil;
+end
+
 function Controller:EnableModule(state)
+	if DoesConflictingAddOnExist() then return; end
+
 	if state then
 		if MerchantFrame_Update and _G[MERCHANT_FRAME] then
 			self.isEnabled = true;
@@ -690,6 +707,13 @@ end
 
 
 do
+	local function GetModuleConflictWarning()
+		local name = GetConflictingAddOnName();
+		if name then
+			return string.format("|cffd4641c%s|r", addon.L["Module Disabled Due To Addon Conflict"]:format(name));
+		end
+	end
+
 	local function EnableModule(state)
 		Controller:EnableModule(state);
 	end
@@ -698,7 +722,9 @@ do
 		name = addon.L["ModuleName MerchantPrice"],
 		dbKey = "MerchantPrice",
 		description = addon.L["ModuleDescription MerchantPrice"],
+		descriptionFunc = GetModuleConflictWarning,
 		toggleFunc = EnableModule,
+		getOverrideState = function() if DoesConflictingAddOnExist() then return false end end, -- Shown as always OFF
 		categoryID = 1,
 		uiOrder = 6,
 		moduleAddedTime = 1719566000,
