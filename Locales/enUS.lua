@@ -46,6 +46,7 @@ L["Always On Module"] = "This module is always enabled.";
 L["Return To Module List"] = "Return to List";
 L["Generic Addon Conflict"] = "This module might be incompatible with addons of similar functionalities:"; -- Addon names are shown as new lines. Support showing multiple names.
 L["Addon Conflict Format"] = "This module might be incompatible with %s."; -- Show one addon name. Used in changelogs.
+L["Module Disabled Due To Addon Conflict"] = "This module is disabled because \"%s\" has similar features.";
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = ": ";
 L["Disabled Module Requires Reload Format"] = "You must %s to apply the changes.";	--We'll replace %s with a clickable "reload the UI"
