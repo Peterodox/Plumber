@@ -2,6 +2,7 @@
 	<Script file="Timer.lua"/>
 	<Script file="EditBox.lua"/>
 	<Script file="StatusBar.lua"/>
+	<Script file="PrivatePopup.lua"/>
 	<Script file="WidgetDisplay.lua"/>
 	<Script file="SharedListButton.lua"/>
 	<Script file="API_Quest.lua"/>
@@ -14,7 +15,7 @@
 
 	<Script file="Retail/ItemUpgradeFrame.lua"/>
 	<Script file="Retail/ActivityUtil.lua"/>
-	<Script file="Retail/ResourceList.lua"/>
+	<Script file="Retail/ResourceData.lua"/>
 	<Script file="Retail/TWW_Activity.lua"/>
 	<Script file="Retail/MID_Activity.lua"/>
 	<Script file="Retail/TraitFrame.lua"/>
@@ -22,7 +23,7 @@
 
 	<!--Include file="LegionRemix/LegionRemix.xml"/-->
 
-	<Script file="Currency.lua"/>
+	<Script file="ResourceList.lua"/>
 	<Script file="FactionUtil.lua"/>
 	<Script file="FactionTab.lua"/>
 	<Script file="ActivityTab.lua"/>

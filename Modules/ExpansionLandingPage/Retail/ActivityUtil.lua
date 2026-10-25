@@ -108,6 +108,41 @@ local InProgressQuestIconFile = {
 };
 
 
+---Designated UIDs for custom activity entries that don't fall under Quest/Item/Currency.
+local CustomEntryUID = {
+	--[uidLookup] = unique number,
+
+	MID_DelveRep = 10,
+	MID_DelveStash = 9,
+	MID_DelveRewardCap = 8,
+	MID_PreyKills = 7,
+	MID_PreyTable = 6,
+	MID_Runestones = 5,
+	MID_Abundance = 4,
+
+	TWW_CofferKey = 3,
+	TWW_CofferKeyShard = 2,
+	TWW_DelveRep = 1,
+};
+
+local function GenerateEntryUID(entry)
+	if entry.questID then
+		return "q"..entry.questID;
+	elseif entry.itemID then
+		return "i"..entry.itemID;
+	elseif entry.currencyID then
+		return "c"..entry.currencyID;
+	elseif entry.uidLookup then
+		if CustomEntryUID[entry.uidLookup] then
+			return "p"..CustomEntryUID[entry.uidLookup];
+		else
+			API.PrintMessage("Landing Page Missing CustomEntryUID: "..entry.uidLookup);
+		end
+	end
+end
+
+local IgnoredEntry = {};
+
 local Conditions = {};
 do
 	ActivityUtil.Conditions = Conditions;
@@ -659,18 +694,26 @@ local function IndexData(activityData)
 		for _, entry in ipairs(category.entries) do
 			n = n + 1;
 			entry.dataIndex = n;
+			if not entry.uid then
+				entry.uid = GenerateEntryUID(entry);
+			end
 		end
 	end
 	return n
 end
 
-local function FlattenData(activityData, n, outputTbl, numCompleted)
-	if not activityData then return n, 0 end;
+--- Flatten the activityData table into a list.
+---@param activityData table?
+---@param n number Total number of entries
+---@param numCompleted number Number of completed entries
+---@param displayedList table
+local function FlattenData(activityData, n, numCompleted, displayedList)
+	if not activityData then return n, numCompleted; end
 
 	local dataIndex = IndexData(activityData);
-
 	local hideCompleted = ActivityUtil.hideCompleted;
-	numCompleted = numCompleted or 0;
+	local inManageMode = ActivityUtil.IsInManageMode();
+	local numIgnored = 0;
 
 	local uniqueQuests = {};
 
@@ -753,6 +796,9 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 						entry.completed = IsQuestFlaggedCompletedOnAccount(flagQuest);
 					else
 						entry.completed = IsQuestFlaggedCompleted(flagQuest);
+						if flagQuest == 89354 then
+							entry.completed = true;
+						end
 					end
 				else
 					entry.completed = false;
@@ -805,6 +851,23 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 				showActivity = entry.shouldShow();
 			end
 
+			entry.ignored = entry.uid and IgnoredEntry[entry.uid];
+
+			if showActivity then
+				if entry.ignored then
+					showActivity = false;
+					numIgnored = numIgnored + 1;
+				end
+			end
+
+			if inManageMode then
+				showActivity = true;
+				anyIncompleted = true;
+				entry.completed = false;
+				entry.isOnQuest = false;
+				entry.readyForTurnIn = false;
+			end
+
 			if showActivity then
 				if entry.completed then
 					numCompleted = numCompleted + 1;
@@ -833,7 +896,7 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 					end
 				end
 
-				if (not hideCompleted) or (entry.isHeader or not entry.completed) then
+				if (not hideCompleted) or (not entry.completed) then
 					if (not entry.questID) or (entry.questID and not uniqueQuests[entry.questID]) then
 						if entry.questID then
 							uniqueQuests[entry.questID] = true;
@@ -856,9 +919,13 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 								dataIndex = dataIndex + 1;
 								local _entry = {questID = questID, name = "", uiMapID = uiMapID, dataIndex = dataIndex, completed = false};
 								InitQuestData(_entry);
-								numEntries = numEntries + 1;
-								entries[numEntries] = _entry;
-								anyIncompleted = true;
+								if IgnoredEntry["q"..questID] then
+									numIgnored = numIgnored + 1;
+								else
+									numEntries = numEntries + 1;
+									entries[numEntries] = _entry;
+									anyIncompleted = true;
+								end
 							end
 						end
 					end
@@ -866,28 +933,14 @@ local function FlattenData(activityData, n, outputTbl, numCompleted)
 			end
 		end
 
-		if hideCompleted then
-			if anyIncompleted then
+		if numEntries > 0 then
+			if (hideCompleted and anyIncompleted) or (not hideCompleted) then
 				n = n + 1;
-				outputTbl[n] = category;
-				if numEntries > 0 then
-					tsort(entries, SortFuncs.IncompleteFirst);
-					for _, entry in ipairs(entries) do
-						n = n + 1;
-						outputTbl[n] = entry;
-					end
-				end
-			end
-		else
-			if true then
-				if numEntries > 0 then
+				displayedList[n] = category;
+				tsort(entries, SortFuncs.IncompleteFirst);
+				for _, entry in ipairs(entries) do
 					n = n + 1;
-					outputTbl[n] = category;
-					tsort(entries, SortFuncs.IncompleteFirst);
-					for _, entry in ipairs(entries) do
-						n = n + 1;
-						outputTbl[n] = entry;
-					end
+					displayedList[n] = entry;
 				end
 			end
 		end
@@ -903,7 +956,7 @@ function ActivityUtil.GetSortedActivity()
 	DynamicQuestDataProvider:QueryQuests();
 
 
-	local tbl = {};
+	local displayedList = {};
 	local n = 0;
 	local numCompleted = 0;
 
@@ -911,16 +964,21 @@ function ActivityUtil.GetSortedActivity()
 		category.isCollapsed = IsCategoryCollapsed(category.categoryID);
 	end
 
-	n, numCompleted = FlattenData(MapQuestData, n, tbl, numCompleted);
-	n, numCompleted = FlattenData(ActivityData, n, tbl, numCompleted);
+	if not ActivityUtil.ignoredListLoaded then
+		ActivityUtil.ignoredListLoaded = true;
+		ActivityUtil.LoadIgnoredList();
+	end
 
-	for k, v in ipairs(tbl) do
+	n, numCompleted = FlattenData(MapQuestData, n, numCompleted, displayedList);
+	n, numCompleted = FlattenData(ActivityData, n, numCompleted, displayedList);
+
+	for k, v in ipairs(displayedList) do
 		v.dataIndex = k;
 	end
 
-	SortedActivity = tbl;
+	SortedActivity = displayedList;
 
-	return tbl, numCompleted
+	return displayedList, numCompleted
 end
 
 function ActivityUtil.UpdateAndGetProgress(dataIndex)
@@ -966,6 +1024,62 @@ addon.CallbackRegistry:Register("LandingPage.SetActivityData", function(data)
 		ActivityData = data;
 	end
 end);
+
+
+do	-- Manage Mode
+	local IGNORE_LIST_DBKEY = "LandingPage_Activity_IgnoreList";
+
+	function ActivityUtil.IsManageModeSupported()
+		return true;
+	end
+
+	function ActivityUtil.IsInManageMode()
+		return ActivityUtil.inManageMode;
+	end
+
+	function ActivityUtil.SetManageMode(inManageMode)
+		ActivityUtil.inManageMode = inManageMode;
+		if not inManageMode then
+			if ActivityUtil.ignoredListDirty then
+				ActivityUtil.ignoredListDirty = nil;
+				-- Save ignored entries
+				local tbl = {};
+				for uid, ignored in pairs(IgnoredEntry) do
+					if ignored then
+						table.insert(tbl, uid);
+					end
+				end
+				addon.SetDBValue(IGNORE_LIST_DBKEY, tbl);
+			end
+		end
+	end
+
+	function ActivityUtil.IsEntryIgnored(entry)
+		if entry and entry.uid then
+			return IgnoredEntry[entry.uid];
+		end
+	end
+
+	function ActivityUtil.ToggleEntryIgnored(entry)
+		if entry.uid then
+			ActivityUtil.ignoredListDirty = true;
+			if IgnoredEntry[entry.uid] then
+				IgnoredEntry[entry.uid] = nil;
+			else
+				IgnoredEntry[entry.uid] = true;
+			end
+		end
+	end
+
+	function ActivityUtil.LoadIgnoredList()
+		local tbl = addon.GetDBValue(IGNORE_LIST_DBKEY);
+		if tbl then
+			for _, uid in ipairs(tbl) do
+				IgnoredEntry[uid] = true;
+			end
+		end
+	end;
+end
 
 
 --[[

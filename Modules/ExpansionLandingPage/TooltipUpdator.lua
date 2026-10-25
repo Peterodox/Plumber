@@ -1,4 +1,5 @@
 local _, addon = ...
+local L = addon.L;
 local API = addon.API;
 local LandingPageUtil = addon.LandingPageUtil;
 
@@ -48,6 +49,7 @@ function TooltipUpdator:StopUpdating()
 	self.tooltipSetter = nil;
 	self.entryChildren = nil;
 	self.itemID = nil;
+	self.entryInfo = nil;
 	self.uiMapID = nil;
 	self.supportShowOnMap = nil;
 end
@@ -109,6 +111,10 @@ end
 
 function TooltipUpdator:RequestItemID(itemID)
 	self.itemID = itemID;
+end
+
+function TooltipUpdator:RequestExtraInfoForManageMode(entryInfo)
+	self.entryInfo = entryInfo;
 end
 
 function TooltipUpdator:SetEnableShowOnMap(uiMapID)
@@ -304,12 +310,28 @@ function TooltipUpdator:OnUpdate(elapsed)
 
 				if self.uiMapID and self.supportShowOnMap and not InCombatLockdown() then
 					tooltip:AddLine(" ");
-					tooltip:AddLine(addon.L["Instruction Set Waypoint"], 0.098, 1.000, 0.098);
+					tooltip:AddLine(L["Instruction Set Waypoint"], 0.098, 1.000, 0.098);
 				end
 
 				if isRetrievingData then
 					tooltip:AddLine(RETRIEVING_DATA, 0.5, 0.5, 0.5, true);
 					self.keepUpdating = true;
+				end
+
+				if self.entryInfo then
+					-- Show entry conditions for Manage Mode
+					local extraInfo;
+					if self.entryInfo.shownIfActive then
+						extraInfo = L["Activity Shown Condition ShownIfActive"];
+					elseif self.entryInfo.shownIfOnQuest then
+						extraInfo = L["Activity Shown Condition ShownIfOnQuest"];
+					elseif self.entryInfo.conditions then
+						extraInfo = L["Activity Shown Condition Generic"];
+					end
+					if extraInfo then
+						tooltip:AddLine(" ");
+						tooltip:AddLine(extraInfo, 0.000, 0.800, 1.000, true);
+					end
 				end
 
 				tooltip:Show();
