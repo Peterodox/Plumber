@@ -7,6 +7,79 @@ local _, addon = ...
 local L = addon.L;
 local changelogs = addon.ControlCenter.changelogs;
 
+changelogs[10907] = {
+	{
+		type = "date",
+		versionText = "1.9.7",
+		timestamp = 1792900000,
+	},
+
+	{
+		type = "h1",
+		text = L["ModuleName NewExpansionLandingPage"],
+		dbKey = "NewExpansionLandingPage",
+	},
+
+	{
+		type = "Checkbox",
+		dbKey = "NewExpansionLandingPage",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "You can now hide unwanted activities or resources.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "The Resource List has a new optional \"Icon Only\" layout to show more items without scrolling down.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "To access these options, click the Manage button in the Activities Tab or the 3-dot button next to the Resources header.",
+	},
+
+	{
+		type = "img",
+		fileName = "Changelog_LandingPageIgnoreEntries",
+		canvasWidth = 1024,
+		canvasHeight = 256,
+		imageRight = 840,
+	},
+
+	{
+		type = "br",
+	},
+
+	{
+		type = "h1",
+		text = MISCELLANEOUS,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Expansion Summary: Added Tormented Soul to Prey activities. Added Kith\'ix to Raids.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Outfit Collection Quick Access: If you open the Transmog UI unconventionally, it should show the full window rather than just the outfit list.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		textGetter = "GetMerchantPriceWarningForChangelog", -- See MerchantPrice.lua
+	},
+};
+
+
 changelogs[10906] = {
 	{
 		type = "date",
@@ -2556,6 +2629,7 @@ changelogs[10803] = {
 };
 
 
+--[[
 changelogs[10802] = {
 	{
 		type = "date",
@@ -2657,7 +2731,6 @@ changelogs[10802] = {
 };
 
 
---[[
 changelogs[10801] = {
 	{
 		type = "date",

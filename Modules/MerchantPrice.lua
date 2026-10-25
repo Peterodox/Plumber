@@ -706,6 +706,14 @@ do  --For some Merchant UI addon users we only update the token frame
 end
 
 
+function addon.GetMerchantPriceWarningForChangelog()
+	if DoesConflictingAddOnExist() then
+		-- We don't localize changelogs
+		return "Merchant Price: This module is disabled if you have \"Krowi\'s Extended Vendor UI\" because it has similar functionality.";
+	end
+end
+
+
 do
 	local function GetModuleConflictWarning()
 		local name = GetConflictingAddOnName();
