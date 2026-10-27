@@ -46,6 +46,7 @@ L["Always On Module"] = "Este módulo está sempre ativado.";
 L["Return To Module List"] = "Retornar ao addon";
 L["Generic Addon Conflict"] = "Esse módulo pode ser incompatível com addons de funcionalidades semelhantes:";
 L["Addon Conflict Format"] = "Esse módulo pode ser incompatível com %s."; -- Show one addon name. Used in changelogs.
+L["Module Disabled Due To Addon Conflict"] = "Esse módulo está desativado porque \"%s\" tem recursos semelhantes.";
 L["Work In Progress Tag"] = "[WIP]";
 L["Colon With Space"] = ": ";
 L["Disabled Module Requires Reload Format"] = "Você precisa %s para aplicar estas mudanças.";	--We'll replace %s with a clickable "reload the UI"
@@ -760,6 +761,23 @@ L["Inactive Currencies Tooltip"] = "Essas moedas estão ocultas porque você as 
 L["New Quest"] = "Nova missão";
 L["Trait Points Available"] = "Pontos Disponíveis";
 L["Unspent Points"] = "Pontos não gastos";
+L["Manage Activities"] = "Gerenciar atividades";
+L["Manage Activities Abbr"] = "Gerenciar";
+L["Manage Activities Tooltip"] = "Escolha as entradas para ignorar.\n\nAs configurações são compartilhadas entre seus personagens.";
+L["Total Ignored Tooltip Format"] = "%d |4entrada foi:entradas foram; ignorada(s).";
+L["Save And Exit"] = "Salvar e sair";
+L["Activity Shown Condition Generic"] = "Essa entrada só é visível se certas condições forem atendidas.";
+L["Activity Shown Condition ShownIfActive"] = "Essa entrada só é visível se a missão estiver ativa.";
+L["Activity Shown Condition ShownIfOnQuest"] = "Essa entrada só é visível se você estiver na missão.";
+L["Click To Ignore Activity"] = "Clique para ignorar";
+L["Click To Enable Activity"] = "Clique para ativar";
+L["Click To Mark As Deleted"] = "Marcar como excluído";
+L["Click To Cancel Deletion"] = "Cancelar exclusão";
+L["Currency Button Layout 1"] = "Nome e ícone";
+L["Currency Button Layout 2"] = "Apenas ícone";
+L["Edit Resource List"] = "Editar";
+L["Resource Shown Condition Generic"] = "Essa entrada só é visível se certas condições forem atendidas.";
+L["Resource Shown Condition ShownIfOwned"] = "Essa entrada só é visível se você tiver algum.";
 
 
 --ExpansionSummaryMinimapButton
