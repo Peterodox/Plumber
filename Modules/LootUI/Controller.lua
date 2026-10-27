@@ -796,7 +796,7 @@ do
 			itemID = tonumber(itemID);
 			if itemID then
 				--Debug_LogLootMessage(text)
-				local link, name = match(text, "(|Hitem:.+|h)%[(.+)%]|h");
+				local link, name = match(text, "|H(item:.+)|h%[(.+)%]|h");
 				if link then
 					if not find(text, ITEM_CHANGED) then
 						--Ignore item upgrade: Your %s was changed to %s.
@@ -821,7 +821,7 @@ do
 			currencyID = tonumber(currencyID);
 			--Debug_LogLootMessage(text)
 			if currencyID then
-				local link, _name = match(text, "(|Hcurrency:.+|h)%[(.+)%]|h");
+				local link, _name = match(text, "|H(currency:.+)|h%[(.+)%]|h");
 				local currencyInfo = link and GetCurrencyInfoFromLink(link);
 				if currencyInfo then
 					local slotIndex = 0;
