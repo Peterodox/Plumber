@@ -271,6 +271,7 @@ stds.wow = {
 		"GetMaxLevelForExpansionLevel",
 		"GetMerchantItemCostInfo",
 		"GetMerchantItemCostItem",
+		"GetMerchantItemID",
 		"GetMerchantItemInfo",
 		"GetMerchantNumItems",
 		"GetMinimapZoneText",
