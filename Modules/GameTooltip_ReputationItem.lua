@@ -4,8 +4,10 @@ local GameTooltipItemManager = addon.GameTooltipManager:GetItemManager();
 local GetFactionStatusText = addon.API.GetFactionStatusText;
 local GetFactionGrantedByItem = addon.GetFactionGrantedByItem;
 
+local MODULE_DB_KEY = "TooltipRepTokens";
 
-local ItemSubModule = {};
+
+local ItemSubModule = GameTooltipItemManager:CreateSubModule(MODULE_DB_KEY)
 do
 	function ItemSubModule:ProcessData(tooltip, itemID)
 		if self.enabled then
@@ -35,30 +37,26 @@ do
 			return false
 		end
 	end
-
-	function ItemSubModule:GetDBKey()
-		return "TooltipRepTokens"
-	end
-
-	function ItemSubModule:SetEnabled(enabled)
-		self.enabled = enabled == true;
-		GameTooltipItemManager:RequestUpdate();
-	end
-
-	function ItemSubModule:IsEnabled()
-		return self.enabled == true
-	end
 end
 
 
-local GameTooltipQuestCurrencyManager = {};
+local EdgeCaseManager = {};
 do
 	local GetFactionGrantedByCurrency = C_CurrencyInfo.GetFactionGrantedByCurrency;
 	local GetQuestOfferCurrencyInfo = C_QuestOffer.GetQuestRewardCurrencyInfo;
 	local GetQuestLogCurrencyInfo = C_QuestLog.GetQuestRewardCurrencyInfo;
+	local GetMerchantItemID = GetMerchantItemID;
+	local GetMerchantItemInfo = C_MerchantFrame.GetItemInfo;
 
-	local function SetupTooltipByCurrency(tooltip, currencyID)
-		local factionID = GetFactionGrantedByCurrency(currencyID);
+	local SpellXFaction = {
+		[1320747] = 2710, -- Silvermoon Court Voucher
+		[1320744] = 2696, -- Amani Tribe Voucher
+		[1320745] = 2704, -- Hara'ti Voucher
+		[1320729] = 2699, -- Singularity Voucher
+		[1320749] = 2772, -- Zul'jarra's Forces Voucher
+	}
+
+	local function AddFactionStatusToTooltip(tooltip, factionID)
 		if factionID then
 			local factionStatus = GetFactionStatusText(factionID);
 			if factionStatus then
@@ -68,7 +66,12 @@ do
 		end
 	end
 
-	function GameTooltipQuestCurrencyManager:SetEnabled(state)
+	local function SetupTooltipByCurrency(tooltip, currencyID)
+		local factionID = GetFactionGrantedByCurrency(currencyID);
+		AddFactionStatusToTooltip(tooltip, factionID);
+	end
+
+	function EdgeCaseManager:SetEnabled(state)
 		self.enabled = state;
 		if state then
 			if not self.hooked then
@@ -93,6 +96,18 @@ do
 						SetupTooltipByCurrency(tooltip, info.currencyID);
 					end
 				end);
+
+				-- 12.1.5: Use "Aqir Research Token" to purchase a spell
+				-- We could use GameTooltipSpellHandler but it will process every spell
+				hooksecurefunc(GameTooltip, "SetMerchantItem", function(tooltip, index)
+					if not self.enabled then return end;
+					if (not index) or (GetMerchantItemID(index ) ~= nil) then return; end
+
+					local info = GetMerchantItemInfo(index);
+					if info and info.spellID then
+						AddFactionStatusToTooltip(tooltip, SpellXFaction[info.spellID]);
+					end
+				end);
 			end
 		end
 	end
@@ -102,16 +117,16 @@ end
 do
 	local function EnableModule(state)
 		ItemSubModule:SetEnabled(state);
-		GameTooltipQuestCurrencyManager:SetEnabled(state);
+		EdgeCaseManager:SetEnabled(state);
 		if state then
 			GameTooltipItemManager:AddSubModule(ItemSubModule);
 		end
 	end
 
 	local moduleData = {
-		name = addon.L["ModuleName TooltipRepTokens"],
-		dbKey = ItemSubModule:GetDBKey(),
-		description = addon.L["ModuleDescription TooltipRepTokens"],
+		name = addon.L["ModuleName "..MODULE_DB_KEY],
+		dbKey = MODULE_DB_KEY,
+		description = addon.L["ModuleDescription "..MODULE_DB_KEY],
 		toggleFunc = EnableModule,
 		categoryID = 3,
 		uiOrder = 1111,
