@@ -461,6 +461,7 @@ local ActivityData = {
 			{name = "Coffer Key Shard", currencyID = 3310, icon = 133016, removeIconBorder = true},
 			{name = "Bonus Renowns", label = L["Bountiful Delves Rep Label"], icon = 3726261, tooltipSetter = SetupFuncs.WeeklyBonusRenown, children = DelvesBonusRepQuestFlags, uidLookup = "MID_DelveRep"},
 			{name = "Gilded Stash", icon = 5872049, removeIconBorder = true, setupFunc = SetupFuncs.GildedStashEntry, tooltipSetter = SetupFuncs.GildedStashTooltip, conditions = GildedStashTracker, uidLookup = "MID_DelveStash"},
+			{name = "Tormented Soul", itemID = 276548, flagQuest = 97628, icon = 236300, tooltipItem = 276548}, -- Auto-fill Nightmare Hunt progress & extra Hero chest
 			{name = "Completion Rewards Cap", icon = 5872049, removeIconBorder = true, setupFunc = DelvesWarbandCap.SetupButton, tooltipSetter = DelvesWarbandCap.SetupTooltip, conditions = DelvesWarbandCap, uidLookup = "MID_DelveRewardCap"},
 		},
 	},
@@ -469,7 +470,6 @@ local ActivityData = {
 		entries = {
 			{name = "Kill Count", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/Checklist.png", sortToTop = true, setupFunc = SetupFuncs.KillCount, tooltipHeader = L["Defeated Prey"], tooltipSetter = SetupFuncs.DefeatedPreyTooltip, uidLookup = "MID_PreyKills"},
 			{name = "Hunt Table", icon = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/Icons/InProgressPrey.png", sortToTop = true, setupFunc = SetupFuncs.HuntTable, removeSharedPrefix = true, uidLookup = "MID_PreyTable"},
-			{name = "Tormented Soul", itemID = 276548, flagQuest = 97628, icon = 236300, tooltipItem = 276548}, -- Auto-fill Nightmare Hunt progress & extra Hero chest
 		},
 	},
 
