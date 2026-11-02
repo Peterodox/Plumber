@@ -13,8 +13,8 @@
 
 ## IconTexture: Interface\AddOns\Plumber\Art\Logo\PlumberLogo64
 
-## X-GameType: Standard [AllowLoadGameType standard]
 ## X-GameType: Camelot [AllowLoadGameType camelot]
+## X-GameType: Standard [AllowLoadGameType standard]
 ## X-GameType: Mists [AllowLoadGameType mists]
 ## X-GameType: TBC [AllowLoadGameType tbc]
 ## X-GameType: Vanilla [AllowLoadGameType vanilla]

@@ -983,7 +983,9 @@ do  --MacroInterpreter
 			end
 			TooltipDataProcessor.AddTooltipPostCall(tooltipDataType, Callback);
 		else
-			print("Plumber AddOn Alert: WoW\'s TooltipDataProcessor methods changed.")
+			if addon.IS_MODERN then
+				print("Plumber AddOn Alert: WoW\'s TooltipDataProcessor methods changed.");
+			end
 		end
 	end
 
