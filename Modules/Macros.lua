@@ -950,6 +950,7 @@ do  --MacroInterpreter
 		["(/dismisspet)"] = "SetDismissPet",
 		["/emote%s+(.+)"] = "SetCustomEmote",
 		["/e%s+(.+)"] = "SetCustomEmote",
+		["/macro%s+(.+)"] = "macro",
 	};
 
 	function MacroInterpreter:Init()
@@ -1196,6 +1197,10 @@ do  --MacroInterpreter
 					end
 				elseif actionType == "profession" then
 					--Action will be set in SpellFlyout_Secure.lua
+				elseif actionType == "macro" then
+					local macroIndex = id and GetMacroIndexByName(id);
+					usable = macroIndex and macroIndex ~= 0;
+					name = (MACRO or "Macro")..": "..id;
 				else
 					name = name or line;
 					macroText = macroText or line;
@@ -1499,6 +1504,26 @@ do  --Editor Setup
 				end
 				local name = GetMountInfoByID(mountID);
 				return name, (mountID and "mount:"..mountID) or nil
+			end,
+		},
+
+		macro = {
+			command = "/macro",
+			validityCheck = function(macroIndex)
+				local name, body = GetMacroInfo(macroIndex);
+				if name and body then
+					if match(body, "#plumber") then
+						return false, L["Drawer Error Attempt Adding Plumber Macro"];
+					else
+						return true;
+					end
+				end
+			end,
+			argGetter = function(macroIndex)
+				local name, body = GetMacroInfo(macroIndex);
+				if name then
+					return name, name
+				end
 			end,
 		},
 
