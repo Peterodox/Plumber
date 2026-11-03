@@ -549,9 +549,9 @@ do  --EL
 		local unit = "softinteract";
 		local nameplate = GetNamePlateForUnit(unit);
 
-		if nameplate and (UnitIsGameObject(unit) or (Settings.includeNPC and not UnitIsPlayer(unit))) then
+		if nameplate and nameplate.UnitFrame and (UnitIsGameObject(unit) or (Settings.includeNPC and not UnitIsPlayer(unit))) then
 			local f = nameplate.UnitFrame.SoftTargetFrame;
-			if f:IsShown() then
+			if f and f:IsShown() then
 				local unitID = GetUnitIDGeneral(unit);
 				--print("GameObject:", unitID);
 
