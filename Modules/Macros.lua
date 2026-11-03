@@ -1532,8 +1532,22 @@ do  --Editor Setup
 				local receptor = EditorSetup.ReceptorFrame;
 				local info = SupportedCursorInfo[infoType];
 				local inCombat = InCombatLockdown();
+				local isValid, failedReason, useRedText;
 
-				if (not inCombat) and info and (arg1 ~= nil) then
+				if inCombat then
+					isValid = false;
+					failedReason = L["PlumberMacro Error EditMacroInCombat"];
+					useRedText = true;
+				elseif not (info and arg1 ~= nil) then
+					isValid = false;
+				elseif info.validityCheck then
+					isValid, failedReason = info.validityCheck(arg1, arg2, arg3, arg4);
+					useRedText = true;
+				else
+					isValid = true;
+				end
+
+				if isValid then
 					receptor.PlusSign:Show();
 					receptor.Instruction:Hide();
 					local name, commandArg, overrideCommand = info.argGetter(arg1, arg2, arg3, arg4);
@@ -1595,11 +1609,13 @@ do  --Editor Setup
 				else
 					receptor.PlusSign:Hide();
 					receptor.Instruction:Show();
-					if inCombat then
-						receptor.Instruction:SetText(L["PlumberMacro Error EditMacroInCombat"]);
+					if not failedReason then
+						failedReason = format(L["Unsupported Action Type Format"], infoType);
+					end
+					receptor.Instruction:SetText(failedReason);
+					if useRedText then
 						receptor.Instruction:SetTextColor(1, 0.1, 0.1);
 					else
-						receptor.Instruction:SetText(format(L["Unsupported Action Type Format"], infoType));
 						receptor.Instruction:SetTextColor(0.6, 0.6, 0.6);
 					end
 					receptor:SetScript("OnEnter", nil);

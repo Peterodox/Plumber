@@ -669,10 +669,12 @@ L["Drawer Option Hide Unusable Tooltip"] = "隐藏身上没有的物品和未学
 L["Drawer Option Hide Unusable Tooltip 2"] = "消耗品例如药水不受此选项影响。"
 L["Drawer Option Update Frequently"] = "频繁更新";
 L["Drawer Option Update Frequently Tooltip"] = "在你背包或法术书发生变化时更新所有收纳宏。启用此选项可能会略微增加运算量。";
+L["Drawer Error Attempt Adding Plumber Macro"] = "不能在收纳宏内加入其他Plumber宏。";
 L["ModuleName DrawerMacro"] = "技能收纳宏";
 L["ModuleDescription DrawerMacro"] = "创建自定义弹出菜单来整理你的物品、法术、宠物、坐骑、玩具。\n\n要创建技能收纳宏, 请先创建一个新宏，然后在宏编辑框中输入 |cffd7c0a3#plumber:drawer|r";
 L["No Slot For New Character Macro Alert"] = "需要一个空的角色专用宏栏位来完成此操作。";
 L["Unknown Pet"] = "未知小宠物";
+L["Unknown Macro"] = "未知宏";
 
 
 --New Expansion Landing Page
