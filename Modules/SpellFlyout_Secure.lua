@@ -331,6 +331,8 @@ do  --VisualButtonMixin
 			self:SetMount(self.id);
 		elseif self.actionType == "teleportHome" then
 			self:SetTeleportHome(self.id);
+		elseif self.actionType == "macro" then
+			self:SetRunMacroByName(self.id);
 		elseif self[action.actionType] then
 			self[action.actionType](self, action.id);
 		end
@@ -532,6 +534,17 @@ do  --VisualButtonMixin
 			h.SetupActionButtonCooldown(self, self.id);
 		else
 			self.tooltipFunc = nil;
+		end
+	end
+
+	function VisualButtonMixin:SetRunMacroByName(macroName)
+		local name, icon = GetMacroInfo(macroName);
+		if name then
+			self.tooltipText = (MACRO or "Macro")..": "..macroName;
+			self.Icon:SetTexture(icon);
+		else
+			self.tooltipText = "|cffff4800"..L["Unknown Macro"]..": "..macroName.."|r";
+			self.Icon:SetTexture(134400);
 		end
 	end
 
