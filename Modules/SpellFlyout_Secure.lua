@@ -696,6 +696,16 @@ do  --SecureControllerPool
 							end
 						end
 
+						local customMacroName = self:GetAttribute("runMacroByName"..i);
+						if customMacroName then
+							processed = true;
+							button:SetAttribute("type", "macro");
+							button:SetAttribute("macro", customMacroName);
+							button:SetAttribute("macrotext", nil);
+						else
+							button:SetAttribute("macro", nil);
+						end
+
 						if not processed then
 							local macroText = self:GetAttribute("customMacroText"..i);
 							button:SetAttribute("type", "macro");
@@ -770,6 +780,12 @@ do  --SecureControllerPool
 			end
 
 			for i, action in ipairs(actions) do
+				if action.actionType == "macro" then
+					handler:SetAttribute("runMacroByName"..i, action.id or "");
+				else
+					handler:SetAttribute("runMacroByName"..i, nil);
+				end
+
 				if appendedMacro then
 					handler:SetAttribute("customMacroText"..i, (action.macroText or "")..appendedMacro);
 				else
@@ -781,6 +797,7 @@ do  --SecureControllerPool
 				else
 					handler:SetAttribute("shouldUseSpellID"..i, nil);
 				end
+
 				handler:SetAttribute("actionID"..i, action.id);
 			end
 		end
