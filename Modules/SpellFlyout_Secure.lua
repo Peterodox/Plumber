@@ -331,6 +331,8 @@ do  --VisualButtonMixin
 			self:SetMount(self.id);
 		elseif self.actionType == "teleportHome" then
 			self:SetTeleportHome(self.id);
+		elseif self.actionType == "macro" then
+			self:SetRunMacroByName(self.id);
 		elseif self[action.actionType] then
 			self[action.actionType](self, action.id);
 		end
@@ -535,6 +537,17 @@ do  --VisualButtonMixin
 		end
 	end
 
+	function VisualButtonMixin:SetRunMacroByName(macroName)
+		local name, icon = GetMacroInfo(macroName);
+		if name then
+			self.tooltipText = (MACRO or "Macro")..": "..macroName;
+			self.Icon:SetTexture(icon);
+		else
+			self.tooltipText = "|cffff4800"..L["Unknown Macro"]..": "..macroName.."|r";
+			self.Icon:SetTexture(134400);
+		end
+	end
+
 	function SpellFlyout:PopulateButtonMixin(externalMixin)
 		for k, v in pairs(VisualButtonMixin) do
 			if not externalMixin[k] then
@@ -683,6 +696,16 @@ do  --SecureControllerPool
 							end
 						end
 
+						local customMacroName = self:GetAttribute("runMacroByName"..i);
+						if customMacroName then
+							processed = true;
+							button:SetAttribute("type", "macro");
+							button:SetAttribute("macro", customMacroName);
+							button:SetAttribute("macrotext", nil);
+						else
+							button:SetAttribute("macro", nil);
+						end
+
 						if not processed then
 							local macroText = self:GetAttribute("customMacroText"..i);
 							button:SetAttribute("type", "macro");
@@ -757,6 +780,12 @@ do  --SecureControllerPool
 			end
 
 			for i, action in ipairs(actions) do
+				if action.actionType == "macro" then
+					handler:SetAttribute("runMacroByName"..i, action.id or "");
+				else
+					handler:SetAttribute("runMacroByName"..i, nil);
+				end
+
 				if appendedMacro then
 					handler:SetAttribute("customMacroText"..i, (action.macroText or "")..appendedMacro);
 				else
@@ -768,6 +797,7 @@ do  --SecureControllerPool
 				else
 					handler:SetAttribute("shouldUseSpellID"..i, nil);
 				end
+
 				handler:SetAttribute("actionID"..i, action.id);
 			end
 		end

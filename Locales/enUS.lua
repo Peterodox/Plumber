@@ -669,10 +669,12 @@ L["Drawer Option Hide Unusable Tooltip"] = "Hide unowned items and unlearned spe
 L["Drawer Option Hide Unusable Tooltip 2"] = "Consumable items like potions will always be shown."
 L["Drawer Option Update Frequently"] = "Update Frequently";
 L["Drawer Option Update Frequently Tooltip"] = "Attempt to update the button states whenever there is a change in your bags or spellbooks. Enabling this option may slightly increase resource usage.";
+L["Drawer Error Attempt Adding Plumber Macro"] = "Cannot add a Plumber macro into the drawer.";
 L["ModuleName DrawerMacro"] = "Drawer Macro";
 L["ModuleDescription DrawerMacro"] = "Create a custom flyout menu to manage your items, spells, pets, mounts, toys.\n\nTo make a Drawer Macro, create a new macro first, then enter |cffd7c0a3#plumber:drawer|r in the command editbox.";
 L["No Slot For New Character Macro Alert"] = "You need to have a spare Character Specific Macro slot to complete this action.";
 L["Unknown Pet"] = "Unknown Pet";
+L["Unknown Macro"] = "Unknown Macro";
 
 
 --New Expansion Landing Page
