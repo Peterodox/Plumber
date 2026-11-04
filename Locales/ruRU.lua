@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.6 b
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.7 c
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -46,6 +46,7 @@ L["Always On Module"] = "Этот модуль всегда включен.";
 L["Return To Module List"] = "Вернуться к списку";
 L["Generic Addon Conflict"] = "Этот модуль может быть несовместим с аддонами, обладающими аналогичными функциональными возможностями:";
 L["Addon Conflict Format"] = "Этот модуль может быть несовместим с %s."; -- Show one addon name. Used in changelogs.
+L["Module Disabled Due To Addon Conflict"] = "Этот модуль отключен, так как \"%s\" имеет аналогичные функции.";
 L["Work In Progress Tag"] = "[ВТЗ]";
 L["Colon With Space"] = ": ";
 L["Disabled Module Requires Reload Format"] = "Вы должны %s, чтобы применить изменения.";	--We'll replace %s with a clickable "reload the UI"
@@ -668,10 +669,12 @@ L["Drawer Option Hide Unusable Tooltip"] = "Скрыть бесполезные 
 L["Drawer Option Hide Unusable Tooltip 2"] = "Расходные материалы, такие как зелья, всегда будут отображаться."
 L["Drawer Option Update Frequently"] = "Часто обновляйте";
 L["Drawer Option Update Frequently Tooltip"] = "Попробуйте обновить состояние кнопок всякий раз, когда в ваших сумках или книгах заклинаний происходят изменения. Включение этой опции может немного увеличить использование ресурсов.";
+L["Drawer Error Attempt Adding Plumber Macro"] = "Не удалось добавить макрос Plumber на выдвижную панель.";
 L["ModuleName DrawerMacro"] = "Макрос ящика";
 L["ModuleDescription DrawerMacro"] = "Создайте пользовательское всплывающее меню для управления вашими предметами, заклинаниями, питомцами, маунтами и игрушками.\n\nЧтобы создать макрос Ящика, сначала создайте новый макрос, затем введите |cffd7c0a3#plumber:drawer|r в поле редактирования команд.";
 L["No Slot For New Character Macro Alert"] = "Для завершения этого действия у вас должна быть свободная ячейка в макросах персонажа.";
 L["Unknown Pet"] = "Неизвестный питомец";
+L["Unknown Macro"] = "Неизвестный макрос";
 
 
 --New Expansion Landing Page
@@ -760,6 +763,23 @@ L["Inactive Currencies Tooltip"] = "Эти валюты скрыты, так к�
 L["New Quest"] = "Новое задание";
 L["Trait Points Available"] = "Доступно очков";
 L["Unspent Points"] = "Нераспределенные очки";
+L["Manage Activities"] = "Управление активностями";
+L["Manage Activities Abbr"] = "Управление";
+L["Manage Activities Tooltip"] = "Выберите элементы, которые хотите игнорировать.\n\nЭти настройки применяются ко всем вашим персонажам.";
+L["Total Ignored Tooltip Format"] = "Игнорируется: %d |4элемент:элемента;.";
+L["Save And Exit"] = "Сохранить и выйти";
+L["Activity Shown Condition Generic"] = "Этот элемент становится видимым только при выполнении определенных условий.";
+L["Activity Shown Condition ShownIfActive"] = "Этот элемент становится видимым только тогда, когда задание активно.";
+L["Activity Shown Condition ShownIfOnQuest"] = "Этот элемент становится видимым только тогда, когда вы выполняете это задание.";
+L["Click To Ignore Activity"] = "Кликните, чтобы игнорировать";
+L["Click To Enable Activity"] = "Кликните, чтобы включить";
+L["Click To Mark As Deleted"] = "Пометить как удаленное";
+L["Click To Cancel Deletion"] = "Отменить удаление";
+L["Currency Button Layout 1"] = "Название и иконка";
+L["Currency Button Layout 2"] = "Только иконка";
+L["Edit Resource List"] = "Редактировать";
+L["Resource Shown Condition Generic"] = "Этот элемент становится видимым только при выполнении определенных условий.";
+L["Resource Shown Condition ShownIfOwned"] = "Этот элемент становится видимым только в том случае, если он у вас есть.";
 
 
 --ExpansionSummaryMinimapButton
