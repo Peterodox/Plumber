@@ -2629,6 +2629,11 @@ do  -- Player
 	function API.IsGreatVaultFeatureAvailable()
 		return IsPlayerAtMaxLevel() and C_WeeklyRewards ~= nil;
 	end
+
+	function API.IsPlayerClass(classFilename)
+		local _, name = UnitClass("player");
+		return name == classFilename;
+	end
 end
 
 --[[
