@@ -3866,6 +3866,44 @@ do  -- Container Item Processor
 	end
 	API.GetItemBagPosition = GetItemBagPosition;
 
+	---@param predicate function predicate(itemID) return boolean
+	---@param maxMatches number? Stop once finding enough items
+	---@return table? itemIDs A list of itemID. Sorted.
+	function API.GetBagItemIDsByPredicate(predicate, maxMatches)
+		local items = {};
+		local numMatches = 0;
+		local itemID;
+		local continue = true;
+		for bagID = 0, 4 do
+			for slotID = 1, GetContainerNumSlots(bagID) do
+				itemID = GetContainerItemID(bagID, slotID);
+				if itemID and predicate(itemID) then
+					if not items[itemID] then
+						items[itemID] = true;
+						numMatches = numMatches + 1;
+						if maxMatches and numMatches >= maxMatches then
+							continue = false;
+							break;
+						end
+					end
+				end
+			end
+			if not continue then
+				break;
+			end
+		end
+		if numMatches > 0 then
+			local list = {};
+			local n = 0;
+			for id in pairs(items) do
+				n = n + 1;
+				list[n] = id;
+			end
+			table.sort(list);
+			return list;
+		end
+	end
+
 	local Processor = CreateFrame("Frame");
 	local ITEM_OPENABLE = ITEM_OPENABLE or "<Right Click to Open>";
 	local OPENABLE_ITEM = {};
