@@ -1,10 +1,14 @@
---Unused
+-- The ActionButton only functions when out of combat
+-- Compared with Sescure Flyout: This flyout's position and layout are eaiser to adjust than our secure flyout.
+
 
 local _, addon = ...
 local API = addon.API;
 local L = addon.L;
+local CooldownUtil = addon.CooldownUtil;
 
 local tinsert = table.insert;
+local GetItemCount = C_Item.GetItemCount;
 local InCombatLockdown = InCombatLockdown;
 local IsPlayerSpell = C_SpellBook.IsSpellKnown;
 local CreateFrame = CreateFrame;
@@ -12,9 +16,11 @@ local UIParent = UIParent;
 
 local FlyoutButtonMixin = {};
 local SpellFlyout = CreateFrame("Frame", nil, UIParent);
-addon.SpellFlyout = SpellFlyout;
-SpellFlyout.UpdateSpellCooldowns = addon.QuickSlot.UpdateSpellCooldowns;
-SpellFlyout.UpdateItemCooldowns = addon.QuickSlot.UpdateItemCooldowns;
+addon.InsecureSpellFlyout = SpellFlyout;
+
+
+local BUTTON_SIZE = 45;
+local BUTTON_GAP = 2;
 
 
 local function SetupClampedFrame(frame)
@@ -41,12 +47,13 @@ do --SpellFlyout Main
 	end
 
 	function SpellFlyout:SetArrowDirection(direction)
+		self.FlyoutArrow:SetShown(direction ~= nil);
 		self.FlyoutArrow:ClearAllPoints();
 		if direction == "down" then
-			self.FlyoutArrow:SetPoint("CENTER", self, "BOTTOMLEFT", 2 + 45/2, -1);
+			self.FlyoutArrow:SetPoint("CENTER", self, "BOTTOMLEFT", BUTTON_GAP + BUTTON_SIZE/2, -1);
 			self.FlyoutArrow:SetTexCoord(48/512, 96/512, 0, 48/512);
 		elseif direction == "up" then
-			self.FlyoutArrow:SetPoint("CENTER", self, "TOPLEFT", 2 + 45/2, 1);
+			self.FlyoutArrow:SetPoint("CENTER", self, "TOPLEFT", BUTTON_GAP + BUTTON_SIZE/2, 1);
 			self.FlyoutArrow:SetTexCoord(0/512, 48/512, 0, 48/512);
 		elseif direction == "right" then
 			self.FlyoutArrow:SetPoint("CENTER", self, "RIGHT", 1, 0);
@@ -66,6 +73,22 @@ do --SpellFlyout Main
 		return false
 	end
 
+	function SpellFlyout:UpdateSpellCooldowns()
+		CooldownUtil.UpdateSpellButtonCooldowns(self.SpellButtons);
+	end
+
+	function SpellFlyout:UpdateItemCooldowns()
+		CooldownUtil.UpdateItemButtonCooldowns(self.ItemButtons);
+	end
+
+	function SpellFlyout:UpdateItemCount()
+		if self.ItemButtons then
+			for i, button in ipairs(self.ItemButtons) do
+				button:UpdateCount();
+			end
+		end
+	end
+
 	function SpellFlyout:OnEvent(event, ...)
 		if event == "GLOBAL_MOUSE_DOWN" then
 			if not self:IsFocused() then
@@ -79,7 +102,7 @@ do --SpellFlyout Main
 		elseif event == "PLAYER_REGEN_ENABLED" then
 			if self:IsVisible() then
 				self:OnShow();
-				self:SetActions(self.actions);
+				self:SetActions(self.tag, self.actions);
 			end
 		elseif event == "ACTIONBAR_SLOT_CHANGED" then
 			self:Hide();
@@ -87,6 +110,8 @@ do --SpellFlyout Main
 			self:UpdateSpellCooldowns();
 		elseif event == "BAG_UPDATE_COOLDOWN" then
 			self:UpdateItemCooldowns();
+		elseif event == "BAG_UPDATE_DELAYED" then
+			self:UpdateItemCount();
 		elseif event == "PLAYER_ENTERING_WORLD" then
 			self:UnregisterEvent(event);
 			self:UpdateCompatibleAddOns();
@@ -94,13 +119,13 @@ do --SpellFlyout Main
 	end
 	SpellFlyout:SetScript("OnEvent", SpellFlyout.OnEvent);
 
+	local StaticEvents = {
+		"GLOBAL_MOUSE_DOWN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "ACTIONBAR_SLOT_CHANGED",
+		"SPELL_UPDATE_COOLDOWN", "BAG_UPDATE_COOLDOWN", "BAG_UPDATE_DELAYED",
+	};
+
 	function SpellFlyout:OnShow()
-		self:RegisterEvent("GLOBAL_MOUSE_DOWN");
-		self:RegisterEvent("PLAYER_REGEN_DISABLED");
-		self:RegisterEvent("PLAYER_REGEN_ENABLED");
-		self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
-		self:RegisterEvent("SPELL_UPDATE_COOLDOWN");
-		self:RegisterEvent("BAG_UPDATE_COOLDOWN");
+		API.RegisterFrameForEvents(self, StaticEvents);
 		local ActionButton = addon.AcquireSecureActionButton("SpellFlyout");
 		if ActionButton then
 			ActionButton:SetParent(self);
@@ -110,12 +135,7 @@ do --SpellFlyout Main
 
 	function SpellFlyout:OnHide()
 		self:Clear();
-		self:UnregisterEvent("GLOBAL_MOUSE_DOWN");
-		self:UnregisterEvent("PLAYER_REGEN_DISABLED");
-		self:UnregisterEvent("PLAYER_REGEN_ENABLED");
-		self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED");
-		self:UnregisterEvent("SPELL_UPDATE_COOLDOWN");
-		self:UnregisterEvent("BAG_UPDATE_COOLDOWN");
+		API.UnregisterFrameForEvents(self, StaticEvents);
 	end
 
 	function SpellFlyout:OnMouseDown(button)
@@ -176,7 +196,7 @@ do --SpellFlyout Main
 		if updateSize then
 			self.Note:SetWidth(0);
 		else
-			self.Note:SetWidth(math.max(self:GetWidth(), 45) - 8);
+			self.Note:SetWidth(math.max(self:GetWidth(), BUTTON_SIZE) - 8);
 		end
 		self.Note:SetText(text);
 
@@ -201,8 +221,11 @@ do --SpellFlyout Main
 		end
 	end
 
-	function SpellFlyout:SetActions(actions)
+	---@param tag string Unique name
+	---@param actions table?
+	function SpellFlyout:SetActions(tag, actions)
 		self:ReleaseButtons();
+		self.tag = tag;
 		self.actions = actions;
 		self.SpellButtons = {};
 		self.ItemButtons = {};
@@ -215,8 +238,8 @@ do --SpellFlyout Main
 		self.Overlay:SetFrameLevel(baseFrameLevel + 10);
 
 		if actions and #actions > 0 then
-			local buttonSize = 45;
-			local gap = 2;
+			local buttonSize = BUTTON_SIZE;
+			local gap = BUTTON_GAP;
 			local h, v = 0, 1;
 			local button;
 			local level = baseFrameLevel + 5;
@@ -247,6 +270,7 @@ do --SpellFlyout Main
 			end
 			if anyItem then
 				self:UpdateItemCooldowns();
+				self:UpdateItemCount();
 			end
 		else
 			self:DisplayNote(L["PlumberMacro Error NoAction"], true);
@@ -258,18 +282,55 @@ do --SpellFlyout Main
 		self.owner = owner;
 	end
 
-	function SpellFlyout:SetMacroText(flyoutButton, macroText)
-		if self.ActionButton then
-			if flyoutButton and macroText then
-				self.ActionButton:SetAttribute("type", "macro");
-				self.ActionButton:SetMacroText(macroText);
-				self.ActionButton:SetFrameLevel(flyoutButton:GetFrameLevel() + 1);
-				self.ActionButton:SetPropagateMouseClicks(true);
-				self.ActionButton:SetPropagateMouseMotion(true);
-				self.ActionButton:CoverObject(flyoutButton, 1);
-				self.ActionButton:Show();
+	function SpellFlyout:IsOwner(owner)
+		return self:IsShown() and self.owner == owner;
+	end
+
+	function SpellFlyout:ToggleFlyout(owner, orientation)
+		if (not self:IsShown()) or (not self.owner) or (self.owner ~= owner) then
+			self:SetOwner(owner);
+			self:ClearAllPoints();
+			local cursorOffset = 4;
+			if owner then
+				if orientation == "LEFT" then
+					self:SetArrowDirection("right");
+					self:SetPoint("RIGHT", owner, "LEFT", -cursorOffset, 0);
+				elseif orientation == "RIGHT" then
+					self:SetArrowDirection("left");
+					self:SetPoint("LEFT", owner, "RIGHT", cursorOffset, 0);
+				else -- "TOP"
+					self:SetArrowDirection("down");
+					self:SetPoint("BOTTOMLEFT", owner, "TOP", -0.5* BUTTON_SIZE - BUTTON_GAP, cursorOffset);
+				end
 			else
-				self.ActionButton:ClearActions();
+				local x, y = API.GetScaledCursorPosition();
+				self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x, y + cursorOffset);
+				self:SetArrowDirection();
+			end
+			self:Show();
+		else
+			self:Hide();
+		end
+	end
+
+	function SpellFlyout:SetMacroText(flyoutButton, macroText)
+		local ab = self.ActionButton;
+		if ab then
+			if flyoutButton and macroText then
+				ab:SetAttribute("type", "macro");
+				ab:SetMacroText(macroText);
+				ab:SetFrameLevel(flyoutButton:GetFrameLevel() + 1);
+				ab:SetPropagateMouseClicks(true);
+				ab:SetPropagateMouseMotion(true);
+				ab:CoverObject(flyoutButton, 1);
+				ab:SetAttribute("useOnKeyDown", false);
+				ab:RegisterForClicks("AnyUp");
+				ab:SetScript("PostClick", function()
+					SpellFlyout:Hide();
+				end);
+				ab:Show();
+			else
+				ab:ClearActions();
 			end
 		end
 	end
@@ -396,6 +457,7 @@ do  --FlyoutButtonMixin
 		self.actionType = action.actionType;
 		self.macroText = action.macroText;
 		self.text = action.text;
+		self.extraTooltip = action.extraTooltip;
 
 		if self.actionType == "spell" then
 			self.tooltipMethod = "SetSpellByID";
@@ -410,6 +472,21 @@ do  --FlyoutButtonMixin
 			end
 		elseif self[action.actionType] then
 			self[action.actionType](self, action.id);
+		end
+	end
+
+	function FlyoutButtonMixin:UpdateCount()
+		if self.actionType == "item" then
+			local count = GetItemCount(self.id);
+			if self.isToy then
+				count = PlayerHasToy(self.id) and 1 or 0;
+			end
+			if count > 1 then
+				self.Count:SetText(count);
+			else
+				self.Count:SetText(nil);
+			end
+			self:SetUsableVisual(count > 0);
 		end
 	end
 
@@ -434,17 +511,26 @@ do  --FlyoutButtonMixin
 		self:SetButtonState("NORMAL");
 	end
 
+	function FlyoutButtonMixin:AppendExtraTooltip(tooltip)
+		if self.extraTooltip then
+			tooltip:AddLine(" ");
+			tooltip:AddLine(self.extraTooltip, 1, 0.82, 0, true);
+		end
+	end
+
 	function FlyoutButtonMixin:ShowTooltip()
 		if self.tooltipMethod then
 			local tooltip = GameTooltip;
 			tooltip:SetOwner(self, "ANCHOR_RIGHT");
 			tooltip[self.tooltipMethod](tooltip, self.id);
+			self:AppendExtraTooltip(tooltip);
 			tooltip:Show();
 			self.UpdateTooltip = self.ShowTooltip;
 		elseif self.tooltipText then
 			local tooltip = GameTooltip;
 			tooltip:SetOwner(self, "ANCHOR_RIGHT");
 			tooltip:SetText(self.tooltipText, 1, 1, 1, 1, true);
+			self:AppendExtraTooltip(tooltip);
 			tooltip:Show();
 			self.UpdateTooltip = nil;
 		else
