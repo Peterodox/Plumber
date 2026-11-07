@@ -290,6 +290,7 @@ local DefaultValues = {
 		LootUI_ForceAutoLoot = true,
 		LootUI_LootUnderMouse = false,
 		LootUI_UseHotkey = true,
+		LootUI_TakeButton = "LeftButton",	--"LeftButton" or "RightButton": mouse button used to take an item in the loot window
 		LootUI_HotkeyName = "E",
 		--LootUI_UseStockUI = false,	--Deprecated and merged into FastLoot
 		--LootUI_WindowHide = false,	--Deprecated and merged into FastLoot
