@@ -39,5 +39,12 @@ end
 
 function EasingFunctions.inQuad(t, b, e, d)
 	t = t / d;
-	return (e - b) * pow(t, 2) + b;
+	t = t * t;
+	return (e - b) * t + b;
+end
+
+function EasingFunctions.outQuad(t, b, e, d)
+	t = t / d;
+	t = 1 - (1 - t) ^ 2;
+	return (e - b) * t + b;
 end
