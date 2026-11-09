@@ -127,6 +127,7 @@ stds.wow = {
 		"BossBanner_OnEvent",
 		"BreakUpLargeNumbers",
 		"CalculateTotalNumberOfFreeBagSlots",
+		"canaccessallvalues",
 		"canaccessvalue",
 		"CastSpell",
 		"CharacterFrame",
@@ -411,6 +412,7 @@ stds.wow = {
 		"PaperDollFrame",
 		"PaperDollItemsFrame",
 		"PaperDollTitlesPane_InitButton",
+		"PetFrameHappiness",
 		"PickupContainerItem",
 		"PickupInventoryItem",
 		"PickupMacro",
@@ -1020,6 +1022,14 @@ stds.wow = {
 			},
 		},
 
+		C_PetInfo = {
+			fields = {
+				"CanPetEatItem",
+				"GetPetFoodTypes",
+				"GetPetHappiness",
+			},
+		},
+
 		C_PetJournal = {
 			fields = {
 				"FindPetIDByName",
@@ -1149,6 +1159,7 @@ stds.wow = {
 		C_Secrets = {
 			fields = {
 				"ShouldAurasBeSecret",
+				"ShouldUnitStatsBeSecret",
 			},
 		},
 
@@ -1183,6 +1194,7 @@ stds.wow = {
 				"GetSpellName",
 				"GetSpellTexture",
 				"IsSpellDataCached",
+				"IsSpellUsable",
 				"PickupSpell",
 				"RequestLoadSpellData",
 			},
@@ -1235,6 +1247,7 @@ stds.wow = {
 		C_Timer = {
 			fields = {
 				"After",
+				"NewTimer",
 			},
 		},
 
@@ -1966,6 +1979,7 @@ stds.wow = {
 		"PARAGON_REPUTATION_TOOLTIP_TEXT_LOW_LEVEL",
 		"PET_DAMAGE_PERCENTAGE",
 		"PET_DIET_TEMPLATE",
+		"PET_FOOD_DELIMIT",
 		"PLAYER_DIFFICULTY1",
 		"PLAYER_DIFFICULTY2",
 		"PLAYER_DIFFICULTY3",

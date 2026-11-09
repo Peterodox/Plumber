@@ -138,7 +138,7 @@ function HappinessButton:ShowTooltip(tooltipFrame)
 		local diet = C_PetInfo.GetPetFoodTypes();
 		local dietText;
 		if diet and #diet > 0 then
-			dietText = PET_DIET_TEMPLATE:format(table.concat(diet, PET_FOOD_DELIMIT));
+			dietText = PET_DIET_TEMPLATE:format(table.concat(diet, PET_FOOD_DELIMIT or ", "));
 		else
 			dietText = PET_DIET_TEMPLATE:format(NONE);
 		end
@@ -230,23 +230,23 @@ function HappinessButton:SetupFeedingAnimation(flyoutButton)
 	local easeIn = addon.EasingFunctions.inQuad;
 	local easeOut = addon.EasingFunctions.outQuad;
 
-	object:SetScript("OnUpdate", function(self, elapsed)
-		self.total = self.total + elapsed;
+	object:SetScript("OnUpdate", function(obj, elapsed)
+		obj.total = obj.total + elapsed;
 
-		local px = easeOut(self.total, self.fromX, self.toX, self.duration);
-		local py = easeIn(self.total, self.fromY, self.toY, self.duration);
-		local size = linear(self.total, self.fromSize, self.toSize, self.duration);
+		local px = easeOut(obj.total, obj.fromX, obj.toX, obj.duration);
+		local py = easeIn(obj.total, obj.fromY, obj.toY, obj.duration);
+		local size = linear(obj.total, obj.fromSize, obj.toSize, obj.duration);
 
-		if self.total >= self.duration then
-			px = self.toX;
-			py = self.toY;
-			size = self.toSize;
-			self:SetScript("OnUpdate", nil);
+		if obj.total >= obj.duration then
+			px = obj.toX;
+			py = obj.toY;
+			size = obj.toSize;
+			obj:SetScript("OnUpdate", nil);
 			HappinessButton:OnFeedingAnimationFinished();
 		end
 
-		self:SetRelativePosition(px, py);
-		self:SetSize(size, size);
+		obj:SetRelativePosition(px, py);
+		obj:SetSize(size, size);
 	end);
 
 	object:Show();
