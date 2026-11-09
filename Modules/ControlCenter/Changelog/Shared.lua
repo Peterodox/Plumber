@@ -10,6 +10,43 @@ local changelogs = addon.ControlCenter.changelogs;
 changelogs[10907] = {
 	{
 		type = "date",
+		versionText = "1.9.7 b-c",
+		timestamp = 1793800000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Plumber Drawer Macro: You can now drag other macros into the Drawer.";
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Break Time Reminder: It no longer treats house interiors and neighborhoods as \"instances\" and postpones the reminder.";
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Tooltip, Reputation Tokens: This module now supports Aqir Research Tokens, showing your renown progress on the vendor tooltip.";
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Auctionator and Loot UI: The price info should appear on the Loot UI's item tooltip.";
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.7",
 		timestamp = 1792900000,
 	},
@@ -76,43 +113,6 @@ changelogs[10907] = {
 		type = "p",
 		bullet = true,
 		textGetter = "GetMerchantPriceWarningForChangelog", -- See MerchantPrice.lua
-	},
-
-	{
-		type = "br",
-	},
-	{
-		type = "br",
-	},
-
-	{
-		type = "date",
-		versionText = "1.9.7 b-c",
-		timestamp = 1793800000,
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Plumber Drawer Macro: You can now drag other macros into the Drawer.";
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Break Time Reminder: It no longer treats house interiors and neighborhoods as \"instances\" and postpones the reminder.";
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Tooltip, Reputation Tokens: This module now supports Aqir Research Tokens, showing your renown progress on the vendor tooltip.";
-	},
-
-	{
-		type = "p",
-		bullet = true,
-		text = "Auctionator and Loot UI: The price info should appear on the Loot UI's item tooltip.";
 	},
 };
 
