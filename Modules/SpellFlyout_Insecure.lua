@@ -299,6 +299,12 @@ do --SpellFlyout Main
 		end
 	end
 
+	---Trigger postClickCallback(flyoutButton)
+	---@param postClickCallback function?
+	function SpellFlyout:SetFlyoutButtonPostClickCallback(postClickCallback)
+		self.postClickCallback = postClickCallback;
+	end
+
 	function SpellFlyout:SetOwner(owner)
 		--owner is ActionBarButton
 		self.owner = owner;
@@ -326,7 +332,7 @@ do --SpellFlyout Main
 				end
 			else
 				local x, y = API.GetScaledCursorPosition();
-				self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x, y + cursorOffset);
+				self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x, y + cursorOffset + 4);
 				self:SetArrowDirection();
 			end
 			self:Show();
@@ -347,7 +353,10 @@ do --SpellFlyout Main
 				ab:CoverObject(flyoutButton, 1);
 				ab:SetAttribute("useOnKeyDown", false);
 				ab:RegisterForClicks("AnyUp");
-				ab:SetScript("PostClick", function()
+				ab:SetScript("PostClick", function(_, mouseButton)
+					if self.postClickCallback then
+						self.postClickCallback(flyoutButton, mouseButton);
+					end
 					SpellFlyout:Hide();
 				end);
 				ab:Show();
@@ -480,6 +489,7 @@ do  --FlyoutButtonMixin
 
 	function FlyoutButtonMixin:SetAction(action)
 		self.id = action.id;
+		self.icon = action.icon;
 		self.Icon:SetTexture(action.icon);
 		self.actionType = action.actionType;
 		self.macroText = action.macroText;
