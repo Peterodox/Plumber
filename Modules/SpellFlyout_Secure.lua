@@ -133,8 +133,8 @@ do --SpellFlyout Main
 		self.Init = nil;
 
 		--Create Background. TO-DO convert into a template?
-		--This texture has a large shadow
-		local bg = addon.CreateNineSliceFrame(self, "NineSlice_GenericBox_Black_Shadowed");
+		local layoutName = addon.IS_FOREVER and "Forever_NineSlice_GenericBox_Black_Shadowed" or "NineSlice_GenericBox_Black_Shadowed";
+		local bg = addon.CreateNineSliceFrame(self, layoutName);
 		local buttonScale = ACTION_BUTTON_SIZE / 45;
 		bg:SetUsingParentLevel(true);
 		bg:CoverParent(16 * buttonScale);
@@ -281,7 +281,6 @@ do  --VisualButtonMixin
 		local file = "Interface/AddOns/Plumber/Art/Frame/SpellFlyout";
 
 		self.NormalTexture:SetTexture(file);
-		self.NormalTexture:SetTexCoord(0/512, 96/512, 48/512, 144/512);
 		self.PushedTexture:SetTexture(file);
 		self.PushedTexture:SetTexCoord(96/512, 192/512, 48/512, 144/512);
 		self.HighlightTexture:SetTexture(file);
@@ -291,6 +290,12 @@ do  --VisualButtonMixin
 
 		self.NormalTexture:SetDrawLayer("OVERLAY");
 		self.PushedTexture:SetDrawLayer("OVERLAY");
+
+		if addon.IS_FOREVER then
+			self.NormalTexture:SetTexCoord(288/512, 384/512, 48/512, 144/512);
+		else
+			self.NormalTexture:SetTexCoord(0/512, 96/512, 48/512, 144/512);
+		end
 
 		self:SetScript("OnEnter", self.OnEnter);
 		self:SetScript("OnLeave", self.OnLeave);

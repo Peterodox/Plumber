@@ -157,9 +157,20 @@ do --SpellFlyout Main
 		end
 		self.buttonPool = API.CreateObjectPool(CreateButton);
 
-		local bg = addon.CreateNineSliceFrame(self, "NineSlice_GenericBox_Black");
+		local layoutName = addon.IS_FOREVER and "Forever_NineSlice_GenericBox_Black_Shadowed" or "NineSlice_GenericBox_Black_Shadowed";
+		local bg = addon.CreateNineSliceFrame(self, layoutName);
 		bg:SetUsingParentLevel(true);
-		bg:SetAllPoints(true);
+		bg:CoverParent(16);
+		bg.pieces[1]:SetTexCoord(0/128, 48/128, 0/128, 48/128);
+		bg.pieces[2]:SetTexCoord(48/128, 80/128, 0/128, 48/128);
+		bg.pieces[3]:SetTexCoord(80/128, 128/128, 0/128, 48/128);
+		bg.pieces[4]:SetTexCoord(0/128, 48/128, 48/128, 80/128);
+		bg.pieces[5]:SetTexCoord(48/128, 80/128, 48/128, 80/128);
+		bg.pieces[6]:SetTexCoord(80/128, 128/128, 48/128, 80/128);
+		bg.pieces[7]:SetTexCoord(0/128, 48/128, 80/128, 128/128);
+		bg.pieces[8]:SetTexCoord(48/128, 80/128, 80/128, 128/128);
+		bg.pieces[9]:SetTexCoord(80/128, 128/128, 80/128, 128/128);
+		bg:SetCornerSize(48);
 
 		self:EnableMouse(true);
 		self:EnableMouseMotion(true);
@@ -449,7 +460,6 @@ do  --FlyoutButtonMixin
 		local file = "Interface/AddOns/Plumber/Art/Frame/SpellFlyout";
 
 		self.NormalTexture:SetTexture(file);
-		self.NormalTexture:SetTexCoord(0/512, 96/512, 48/512, 144/512);
 		self.PushedTexture:SetTexture(file);
 		self.PushedTexture:SetTexCoord(96/512, 192/512, 48/512, 144/512);
 		self.HighlightTexture:SetTexture(file);
@@ -457,6 +467,12 @@ do  --FlyoutButtonMixin
 
 		self.NormalTexture:SetDrawLayer("OVERLAY");
 		self.PushedTexture:SetDrawLayer("OVERLAY");
+
+		if addon.IS_FOREVER then
+			self.NormalTexture:SetTexCoord(288/512, 384/512, 48/512, 144/512);
+		else
+			self.NormalTexture:SetTexCoord(0/512, 96/512, 48/512, 144/512);
+		end
 
 		self:SetScript("OnEnter", self.OnEnter);
 		self:SetScript("OnLeave", self.OnLeave);
