@@ -1,6 +1,10 @@
 local VERSION_TEXT = "1.9.7 c";
 local VERSION_DATE = 1794200000;
 
+-- If "AutoShowChangelog" is enabled: The following dates determine if the changelog should auto open
+local RETAIL_CHANGELOG_DATE = 1794200000;
+local FOREVER_CHANGELOG_DATE = 1794200000;
+
 
 local addonName, addon = ...
 
@@ -450,12 +454,13 @@ local function LoadDatabase()
 		DB.installTime = VERSION_DATE;
 	end
 
+	local changelogDate = addon.IS_FOREVER and FOREVER_CHANGELOG_DATE or RETAIL_CHANGELOG_DATE;
 	if DB.lastVersionTime then
-		if (VERSION_DATE - 1 > DB.lastVersionTime) and DB.SettingsPanel_AutoShowChangelog then
+		if (changelogDate - 1 > DB.lastVersionTime) and DB.SettingsPanel_AutoShowChangelog then
 			CallbackRegistry:Trigger("ShowChangelog");
 		end
 	end
-	DB.lastVersionTime = VERSION_DATE;
+	DB.lastVersionTime = changelogDate;
 
 	DefaultValues = nil;
 
