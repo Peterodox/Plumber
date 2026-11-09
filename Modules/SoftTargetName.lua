@@ -39,6 +39,7 @@ local Settings = {
 	titleHeight = 15,
 	subtextHeight = 13,
 	iconSize = 16,
+	iconOffsetY = 16,
 	showCastBar = false,
 	fontObject = "GameFontNormal",
 	textOutline = false,
@@ -58,6 +59,24 @@ local SpecialGameObjects = {};
 local function IsHousingAvailable()
 	return addon.IS_RETAIL;
 end
+
+
+-- For nameplate addons that create their own SoftInteractIcon
+-- Align our radial cast bar to the center of their texture
+local SoftInteractIconGetters = {
+	Blizzard = function(nameplate)
+		return nameplate.UnitFrame.SoftTargetFrame.Icon;
+	end,
+
+	Platynator = function(nameplate)
+		for _, obj in ipairs({nameplate:GetChildren()}) do
+			if obj.SoftTargetIcon and obj.SoftTargetIcon.SetShown then
+				return obj.SoftTargetIcon;
+			end
+		end
+	end,
+};
+
 
 do  --Display
 	Display:Hide();
@@ -140,19 +159,17 @@ do  --Display
 			self.Subtext.Background = CreateTextBackground(self.SubtextContainer, self.Subtext, 28, 12);
 		end
 
-		local iconOffsetY = 16;
-
 		if not self.InteractIcon then
 			self.InteractIcon = self:CreateTexture(nil, "ARTWORK");
 			self.InteractIcon:SetSize(18, 18);
-			self.InteractIcon:SetPoint("CENTER", self, "TOP", 0, iconOffsetY);
+			self.InteractIcon:SetPoint("CENTER", self, "TOP", 0, Settings.iconOffsetY);
 			self.InteractIcon:Hide();
 		end
 
 		if not self.CastingIndicator then
 			local f = CreateFrame("Cooldown", nil, self, "PlumberGenericCooldownTemplate");
 			self.CastingIndicator = f;
-			f:SetPoint("CENTER", self, "TOP", 0, iconOffsetY);
+			f:SetPoint("CENTER", self, "TOP", 0, Settings.iconOffsetY);
 			local a = 24;
 			f:SetSize(a, a);
 			f.Background:SetSize(2*a, 2*a);
@@ -203,6 +220,24 @@ do  --Display
 			self:RegisterEvent("NAME_PLATE_UNIT_ADDED");
 		else
 			self:UnregisterEvent("NAME_PLATE_UNIT_ADDED");
+		end
+	end
+
+	function Display:CheckForAddons()
+		self.interactIconGetter = SoftInteractIconGetters.Blizzard;
+
+		for addonName, getterFunc in pairs(SoftInteractIconGetters) do
+			if C_AddOns.IsAddOnLoaded(addonName) then
+				self.interactIconGetter = getterFunc;
+			end
+		end
+
+		if self.interactIconGetter == SoftInteractIconGetters.Blizzard then
+			self.useDynamicPosition = false;
+			self.CastingIndicator:ClearAllPoints();
+			self.CastingIndicator:SetPoint("CENTER", self, "TOP", 0, Settings.iconOffsetY);
+		else
+			self.useDynamicPosition = true;
 		end
 	end
 
@@ -261,20 +296,28 @@ do  --Display
 		return self.inHouseArea and Settings.hideNameInHouse
 	end
 
-	function Display:ShowBlizzardInteractIcon(state)
+	function Display:ShowDefaultInteractIcon(state, adjustCastingIndicator)
 		local nameplate = GetNamePlateForUnit("softinteract");
 		if nameplate then
 			if self:ShouldHideIcon() then
 				state = false;
 			end
 
-			local icon = nameplate.UnitFrame.SoftTargetFrame.Icon;
+			local icon = self.interactIconGetter(nameplate);
+			if not icon then return; end
 
 			if state then
-				state = SetUnitCursorTexture(icon, "softinteract");
+				if icon:IsObjectType("Texture") then
+					state = SetUnitCursorTexture(icon, "softinteract");
+				end
 			end
 
 			icon:SetShown(state);
+
+			if self.useDynamicPosition and adjustCastingIndicator then
+				self.CastingIndicator:ClearAllPoints();
+				self.CastingIndicator:SetPoint("CENTER", icon, "CENTER", 0, 0);
+			end
 		end
 	end
 
@@ -293,16 +336,16 @@ do  --Display
 				f:SetAlpha(0);
 				f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
 				f:SetScript("OnCooldownDone", function()
-					self:ShowBlizzardInteractIcon(true);
+					self:ShowDefaultInteractIcon(true);
 				end);
 				f.SuccessGlow:Hide();
-				self:ShowBlizzardInteractIcon(false);
+				self:ShowDefaultInteractIcon(false, true);
 			end
 		else
 			f:SetScript("OnUpdate", nil);
 			f:Hide();
 			f.SuccessGlow:Hide();
-			self:ShowBlizzardInteractIcon(true);
+			self:ShowDefaultInteractIcon(true);
 		end
 	end
 
@@ -315,7 +358,7 @@ do  --Display
 			_, _, _, startTime, endTime = UnitChannelInfo("player");
 		end
 		if startTime and endTime and (endTime - startTime) > 0.1 then
-			self:ShowBlizzardInteractIcon(false);
+			self:ShowDefaultInteractIcon(false, true);
 			local duration = endTime - startTime;
 			local f = self.CastingIndicator;
 			f:SetCooldown(startTime / 1000.0, duration / 1000.0);
@@ -327,7 +370,7 @@ do  --Display
 			f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
 			f.SuccessGlow:Hide();
 		else
-			self:ShowBlizzardInteractIcon(true);
+			self:ShowDefaultInteractIcon(true);
 			self.CastingIndicator:Hide();
 		end
 	end
@@ -339,7 +382,7 @@ do  --Display
 				duo = UnitChannelDuration("player");
 			end
 			if duo then
-				self:ShowBlizzardInteractIcon(false);
+				self:ShowDefaultInteractIcon(false, true);
 				local f = self.CastingIndicator;
 				f:SetCooldownFromDurationObject(duo);
 				f:SetEdgeScale(self:GetEffectiveScale());
@@ -350,7 +393,7 @@ do  --Display
 				f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
 				f.SuccessGlow:Hide();
 			else
-				self:ShowBlizzardInteractIcon(true);
+				self:ShowDefaultInteractIcon(true);
 				self.CastingIndicator:Hide();
 			end
 		end
@@ -376,7 +419,7 @@ do  --Display
 		f.SuccessGlow:Show();
 		f.alpha = 1;
 		f:SetScript("OnUpdate", SuccessVisual_OnUpdate);
-		self:ShowBlizzardInteractIcon(true);
+		self:ShowDefaultInteractIcon(true);
 	end
 
 	function Display:OnUpdate(elapsed)
@@ -783,6 +826,7 @@ do  --Module Registery
 			EL:ListenEvents(true);
 			EL:ProcessSoftInteractNameplate();
 			Display:UpdateInHouseStatus();
+			Display:CheckForAddons();
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
 			EL:ListenEvents(false);
