@@ -231,6 +231,8 @@ local DefaultValues = {
 	PreyQuestSuperTrack = true,			--During the final stage, clicking the Prey widget also super track the target location.
 	TransmogRaestorePending = true,		--Restore unsaved transmog changes
 		TransmogRaestorePending_AlwaysMoveChanges = false,
+	PetHappiness = true,				--Forever Only: Click PetFrameHappiness to show food buttons
+
 
 	--Tooltip
 	TooltipChestKeys = true,            --Show keys that unlocked the current chest or door

@@ -946,6 +946,16 @@ L["ModuleDescription Housing_HouseList"] = "改进房屋列表界面：\n\n- 用
 L["View Houses In Combat Warning"] = "你无法在战斗中查看住宅。";
 
 
+--PetHappiness
+L["ModuleFrame PetFoodMenu"] = "猎人：宠物食物菜单";
+L["ModuleDescription PetFoodMenu"] = "点击宠物快乐度图标可显示背包中合适的食物，便于你喂食。";
+L["No Available Pet Food Warning"] = "背包中没有合适的食物。";
+L["Instruction Click To Show Food Menu"] = "<点击以显示食物菜单>";
+L["Instruction Click To Feed Food"] = "<点击将此食物喂给你的宠物>";
+L["No Learned Spell Format"] = "你还未学会|cffffffff%s|r。";
+L["Not Usable Spell Format"] = "你现在无法施放|cffffffff%s|r。";
+
+
 --Generic
 L["Total Colon"] = "总计：";
 L["Reposition Button Horizontal"] = "水平方向移动";   --Move the window horizontally
