@@ -362,7 +362,7 @@ do  -- Blizzard Frame Modification
 	function Mod.FlagTransmogFrameOpenedByPlumber()
 		if not Mod.openedByPlumber then
 			Mod.openedByPlumber = true;
-			C_Timer.After(0.2, function()
+			C_Timer.After(1.0, function()
 				Mod.openedByPlumber = false;
 			end);
 		end
