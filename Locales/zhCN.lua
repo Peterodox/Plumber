@@ -954,6 +954,7 @@ L["Instruction Click To Show Food Menu"] = "<点击以显示食物菜单>";
 L["Instruction Click To Feed Food"] = "<点击将此食物喂给你的宠物>";
 L["No Learned Spell Format"] = "你还未学会|cffffffff%s|r。";
 L["Not Usable Spell Format"] = "你现在无法施放|cffffffff%s|r。";
+L["Blizzard PetFrameHappiness Not Found Error"] = "暴雪原生的宠物快乐度图标当前不可见。";
 
 
 --Generic

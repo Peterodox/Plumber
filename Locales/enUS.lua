@@ -986,6 +986,7 @@ L["Instruction Click To Toggle Food Menu"] = "<Click to Toggle Food Menu>";
 L["Instruction Click To Feed Food"] = "<Click to feed this food to your pet>";
 L["Not Learned Spell Format"] = "You have not learned |cffffffff%s|r yet.";
 L["Not Usable Spell Format"] = "You cannot cast |cffffffff%s|r right now.";
+L["Blizzard PetFrameHappiness Not Found Error"] = "Blizzard\'s Pet Happiness Indicator is currently hidden.";
 
 
 --Generic

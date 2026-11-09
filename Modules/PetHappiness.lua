@@ -373,10 +373,24 @@ do
 		end
 	end
 
+	local function GetExtraDescription()
+		if not (PetFrameHappiness and PetFrameHappiness:IsVisible()) then
+			local happiness = C_PetInfo.GetPetHappiness();
+			local warningText;
+			if not happiness then
+				warningText = SPELL_FAILED_NO_PET;
+			else
+				warningText = L["Blizzard PetFrameHappiness Not Found Error"];
+			end
+			return "|cffd4641c"..warningText.."|r";
+		end
+	end
+
 	local moduleData = {
 		name = L["ModuleFrame PetFoodMenu"],
 		dbKey = "PetFoodMenu",
 		description = L["ModuleDescription PetFoodMenu"],
+		descriptionFunc = GetExtraDescription,
 		toggleFunc = EnableModule,
 		moduleAddedTime = 0,
 		categoryKeys = {"Inventory"},
