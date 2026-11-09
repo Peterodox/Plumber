@@ -978,6 +978,17 @@ L["ModuleDescription Housing_HouseList"] = "Improve the House List UI:\n\n- Indi
 L["View Houses In Combat Warning"] = "You cannot view houses while in combat.";
 
 
+--PetHappiness
+L["ModuleFrame PetFoodMenu"] = "Hunter: Pet Food Menu";
+L["ModuleDescription PetFoodMenu"] = "Click the Pet Happiness indicator to show a list of suitable food, allowing you to easily feed your pet.";
+L["No Available Pet Food Warning"] = "No pet food available in your bag.";
+L["Instruction Click To Toggle Food Menu"] = "<Click to Toggle Food Menu>";
+L["Instruction Click To Feed Food"] = "<Click to feed this food to your pet>";
+L["Not Learned Spell Format"] = "You have not learned |cffffffff%s|r yet.";
+L["Not Usable Spell Format"] = "You cannot cast |cffffffff%s|r right now.";
+L["Blizzard PetFrameHappiness Not Found Error"] = "Blizzard\'s Pet Happiness Indicator is currently hidden.";
+
+
 --Generic
 L["Total Colon"] = FROM_TOTAL or "Total:";
 L["Reposition Button Horizontal"] = "Move Horizontally";   --Move the window horizontally

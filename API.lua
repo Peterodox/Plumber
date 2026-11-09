@@ -1598,49 +1598,6 @@ do  -- Pixel
 	end
 end
 
-do  -- Easing
-	local EasingFunctions = {};
-	addon.EasingFunctions = EasingFunctions;
-
-
-	local sin = math.sin;
-	local cos = math.cos;
-	local pow = math.pow;
-	local pi = math.pi;
-
-	--t: total time elapsed
-	--b: beginning position
-	--e: ending position
-	--d: animation duration
-
-	function EasingFunctions.linear(t, b, e, d)
-		return (e - b) * t / d + b
-	end
-
-	function EasingFunctions.outSine(t, b, e, d)
-		return (e - b) * sin(t / d * (pi / 2)) + b
-	end
-
-	function EasingFunctions.inOutSine(t, b, e, d)
-		return -(e - b) / 2 * (cos(pi * t / d) - 1) + b
-	end
-
-	function EasingFunctions.outQuart(t, b, e, d)
-		t = t / d - 1;
-		return (b - e) * (pow(t, 4) - 1) + b
-	end
-
-	function EasingFunctions.outQuint(t, b, e, d)
-		t = t / d
-		return (b - e)* (pow(1 - t, 5) - 1) + b
-	end
-
-	function EasingFunctions.inQuad(t, b, e, d)
-		t = t / d
-		return (e - b) * pow(t, 2) + b
-	end
-end
-
 do  -- Currency
 	local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo;
 	local GetCurrencyContainerInfo = C_CurrencyInfo.GetCurrencyContainerInfo or Nop;
@@ -2628,6 +2585,11 @@ do  -- Player
 
 	function API.IsGreatVaultFeatureAvailable()
 		return IsPlayerAtMaxLevel() and C_WeeklyRewards ~= nil;
+	end
+
+	function API.IsPlayerClass(classFilename)
+		local _, name = UnitClass("player");
+		return name == classFilename;
 	end
 end
 
@@ -3860,6 +3822,44 @@ do  -- Container Item Processor
 		end
 	end
 	API.GetItemBagPosition = GetItemBagPosition;
+
+	---@param predicate function predicate(itemID) return boolean
+	---@param maxMatches number? Stop once finding enough items
+	---@return table? itemIDs A list of itemID. Sorted.
+	function API.GetBagItemIDsByPredicate(predicate, maxMatches)
+		local items = {};
+		local numMatches = 0;
+		local itemID;
+		local continue = true;
+		for bagID = 0, 4 do
+			for slotID = 1, GetContainerNumSlots(bagID) do
+				itemID = GetContainerItemID(bagID, slotID);
+				if itemID and predicate(itemID) then
+					if not items[itemID] then
+						items[itemID] = true;
+						numMatches = numMatches + 1;
+						if maxMatches and numMatches >= maxMatches then
+							continue = false;
+							break;
+						end
+					end
+				end
+			end
+			if not continue then
+				break;
+			end
+		end
+		if numMatches > 0 then
+			local list = {};
+			local n = 0;
+			for id in pairs(items) do
+				n = n + 1;
+				list[n] = id;
+			end
+			table.sort(list);
+			return list;
+		end
+	end
 
 	local Processor = CreateFrame("Frame");
 	local ITEM_OPENABLE = ITEM_OPENABLE or "<Right Click to Open>";

@@ -133,8 +133,8 @@ do --SpellFlyout Main
 		self.Init = nil;
 
 		--Create Background. TO-DO convert into a template?
-		--This texture has a large shadow
-		local bg = addon.CreateNineSliceFrame(self, "NineSlice_GenericBox_Black_Shadowed");
+		local layoutName = addon.IS_FOREVER and "Forever_NineSlice_GenericBox_Black_Shadowed" or "NineSlice_GenericBox_Black_Shadowed";
+		local bg = addon.CreateNineSliceFrame(self, layoutName);
 		local buttonScale = ACTION_BUTTON_SIZE / 45;
 		bg:SetUsingParentLevel(true);
 		bg:CoverParent(16 * buttonScale);
@@ -177,7 +177,7 @@ do --SpellFlyout Main
 		SetupClampedFrame(self);
 	end
 
-	function SpellFlyout:ShowActions(actions)
+	function SpellFlyout:ShowActions(actions, noActionText)
 		self.actions = actions;
 		self.SpellButtons = {};
 		self.ItemButtons = {};
@@ -240,7 +240,7 @@ do --SpellFlyout Main
 
 			self:SetSize(h * (buttonSize + gap) + gap, (v + 1) * (buttonSize + gap) + gap);
 		else
-			self.Note:SetText(L["PlumberMacro Error NoAction"]);
+			self.Note:SetText(noActionText or L["PlumberMacro Error NoAction"]);
 			self.Note:Show();
 			h = 4;
 			v = 0;
@@ -281,7 +281,6 @@ do  --VisualButtonMixin
 		local file = "Interface/AddOns/Plumber/Art/Frame/SpellFlyout";
 
 		self.NormalTexture:SetTexture(file);
-		self.NormalTexture:SetTexCoord(0/512, 96/512, 48/512, 144/512);
 		self.PushedTexture:SetTexture(file);
 		self.PushedTexture:SetTexCoord(96/512, 192/512, 48/512, 144/512);
 		self.HighlightTexture:SetTexture(file);
@@ -291,6 +290,12 @@ do  --VisualButtonMixin
 
 		self.NormalTexture:SetDrawLayer("OVERLAY");
 		self.PushedTexture:SetDrawLayer("OVERLAY");
+
+		if addon.IS_FOREVER then
+			self.NormalTexture:SetTexCoord(288/512, 384/512, 48/512, 144/512);
+		else
+			self.NormalTexture:SetTexCoord(0/512, 96/512, 48/512, 144/512);
+		end
 
 		self:SetScript("OnEnter", self.OnEnter);
 		self:SetScript("OnLeave", self.OnLeave);
@@ -658,8 +663,8 @@ do  --SecureControllerPool
 		if show then
 			frame:SetID(handlerID);
 			local UIParent = self:GetFrameRef("UIParent");
-			local uiWidth = UIParent:GetWidth();
-			local uiHeight = UIParent:GetHeight();
+			local uiWidth = self:GetWidth();
+			local uiHeight = self:GetHeight();
 			local xRatio, yRatio = self:GetMousePosition();
 			if xRatio and yRatio then
 				local numActions = self:GetAttribute("numActions");
@@ -737,7 +742,7 @@ do  --SecureControllerPool
 					h = 4;
 				end
 
-				ActionButtonContainer:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 24.0, y + 26.0);
+				ActionButtonContainer:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", x - 24.0, y + 26.0);
 				ActionButtonContainer:SetWidth(h * (buttonSize + gap) + gap);
 				ActionButtonContainer:SetHeight((v + 1) * (buttonSize + gap) + gap);
 				--ActionButtonContainer:RegisterAutoHide(2);
@@ -756,14 +761,14 @@ do  --SecureControllerPool
 	end
 	SecureControllerPool:UpdateLayout()
 
-	function SecureControllerPool:AddActions(actions)
+	function SecureControllerPool:AddActions(actions, handler, noActionText)
 		local numActions = actions and #actions or 0;
 
 		if numActions == 0 and self.emptyActionHandlerName then
 			return self.emptyActionHandlerName;
 		end
 
-		local handler = self:AcquireClickHandler();
+		handler = handler or self:AcquireClickHandler();
 		local handlerName = handler:GetName();
 
 		if numActions == 0 then
@@ -804,7 +809,7 @@ do  --SecureControllerPool
 
 		handler:SetScript("PreClick", function()
 			if not(SpellFlyout:IsShown() and SpellFlyout.actions == actions) then
-				SpellFlyout:ShowActions(actions);
+				SpellFlyout:ShowActions(actions, noActionText);
 			end
 			if not InCombatLockdown() then
 				ActionButtonPool:UpdateClicks();
@@ -831,6 +836,17 @@ do  --SecureControllerPool
 			self.clickToCloseMacro = "/click "..handler:GetName();
 		end
 		return self.clickToCloseMacro
+	end
+
+	function SecureControllerPool:CreateClickHandler(id)
+		local name = VIRTUAL_BUTTON_NAME..id;
+		local handler = CreateFrame("Button", name, UIParent, "SecureHandlerClickTemplate");
+		handler:Hide();
+		handler:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0);
+		handler:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0);
+		self:SetupHandler(handler);
+		handler:SetID(id);
+		return handler
 	end
 
 
@@ -864,6 +880,25 @@ do  --SecureControllerPool
 				SecureRootContainer:Hide();
 			end
 		end
+	end
+
+	local CustomHandlers = {};
+	CustomHandlers.total = 0;
+	CustomHandlers.fromID = 1000;
+
+	function SpellFlyout:CreateCustomActionHandler(handlerName, actions, noActionText)
+		if not CustomHandlers[handlerName] then
+			if InCombatLockdown() then return; end
+			local actualName = string.format("PlumberSecure%sHandler", handlerName);
+			local handler = CreateFrame("Button", actualName, UIParent, "SecureHandlerClickTemplate");
+			CustomHandlers[handlerName] = handler;
+			handler:Hide();
+			SecureControllerPool:SetupHandler(handler);
+			CustomHandlers.total = CustomHandlers.total + 1;
+			handler:SetID(CustomHandlers.total + CustomHandlers.fromID);
+		end
+		SecureControllerPool:AddActions(actions, CustomHandlers[handlerName], noActionText);
+		return CustomHandlers[handlerName];
 	end
 end
 

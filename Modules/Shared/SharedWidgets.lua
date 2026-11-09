@@ -51,6 +51,8 @@ do  -- Slice Frame
 		NineSlice_GenericBox_Black = true,
 		NineSlice_GenericBox_Black_Shadowed = true, --CustomSpellFlyout
 		NineSlice_DarkBrownBox = true,
+
+		Forever_NineSlice_GenericBox_Black_Shadowed = true,
 	};
 
 	local ThreeSliceLayouts = {

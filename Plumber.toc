@@ -38,6 +38,7 @@ Modules\ControlCenter\ControlCenter.xml
 
 Modules\LootUI\LootUI.xml
 Modules\SpellFlyout_Secure.lua
+Modules\SpellFlyout_Insecure.lua
 Modules\Macros.lua
 Modules\StaticPopup_Basic.lua
 
@@ -50,7 +51,6 @@ Modules\BackpackItemTracker.lua [AllowLoadGameType standard, camelot]
 Modules\AutoJoinEvents.lua [AllowLoadGameType standard]
 Modules\PlayerChoiceFrameToken.lua [AllowLoadGameType standard]
 Modules\QuickSlot.xml [AllowLoadGameType standard, camelot]
-#Modules\SpellFlyout.lua [AllowLoadGameType standard]
 Modules\QuestAreaTrigger.lua [AllowLoadGameType standard]
 Modules\Dreamseed.lua [AllowLoadGameType standard]
 #Modules\EventMap.lua [AllowLoadGameType standard]
@@ -92,6 +92,7 @@ Modules\CatalystUI.lua [AllowLoadGameType standard]
 Modules\HuntTable.lua [AllowLoadGameType standard]
 Modules\PreyQuestSuperTrack.lua [AllowLoadGameType standard]
 Modules\TransmogRestorePending.lua [AllowLoadGameType standard, mists, camelot]
+Modules\PetHappiness.lua [AllowLoadGameType camelot]
 
 #Modules\MerchantUI\MerchantUI.xml [AllowLoadGameType standard]
 
