@@ -178,6 +178,11 @@ function HappinessButton:SetupFeedingAnimation(flyoutButton)
 
 	if not canaccessallvalues(fromX, fromY, toX, toY) then return; end
 
+	local buttonScale = flyoutButton:GetEffectiveScale();
+	local selfScale = self:GetEffectiveScale();
+	fromX = fromX * buttonScale / selfScale;
+	fromY = fromY * buttonScale / selfScale;
+
 	local offsetX = Def.BuffIconOffsetX;
 	fromX = fromX - offsetX;
 	local x0, y0 = fromX - toX, fromY - toY;
@@ -217,7 +222,7 @@ function HappinessButton:SetupFeedingAnimation(flyoutButton)
 	object:SetRelativePosition(x0, y0);
 
 	local distance = x0^2 + y0^2;
-	object.duration = addon.API.Clamp(math.sqrt(distance)/120, 0.2, 0.6);
+	object.duration = addon.API.Clamp(math.sqrt(distance)/120, 0.4, 0.6);
 	object.fromX = x0;
 	object.toX = 0;
 	object.fromY = y0;
