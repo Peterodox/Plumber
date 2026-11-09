@@ -21,6 +21,7 @@ addon.InsecureSpellFlyout = SpellFlyout;
 
 local BUTTON_SIZE = 45;
 local BUTTON_GAP = 2;
+local MAX_BUTTON_PER_ROW = 4;
 
 
 local function SetupClampedFrame(frame)
@@ -44,6 +45,7 @@ do --SpellFlyout Main
 		self:Hide();
 		self:ClearAllPoints();
 		self:ReleaseButtons();
+		self:SetFlyoutButtonPostClickCallback(nil);
 	end
 
 	function SpellFlyout:SetArrowDirection(direction)
@@ -240,17 +242,25 @@ do --SpellFlyout Main
 		if actions and #actions > 0 then
 			local buttonSize = BUTTON_SIZE;
 			local gap = BUTTON_GAP;
+			local buttonsPerRow = MAX_BUTTON_PER_ROW;
 			local h, v = 0, 1;
 			local button;
 			local level = baseFrameLevel + 5;
 			local anySpell, anyItem;
+			local padding = gap;
 
 			for _, action in ipairs(actions) do
+				h = h + 1;
+				if h > buttonsPerRow then
+					h = 1;
+					v = v + 1;
+				end
+
 				button = self.buttonPool:Acquire();
 				button:SetAction(action);
-				button:SetPoint("LEFT", self, "LEFT", gap + h * (buttonSize + gap), 0);
+				button:SetPoint("TOPLEFT", self, "TOPLEFT", padding + (h - 1) * (buttonSize + gap), -padding + (1 - v) * (buttonSize + gap));
 				button:SetFrameLevel(level);
-				h = h + 1;
+
 				if action.actionType == "spell" then
 					anySpell = true;
 					tinsert(self.SpellButtons, button);
@@ -260,7 +270,8 @@ do --SpellFlyout Main
 				end
 			end
 
-			self:SetSize(h * (buttonSize + gap) + gap, v * (buttonSize + gap) + gap);
+			local numCols = v > 1 and buttonsPerRow or h;
+			self:SetSize(numCols * (buttonSize + gap) + padding, v * (buttonSize + gap) + padding);
 
 			if InCombatLockdown() then
 				self:DisplayNote(L["PlumberMacro Error Combat"], false);
