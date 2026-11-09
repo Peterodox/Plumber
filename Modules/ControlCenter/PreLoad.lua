@@ -10,6 +10,7 @@ ControlCenter.modules = {};
 ControlCenter.newDBKeys = {};
 ControlCenter.dbKeyXModule = {};
 ControlCenter.changelogs = {};
+ControlCenter.changelogs_Forever = {};
 
 
 local CategoryDefinition = {

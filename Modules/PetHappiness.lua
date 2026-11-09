@@ -387,12 +387,12 @@ do
 	end
 
 	local moduleData = {
-		name = L["ModuleFrame PetFoodMenu"],
+		name = L["ModuleName PetFoodMenu"],
 		dbKey = "PetFoodMenu",
 		description = L["ModuleDescription PetFoodMenu"],
 		descriptionFunc = GetExtraDescription,
 		toggleFunc = EnableModule,
-		moduleAddedTime = 0,
+		moduleAddedTime = 1794200000,
 		categoryKeys = {"Inventory"},
 	};
 

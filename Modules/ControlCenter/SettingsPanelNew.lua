@@ -1617,10 +1617,23 @@ do  --ChangelogTab
 		MainFrame:ShowLatestChangelog();
 	end
 
+	local function GetChangelogs(versionID)
+		local changelogs;
+		if addon.IS_FOREVER then
+			changelogs = ControlCenter.changelogs_Forever;
+		else
+			changelogs = ControlCenter.changelogs;
+		end
+		if versionID then
+			return changelogs and changelogs[versionID];
+		else
+			return changelogs or {};
+		end
+	end
 
 	function MainFrame:ShowChangelog(versionID)
 		--Format Changelog
-		local changelog = ControlCenter.changelogs[versionID];
+		local changelog = GetChangelogs(versionID);
 		if not changelog then return end;
 
 		Formatter:LoadUserFont();
@@ -1943,7 +1956,7 @@ do  --ChangelogTab
 		if not self.changelogList then
 			local tbl = {};
 			local n = 0;
-			for versionID, changelog in pairs(ControlCenter.changelogs) do
+			for versionID, changelog in pairs(GetChangelogs()) do
 				n = n + 1;
 				tbl[n] = {
 					versionID = versionID,

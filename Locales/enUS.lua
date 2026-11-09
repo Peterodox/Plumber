@@ -979,7 +979,7 @@ L["View Houses In Combat Warning"] = "You cannot view houses while in combat.";
 
 
 --PetHappiness
-L["ModuleFrame PetFoodMenu"] = "Hunter: Pet Food Menu";
+L["ModuleName PetFoodMenu"] = "Hunter: Pet Food Menu";
 L["ModuleDescription PetFoodMenu"] = "Click the Pet Happiness indicator to show a list of suitable food, allowing you to easily feed your pet.";
 L["No Available Pet Food Warning"] = "No pet food available in your bag.";
 L["Instruction Click To Toggle Food Menu"] = "<Click to Toggle Food Menu>";
