@@ -1,4 +1,4 @@
-local VERSION_TEXT = "1.9.7 c";
+local VERSION_TEXT = "1.9.7 d";
 local VERSION_DATE = 1794200000;
 
 -- If "AutoShowChangelog" is enabled: The following dates determine if the changelog should auto open
