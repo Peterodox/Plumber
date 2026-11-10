@@ -621,7 +621,7 @@ function ItemFrameMixin:OnFocused()
 end
 
 function ItemFrameMixin:OnMouseDown(button)
-	if button == "LeftButton" and self.lootFrame.ButtonHighlight:IsShown() then
+	if button == (addon.GetDBValue("LootUI_TakeButton") or "LeftButton") and self.lootFrame.ButtonHighlight:IsShown() then
 		self.lootFrame.ButtonHighlight:ShowMouseDownFeedback();
 	end
 end
@@ -631,7 +631,7 @@ function ItemFrameMixin:OnMouseUp(button)
 end
 
 function ItemFrameMixin:OnClick(button)
-	if button == "LeftButton" or button == "EmulateLeftButton" then
+	if button == (addon.GetDBValue("LootUI_TakeButton") or "LeftButton") or button == "EmulateLeftButton" then
 		if IsModifiedClick("DRESSUP") and not InCombatLockdown() then
 			local itemID = self.data.slotType == Def.SLOT_TYPE_ITEM and self.data.id;
 			if itemID then
@@ -725,6 +725,7 @@ function LootUI.Templates.CreateItemFrame(parent)
 	f:SetScript("OnLeave", f.OnLeave);
 	f:SetScript("OnMouseDown", f.OnMouseDown);
 	f:SetScript("OnMouseUp", f.OnMouseUp);
+	f:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 	f:SetScript("OnClick", f.OnClick);
 
 	f.scriptEnabled = true;
