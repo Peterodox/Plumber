@@ -22,6 +22,7 @@ local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local UnitCastingDuration = UnitCastingDuration;
 local UnitChannelDuration = UnitChannelDuration;
+local UnitGUID = UnitGUID;
 local Secret_CanAccess = API.Secret_CanAccess;
 
 
@@ -252,16 +253,51 @@ do  --Display
 		self:ListenSpellCastEvents(false);
 	end
 
+	--Remember which soft target the cast started on, so the radial isn't moved to another object mid-cast
+	local function GetCastKey()
+		local startTime = select(4, UnitCastingInfo("player"));
+		if not Secret_CanAccess(startTime) then
+			startTime = select(4, UnitChannelInfo("player"));
+		end
+		if Secret_CanAccess(startTime) then
+			return startTime
+		end
+	end
+
+	function Display:RecordCastTarget()
+		local key = GetCastKey();
+		if key and key ~= self.castKey then
+			self.castKey = key;
+			self.castTargetGUID = UnitGUID("softinteract");
+			self.castMismatch = false;
+		end
+		return key
+	end
+
+	function Display:IsCastOnCurrentTarget()
+		if not self:RecordCastTarget() then
+			self.castMismatch = false;
+			return true
+		end
+		local guid = UnitGUID("softinteract");
+		if not (Secret_CanAccess(guid) and Secret_CanAccess(self.castTargetGUID)) then
+			return true
+		end
+		self.castMismatch = guid ~= self.castTargetGUID;
+		return not self.castMismatch
+	end
+
 	function Display:OnEvent(event, ...)
 		if event == "UNIT_SPELLCAST_SUCCEEDED" then
 			local unitTarget, castGUID, spellID = ...
 			self.succeededSpellID = spellID;
 		elseif event == "UNIT_SPELLCAST_STOP" then
-			if self.succeededSpellID == self.currentSpellID then
+			if self.succeededSpellID == self.currentSpellID and not self.castMismatch then
 				self:ShowCastSuccessVisual();
 			else
 				self:UpdateCastingIndicator();
 			end
+			self.castMismatch = false;
 			self.succeededSpellID = nil;
 			self.currentSpellID = nil;
 		elseif event == "UNIT_SPELLCAST_START" or  event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
@@ -357,7 +393,7 @@ do  --Display
 		if not startTime then
 			_, _, _, startTime, endTime = UnitChannelInfo("player");
 		end
-		if startTime and endTime and (endTime - startTime) > 0.1 then
+		if startTime and endTime and (endTime - startTime) > 0.1 and self:IsCastOnCurrentTarget() then
 			self:ShowDefaultInteractIcon(false, true);
 			local duration = endTime - startTime;
 			local f = self.CastingIndicator;
@@ -381,7 +417,7 @@ do  --Display
 			if not duo then
 				duo = UnitChannelDuration("player");
 			end
-			if duo then
+			if duo and self:IsCastOnCurrentTarget() then
 				self:ShowDefaultInteractIcon(false, true);
 				local f = self.CastingIndicator;
 				f:SetCooldownFromDurationObject(duo);
@@ -699,6 +735,9 @@ do  --EL
 				Display:Hide();
 				self.softTargetUnit = nil;
 			end
+		elseif event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" then
+			--Display only listens while shown; record casts that start with no soft target too
+			Display:RecordCastTarget();
 		elseif event == "HOUSE_PLOT_ENTERED" then
 			Display:UpdateInHouseStatus(true);
 		elseif event == "HOUSE_PLOT_EXITED" then
@@ -719,9 +758,13 @@ do  --EL
 		if state then
 			self:SetScript("OnEvent", EL.OnEvent);
 			API.RegisterFrameForEvents(self, self.events);
+			self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
+			self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
 		else
 			self:SetScript("OnEvent", nil);
 			API.UnregisterFrameForEvents(self, self.events);
+			self:UnregisterEvent("UNIT_SPELLCAST_START");
+			self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
 		end
 	end
 end
