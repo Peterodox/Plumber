@@ -269,6 +269,7 @@ do  --Display
 		if key and key ~= self.castKey then
 			self.castKey = key;
 			self.castTargetGUID = UnitGUID("softinteract");
+			self.castSoftTargetChanges = self.softTargetChanges or 0;
 			self.castMismatch = false;
 		end
 		return key
@@ -280,10 +281,12 @@ do  --Display
 			return true
 		end
 		local guid = UnitGUID("softinteract");
-		if not (Secret_CanAccess(guid) and Secret_CanAccess(self.castTargetGUID)) then
-			return true
+		if Secret_CanAccess(guid) and Secret_CanAccess(self.castTargetGUID) then
+			self.castMismatch = guid ~= self.castTargetGUID;
+		else
+			--GUIDs are secret (e.g. in instances): hide once the soft target has changed since the cast started
+			self.castMismatch = (self.softTargetChanges or 0) ~= self.castSoftTargetChanges;
 		end
-		self.castMismatch = guid ~= self.castTargetGUID;
 		return not self.castMismatch
 	end
 
@@ -728,6 +731,7 @@ do  --EL
 
 	function EL:OnEvent(event, ...)
 		if event == "PLAYER_SOFT_INTERACT_CHANGED" then
+			Display.softTargetChanges = (Display.softTargetChanges or 0) + 1;
 			local oldTarget, newTarget = ...
 			if newTarget then
 				self:RequestUpdate();
