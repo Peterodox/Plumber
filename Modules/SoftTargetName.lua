@@ -293,7 +293,9 @@ do  --Display
 	function Display:OnEvent(event, ...)
 		if event == "UNIT_SPELLCAST_SUCCEEDED" then
 			local unitTarget, castGUID, spellID = ...
-			self.succeededSpellID = spellID;
+			if Secret_CanAccess(spellID) then
+				self.succeededSpellID = spellID;
+			end
 		elseif event == "UNIT_SPELLCAST_STOP" then
 			if self.succeededSpellID == self.currentSpellID and not self.castMismatch then
 				self:ShowCastSuccessVisual();
@@ -352,11 +354,16 @@ do  --Display
 			end
 
 			icon:SetShown(state);
+			if state then
+				icon:SetAlpha(1);   --In case the success visual's fade-in was cut short
+			end
 
 			if self.useDynamicPosition and adjustCastingIndicator then
 				self.CastingIndicator:ClearAllPoints();
 				self.CastingIndicator:SetPoint("CENTER", icon, "CENTER", 0, 0);
 			end
+
+			return state and icon
 		end
 	end
 
@@ -416,6 +423,9 @@ do  --Display
 
 	if Settings.IS_MODERN then
 		function Display:UpdateCastingIndicator()
+			--Needed by UNIT_SPELLCAST_STOP to tell a completed cast (success glow) from an interrupted one
+			local spellID = select(9, UnitCastingInfo("player")) or select(8, UnitChannelInfo("player"));
+			self.currentSpellID = Secret_CanAccess(spellID) and spellID or nil;
 			local duo = UnitCastingDuration("player");
 			if not duo then
 				duo = UnitChannelDuration("player");
@@ -446,6 +456,13 @@ do  --Display
 			self:Hide();
 		end
 		self:SetAlpha(self.alpha);
+		if self.fadingIcon then
+			--Interact icon fades in as the ring fades out
+			self.fadingIcon:SetAlpha(1 - self.alpha);
+			if self.alpha == 0 then
+				self.fadingIcon = nil;
+			end
+		end
 	end
 
 	function Display:ShowCastSuccessVisual()
@@ -458,7 +475,10 @@ do  --Display
 		f.SuccessGlow:Show();
 		f.alpha = 1;
 		f:SetScript("OnUpdate", SuccessVisual_OnUpdate);
-		self:ShowDefaultInteractIcon(true);
+		f.fadingIcon = self:ShowDefaultInteractIcon(true);
+		if f.fadingIcon then
+			f.fadingIcon:SetAlpha(0);
+		end
 	end
 
 	function Display:OnUpdate(elapsed)
