@@ -24,6 +24,7 @@ local UnitCastingDuration = UnitCastingDuration;
 local UnitChannelDuration = UnitChannelDuration;
 local UnitGUID = UnitGUID;
 local Secret_CanAccess = API.Secret_CanAccess;
+local Secret_IsSecret = API.Secret_IsSecret;
 
 
 local Display = CreateFrame("Frame");
@@ -271,6 +272,15 @@ do  --Display
 			self.castTargetGUID = UnitGUID("softinteract");
 			self.castSoftTargetChanges = self.softTargetChanges or 0;
 			self.castMismatch = false;
+			--UNIT_SPELLCAST_SENT's target is the object's name for interactions, nil/empty for Hearthstone etc.,
+			--and the player's name for self casts. Unknown (secret or no SENT): assume it's an interaction.
+			local name = UnitName("softinteract");
+			if self.sentTargetKnown and Secret_CanAccess(name) then
+				self.castIsObject = self.sentTarget == name;
+			else
+				self.castIsObject = true;
+			end
+			self.sentTargetKnown = false;
 		end
 		return key
 	end
@@ -279,6 +289,11 @@ do  --Display
 		if not self:RecordCastTarget() then
 			self.castMismatch = false;
 			return true
+		end
+		if not self.castIsObject then
+			--Not cast on an object (Hearthstone, self casts, etc.): no radial
+			self.castMismatch = true;
+			return false
 		end
 		local guid = UnitGUID("softinteract");
 		if Secret_CanAccess(guid) and Secret_CanAccess(self.castTargetGUID) then
@@ -759,6 +774,10 @@ do  --EL
 				Display:Hide();
 				self.softTargetUnit = nil;
 			end
+		elseif event == "UNIT_SPELLCAST_SENT" then
+			local _, target = ...
+			Display.sentTargetKnown = not Secret_IsSecret(target);
+			Display.sentTarget = Display.sentTargetKnown and target or nil;
 		elseif event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" then
 			--Display only listens while shown; record casts that start with no soft target too
 			Display:RecordCastTarget();
@@ -782,11 +801,13 @@ do  --EL
 		if state then
 			self:SetScript("OnEvent", EL.OnEvent);
 			API.RegisterFrameForEvents(self, self.events);
+			self:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player");
 			self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
 			self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
 		else
 			self:SetScript("OnEvent", nil);
 			API.UnregisterFrameForEvents(self, self.events);
+			self:UnregisterEvent("UNIT_SPELLCAST_SENT");
 			self:UnregisterEvent("UNIT_SPELLCAST_START");
 			self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
 		end
