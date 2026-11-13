@@ -669,10 +669,12 @@ L["Drawer Option Hide Unusable Tooltip"] = "Oculta itens não possuídos e feiti
 L["Drawer Option Hide Unusable Tooltip 2"] = "Itens consumíveis, como poções, sempre serão mostrados.";
 L["Drawer Option Update Frequently"] = "Atualizar frequentemente";
 L["Drawer Option Update Frequently Tooltip"] = "Tenta atualizar os estados dos botões sempre que houver uma mudança em suas bolsas ou livros de feitiços. Ativar esta opção pode aumentar ligeiramente o uso de recursos.";
+L["Drawer Error Attempt Adding Plumber Macro"] = "Não é possível adicionar uma macro do Plumber à gaveta.";
 L["ModuleName DrawerMacro"] = "Macro de gaveta";
 L["ModuleDescription DrawerMacro"] = "Cria um menu flutuante personalizado para administrar seus itens, feitiços, mascotes, montarias, brinquedos.\n\nPara fazer uma macro de gaveta, primeiro crie uma macro, então digite |cffd7c0a3#plumber:drawer|r na caixa de texto.";
 L["No Slot For New Character Macro Alert"] = "Você precisa ter um slot de macro específico de personagem disponível para completar esta ação.";
 L["Unknown Pet"] = "Mascote desconhecido";
+L["Unknown Macro"] = "Macro desconhecida";
 
 
 --New Expansion Landing Page
@@ -974,6 +976,17 @@ L["ModuleDescription BlizzFixActionBarArt"] = "Corrigido um problema em que a ar
 L["ModuleName Housing_HouseList"] = "Lista de Moradias";
 L["ModuleDescription Housing_HouseList"] = "Melhoria na interface da Lista de Moradias:\n\n- Exibe a facção da casa com um ícone à direita.\n\n- Exibe ambos os botões Visitar Casa caso o jogador possua duas casas.";
 L["View Houses In Combat Warning"] = "Você não pode visualizar casas em combate.";
+
+
+--PetHappiness
+L["ModuleName PetFoodMenu"] = "Caçador: Menu de petiscos";
+L["ModuleDescription PetFoodMenu"] = "Clique no indicador de felicidade do ajudante para mostrar uma lista de alimentos adequados, permitindo que você o alimente facilmente.";
+L["No Available Pet Food Warning"] = "Nenhum petisco disponível em suas bolsas.";
+L["Instruction Click To Toggle Food Menu"] = "<Clique para exibir o menu de petiscos>";
+L["Instruction Click To Feed Food"] = "<Clique para alimentar este petisco ao seu ajudante>";
+L["Not Learned Spell Format"] = "Você não aprendeu |cffffffff%s|r ainda.";
+L["Not Usable Spell Format"] = "Você não pode lançar |cffffffff%s|r agora.";
+L["Blizzard PetFrameHappiness Not Found Error"] = "O indicador de felicidade do ajudante da Blizzard está oculto.";
 
 
 --Generic
