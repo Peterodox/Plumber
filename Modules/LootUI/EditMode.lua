@@ -259,6 +259,57 @@ end
 
 
 
+local TakeButtonOptions = {
+	{value = "LeftButton", label = L["LootUI Option Take Button Left"]},
+	{value = "RightButton", label = L["LootUI Option Take Button Right"]},
+};
+
+local MenuData_TakeButton = {};
+do
+	MenuData_TakeButton.GetSelectedText = function()
+		local value = addon.GetDBValue("LootUI_TakeButton") or "LeftButton";
+		for _, v in ipairs(TakeButtonOptions) do
+			if v.value == value then
+				return v.label;
+			end
+		end
+	end
+
+	MenuData_TakeButton.tooltip = L["LootUI Option Take Button Tooltip"];
+
+	MenuData_TakeButton.OnClick = function(self, button)
+		addon.UpdateSettingsDialog();
+	end
+
+	MenuData_TakeButton.MenuInfoGetter = function()
+		local tbl = {
+			key = "LootUITakeButton",
+			blizzardTheme = true,
+		};
+
+		local widgets = {};
+		tbl.widgets = widgets;
+
+		local value = addon.GetDBValue("LootUI_TakeButton") or "LeftButton";
+
+		for _, v in ipairs(TakeButtonOptions) do
+			table.insert(widgets, {
+				type = "Radio",
+				text = v.label,
+				closeAfterClick = true,
+				onClickFunc = function()
+					addon.SetDBValue("LootUI_TakeButton", v.value);
+					MenuData_TakeButton.OnClick();
+				end,
+				selected = v.value == value,
+			});
+		end
+
+		return tbl;
+	end
+end
+
+
 local OPTIONS_SCHEMATIC = {
 	title = L["Addon Name Colon"]..L["ModuleName LootUI"],
 	moduleDBKey = "LootUI",
@@ -293,6 +344,10 @@ local OPTIONS_SCHEMATIC = {
 		},
 		{type = "Checkbox", label = L["LootUI Option Force Auto Loot"], onClickFunc = nil, validityCheckFunc = Options_ForceAutoLoot_ValidityCheck, dbKey = "LootUI_ForceAutoLoot", tooltip = L["LootUI Option Force Auto Loot Tooltip"], tooltip2 = Tooltip_ManualLootInstruction},
 		{type = "Checkbox", label = L["LootUI Option Loot Under Mouse"], onClickFunc = nil, dbKey = "LootUI_LootUnderMouse", tooltip = L["LootUI Option Loot Under Mouse Tooltip"]},
+		{type = "Dropdown", label = L["LootUI Option Take Button"], onClickFunc = MenuData_TakeButton.OnClick, dbKey = "LootUI_TakeButton",
+			tooltipTitle = L["LootUI Option Take Button"],
+			menuData = MenuData_TakeButton,
+		},
 		{type = "Checkbox", label = L["LootUI Option Use Hotkey"], onClickFunc = nil, dbKey = "LootUI_UseHotkey", tooltip = L["LootUI Option Use Hotkey Tooltip"]},
 		{type = "Keybind", label = L["Take All"], dbKey = "LootUI_HotkeyName", tooltip = L["LootUI Option Use Hotkey Tooltip"], defaultKey = "E"},
 

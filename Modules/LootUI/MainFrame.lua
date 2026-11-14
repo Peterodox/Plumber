@@ -469,7 +469,7 @@ do
 		if event == "GLOBAL_MOUSE_UP" then
 			if self:IsMouseOver() then
 				local button = ...
-				if button == "RightButton" then
+				if button == "RightButton" and not (addon.GetDBValue("LootUI_TakeButton") == "RightButton" and self:GetFocusedItemFrame()) then
 					CloseLoot();
 					self:TryHide(true);
 				elseif (not (self:IsInMaualModeOrEditMode())) and button == "LeftButton" and not InCombatLockdown() then
