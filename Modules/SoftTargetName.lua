@@ -370,16 +370,46 @@ do  --Display
 
 			icon:SetShown(state);
 			if state then
-				icon:SetAlpha(1);   --In case the success visual's fade-in was cut short
+				icon:SetAlpha(1);   --In case a fade was cut short
+				self.CastingIndicator.fadingOutIcon = nil;
 			end
 
-			if self.useDynamicPosition and adjustCastingIndicator then
+			--Center the ring on the icon. A fixed offset from Display drifts with icon size and nameplate scale.
+			if adjustCastingIndicator then
 				self.CastingIndicator:ClearAllPoints();
 				self.CastingIndicator:SetPoint("CENTER", icon, "CENTER", 0, 0);
 			end
 
 			return state and icon
 		end
+	end
+
+	--Interact icon fades out as the ring fades in, instead of disappearing at once
+	local function CastFadeIn_OnUpdate(self, elapsed)
+		self.alpha = self.alpha + 8*elapsed;
+		if self.alpha >= 1 then
+			self.alpha = 1;
+			self:SetScript("OnUpdate", nil);
+		end
+		self:SetAlpha(self.alpha);
+		local icon = self.fadingOutIcon;
+		if icon then
+			if self.alpha >= 1 then
+				self.fadingOutIcon = nil;
+				icon:Hide();
+				icon:SetAlpha(1);
+			else
+				icon:SetAlpha(1 - self.alpha);
+			end
+		end
+	end
+
+	function Display:StartCastingIndicatorFadeIn()
+		local f = self.CastingIndicator;
+		f.alpha = 0;
+		f:SetAlpha(0);
+		f.fadingOutIcon = self:ShowDefaultInteractIcon(true, true);
+		f:SetScript("OnUpdate", CastFadeIn_OnUpdate);
 	end
 
 	function Display:EditModeShowCastingIndicator(state)
@@ -419,16 +449,13 @@ do  --Display
 			_, _, _, startTime, endTime = UnitChannelInfo("player");
 		end
 		if startTime and endTime and (endTime - startTime) > 0.1 and self:IsCastOnCurrentTarget() then
-			self:ShowDefaultInteractIcon(false, true);
 			local duration = endTime - startTime;
 			local f = self.CastingIndicator;
 			f:SetCooldown(startTime / 1000.0, duration / 1000.0);
 			f:SetEdgeScale(self:GetEffectiveScale());
 			f:SetDrawEdge(true);
 			f:Resume();
-			f.alpha = 0;
-			f:SetAlpha(0);
-			f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+			self:StartCastingIndicatorFadeIn();
 			f.SuccessGlow:Hide();
 		else
 			self:ShowDefaultInteractIcon(true);
@@ -446,15 +473,12 @@ do  --Display
 				duo = UnitChannelDuration("player");
 			end
 			if duo and self:IsCastOnCurrentTarget() then
-				self:ShowDefaultInteractIcon(false, true);
 				local f = self.CastingIndicator;
 				f:SetCooldownFromDurationObject(duo);
 				f:SetEdgeScale(self:GetEffectiveScale());
 				f:SetDrawEdge(true);
 				f:Resume();
-				f.alpha = 0;
-				f:SetAlpha(0);
-				f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+				self:StartCastingIndicatorFadeIn();
 				f.SuccessGlow:Hide();
 			else
 				self:ShowDefaultInteractIcon(true);
