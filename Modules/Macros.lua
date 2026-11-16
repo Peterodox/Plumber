@@ -70,6 +70,26 @@ local ModifyType = {
 };
 
 
+local GetSpellFullName;
+
+if addon.IS_RETAIL or addon.IS_MISTS then
+	GetSpellFullName = GetSpellName;
+else
+	local GetSpellSubtext = C_Spell.GetSpellSubtext;
+
+	GetSpellFullName = function(id)
+		local name = GetSpellName(id);
+		if name then
+			local subtext = GetSpellSubtext(id); -- Can be Rank X, Racial...
+			if subtext and subtext ~= "" then
+				name = name.."("..subtext..")";
+			end
+			return name;
+		end
+	end
+end
+
+
 local function AddExtraLineToMacroBody(extraLine, body)
 	extraLine = "\n\n"..extraLine;
 	local numRequired = strlenutf8(extraLine) + 3;
@@ -119,7 +139,7 @@ do
 		end,
 
 		addFunc = function()
-			local spellName = (GetSpellName(PlumberMacros["drive"].spellID)) or "G-99 Breakneck";
+			local spellName = (GetSpellFullName(PlumberMacros["drive"].spellID)) or "G-99 Breakneck";
 			--return "/cast spell:460013\n/cast [noswimming] "..spellName
 			return "/cast "..spellName
 			--The first /cast doesn't get executed but it's necessary to make GetActionInfo() return the macroIndex instead of spellID
@@ -1047,7 +1067,7 @@ do  --MacroInterpreter
 				if id then
 					processed = true;
 					actionType = "spell";
-					name = GetSpellName(tonumber(id));
+					name = GetSpellFullName(tonumber(id));
 				end
 			end
 
@@ -1189,7 +1209,7 @@ do  --MacroInterpreter
 						id = _spellID;
 					else
 						local _name, _spellID, _icon, _isActive, _isUsable, _sourceType, _isFavorite, _isFactionSpecific, _faction, _shouldHideOnChar, _isCollected = GetMountInfoByID(id);
-						name = GetSpellName(_spellID) or _name;
+						name = GetSpellFullName(_spellID) or _name;
 						icon = _icon;
 						usable = _isCollected and not _shouldHideOnChar;
 						macroText = format("/run C_MountJournal.SummonByID(%d)", id);
@@ -1470,7 +1490,7 @@ do  --Editor Setup
 		spell = {
 			command = "/cast",
 			argGetter = function(spellIndex, bookType, spellID, baseSpellID)
-				local name = GetSpellName(spellID);
+				local name = GetSpellFullName(spellID);
 				local info;
 				for i = 1, 2 do
 					info = API.GetProfessionSpellInfo(i);
@@ -1499,7 +1519,7 @@ do  --Editor Setup
 			argGetter = function(mountID, mountIndex)
 				if mountID > 9999 then
 					--the exact id for RandomFavoriteMount is (2^28 - 1)
-					local name = GetSpellName(150544);
+					local name = GetSpellFullName(150544);
 					return name, "mount:0"
 				end
 				local name = GetMountInfoByID(mountID);
