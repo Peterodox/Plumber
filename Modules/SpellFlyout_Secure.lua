@@ -49,8 +49,10 @@ local UseSpellID = {
 
 local IS_CLASSIC = addon.IS_CLASSIC;
 local ACTION_BUTTON_SIZE = 45;
+local NUMBER_FONT_OFFSET = 5;
 if IS_CLASSIC then
 	ACTION_BUTTON_SIZE = 36;
+	NUMBER_FONT_OFFSET= 3;
 end
 
 --Flyout Cursor OffsetX = 24.0
@@ -302,6 +304,14 @@ do  --VisualButtonMixin
 
 		if IS_CLASSIC then
 			self:SetEffectiveSize(ACTION_BUTTON_SIZE);
+		end
+
+		if self.Count then
+			self.Count:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -NUMBER_FONT_OFFSET, NUMBER_FONT_OFFSET);
+		end
+
+		if self.Subtext then
+			self.Subtext:SetPoint("TOPRIGHT", self, "TOPRIGHT", -NUMBER_FONT_OFFSET, -NUMBER_FONT_OFFSET);
 		end
 	end
 
