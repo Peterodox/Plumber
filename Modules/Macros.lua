@@ -80,11 +80,15 @@ else
 	GetSpellFullName = function(id)
 		local name = GetSpellName(id);
 		if name then
+			local fullName;
 			local subtext = GetSpellSubtext(id); -- Can be Rank X, Racial...
 			if subtext and subtext ~= "" then
-				name = name.."("..subtext..")";
+				fullName = name.."("..subtext..")";
+			else
+				fullName = name;
+				subtext = nil;
 			end
-			return name;
+			return fullName, name, subtext;
 		end
 	end
 end
@@ -1017,7 +1021,7 @@ do  --MacroInterpreter
 		local tbl;
 		local n = 0;
 		local processed, usable;
-		local name, icon, actionType, id, macroText, craftingQuality, tempID;
+		local name, icon, actionType, id, macroText, craftingQuality, tooltipLeftText, tooltipRightText, tempID;
 		local canPerform, isConsumable;
 
 		for line in gmatch(body, "#(/[^\n]+)") do
@@ -1028,6 +1032,8 @@ do  --MacroInterpreter
 			actionType = nil;
 			id = nil;
 			macroText = nil;
+			tooltipLeftText = nil;
+			tooltipRightText = nil;
 			tempID = nil;
 
 			if not processed then
@@ -1067,7 +1073,10 @@ do  --MacroInterpreter
 				if id then
 					processed = true;
 					actionType = "spell";
-					name = GetSpellFullName(tonumber(id));
+					local fullName, spellName, subtext = GetSpellFullName(tonumber(id));
+					name = fullName;
+					tooltipLeftText = spellName or fullName;
+					tooltipRightText = subtext;
 				end
 			end
 
@@ -1247,7 +1256,8 @@ do  --MacroInterpreter
 
 					n = n + 1;
 					tbl[n] = {
-						tooltipLineText = name,
+						tooltipLineText = tooltipLeftText or name,
+						tooltipRightText = tooltipRightText,
 						icon = icon,
 						actionType = actionType,
 						id = id,
@@ -1273,10 +1283,18 @@ do  --MacroInterpreter
 
 			for _, info in ipairs(drawerInfo) do
 				if info.tooltipLineText then
-					if info.usable then
-						tooltip:AddLine(info.tooltipLineText, 1, 0.82, 0);
+					if info.tooltipRightText then
+						if info.usable then
+							tooltip:AddDoubleLine(info.tooltipLineText, info.tooltipRightText, 1, 0.82, 0, 0.5, 0.5, 0.5);
+						else
+							tooltip:AddDoubleLine(info.tooltipLineText, info.tooltipRightText, 0.6, 0.6, 0.6, 0, 0.5, 0.5, 0.5);
+						end
 					else
-						tooltip:AddLine(info.tooltipLineText, 0.6, 0.6, 0.6);
+						if info.usable then
+							tooltip:AddLine(info.tooltipLineText, 1, 0.82, 0);
+						else
+							tooltip:AddLine(info.tooltipLineText, 0.6, 0.6, 0.6);
+						end
 					end
 				end
 			end
