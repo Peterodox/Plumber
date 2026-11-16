@@ -1192,6 +1192,7 @@ stds.wow = {
 				"GetSpellInfo",
 				"GetSpellLink",
 				"GetSpellName",
+				"GetSpellSubtext",
 				"GetSpellTexture",
 				"IsSpellDataCached",
 				"IsSpellUsable",
