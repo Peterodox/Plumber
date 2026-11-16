@@ -3,5 +3,6 @@
 	<Script file="GameTooltip_Core.lua"/>
 
 	<!--Item Modules-->
+	<Script file="GameTooltip_ItemReagents.lua"/>
 	<Script file="GameTooltip_ItemQuest.lua"/>
 </Ui>
