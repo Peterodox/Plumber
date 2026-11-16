@@ -318,7 +318,12 @@ do  --VisualButtonMixin
 			if not CanPlayerPerformAction("spell", self.id) then
 				self:SetUsableVisual(false);
 			end
-
+			if self.Subtext and action.tooltipRightText then
+				local rank = string.match(action.tooltipRightText, "%d+");
+				if rank then
+					self.Subtext:SetText(rank);
+				end
+			end
 		elseif self.actionType == "item" then
 			if API.IsToyItem(self.id) then
 				self.isToy = true;
@@ -452,6 +457,9 @@ do  --VisualButtonMixin
 			end
 			if self.Count then
 				self.Count:SetText(nil);
+			end
+			if self.Subtext then
+				self.Subtext:SetText(nil);
 			end
 			self:SetUsableVisual(true);
 			self:SetCraftingQuality(nil);

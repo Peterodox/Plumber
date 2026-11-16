@@ -529,6 +529,12 @@
 						<Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
 					</Anchors>
 				</FontString>
+				<FontString parentKey="Subtext" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-5" y="-5"/>
+					</Anchors>
+					<Color r="0.6" g="0.6" b="0.6"/>
+				</FontString>
 			</Layer>
 			<Layer level="OVERLAY" textureSubLevel="4">
 				<!--FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">

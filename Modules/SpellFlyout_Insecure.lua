@@ -501,6 +501,12 @@ do  --FlyoutButtonMixin
 			if not IsPlayerSpell(self.id) then
 				self:SetUsableVisual(false);
 			end
+			if self.Subtext and action.tooltipRightText then
+				local rank = string.match(action.tooltipRightText, "%d+");
+				if rank then
+					self.Subtext:SetText(rank);
+				end
+			end
 		elseif self.actionType == "item" then
 			if API.IsToyItem(self.id) then
 				self.tooltipMethod = "SetToyByItemID";
@@ -592,6 +598,9 @@ do  --FlyoutButtonMixin
 		self.Cooldown:Clear();
 		self.Cooldown:Hide();
 		self:SetUsableVisual(true);
+		if self.Subtext then
+			self.Subtext:SetText(nil);
+		end
 	end
 
 	function FlyoutButtonMixin:OnRemoved()
