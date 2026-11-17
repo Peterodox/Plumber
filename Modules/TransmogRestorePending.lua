@@ -458,10 +458,51 @@ do
 		return slashCommand and slashCommand:match("^/customset (.+)$");
 	end
 
+	--Due to a bug we had to copy this Blizzard function then fix it for Forever [2026-11-13]
+	--Skip "NUM_CUSTOM_SET_SLASH_COMMAND_VALUES" check
+	--Note: `TransmogSlotOrder` is a global but that feels susceptible to change.
+	local function ParseCustomSetSlashCommand(msg)
+		local readlist = C_Transmog.ExtractTransmogIDList(string.sub(msg, 4));
+
+		-- accessor for next value
+		local readIndex = 0;
+		local function GetNextReadValue()
+			readIndex = readIndex + 1;
+			return readlist[readIndex];
+		end
+
+		-- set the values
+		local itemTransmogInfoList = TransmogUtil.GetEmptyItemTransmogInfoList();
+		for _index, slotID in ipairs(TransmogSlotOrder) do
+			local info = itemTransmogInfoList[slotID];
+			info.appearanceID = GetNextReadValue();
+			-- secondaries
+			if slotID == INVSLOT_SHOULDER or slotID == INVSLOT_MAINHAND then
+				info.secondaryAppearanceID = GetNextReadValue();
+				-- category check on shoulder secondary
+				if slotID == INVSLOT_SHOULDER and info.secondaryAppearanceID ~= Constants.Transmog.NoTransmogID then
+					local appearanceSourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(info.secondaryAppearanceID);
+					if appearanceSourceInfo and appearanceSourceInfo.category ~= Enum.TransmogCollectionType.Shoulder then
+						info.secondaryAppearanceID = Constants.Transmog.NoTransmogID;
+					end
+				end
+			end
+
+			-- illusions
+			if slotID == INVSLOT_MAINHAND or slotID == INVSLOT_OFFHAND then
+				info.illusionID = math.max(GetNextReadValue(), Constants.Transmog.NoTransmogID);
+			end
+		end
+
+		return itemTransmogInfoList;
+	end
+
 	local function DeserializeSnapshot(str)
 		local parseFunc = TransmogUtil and TransmogUtil.ParseCustomSetSlashCommand;
 		return parseFunc and parseFunc(str);
 	end
+
+	DeserializeSnapshot = ParseCustomSetSlashCommand;
 
 	--EL.PendingSlots is a set of invSlotIDs, saved and loaded as a simple comma-joined list.
 	local function SerializePendingSlots(pendingSlots)

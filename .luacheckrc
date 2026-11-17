@@ -481,6 +481,7 @@ stds.wow = {
 		"TransmogFrame",
 		"TransmogAndMountDressupFrame",
 		"Transmog_LoadUI",
+		"TransmogSlotOrder",
 		"TransmogUtil",
 		"UIErrorsFrame",
 		"UIParent",
