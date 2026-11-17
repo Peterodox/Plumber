@@ -973,6 +973,8 @@ do
 	end
 
 	function EL.SnapshotFrame_OnLoad(TransmogFrame)
+		EL.LoadPendingFromDB();
+
 		if EL.snapshotHooked then return end;
 		EL.snapshotHooked = true;
 
@@ -997,7 +999,6 @@ do
 	local function EnableModule(state)
 		if state and not EL.enabled then
 			EL.enabled = true;
-			EL.LoadPendingFromDB();
 			addon.BlizzardFrameUtil:AddFrameModifier("TransmogFrame", EL.SnapshotFrame_OnLoad);
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;
