@@ -106,7 +106,7 @@ do
 				--0 means the left shoulder was never set independently, mirror the right
 				secondaryAppearanceID = transmogID;
 			end
-			SetPendingFromSlot(3, Enum.TransmogOutfitSlot.ShoulderLeft, secondaryAppearanceID);
+			SetPendingFromSlot(3, SHOULDER_LEFT, secondaryAppearanceID);
 		end
 	end
 
@@ -187,7 +187,7 @@ do
 				local hasPending;
 				if invSlotID == 3 then
 					--Either shoulder counts, the left one is its own slot only while separate shoulders are on
-					hasPending = SlotHasPending(SHOULDER_RIGHT) or SlotHasPending(Enum.TransmogOutfitSlot.ShoulderLeft);
+					hasPending = SlotHasPending(SHOULDER_RIGHT) or SlotHasPending(SHOULDER_LEFT);
 					if hasPending then
 						--Only capture when fresh, a switch briefly resets this and reading it then would lose our value
 						shoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
@@ -594,7 +594,7 @@ do
 
 	--Always reselects explicitly, Blizzard can clear the left shoulder before our pending restore re-separates it.
 	local function ReselectShoulderOnOutfitSwitch()
-		if EL.LastSelectedSlot ~= Enum.TransmogOutfitSlot.ShoulderLeft then return; end
+		if EL.LastSelectedSlot ~= SHOULDER_LEFT then return; end
 
 		local slotFrame = GetShoulderSlotFrame(true) or GetShoulderSlotFrame(false);
 		if slotFrame then
