@@ -31,36 +31,40 @@ local function GetShoulderSlotFrame(isSeparated)
 	return TransmogFrame.CharacterPreview:GetSlotFrame(slot, Enum.TransmogType.Appearance);
 end
 
+local function GetShoulderOption()
+	-- For Forever
+	local optionType;
+	local shoulderSlotFrame = GetShoulderSlotFrame();
+
+	-- If player has chosen an armorType for shoulder slot, then we use that.
+	if shoulderSlotFrame and shoulderSlotFrame.slotData and shoulderSlotFrame.slotData.currentOptionInfo then
+		optionType = GetOptionType(shoulderSlotFrame.slotData.currentOptionInfo);
+	end
+
+	-- This part follow WoW's own logic:
+	-- If player has equipped a shoulder armor, use its type, otherwise use the first default option (usually Cloth)
+	if not optionType then
+		local option = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(SHOULDER_RIGHT);
+		if option ~= 0 then
+			optionType = option;
+		end
+		if not optionType then
+			local options = GetOptionsForSlot(SHOULDER_RIGHT);
+			if options and options[1] then
+				optionType = GetOptionType(options[1]);
+			end
+		end
+	end
+
+	return optionType or 0;
+end
+
 --Forever: "GetSecondarySlotState" requires a second arg "armorType"
 local function GetSecondarySlotState()
 	if HAS_ARMOR_OPTIONS then
-		-- For Forever
-		local optionType;
-		local shoulderSlotFrame = GetShoulderSlotFrame();
-		-- If player has chosen an armorType for shoulder slot, then we use that.
-		if shoulderSlotFrame and shoulderSlotFrame.slotData and shoulderSlotFrame.slotData.currentOptionInfo then
-			optionType = GetOptionType(shoulderSlotFrame.slotData.currentOptionInfo);
-		end
-		-- This part follow WoW's own logic:
-		-- If player has equipped a shoulder armor, use its type, otherwise use the first default option (usually Cloth)
-		if not optionType then
-			local option = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(SHOULDER_RIGHT);
-			if option ~= 0 then
-				optionType = option;
-			end
-			if not optionType then
-				local options = GetOptionsForSlot(SHOULDER_RIGHT);
-				if options and options[1] then
-					optionType = GetOptionType(options[1]);
-				end
-			end
-			if not optionType then
-				optionType = 0;
-			end
-		end
+		local optionType = GetShoulderOption();
 		return C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT, optionType);
 	else
-		-- For Retail
 		return C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
 	end
 end
@@ -252,7 +256,12 @@ do
 
 	function EL.RestoreShoulderSecondaryState(enabled)
 		if enabled ~= nil then
-			C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, enabled);
+			if HAS_ARMOR_OPTIONS then
+				local optionType = GetShoulderOption();
+				C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, optionType, enabled);
+			else
+				C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, enabled);
+			end
 		end
 	end
 
