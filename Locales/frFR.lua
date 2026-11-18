@@ -371,7 +371,7 @@ L["Power Borrowed"] = "Pouvoir emprunté";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "Anniversaire de WoW";
-L["ModuleDescription WoWAnniversary"] = "– Invoquer facilement la monture correspondante pendant l'événement Maniaque des montures.\n\n– Affichez les résultats des votes pendant l'événement Frénésie de mode.";
+L["ModuleDescription WoWAnniversary"] = "Invoquer facilement la monture correspondante pendant l'événement Maniaque des montures.";
 L["Voting Result Header"] = "Résultats";
 L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "Vous n'avez pas récupéré cette monture.";
 

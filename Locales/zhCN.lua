@@ -373,7 +373,7 @@ L["Power Borrowed"] = "获得特效";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "魔兽周年庆";
-L["ModuleDescription WoWAnniversary"] = "- 在坐骑狂欢活动期间轻松召唤相应坐骑。\n\n- 在时尚比赛期间显示投票结果。";
+L["ModuleDescription WoWAnniversary"] = "在坐骑狂欢活动期间轻松召唤相应坐骑。";
 L["Voting Result Header"] = "投票结果";
 L["Mount Not Collected"] = "你尚未收集到该坐骑。";
 

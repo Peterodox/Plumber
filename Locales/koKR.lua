@@ -371,7 +371,7 @@ L["Power Borrowed"] = "한시적 능력 강화";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "WoW 기념 이벤트";
-L["ModuleDescription WoWAnniversary"] = "- 탈것 광란 이벤트에서 해당 탈것을 간편하게 소환합니다.\n\n- 패션 열풍 이벤트에서 투표 결과를 표시합니다.";
+L["ModuleDescription WoWAnniversary"] = "탈것 광란 이벤트에서 해당 탈것을 간편하게 소환합니다.";
 L["Voting Result Header"] = "결과";
 L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "이 탈것을 수집하지 않았습니다.";
 
