@@ -1,5 +1,5 @@
-local VERSION_TEXT = "1.9.7 e";
-local VERSION_DATE = 1794900000;
+local VERSION_TEXT = "1.9.7 f";
+local VERSION_DATE = 1795000000;
 
 -- If "AutoShowChangelog" is enabled: The following dates determine if the changelog should auto open
 local RETAIL_CHANGELOG_DATE = 1794200000;
@@ -194,7 +194,6 @@ local DefaultValues = {
 	Delves_SeasonProgress = true,       --Display Seaonal Journey changes on a progress bar
 	Delves_Automation = true,           --Auto select enhancement (PlayerChoiceFrame)
 	WoWAnniversary = true,              --QuickSlot for Mount Maniac Event
-		VotingResultsExpanded = true,
 	BlizzFixFishingArtifact = true,     --Fix Fishing Artifact Traits Not Showing bug
 	QuestItemDestroyAlert = true,       --Show related quest info when destroying a quest-starting item
 	SpellcastingInfo = false,           --Show the spell info when hovering over target/focus cast bars. Logging target spells and displayed it on UnitPopupMenu
