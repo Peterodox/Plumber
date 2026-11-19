@@ -6,13 +6,18 @@ local FastLoot = LootUI.FastLoot;
 local EventListeners = LootUI.EventListeners;
 
 
-local ENABLE_MODULE = false;
+local ENABLE_MODULE = nil;
 local STOCK_UI_MUTED = false;
 local IS_RESOLVING_SYSTEM_STATUS = false;
 
 
 local function ResolveSystemStatus()
-	if addon.GetDBBool("LootUI") then
+	LootUI.UpdateMasterLooter();
+
+	local isLootUIEnabled = addon.GetDBBool("LootUI");
+	local isPlayerMasterLooter = LootUI.IsMasterLooter();
+
+	if isLootUIEnabled and not isPlayerMasterLooter then
 		ENABLE_MODULE = true;
 
 		EventListeners:Enable();
@@ -22,7 +27,6 @@ local function ResolveSystemStatus()
 		end
 
 		MainFrame:OnUIScaleChanged();
-
 	else
 		ENABLE_MODULE = false;
 
@@ -143,6 +147,10 @@ local function GetFastLootExtraDescription()
 		return L["FastLoot Always On Reason"].."\n\n"..lootSpeedTooltip;
 	end
 
+	if addon.GetDBBool("FastLoot") and LootUI.IsMasterLooter() then
+		return "|cffff4800"..L["Loot Feature Disabled For Master Loot Format"]:format(L["ModuleName FastLoot"]).."|r";
+	end
+
 	return L["FastLoot User Notes"];
 end
 
@@ -151,7 +159,7 @@ local LootUI_ModuleData = {
 	name = L["ModuleName LootUI"],
 	dbKey = "LootUI",
 	description = L["ModuleDescription LootUI"],
-	descriptionFunc = GetModuleConflictWarning,
+	descriptionFunc = GetLootUIExtraDescription,
 	toggleFunc = EnableModule,
 	categoryID = 1,
 	uiOrder = 0,

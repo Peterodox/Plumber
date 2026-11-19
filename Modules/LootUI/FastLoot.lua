@@ -88,7 +88,10 @@ local LootEvents = {
 };
 
 function FastLoot:ResolveSystemStatus()
-	if addon.GetDBBool("FastLoot") and not addon.GetDBBool("LootUI") then
+	local isFastLootEnabled = addon.GetDBBool("FastLoot") and not addon.GetDBBool("LootUI");
+	local isPlayerMasterLooter = LootUI.IsMasterLooter();
+
+	if isFastLootEnabled and not isPlayerMasterLooter then
 		if not self.eventRegistered then
 			self.eventRegistered = true;
 			addon.API.RegisterFrameForEvents(self, LootEvents);
