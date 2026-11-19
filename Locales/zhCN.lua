@@ -630,6 +630,7 @@ L["ModuleName FastLoot"] = "快速拾取";
 L["ModuleDescription FastLoot"] = "快速拾取物品。";
 L["FastLoot Always On Reason"] = "快速拾取功能将一直生效，因为你已启用Plumber拾取窗口。";
 L["FastLoot User Notes"] = "*Plumber快速拾取只干一项任务...快速拾取。若你想要更多功能，请尝试其它拾取插件例如\"Speedy AutoLoot\"或\"XLoot\".";
+L["Loot Feature Disabled For Master Loot Format"] = "由于你是战利品分配者，Plumber%s功能已被暂时禁用。";
 
 
 --Quick Slot For Third-party Dev

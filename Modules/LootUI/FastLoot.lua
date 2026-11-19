@@ -104,6 +104,10 @@ function FastLoot:ResolveSystemStatus()
 			self:SetScript("OnEvent", nil);
 			self.t = 0;
 			self:SetScript("OnUpdate", nil);
+
+			if isFastLootEnabled and isPlayerMasterLooter then
+				addon.API.PrintMessage(L["Loot Feature Disabled For Master Loot Format"]:format(L["ModuleName FastLoot"]));
+			end
 		end
 	end
 

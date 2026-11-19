@@ -28,6 +28,10 @@ local function ResolveSystemStatus()
 
 		MainFrame:OnUIScaleChanged();
 	else
+		if (ENABLE_MODULE or ENABLE_MODULE == nil) and isLootUIEnabled and isPlayerMasterLooter then
+			addon.API.PrintMessage(L["Loot Feature Disabled For Master Loot Format"]:format(L["ModuleName LootUI"]));
+		end
+
 		ENABLE_MODULE = false;
 
 		EventListeners:Disable();
@@ -133,6 +137,17 @@ local function GetModuleConflictWarning()
 	local name = GetConflictAddOnName();
 	if name then
 		return string.format("|cffd4641c%s\n- %s|r", L["Generic Addon Conflict"], name);
+	end
+end
+
+local function GetLootUIExtraDescription()
+	local warning = GetModuleConflictWarning();
+	if warning then
+		return warning;
+	end
+
+	if addon.GetDBBool("LootUI") and LootUI.IsMasterLooter() then
+		return "|cffff4800"..L["Loot Feature Disabled For Master Loot Format"]:format(L["ModuleName LootUI"]).."|r";
 	end
 end
 
