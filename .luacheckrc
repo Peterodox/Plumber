@@ -1011,6 +1011,7 @@ stds.wow = {
 
 		C_PartyInfo = {
 			fields = {
+				"GetAvailableLootMethods",
 				"GetLootMethod",
 				"IsCrossFactionParty",
 				"IsDelveInProgress",
