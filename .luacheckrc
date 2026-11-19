@@ -1011,6 +1011,7 @@ stds.wow = {
 
 		C_PartyInfo = {
 			fields = {
+				"GetLootMethod",
 				"IsCrossFactionParty",
 				"IsDelveInProgress",
 				"IsPartyWalkIn",
@@ -1516,6 +1517,12 @@ stds.wow = {
 				ItemSlotFilterType = {
 					fields = {
 						"NoFilter",
+					},
+				},
+
+				LootMethod = {
+					fields = {
+						"Masterlooter",
 					},
 				},
 
