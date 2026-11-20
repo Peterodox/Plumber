@@ -88,20 +88,26 @@ local LootEvents = {
 };
 
 function FastLoot:ResolveSystemStatus()
-	if addon.GetDBBool("FastLoot") and not addon.GetDBBool("LootUI") then
+	local isFastLootEnabled = addon.GetDBBool("FastLoot") and not addon.GetDBBool("LootUI");
+	local isPlayerMasterLooter = LootUI.IsMasterLooter();
+
+	if isFastLootEnabled and not isPlayerMasterLooter then
 		if not self.eventRegistered then
 			self.eventRegistered = true;
 			addon.API.RegisterFrameForEvents(self, LootEvents);
 			self:SetScript("OnEvent", self.OnEvent);
 		end
 	else
+		if self.eventRegistered ~= false and isFastLootEnabled and isPlayerMasterLooter then
+			addon.API.PrintMessage(L["Loot Feature Disabled For Master Loot Format"]:format(L["ModuleName FastLoot"]));
+		end
 		if self.eventRegistered then
-			self.eventRegistered = nil;
 			addon.API.UnregisterFrameForEvents(self, LootEvents);
 			self:SetScript("OnEvent", nil);
 			self.t = 0;
 			self:SetScript("OnUpdate", nil);
 		end
+		self.eventRegistered = false;
 	end
 
 	self:UpdateLootSpeed();
