@@ -23,6 +23,7 @@ local UnitChannelInfo = UnitChannelInfo;
 local UnitCastingDuration = UnitCastingDuration;
 local UnitChannelDuration = UnitChannelDuration;
 local Secret_CanAccess = API.Secret_CanAccess;
+local PLAYER_GUID = UnitGUID("player");
 
 
 local Display = CreateFrame("Frame");
@@ -523,7 +524,7 @@ do  --Display
 				elseif line.type == Enum.TooltipDataLineType.QuestPlayer then
 					--Compare GUID, leftText only shows the first word of the name (Forever)
 					if not Secret_CanAccess(line.guid) then return; end
-					isOwnProgress = line.guid == UnitGUID("player");
+					isOwnProgress = line.guid == PLAYER_GUID;
 				elseif line.type == Enum.TooltipDataLineType.QuestObjective and isOwnProgress then
 					objectiveLine = line;
 				end
