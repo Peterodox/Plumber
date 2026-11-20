@@ -102,12 +102,12 @@ function FastLoot:ResolveSystemStatus()
 			addon.API.PrintMessage(L["Loot Feature Disabled For Master Loot Format"]:format(L["ModuleName FastLoot"]));
 		end
 		if self.eventRegistered then
-			self.eventRegistered = false;
 			addon.API.UnregisterFrameForEvents(self, LootEvents);
 			self:SetScript("OnEvent", nil);
 			self.t = 0;
 			self:SetScript("OnUpdate", nil);
 		end
+		self.eventRegistered = false;
 	end
 
 	self:UpdateLootSpeed();
