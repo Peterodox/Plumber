@@ -526,7 +526,11 @@ do  --Display
 					if not Secret_CanAccess(line.guid) then return; end
 					isOwnProgress = line.guid == PLAYER_GUID;
 				elseif line.type == Enum.TooltipDataLineType.QuestObjective and isOwnProgress then
-					objectiveLine = line;
+					if not Secret_CanAccess(line.completed) then return; end
+					if not line.completed then
+						objectiveLine = line;
+						break;
+					end
 				end
 			end
 
