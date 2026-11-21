@@ -23,6 +23,7 @@ local UnitChannelInfo = UnitChannelInfo;
 local UnitCastingDuration = UnitCastingDuration;
 local UnitChannelDuration = UnitChannelDuration;
 local UnitGUID = UnitGUID;
+local UnitExists = UnitExists;
 local Secret_CanAccess = API.Secret_CanAccess;
 local Secret_IsSecret = API.Secret_IsSecret;
 
@@ -102,6 +103,22 @@ do  --Display
 		return bg
 	end
 
+	local function CreateCastingIndicator(parent)
+		local f = CreateFrame("Cooldown", nil, parent, "PlumberGenericCooldownTemplate");
+		local a = 24;
+		f:SetSize(a, a);
+		f.Background:SetSize(2*a, 2*a);
+		f.Background:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Background");
+		f:SetSwipeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Swipe-Blue");
+		f:SetEdgeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Edge");
+		f.SuccessGlow = f:CreateTexture(nil, "OVERLAY");
+		f.SuccessGlow:SetSize(a, a);
+		f.SuccessGlow:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.SuccessGlow:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-SuccessGlow");
+		f.SuccessGlow:Hide();
+		return f
+	end
+
 	function Display:UpdateFonts()
 		local file, height, flags = _G[Settings.fontObject]:GetFont();
 		if Settings.textOutline then
@@ -169,20 +186,9 @@ do  --Display
 		end
 
 		if not self.CastingIndicator then
-			local f = CreateFrame("Cooldown", nil, self, "PlumberGenericCooldownTemplate");
+			local f = CreateCastingIndicator(self);
 			self.CastingIndicator = f;
 			f:SetPoint("CENTER", self, "TOP", 0, Settings.iconOffsetY);
-			local a = 24;
-			f:SetSize(a, a);
-			f.Background:SetSize(2*a, 2*a);
-			f.Background:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Background");
-			f:SetSwipeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Swipe-Blue");
-			f:SetEdgeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Edge");
-			f.SuccessGlow = f:CreateTexture(nil, "OVERLAY");
-			f.SuccessGlow:SetSize(a, a);
-			f.SuccessGlow:SetPoint("CENTER", f, "CENTER", 0, 0);
-			f.SuccessGlow:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-SuccessGlow");
-			f.SuccessGlow:Hide();
 		end
 
 		self:SetScript("OnShow", self.OnShow);
@@ -520,6 +526,110 @@ do  --Display
 		end
 	end
 
+	--Some interactables are Creature units (e.g. Snakeroot, needs "Include NPC"). Pressing interact clears their
+	--soft target before the cast starts, which hides Display, and the gather fires no UNIT_SPELLCAST_SENT.
+	--The node is the hard target during the cast, so we show the radial on the target nameplate instead.
+	local NODE_INDICATOR_OFFSET_Y = 0;
+
+	function Display:SetClearedSoftTarget(oldTarget)
+		--Kept until a different soft target appears: after an interrupted attempt the node stays the hard target
+		--and never becomes the soft target again. Only Creature units can become the hard target.
+		if (not Secret_IsSecret(oldTarget)) and oldTarget == nil then return end;  --nil -> nil also fires after the clear
+		if Settings.showCastBar and Settings.includeNPC and not self:ShouldHideIcon() and Secret_CanAccess(oldTarget)
+			and string.find(oldTarget, "^Creature%-") then
+			self.clearedTargetGUID = oldTarget;
+		else
+			self.clearedTargetGUID = nil;
+		end
+	end
+
+	local function NodeCastingIndicator_OnEvent(self, event, ...)
+		if event == "UNIT_SPELLCAST_SUCCEEDED" then
+			local _, _, spellID = ...
+			if Secret_CanAccess(spellID) and spellID == self.spellID then
+				self.succeeded = true;
+			end
+		else    --UNIT_SPELLCAST_STOP, UNIT_SPELLCAST_CHANNEL_STOP
+			self:UnregisterAllEvents();
+			if self.succeeded then
+				self.succeeded = nil;
+				self:Pause();
+				self:SetCooldown(GetTime() - 100, 100);
+				self:SetDrawEdge(false);
+				self.SuccessGlow:Show();
+				self.alpha = 1;
+				self:SetAlpha(1);
+				self:SetScript("OnUpdate", SuccessVisual_OnUpdate);
+			else
+				self:Hide();
+			end
+		end
+	end
+
+	local function NodeCastingIndicator_OnHide(self)
+		self:SetScript("OnUpdate", nil);
+		self:UnregisterAllEvents();
+		self.succeeded = nil;
+	end
+
+	function Display:UpdateNodeCastingIndicator()
+		--Run before RecordCastTarget, which consumes the SENT target
+		local sentTargetKnown = self.sentTargetKnown and (GetTime() - (self.sentTime or 0)) <= 1;
+		local guid = self.clearedTargetGUID;
+		if not (guid and Settings.showCastBar) or UnitExists("softinteract") then return end;
+
+		local targetGUID = UnitGUID("target");
+		if not (Secret_CanAccess(targetGUID) and targetGUID == guid) then return end;
+
+		if sentTargetKnown then
+			--Not cast on the node (e.g. Hearthstone sends nil)
+			local name = UnitName("target");
+			if not (Secret_CanAccess(name) and name == self.sentTarget) then return end;
+		end
+
+		local nameplate = GetNamePlateForUnit("target");
+		if not nameplate then return end;
+
+		local duo = UnitCastingDuration and (UnitCastingDuration("player") or UnitChannelDuration("player"));
+		if not duo then return end;
+
+		local f = self.NodeCastingIndicator;
+		if not f then
+			f = CreateCastingIndicator(UIParent);
+			f:SetScript("OnEvent", NodeCastingIndicator_OnEvent);
+			f:SetScript("OnHide", NodeCastingIndicator_OnHide);
+			self.NodeCastingIndicator = f;
+		end
+
+		f:SetParent(nameplate);
+		f:ClearAllPoints();
+		f:SetPoint("BOTTOM", nameplate, "TOP", 0, NODE_INDICATOR_OFFSET_Y);
+
+		local spellID = select(9, UnitCastingInfo("player")) or select(8, UnitChannelInfo("player"));
+		f.spellID = Secret_CanAccess(spellID) and spellID or nil;
+		f.succeeded = nil;
+
+		f:SetCooldownFromDurationObject(duo);
+		f:SetEdgeScale(f:GetEffectiveScale());
+		f:SetDrawEdge(true);
+		f:Resume();
+		f.SuccessGlow:Hide();
+		f.alpha = 0;
+		f:SetAlpha(0);
+		f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+		f:Show();
+		f:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+		f:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
+		f:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
+	end
+
+	function Display:HideNodeCastingIndicator()
+		self.clearedTargetGUID = nil;
+		if self.NodeCastingIndicator then
+			self.NodeCastingIndicator:Hide();
+		end
+	end
+
 	function Display:OnUpdate(elapsed)
 		self.alpha = self.alpha + 8*elapsed;
 		if self.alpha >= 1 then
@@ -793,8 +903,10 @@ do  --EL
 			Display.softTargetChanges = (Display.softTargetChanges or 0) + 1;
 			local oldTarget, newTarget = ...
 			if newTarget then
+				Display.clearedTargetGUID = nil;
 				self:RequestUpdate();
 			else
+				Display:SetClearedSoftTarget(oldTarget);
 				Display:Hide();
 				self.softTargetUnit = nil;
 			end
@@ -802,7 +914,9 @@ do  --EL
 			local _, target = ...
 			Display.sentTargetKnown = not Secret_IsSecret(target);
 			Display.sentTarget = Display.sentTargetKnown and target or nil;
+			Display.sentTime = GetTime();
 		elseif event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" then
+			Display:UpdateNodeCastingIndicator();
 			--Display only listens while shown; record casts that start with no soft target too
 			Display:RecordCastTarget();
 		elseif event == "HOUSE_PLOT_ENTERED" then
@@ -944,6 +1058,7 @@ do  --Module Registery
 			EL:ListenEvents(false);
 			EL:SetScript("OnUpdate", nil);
 			Display:Remove();
+			Display:HideNodeCastingIndicator();
 		end
 	end
 
