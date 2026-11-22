@@ -22,7 +22,10 @@ local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local UnitCastingDuration = UnitCastingDuration;
 local UnitChannelDuration = UnitChannelDuration;
+local UnitGUID = UnitGUID;
+local UnitExists = UnitExists;
 local Secret_CanAccess = API.Secret_CanAccess;
+local Secret_IsSecret = API.Secret_IsSecret;
 local PLAYER_GUID = UnitGUID("player");
 
 
@@ -103,6 +106,22 @@ do  --Display
 		return bg
 	end
 
+	local function CreateCastingIndicator(parent)
+		local f = CreateFrame("Cooldown", nil, parent, "PlumberGenericCooldownTemplate");
+		local a = 24;
+		f:SetSize(a, a);
+		f.Background:SetSize(2*a, 2*a);
+		f.Background:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Background");
+		f:SetSwipeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Swipe-Blue");
+		f:SetEdgeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Edge");
+		f.SuccessGlow = f:CreateTexture(nil, "OVERLAY");
+		f.SuccessGlow:SetSize(a, a);
+		f.SuccessGlow:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.SuccessGlow:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-SuccessGlow");
+		f.SuccessGlow:Hide();
+		return f
+	end
+
 	function Display:UpdateFonts()
 		local file, height, flags = _G[Settings.fontObject]:GetFont();
 		if Settings.textOutline then
@@ -170,20 +189,9 @@ do  --Display
 		end
 
 		if not self.CastingIndicator then
-			local f = CreateFrame("Cooldown", nil, self, "PlumberGenericCooldownTemplate");
+			local f = CreateCastingIndicator(self);
 			self.CastingIndicator = f;
 			f:SetPoint("CENTER", self, "TOP", 0, Settings.iconOffsetY);
-			local a = 24;
-			f:SetSize(a, a);
-			f.Background:SetSize(2*a, 2*a);
-			f.Background:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Background");
-			f:SetSwipeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Swipe-Blue");
-			f:SetEdgeTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-Edge");
-			f.SuccessGlow = f:CreateTexture(nil, "OVERLAY");
-			f.SuccessGlow:SetSize(a, a);
-			f.SuccessGlow:SetPoint("CENTER", f, "CENTER", 0, 0);
-			f.SuccessGlow:SetTexture("Interface/AddOns/Plumber/Art/Cooldown/ThickCircle-SuccessGlow");
-			f.SuccessGlow:Hide();
 		end
 
 		self:SetScript("OnShow", self.OnShow);
@@ -255,16 +263,70 @@ do  --Display
 		self:ListenSpellCastEvents(false);
 	end
 
+	--Remember which soft target the cast started on, so the radial isn't moved to another object mid-cast
+	local function GetCastKey()
+		local startTime = select(4, UnitCastingInfo("player"));
+		if not Secret_CanAccess(startTime) then
+			startTime = select(4, UnitChannelInfo("player"));
+		end
+		if Secret_CanAccess(startTime) then
+			return startTime
+		end
+	end
+
+	function Display:RecordCastTarget()
+		local key = GetCastKey();
+		if key and key ~= self.castKey then
+			self.castKey = key;
+			self.castTargetGUID = UnitGUID("softinteract");
+			self.castSoftTargetChanges = self.softTargetChanges or 0;
+			self.castMismatch = false;
+			--UNIT_SPELLCAST_SENT's target is the object's name for interactions, nil/empty for Hearthstone etc.,
+			--and the player's name for self casts. Unknown (secret or no SENT): assume it's an interaction.
+			local name = UnitName("softinteract");
+			if self.sentTargetKnown and Secret_CanAccess(name) then
+				self.castIsObject = self.sentTarget == name;
+			else
+				self.castIsObject = true;
+			end
+			self.sentTargetKnown = false;
+		end
+		return key
+	end
+
+	function Display:IsCastOnCurrentTarget()
+		if not self:RecordCastTarget() then
+			self.castMismatch = false;
+			return true
+		end
+		if not self.castIsObject then
+			--Not cast on an object (Hearthstone, self casts, etc.): no radial
+			self.castMismatch = true;
+			return false
+		end
+		local guid = UnitGUID("softinteract");
+		if Secret_CanAccess(guid) and Secret_CanAccess(self.castTargetGUID) then
+			self.castMismatch = guid ~= self.castTargetGUID;
+		else
+			--GUIDs are secret (e.g. in instances): hide once the soft target has changed since the cast started
+			self.castMismatch = (self.softTargetChanges or 0) ~= self.castSoftTargetChanges;
+		end
+		return not self.castMismatch
+	end
+
 	function Display:OnEvent(event, ...)
 		if event == "UNIT_SPELLCAST_SUCCEEDED" then
 			local unitTarget, castGUID, spellID = ...
-			self.succeededSpellID = spellID;
+			if Secret_CanAccess(spellID) then
+				self.succeededSpellID = spellID;
+			end
 		elseif event == "UNIT_SPELLCAST_STOP" then
-			if self.succeededSpellID == self.currentSpellID then
+			if self.succeededSpellID == self.currentSpellID and not self.castMismatch then
 				self:ShowCastSuccessVisual();
 			else
 				self:UpdateCastingIndicator();
 			end
+			self.castMismatch = false;
 			self.succeededSpellID = nil;
 			self.currentSpellID = nil;
 		elseif event == "UNIT_SPELLCAST_START" or  event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
@@ -316,12 +378,47 @@ do  --Display
 			end
 
 			icon:SetShown(state);
+			if state then
+				icon:SetAlpha(1);   --In case a fade was cut short
+				self.CastingIndicator.fadingOutIcon = nil;
+			end
 
-			if self.useDynamicPosition and adjustCastingIndicator then
+			--Center the ring on the icon. A fixed offset from Display drifts with icon size and nameplate scale.
+			if adjustCastingIndicator then
 				self.CastingIndicator:ClearAllPoints();
 				self.CastingIndicator:SetPoint("CENTER", icon, "CENTER", 0, 0);
 			end
+
+			return state and icon
 		end
+	end
+
+	--Interact icon fades out as the ring fades in, instead of disappearing at once
+	local function CastFadeIn_OnUpdate(self, elapsed)
+		self.alpha = self.alpha + 8*elapsed;
+		if self.alpha >= 1 then
+			self.alpha = 1;
+			self:SetScript("OnUpdate", nil);
+		end
+		self:SetAlpha(self.alpha);
+		local icon = self.fadingOutIcon;
+		if icon then
+			if self.alpha >= 1 then
+				self.fadingOutIcon = nil;
+				icon:Hide();
+				icon:SetAlpha(1);
+			else
+				icon:SetAlpha(1 - self.alpha);
+			end
+		end
+	end
+
+	function Display:StartCastingIndicatorFadeIn()
+		local f = self.CastingIndicator;
+		f.alpha = 0;
+		f:SetAlpha(0);
+		f.fadingOutIcon = self:ShowDefaultInteractIcon(true, true);
+		f:SetScript("OnUpdate", CastFadeIn_OnUpdate);
 	end
 
 	function Display:EditModeShowCastingIndicator(state)
@@ -360,17 +457,14 @@ do  --Display
 		if not startTime then
 			_, _, _, startTime, endTime = UnitChannelInfo("player");
 		end
-		if startTime and endTime and (endTime - startTime) > 0.1 then
-			self:ShowDefaultInteractIcon(false, true);
+		if startTime and endTime and (endTime - startTime) > 0.1 and self:IsCastOnCurrentTarget() then
 			local duration = endTime - startTime;
 			local f = self.CastingIndicator;
 			f:SetCooldown(startTime / 1000.0, duration / 1000.0);
 			f:SetEdgeScale(self:GetEffectiveScale());
 			f:SetDrawEdge(true);
 			f:Resume();
-			f.alpha = 0;
-			f:SetAlpha(0);
-			f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+			self:StartCastingIndicatorFadeIn();
 			f.SuccessGlow:Hide();
 		else
 			self:ShowDefaultInteractIcon(true);
@@ -380,20 +474,20 @@ do  --Display
 
 	if Settings.IS_MODERN then
 		function Display:UpdateCastingIndicator()
+			--Needed by UNIT_SPELLCAST_STOP to tell a completed cast (success glow) from an interrupted one
+			local spellID = select(9, UnitCastingInfo("player")) or select(8, UnitChannelInfo("player"));
+			self.currentSpellID = Secret_CanAccess(spellID) and spellID or nil;
 			local duo = UnitCastingDuration("player");
 			if not duo then
 				duo = UnitChannelDuration("player");
 			end
-			if duo then
-				self:ShowDefaultInteractIcon(false, true);
+			if duo and self:IsCastOnCurrentTarget() then
 				local f = self.CastingIndicator;
 				f:SetCooldownFromDurationObject(duo);
 				f:SetEdgeScale(self:GetEffectiveScale());
 				f:SetDrawEdge(true);
 				f:Resume();
-				f.alpha = 0;
-				f:SetAlpha(0);
-				f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+				self:StartCastingIndicatorFadeIn();
 				f.SuccessGlow:Hide();
 			else
 				self:ShowDefaultInteractIcon(true);
@@ -410,6 +504,13 @@ do  --Display
 			self:Hide();
 		end
 		self:SetAlpha(self.alpha);
+		if self.fadingIcon then
+			--Interact icon fades in as the ring fades out
+			self.fadingIcon:SetAlpha(1 - self.alpha);
+			if self.alpha == 0 then
+				self.fadingIcon = nil;
+			end
+		end
 	end
 
 	function Display:ShowCastSuccessVisual()
@@ -422,7 +523,114 @@ do  --Display
 		f.SuccessGlow:Show();
 		f.alpha = 1;
 		f:SetScript("OnUpdate", SuccessVisual_OnUpdate);
-		self:ShowDefaultInteractIcon(true);
+		f.fadingIcon = self:ShowDefaultInteractIcon(true);
+		if f.fadingIcon then
+			f.fadingIcon:SetAlpha(0);
+		end
+	end
+
+	--Some interactables are Creature units (e.g. Snakeroot, needs "Include NPC"). Pressing interact clears their
+	--soft target before the cast starts, which hides Display, and the gather fires no UNIT_SPELLCAST_SENT.
+	--The node is the hard target during the cast, so we show the radial on the target nameplate instead.
+	local NODE_INDICATOR_OFFSET_Y = 0;
+
+	function Display:SetClearedSoftTarget(oldTarget)
+		--Kept until a different soft target appears: after an interrupted attempt the node stays the hard target
+		--and never becomes the soft target again. Only Creature units can become the hard target.
+		if (not Secret_IsSecret(oldTarget)) and oldTarget == nil then return end;  --nil -> nil also fires after the clear
+		if Settings.showCastBar and Settings.includeNPC and not self:ShouldHideIcon() and Secret_CanAccess(oldTarget)
+			and string.find(oldTarget, "^Creature%-") then
+			self.clearedTargetGUID = oldTarget;
+		else
+			self.clearedTargetGUID = nil;
+		end
+	end
+
+	local function NodeCastingIndicator_OnEvent(self, event, ...)
+		if event == "UNIT_SPELLCAST_SUCCEEDED" then
+			local _, _, spellID = ...
+			if Secret_CanAccess(spellID) and spellID == self.spellID then
+				self.succeeded = true;
+			end
+		else    --UNIT_SPELLCAST_STOP, UNIT_SPELLCAST_CHANNEL_STOP
+			self:UnregisterAllEvents();
+			if self.succeeded then
+				self.succeeded = nil;
+				self:Pause();
+				self:SetCooldown(GetTime() - 100, 100);
+				self:SetDrawEdge(false);
+				self.SuccessGlow:Show();
+				self.alpha = 1;
+				self:SetAlpha(1);
+				self:SetScript("OnUpdate", SuccessVisual_OnUpdate);
+			else
+				self:Hide();
+			end
+		end
+	end
+
+	local function NodeCastingIndicator_OnHide(self)
+		self:SetScript("OnUpdate", nil);
+		self:UnregisterAllEvents();
+		self.succeeded = nil;
+	end
+
+	function Display:UpdateNodeCastingIndicator()
+		--Run before RecordCastTarget, which consumes the SENT target
+		local sentTargetKnown = self.sentTargetKnown and (GetTime() - (self.sentTime or 0)) <= 1;
+		local guid = self.clearedTargetGUID;
+		if not (guid and Settings.showCastBar) or UnitExists("softinteract") then return end;
+
+		local targetGUID = UnitGUID("target");
+		if not (Secret_CanAccess(targetGUID) and targetGUID == guid) then return end;
+
+		if sentTargetKnown then
+			--Not cast on the node (e.g. Hearthstone sends nil)
+			local name = UnitName("target");
+			if not (Secret_CanAccess(name) and name == self.sentTarget) then return end;
+		end
+
+		local nameplate = GetNamePlateForUnit("target");
+		if not nameplate then return end;
+
+		local duo = UnitCastingDuration and (UnitCastingDuration("player") or UnitChannelDuration("player"));
+		if not duo then return end;
+
+		local f = self.NodeCastingIndicator;
+		if not f then
+			f = CreateCastingIndicator(UIParent);
+			f:SetScript("OnEvent", NodeCastingIndicator_OnEvent);
+			f:SetScript("OnHide", NodeCastingIndicator_OnHide);
+			self.NodeCastingIndicator = f;
+		end
+
+		f:SetParent(nameplate);
+		f:ClearAllPoints();
+		f:SetPoint("BOTTOM", nameplate, "TOP", 0, NODE_INDICATOR_OFFSET_Y);
+
+		local spellID = select(9, UnitCastingInfo("player")) or select(8, UnitChannelInfo("player"));
+		f.spellID = Secret_CanAccess(spellID) and spellID or nil;
+		f.succeeded = nil;
+
+		f:SetCooldownFromDurationObject(duo);
+		f:SetEdgeScale(f:GetEffectiveScale());
+		f:SetDrawEdge(true);
+		f:Resume();
+		f.SuccessGlow:Hide();
+		f.alpha = 0;
+		f:SetAlpha(0);
+		f:SetScript("OnUpdate", SharedFadeIn_OnUpdate);
+		f:Show();
+		f:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
+		f:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
+		f:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
+	end
+
+	function Display:HideNodeCastingIndicator()
+		self.clearedTargetGUID = nil;
+		if self.NodeCastingIndicator then
+			self.NodeCastingIndicator:Hide();
+		end
 	end
 
 	function Display:OnUpdate(elapsed)
@@ -706,13 +914,25 @@ do  --EL
 
 	function EL:OnEvent(event, ...)
 		if event == "PLAYER_SOFT_INTERACT_CHANGED" then
+			Display.softTargetChanges = (Display.softTargetChanges or 0) + 1;
 			local oldTarget, newTarget = ...
 			if newTarget then
+				Display.clearedTargetGUID = nil;
 				self:RequestUpdate();
 			else
+				Display:SetClearedSoftTarget(oldTarget);
 				Display:Hide();
 				self.softTargetUnit = nil;
 			end
+		elseif event == "UNIT_SPELLCAST_SENT" then
+			local _, target = ...
+			Display.sentTargetKnown = not Secret_IsSecret(target);
+			Display.sentTarget = Display.sentTargetKnown and target or nil;
+			Display.sentTime = GetTime();
+		elseif event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" then
+			Display:UpdateNodeCastingIndicator();
+			--Display only listens while shown; record casts that start with no soft target too
+			Display:RecordCastTarget();
 		elseif event == "HOUSE_PLOT_ENTERED" then
 			Display:UpdateInHouseStatus(true);
 		elseif event == "HOUSE_PLOT_EXITED" then
@@ -733,9 +953,15 @@ do  --EL
 		if state then
 			self:SetScript("OnEvent", EL.OnEvent);
 			API.RegisterFrameForEvents(self, self.events);
+			self:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player");
+			self:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
+			self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
 		else
 			self:SetScript("OnEvent", nil);
 			API.UnregisterFrameForEvents(self, self.events);
+			self:UnregisterEvent("UNIT_SPELLCAST_SENT");
+			self:UnregisterEvent("UNIT_SPELLCAST_START");
+			self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START");
 		end
 	end
 end
@@ -846,6 +1072,7 @@ do  --Module Registery
 			EL:ListenEvents(false);
 			EL:SetScript("OnUpdate", nil);
 			Display:Remove();
+			Display:HideNodeCastingIndicator();
 		end
 	end
 
