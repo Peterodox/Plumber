@@ -16,7 +16,7 @@ local CreateSystemCard;
 do
 	function CreateSystemCard(systemID, systemName)
 		local f = CreateFrame("Frame", nil, PlayerPowerTab);
-		f:SetSize(512, 80);
+		f:SetSize(528, 80);
 
 		local texture = "Interface/AddOns/Plumber/Art/ExpansionLandingPage/PlayerPowerCard.png";
 
@@ -58,9 +58,17 @@ do
 
 		local Name = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
 		Name:SetPoint("LEFT", f, "LEFT", 86, 0);
-		Name:SetPoint("RIGHT", traitFrame, "LEFT", -20, 0);
+		Name:SetPoint("RIGHT", traitFrame, "LEFT", -18, 0);
 		Name:SetTextColor(0.804, 0.667, 0.498);
+		Name:SetMaxLines(2);
+		Name:SetSpacing(2);
 		Name:SetText(systemName);
+
+		RunNextFrame(function()
+			if Name:IsTruncated() then
+				Name:Hide();
+			end
+		end);
 
 		f.TraitFrame = traitFrame;
 

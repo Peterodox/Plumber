@@ -38,6 +38,7 @@ do
 		end
 		TraitContainer:SetConfigIDBySystemID(systemID);
 		TraitContainer:SetEnableAutoCommit(true);
+		self:SetWidth(TraitContainer:GetWidth());
 	end
 
 	function TraitFrameMixin:Refresh()

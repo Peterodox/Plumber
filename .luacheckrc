@@ -437,6 +437,7 @@ stds.wow = {
 		"RequestRaidInfo",
 		"ResetCursor",
 		"securecall",
+		"RunNextFrame",
 		"securecallfunction",
 		"SearchBoxTemplate_OnTextChanged",
 		"SetAchievementSearchString",
