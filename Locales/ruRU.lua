@@ -373,7 +373,7 @@ L["Power Borrowed"] = "Заимствованная мощность";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "Годовщина WoW";
-L["ModuleDescription WoWAnniversary"] = "- Легко призовите средство передвижения во время события Ездомания.\n\n- Показать результаты голосования во время мероприятия Модной лихорадки. ";
+L["ModuleDescription WoWAnniversary"] = "Легко призовите средство передвижения во время события Ездомания.";
 L["Voting Result Header"] = "Результаты";
 L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "У вас нет этого средства передвижения.";
 

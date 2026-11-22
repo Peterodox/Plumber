@@ -26,6 +26,49 @@ local function SameAppearance(liveInfo, recordedInfo)
 		and liveInfo.secondaryAppearanceID == recordedInfo.secondaryAppearanceID;
 end
 
+local function GetShoulderSlotFrame(isSeparated)
+	local slot = isSeparated and SHOULDER_LEFT or SHOULDER_RIGHT;
+	return TransmogFrame.CharacterPreview:GetSlotFrame(slot, Enum.TransmogType.Appearance);
+end
+
+local function GetShoulderOption()
+	-- For Forever
+	local optionType;
+	local shoulderSlotFrame = GetShoulderSlotFrame();
+
+	-- If player has chosen an armorType for shoulder slot, then we use that.
+	if shoulderSlotFrame and shoulderSlotFrame.slotData and shoulderSlotFrame.slotData.currentOptionInfo then
+		optionType = GetOptionType(shoulderSlotFrame.slotData.currentOptionInfo);
+	end
+
+	-- This part follow WoW's own logic:
+	-- If player has equipped a shoulder armor, use its type, otherwise use the first default option (usually Cloth)
+	if not optionType then
+		local option = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(SHOULDER_RIGHT);
+		if option ~= 0 then
+			optionType = option;
+		end
+		if not optionType then
+			local options = GetOptionsForSlot(SHOULDER_RIGHT);
+			if options and options[1] then
+				optionType = GetOptionType(options[1]);
+			end
+		end
+	end
+
+	return optionType or 0;
+end
+
+--Forever: "GetSecondarySlotState" requires a second arg "armorType"
+local function GetSecondarySlotState()
+	if HAS_ARMOR_OPTIONS then
+		local optionType = GetShoulderOption();
+		return C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT, optionType);
+	else
+		return C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+	end
+end
+
 
 do
 	local IgnoredInvSlots = {
@@ -106,13 +149,13 @@ do
 				--0 means the left shoulder was never set independently, mirror the right
 				secondaryAppearanceID = transmogID;
 			end
-			SetPendingFromSlot(3, Enum.TransmogOutfitSlot.ShoulderLeft, secondaryAppearanceID);
+			SetPendingFromSlot(3, SHOULDER_LEFT, secondaryAppearanceID);
 		end
 	end
 
 	--Blizzard keeps the left shoulder pending with the old item when the right one is reverted while merged.
 	function EL.FixStaleLeftShoulder()
-		if C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT) then return; end
+		if GetSecondarySlotState() then return; end
 
 		--Slots without options use None
 		local options = {Enum.TransmogOutfitSlotOption.None};
@@ -187,10 +230,10 @@ do
 				local hasPending;
 				if invSlotID == 3 then
 					--Either shoulder counts, the left one is its own slot only while separate shoulders are on
-					hasPending = SlotHasPending(SHOULDER_RIGHT) or SlotHasPending(Enum.TransmogOutfitSlot.ShoulderLeft);
+					hasPending = SlotHasPending(SHOULDER_RIGHT) or SlotHasPending(SHOULDER_LEFT);
 					if hasPending then
 						--Only capture when fresh, a switch briefly resets this and reading it then would lose our value
-						shoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+						shoulderSecondary = GetSecondarySlotState();
 					end
 				else
 					local slot = C_TransmogOutfitInfo.GetTransmogOutfitSlotFromInventorySlot(invSlotID - 1);
@@ -213,7 +256,12 @@ do
 
 	function EL.RestoreShoulderSecondaryState(enabled)
 		if enabled ~= nil then
-			C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, enabled);
+			if HAS_ARMOR_OPTIONS then
+				local optionType = GetShoulderOption();
+				C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, optionType, enabled);
+			else
+				C_TransmogOutfitInfo.SetSecondarySlotState(SHOULDER_RIGHT, enabled);
+			end
 		end
 	end
 
@@ -229,7 +277,7 @@ do
 	--Left shoulder only exists while separated, writing it otherwise would override the right one.
 	local function GetRecordSlot(record)
 		local slot = record[6] or GetOptionSlot(record[1]);
-		if slot == SHOULDER_LEFT and not C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT) then return; end
+		if slot == SHOULDER_LEFT and not GetSecondarySlotState() then return; end
 		return slot;
 	end
 	EL.GetRecordSlot = GetRecordSlot;
@@ -310,7 +358,7 @@ do
 		end
 
 		if HAS_ARMOR_OPTIONS then
-			local isSeparated = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+			local isSeparated = GetSecondarySlotState();
 			if isSeparated then
 				weaponOptionsPending = CaptureSlotOptions(weaponOptionsPending, previousWeaponOptions, 3, SHOULDER_LEFT);
 			end
@@ -419,10 +467,51 @@ do
 		return slashCommand and slashCommand:match("^/customset (.+)$");
 	end
 
+	--Due to a bug we had to copy this Blizzard function then fix it for Forever [2026-11-13]
+	--Skip "NUM_CUSTOM_SET_SLASH_COMMAND_VALUES" check
+	--Note: `TransmogSlotOrder` is a global but that feels susceptible to change.
+	local function ParseCustomSetSlashCommand(msg)
+		local readlist = C_Transmog.ExtractTransmogIDList(string.sub(msg, 4));
+
+		-- accessor for next value
+		local readIndex = 0;
+		local function GetNextReadValue()
+			readIndex = readIndex + 1;
+			return readlist[readIndex];
+		end
+
+		-- set the values
+		local itemTransmogInfoList = TransmogUtil.GetEmptyItemTransmogInfoList();
+		for _index, slotID in ipairs(TransmogSlotOrder) do
+			local info = itemTransmogInfoList[slotID];
+			info.appearanceID = GetNextReadValue();
+			-- secondaries
+			if slotID == INVSLOT_SHOULDER or slotID == INVSLOT_MAINHAND then
+				info.secondaryAppearanceID = GetNextReadValue();
+				-- category check on shoulder secondary
+				if slotID == INVSLOT_SHOULDER and info.secondaryAppearanceID ~= Constants.Transmog.NoTransmogID then
+					local appearanceSourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(info.secondaryAppearanceID);
+					if appearanceSourceInfo and appearanceSourceInfo.category ~= Enum.TransmogCollectionType.Shoulder then
+						info.secondaryAppearanceID = Constants.Transmog.NoTransmogID;
+					end
+				end
+			end
+
+			-- illusions
+			if slotID == INVSLOT_MAINHAND or slotID == INVSLOT_OFFHAND then
+				info.illusionID = math.max(GetNextReadValue(), Constants.Transmog.NoTransmogID);
+			end
+		end
+
+		return itemTransmogInfoList;
+	end
+
 	local function DeserializeSnapshot(str)
 		local parseFunc = TransmogUtil and TransmogUtil.ParseCustomSetSlashCommand;
 		return parseFunc and parseFunc(str);
 	end
+
+	DeserializeSnapshot = ParseCustomSetSlashCommand;
 
 	--EL.PendingSlots is a set of invSlotIDs, saved and loaded as a simple comma-joined list.
 	local function SerializePendingSlots(pendingSlots)
@@ -537,7 +626,7 @@ do
 				EL.PendingShoulderSecondary = nil;
 			elseif isSameOutfit then
 				--Only carried forward, so read it here. Not after a switch, which briefly resets it.
-				EL.PendingShoulderSecondary = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+				EL.PendingShoulderSecondary = GetSecondarySlotState();
 			end
 
 			--Identical untouched shoulders restore merged, like Forever does
@@ -581,11 +670,6 @@ do
 		end
 	end
 
-	local function GetShoulderSlotFrame(isSeparated)
-		local slot = isSeparated and Enum.TransmogOutfitSlot.ShoulderLeft or SHOULDER_RIGHT;
-		return TransmogFrame.CharacterPreview:GetSlotFrame(slot, Enum.TransmogType.Appearance);
-	end
-
 	--Slot frames get released and recreated on every outfit switch, so track the slot enum instead of the frame.
 	local function OnSlotSelected(_, slotFrame)
 		local transmogLocation = slotFrame and slotFrame.slotData and slotFrame.slotData.transmogLocation;
@@ -594,7 +678,7 @@ do
 
 	--Always reselects explicitly, Blizzard can clear the left shoulder before our pending restore re-separates it.
 	local function ReselectShoulderOnOutfitSwitch()
-		if EL.LastSelectedSlot ~= Enum.TransmogOutfitSlot.ShoulderLeft then return; end
+		if EL.LastSelectedSlot ~= SHOULDER_LEFT then return; end
 
 		local slotFrame = GetShoulderSlotFrame(true) or GetShoulderSlotFrame(false);
 		if slotFrame then
@@ -707,7 +791,7 @@ do
 	--Uses the EL.LiveShoulder values instead of a fresh read, which could already show the same reset.
 	local function FixShoulderSecondaryToggle()
 		if not HAS_ARMOR_OPTIONS then
-			local isSeparated = C_TransmogOutfitInfo.GetSecondarySlotState(SHOULDER_RIGHT);
+			local isSeparated = GetSecondarySlotState();
 			local rightDisplayType = EL.LiveShoulderDisplayTypes and EL.LiveShoulderDisplayTypes[SHOULDER_RIGHT];
 			if rightDisplayType then
 				--Its live info is just the hidden source, copy the display type instead
@@ -898,6 +982,8 @@ do
 	end
 
 	function EL.SnapshotFrame_OnLoad(TransmogFrame)
+		EL.LoadPendingFromDB();
+
 		if EL.snapshotHooked then return end;
 		EL.snapshotHooked = true;
 
@@ -922,7 +1008,6 @@ do
 	local function EnableModule(state)
 		if state and not EL.enabled then
 			EL.enabled = true;
-			EL.LoadPendingFromDB();
 			addon.BlizzardFrameUtil:AddFrameModifier("TransmogFrame", EL.SnapshotFrame_OnLoad);
 		elseif (not state) and EL.enabled then
 			EL.enabled = nil;

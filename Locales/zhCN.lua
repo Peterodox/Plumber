@@ -373,7 +373,7 @@ L["Power Borrowed"] = "获得特效";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "魔兽周年庆";
-L["ModuleDescription WoWAnniversary"] = "- 在坐骑狂欢活动期间轻松召唤相应坐骑。\n\n- 在时尚比赛期间显示投票结果。";
+L["ModuleDescription WoWAnniversary"] = "在坐骑狂欢活动期间轻松召唤相应坐骑。";
 L["Voting Result Header"] = "投票结果";
 L["Mount Not Collected"] = "你尚未收集到该坐骑。";
 
@@ -630,6 +630,7 @@ L["ModuleName FastLoot"] = "快速拾取";
 L["ModuleDescription FastLoot"] = "快速拾取物品。";
 L["FastLoot Always On Reason"] = "快速拾取功能将一直生效，因为你已启用Plumber拾取窗口。";
 L["FastLoot User Notes"] = "*Plumber快速拾取只干一项任务...快速拾取。若你想要更多功能，请尝试其它拾取插件例如\"Speedy AutoLoot\"或\"XLoot\".";
+L["Loot Feature Disabled For Master Loot Format"] = "由于你是战利品分配者，Plumber%s功能已被暂时禁用。";
 
 
 --Quick Slot For Third-party Dev

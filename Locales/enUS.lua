@@ -373,7 +373,7 @@ L["Power Borrowed"] = "Power Borrowed";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "WoW Anniversary";
-L["ModuleDescription WoWAnniversary"] = "- Summon the corresponding mount easily during the Mount Maniac event.\n\n- Show voting results during the Fashion Frenzy event. ";
+L["ModuleDescription WoWAnniversary"] = "Summon the corresponding mount easily during the Mount Maniac event.";
 L["Voting Result Header"] = "Results";
 L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "You have not collected this mount.";
 
@@ -630,6 +630,7 @@ L["ModuleName FastLoot"] = "Fast Loot";
 L["ModuleDescription FastLoot"] = "Loot items fast.";
 L["FastLoot Always On Reason"] = "Fast Loot is always enabled with Plumber Loot Window.";
 L["FastLoot User Notes"] = "*Plumber Fast Loot only does one thing... fast loot. If you prefer finer control, try addons like \"Speedy AutoLoot\" or \"XLoot\".";
+L["Loot Feature Disabled For Master Loot Format"] = "Plumber %s is temporarily disabled because you are the loot master.";
 
 
 --Quick Slot For Third-party Dev

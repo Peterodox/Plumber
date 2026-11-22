@@ -437,6 +437,7 @@ stds.wow = {
 		"RequestRaidInfo",
 		"ResetCursor",
 		"securecall",
+		"RunNextFrame",
 		"securecallfunction",
 		"SearchBoxTemplate_OnTextChanged",
 		"SetAchievementSearchString",
@@ -481,6 +482,7 @@ stds.wow = {
 		"TransmogFrame",
 		"TransmogAndMountDressupFrame",
 		"Transmog_LoadUI",
+		"TransmogSlotOrder",
 		"TransmogUtil",
 		"UIErrorsFrame",
 		"UIParent",
@@ -1010,6 +1012,8 @@ stds.wow = {
 
 		C_PartyInfo = {
 			fields = {
+				"GetAvailableLootMethods",
+				"GetLootMethod",
 				"IsCrossFactionParty",
 				"IsDelveInProgress",
 				"IsPartyWalkIn",
@@ -1192,6 +1196,7 @@ stds.wow = {
 				"GetSpellInfo",
 				"GetSpellLink",
 				"GetSpellName",
+				"GetSpellSubtext",
 				"GetSpellTexture",
 				"IsSpellDataCached",
 				"IsSpellUsable",
@@ -1301,6 +1306,7 @@ stds.wow = {
 
 		C_Transmog = {
 			fields = {
+				"ExtractTransmogIDList",
 				"GetAllSetAppearancesByID",
 				"IsAtTransmogNPC",
 				"SetPending",
@@ -1516,6 +1522,12 @@ stds.wow = {
 					},
 				},
 
+				LootMethod = {
+					fields = {
+						"Masterlooter",
+					},
+				},
+
 				NavigationState = {
 					fields = {
 						"Disabled",
@@ -1630,6 +1642,12 @@ stds.wow = {
 						"Object",
 						"Spell",
 						"Unit",
+					},
+				},
+
+				TransmogCollectionType = {
+					fields = {
+						"Shoulder",
 					},
 				},
 
@@ -1940,6 +1958,8 @@ stds.wow = {
 		"HOUSING_DECOR_STORAGE_ITEM_DESTROY",
 		"HOURS_ABBR",
 		"INVSLOT_MAINHAND",
+		"INVSLOT_OFFHAND",
+		"INVSLOT_SHOULDER",
 		"INVTYPE_HOLDABLE",
 		"IN_GAME_NAVIGATION_RANGE",
 		"ITEM_BNETACCOUNTBOUND",

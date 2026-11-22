@@ -49,8 +49,10 @@ local UseSpellID = {
 
 local IS_CLASSIC = addon.IS_CLASSIC;
 local ACTION_BUTTON_SIZE = 45;
+local NUMBER_FONT_OFFSET = 5;
 if IS_CLASSIC then
 	ACTION_BUTTON_SIZE = 36;
+	NUMBER_FONT_OFFSET= 3;
 end
 
 --Flyout Cursor OffsetX = 24.0
@@ -303,6 +305,14 @@ do  --VisualButtonMixin
 		if IS_CLASSIC then
 			self:SetEffectiveSize(ACTION_BUTTON_SIZE);
 		end
+
+		if self.Count then
+			self.Count:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -NUMBER_FONT_OFFSET, NUMBER_FONT_OFFSET);
+		end
+
+		if self.Subtext then
+			self.Subtext:SetPoint("TOPRIGHT", self, "TOPRIGHT", -NUMBER_FONT_OFFSET, -NUMBER_FONT_OFFSET);
+		end
 	end
 
 	function VisualButtonMixin:SetAction(action)
@@ -318,7 +328,12 @@ do  --VisualButtonMixin
 			if not CanPlayerPerformAction("spell", self.id) then
 				self:SetUsableVisual(false);
 			end
-
+			if self.Subtext and action.tooltipRightText then
+				local rank = string.match(action.tooltipRightText, "%d+");
+				if rank then
+					self.Subtext:SetText(rank);
+				end
+			end
 		elseif self.actionType == "item" then
 			if API.IsToyItem(self.id) then
 				self.isToy = true;
@@ -405,7 +420,13 @@ do  --VisualButtonMixin
 		if self.tooltipMethod then
 			local tooltip = GameTooltip;
 			tooltip:SetOwner(self, "ANCHOR_RIGHT");
-			tooltip[self.tooltipMethod](tooltip, self.id);
+			if self.actionType == "spell" then
+				local isPet = nil;
+				local showSubtext = true;
+				tooltip[self.tooltipMethod](tooltip, self.id, isPet, showSubtext);
+			else
+				tooltip[self.tooltipMethod](tooltip, self.id);
+			end
 			tooltip:Show();
 			self.UpdateTooltip = self.ShowTooltip;
 			return true
@@ -446,6 +467,9 @@ do  --VisualButtonMixin
 			end
 			if self.Count then
 				self.Count:SetText(nil);
+			end
+			if self.Subtext then
+				self.Subtext:SetText(nil);
 			end
 			self:SetUsableVisual(true);
 			self:SetCraftingQuality(nil);

@@ -348,7 +348,7 @@ L["Power Borrowed"] = "Macht ausgeliehen";
 
 --WoW Anniversary
 L["ModuleName WoWAnniversary"] = "WoW-Jubiläum";
-L["ModuleDescription WoWAnniversary"] = "- Erleichtert das Beschwören das entsprechenden Reittiers während des Mount-Maniac-Events.\n\n- Zeigt Abstimmungsergebnisse während des Fashion-Frenzy-Events an.";
+L["ModuleDescription WoWAnniversary"] = "Erleichtert das Beschwören das entsprechenden Reittiers während des Mount-Maniac-Events.";
 L["Voting Result Header"] = "Ergebnisse";
 L["Mount Not Collected"] = MOUNT_JOURNAL_NOT_COLLECTED or "Ihr habt dieses Reittier noch nicht erworben.";
 

@@ -501,6 +501,12 @@ do  --FlyoutButtonMixin
 			if not IsPlayerSpell(self.id) then
 				self:SetUsableVisual(false);
 			end
+			if self.Subtext and action.tooltipRightText then
+				local rank = string.match(action.tooltipRightText, "%d+");
+				if rank then
+					self.Subtext:SetText(rank);
+				end
+			end
 		elseif self.actionType == "item" then
 			if API.IsToyItem(self.id) then
 				self.tooltipMethod = "SetToyByItemID";
@@ -559,7 +565,13 @@ do  --FlyoutButtonMixin
 		if self.tooltipMethod then
 			local tooltip = GameTooltip;
 			tooltip:SetOwner(self, "ANCHOR_RIGHT");
-			tooltip[self.tooltipMethod](tooltip, self.id);
+			if self.actionType == "spell" then
+				local isPet = nil;
+				local showSubtext = true;
+				tooltip[self.tooltipMethod](tooltip, self.id, isPet, showSubtext);
+			else
+				tooltip[self.tooltipMethod](tooltip, self.id);
+			end
 			self:AppendExtraTooltip(tooltip);
 			tooltip:Show();
 			self.UpdateTooltip = self.ShowTooltip;
@@ -586,6 +598,9 @@ do  --FlyoutButtonMixin
 		self.Cooldown:Clear();
 		self.Cooldown:Hide();
 		self:SetUsableVisual(true);
+		if self.Subtext then
+			self.Subtext:SetText(nil);
+		end
 	end
 
 	function FlyoutButtonMixin:OnRemoved()

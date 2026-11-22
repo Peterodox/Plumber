@@ -546,6 +546,12 @@ do  --Event Listener
 		self:SetScript("OnUpdate", self.OnUpdate);
 	end
 
+	function EL:RequestUpdateAllNameplates()
+		self.t = 0;
+		self.nameplateDirty = true;
+		self:SetScript("OnUpdate", self.OnUpdate);
+	end
+
 	function EL:OnUpdate(elapsed)
 		self.t = self.t + elapsed;
 		if self.t > 0 then
@@ -564,7 +570,12 @@ do  --Event Listener
 				end
 			end
 
-			if not (self.questDirty or self.modifierDirty) then
+			if self.nameplateDirty then
+				self.nameplateDirty = nil;
+				self:UpdateAllNameplates();
+			end
+
+			if not (self.questDirty or self.modifierDirty or self.nameplateDirty) then
 				self:SetScript("OnUpdate", nil);
 			end
 		end
@@ -587,7 +598,7 @@ do  --Event Listener
 		elseif event == "PLAYER_ENTERING_WORLD" then
 			self:UpdateZone();
 		elseif event == "RAID_TARGET_UPDATE" then
-			self:UpdateAllNameplates();
+			self:RequestUpdateAllNameplates();
 		end
 	end
 

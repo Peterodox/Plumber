@@ -26,6 +26,7 @@ local UnitGUID = UnitGUID;
 local UnitExists = UnitExists;
 local Secret_CanAccess = API.Secret_CanAccess;
 local Secret_IsSecret = API.Secret_IsSecret;
+local PLAYER_GUID = UnitGUID("player");
 
 
 local Display = CreateFrame("Frame");
@@ -73,8 +74,10 @@ local SoftInteractIconGetters = {
 
 	Platynator = function(nameplate)
 		for _, obj in ipairs({nameplate:GetChildren()}) do
-			if obj.SoftTargetIcon and obj.SoftTargetIcon.SetShown then
-				return obj.SoftTargetIcon;
+			if obj.SoftTargetIcon and obj.SoftTargetIcon.SetShown and obj.interactUnit then
+				if UnitIsUnit(obj.interactUnit, "softinteract") then
+					return obj.SoftTargetIcon
+				end
 			end
 		end
 	end,
@@ -717,21 +720,32 @@ do  --Display
 	end
 
 	function Display:UpdateTooltip()
-		if not Secret_CanAccess(self.objectName) then return end;
+		if not Secret_CanAccess(self.objectName) then return; end
 
 		local tooltipInfo = GetWorldCursor();
 		if tooltipInfo and tooltipInfo.lines then
-			local numLines = #tooltipInfo.lines;
+			local objectiveLine;
+			local isOwnProgress = true;
 			for index, line in ipairs(tooltipInfo.lines) do
 				if index == 1 then
 					if not (Secret_CanAccess(line.leftText) and self.objectName == line.leftText) then
-						break
+						return;
 					end
-				else
-					if index == numLines and line.type == 8 then  --quest criteria
-						Display:SetSubtext(line.leftText, (self.unabled and Colors.UnabledColor) or line.leftColor, self.subtextFontHeight);
+				elseif line.type == Enum.TooltipDataLineType.QuestPlayer then
+					--Compare GUID, leftText only shows the first word of the name (Forever)
+					if not Secret_CanAccess(line.guid) then return; end
+					isOwnProgress = line.guid == PLAYER_GUID;
+				elseif line.type == Enum.TooltipDataLineType.QuestObjective and isOwnProgress then
+					if not Secret_CanAccess(line.completed) then return; end
+					if not line.completed then
+						objectiveLine = line;
+						break;
 					end
 				end
+			end
+
+			if objectiveLine then
+				Display:SetSubtext(objectiveLine.leftText, (self.unabled and Colors.UnabledColor) or objectiveLine.leftColor, self.subtextFontHeight);
 			end
 		end
 	end

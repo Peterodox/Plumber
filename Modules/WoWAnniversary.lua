@@ -156,14 +156,12 @@ function EL:OnUpdate(elapsed)
 		self.t = 0;
 		self.eventIndex = self:GetPlayerEventArea();
 		if self.eventIndex == 1 then
-			self:ShowVoteCounter(false);
 			if self:IsEventActive(WIDGET_ID_MOUNT_MANIAC_ACTIVE) then
 				self:ShowQuickSlot(true);
 			else
 				self:ShowQuickSlot(false);
 			end
 		else
-			self:ShowVoteCounter(false);
 			self:ShowQuickSlot(false);
 		end
 	end
@@ -220,7 +218,7 @@ end
 --]]
 
 
-do  --Vote Counter
+do  --Vote Counter (Retired due to combat log event changes)
 	local MAX_ENTRY_PER_PAGE = 10;
 	local BUTTON_WIDTH = 192;
 	local BUTTON_HEIGHT = 24;
@@ -663,30 +661,6 @@ do  --Vote Counter
 
 		addon.SetDBValue("VotingResultsExpanded", newState);
 	end
-
-	--do  --Debug
-		--[[
-		C_Timer.After(1, function()
-			function VoteCounterMixin:AddPlayerEntry()
-				self:AddEntry(self.playerGUID, UnitName("player"))
-			end
-			EL:ShowVoteCounter(true);
-			VoteCounter:AddPlayerEntry();
-			for i = 1, MAX_ENTRY_PER_PAGE do
-				local name = "Player"..i;
-				local guid = "p"..i;
-				if i == 0 then
-					guid = "Player-5765-000FC25A";
-					name = "Naughordespy-Vyranoth";
-				end
-				for j = 1, math.random(1, 20) do
-					VoteCounter:AddEntry(guid, name);
-				end
-			end
-			VT = VoteCounter;
-		end)
-		--]]
-	--end
 end
 
 
@@ -707,7 +681,6 @@ do
 				local function OnLeaveZoneCallback()
 					EL:ListenEvents(false);
 					EL:ShowQuickSlot(false);
-					EL:ShowVoteCounter(false);
 				end
 
 				module:SetEnterZoneCallback(OnEnterZoneCallback);
@@ -721,17 +694,7 @@ do
 			end
 			EL:ListenEvents(false);
 			EL:ShowQuickSlot(false);
-			EL:ShowVoteCounter(false);
-			EL:ListenCombatLog(false);
 		end
-	end
-
-	local function ValidityCheck()
-		if addon.IsToCVersionEqualOrNewerThan(110005) then
-			return true
-		end
-
-		return time() > 1729400000
 	end
 
 	local function OptionToggle_OnClick(self, button)
@@ -771,7 +734,6 @@ do
 		categoryID = 1,
 		uiOrder = 1150,
 		moduleAddedTime = 1763300000,
-		validityCheck = ValidityCheck,
 		optionToggleFunc = OptionToggle_OnClick,
 		hasMovableWidget = true,
 		categoryKeys = {
