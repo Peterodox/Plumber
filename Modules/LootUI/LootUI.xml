@@ -10,6 +10,7 @@
 	</Font>
 
 	<Script file="Basic.lua"/>
+	<Script file="MasterLootUtil.lua"/>
 	<Script file="ItemFrame.lua"/>
 	<Script file="MiscWidgets.lua"/>
 	<Script file="MainFrame.lua"/>
