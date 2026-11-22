@@ -13,7 +13,7 @@ local IsWarningColor = API.IsWarningColor;
 
 
 local InCombatLockdown = InCombatLockdown;
-local IsSpellKnown = C_SpellBook.IsSpellKnown or IsSpellKnown;
+local IsSpellUsable = C_Spell.IsSpellUsable;
 local SpellIsTargeting = SpellIsTargeting;
 local GetMouseFocus = API.GetMouseFocus;
 local GetSpellInfo = API.GetSpellInfo;
@@ -122,7 +122,7 @@ local function IsPlayerInteracingBank()
 end
 
 local function ShouldShowOverlay()
-	return (not InCombatLockdown()) and (not GetCursorInfo()) and (not SpellIsTargeting()) and IsSpellKnown(SPELL_ID_PICK_LOCK) and (not(MerchantFrame and MerchantFrame:IsShown()))
+	return (not InCombatLockdown()) and (not GetCursorInfo()) and (not SpellIsTargeting()) and IsSpellUsable(SPELL_ID_PICK_LOCK) and (not(MerchantFrame and MerchantFrame:IsShown()))
 end
 
 local function GetUnlockSpellName()
