@@ -71,8 +71,10 @@ local SoftInteractIconGetters = {
 
 	Platynator = function(nameplate)
 		for _, obj in ipairs({nameplate:GetChildren()}) do
-			if obj.SoftTargetIcon and obj.SoftTargetIcon.SetShown then
-				return obj.SoftTargetIcon;
+			if obj.SoftTargetIcon and obj.SoftTargetIcon.SetShown and obj.interactUnit then
+				if UnitIsUnit(obj.interactUnit, "softinteract") then
+					return obj.SoftTargetIcon
+				end
 			end
 		end
 	end,
