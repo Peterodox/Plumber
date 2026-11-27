@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.7 c
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.9.7 f
 
 if not (GetLocale() == "ruRU") then return end;
 
@@ -630,6 +630,7 @@ L["ModuleName FastLoot"] = "Быстрый сбор добычи";
 L["ModuleDescription FastLoot"] = "Быстрый сбор предметов.";
 L["FastLoot Always On Reason"] = "Быстрый сбор добычи всегда включен при использовании окна добычи Plumber.";
 L["FastLoot User Notes"] = "*Функция быстрого сбора добычи в Plumber делает только одно... быстро собирает добычу. Если вам нужен более точный контроль, попробуйте такие аддоны, как \"Speedy AutoLoot\" или \"XLoot\".";
+L["Loot Feature Disabled For Master Loot Format"] = "Модуль %s Plumber временно отключен, так как вы являетесь ответственным за добычу.";
 
 
 --Quick Slot For Third-party Dev
@@ -976,6 +977,17 @@ L["ModuleDescription BlizzFixActionBarArt"] = "Исправляет ошибку
 L["ModuleName Housing_HouseList"] = "Список домов";
 L["ModuleDescription Housing_HouseList"] = "Улучшение интерфейса списка домов:\n\n- Отображение фракции дома с помощью изображения справа.\n\n- Показ обеих кнопок «Посетить дом», если у игрока два дома.";
 L["View Houses In Combat Warning"] = "Вы не можете просматривать дома в бою.";
+
+
+--PetHappiness
+L["ModuleName PetFoodMenu"] = "Охотник: меню еды для питомца";
+L["ModuleDescription PetFoodMenu"] = "Нажмите на индикатор настроения питомца, чтобы открыть список подходящей еды и быстро покормить его.";
+L["No Available Pet Food Warning"] = "В вашей сумке нет подходящей еды для питомца.";
+L["Instruction Click To Toggle Food Menu"] = "<Нажмите, чтобы открыть/закрыть меню еды>";
+L["Instruction Click To Feed Food"] = "<Нажмите, чтобы покормить питомца этой едой>";
+L["Not Learned Spell Format"] = "Вы еще не изучили заклинание |cffffffff%s|r.";
+L["Not Usable Spell Format"] = "Сейчас вы не можете применить заклинание |cffffffff%s|r.";
+L["Blizzard PetFrameHappiness Not Found Error"] = "Индикатор настроения питомца от Blizzard в данный момент скрыт.";
 
 
 --Generic
