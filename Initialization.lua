@@ -1,9 +1,9 @@
-local VERSION_TEXT = "1.9.7 f";
-local VERSION_DATE = 1795000000;
+local VERSION_TEXT = "1.9.7 g";
+local VERSION_DATE = 1795700000;
 
 -- If "AutoShowChangelog" is enabled: The following dates determine if the changelog should auto open
 local RETAIL_CHANGELOG_DATE = 1794200000;
-local FOREVER_CHANGELOG_DATE = 1794900000;
+local FOREVER_CHANGELOG_DATE = 1795700000;
 
 
 local addonName, addon = ...

@@ -10,6 +10,43 @@ local changelogs = addon.ControlCenter.changelogs_Forever;
 changelogs[10907] = {
 	{
 		type = "date",
+		versionText = "1.9.7 g",
+		timestamp = 1795700000,
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Loot Window: To address a conflict with the game, Plumber Loot Window will now be automatically disabled if you are the Loot Master in a group.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Nameplate: Soft Target: It should now only display your own quest objective progress when you are in a group.",
+	},
+
+	{
+		type = "p",
+		bullet = true,
+		text = "Handy Lockpick: This module has been re-enabled on Forever, allowing you to right-click a lockbox in your bag or the Trade UI to unlock it.",
+	},
+
+	{
+		type = "p",
+		bullet = 2,
+		text = "Note: We don't have any rogues to verify this feature on Forever, though the underlying system should be identical to modern WoW.",
+	},
+
+	{
+		type = "br",
+	},
+	{
+		type = "br",
+	},
+
+	{
+		type = "date",
 		versionText = "1.9.7 e",
 		timestamp = 1794900000,
 	},
